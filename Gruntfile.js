@@ -25,6 +25,7 @@ module.exports = function (grunt) {
     'browserify',
     'postcss:build',
     'copy:build',
+    'copy:leaflet',
     'copy:test'
   ]);
 
