@@ -30,7 +30,7 @@ var watch = {
     tasks: [
       'jshint:scripts',
       'browserify',
-      'mocha_phantomjs'
+      //'mocha_phantomjs'
     ]
   },
 

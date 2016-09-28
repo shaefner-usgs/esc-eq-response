@@ -24,7 +24,7 @@ var gruntConfig = {
     'grunt-contrib-jshint',
     'grunt-contrib-uglify',
     'grunt-contrib-watch',
-    'grunt-mocha-phantomjs',
+    //'grunt-mocha-phantomjs',
     'grunt-postcss'
   ]
 };

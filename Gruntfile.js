@@ -52,12 +52,12 @@ module.exports = function (grunt) {
     'build',
     'configureRewriteRules',
     'configureProxies:dev',
-    'configureProxies:test',
+    //'configureProxies:test',
     'connect:template',
     'connect:dev',
-    'connect:test',
-    'connect:example',
-    'mocha_phantomjs',
+    //'connect:test',
+    //'connect:example',
+    //'mocha_phantomjs',
     'watch'
   ]);
 
