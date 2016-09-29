@@ -1,4 +1,7 @@
-#application:after {
-  content: 'css content';
-  display: block;
+.hide {
+  display: none;
+}
+
+.map {
+  height: 500px;
 }
