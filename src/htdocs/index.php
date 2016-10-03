@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    <link rel="stylesheet" href="/lib/leaflet-1.0.0/leaflet.css" />
+    <link rel="stylesheet" href="/lib/leaflet-0.7.7/leaflet.css" />
     <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
@@ -33,6 +33,6 @@
       <h2>Summary</h2>
     </section>
   </body>
-  <script src="/lib/leaflet-1.0.0/leaflet.js"></script>
+  <script src="/lib/leaflet-0.7.7/leaflet.js"></script>
   <script src="js/index.js"></script>
 </html>

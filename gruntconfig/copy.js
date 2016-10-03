@@ -50,7 +50,7 @@ var copy = {
   leaflet: {
     expand: true,
     cwd: 'node_modules/leaflet/dist',
-    dest: config.build + '/' + config.src + '/htdocs/lib/leaflet-1.0.0',
+    dest: config.build + '/' + config.src + '/htdocs/lib/leaflet-0.7.7',
     rename: function (dest, src) {
       var newName;
 
