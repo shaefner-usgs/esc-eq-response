@@ -15,8 +15,8 @@ var Controller = function (options) {
       _getParams,
       _hidePanes,
       _setParam,
+      _setFormFields,
       _setQueryString,
-      _setValues,
       _showPane,
       _updateQueryString;
 
@@ -31,22 +31,32 @@ var Controller = function (options) {
 
     _addListeners();
     _showPane(id);
-    _setValues();
+    _setFormFields();
     _setQueryString();
   };
 
+  /**
+   * Add Event Listeners
+   */
   _addListeners = function () {
     var i;
 
+    // Update UI when user changes mode
     for (i = 0; i < _modes.length; i ++) {
       _modes[i].addEventListener('click', _changeMode);
     }
 
+    // Update querystring when input is changed
     for (i = 0; i < _inputs.length; i ++) {
       _inputs[i].addEventListener('change', _updateQueryString);
     }
   };
 
+  /**
+   * Switch between modes in UI
+   *
+   * @param e {Obj} Event
+   */
   _changeMode = function (e) {
     var id = e.target.hash.substr(1);
 
@@ -55,6 +65,11 @@ var Controller = function (options) {
     _showPane(id);
   };
 
+  /**
+   * Get id of default pane to show
+   *
+   * @return id {String}
+   */
   _getDefaultPaneId = function () {
     var id = 'edit';
 
@@ -65,12 +80,24 @@ var Controller = function (options) {
     return id;
   };
 
+  /**
+   * Get value of url param
+   *
+   * @param name {String}
+   *
+   * @return {Mixed}
+   */
   _getParam = function (name) {
     var params = _getParams();
 
     return params[name];
   };
 
+  /**
+   * Get all url param name/value pairs
+   *
+   * @return {Object}
+   */
   _getParams = function () {
     var params,
         queryString;
@@ -85,6 +112,9 @@ var Controller = function (options) {
     return params;
   };
 
+  /**
+   * Hide all panes in UI; set all mode buttons to unselected
+   */
   _hidePanes = function () {
     var button,
         id,
@@ -100,6 +130,12 @@ var Controller = function (options) {
     }
   };
 
+  /**
+   * Set value of url param
+   *
+   * @param name {String}
+   * @param value {Mixed}
+   */
   _setParam = function (name, value) {
     var hash,
         pairs,
@@ -119,15 +155,10 @@ var Controller = function (options) {
     window.history.replaceState({}, '', queryString + hash);
   };
 
-  _setQueryString = function () {
-    var i;
-
-    for (i = 0; i < _inputs.length; i ++) {
-      _setParam(_inputs[i].id, _inputs[i].value);
-    }
-  };
-
-  _setValues = function () {
+  /**
+   * Set all form field values to match values in querystring
+   */
+  _setFormFields = function () {
     var params = _getParams();
 
     Object.keys(params).forEach(function(key) {
@@ -137,6 +168,23 @@ var Controller = function (options) {
     });
   };
 
+  /**
+   * Set all querystring values to match values in form fields
+   */
+  _setQueryString = function () {
+    var i;
+
+    for (i = 0; i < _inputs.length; i ++) {
+      _setParam(_inputs[i].id, _inputs[i].value);
+    }
+  };
+
+  /**
+   * Show selected pane in UI
+   *
+   * @param id {String}
+   *    id of pane to show
+   */
   _showPane = function (id) {
     var button,
         pane;
@@ -148,6 +196,11 @@ var Controller = function (options) {
     pane.classList.remove('hide');
   };
 
+  /**
+   * Update querystring when a form field value changes
+   *
+   * @param e {Obj} Event
+   */
   _updateQueryString = function (e) {
     var id,
         value;
