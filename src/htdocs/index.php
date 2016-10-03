@@ -18,11 +18,11 @@
         <label for="eqid">
           Earthquake id:
           <input type="text" id="eqid" />
-        <label>
+        </label>
         <label for="mag">
           Magnitude threshold:
           <input type="text" id="mag" value="2.5" />
-        <label>
+        </label>
       </form>
     </section>
     <section id="map" class="hide">
