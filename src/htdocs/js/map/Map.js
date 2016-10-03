@@ -104,8 +104,7 @@ var Map = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
-    var //bounds,
-        layers,
+    var layers,
         map;
 
     layers = _getMapLayers();
@@ -117,9 +116,6 @@ var Map = function (options) {
       scrollWheelZoom: false,
       zoom: 7
     });
-
-    // Set intial map extent to contain networks overlay
-    //map.fitBounds(bounds);
 
     // Add controllers
     L.control.layers(layers.baseLayers, layers.overlays).addTo(map);
