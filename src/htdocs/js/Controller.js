@@ -14,9 +14,9 @@ var Controller = function (options) {
       _getParam,
       _getParams,
       _hidePanes,
-      _setParam,
       _setFormFields,
       _setQueryString,
+      _setParam,
       _showPane,
       _updateQueryString;
 
@@ -131,6 +131,30 @@ var Controller = function (options) {
   };
 
   /**
+   * Set all form field values to match values in querystring
+   */
+  _setFormFields = function () {
+    var params = _getParams();
+
+    Object.keys(params).forEach(function(key) {
+      if (document.getElementById(key)) {
+        document.getElementById(key).value = params[key];
+      }
+    });
+  };
+
+  /**
+   * Set all querystring values to match values in form fields
+   */
+  _setQueryString = function () {
+    var i;
+
+    for (i = 0; i < _inputs.length; i ++) {
+      _setParam(_inputs[i].id, _inputs[i].value);
+    }
+  };
+
+  /**
    * Set value of url param
    *
    * @param name {String}
@@ -153,30 +177,6 @@ var Controller = function (options) {
     queryString = '?' + pairs.join('&');
 
     window.history.replaceState({}, '', queryString + hash);
-  };
-
-  /**
-   * Set all form field values to match values in querystring
-   */
-  _setFormFields = function () {
-    var params = _getParams();
-
-    Object.keys(params).forEach(function(key) {
-      if (document.getElementById(key)) {
-        document.getElementById(key).value = params[key];
-      }
-    });
-  };
-
-  /**
-   * Set all querystring values to match values in form fields
-   */
-  _setQueryString = function () {
-    var i;
-
-    for (i = 0; i < _inputs.length; i ++) {
-      _setParam(_inputs[i].id, _inputs[i].value);
-    }
   };
 
   /**
