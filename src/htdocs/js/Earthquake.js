@@ -10,7 +10,7 @@ var Earthquake = function (options) {
       _getUrls,
       _loadDetailFeed,
       _setProps,
-      _updateFields,
+      _setDefaults,
 
       _controller,
       _editPane,
@@ -26,6 +26,11 @@ var Earthquake = function (options) {
     _loadDetailFeed();
   };
 
+  /**
+   * Get urls to data feeds needed for map layers & summary
+   *
+   * @return urls {Object}
+   */
   _getUrls = function (products) {
     var urls;
 
@@ -36,6 +41,9 @@ var Earthquake = function (options) {
     return urls;
   };
 
+  /**
+   * Load GeoJson detail feed for selected event id
+   */
   _loadDetailFeed = function () {
     var url;
 
@@ -53,6 +61,11 @@ var Earthquake = function (options) {
     });
   };
 
+  /**
+   * Set properties we need from the GeoJson detail feed and attach to _this
+   *
+   * @param data {Object} GeoJson data
+   */
   _setProps = function (data) {
     var props;
 
@@ -70,17 +83,22 @@ var Earthquake = function (options) {
       updated: props.updated
     };
 
-    _updateFields();
+    _setDefaults();
   };
 
-  _updateFields = function () {
+  /**
+   * Set default form field values based on selected event's details
+   */
+  _setDefaults = function () {
     var defaults;
 
     defaults = _editPane.getDefaults(_this);
     Object.keys(defaults).forEach(function(key) {
+      // first, update url params
       _controller.setParam(key, defaults[key]);
     });
 
+    // next, update all form fields to match url params
     _controller.setFormFields();
   };
 
