@@ -14,9 +14,7 @@ var Controller = function (options) {
       _getParam,
       _getParams,
       _hidePanes,
-      _setFormFields,
       _setQueryString,
-      _setParam,
       _showPane,
       _updateQueryString;
 
@@ -31,7 +29,7 @@ var Controller = function (options) {
 
     _addListeners();
     _showPane(id);
-    _setFormFields();
+    _this.setFormFields();
     _setQueryString();
   };
 
@@ -131,52 +129,14 @@ var Controller = function (options) {
   };
 
   /**
-   * Set all form field values to match values in querystring
-   */
-  _setFormFields = function () {
-    var params = _getParams();
-
-    Object.keys(params).forEach(function(key) {
-      if (document.getElementById(key)) {
-        document.getElementById(key).value = params[key];
-      }
-    });
-  };
-
-  /**
    * Set all querystring values to match values in form fields
    */
   _setQueryString = function () {
     var i;
 
     for (i = 0; i < _inputs.length; i ++) {
-      _setParam(_inputs[i].id, _inputs[i].value);
+      _this.setParam(_inputs[i].id, _inputs[i].value);
     }
-  };
-
-  /**
-   * Set value of url param
-   *
-   * @param name {String}
-   * @param value {Mixed}
-   */
-  _setParam = function (name, value) {
-    var hash,
-        pairs,
-        params,
-        queryString;
-
-    hash = location.hash;
-    params = _getParams();
-    params[name] = value;
-
-    pairs = [];
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-    queryString = '?' + pairs.join('&');
-
-    window.history.replaceState({}, '', queryString + hash);
   };
 
   /**
@@ -208,7 +168,45 @@ var Controller = function (options) {
     id = e.target.id;
     value = document.getElementById(id).value;
 
-    _setParam(id, value);
+    _this.setParam(id, value);
+  };
+
+  /**
+   * Set all form field values to match values in querystring
+   */
+  _this.setFormFields = function () {
+    var params = _getParams();
+
+    Object.keys(params).forEach(function(key) {
+      if (document.getElementById(key)) {
+        document.getElementById(key).value = params[key];
+      }
+    });
+  };
+
+  /**
+   * Set the value of a url parameter
+   *
+   * @param name {String}
+   * @param value {Mixed}
+   */
+  _this.setParam = function (name, value) {
+    var hash,
+        pairs,
+        params,
+        queryString;
+
+    hash = location.hash;
+    params = _getParams();
+    params[name] = value;
+
+    pairs = [];
+    Object.keys(params).forEach(function(key) {
+      pairs.push(key + '=' + params[key]);
+    });
+    queryString = '?' + pairs.join('&');
+
+    window.history.replaceState({}, '', queryString + hash);
   };
 
 
