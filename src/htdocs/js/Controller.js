@@ -11,7 +11,6 @@ var Controller = function (options) {
       _addListeners,
       _changeMode,
       _getDefaultPaneId,
-      _getParam,
       _getParams,
       _hidePanes,
       _setQueryString,
@@ -53,7 +52,7 @@ var Controller = function (options) {
   /**
    * Switch between modes in UI
    *
-   * @param e {Obj} Event
+   * @param e {Object} Event
    */
   _changeMode = function (e) {
     var id = e.target.hash.substr(1);
@@ -76,19 +75,6 @@ var Controller = function (options) {
     }
 
     return id;
-  };
-
-  /**
-   * Get value of url param
-   *
-   * @param name {String}
-   *
-   * @return {Mixed}
-   */
-  _getParam = function (name) {
-    var params = _getParams();
-
-    return params[name];
   };
 
   /**
@@ -169,6 +155,19 @@ var Controller = function (options) {
     value = document.getElementById(id).value;
 
     _this.setParam(id, value);
+  };
+
+  /**
+   * Get value of url param
+   *
+   * @param name {String}
+   *
+   * @return {Mixed}
+   */
+  _this.getParam = function (name) {
+    var params = _getParams();
+
+    return params[name];
   };
 
   /**
