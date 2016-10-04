@@ -17,12 +17,22 @@
       <h2>Edit</h2>
       <form>
         <label for="eqid">
-          Earthquake id:
+          <p>Earthquake id</p>
           <input type="text" id="eqid" />
         </label>
-        <label for="mag">
-          Magnitude threshold:
-          <input type="text" id="mag" value="2.5" />
+        <h3>Aftershocks</h3>
+        <label for="ashockDistance">
+          <p>Max distance from mainshock (km)</p>
+          <input type="text" id="ashockDistance" value="" />
+        </label>
+        <h3>Historical Seismicity</h3>
+        <label for="histDistance">
+          <p>Max distance from mainshock (km)</p>
+          <input type="text" id="histDistance" value="" />
+        </label>
+        <label for="histYears">
+          <p>Max time before mainshock (years)</p>
+          <input type="text" id="histYears" value="10">
         </label>
       </form>
     </section>
