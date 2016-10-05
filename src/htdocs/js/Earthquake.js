@@ -95,7 +95,9 @@ var Earthquake = function (options) {
     defaults = _editPane.getDefaults(_this);
     Object.keys(defaults).forEach(function(key) {
       // first, update url params
-      _controller.setParam(key, defaults[key]);
+      if (_controller.getParam(key) === '') { // only set empty fields
+        _controller.setParam(key, defaults[key]);
+      }
     });
 
     // next, update all form fields to match url params
