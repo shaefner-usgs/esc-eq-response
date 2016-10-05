@@ -37,8 +37,6 @@ var Map = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
 
-    // Load netwoks layer which calls _initMap() when finished
-    //_loadNetworksLayer();
     _initMap();
   };
 
@@ -86,29 +84,27 @@ var Map = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
-    var layers,
-        map;
-
-    layers = _getMapLayers();
+    _this.layers = _getMapLayers();
 
     // Create map
-    map = L.map(_el, {
+    _this.map = L.map(_el, {
       center: [38, -123],
-      layers: layers.defaults,
+      layers: _this.layers.defaults,
       scrollWheelZoom: false,
       zoom: 7
     });
 
     // Add controllers
-    L.control.layers(layers.baseLayers, layers.overlays).addTo(map);
-    L.control.mousePosition().addTo(map);
-    L.control.scale().addTo(map);
+    L.control.layers(_this.layers.baseLayers, _this.layers.overlays)
+      .addTo(_this.map);
+    L.control.mousePosition().addTo(_this.map);
+    L.control.scale().addTo(_this.map);
 
     // Remember user's map settings (selected layers, map extent)
-    map.restoreMap({
-      baseLayers: layers.baseLayers,
+    _this.map.restoreMap({
+      baseLayers: _this.layers.baseLayers,
       id: 'eqid', // TODO: insert actual eqid
-      overlays: layers.overlays,
+      overlays: _this.layers.overlays,
       scope: 'response'
     });
   };
