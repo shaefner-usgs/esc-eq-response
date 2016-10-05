@@ -44,7 +44,7 @@ var Map = function (options) {
 
 
   /**
-   * Get all map layers that will be displayed on map
+   * Get all 'static' map layers that will be displayed on map
    *
    * @return layers {Object}
    *    {
@@ -81,24 +81,6 @@ var Map = function (options) {
 
     return layers;
   };
-
-  /**
-   * Load networks layer from geojson data via ajax
-   */
-  // _loadNetworksLayer = function () {
-  //   Xhr.ajax({
-  //     url: MOUNT_PATH + '/_getNetworks.json.php',
-  //     success: function (data) {
-  //       _networks = L.networksLayer({
-  //         data: data
-  //       });
-  //       _initMap();
-  //     },
-  //     error: function (status) {
-  //       console.log(status);
-  //     }
-  //   });
-  // };
 
   /**
    * Create Leaflet map instance
