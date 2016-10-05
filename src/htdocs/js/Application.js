@@ -18,6 +18,7 @@ var Application = function (options) {
       _els,
       _mapPane,
 
+      _addEarthquake,
       _createEarthquake;
 
 
@@ -43,11 +44,18 @@ var Application = function (options) {
     _eqid.addEventListener('change', _createEarthquake);
   };
 
+  _addEarthquake = function (geojson) {
+    _earthquake = geojson;
+
+    _editPane.setDefaults(_earthquake);
+
+    console.log(_mapPane);
+  };
+
   _createEarthquake = function () {
-    _earthquake = Earthquake({
-      id: _eqid.value,
-      controller: _controller,
-      editPane: _editPane
+    Earthquake({
+      callback: _addEarthquake,
+      id: _eqid.value
     });
   };
 

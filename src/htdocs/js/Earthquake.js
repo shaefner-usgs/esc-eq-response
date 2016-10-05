@@ -10,24 +10,60 @@ var Earthquake = function (options) {
       _createGeoJson,
       _getFeatures,
       _loadDetailFeed,
-      _setDefaults,
 
-      _controller,
-      _editPane,
+      _callback,
       _id;
+
 
   _this = {};
 
   _initialize = function (options) {
-    _controller = options.controller;
-    _editPane = options.editPane;
+    _callback = options.callback;
     _id = options.id;
 
     _loadDetailFeed();
   };
 
   /**
-   * Get urls to data feeds needed for map layers & summary
+   * Create GeoJson object for selected earthquake and return via _callback()
+   *
+   * @param data {Object} GeoJson data
+   */
+  _createGeoJson = function (data) {
+    var geojson,
+        props,
+        server;
+
+    props = data.properties;
+    server = 'http://earthquake.usgs.gov/';
+
+    geojson = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: data.id,
+          geometry: data.geometry,
+          properties: {
+            features: _getFeatures(data.properties.products),
+            mag: props.mag,
+            magType: props.magType,
+            place: props.place,
+            status: props.status,
+            time: props.time,
+            url: server + 'earthquakes/eventpage/' + data.id,
+            updated: props.updated,
+            utcOffset: props.tz
+          },
+          type: 'Feature'
+        }
+      ]
+    };
+
+    _callback(geojson);
+  };
+
+  /**
+   * Get urls to data feeds needed for map feature layers & summary page
    *
    * @return urls {Object}
    */
@@ -42,7 +78,7 @@ var Earthquake = function (options) {
   };
 
   /**
-   * Load GeoJson detail feed for selected event id
+   * Load GeoJson detail feed for selected event id, then call _createGeoJson()
    */
   _loadDetailFeed = function () {
     var url;
@@ -59,61 +95,6 @@ var Earthquake = function (options) {
         console.log(status);
       }
     });
-  };
-
-  /**
-   * Create GeoJson object for selected earthquake and attach to _this
-   *
-   * @param data {Object} GeoJson data
-   */
-  _createGeoJson = function (data) {
-    var props,
-        server;
-
-    props = data.properties;
-    server = 'http://earthquake.usgs.gov/';
-
-    _this = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          id: data.id,
-          geometry: data.geometry,
-          properties: {
-            features: _getFeatures(data.properties.products),
-            mag: props.mag,
-            magType: props.magType,
-            place: props.place,
-            status: props.status,
-            time: props.time,
-            url: server + 'earthquakes/eventpage/' + data.id,
-            utcOffset: props.tz,
-            updated: props.updated
-          },
-          type: 'Feature'
-        }
-      ]
-    };
-
-    _setDefaults();
-  };
-
-  /**
-   * Set default form field values based on selected event's details
-   */
-  _setDefaults = function () {
-    var defaults;
-
-    defaults = _editPane.getDefaults(_this);
-    Object.keys(defaults).forEach(function(key) {
-      // first, update url params
-      if (_controller.getParam(key) === '') { // only set empty fields
-        _controller.setParam(key, defaults[key]);
-      }
-    });
-
-    // next, update all form fields to match url params
-    _controller.setFormFields();
   };
 
 
