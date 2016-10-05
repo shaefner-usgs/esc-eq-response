@@ -13,15 +13,17 @@ var _COLORS,
     _MARKER_DEFAULTS;
 
 _COLORS = {
+  historical: '#ccc',
+  mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  pastmonth: '#ffc'
+  older: '#ffc'
 };
 _MARKER_DEFAULTS = {
   weight: 1,
   opacity: 0.5,
-  fillOpacity: 0.9,
+  fillOpacity: 0.8,
   color: '#333'
 };
 _DEFAULTS = {
@@ -73,7 +75,7 @@ var EarthquakesLayer = function (options) {
   /**
    * Get 'age' of earthquake (pasthour, pastday, etc)
    *
-   * @param tiemstamp {Int} milliseconds since 1970
+   * @param timestamp {Int} milliseconds since 1970
    *
    * @return age {String}
    */
@@ -89,7 +91,7 @@ var EarthquakesLayer = function (options) {
     } else if (eqtime.isSameOrAfter(_pastWeek)) {
       age = 'pastweek';
     } else {
-      age = 'pastmonth';
+      age = 'older';
     }
 
     return age;
