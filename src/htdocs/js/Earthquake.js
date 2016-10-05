@@ -8,7 +8,7 @@ var Earthquake = function (options) {
       _initialize,
 
       _createGeoJson,
-      _getUrls,
+      _getFeatures,
       _loadDetailFeed,
       _setDefaults,
 
@@ -31,14 +31,14 @@ var Earthquake = function (options) {
    *
    * @return urls {Object}
    */
-  _getUrls = function (products) {
-    var urls;
+  _getFeatures = function (products) {
+    var features;
 
-    urls = {
+    features = {
       shakemap_mmi: products.shakemap[0].contents['download/cont_mi.json'].url
     };
 
-    return urls;
+    return features;
   };
 
   /**
@@ -67,9 +67,11 @@ var Earthquake = function (options) {
    * @param data {Object} GeoJson data
    */
   _createGeoJson = function (data) {
-    var props;
+    var props,
+        server;
 
     props = data.properties;
+    server = 'http://earthquake.usgs.gov/';
 
     _this = {
       type: 'FeatureCollection',
@@ -78,11 +80,13 @@ var Earthquake = function (options) {
           id: data.id,
           geometry: data.geometry,
           properties: {
+            features: _getFeatures(data.properties.products),
             mag: props.mag,
             magType: props.magType,
             place: props.place,
+            status: props.status,
             time: props.time,
-            urls: _getUrls(data.properties.products),
+            url: server + 'earthquakes/eventpage/' + data.id,
             utcOffset: props.tz,
             updated: props.updated
           },
