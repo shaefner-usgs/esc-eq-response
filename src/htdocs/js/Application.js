@@ -49,8 +49,6 @@ var Application = function (options) {
       controller: _controller,
       editPane: _editPane
     });
-
-    console.log(_earthquake);
   };
 
 
