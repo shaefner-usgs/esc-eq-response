@@ -8,7 +8,7 @@ var EditPane = function (options) {
   _this = {};
 
   _initialize = function () {
-
+    document.getElementById('eqid').focus();
   };
 
   /*
@@ -21,7 +21,7 @@ var EditPane = function (options) {
   _this.getDefaults = function (earthquake) {
     var mag;
 
-    mag = earthquake.properties.mag;
+    mag = earthquake.features[0].properties.mag;
 
     return {
       ashockDistance: Math.max(5, Math.round(mag - 2) * 5),

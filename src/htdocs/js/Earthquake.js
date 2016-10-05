@@ -7,9 +7,9 @@ var Earthquake = function (options) {
   var _this,
       _initialize,
 
+      _createGeoJson,
       _getUrls,
       _loadDetailFeed,
-      _setProps,
       _setDefaults,
 
       _controller,
@@ -53,7 +53,7 @@ var Earthquake = function (options) {
     Xhr.ajax({
       url: url,
       success: function (data) {
-        _setProps(data);
+        _createGeoJson(data);
       },
       error: function (status) {
         console.log(status);
@@ -62,25 +62,33 @@ var Earthquake = function (options) {
   };
 
   /**
-   * Set properties we need from the GeoJson detail feed and attach to _this
+   * Create GeoJson object for selected earthquake and attach to _this
    *
    * @param data {Object} GeoJson data
    */
-  _setProps = function (data) {
+  _createGeoJson = function (data) {
     var props;
 
     props = data.properties;
 
-    _this.id = data.id;
-    _this.geometry = data.geometry;
-    _this.properties = {
-      mag: props.mag,
-      magType: props.magType,
-      place: props.place,
-      time: props.time,
-      urls: _getUrls(data.properties.products),
-      utcOffset: props.tz,
-      updated: props.updated
+    _this = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: data.id,
+          geometry: data.geometry,
+          properties: {
+            mag: props.mag,
+            magType: props.magType,
+            place: props.place,
+            time: props.time,
+            urls: _getUrls(data.properties.products),
+            utcOffset: props.tz,
+            updated: props.updated
+          },
+          type: 'Feature'
+        }
+      ]
     };
 
     _setDefaults();
