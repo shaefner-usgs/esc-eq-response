@@ -1,11 +1,9 @@
 'use strict';
 
 
-var Controller = require('Controller'),
-    Map = require('map/Map');
+var Application = require('Application');
 
-Controller();
-
-Map({
-  el: document.querySelector('.map')
+Application({
+  map: document.querySelector('.map'),
+  summary: document.querySelector('#summary')
 });
