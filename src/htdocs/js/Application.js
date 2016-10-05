@@ -6,6 +6,7 @@ var Controller = require('Controller'),
     EditPane = require('EditPane'),
     MapPane = require('MapPane');
 
+var EarthquakeLayer = require('features/EarthquakeLayer');
 
 var Application = function (options) {
   var _this,
@@ -49,7 +50,9 @@ var Application = function (options) {
 
     _editPane.setDefaults(_earthquake);
 
-    console.log(_mapPane);
+    EarthquakeLayer({
+      data: JSON.stringify(geojson)
+    });
   };
 
   _createEarthquake = function () {
