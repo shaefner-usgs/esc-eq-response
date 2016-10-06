@@ -38,10 +38,7 @@
     </section>
     <section id="map">
       <h2>Map</h2>
-      <div class="map">
-        <p>To view a map, go to the &lsquo;<a href="#edit" class="edit">Edit</a>&rsquo; 
-          tab and enter an evend id.</p>
-      </div>
+      <div class="map"></div>
     </section>
     <section id="summary">
       <h2>Summary</h2>

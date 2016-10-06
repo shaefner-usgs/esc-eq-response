@@ -39,7 +39,6 @@ var Navigation = function (options) {
     for (i = 0; i < _modes.length; i ++) {
       _modes[i].addEventListener('click', _changeMode);
     }
-    document.querySelector('.edit').addEventListener('click', _changeMode);
   };
 
   /**
