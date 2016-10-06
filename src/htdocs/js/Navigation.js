@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Controller = function (options) {
+var Navigation = function (options) {
   var _this,
       _initialize,
 
@@ -106,4 +106,4 @@ var Controller = function (options) {
   return _this;
 };
 
-module.exports = Controller;
+module.exports = Navigation;

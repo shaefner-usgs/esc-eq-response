@@ -1,22 +1,22 @@
 'use strict';
 
 
-var Controller = require('Controller'),
-    Earthquake = require('Earthquake'),
+var Earthquake = require('Earthquake'),
     EditPane = require('EditPane'),
-    MapPane = require('MapPane');
+    MapPane = require('MapPane'),
+    Navigation = require('Navigation');
 
 
 var Application = function (options) {
   var _this,
       _initialize,
 
-      _controller,
       _earthquake,
       _editPane,
       _eqid,
       _els,
       _mapPane,
+      _navigation,
 
       _addEarthquake,
       _createEarthquake;
@@ -32,7 +32,7 @@ var Application = function (options) {
 
     _eqid = document.getElementById('eqid');
 
-    _controller = Controller();
+    _navigation = Navigation();
     _editPane = EditPane();
     _mapPane = MapPane({
       el: _els.map
@@ -48,8 +48,6 @@ var Application = function (options) {
     _earthquake = geojson;
 
     _editPane.setDefaults(_earthquake);
-
-    console.log(_mapPane);
   };
 
   _createEarthquake = function () {
