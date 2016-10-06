@@ -95,8 +95,8 @@ var Map = function (options) {
     });
 
     // Add controllers
-    L.control.layers(_this.layers.baseLayers, _this.layers.overlays)
-      .addTo(_this.map);
+    _this.layerController = L.control.layers(_this.layers.baseLayers, 
+      _this.layers.overlays).addTo(_this.map);
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
 
