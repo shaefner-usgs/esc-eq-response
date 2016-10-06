@@ -16,11 +16,14 @@ var Application = function (options) {
       _editPane,
       _eqid,
       _els,
+      _features,
       _mapPane,
       _navigation,
 
       _addEarthquake,
-      _createEarthquake;
+      _addLayer,
+      _createEarthquake,
+      _removeLayers;
 
 
   _this = {};
@@ -31,6 +34,7 @@ var Application = function (options) {
       summary: options.summary
     };
     _eqid = document.getElementById('eqid');
+    _features = {};
 
     _editPane = EditPane();
     _mapPane = MapPane({
@@ -62,11 +66,23 @@ var Application = function (options) {
       data: _earthquake
     });
 
+    _removeLayers();
+    _addLayer(mainshock, 'Mainshock');
     _editPane.setDefaults(_earthquake);
-
-    _mapPane.map.addLayer(mainshock);
     _mapPane.map.setView([coords[1], coords[0]], 9, true);
-    _mapPane.layerController.addOverlay(mainshock, 'Mainshock');
+  };
+
+  /**
+   * Add feature layer to map
+   *
+   * @param layer {L.Layer} Leaflet layer
+   * @param name {String} Layer name
+   */
+  _addLayer = function (layer, name) {
+    _mapPane.map.addLayer(layer);
+    _mapPane.layerController.addOverlay(layer, name);
+
+    _features[name] = layer;
   };
 
   /**
@@ -77,6 +93,22 @@ var Application = function (options) {
       callback: _addEarthquake,
       id: _eqid.value
     });
+  };
+
+  /**
+   * Remove all feature (i.e. event-related) layers from map / layer controller
+   */
+  _removeLayers = function () {
+    var layer;
+
+    if (_features) {
+      Object.keys(_features).forEach(function(key) {
+        layer = _features[key];
+
+        _mapPane.map.removeLayer(layer);
+        _mapPane.layerController.removeLayer(layer);
+      });
+    }
   };
 
 
