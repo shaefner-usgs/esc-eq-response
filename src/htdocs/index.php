@@ -13,7 +13,7 @@
       <li><a href="#map">Map</a></li>
       <li><a href="#summary">Summary</a></li>
     </ul>
-    <section id="edit" class="hide">
+    <section id="edit">
       <h2>Edit</h2>
       <form>
         <label for="eqid">
@@ -36,11 +36,11 @@
         </label>
       </form>
     </section>
-    <section id="map" class="hide">
+    <section id="map">
       <h2>Map</h2>
       <div class="map"></div>
     </section>
-    <section id="summary" class="hide">
+    <section id="summary">
       <h2>Summary</h2>
     </section>
   </body>

@@ -25,6 +25,7 @@ var Navigation = function (options) {
     id = _getDefaultPaneId();
 
     _addListeners();
+    _hidePanes();
     _showPane(id);
   };
 
