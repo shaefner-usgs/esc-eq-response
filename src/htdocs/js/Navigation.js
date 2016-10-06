@@ -11,14 +11,16 @@ var Navigation = function (options) {
       _changeMode,
       _getDefaultPaneId,
       _hidePanes,
+      _map,
       _showPane;
 
 
   _this = {};
 
-  _initialize = function () {
+  _initialize = function (options) {
     var id;
 
+    _map = options.mapPane.map;
     _modes = document.querySelectorAll('.modes a');
     id = _getDefaultPaneId();
 
@@ -98,6 +100,11 @@ var Navigation = function (options) {
 
     button.classList.add('selected');
     pane.classList.remove('hide');
+
+    // Update map container so it displays correctly when unhidden
+    if (id === 'map') {
+      _map.invalidateSize();
+    }
   };
 
 

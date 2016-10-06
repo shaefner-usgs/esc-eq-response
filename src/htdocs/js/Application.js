@@ -32,10 +32,12 @@ var Application = function (options) {
 
     _eqid = document.getElementById('eqid');
 
-    _navigation = Navigation();
     _editPane = EditPane();
     _mapPane = MapPane({
       el: _els.map
+    });
+    _navigation = Navigation({
+      mapPane: _mapPane
     });
 
     if (_eqid.value) {
