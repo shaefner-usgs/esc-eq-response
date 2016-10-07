@@ -111,7 +111,8 @@ var Application = function (options) {
     var mainshock;
 
     mainshock = EarthquakesLayer({
-      data: _earthquake
+      data: _earthquake,
+      mainshockTime: _earthquake.features[0].properties.time
     });
 
     _addLayer(mainshock, 'Mainshock');
