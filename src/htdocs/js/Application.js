@@ -6,7 +6,8 @@ var Earthquake = require('Earthquake'),
     EditPane = require('EditPane'),
     MapPane = require('MapPane'),
     Moment = require('Moment'),
-    Navigation = require('Navigation');
+    Navigation = require('Navigation'),
+    Xhr = require('util/Xhr');
 
 
 var Application = function (options) {
@@ -28,6 +29,7 @@ var Application = function (options) {
       _createEarthquake,
       _getFeedUrl,
       _initFeatureLayers,
+      _loadFeed,
       _removeLayers;
 
 
@@ -55,67 +57,88 @@ var Application = function (options) {
     _eqid.addEventListener('change', _createEarthquake);
   };
 
+  /**
+   * Set params for aftershocks feature layer and then load the feed
+   */
   _addAftershocks = function () {
-    var eq,
-        params,
-        url;
+    var mainshock,
+        params;
 
-    eq = _earthquake.features[0];
+    mainshock = _earthquake.features[0];
     params = {
-      latitude: eq.geometry.coordinates[1],
-      longitude: eq.geometry.coordinates[0],
+      latitude: mainshock.geometry.coordinates[1],
+      longitude: mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('ashockDistance').value,
-      starttime: Moment(eq.properties.time).utc().toISOString().slice(0, -5)
+      starttime: Moment(mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
     };
 
-    url = _getFeedUrl(params);
+    _loadFeed({
+      layerClass: EarthquakesLayer,
+      name: 'Aftershocks',
+      url: _getFeedUrl(params)
+    });
   };
 
+  /**
+   * Set params for Historical seismicity feature layer and then load the feed
+   */
   _addHistorical = function () {
-    var eq,
+    var mainshock,
         params,
-        url,
         years;
 
-    eq = _earthquake.features[0];
+    mainshock = _earthquake.features[0];
     years = document.getElementById('histYears').value;
     params = {
-      endtime: Moment(eq.properties.time).utc().toISOString().slice(0, -5),
-      latitude: eq.geometry.coordinates[1],
-      longitude: eq.geometry.coordinates[0],
+      endtime: Moment(mainshock.properties.time).utc().toISOString().slice(0, -5),
+      latitude: mainshock.geometry.coordinates[1],
+      longitude: mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('histDistance').value,
-      starttime: Moment(eq.properties.time).utc().subtract(years, 'years')
+      starttime: Moment(mainshock.properties.time).utc().subtract(years, 'years')
         .toISOString().slice(0, -5)
     };
 
-    url = _getFeedUrl(params);
+    _loadFeed({
+      layerClass: EarthquakesLayer,
+      name: 'Historical seismicity',
+      url: _getFeedUrl(params)
+    });
   };
 
   /**
-   * Add feature layer to map
+   * Create and add a feature layer to map and layer controller
    *
-   * @param layer {L.Layer} Leaflet layer
-   * @param name {String} layer name
+   * @param opts {Object}
+   *   {
+   *     layerClass: {Function} // creates Leaflet layer
+   *     layerOptions: {Object} // contains data prop (req'd) with geojson data
+   *     name: {String} // layer name
+   *   }
    */
-  _addLayer = function (layer, name) {
-    _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, name);
+  _addLayer = function (opts) {
+    var layer;
 
-    _features[name] = layer;
+    // Create Leaflet layer using Layer class specified in opts
+    layer = opts.layerClass(opts.layerOptions);
+
+    // Add it (and store it in _features for later removal)
+    _mapPane.map.addLayer(layer);
+    _mapPane.layerController.addOverlay(layer, opts.name);
+    _features[opts.name] = layer;
   };
 
   /**
-   * Create and then add earthquake (mainshock) layer
+   * Wrapper for earthquake (mainshock) layer
    */
   _addMainshock = function () {
-    var mainshock;
-
-    mainshock = EarthquakesLayer({
-      data: _earthquake,
-      mainshockTime: _earthquake.features[0].properties.time
+    _addLayer({
+      layerClass: EarthquakesLayer,
+      layerOptions: {
+        data: _earthquake,
+        mainshockTime: _earthquake.features[0].properties.time,
+      },
+      name: 'Mainshock'
     });
-
-    _addLayer(mainshock, 'Mainshock');
   };
 
   /**
@@ -129,7 +152,7 @@ var Application = function (options) {
   };
 
   /**
-   * Get feed url for for querying aftershocks / historical seismicity
+   * Get the feed url for aftershock / historical seismicity layers
    *
    * @param params {Object}
    *
@@ -142,7 +165,7 @@ var Application = function (options) {
 
     baseUri = 'http://earthquake.usgs.gov/fdsnws/event/1/query';
 
-    pairs = ['format=geojson'];
+    pairs = ['format=geojson', 'orderby=time-asc'];
     Object.keys(params).forEach(function(key) {
       pairs.push(key + '=' + params[key]);
     });
@@ -152,10 +175,10 @@ var Application = function (options) {
   };
 
   /**
-   * Set up environment and map and call methods for adding feature layers
+   * Set up environment / map and call methods for adding feature layers
    *
    * @param geojson {Object}
-   *     Geojson layer returned by Earthquake class
+   *     Geojson data returned by Earthquake class
    */
   _initFeatureLayers = function (geojson) {
     var coords;
@@ -174,7 +197,35 @@ var Application = function (options) {
   };
 
   /**
-   * Remove all feature (i.e. event-related) layers from map / layer controller
+   * Load data feed for feature layer and then call _addLayer to create / add it
+   *
+   * @param opts {Object}
+   *   {
+   *     layerClass: {Function}
+   *     name: {String}
+   *     url: {String}
+   *   }
+   */
+  _loadFeed = function (opts) {
+    Xhr.ajax({
+      url: opts.url,
+      success: function (data) {
+        _addLayer({
+          layerClass: opts.layerClass,
+          layerOptions: {
+            data: data
+          },
+          name: opts.name
+        });
+      },
+      error: function (status) {
+        console.log(status);
+      }
+    });
+  };
+
+  /**
+   * Remove all feature layers from map / layer controller
    */
   _removeLayers = function () {
     var layer;
