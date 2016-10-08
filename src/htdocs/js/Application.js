@@ -213,7 +213,8 @@ var Application = function (options) {
         _addLayer({
           layerClass: opts.layerClass,
           layerOptions: {
-            data: data
+            data: data,
+            mainshockTime: _earthquake.features[0].properties.time
           },
           name: opts.name
         });

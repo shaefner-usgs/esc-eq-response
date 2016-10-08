@@ -13,12 +13,12 @@ var _COLORS,
     _MARKER_DEFAULTS;
 
 _COLORS = {
-  historical: '#ccf',
+  historical: '#ccd',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  older: '#ffc'
+  older: '#ffd'
 };
 _MARKER_DEFAULTS = {
   weight: 1,
@@ -86,7 +86,9 @@ var EarthquakesLayer = function (options) {
         eqtime;
 
     eqtime = Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (eqtime.isSameOrAfter(_pastHour)) {
+    if (timestamp < _mainshockTime) {
+      age = 'historical';
+    } else if (eqtime.isSameOrAfter(_pastHour)) {
       age = 'pastweek';
     } else if (eqtime.isSameOrAfter(_pastDay)) {
       age = 'pastday';
@@ -94,7 +96,7 @@ var EarthquakesLayer = function (options) {
       age = 'pasthour';
     } else if (timestamp === _mainshockTime) {
       age = 'mainshock';
-    }  else {
+    } else {
       age = 'older';
     }
 
