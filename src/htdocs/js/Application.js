@@ -7,6 +7,7 @@ var Earthquake = require('Earthquake'),
     MapPane = require('MapPane'),
     Moment = require('Moment'),
     Navigation = require('Navigation'),
+    SummaryPane = require('SummaryPane'),
     Xhr = require('util/Xhr');
 
 
@@ -21,16 +22,17 @@ var Application = function (options) {
       _features,
       _mapPane,
       _navigation,
+      _summaryPane,
 
       _addAftershocks,
+      _addFeatureLayer,
       _addHistorical,
-      _addLayer,
       _addMainshock,
       _createEarthquake,
       _getFeedUrl,
       _initFeatureLayers,
       _loadFeed,
-      _removeLayers;
+      _removeFeatureLayers;
 
 
   _this = {};
@@ -50,6 +52,7 @@ var Application = function (options) {
     _navigation = Navigation({
       mapPane: _mapPane
     });
+    _summaryPane = SummaryPane();
 
     if (_eqid.value) {
       _createEarthquake();
@@ -73,9 +76,39 @@ var Application = function (options) {
     };
 
     _loadFeed({
+      id: 'aftershocks',
       layerClass: EarthquakesLayer,
       name: 'Aftershocks',
       url: _getFeedUrl(params)
+    });
+  };
+
+  /**
+   * Create and add a feature layer to map / layer controller, summary page
+   *
+   * @param opts {Object}
+   *   {
+   *     id: {String} // layer id
+   *     layerClass: {Function} // creates Leaflet layer
+   *     layerOptions: {Object} // contains data prop (req'd) with geojson data
+   *     name: {String} // layer name
+   *   }
+   */
+  _addFeatureLayer = function (opts) {
+    var layer;
+
+    // Create Leaflet layer using Layer class specified in opts
+    layer = opts.layerClass(opts.layerOptions);
+
+    // Add it (and store it in _features for potential removal later)
+    _mapPane.map.addLayer(layer);
+    _mapPane.layerController.addOverlay(layer, opts.name);
+    _features[opts.id] = layer;
+
+    _summaryPane.addSummary({
+      id: opts.id,
+      name: opts.name,
+      summary: layer.summary
     });
   };
 
@@ -99,6 +132,7 @@ var Application = function (options) {
     };
 
     _loadFeed({
+      id: 'historical',
       layerClass: EarthquakesLayer,
       name: 'Historical seismicity',
       url: _getFeedUrl(params)
@@ -106,32 +140,11 @@ var Application = function (options) {
   };
 
   /**
-   * Create and add a feature layer to map and layer controller
-   *
-   * @param opts {Object}
-   *   {
-   *     layerClass: {Function} // creates Leaflet layer
-   *     layerOptions: {Object} // contains data prop (req'd) with geojson data
-   *     name: {String} // layer name
-   *   }
-   */
-  _addLayer = function (opts) {
-    var layer;
-
-    // Create Leaflet layer using Layer class specified in opts
-    layer = opts.layerClass(opts.layerOptions);
-
-    // Add it (and store it in _features for later removal)
-    _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, opts.name);
-    _features[opts.name] = layer;
-  };
-
-  /**
    * Wrapper for earthquake (mainshock) layer
    */
   _addMainshock = function () {
-    _addLayer({
+    _addFeatureLayer({
+      id: 'mainshock',
       layerClass: EarthquakesLayer,
       layerOptions: {
         data: _earthquake,
@@ -175,7 +188,10 @@ var Application = function (options) {
   };
 
   /**
-   * Set up environment / map and call methods for adding feature layers
+   * Set up environment / map and call methods for adding 'feature' layers
+   *
+   * Feature layers are event specific layers added dynamically to the map
+   * and summary panes, based on the eqid entered by user
    *
    * @param geojson {Object}
    *     Geojson data returned by Earthquake class
@@ -189,7 +205,7 @@ var Application = function (options) {
     _editPane.setDefaults(_earthquake);
     _mapPane.map.setView([coords[1], coords[0]], 9, true);
 
-    _removeLayers();
+    _removeFeatureLayers();
 
     _addMainshock();
     _addAftershocks();
@@ -197,7 +213,7 @@ var Application = function (options) {
   };
 
   /**
-   * Load data feed for feature layer and then call _addLayer to create / add it
+   * Load data feed and then call _addFeatureLayer when it's finished loading
    *
    * @param opts {Object}
    *   {
@@ -210,7 +226,8 @@ var Application = function (options) {
     Xhr.ajax({
       url: opts.url,
       success: function (data) {
-        _addLayer({
+        _addFeatureLayer({
+          id: opts.id,
           layerClass: opts.layerClass,
           layerOptions: {
             data: data,
@@ -226,17 +243,21 @@ var Application = function (options) {
   };
 
   /**
-   * Remove all feature layers from map / layer controller
+   * Remove all feature layers from map / layer controller, summary pane
    */
-  _removeLayers = function () {
-    var layer;
+  _removeFeatureLayers = function () {
+    var el,
+        layer;
 
     if (_features) {
-      Object.keys(_features).forEach(function(key) {
-        layer = _features[key];
+      Object.keys(_features).forEach(function(id) {
+        el = document.getElementById(id);
+        layer = _features[id];
 
         _mapPane.map.removeLayer(layer);
         _mapPane.layerController.removeLayer(layer);
+
+        el.parentNode.removeChild(el);
       });
     }
   };
