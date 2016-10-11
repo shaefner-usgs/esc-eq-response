@@ -50,9 +50,9 @@ var Earthquake = function (options) {
             place: props.place,
             status: props.status,
             time: props.time,
+            tz: props.tz,
             url: server + 'earthquakes/eventpage/' + data.id,
-            updated: props.updated,
-            utcOffset: props.tz
+            updated: props.updated
           },
           type: 'Feature'
         }
