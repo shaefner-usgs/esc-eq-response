@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Earthquake Response App</title>
     <link rel="stylesheet" href="/lib/leaflet-0.7.7/leaflet.css" />
     <link rel="stylesheet" href="css/index.css" />
   </head>
@@ -42,6 +42,7 @@
     </section>
     <section id="summary">
       <h2>Summary</h2>
+      <div class="summaries"></div>
     </section>
   </body>
   <script src="/lib/leaflet-0.7.7/leaflet.js"></script>
