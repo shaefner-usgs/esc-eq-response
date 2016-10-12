@@ -15,6 +15,16 @@ var SummaryPane = function (options) {
 
   };
 
+  /**
+   * Add summary text to summary pane (text plus <div> container)
+   *
+   * @param opts {Object}
+   *   {
+   *     id: {String} // id for container elem
+   *     name: {String} // Layer name
+   *     summary: {Html} // Summary text
+   *   }
+   */
   _this.addSummary = function (opts) {
     var div,
         timestamp;
@@ -27,6 +37,16 @@ var SummaryPane = function (options) {
       '</time>' + opts.summary;
 
     document.querySelector('.summaries').appendChild(div);
+  };
+
+  /**
+   * Remove summary text from summary pane (text plus <div> container)
+   *
+   * @param el {Element}
+   *     Element to remove
+   */
+  _this.removeSummary = function (el) {
+    el.parentNode.removeChild(el);
   };
 
   _initialize(options);
