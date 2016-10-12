@@ -1,7 +1,11 @@
 'use strict';
 
 
-var EditPane = function (options) {
+/**
+ * Edit pane - handles form fields and setting browser's address bar to match
+ *  application state
+ */
+var EditPane = function () {
   var _this,
       _initialize,
 
@@ -41,7 +45,7 @@ var EditPane = function (options) {
   };
 
   /*
-   * Get default values for form fields that depend on user-selected mainshock 
+   * Get default values for form fields that depend on user-selected mainshock
    *
    * @param mainshock {Object}
    *
@@ -104,7 +108,7 @@ var EditPane = function (options) {
   /**
    * Update querystring (e.g. called when a form field value changes)
    *
-   * @param e {Obj} Event
+   * @param e {Event}
    */
   _updateQueryString = function (e) {
     var id,
@@ -131,6 +135,8 @@ var EditPane = function (options) {
 
   /**
    * Set default form field values based on mainshock's details
+   *
+   * @param mainshock {Object}
    */
   _this.setDefaults = function (mainshock) {
     var defaults;
@@ -173,9 +179,9 @@ var EditPane = function (options) {
   };
 
 
-  _initialize(options);
-  options = null;
+  _initialize();
   return _this;
 };
+
 
 module.exports = EditPane;

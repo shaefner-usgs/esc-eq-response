@@ -33,13 +33,13 @@ _DEFAULTS = {
 
 
 /**
- * Factory for Earthquakes overlay
+ * Factory for creating earthquakes overlay, summary
  *
  * @param options {Object}
- *     {
- *       data: {String} Geojson data
- *       markerOptions: {Object} L.Path options
- *     }
+ *   {
+ *     data: {Object}, // Geojson data
+ *     mainshock: {Object} // magnitude, time, etc.
+ *   }
  *
  * @return {L.FeatureGroup}
  */
@@ -238,6 +238,7 @@ var EarthquakesLayer = function (options) {
 
     return L.circleMarker(latlng, _markerOptions);
   };
+
 
   _initialize(options);
   options = null;

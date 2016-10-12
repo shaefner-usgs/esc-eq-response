@@ -4,7 +4,10 @@
 var Moment = require('Moment');
 
 
-var SummaryPane = function (options) {
+/**
+ * Summary pane - adds / removes summary info for selected event
+ */
+var SummaryPane = function () {
   var _this,
       _initialize;
 
@@ -20,8 +23,8 @@ var SummaryPane = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     id: {String} // id for container elem
-   *     name: {String} // Layer name
+   *     id: {String}, // id for container elem
+   *     name: {String}, // Layer name
    *     summary: {Html} // Summary text
    *   }
    */
@@ -49,8 +52,8 @@ var SummaryPane = function (options) {
     el.parentNode.removeChild(el);
   };
 
-  _initialize(options);
-  options = null;
+
+  _initialize();
   return _this;
 };
 

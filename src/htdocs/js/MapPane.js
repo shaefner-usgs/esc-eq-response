@@ -2,8 +2,6 @@
 'use strict';
 
 
-//var Xhr = require('util/Xhr');
-
 // Leaflet plugins
 require('map/MousePosition');
 require('map/RestoreMap');
@@ -17,7 +15,7 @@ require('map/TerrainLayer');
 
 
 /**
- * Factory for leaflet map instance
+ * Map pane - sets up leaflet map instance
  *
  * @param options {Object}
  */
@@ -46,8 +44,8 @@ var Map = function (options) {
    *
    * @return layers {Object}
    *    {
-   *      baseLayers: {Object}
-   *      overlays: {Object}
+   *      baseLayers: {Object},
+   *      overlays: {Object},
    *      defaults: {Array}
    *    }
    */

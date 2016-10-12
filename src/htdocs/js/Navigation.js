@@ -1,6 +1,9 @@
 'use strict';
 
 
+/**
+ * Switches between app panes of the single page app
+ */
 var Navigation = function (options) {
   var _this,
       _initialize,

@@ -9,6 +9,15 @@ var Earthquake = require('Earthquake'),
     SummaryPane = require('SummaryPane');
 
 
+/**
+ * Earthquake Response Application - sets up app and dependencies
+ *
+ * @param options {Object}
+ *   {
+ *     map: {Element},
+ *     summary: {Element}
+ *   }
+ */
 var Application = function (options) {
   var _this,
       _initialize,
@@ -33,6 +42,7 @@ var Application = function (options) {
     };
     _eqid = document.getElementById('eqid');
 
+    // Set up each pane (or 'page') of app
     _editPane = EditPane();
     _mapPane = MapPane({
       el: _els.map
@@ -43,6 +53,7 @@ var Application = function (options) {
       mapPane: _mapPane
     });
 
+    // Features are event-specific layers on map and summary pages
     _features = Features({
       editPane: _editPane,
       mapPane: _mapPane,
@@ -60,10 +71,11 @@ var Application = function (options) {
    */
   _createEarthquake = function () {
     Earthquake({
-      callback: _features.initFeatures,
+      callback: _features.initFeatures, // add features to map and summary panes
       id: _eqid.value
     });
   };
+
 
   _initialize(options);
   options = null;

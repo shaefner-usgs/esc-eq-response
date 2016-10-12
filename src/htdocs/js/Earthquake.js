@@ -3,6 +3,16 @@
 
 var Xhr = require('util/Xhr');
 
+
+/**
+ * Factory for creating an earthquake instance
+ *
+ * @param options {Object}
+ *   {
+ *     callback: {Function},
+ *     id: {String}
+ *   }
+ */
 var Earthquake = function (options) {
   var _this,
       _initialize,
@@ -63,9 +73,9 @@ var Earthquake = function (options) {
   };
 
   /**
-   * Get urls to data feeds needed for map feature layers & summary page
+   * Get urls to data feeds needed for map feature layers & summary pane
    *
-   * @return urls {Object}
+   * @return features {Object}
    */
   _getFeatures = function (products) {
     var features;

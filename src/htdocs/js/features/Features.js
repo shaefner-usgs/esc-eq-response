@@ -6,6 +6,15 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
     Xhr = require('util/Xhr');
 
 
+/**
+ * Adds feature layers to map, summary panes
+ *
+ * @param options {Object}
+ *   {
+ *     data: {Object}, // Geojson data
+ *     mainshock: {Object} // magnitude, time, etc.
+ *   }
+ */
 var Features = function (options) {
   var _this,
       _initialize,
@@ -36,7 +45,8 @@ var Features = function (options) {
   };
 
   /**
-   * Set params for aftershocks feature layer and then load the feed
+   * Aftershocks feature layer
+   *   loads feed then adds it to map, summary panes thru callbacks
    */
   _addAftershocks = function () {
     var params;
@@ -61,9 +71,9 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     id: {String} // layer id
-   *     layerClass: {Function} // creates Leaflet layer
-   *     layerOptions: {Object} // contains data prop (req'd) with geojson data
+   *     id: {String}, // layer id
+   *     layerClass: {Function}, // creates Leaflet layer
+   *     layerOptions: {Object}, // contains data prop (req'd) with geojson data
    *     name: {String} // layer name
    *   }
    */
@@ -86,7 +96,8 @@ var Features = function (options) {
   };
 
   /**
-   * Set params for Historical seismicity feature layer and then load the feed
+   * Historical seismicity feature layer
+   *   loads feed then adds it to map, summary panes thru callbacks
    */
   _addHistorical = function () {
     var params,
@@ -112,6 +123,9 @@ var Features = function (options) {
 
   /**
    * Wrapper for earthquake (mainshock) layer
+   *   _addFeature adds it to map, summary panes
+   *
+   * @param data {Object} GeoJson data
    */
   _addMainshock = function (data) {
     _addFeature({
@@ -153,8 +167,8 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     layerClass: {Function}
-   *     name: {String}
+   *     layerClass: {Function},
+   *     name: {String},
    *     url: {String}
    *   }
    */
@@ -224,6 +238,7 @@ var Features = function (options) {
     _addAftershocks();
     _addHistorical();
   };
+
 
   _initialize(options);
   options = null;
