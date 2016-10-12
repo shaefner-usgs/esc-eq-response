@@ -60,7 +60,7 @@ var Application = function (options) {
    */
   _createEarthquake = function () {
     Earthquake({
-      callback: _features.initFeatureLayers,
+      callback: _features.initFeatures,
       id: _eqid.value
     });
   };

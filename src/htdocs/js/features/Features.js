@@ -12,7 +12,7 @@ var Features = function (options) {
 
       _earthquake,
       _editPane,
-      _features,
+      _layers,
       _mapPane,
       _summaryPane,
 
@@ -28,7 +28,7 @@ var Features = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    _features = {};
+    _layers = {};
 
     _editPane = options.editPane;
     _mapPane = options.mapPane;
@@ -75,10 +75,10 @@ var Features = function (options) {
     // Create Leaflet layer using Layer class specified in opts
     layer = opts.layerClass(opts.layerOptions);
 
-    // Add it (and store it in _features for potential removal later)
+    // Add it (and store it in _layers for potential removal later)
     _mapPane.map.addLayer(layer);
     _mapPane.layerController.addOverlay(layer, opts.name);
-    _features[opts.id] = layer;
+    _layers[opts.id] = layer;
 
     _summaryPane.addSummary({
       id: opts.id,
@@ -189,9 +189,9 @@ var Features = function (options) {
     var layer,
         summary;
 
-    if (_features) {
-      Object.keys(_features).forEach(function(id) {
-        layer = _features[id];
+    if (_layers) {
+      Object.keys(_layers).forEach(function(id) {
+        layer = _layers[id];
         summary = document.getElementById(id);
 
         _mapPane.map.removeLayer(layer);
@@ -211,7 +211,7 @@ var Features = function (options) {
    * @param geojson {Object}
    *     Geojson data returned by Earthquake class
    */
-  _this.initFeatureLayers = function (geojson) {
+  _this.initFeatures = function (geojson) {
     var coords;
 
     _earthquake = geojson;
@@ -220,10 +220,10 @@ var Features = function (options) {
     _editPane.setDefaults(_earthquake);
     _mapPane.map.setView([coords[1], coords[0]], 9, true);
 
-    // First, remove any existing event-specific layers
+    // First, remove any existing event-specific features
     _removeFeatures();
 
-    // Now, add event-specific layers
+    // Now, add event-specific features
     _addMainshock();
     _addAftershocks();
     _addHistorical();
