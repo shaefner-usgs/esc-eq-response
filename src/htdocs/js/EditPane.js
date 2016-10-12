@@ -41,16 +41,16 @@ var EditPane = function (options) {
   };
 
   /*
-   * Get default values for form fields that depend on selected earthquake
+   * Get default values for form fields that depend on user-selected mainshock 
    *
-   * @param earthquake {Object}
+   * @param mainshock {Object}
    *
    * @return {Object}
    */
-  _getDefaults = function (earthquake) {
+  _getDefaults = function (mainshock) {
     var mag;
 
-    mag = earthquake.features[0].properties.mag;
+    mag = mainshock.properties.mag;
 
     return {
       ashockDistance: Math.max(5, Math.round(mag - 2) * 5),
@@ -130,12 +130,12 @@ var EditPane = function (options) {
   };
 
   /**
-   * Set default form field values based on selected event's details
+   * Set default form field values based on mainshock's details
    */
-  _this.setDefaults = function (earthquake) {
+  _this.setDefaults = function (mainshock) {
     var defaults;
 
-    defaults = _getDefaults(earthquake);
+    defaults = _getDefaults(mainshock);
     Object.keys(defaults).forEach(function(key) {
       // first, update url params
       if (_this.getParam(key) === '') { // only set empty fields

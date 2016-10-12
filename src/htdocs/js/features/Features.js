@@ -10,9 +10,9 @@ var Features = function (options) {
   var _this,
       _initialize,
 
-      _earthquake,
       _editPane,
       _layers,
+      _mainshock,
       _mapPane,
       _summaryPane,
 
@@ -39,15 +39,13 @@ var Features = function (options) {
    * Set params for aftershocks feature layer and then load the feed
    */
   _addAftershocks = function () {
-    var mainshock,
-        params;
+    var params;
 
-    mainshock = _earthquake.features[0];
     params = {
-      latitude: mainshock.geometry.coordinates[1],
-      longitude: mainshock.geometry.coordinates[0],
+      latitude: _mainshock.geometry.coordinates[1],
+      longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('ashockDistance').value,
-      starttime: Moment(mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
+      starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
     };
 
     _loadFeed({
@@ -91,18 +89,16 @@ var Features = function (options) {
    * Set params for Historical seismicity feature layer and then load the feed
    */
   _addHistorical = function () {
-    var mainshock,
-        params,
+    var params,
         years;
 
-    mainshock = _earthquake.features[0];
     years = document.getElementById('histYears').value;
     params = {
-      endtime: Moment(mainshock.properties.time).utc().toISOString().slice(0, -5),
-      latitude: mainshock.geometry.coordinates[1],
-      longitude: mainshock.geometry.coordinates[0],
+      endtime: Moment(_mainshock.properties.time).utc().toISOString().slice(0, -5),
+      latitude: _mainshock.geometry.coordinates[1],
+      longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('histDistance').value,
-      starttime: Moment(mainshock.properties.time).utc().subtract(years, 'years')
+      starttime: Moment(_mainshock.properties.time).utc().subtract(years, 'years')
         .toISOString().slice(0, -5)
     };
 
@@ -117,13 +113,13 @@ var Features = function (options) {
   /**
    * Wrapper for earthquake (mainshock) layer
    */
-  _addMainshock = function () {
+  _addMainshock = function (data) {
     _addFeature({
       id: 'mainshock',
       layerClass: EarthquakesLayer,
       layerOptions: {
-        data: _earthquake,
-        mainshockTime: _earthquake.features[0].properties.time,
+        data: data,
+        mainshock: _mainshock,
       },
       name: 'Mainshock'
     });
@@ -171,7 +167,7 @@ var Features = function (options) {
           layerClass: opts.layerClass,
           layerOptions: {
             data: data,
-            mainshockTime: _earthquake.features[0].properties.time
+            mainshock: _mainshock
           },
           name: opts.name
         });
@@ -214,17 +210,17 @@ var Features = function (options) {
   _this.initFeatures = function (geojson) {
     var coords;
 
-    _earthquake = geojson;
-    coords = _earthquake.features[0].geometry.coordinates;
+    _mainshock = geojson.features[0];
+    coords = _mainshock.geometry.coordinates;
 
-    _editPane.setDefaults(_earthquake);
+    _editPane.setDefaults(_mainshock);
     _mapPane.map.setView([coords[1], coords[0]], 9, true);
 
     // First, remove any existing event-specific features
     _removeFeatures();
 
     // Now, add event-specific features
-    _addMainshock();
+    _addMainshock(geojson);
     _addAftershocks();
     _addHistorical();
   };
