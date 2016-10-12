@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
-    <ul class="modes">
+    <ul class="panes">
       <li><a href="#edit">Edit</a></li>
       <li><a href="#map">Map</a></li>
       <li><a href="#summary">Summary</a></li>

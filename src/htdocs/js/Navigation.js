@@ -3,15 +3,20 @@
 
 /**
  * Switches between app panes of the single page app
+ *
+ * @param options {Object}
+ *   {
+ *     mapPane: {Object} // mapPane instance
+ *   }
  */
 var Navigation = function (options) {
   var _this,
       _initialize,
 
-      _modes,
+      _panes,
 
       _addListeners,
-      _changeMode,
+      _changePane,
       _getDefaultPaneId,
       _hidePanes,
       _map,
@@ -24,7 +29,7 @@ var Navigation = function (options) {
     var id;
 
     _map = options.mapPane.map;
-    _modes = document.querySelectorAll('.modes a');
+    _panes = document.querySelectorAll('.panes a');
     id = _getDefaultPaneId();
 
     _addListeners();
@@ -39,17 +44,17 @@ var Navigation = function (options) {
     var i;
 
     // Update UI when user changes mode
-    for (i = 0; i < _modes.length; i ++) {
-      _modes[i].addEventListener('click', _changeMode);
+    for (i = 0; i < _panes.length; i ++) {
+      _panes[i].addEventListener('click', _changePane);
     }
   };
 
   /**
-   * Switch between modes in UI
+   * Switch between panes in UI
    *
    * @param e {Object} Event
    */
-  _changeMode = function (e) {
+  _changePane = function (e) {
     var id = e.target.hash.substr(1);
 
     _hidePanes();
@@ -79,8 +84,8 @@ var Navigation = function (options) {
         id,
         pane;
 
-    for (var i = 0; i < _modes.length; i ++) {
-      id = _modes[i].hash.substr(1);
+    for (var i = 0; i < _panes.length; i ++) {
+      id = _panes[i].hash.substr(1);
       button = document.querySelector('[href="#' + id + '"]');
       pane = document.querySelector('#' + id);
 
