@@ -95,18 +95,18 @@ var Map = function (options) {
     });
 
     // Add controllers
-    _this.layerController = L.control.layers(_this.layers.baseLayers, 
+    _this.layerController = L.control.layers(_this.layers.baseLayers,
       _this.layers.overlays).addTo(_this.map);
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
 
     // Remember user's map settings (selected layers, map extent)
-    _this.map.restoreMap({
-      baseLayers: _this.layers.baseLayers,
-      id: 'eqid', // TODO: insert actual eqid
-      overlays: _this.layers.overlays,
-      scope: 'response'
-    });
+    // _this.map.restoreMap({
+    //   baseLayers: _this.layers.baseLayers,
+    //   id: 'eqid', // TODO: insert actual eqid
+    //   overlays: _this.layers.overlays,
+    //   scope: 'response'
+    // });
   };
 
 
