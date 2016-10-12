@@ -41,11 +41,9 @@ var Earthquake = function (options) {
    */
   _createGeoJson = function (data) {
     var geojson,
-        props,
-        server;
+        props;
 
     props = data.properties;
-    server = 'http://earthquake.usgs.gov/';
 
     geojson = {
       type: 'FeatureCollection',
@@ -61,8 +59,8 @@ var Earthquake = function (options) {
             status: props.status,
             time: props.time,
             tz: props.tz,
-            url: server + 'earthquakes/eventpage/' + data.id,
-            updated: props.updated
+            updated: props.updated,
+            url: props.url
           },
           type: 'Feature'
         }
