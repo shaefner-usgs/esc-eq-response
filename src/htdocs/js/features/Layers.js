@@ -17,12 +17,12 @@ var Layers = function (options) {
       _summaryPane,
 
       _addAftershocks,
-      _addFeatureLayer,
+      _addFeature,
       _addHistorical,
       _addMainshock,
       _getFeedUrl,
       _loadFeed,
-      _removeFeatureLayers;
+      _removeFeatures;
 
 
   _this = {};
@@ -69,7 +69,7 @@ var Layers = function (options) {
    *     name: {String} // layer name
    *   }
    */
-  _addFeatureLayer = function (opts) {
+  _addFeature = function (opts) {
     var layer;
 
     // Create Leaflet layer using Layer class specified in opts
@@ -118,7 +118,7 @@ var Layers = function (options) {
    * Wrapper for earthquake (mainshock) layer
    */
   _addMainshock = function () {
-    _addFeatureLayer({
+    _addFeature({
       id: 'mainshock',
       layerClass: EarthquakesLayer,
       layerOptions: {
@@ -153,7 +153,7 @@ var Layers = function (options) {
   };
 
   /**
-   * Load data feed and then call _addFeatureLayer when it's finished loading
+   * Load data feed and then call _addFeature when it's finished loading
    *
    * @param opts {Object}
    *   {
@@ -166,7 +166,7 @@ var Layers = function (options) {
     Xhr.ajax({
       url: opts.url,
       success: function (data) {
-        _addFeatureLayer({
+        _addFeature({
           id: opts.id,
           layerClass: opts.layerClass,
           layerOptions: {
@@ -185,19 +185,19 @@ var Layers = function (options) {
   /**
    * Remove all feature layers from map / layer controller, summary pane
    */
-  _removeFeatureLayers = function () {
-    var el,
-        layer;
+  _removeFeatures = function () {
+    var layer,
+        summary;
 
     if (_features) {
       Object.keys(_features).forEach(function(id) {
-        el = document.getElementById(id);
         layer = _features[id];
+        summary = document.getElementById(id);
 
         _mapPane.map.removeLayer(layer);
         _mapPane.layerController.removeLayer(layer);
 
-        el.parentNode.removeChild(el);
+        _summaryPane.removeSummary(summary);
       });
     }
   };
@@ -221,7 +221,7 @@ var Layers = function (options) {
     _mapPane.map.setView([coords[1], coords[0]], 9, true);
 
     // First, remove any existing event-specific layers
-    _removeFeatureLayers();
+    _removeFeatures();
 
     // Now, add event-specific layers
     _addMainshock();
