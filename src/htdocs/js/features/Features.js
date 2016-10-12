@@ -6,7 +6,7 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
     Xhr = require('util/Xhr');
 
 
-var Layers = function (options) {
+var Features = function (options) {
   var _this,
       _initialize,
 
@@ -235,4 +235,4 @@ var Layers = function (options) {
 };
 
 
-module.exports = Layers;
+module.exports = Features;

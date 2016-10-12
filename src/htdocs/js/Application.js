@@ -3,7 +3,7 @@
 
 var Earthquake = require('Earthquake'),
     EditPane = require('EditPane'),
-    Layers = require('features/Layers'),
+    Features = require('features/Features'),
     MapPane = require('MapPane'),
     Navigation = require('Navigation'),
     SummaryPane = require('SummaryPane');
@@ -16,7 +16,7 @@ var Application = function (options) {
       _editPane,
       _eqid,
       _els,
-      _layers,
+      _features,
       _mapPane,
       _navigation,
       _summaryPane,
@@ -42,8 +42,8 @@ var Application = function (options) {
     _navigation = Navigation({
       mapPane: _mapPane
     });
-    
-    _layers = Layers({
+
+    _features = Features({
       editPane: _editPane,
       mapPane: _mapPane,
       summaryPane: _summaryPane
@@ -60,7 +60,7 @@ var Application = function (options) {
    */
   _createEarthquake = function () {
     Earthquake({
-      callback: _layers.initFeatureLayers,
+      callback: _features.initFeatureLayers,
       id: _eqid.value
     });
   };
