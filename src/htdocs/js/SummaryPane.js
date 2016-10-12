@@ -9,13 +9,33 @@ var Moment = require('Moment');
  */
 var SummaryPane = function () {
   var _this,
-      _initialize;
+      _initialize,
+
+      _summaries,
+
+      _addTimestamp;
 
 
   _this = {};
 
   _initialize = function () {
+    _summaries = document.querySelector('.summaries');
 
+    _addTimestamp();
+  };
+
+  /**
+   * Add timestamp to summary page
+   */
+  _addTimestamp = function () {
+    var time,
+        timestamp;
+
+    time = document.createElement('time');
+    timestamp = Moment().format('ddd MMM D, YYYY h:mm:ss A');
+
+    time.innerHTML = timestamp;
+    _summaries.appendChild(time);
   };
 
   /**
@@ -29,17 +49,13 @@ var SummaryPane = function () {
    *   }
    */
   _this.addSummary = function (opts) {
-    var div,
-        timestamp;
-
-    timestamp = Moment().format('ddd MMM D, YYYY h:mm:ss A');
+    var div;
 
     div = document.createElement('div');
     div.setAttribute('id', opts.id);
-    div.innerHTML = '<h3>' + opts.name + '</h3>' + '<time>' + timestamp +
-      '</time>' + opts.summary;
+    div.innerHTML = '<h3>' + opts.name + '</h3>' + opts.summary;
 
-    document.querySelector('.summaries').appendChild(div);
+    _summaries.appendChild(div);
   };
 
   /**
