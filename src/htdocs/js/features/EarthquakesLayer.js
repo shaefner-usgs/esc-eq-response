@@ -47,12 +47,13 @@ var EarthquakesLayer = function (options) {
   var _this,
       _initialize,
 
-      _mainshockTime,
+      _mainshock,
       _markerOptions,
       _pastDay,
       _pastHour,
       _pastWeek,
       _summary,
+      _threshold,
 
       _getAge,
       _getSummary,
@@ -64,18 +65,25 @@ var EarthquakesLayer = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
-    _mainshockTime = options.mainshockTime;
+    _mainshock = {
+      mag: options.mainshock.properties.mag,
+      time: options.mainshock.properties.time
+    };
     _pastDay = Moment.utc().subtract(1, 'days');
     _pastHour = Moment.utc().subtract(1, 'hours');
     _pastWeek = Moment.utc().subtract(1, 'weeks');
     _summary = '';
+    _threshold = {
+      aftershocks: Math.floor(_mainshock.mag - 2.5),
+      historical: Math.floor(_mainshock.mag - 1)
+    };
 
     _this = L.geoJson(options.data, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
 
-    // Attach text summary to layer
+    // Attach html summary to layer
     _this.summary = _getSummary();
   };
 
@@ -92,7 +100,7 @@ var EarthquakesLayer = function (options) {
         eqtime;
 
     eqtime = Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (timestamp < _mainshockTime) {
+    if (timestamp < _mainshock.time) {
       age = 'historical';
     } else if (eqtime.isSameOrAfter(_pastHour)) {
       age = 'pastweek';
@@ -100,7 +108,7 @@ var EarthquakesLayer = function (options) {
       age = 'pastday';
     } else if (eqtime.isSameOrAfter(_pastWeek)) {
       age = 'pasthour';
-    } else if (timestamp === _mainshockTime) {
+    } else if (timestamp === _mainshock.time) {
       age = 'mainshock';
     } else {
       age = 'older';
@@ -142,7 +150,6 @@ var EarthquakesLayer = function (options) {
         utcTime;
 
     props = feature.properties;
-
     momentObj = Moment.utc(props.time, 'x');
     utcTime = momentObj.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
@@ -200,7 +207,13 @@ var EarthquakesLayer = function (options) {
         '<td>{lat}, {lng}</td>' +
         '<td>{depth} km</td>' +
       '</tr>';
-    _summary += L.Util.template(summaryTemplate, data);
+
+    // only add to summary if above a magnitude threshold
+    if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
+        (props.time < _mainshock.time && props.mag > _threshold.historical) ||
+         props.time === _mainshock.time) {
+      _summary += L.Util.template(summaryTemplate, data);
+    }
   };
 
   /**
