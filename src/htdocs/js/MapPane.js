@@ -40,7 +40,7 @@ var Map = function (options) {
 
 
   /**
-   * Get all 'static' map layers that will be displayed on map
+   * Get all 'static' map layers (not related to mainshock) that will be on map
    *
    * @return layers {Object}
    *    {
