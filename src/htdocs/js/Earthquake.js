@@ -64,7 +64,11 @@ var Earthquake = function (options) {
           },
           type: 'Feature'
         }
-      ]
+      ],
+      metadata: {
+        generated: Date.now(),
+        title: 'Mainshock'
+      }
     };
 
     _callback(geojson);
