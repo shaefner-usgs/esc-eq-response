@@ -2,8 +2,8 @@
 'use strict';
 
 
-require('map/Utfgrid');
-require('map/MouseOverLayer');
+require('mappane/Utfgrid');
+require('mappane/MouseOverLayer');
 
 
 /**

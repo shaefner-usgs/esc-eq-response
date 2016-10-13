@@ -3,7 +3,7 @@
 
 var Earthquake = require('Earthquake'),
     EditPane = require('EditPane'),
-    Features = require('features/Features'),
+    Features = require('Features'),
     MapPane = require('MapPane'),
     Navigation = require('Navigation'),
     SummaryPane = require('SummaryPane');

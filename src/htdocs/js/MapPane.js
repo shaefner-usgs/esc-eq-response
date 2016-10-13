@@ -3,15 +3,15 @@
 
 
 // Leaflet plugins
-require('map/MousePosition');
-require('map/RestoreMap');
+require('mappane/MousePosition');
+require('mappane/RestoreMap');
 
 // Factories for creating map layers (returns e.g. "L.earthquakesLayer()")
-require('map/DarkLayer');
-require('map/FaultsLayer');
-require('map/GreyscaleLayer');
-require('map/SatelliteLayer');
-require('map/TerrainLayer');
+require('mappane/DarkLayer');
+require('mappane/FaultsLayer');
+require('mappane/GreyscaleLayer');
+require('mappane/SatelliteLayer');
+require('mappane/TerrainLayer');
 
 
 /**
