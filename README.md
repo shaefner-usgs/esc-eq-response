@@ -26,5 +26,5 @@ First install [node.js](https://nodejs.org/) and [grunt](http://gruntjs.com).
 4. Run grunt
 
   `cd esc-eq-response`
-  
+
   `grunt`
