@@ -75,7 +75,7 @@ var Earthquake = function (options) {
   };
 
   /**
-   * Get urls to data feeds needed for map feature layers & summary pane
+   * Get urls to data feeds needed for feature layers on map, summary panes
    *
    * @return features {Object}
    */

@@ -7,7 +7,10 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
 
 
 /**
- * Adds feature layers to map, summary panes
+ * Adds 'feature' layers to map, summary panes
+ *
+ * Feature layers are event specific layers added dynamically to the map
+ * and summary panes, based on the eqid entered by user
  *
  * @param options {Object}
  *   {
@@ -67,7 +70,7 @@ var Features = function (options) {
   };
 
   /**
-   * Create and add a feature layer to map / layer controller, summary page
+   * Create and add a feature layer to map / layer controller, summary pane
    *
    * @param opts {Object}
    *   {
@@ -221,9 +224,6 @@ var Features = function (options) {
 
   /**
    * Set up environment / map and call methods for adding 'feature' layers
-   *
-   * Feature layers are event specific layers added dynamically to the map
-   * and summary panes, based on the eqid entered by user
    *
    * @param geojson {Object}
    *     Geojson data returned by Earthquake class
