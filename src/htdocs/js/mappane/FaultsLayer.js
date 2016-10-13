@@ -2,7 +2,6 @@
 'use strict';
 
 
-require('mappane/Utfgrid');
 require('mappane/MouseOverLayer');
 
 
