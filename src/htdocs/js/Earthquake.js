@@ -78,9 +78,11 @@ var Earthquake = function (options) {
   _getFeatures = function (products) {
     var features;
 
-    features = {
-      shakemap_mmi: products.shakemap[0].contents['download/cont_mi.json'].url
-    };
+    if (products.shakemap) {
+      features = {
+        shakemap_mmi: products.shakemap[0].contents['download/cont_mi.json'].url
+      };
+    }
 
     return features;
   };
