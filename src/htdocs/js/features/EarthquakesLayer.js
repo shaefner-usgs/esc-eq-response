@@ -125,15 +125,19 @@ var EarthquakesLayer = function (options) {
   _getSummary = function () {
     var summary;
 
-    summary = '<table>' +
-        '<tr>' +
-          '<th>Mag</th>' +
-          '<th>Time <span>(local unless UTC specified)</span></th>' +
-          '<th>Cooordinates</th>' +
-          '<th>Depth</th>' +
-        '</tr>' +
-        _summary + 
-      '</table>';
+    summary = '';
+
+    if (_summary) {
+      summary += '<table>' +
+          '<tr>' +
+            '<th>Mag</th>' +
+            '<th>Time <span>(local unless UTC specified)</span></th>' +
+            '<th>Cooordinates</th>' +
+            '<th>Depth</th>' +
+          '</tr>' +
+          _summary +
+        '</table>';
+    }
 
     return summary;
   };
