@@ -1,0 +1,23 @@
+#summary {
+  table {
+    border-collapse: collapse;
+  }
+
+  td, th {
+    border: 1px solid #e8e8e8;
+    padding: .666em .75em;
+  }
+
+  th {
+    background-color: rgba(0, 0, 0, .03);
+    font-weight: 700;
+  }
+
+  time {
+    display: block;
+
+    &:before {
+      content: 'Updated: ';
+    }
+  }
+}
