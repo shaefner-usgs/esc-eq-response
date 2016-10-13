@@ -78,19 +78,25 @@ var Features = function (options) {
    *   }
    */
   _addFeature = function (opts) {
-    var layer;
+    var layer,
+        name;
 
     // Create Leaflet layer using Layer class specified in opts
     layer = opts.layerClass(opts.layerOptions);
 
+    name = opts.name;
+    if (opts.count) {
+      name += ' (' + opts.count + ')';
+    }
+
     // Add it (and store it in _layers for potential removal later)
     _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, opts.name);
+    _mapPane.layerController.addOverlay(layer, name);
     _layers[opts.id] = layer;
 
     _summaryPane.addFeature({
       id: opts.id,
-      name: opts.name,
+      name: name,
       summary: layer.summary
     });
   };
@@ -177,6 +183,7 @@ var Features = function (options) {
       url: opts.url,
       success: function (data) {
         _addFeature({
+          count: data.metadata.count,
           id: opts.id,
           layerClass: opts.layerClass,
           layerOptions: {
