@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
-    <ul class="panes">
-      <li><a href="#edit">Edit</a></li>
-      <li><a href="#map">Map</a></li>
-      <li><a href="#summary">Summary</a></li>
-    </ul>
-    <section id="edit">
+    <div id="toolbar">
+      <ul id="nav" class="panes">
+        <li><a href="#edit">Edit</a></li>
+        <li><a href="#map">Map</a></li>
+        <li><a href="#summary">Summary</a></li>
+      </ul>
+    </div>
+    <section id="edit" class="pane">
       <h2>Edit</h2>
       <form>
         <label for="eqid">
@@ -36,11 +38,11 @@
         </label>
       </form>
     </section>
-    <section id="map">
+    <section id="map" class="pane">
       <h2>Map</h2>
       <div class="map"></div>
     </section>
-    <section id="summary">
+    <section id="summary" class="pane">
       <h2>Summary</h2>
       <div class="features"></div>
     </section>
