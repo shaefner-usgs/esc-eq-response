@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Moment = require('Moment');
+var Moment = require('moment');
 
 
 /**
@@ -11,7 +11,7 @@ var SummaryPane = function () {
   var _this,
       _initialize,
 
-      _summaries,
+      _features,
 
       _addTimestamp;
 
@@ -19,7 +19,7 @@ var SummaryPane = function () {
   _this = {};
 
   _initialize = function () {
-    _summaries = document.querySelector('.summaries');
+    _features = document.querySelector('.features');
 
     _addTimestamp();
   };
@@ -35,7 +35,7 @@ var SummaryPane = function () {
     timestamp = Moment().format('ddd MMM D, YYYY h:mm:ss A');
 
     time.innerHTML = timestamp;
-    _summaries.appendChild(time);
+    _features.appendChild(time);
   };
 
   /**
@@ -48,14 +48,15 @@ var SummaryPane = function () {
    *     summary: {Html} // Summary text
    *   }
    */
-  _this.addSummary = function (opts) {
+  _this.addFeature = function (opts) {
     var div;
 
     div = document.createElement('div');
+    div.classList.add('feature');
     div.setAttribute('id', opts.id);
     div.innerHTML = '<h3>' + opts.name + '</h3>' + opts.summary;
 
-    _summaries.appendChild(div);
+    _features.appendChild(div);
   };
 
   /**
@@ -64,7 +65,7 @@ var SummaryPane = function () {
    * @param el {Element}
    *     Element to remove
    */
-  _this.removeSummary = function (el) {
+  _this.removeFeature = function (el) {
     el.parentNode.removeChild(el);
   };
 

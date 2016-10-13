@@ -88,7 +88,7 @@ var Features = function (options) {
     _mapPane.layerController.addOverlay(layer, opts.name);
     _layers[opts.id] = layer;
 
-    _summaryPane.addSummary({
+    _summaryPane.addFeature({
       id: opts.id,
       name: opts.name,
       summary: layer.summary
@@ -207,7 +207,7 @@ var Features = function (options) {
         _mapPane.map.removeLayer(layer);
         _mapPane.layerController.removeLayer(layer);
 
-        _summaryPane.removeSummary(summary);
+        _summaryPane.removeFeature(summary);
       });
     }
   };
