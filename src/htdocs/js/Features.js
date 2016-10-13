@@ -2,7 +2,7 @@
 
 
 var EarthquakesLayer = require('features/EarthquakesLayer'),
-    Moment = require('Moment'),
+    Moment = require('moment'),
     Xhr = require('util/Xhr');
 
 
