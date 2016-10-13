@@ -73,7 +73,7 @@ var Map = function (options) {
     layers.overlays = {
       'Faults': faults
     };
-    layers.defaults = [terrain];
+    layers.defaults = [terrain, faults];
 
     return layers;
   };
