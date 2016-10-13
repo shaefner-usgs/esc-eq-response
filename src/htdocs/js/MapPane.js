@@ -86,7 +86,7 @@ var Map = function (options) {
 
     // Create map
     _this.map = L.map(_el, {
-      center: [38, -123],
+      center: [38, -118],
       layers: _this.layers.defaults,
       scrollWheelZoom: false,
       zoom: 7

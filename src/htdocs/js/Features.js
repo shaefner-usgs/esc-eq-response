@@ -235,7 +235,7 @@ var Features = function (options) {
     coords = _mainshock.geometry.coordinates;
 
     _editPane.setDefaults(_mainshock);
-    _mapPane.map.setView([coords[1], coords[0]], 9, true);
+    _mapPane.map.setView([coords[1], coords[0]], 10, true);
 
     // First, remove any existing event-specific features
     _removeFeatures();
