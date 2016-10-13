@@ -97,6 +97,13 @@ var Features = function (options) {
     _mapPane.layerController.addOverlay(layer, name);
     _layers[opts.id] = layer;
 
+    // Render mainshock on top of other features
+    if (opts.name === 'Mainshock') {
+      layer.bringToFront();
+    } else {
+      layer.bringToBack();
+    }
+
     _summaryPane.addFeature({
       id: opts.id,
       name: name,
