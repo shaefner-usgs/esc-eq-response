@@ -1,7 +1,28 @@
-.hide {
-  display: none;
+@import '_editPane.scss';
+@import '_mapPane.scss';
+@import '_navigation.scss';
+@import '_summaryPane.scss';
+@import '_toolbar.scss';
+
+html, body {
+  font: 16px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.map {
-  height: 500px;
+body {
+  position: relative;
+}
+
+.pane {
+  padding: 4em 1em 1em;
+
+  &#map {
+    padding: 0;
+  }
+
+  > h2 {
+    display: none;
+  }
 }
