@@ -171,11 +171,11 @@ var EarthquakesLayer = function (options) {
         eqMoment,
         label,
         labelTemplate,
-        localTime,
         popup,
         popupTemplate,
         props,
         summaryTemplate,
+        time,
         tz,
         utcTime;
 
@@ -185,25 +185,25 @@ var EarthquakesLayer = function (options) {
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
-      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
-      tz = ' at epicenter';
+      time = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
+      tz = 'at epicenter';
     } else {
-      localTime = utcTime;
-      tz = ' UTC';
+      time = utcTime;
+      tz = 'UTC';
     }
 
     data = {
       depth: Math.round(feature.geometry.coordinates[2] * 10) / 10,
       lat: feature.geometry.coordinates[1],
       lng: feature.geometry.coordinates[0],
-      localTime: localTime,
       mag: Math.round(props.mag * 10) / 10,
       magType: props.magType,
       place: props.place,
       status: props.status,
+      time: time,
       tz: tz,
-      utcTime: utcTime,
-      url: props.url
+      url: props.url,
+      utcTime: utcTime
     };
 
     // Create label
@@ -231,7 +231,7 @@ var EarthquakesLayer = function (options) {
     // Create summary html
     summaryTemplate = '<tr>' +
         '<td>{magType} {mag}</td>' +
-        '<td>{localTime} {tz}</td>' +
+        '<td>{time} {tz}</td>' +
         '<td>{lat}, {lng}</td>' +
         '<td>{depth} km</td>' +
       '</tr>';
