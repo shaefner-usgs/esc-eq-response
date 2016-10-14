@@ -20,4 +20,23 @@
       content: 'Updated: ';
     }
   }
+
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .feature {
+    width: 100%;
+  }
+}
+
+#mainshock {
+  order: 0;
+}
+#aftershocks {
+  order: 1;
+}
+#historical {
+  order: 2;
 }
