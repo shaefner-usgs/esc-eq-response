@@ -47,6 +47,7 @@ var EarthquakesLayer = function (options) {
   var _this,
       _initialize,
 
+      _id,
       _mainshock,
       _markerOptions,
       _pastDay,
@@ -65,6 +66,7 @@ var EarthquakesLayer = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
+    _id = options.id;
     _mainshock = {
       mag: options.mainshock.properties.mag,
       time: options.mainshock.properties.time
@@ -73,6 +75,8 @@ var EarthquakesLayer = function (options) {
     _pastHour = Moment.utc().subtract(1, 'hours');
     _pastWeek = Moment.utc().subtract(1, 'weeks');
     _summary = '';
+
+    // Mag threshold for list on summary pane
     _threshold = {
       aftershocks: Math.floor(_mainshock.mag - 2.5),
       historical: Math.floor(_mainshock.mag - 1)
@@ -123,15 +127,27 @@ var EarthquakesLayer = function (options) {
    * @return summary {String}
    */
   _getSummary = function () {
-    var summary;
+    var formValues,
+        summary;
+
+    formValues = {
+      aftershocksDist: document.getElementById('aftershocks-dist').value,
+      historicalDist: document.getElementById('historical-dist').value,
+      historicalYears: document.getElementById('historical-years').value
+    };
 
     summary = '';
+    if (_id === 'aftershocks' || _id === 'historical') {
+      summary += '<p>Earthquakes within ' + formValues[_id + 'Dist'] + ' km of ' +
+        'mainshock epicenter';
+      summary += ' (displaying only M ' + _threshold[_id] + '+).</p>';
+    }
 
     if (_summary) {
       summary += '<table>' +
           '<tr>' +
             '<th>Mag</th>' +
-            '<th>Time <span>(local unless UTC specified)</span></th>' +
+            '<th>Time</th>' +
             '<th>Cooordinates</th>' +
             '<th>Depth</th>' +
           '</tr>' +
@@ -159,6 +175,7 @@ var EarthquakesLayer = function (options) {
         popupTemplate,
         props,
         summaryTemplate,
+        tz,
         utcTime;
 
     props = feature.properties;
@@ -168,12 +185,14 @@ var EarthquakesLayer = function (options) {
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
       localTime = momentObj.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
+      tz = ' at epicenter';
     } else {
       localTime = utcTime;
+      tz = ' UTC';
     }
 
     data = {
-      depth: feature.geometry.coordinates[2],
+      depth: Math.round(feature.geometry.coordinates[2] * 10) / 10,
       lat: feature.geometry.coordinates[1],
       lng: feature.geometry.coordinates[0],
       localTime: localTime,
@@ -181,6 +200,7 @@ var EarthquakesLayer = function (options) {
       magType: props.magType,
       place: props.place,
       status: props.status,
+      tz: tz,
       utcTime: utcTime,
       url: props.url
     };
@@ -210,12 +230,12 @@ var EarthquakesLayer = function (options) {
     // Create summary html
     summaryTemplate = '<tr>' +
         '<td>{magType} {mag}</td>' +
-        '<td>{localTime}</td>' +
+        '<td>{localTime} {tz}</td>' +
         '<td>{lat}, {lng}</td>' +
         '<td>{depth} km</td>' +
       '</tr>';
 
-    // only add to summary if above a magnitude threshold
+    // only add to summary if above magnitude threshold
     if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
         (props.time < _mainshock.time && props.mag > _threshold.historical) ||
          props.time === _mainshock.time) {
