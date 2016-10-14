@@ -50,9 +50,9 @@ var EarthquakesLayer = function (options) {
       _id,
       _mainshock,
       _markerOptions,
-      _pastDay,
-      _pastHour,
-      _pastWeek,
+      _pastDayMoment,
+      _pastHourMoment,
+      _pastWeekMoment,
       _summary,
       _threshold,
 
@@ -69,11 +69,12 @@ var EarthquakesLayer = function (options) {
     _id = options.id;
     _mainshock = {
       mag: options.mainshock.properties.mag,
+      moment: Moment.utc(options.mainshock.properties.time, 'x'),
       time: options.mainshock.properties.time
     };
-    _pastDay = Moment.utc().subtract(1, 'days');
-    _pastHour = Moment.utc().subtract(1, 'hours');
-    _pastWeek = Moment.utc().subtract(1, 'weeks');
+    _pastDayMoment = Moment.utc().subtract(1, 'days');
+    _pastHourMoment = Moment.utc().subtract(1, 'hours');
+    _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
     _summary = '';
 
     // Mag threshold for list on summary pane
@@ -101,18 +102,18 @@ var EarthquakesLayer = function (options) {
    */
   _getAge = function (timestamp) {
     var age,
-        eqtime;
+        eqMoment;
 
-    eqtime = Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (timestamp < _mainshock.time) {
+    eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
+    if (eqMoment.isBefore(_mainshock.moment)) {
       age = 'historical';
-    } else if (eqtime.isSameOrAfter(_pastHour)) {
+    } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
       age = 'pastweek';
-    } else if (eqtime.isSameOrAfter(_pastDay)) {
+    } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
       age = 'pastday';
-    } else if (eqtime.isSameOrAfter(_pastWeek)) {
+    } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
       age = 'pasthour';
-    } else if (timestamp === _mainshock.time) {
+    } else if (eqMoment.isSame(_mainshock.moment)) {
       age = 'mainshock';
     } else {
       age = 'older';
@@ -167,10 +168,10 @@ var EarthquakesLayer = function (options) {
    */
   _onEachFeature = function (feature, layer) {
     var data,
+        eqMoment,
         label,
         labelTemplate,
         localTime,
-        momentObj,
         popup,
         popupTemplate,
         props,
@@ -179,12 +180,12 @@ var EarthquakesLayer = function (options) {
         utcTime;
 
     props = feature.properties;
-    momentObj = Moment.utc(props.time, 'x');
-    utcTime = momentObj.format('MMM D, YYYY HH:mm:ss') + ' UTC';
+    eqMoment = Moment.utc(props.time, 'x');
+    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
-      localTime = momentObj.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
+      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
       tz = ' at epicenter';
     } else {
       localTime = utcTime;
