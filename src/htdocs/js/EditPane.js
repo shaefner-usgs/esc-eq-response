@@ -57,8 +57,8 @@ var EditPane = function () {
     mag = mainshock.properties.mag;
 
     return {
-      ashockDistance: Math.max(5, Math.round(mag - 2) * 5),
-      histDistance: Math.max(10, Math.round(mag - 2) * 10)
+      'aftershocks-dist': Math.max(5, Math.round(mag - 2) * 5),
+      'historical-dist': Math.max(10, Math.round(mag - 2) * 10)
     };
   };
 

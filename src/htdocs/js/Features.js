@@ -57,7 +57,7 @@ var Features = function (options) {
     params = {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('ashockDistance').value,
+      maxradiuskm: document.getElementById('aftershocks-dist').value,
       starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
     };
 
@@ -119,12 +119,12 @@ var Features = function (options) {
     var params,
         years;
 
-    years = document.getElementById('histYears').value;
+    years = document.getElementById('historical-years').value;
     params = {
       endtime: Moment(_mainshock.properties.time).utc().toISOString().slice(0, -5),
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('histDistance').value,
+      maxradiuskm: document.getElementById('historical-dist').value,
       starttime: Moment(_mainshock.properties.time).utc().subtract(years, 'years')
         .toISOString().slice(0, -5)
     };
@@ -144,10 +144,13 @@ var Features = function (options) {
    * @param data {Object} GeoJson data
    */
   _addMainshock = function (data) {
+    var id = 'mainshock';
+
     _addFeature({
-      id: 'mainshock',
+      id: id,
       layerClass: EarthquakesLayer,
       layerOptions: {
+        id: id,
         data: data,
         mainshock: _mainshock,
       },
@@ -197,6 +200,7 @@ var Features = function (options) {
           id: opts.id,
           layerClass: opts.layerClass,
           layerOptions: {
+            id: opts.id,
             data: data,
             mainshock: _mainshock
           },
