@@ -18,7 +18,7 @@ _COLORS = {
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  older: '#ffd'
+  older: '#ffe'
 };
 _MARKER_DEFAULTS = {
   weight: 1,
