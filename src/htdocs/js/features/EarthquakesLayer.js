@@ -108,11 +108,11 @@ var EarthquakesLayer = function (options) {
     if (eqMoment.isBefore(_mainshock.moment)) {
       age = 'historical';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
-      age = 'pastweek';
+      age = 'pasthour';
     } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
       age = 'pastday';
     } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
-      age = 'pasthour';
+      age = 'pastweek';
     } else if (eqMoment.isSame(_mainshock.moment)) {
       age = 'mainshock';
     } else {
