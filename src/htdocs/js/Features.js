@@ -132,7 +132,7 @@ var Features = function (options) {
     _loadFeed({
       id: 'historical',
       layerClass: EarthquakesLayer,
-      name: 'Historical seismicity',
+      name: 'Historical Seismicity',
       url: _getFeedUrl(params)
     });
   };
