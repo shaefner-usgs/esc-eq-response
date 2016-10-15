@@ -21,13 +21,25 @@
     }
   }
 
+  .empty {
+    background: none;
+    border: 0;
+  }
+
   .features {
     display: flex;
     flex-wrap: wrap;
   }
 
   .feature {
+    border-bottom: 1px solid #ddd;
+  	padding: 1em 0 2em;
     width: 100%;
+
+    &:last-child {
+      border: 0;
+      padding-bottom: 0;
+    }
   }
 }
 
