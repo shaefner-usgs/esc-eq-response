@@ -4,6 +4,8 @@
 var Application = require('Application');
 
 Application({
-  map: document.querySelector('.map'),
-  summary: document.querySelector('#summary')
+  edit: document.getElementById('edit'),
+  map: document.querySelector('#map .map'),
+  nav: document.getElementById('nav'),
+  summary: document.getElementById('summary')
 });

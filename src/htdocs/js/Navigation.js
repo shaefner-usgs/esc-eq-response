@@ -13,6 +13,7 @@ var Navigation = function (options) {
   var _this,
       _initialize,
 
+      _el,
       _panes,
 
       _addListeners,
@@ -28,8 +29,11 @@ var Navigation = function (options) {
   _initialize = function (options) {
     var id;
 
+    options = options || {};
+    _el = options.el || document.createElement('div');
     _map = options.mapPane.map;
-    _panes = document.querySelectorAll('.panes a');
+
+    _panes = _el.querySelectorAll('.panes a');
     id = _getDefaultPaneId();
 
     _addListeners();
@@ -86,8 +90,8 @@ var Navigation = function (options) {
 
     for (var i = 0; i < _panes.length; i ++) {
       id = _panes[i].hash.substr(1);
-      button = document.querySelector('[href="#' + id + '"]');
-      pane = document.querySelector('#' + id);
+      button = _el.querySelector('[href="#' + id + '"]');
+      pane = document.getElementById(id);
 
       button.classList.remove('selected');
       pane.classList.add('hide');
@@ -104,8 +108,8 @@ var Navigation = function (options) {
     var button,
         pane;
 
-    button = document.querySelector('[href="#' + id + '"]');
-    pane = document.querySelector('#' + id);
+    button = _el.querySelector('[href="#' + id + '"]');
+    pane = document.getElementById(id);
 
     button.classList.add('selected');
     pane.classList.remove('hide');

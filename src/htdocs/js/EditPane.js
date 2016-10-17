@@ -5,10 +5,11 @@
  * Edit pane - handles form fields and setting browser's address bar to match
  *  application state
  */
-var EditPane = function () {
+var EditPane = function (options) {
   var _this,
       _initialize,
 
+      _el,
       _inputs,
 
       _addListeners,
@@ -21,10 +22,13 @@ var EditPane = function () {
 
   _this = {};
 
-  _initialize = function () {
-    _inputs = document.querySelectorAll('input');
+  _initialize = function (options) {
+    options = options || {};
+    _el = options.el || document.createElement('div');
 
     document.getElementById('eqid').focus();
+
+    _inputs = _el.querySelectorAll('input');
 
     _addListeners();
     _setFormFields();
@@ -179,7 +183,8 @@ var EditPane = function () {
   };
 
 
-  _initialize();
+  _initialize(options);
+  options = null;
   return _this;
 };
 

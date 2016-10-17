@@ -7,10 +7,11 @@ var Moment = require('moment');
 /**
  * Summary pane - adds / removes summary info for selected event
  */
-var SummaryPane = function () {
+var SummaryPane = function (options) {
   var _this,
       _initialize,
 
+      _el,
       _features,
 
       _addTimestamp;
@@ -18,8 +19,11 @@ var SummaryPane = function () {
 
   _this = {};
 
-  _initialize = function () {
-    _features = document.querySelector('.features');
+  _initialize = function (options) {
+    options = options || {};
+    _el = options.el || document.createElement('div');
+
+    _features = _el.querySelector('.features');
 
     _addTimestamp();
   };
@@ -28,16 +32,14 @@ var SummaryPane = function () {
    * Add timestamp to summary page
    */
   _addTimestamp = function () {
-    var summary,
-        time,
+    var time,
         timestamp;
 
-    summary = document.getElementById('summary');
     time = document.createElement('time');
-    timestamp = Moment().format('ddd MMM D, YYYY h:mm:ss A');
-
+    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A');
     time.innerHTML = timestamp;
-    summary.insertBefore(time, _features);
+
+    _el.insertBefore(time, _features);
   };
 
   /**
@@ -72,7 +74,8 @@ var SummaryPane = function () {
   };
 
 
-  _initialize();
+  _initialize(options);
+  options = null;
   return _this;
 };
 

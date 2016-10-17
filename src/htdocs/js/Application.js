@@ -24,7 +24,6 @@ var Application = function (options) {
 
       _editPane,
       _eqid,
-      _els,
       _features,
       _mapPane,
       _navigation,
@@ -36,30 +35,31 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    _els = {
-      map: options.map,
-      summary: options.summary
-    };
     _eqid = document.getElementById('eqid');
 
-    // Set up each pane (or 'page') of app
-    _editPane = EditPane();
-    _mapPane = MapPane({
-      el: _els.map
+    // Initialize each pane (or 'page') of app & navigation
+    _editPane = EditPane({
+      el: options.edit
     });
-    _summaryPane = SummaryPane();
-
+    _mapPane = MapPane({
+      el: options.map
+    });
+    _summaryPane = SummaryPane({
+      el: options.summary
+    });
     _navigation = Navigation({
+      el: options.nav,
       mapPane: _mapPane
     });
 
-    // Features are event-specific layers on map and summary pages
+    // Initialize features (event-specific layers) on map and summary panes
     _features = Features({
       editPane: _editPane,
       mapPane: _mapPane,
       summaryPane: _summaryPane
     });
 
+    // Call _createEarthquake() when eqid is supplied
     if (_eqid.value) {
       _createEarthquake();
     }
