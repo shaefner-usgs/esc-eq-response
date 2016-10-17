@@ -236,7 +236,7 @@ var Features = function (options) {
   _this.initFeatures = function (geojson) {
     var coords;
 
-    _mainshock = geojson.features[0];
+    _mainshock = geojson;
     coords = _mainshock.geometry.coordinates;
 
     _mapPane.map.setView([coords[1], coords[0]], 10, true);
@@ -245,7 +245,7 @@ var Features = function (options) {
     _removeFeatures();
 
     // Now, add event-specific features
-    _addMainshock(geojson);
+    _addMainshock(_mainshock);
     _this.addAftershocks();
     _this.addHistorical();
   };

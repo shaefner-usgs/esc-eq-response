@@ -51,29 +51,24 @@ var Earthquake = function (options) {
     props = data.properties;
 
     geojson = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          id: data.id,
-          geometry: data.geometry,
-          properties: {
-            features: _getFeatures(data.properties.products),
-            mag: props.mag,
-            magType: props.magType,
-            place: props.place,
-            status: props.status,
-            time: props.time,
-            tz: props.tz,
-            updated: props.updated,
-            url: props.url
-          },
-          type: 'Feature'
-        }
-      ],
+      id: data.id,
+      geometry: data.geometry,
       metadata: {
         generated: Date.now(),
         title: 'Mainshock'
-      }
+      },
+      properties: {
+        features: _getFeatures(data.properties.products),
+        mag: props.mag,
+        magType: props.magType,
+        place: props.place,
+        status: props.status,
+        time: props.time,
+        tz: props.tz,
+        updated: props.updated,
+        url: props.url
+      },
+      type: 'Feature'
     };
 
     _callback(geojson);
