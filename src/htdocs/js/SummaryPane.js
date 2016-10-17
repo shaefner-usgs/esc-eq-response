@@ -19,7 +19,8 @@ var SummaryPane = function (options) {
       _el,
       _features,
 
-      _addTimestamp;
+      _addTimestamp,
+      _updateTimestamp;
 
 
   _this = {};
@@ -37,14 +38,20 @@ var SummaryPane = function (options) {
    * Add timestamp to summary page
    */
   _addTimestamp = function () {
+    var time;
+
+    time = document.createElement('time');
+    _el.insertBefore(time, _features);
+  };
+
+  _updateTimestamp = function () {
     var time,
         timestamp;
 
-    time = document.createElement('time');
+    time = _el.querySelector('time');
     timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A');
-    time.innerHTML = timestamp;
 
-    _el.insertBefore(time, _features);
+    time.innerHTML = timestamp;
   };
 
   /**
@@ -66,6 +73,8 @@ var SummaryPane = function (options) {
     div.innerHTML = '<h3>' + opts.name + '</h3>' + opts.summary;
 
     _features.appendChild(div);
+
+    _updateTimestamp();
   };
 
   /**
