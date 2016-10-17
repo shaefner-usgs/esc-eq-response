@@ -63,6 +63,7 @@ var EarthquakesLayer = function (options) {
       _getIntervals,
       _getPeriod,
       _getSummary,
+      _getTemplate,
       _onEachFeature,
       _pointToLayer;
 
@@ -144,10 +145,10 @@ var EarthquakesLayer = function (options) {
         '<th>' + _period + ' month</th>' +
         '<th>' + _period + ' year</th>' +
       '</tr>';
-    _bins.forEach(function(rows, mag) {
+    _bins.forEach(function(cols, mag) {
       table += '<tr><td>M ' + mag + '+</td>';
-      rows.forEach(function(row) {
-        table += '<td>' + row + '</td>';
+      cols.forEach(function(col) {
+        table += '<td>' + col + '</td>';
       });
       table += '</tr>';
     });
@@ -174,7 +175,7 @@ var EarthquakesLayer = function (options) {
   };
 
   /**
-   * Get nomenclature depending on type of event (aftershock, historical)
+   * Get nomenclature depending on type (aftershock, historical) of event
    *
    * @param days {Number}
    *
@@ -233,6 +234,42 @@ var EarthquakesLayer = function (options) {
   };
 
   /**
+   * Get html template for displaying eq details
+   *
+   * @param type {String}
+   *
+   * @return template {Html}
+   */
+  _getTemplate = function (type) {
+    var template;
+
+    if (type === 'label') {
+      template = 'M{mag} - {utcTime}';
+    }
+    else if (type === 'popup') {
+      template = '<div class="popup eq">' +
+        '<h2><a href="{url}" target="_blank">M {mag} - {place}</a></h2>' +
+        '<dl>' +
+          '<dt>Time</dt><dd><time>{utcTime}</time></dd>' +
+          '<dt>Location (depth)</dt><dd>{lat}, {lng} ({depth} km)</dd>' +
+          '<dt>Magnitude ({magType})</dt><dd>{mag}</dd>' +
+          '<dt>Status</dt><dd>{status}</dd>' +
+        '</dl>' +
+      '</div>';
+    }
+    else if (type === 'summary') {
+      template = '<tr>' +
+        '<td>{magType} {mag}</td>' +
+        '<td>{time} {tz}</td>' +
+        '<td>{lat}, {lng}</td>' +
+        '<td>{depth} km</td>' +
+      '</tr>';
+    }
+
+    return template;
+  };
+
+  /**
    * Leaflet GeoJSON option: called on each created feature layer. Useful for
    * attaching events and popups to features.
    *
@@ -260,35 +297,6 @@ var EarthquakesLayer = function (options) {
     eqMoment = Moment.utc(props.time, 'x');
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
-    // Bin eqs by magnitude and time
-    if (_id !== 'mainshock') {
-      decimalDays = Moment.duration(eqMoment - _mainshock.moment).asDays();
-      if (!_period) {
-        _period = _getPeriod(decimalDays);
-      }
-
-      magInt = Math.floor(props.mag);
-      if (!_bins[magInt]) {
-        intervals = _getIntervals(_period);
-        _bins[magInt] = intervals;
-      }
-
-      _bins[magInt][0] ++; // total
-      days = Math.floor(Math.abs(decimalDays));
-      if (days <= 365) { // bin eqs less than one year apart
-        _bins[magInt][365] ++;
-        if (days <= 30) {
-          _bins[magInt][30] ++;
-          if (days <= 7) {
-            _bins[magInt][7] ++;
-            if (days <= 1) {
-              _bins[magInt][1] ++;
-            }
-          }
-        }
-      }
-    }
-
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
       time = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
@@ -313,19 +321,15 @@ var EarthquakesLayer = function (options) {
     };
 
     // Create label
-    labelTemplate = 'M{mag} - {utcTime}';
+    if (!labelTemplate) {
+      labelTemplate = _getTemplate('label');
+    }
     label = L.Util.template(labelTemplate, data);
 
     // Create popup html
-    popupTemplate = '<div class="popup eq">' +
-        '<h2><a href="{url}" target="_blank">M {mag} - {place}</a></h2>' +
-        '<dl>' +
-          '<dt>Time</dt><dd><time>{utcTime}</time></dd>' +
-          '<dt>Location (depth)</dt><dd>{lat}, {lng} ({depth} km)</dd>' +
-          '<dt>Magnitude ({magType})</dt><dd>{mag}</dd>' +
-          '<dt>Status</dt><dd>{status}</dd>' +
-        '</dl>' +
-      '</div>';
+    if (!popupTemplate) {
+      popupTemplate = _getTemplate('popup');
+    }
     popup = L.Util.template(popupTemplate, data);
 
     // Bind popup and label to marker
@@ -335,18 +339,43 @@ var EarthquakesLayer = function (options) {
     }).bindLabel(label);
 
     // Create summary html
-    summaryTemplate = '<tr>' +
-        '<td>{magType} {mag}</td>' +
-        '<td>{time} {tz}</td>' +
-        '<td>{lat}, {lng}</td>' +
-        '<td>{depth} km</td>' +
-      '</tr>';
-
-    // only add to summary if above magnitude threshold
+    if (!summaryTemplate) {
+      summaryTemplate = _getTemplate('summary');
+    }
+    // Only add eq to summary if above magnitude threshold
     if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
         (props.time < _mainshock.time && props.mag > _threshold.historical) ||
          props.time === _mainshock.time) {
       _summary += L.Util.template(summaryTemplate, data);
+    }
+
+    // Bin eq totals by magnitude and time
+    if (_id !== 'mainshock') {
+      decimalDays = Moment.duration(eqMoment - _mainshock.moment).asDays();
+      if (!_period) {
+        _period = _getPeriod(decimalDays);
+      }
+
+      magInt = Math.floor(props.mag);
+      if (!_bins[magInt]) {
+        intervals = _getIntervals();
+        _bins[magInt] = intervals;
+      }
+
+      _bins[magInt][0] ++; // total
+      days = Math.floor(Math.abs(decimalDays));
+      if (days <= 365) { // bin eqs less than one year apart
+        _bins[magInt][365] ++;
+        if (days <= 30) {
+          _bins[magInt][30] ++;
+          if (days <= 7) {
+            _bins[magInt][7] ++;
+            if (days <= 1) {
+              _bins[magInt][1] ++;
+            }
+          }
+        }
+      }
     }
   };
 
