@@ -17,13 +17,13 @@ var Earthquake = function (options) {
   var _this,
       _initialize,
 
-      _createGeoJson,
-      _getFeatures,
-      _loadDetailFeed,
-
       _callback,
       _editPane,
-      _id;
+      _id,
+
+      _createGeoJson,
+      _getFeatures,
+      _loadDetailFeed;
 
 
   _this = {};
