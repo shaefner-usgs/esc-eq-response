@@ -37,10 +37,7 @@ var Application = function (options) {
   _initialize = function (options) {
     _eqid = document.getElementById('eqid');
 
-    // Initialize each pane (or 'page') of app & navigation
-    _editPane = EditPane({
-      el: options.edit
-    });
+    // Initialize map, summary panes & navigation
     _mapPane = MapPane({
       el: options.map
     });
@@ -56,6 +53,12 @@ var Application = function (options) {
     _features = Features({
       mapPane: _mapPane,
       summaryPane: _summaryPane
+    });
+
+    // Initialize edit pane
+    _editPane = EditPane({
+      el: options.edit,
+      features: _features
     });
 
     // Call _createEarthquake() when eqid is supplied
