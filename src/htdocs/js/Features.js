@@ -28,9 +28,7 @@ var Features = function (options) {
       _mapPane,
       _summaryPane,
 
-      _addAftershocks,
       _addFeature,
-      _addHistorical,
       _addMainshock,
       _getFeedUrl,
       _loadFeed,
@@ -45,28 +43,6 @@ var Features = function (options) {
     _editPane = options.editPane;
     _mapPane = options.mapPane;
     _summaryPane = options.summaryPane;
-  };
-
-  /**
-   * Aftershocks feature layer
-   *   loads feed then adds it to map, summary panes thru callbacks
-   */
-  _addAftershocks = function () {
-    var params;
-
-    params = {
-      latitude: _mainshock.geometry.coordinates[1],
-      longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('aftershocks-dist').value,
-      starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
-    };
-
-    _loadFeed({
-      id: 'aftershocks',
-      layerClass: EarthquakesLayer,
-      name: 'Aftershocks',
-      url: _getFeedUrl(params)
-    });
   };
 
   /**
@@ -108,32 +84,6 @@ var Features = function (options) {
       id: opts.id,
       name: name,
       summary: layer.summary
-    });
-  };
-
-  /**
-   * Historical seismicity feature layer
-   *   loads feed then adds it to map, summary panes thru callbacks
-   */
-  _addHistorical = function () {
-    var params,
-        years;
-
-    years = document.getElementById('historical-years').value;
-    params = {
-      endtime: Moment(_mainshock.properties.time).utc().toISOString().slice(0, -5),
-      latitude: _mainshock.geometry.coordinates[1],
-      longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('historical-dist').value,
-      starttime: Moment(_mainshock.properties.time).utc().subtract(years, 'years')
-        .toISOString().slice(0, -5)
-    };
-
-    _loadFeed({
-      id: 'historical',
-      layerClass: EarthquakesLayer,
-      name: 'Historical Seismicity',
-      url: _getFeedUrl(params)
     });
   };
 
@@ -225,6 +175,54 @@ var Features = function (options) {
   };
 
   /**
+   * Aftershocks feature layer
+   *   loads feed then adds it to map, summary panes thru callbacks
+   */
+  _this.addAftershocks = function () {
+    var params;
+
+    params = {
+      latitude: _mainshock.geometry.coordinates[1],
+      longitude: _mainshock.geometry.coordinates[0],
+      maxradiuskm: document.getElementById('aftershocks-dist').value,
+      starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
+    };
+
+    _loadFeed({
+      id: 'aftershocks',
+      layerClass: EarthquakesLayer,
+      name: 'Aftershocks',
+      url: _getFeedUrl(params)
+    });
+  };
+
+  /**
+   * Historical seismicity feature layer
+   *   loads feed then adds it to map, summary panes thru callbacks
+   */
+  _this.addHistorical = function () {
+    var params,
+        years;
+
+    years = document.getElementById('historical-years').value;
+    params = {
+      endtime: Moment(_mainshock.properties.time).utc().toISOString().slice(0, -5),
+      latitude: _mainshock.geometry.coordinates[1],
+      longitude: _mainshock.geometry.coordinates[0],
+      maxradiuskm: document.getElementById('historical-dist').value,
+      starttime: Moment(_mainshock.properties.time).utc().subtract(years, 'years')
+        .toISOString().slice(0, -5)
+    };
+
+    _loadFeed({
+      id: 'historical',
+      layerClass: EarthquakesLayer,
+      name: 'Historical Seismicity',
+      url: _getFeedUrl(params)
+    });
+  };
+
+  /**
    * Set up environment / map and call methods for adding 'feature' layers
    *
    * @param geojson {Object}
@@ -244,8 +242,8 @@ var Features = function (options) {
 
     // Now, add event-specific features
     _addMainshock(geojson);
-    _addAftershocks();
-    _addHistorical();
+    _this.addAftershocks();
+    _this.addHistorical();
   };
 
   /**
