@@ -217,18 +217,9 @@ var Features = function (options) {
    * Remove all feature layers from map / layer controller, summary pane
    */
   _removeFeatures = function () {
-    var layer,
-        summary;
-
     if (_layers) {
       Object.keys(_layers).forEach(function(id) {
-        layer = _layers[id];
-        summary = document.getElementById(id);
-
-        _mapPane.map.removeLayer(layer);
-        _mapPane.layerController.removeLayer(layer);
-
-        _summaryPane.removeFeature(summary);
+        _this.removeFeature(id);
       });
     }
   };
@@ -255,6 +246,25 @@ var Features = function (options) {
     _addMainshock(geojson);
     _addAftershocks();
     _addHistorical();
+  };
+
+  /**
+   * Remove feature layer from map / layer controller, summary pane
+   *
+   * @param id {String}
+   *     feature to remove
+   */
+  _this.removeFeature = function (id) {
+    var layer,
+        summary;
+
+    layer = _layers[id];
+    summary = document.getElementById(id);
+
+    _mapPane.map.removeLayer(layer);
+    _mapPane.layerController.removeLayer(layer);
+
+    _summaryPane.removeFeature(summary);
   };
 
 
