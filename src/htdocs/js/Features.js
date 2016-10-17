@@ -14,8 +14,8 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
  *
  * @param options {Object}
  *   {
- *     data: {Object}, // Geojson data
- *     mainshock: {Object} // magnitude, time, etc.
+ *     mapPane: {Object}, // MapPane instance
+ *     summaryPane: {Object} // SummaryPane instance
  *   }
  */
 var Features = function (options) {
@@ -37,10 +37,11 @@ var Features = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    _layers = {};
-
+    options = options || {};
     _mapPane = options.mapPane;
     _summaryPane = options.summaryPane;
+
+    _layers = {};
   };
 
   /**
@@ -48,6 +49,7 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
+   *     count: {Integer}, // number of features in feature layer
    *     id: {String}, // layer id
    *     layerClass: {Function}, // creates Leaflet layer
    *     layerOptions: {Object}, // contains data prop (req'd) with geojson data
@@ -55,21 +57,25 @@ var Features = function (options) {
    *   }
    */
   _addFeature = function (opts) {
-    var layer,
+    var count,
+        id,
+        layer,
         name;
+
+    count = opts.count;
+    id = opts.id;
+    name = opts.name;
+    if (count) {
+      name += ' (' + count + ')';
+    }
 
     // Create Leaflet layer using Layer class specified in opts
     layer = opts.layerClass(opts.layerOptions);
 
-    name = opts.name;
-    if (opts.count) {
-      name += ' (' + opts.count + ')';
-    }
-
     // Add it (and store it in _layers for potential removal later)
     _mapPane.map.addLayer(layer);
     _mapPane.layerController.addOverlay(layer, name);
-    _layers[opts.id] = layer;
+    _layers[id] = layer;
 
     // Render mainshock on top of other features
     if (opts.name === 'Mainshock') {
@@ -79,17 +85,17 @@ var Features = function (options) {
     }
 
     _summaryPane.addFeature({
-      id: opts.id,
+      id: id,
       name: name,
       summary: layer.summary
     });
   };
 
   /**
-   * Wrapper for earthquake (mainshock) layer
-   *   _addFeature adds it to map, summary panes
+   * Wrapper for mainshock layer (_addFeature adds it to map, summary panes)
    *
-   * @param data {Object} GeoJson data
+   * @param data {Object}
+   *     GeoJson data returned by Earthquake class
    */
   _addMainshock = function (data) {
     var id = 'mainshock';
@@ -134,6 +140,7 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
+   *     id: {String},
    *     layerClass: {Function},
    *     name: {String},
    *     url: {String}
@@ -224,7 +231,7 @@ var Features = function (options) {
    * Set up environment / map and call methods for adding 'feature' layers
    *
    * @param geojson {Object}
-   *     Geojson data returned by Earthquake class
+   *     GeoJson data returned by Earthquake class
    */
   _this.initFeatures = function (geojson) {
     var coords;

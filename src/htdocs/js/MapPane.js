@@ -15,9 +15,12 @@ require('mappane/TerrainLayer');
 
 
 /**
- * Map pane - sets up leaflet map instance
+ * Sets up leaflet map instance
  *
  * @param options {Object}
+ *   {
+ *     el: {Element}
+ *   }
  */
 var Map = function (options) {
   var _this,
@@ -38,15 +41,14 @@ var Map = function (options) {
     _initMap();
   };
 
-
   /**
-   * Get all 'static' map layers (not related to mainshock) that will be on map
+   * Get all 'static' map layers (not directly related to mainshock)
    *
    * @return layers {Object}
    *    {
    *      baseLayers: {Object},
-   *      overlays: {Object},
-   *      defaults: {Array}
+   *      defaults: {Array},
+   *      overlays: {Object}
    *    }
    */
   _getMapLayers = function () {
@@ -70,10 +72,10 @@ var Map = function (options) {
       'Greyscale': greyscale,
       'Dark': dark
     };
+    layers.defaults = [terrain, faults];
     layers.overlays = {
       'Faults': faults
     };
-    layers.defaults = [terrain, faults];
 
     return layers;
   };

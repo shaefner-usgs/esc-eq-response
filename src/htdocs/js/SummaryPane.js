@@ -5,7 +5,12 @@ var Moment = require('moment');
 
 
 /**
- * Summary pane - adds / removes summary info for selected event
+ * Adds / removes summary info for selected event
+ *
+ * @param options {Object}
+ *   {
+ *     el: {Element}
+ *   }
  */
 var SummaryPane = function (options) {
   var _this,

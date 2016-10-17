@@ -10,6 +10,7 @@ var Xhr = require('util/Xhr');
  * @param options {Object}
  *   {
  *     callback: {Function},
+ *     editPane: {Object}, // EditPane instance
  *     id: {String}
  *   }
  */
@@ -29,6 +30,7 @@ var Earthquake = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    options = options || {};
     _callback = options.callback;
     _editPane = options.editPane;
     _id = options.id;
@@ -39,7 +41,8 @@ var Earthquake = function (options) {
   /**
    * Create GeoJson object for selected earthquake and return via _callback()
    *
-   * @param data {Object} GeoJson data
+   * @param data {Object}
+   *     GeoJson data
    */
   _createGeoJson = function (data) {
     var geojson,
@@ -78,6 +81,8 @@ var Earthquake = function (options) {
 
   /**
    * Get urls to data feeds needed for feature layers on map, summary panes
+   *
+   * @param products {Object}
    *
    * @return features {Object}
    */
@@ -119,5 +124,6 @@ var Earthquake = function (options) {
   options = null;
   return _this;
 };
+
 
 module.exports = Earthquake;

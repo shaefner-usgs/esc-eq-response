@@ -2,11 +2,12 @@
 
 
 /**
- * Switches between app panes of the single page app
+ * Switches between panes ('pages') of single page app
  *
  * @param options {Object}
  *   {
- *     mapPane: {Object} // mapPane instance
+ *     el: {Element}
+ *     mapPane: {Object} // MapPane instance
  *   }
  */
 var Navigation = function (options) {
@@ -56,7 +57,7 @@ var Navigation = function (options) {
   /**
    * Switch between panes in UI
    *
-   * @param e {Object} Event
+   * @param e {Event}
    */
   _changePane = function (e) {
     var id = e.target.hash.substr(1);
@@ -125,5 +126,6 @@ var Navigation = function (options) {
   options = null;
   return _this;
 };
+
 
 module.exports = Navigation;

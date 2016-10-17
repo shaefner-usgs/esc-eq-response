@@ -14,7 +14,9 @@ var Earthquake = require('Earthquake'),
  *
  * @param options {Object}
  *   {
+ *     edit: {ELement},
  *     map: {Element},
+ *     nav: {Element},
  *     summary: {Element}
  *   }
  */

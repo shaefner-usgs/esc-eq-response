@@ -2,8 +2,13 @@
 
 
 /**
- * Edit pane - handles form fields and setting browser's address bar to match
- *  application state
+ * Handles form fields and setting address bar to match application state
+ *
+ * @param options {Object}
+ *   {
+ *     el: {Element},
+ *     features: {Object} // Features instance
+ *   }
  */
 var EditPane = function (options) {
   var _this,
@@ -14,7 +19,7 @@ var EditPane = function (options) {
       _inputs,
 
       _addListener,
-      _addListeners,
+      _initListeners,
       _getDefaults,
       _getParams,
       _refreshAftershocks,
@@ -35,16 +40,15 @@ var EditPane = function (options) {
 
     _inputs = _el.querySelectorAll('input');
 
-    _addListeners();
+    _initListeners();
     _setFormFields();
     _setQueryString();
   };
 
-
   /**
-   * Add Event Listeners
+   * Initialize event listeners
    */
-  _addListeners = function () {
+  _initListeners = function () {
     var aftershocks,
         historical;
 
@@ -57,9 +61,14 @@ var EditPane = function (options) {
     // Update earthquake layer(s) when input is changed
     _addListener(aftershocks, _refreshAftershocks);
     _addListener(historical, _refreshHistorical);
-
   };
 
+  /**
+   * Add event listener
+   *
+   * @param els {Elements}
+   * @param listener {Function}
+   */
   _addListener = function (els, listener) {
     var i;
 
@@ -89,7 +98,7 @@ var EditPane = function (options) {
   /**
    * Get all url param name/value pairs
    *
-   * @return {Object}
+   * @return params {Object}
    */
   _getParams = function () {
     var params,
@@ -105,11 +114,17 @@ var EditPane = function (options) {
     return params;
   };
 
+  /**
+   * Refresh aftershocks feature layer
+   */
   _refreshAftershocks = function () {
     _features.removeFeature('aftershocks');
     _features.addAftershocks();
   };
 
+  /**
+   * Refresh historical seismicity feature layer
+   */
   _refreshHistorical = function () {
     _features.removeFeature('historical');
     _features.addHistorical();
