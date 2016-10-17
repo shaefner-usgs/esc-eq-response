@@ -135,33 +135,37 @@ var EarthquakesLayer = function (options) {
    */
   _getBinnedData = function () {
     var cell,
-        table,
+        html,
         total;
 
-    table = '<table>' +
-      '<tr>' +
-        '<th class="empty"></th>' +
-        '<th>' + _period + ' day</th>' +
-        '<th>' + _period + ' week</th>' +
-        '<th>' + _period + ' month</th>' +
-        '<th>' + _period + ' year</th>' +
-        '<th>Total</th>' +
-      '</tr>';
-    _bins.forEach(function(cols, mag) {
-      table += '<tr><td>M ' + mag + '+</td>';
-      cols.forEach(function(col, i) {
-        cell = '<td>' + col + '</td>';
-        if (i === 0) { // store total and add to table as last column
-          total = cell;
-        } else {
-          table += cell;
-        }
+    if (_bins.length > 0) {
+      html = '<table>' +
+        '<tr>' +
+          '<th class="empty"></th>' +
+          '<th>' + _period + ' day</th>' +
+          '<th>' + _period + ' week</th>' +
+          '<th>' + _period + ' month</th>' +
+          '<th>' + _period + ' year</th>' +
+          '<th>Total</th>' +
+        '</tr>';
+      _bins.forEach(function(cols, mag) {
+        html += '<tr><td>M ' + mag + '+</td>';
+        cols.forEach(function(col, i) {
+          cell = '<td>' + col + '</td>';
+          if (i === 0) { // store total and add to table as last column
+            total = cell;
+          } else {
+            html += cell;
+          }
+        });
+        html += total + '</tr>';
       });
-      table += total + '</tr>';
-    });
-    table += '</table>';
+      html += '</table>';
+    } else {
+      html = '<p>None.</p>';
+    }
 
-    return table;
+    return html;
   };
 
   /**
