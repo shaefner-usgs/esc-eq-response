@@ -222,7 +222,11 @@ var EarthquakesLayer = function (options) {
       };
 
       summary += '<p>Earthquakes within ' + formValues[_id + 'Dist'] + ' km of ' +
-        'mainshock epicenter</p>';
+        'mainshock epicenter';
+      if (_id === 'historical') {
+        summary += ' in the past ' + formValues[_id + 'Years'] + ' years';
+      }
+      summary += '.</p>';
       summary += _getBinnedData();
       summary += '<h4>M ' + _threshold[_id] + '+ Earthquakes</h4>';
     }
