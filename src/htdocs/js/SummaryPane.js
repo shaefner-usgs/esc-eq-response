@@ -28,14 +28,16 @@ var SummaryPane = function () {
    * Add timestamp to summary page
    */
   _addTimestamp = function () {
-    var time,
+    var summary,
+        time,
         timestamp;
 
+    summary = document.getElementById('summary');
     time = document.createElement('time');
     timestamp = Moment().format('ddd MMM D, YYYY h:mm:ss A');
 
     time.innerHTML = timestamp;
-    _features.appendChild(time);
+    summary.insertBefore(time, _features);
   };
 
   /**
