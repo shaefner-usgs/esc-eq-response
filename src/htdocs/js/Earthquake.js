@@ -22,6 +22,7 @@ var Earthquake = function (options) {
       _loadDetailFeed,
 
       _callback,
+      _editPane,
       _id;
 
 
@@ -29,6 +30,7 @@ var Earthquake = function (options) {
 
   _initialize = function (options) {
     _callback = options.callback;
+    _editPane = options.editPane;
     _id = options.id;
 
     _loadDetailFeed();
@@ -103,6 +105,7 @@ var Earthquake = function (options) {
     Xhr.ajax({
       url: url,
       success: function (data) {
+        _editPane.setDefaults(data);
         _createGeoJson(data);
       },
       error: function (status) {

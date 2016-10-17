@@ -54,7 +54,6 @@ var Application = function (options) {
 
     // Initialize features (event-specific layers) on map and summary panes
     _features = Features({
-      editPane: _editPane,
       mapPane: _mapPane,
       summaryPane: _summaryPane
     });
@@ -72,6 +71,7 @@ var Application = function (options) {
   _createEarthquake = function () {
     Earthquake({
       callback: _features.initFeatures, // add features to map and summary panes
+      editPane: _editPane,
       id: _eqid.value
     });
   };

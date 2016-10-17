@@ -22,7 +22,6 @@ var Features = function (options) {
   var _this,
       _initialize,
 
-      _editPane,
       _layers,
       _mainshock,
       _mapPane,
@@ -40,7 +39,6 @@ var Features = function (options) {
   _initialize = function (options) {
     _layers = {};
 
-    _editPane = options.editPane;
     _mapPane = options.mapPane;
     _summaryPane = options.summaryPane;
   };
@@ -234,7 +232,6 @@ var Features = function (options) {
     _mainshock = geojson.features[0];
     coords = _mainshock.geometry.coordinates;
 
-    _editPane.setDefaults(_mainshock);
     _mapPane.map.setView([coords[1], coords[0]], 10, true);
 
     // First, remove any existing event-specific features
