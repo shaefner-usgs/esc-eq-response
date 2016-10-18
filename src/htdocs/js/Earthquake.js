@@ -58,9 +58,13 @@ var Earthquake = function (options) {
         title: 'Mainshock'
       },
       properties: {
+        alert: props.alert,
+        cdi: props.cdi,
         features: _getFeatures(data.properties.products),
+        felt: props.felt,
         mag: props.mag,
         magType: props.magType,
+        mmi: props.mmi,
         place: props.place,
         status: props.status,
         time: props.time,
