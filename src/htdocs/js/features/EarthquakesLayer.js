@@ -277,6 +277,8 @@ var EarthquakesLayer = function (options) {
         formValues,
         summary;
 
+    summary = '';
+    
     if (_id !== 'mainshock') {
       duration = Math.round(Moment.duration(_nowMoment - _mainshock.moment)
         .asDays() * 10) / 10;
@@ -287,7 +289,7 @@ var EarthquakesLayer = function (options) {
         historicalYears: document.getElementById('historical-years').value
       };
 
-      summary = '<p>Earthquakes within ' + formValues[_id + 'Dist'] +
+      summary += '<p>Earthquakes within ' + formValues[_id + 'Dist'] +
         ' km of mainshock epicenter';
 
       if (_id === 'aftershocks') {
