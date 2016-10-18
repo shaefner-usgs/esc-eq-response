@@ -44,6 +44,9 @@ var SummaryPane = function (options) {
     _el.insertBefore(time, _features);
   };
 
+  /**
+   * Update timestamp
+   */
   _updateTimestamp = function () {
     var time,
         timestamp;
