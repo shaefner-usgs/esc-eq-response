@@ -54,15 +54,14 @@ var EarthquakesLayer = function (options) {
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
-      _period,
       _summaryTable,
       _threshold,
 
+      _addEqToBin,
       _getAge,
       _getBinnedData,
       _getBubbles,
       _getIntervals,
-      _getPeriod,
       _getSummary,
       _getTemplate,
       _onEachFeature,
@@ -75,7 +74,7 @@ var EarthquakesLayer = function (options) {
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _id = options.id;
-    _bins = [];
+    _bins = {};
     _mainshock = {
       mag: options.mainshock.properties.mag,
       moment: Moment.utc(options.mainshock.properties.time, 'x'),
@@ -99,6 +98,43 @@ var EarthquakesLayer = function (options) {
 
     // Attach html summary to layer
     _this.summary = _getSummary();
+  };
+
+  /**
+   * Bin earthquakes by magnitude and time period
+   *
+   * @param days {Integer}
+   * @param mag {Float}
+   * @param period {String}
+   */
+  _addEqToBin = function (days, mag, period) {
+    var intervals,
+        magInt;
+
+    magInt = Math.floor(mag);
+
+    if (!_bins[period]) {
+      _bins[period] = [];
+    }
+
+    if (!_bins[period][magInt]) {
+      intervals = _getIntervals();
+      _bins[period][magInt] = intervals;
+    }
+
+    _bins[period][magInt][0] ++; // total
+    if (days <= 365) { // bin eqs less than one year apart
+      _bins[period][magInt][365] ++;
+      if (days <= 30) {
+        _bins[period][magInt][30] ++;
+        if (days <= 7) {
+          _bins[period][magInt][7] ++;
+          if (days <= 1) {
+            _bins[period][magInt][1] ++;
+          }
+        }
+      }
+    }
   };
 
   /**
@@ -133,24 +169,27 @@ var EarthquakesLayer = function (options) {
   /**
    * Get table containing binned earthquake data
    *
-   * @return table {Html}
+   * @param period {String}
+   *     'First', 'Past', or 'Prior' depending on type (aftershocks/historical)
+   *
+   * @return html {Html}
    */
-  _getBinnedData = function () {
+  _getBinnedData = function (period) {
     var cell,
         html,
         total;
 
-    if (_bins.length > 0) {
+    if (_bins[period].length > 0) {
       html = '<table>' +
         '<tr>' +
           '<th class="empty"></th>' +
-          '<th>' + _period + ' day</th>' +
-          '<th>' + _period + ' week</th>' +
-          '<th>' + _period + ' month</th>' +
-          '<th>' + _period + ' year</th>' +
+          '<th>' + period + ' day</th>' +
+          '<th>' + period + ' week</th>' +
+          '<th>' + period + ' month</th>' +
+          '<th>' + period + ' year</th>' +
           '<th>Total</th>' +
         '</tr>';
-      _bins.forEach(function(cols, mag) {
+      _bins[period].forEach(function(cols, mag) {
         html += '<tr><td>M ' + mag + '+</td>';
         cols.forEach(function(col, i) {
           cell = '<td>' + col + '</td>';
@@ -226,25 +265,6 @@ var EarthquakesLayer = function (options) {
   };
 
   /**
-   * Get nomenclature depending on type (aftershock, historical) of event
-   *
-   * @param days {Number}
-   *
-   * @return period {String}
-   */
-  _getPeriod = function (days) {
-    var period;
-
-    if (days > 0) { // aftershock
-      period = 'First';
-    } else { // historical
-      period = 'Prior';
-    }
-
-    return period;
-  };
-
-  /**
    * Get summary html for summary pane
    *
    * @return summary {Html}
@@ -267,7 +287,12 @@ var EarthquakesLayer = function (options) {
         summary += ' in the prior ' + formValues[_id + 'Years'] + ' years';
       }
       summary += '.</p>';
-      summary += _getBinnedData();
+      if (_id === 'aftershocks') {
+        summary += _getBinnedData('First');
+      }
+      else if (_id === 'historical') {
+        summary += _getBinnedData('Prior');
+      }
       summary += '<h4>M ' + _threshold[_id] + '+ Earthquakes</h4>';
     }
 
@@ -340,13 +365,10 @@ var EarthquakesLayer = function (options) {
     var coords,
         data,
         days,
-        decimalDays,
         eqMoment,
-        intervals,
         label,
         labelTemplate,
         localTime,
-        magInt,
         popup,
         popupTemplate,
         props,
@@ -415,32 +437,13 @@ var EarthquakesLayer = function (options) {
     }
 
     // Bin eq totals by magnitude and time
-    if (_id !== 'mainshock') {
-      decimalDays = Moment.duration(eqMoment - _mainshock.moment).asDays();
-      if (!_period) {
-        _period = _getPeriod(decimalDays);
-      }
-
-      magInt = Math.floor(props.mag);
-      if (!_bins[magInt]) {
-        intervals = _getIntervals();
-        _bins[magInt] = intervals;
-      }
-
-      _bins[magInt][0] ++; // total
-      days = Math.floor(Math.abs(decimalDays));
-      if (days <= 365) { // bin eqs less than one year apart
-        _bins[magInt][365] ++;
-        if (days <= 30) {
-          _bins[magInt][30] ++;
-          if (days <= 7) {
-            _bins[magInt][7] ++;
-            if (days <= 1) {
-              _bins[magInt][1] ++;
-            }
-          }
-        }
-      }
+    if (_id === 'aftershocks') {
+      days = Math.floor(Moment.duration(eqMoment - _mainshock.moment).asDays());
+      _addEqToBin(days, props.mag, 'First');
+    }
+    else if (_id === 'historical') {
+      days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
+      _addEqToBin(days, props.mag, 'Prior');
     }
   };
 
