@@ -60,12 +60,14 @@ var EarthquakesLayer = function (options) {
 
       _getAge,
       _getBinnedData,
+      _getBubbles,
       _getIntervals,
       _getPeriod,
       _getSummary,
       _getTemplate,
       _onEachFeature,
-      _pointToLayer;
+      _pointToLayer,
+      _romanize;
 
 
   _initialize = function (options) {
@@ -169,6 +171,44 @@ var EarthquakesLayer = function (options) {
   };
 
   /**
+   * Get USGS 'Bubbles' HTML for popups
+   *
+   * @param data {Object}
+   *
+   * @return bubbles {Html}
+   */
+  _getBubbles = function (data) {
+    var bubbles,
+        bubblesTemplate;
+
+    bubblesTemplate = '';
+    if (data.cdi) { // DYFI
+      bubblesTemplate += '<a href="{url}#dyfi" class="mmi{cdi}" title="Did You Feel It?' +
+        ' maximum reported intensity ({felt} responses)"><strong class="roman">' +
+        '{cdi}</strong><br><abbr title="Did You Feel It?">DYFI?</abbr></a>';
+    }
+    if (data.mmi) { // ShakeMap
+      bubblesTemplate += '<a href="{url}#shakemap" class="mmi{mmi}" title="ShakeMap' +
+        ' maximum estimated intensity"><strong class="roman">{mmi}</strong><br>' +
+        '<abbr title="ShakeMap">ShakeMap</abbr></a>';
+    }
+    if (data.alert) { // PAGER
+      bubblesTemplate += '<a href="{url}#pager" class="pager-alertlevel-{alert}"' +
+      ' title="PAGER estimated impact alert level"><strong class="roman">' +
+      '{alert}</strong><br><abbr title="Prompt Assessment of Global Earthquakes for' +
+      ' Response">PAGER</abbr></a>';
+    }
+    if (data.tsunami) {
+      bubblesTemplate += '<a href="http://www.tsunami.gov/" class="tsunami"' +
+      ' title="Tsunami Warning Center"><img src="/img/tsunami.jpg"' +
+      ' alt="Tsunami Warning Center"></a>';
+    }
+    bubbles = L.Util.template(bubblesTemplate, data);
+
+    return bubbles;
+  };
+
+  /**
    * Get intervals to store binned data in
    *
    * @return intervals {Array}
@@ -224,7 +264,7 @@ var EarthquakesLayer = function (options) {
       summary += '<p>Earthquakes within ' + formValues[_id + 'Dist'] + ' km of ' +
         'mainshock epicenter';
       if (_id === 'historical') {
-        summary += ' in the past ' + formValues[_id + 'Years'] + ' years';
+        summary += ' in the prior ' + formValues[_id + 'Years'] + ' years';
       }
       summary += '.</p>';
       summary += _getBinnedData();
@@ -263,20 +303,25 @@ var EarthquakesLayer = function (options) {
     }
     else if (type === 'popup') {
       template = '<div class="popup eq">' +
-        '<h2><a href="{url}" target="_blank">M {mag} - {place}</a></h2>' +
+        '<h2><a href="{url}" target="_blank">{magType} {mag} - {place}</a></h2>' +
+        '<div class="impact-bubbles">{bubbles}</div>' +
         '<dl>' +
-          '<dt>Time</dt><dd><time>{utcTime}</time></dd>' +
-          '<dt>Location (depth)</dt><dd>{lat}, {lng} ({depth} km)</dd>' +
-          '<dt>Magnitude ({magType})</dt><dd>{mag}</dd>' +
-          '<dt>Status</dt><dd>{status}</dd>' +
+          '<dt>Time</dt>' +
+          '<dd><time datetime="{isoTime}">{utcTime}</time></dd>' +
+          '<dt>Location</dt>' +
+          '<dd>{latlng}</dd>' +
+          '<dt>Depth</dt>' +
+          '<dd>{depth} km</dd>' +
+          '<dt>Status</dt>' +
+          '<dd>{status}</dd>' +
         '</dl>' +
       '</div>';
     }
     else if (type === 'summary') {
       template = '<tr>' +
         '<td>{magType} {mag}</td>' +
-        '<td>{time} {tz}</td>' +
-        '<td>{lat}, {lng}</td>' +
+        '<td>{localTime}</td>' +
+        '<td>{latlng}</td>' +
         '<td>{depth} km</td>' +
       '</tr>';
     }
@@ -292,48 +337,53 @@ var EarthquakesLayer = function (options) {
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
-    var data,
+    var coords,
+        data,
         days,
         decimalDays,
         eqMoment,
         intervals,
         label,
         labelTemplate,
+        localTime,
         magInt,
         popup,
         popupTemplate,
         props,
         summaryTemplate,
-        time,
-        tz,
         utcTime;
 
+    coords = feature.geometry.coordinates;
     props = feature.properties;
     eqMoment = Moment.utc(props.time, 'x');
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
-      time = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A');
-      tz = 'at epicenter';
+      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
+        ' at epicenter';
     } else {
-      time = utcTime;
-      tz = 'UTC';
+      localTime = utcTime;
     }
 
     data = {
-      depth: Math.round(feature.geometry.coordinates[2] * 10) / 10,
-      lat: feature.geometry.coordinates[1],
-      lng: feature.geometry.coordinates[0],
+      alert: props.alert, // PAGER
+      cdi: _romanize(props.cdi), // DYFI
+      depth: Math.round(coords[2] * 10) / 10,
+      felt: props.felt,
+      isoTime: eqMoment.toISOString(),
+      latlng: Math.round(coords[1] * 1000) / 1000 + ', ' +
+        Math.round(coords[0] * 1000) / 1000,
+      localTime: localTime,
       mag: Math.round(props.mag * 10) / 10,
       magType: props.magType,
+      mmi: _romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
-      time: time,
-      tz: tz,
       url: props.url,
       utcTime: utcTime
     };
+    data.bubbles = _getBubbles(data);
 
     // Create label
     if (!labelTemplate) {
@@ -350,7 +400,7 @@ var EarthquakesLayer = function (options) {
     // Bind popup and label to marker
     layer.bindPopup(popup, {
       autoPanPadding: L.point(50, 50),
-      maxWidth: '265'
+      minWidth: '250'
     }).bindLabel(label);
 
     // Create summary html
@@ -415,6 +465,37 @@ var EarthquakesLayer = function (options) {
     _markerOptions.radius = radius;
 
     return L.circleMarker(latlng, _markerOptions);
+  };
+
+  /**
+   * Convert number to roman numeral
+   *
+   * @param num {Number}
+   *
+   * @return {String}
+   */
+  _romanize = function (num) {
+    var digits,
+        i,
+        key,
+        roman;
+
+    if (typeof num !== 'number') {
+      return false;
+    }
+    num = Math.round(num) || 1; // return 'I' for values less than 1
+    digits = String(num).split('');
+    key = ['','C','CC','CCC','CD','D','DC','DCC','DCCC','CM',
+           '','X','XX','XXX','XL','L','LX','LXX','LXXX','XC',
+           '','I','II','III','IV','V','VI','VII','VIII','IX'];
+    roman = '';
+    i = 3;
+
+    while (i--) {
+      roman = (key[+digits.pop() + (i * 10)] || '') + roman;
+    }
+
+    return Array(+digits.join('') + 1).join('M') + roman;
   };
 
 
