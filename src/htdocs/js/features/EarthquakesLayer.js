@@ -55,7 +55,7 @@ var EarthquakesLayer = function (options) {
       _pastHourMoment,
       _pastWeekMoment,
       _period,
-      _summary,
+      _summaryTable,
       _threshold,
 
       _getAge,
@@ -84,7 +84,7 @@ var EarthquakesLayer = function (options) {
     _pastDayMoment = Moment.utc().subtract(1, 'days');
     _pastHourMoment = Moment.utc().subtract(1, 'hours');
     _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
-    _summary = '';
+    _summaryTable = '';
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -271,7 +271,7 @@ var EarthquakesLayer = function (options) {
       summary += '<h4>M ' + _threshold[_id] + '+ Earthquakes</h4>';
     }
 
-    if (_summary) {
+    if (_summaryTable) {
       summary += '<table>' +
           '<tr>' +
             '<th>Mag</th>' +
@@ -279,7 +279,7 @@ var EarthquakesLayer = function (options) {
             '<th>Cooordinates</th>' +
             '<th>Depth</th>' +
           '</tr>' +
-          _summary +
+          _summaryTable +
         '</table>';
     } else {
       summary += '<p>None.</p>';
@@ -411,7 +411,7 @@ var EarthquakesLayer = function (options) {
     if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
         (props.time < _mainshock.time && props.mag > _threshold.historical) ||
          props.time === _mainshock.time) {
-      _summary += L.Util.template(summaryTemplate, data);
+      _summaryTable += L.Util.template(summaryTemplate, data);
     }
 
     // Bin eq totals by magnitude and time
