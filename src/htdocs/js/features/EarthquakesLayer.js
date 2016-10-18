@@ -272,30 +272,34 @@ var EarthquakesLayer = function (options) {
    * @return summary {Html}
    */
   _getSummary = function () {
-    var formValues,
+    var duration,
+        formValues,
         summary;
 
-    summary = '';
     if (_id !== 'mainshock') {
+      duration = Math.round(Moment.duration(_nowMoment - _mainshock.moment)
+        .asDays() * 10) / 10;
+
       formValues = {
         aftershocksDist: document.getElementById('aftershocks-dist').value,
         historicalDist: document.getElementById('historical-dist').value,
         historicalYears: document.getElementById('historical-years').value
       };
 
-      summary += '<p>Earthquakes within ' + formValues[_id + 'Dist'] + ' km of ' +
-        'mainshock epicenter';
-      if (_id === 'historical') {
-        summary += ' in the prior ' + formValues[_id + 'Years'] + ' years';
-      }
-      summary += '.</p>';
+      summary = '<p>Earthquakes within ' + formValues[_id + 'Dist'] +
+        ' km of mainshock epicenter';
+
       if (_id === 'aftershocks') {
+        summary += '. The aftershock sequence duration is currently ' +
+          duration + ' days.</p>';
         summary += _getBinnedData('First');
         summary += _getBinnedData('Past');
       }
       else if (_id === 'historical') {
+        summary += ' in the prior ' + formValues[_id + 'Years'] + ' years.</p>';
         summary += _getBinnedData('Prior');
       }
+
       summary += '<h4>M ' + _threshold[_id] + '+ Earthquakes</h4>';
     }
 
