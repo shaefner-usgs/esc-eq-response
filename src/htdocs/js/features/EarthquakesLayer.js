@@ -51,6 +51,7 @@ var EarthquakesLayer = function (options) {
       _bins,
       _mainshock,
       _markerOptions,
+      _nowMoment,
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
@@ -80,9 +81,10 @@ var EarthquakesLayer = function (options) {
       moment: Moment.utc(options.mainshock.properties.time, 'x'),
       time: options.mainshock.properties.time
     };
-    _pastDayMoment = Moment.utc().subtract(1, 'days');
-    _pastHourMoment = Moment.utc().subtract(1, 'hours');
-    _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
+    _nowMoment = Moment.utc();
+    _pastDayMoment = _nowMoment.subtract(1, 'days');
+    _pastHourMoment = _nowMoment.subtract(1, 'hours');
+    _pastWeekMoment = _nowMoment.subtract(1, 'weeks');
     _summaryTable = '';
 
     // Mag threshold for list on summary pane
@@ -289,6 +291,7 @@ var EarthquakesLayer = function (options) {
       summary += '.</p>';
       if (_id === 'aftershocks') {
         summary += _getBinnedData('First');
+        summary += _getBinnedData('Past');
       }
       else if (_id === 'historical') {
         summary += _getBinnedData('Prior');
@@ -440,6 +443,9 @@ var EarthquakesLayer = function (options) {
     if (_id === 'aftershocks') {
       days = Math.floor(Moment.duration(eqMoment - _mainshock.moment).asDays());
       _addEqToBin(days, props.mag, 'First');
+
+      days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
+      _addEqToBin(days, props.mag, 'Past');
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
