@@ -23,6 +23,7 @@ var Features = function (options) {
       _initialize,
 
       _layers,
+      _loadingModule,
       _mainshock,
       _mapPane,
       _summaryPane,
@@ -38,6 +39,7 @@ var Features = function (options) {
 
   _initialize = function (options) {
     options = options || {};
+    _loadingModule = options.loadingModule;
     _mapPane = options.mapPane;
     _summaryPane = options.summaryPane;
 
@@ -89,6 +91,9 @@ var Features = function (options) {
       name: name,
       summary: layer.summary
     });
+
+    // Feature done loading; remove alert
+    _loadingModule.removeItem(id);
   };
 
   /**
@@ -98,7 +103,14 @@ var Features = function (options) {
    *     GeoJson data returned by Earthquake class
    */
   _addMainshock = function (data) {
-    var id = 'mainshock';
+    var id,
+        name;
+
+    id = 'mainshock';
+    name = 'Mainshock';
+
+    // Alert user that feature is loading
+    _loadingModule.addItem(id, name);
 
     _addFeature({
       id: id,
@@ -108,7 +120,7 @@ var Features = function (options) {
         data: data,
         mainshock: _mainshock,
       },
-      name: 'Mainshock'
+      name: name
     });
   };
 
@@ -184,7 +196,15 @@ var Features = function (options) {
    *   loads feed then adds it to map, summary panes thru callbacks
    */
   _this.addAftershocks = function () {
-    var params;
+    var id,
+        name,
+        params;
+
+    id = 'aftershocks';
+    name = 'Aftershocks';
+
+    // Alert user that feature is loading
+    _loadingModule.addItem(id, name);
 
     params = {
       latitude: _mainshock.geometry.coordinates[1],
@@ -194,9 +214,9 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      id: 'aftershocks',
+      id: id,
       layerClass: EarthquakesLayer,
-      name: 'Aftershocks',
+      name: name,
       url: _getFeedUrl(params)
     });
   };
@@ -206,8 +226,16 @@ var Features = function (options) {
    *   loads feed then adds it to map, summary panes thru callbacks
    */
   _this.addHistorical = function () {
-    var params,
+    var id,
+        name,
+        params,
         years;
+
+    id = 'historical';
+    name = 'Historical Seismicity';
+
+    // Alert user that feature is loading
+    _loadingModule.addItem(id, name);
 
     years = document.getElementById('historical-years').value;
     params = {
@@ -220,9 +248,9 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      id: 'historical',
+      id: id,
       layerClass: EarthquakesLayer,
-      name: 'Historical Seismicity',
+      name: name,
       url: _getFeedUrl(params)
     });
   };

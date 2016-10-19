@@ -4,6 +4,7 @@
 var Earthquake = require('Earthquake'),
     EditPane = require('EditPane'),
     Features = require('Features'),
+    LoadingModule = require('LoadingModule'),
     MapPane = require('MapPane'),
     Navigation = require('Navigation'),
     SummaryPane = require('SummaryPane');
@@ -27,6 +28,7 @@ var Application = function (options) {
       _editPane,
       _eqid,
       _features,
+      _loadingModule,
       _mapPane,
       _navigation,
       _summaryPane,
@@ -51,8 +53,14 @@ var Application = function (options) {
       mapPane: _mapPane
     });
 
+    // Initialize loading module
+    _loadingModule = LoadingModule({
+      el: options.loading
+    });
+
     // Initialize features (event-specific layers) on map and summary panes
     _features = Features({
+      loadingModule: _loadingModule,
       mapPane: _mapPane,
       summaryPane: _summaryPane
     });
