@@ -47,7 +47,7 @@ var Application = function (options) {
       el: options.summary
     });
     _navigation = Navigation({
-      el: options.nav,
+      el: options.navigation,
       mapPane: _mapPane
     });
 

@@ -6,6 +6,6 @@ var Application = require('Application');
 Application({
   edit: document.getElementById('edit'),
   map: document.querySelector('#map .map'),
-  nav: document.getElementById('nav'),
+  navigation: document.getElementById('navigation'),
   summary: document.getElementById('summary')
 });
