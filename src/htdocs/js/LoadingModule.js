@@ -7,6 +7,7 @@ var LoadingModule = function (options) {
 
       _el,
 
+      _clearError,
       _hideModule,
       _showModule;
 
@@ -16,6 +17,18 @@ var LoadingModule = function (options) {
   _initialize = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
+  };
+
+  /**
+   * Clear error message in loading module
+   */
+  _clearError = function (id) {
+    var error;
+
+    error = _el.querySelector('.error.' + id);
+    if (error) {
+      error.parentNode.removeChild(error);
+    }
   };
 
   /**
@@ -41,10 +54,11 @@ var LoadingModule = function (options) {
   _this.addItem = function (id, name) {
     var p;
 
+    _clearError(id);
     _showModule();
 
     p = document.createElement('p');
-    p.setAttribute('class', id);
+    p.classList.add(id);
     p.innerHTML = 'Loading ' + name + '&hellip;';
 
     _el.appendChild(p);
@@ -56,19 +70,35 @@ var LoadingModule = function (options) {
    * @param id {String}
    */
   _this.removeItem = function (id) {
+    var ps;
+
+    ps = _el.querySelectorAll('.' + id);
+    [].forEach.call(ps, function (p) {
+      if (_el.children.length === 1) {
+        // add a slight delay if removing last message
+        //window.setTimeout(function () {
+          p.parentNode.removeChild(p);
+          _hideModule();
+        //}, 500);
+      } else {
+        p.parentNode.removeChild(p);
+      }
+    });
+  };
+
+  _this.showError = function (id, error) {
     var p;
 
-    p = _el.querySelector('.' + id);
+    _showModule();
 
-    if (_el.children.length === 1) {
-      // add a slight delay if removing last message
-      window.setTimeout(function () {
-        p.parentNode.removeChild(p);
-        _hideModule();
-      }, 500);
-    } else {
-      p.parentNode.removeChild(p);
-    }
+    p = document.createElement('p');
+    p.classList.add(id, 'error');
+    p.innerHTML = error;
+
+    _el.appendChild(p);
+
+    // clean up left over loading message
+    _this.removeItem(id);
   };
 
 
