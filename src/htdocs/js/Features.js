@@ -176,6 +176,10 @@ var Features = function (options) {
       },
       error: function (status) {
         console.log(status);
+        if (status === 400) {
+          _loadingModule.showError(opts.id, 'Error loading ' + opts.name +
+            '. Please modify the parameters to match fewer events (20,000 max).');
+        }
       }
     });
   };
