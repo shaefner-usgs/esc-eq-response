@@ -87,7 +87,9 @@ var SummaryPane = function (options) {
    *     Element to remove
    */
   _this.removeFeature = function (el) {
-    el.parentNode.removeChild(el);
+    if (_el.contains(el)) {
+      el.parentNode.removeChild(el);
+    }
   };
 
 
