@@ -19,9 +19,15 @@
     width: 100%;
     z-index: 1001;
 
+    span {
+      display: block;
+      font-size: 14px;
+    }
+
     &.error {
       background-color: rgb(255, 180, 180);
       border-color: #dc8f8f;
+      padding: 3px 0;
       z-index: 1002;
     }
   }
