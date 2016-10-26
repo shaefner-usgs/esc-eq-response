@@ -86,7 +86,7 @@ var Features = function (options) {
       layer.bringToBack();
     }
 
-    _summaryPane.addFeature({
+    _summaryPane.addSummary({
       id: id,
       name: name,
       summary: layer.summary
@@ -298,7 +298,7 @@ var Features = function (options) {
     _mapPane.map.removeLayer(layer);
     _mapPane.layerController.removeLayer(layer);
 
-    _summaryPane.removeFeature(summary);
+    _summaryPane.removeSummary(summary);
   };
 
 

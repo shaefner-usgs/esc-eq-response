@@ -67,7 +67,7 @@ var SummaryPane = function (options) {
    *     summary: {Html} // Summary text
    *   }
    */
-  _this.addFeature = function (opts) {
+  _this.addSummary = function (opts) {
     var div;
 
     div = document.createElement('div');
@@ -86,7 +86,7 @@ var SummaryPane = function (options) {
    * @param el {Element}
    *     Element to remove
    */
-  _this.removeFeature = function (el) {
+  _this.removeSummary = function (el) {
     if (_el.contains(el)) {
       el.parentNode.removeChild(el);
     }
