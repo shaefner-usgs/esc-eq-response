@@ -110,6 +110,7 @@ var Earthquake = function (options) {
       url: url,
       success: function (data) {
         _editPane.setDefaults(data);
+        _editPane.showEqDetails(data);
         _createGeoJson(data);
       },
       error: function (status) {
