@@ -1,1 +1,23 @@
+#edit {
+  form {
+    background: #f6f6f6;
+    border: 1px solid #dbdbdb;
+    padding: 1em;
 
+    p {
+      margin-bottom: .25em;
+    }
+  }
+
+  h3 {
+    margin: 2em 0 .5em;
+  }
+  label h3 {
+    margin-top: 0;
+  }
+
+  input {
+    font-size: .9rem;
+    padding: 5px;
+  }
+}
