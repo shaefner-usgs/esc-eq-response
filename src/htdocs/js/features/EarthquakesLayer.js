@@ -293,7 +293,7 @@ var EarthquakesLayer = function (options) {
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
-        summary += '. The aftershock sequence duration is currently <strong>' +
+        summary += '. The duration of the aftershock sequence is <strong>' +
           duration + ' days</strong>.</p>';
         summary += _getBinnedData('First');
         summary += _getBinnedData('Past');
