@@ -73,7 +73,7 @@ var SummaryPane = function (options) {
     div = document.createElement('div');
     div.classList.add('feature');
     div.setAttribute('id', opts.id);
-    div.innerHTML = '<h3>' + opts.name + '</h3>' + opts.summary;
+    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.summary;
 
     _features.appendChild(div);
 
