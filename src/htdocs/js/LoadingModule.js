@@ -70,20 +70,15 @@ var LoadingModule = function (options) {
    * @param id {String}
    */
   _this.removeItem = function (id) {
-    var ps;
+    var p;
 
-    ps = _el.querySelectorAll('.' + id);
-    [].forEach.call(ps, function (p) {
-      if (_el.children.length === 1) {
-        // add a slight delay if removing last message
-        //window.setTimeout(function () {
-          p.parentNode.removeChild(p);
-          _hideModule();
-        //}, 500);
-      } else {
-        p.parentNode.removeChild(p);
-      }
-    });
+    p = _el.querySelector('.' + id);
+
+    p.parentNode.removeChild(p);
+    
+    if (_el.children.length === 0) {
+        _hideModule();
+    }
   };
 
   _this.showError = function (id, error) {
@@ -97,7 +92,7 @@ var LoadingModule = function (options) {
 
     _el.appendChild(p);
 
-    // clean up left over loading message
+    // clean up stranded loading message for this feature
     _this.removeItem(id);
   };
 
