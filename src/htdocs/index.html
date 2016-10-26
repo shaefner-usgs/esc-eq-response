@@ -16,34 +16,45 @@
       </ul>
     </header>
     <section id="edit" class="pane">
-      <h2>Edit</h2>
+      <h1>Earthquake Response App</h1>
+      <p>This web application creates a map and summary to help collect and
+        digest information used in talking points and scientific response.</p>
+      <h2>Instructions</h2>
+      <ol>
+        <li>Enter an Earthquake id</li>
+        <li>Optionally tweak the parameters for Aftershocks / Historical
+          Seismicity</li>
+        <li>Click the &lsquo;Map&rsquo; or &lsquo;Summary&rsquo; tab</li>
+      </ol>
       <form>
         <label for="eqid">
           <h3>Earthquake id</h3>
-          <input type="text" id="eqid" />
         </label>
+        <input type="text" id="eqid" />
         <h3>Aftershocks</h3>
         <label for="aftershocks-dist">
           <p>Max distance from mainshock (km)</p>
-          <input type="text" id="aftershocks-dist" class="aftershocks" value="" />
         </label>
+        <input type="text" id="aftershocks-dist" class="aftershocks" value="" />
         <h3>Historical Seismicity</h3>
         <label for="historical-dist">
           <p>Max distance from mainshock (km)</p>
-          <input type="text" id="historical-dist" class="historical" value="" />
         </label>
+        <input type="text" id="historical-dist" class="historical" value="" />
         <label for="historical-years">
           <p>Max time before mainshock (years)</p>
-          <input type="text" id="historical-years" class="historical" value="10">
         </label>
+        <input type="text" id="historical-years" class="historical" value="10">
       </form>
+      <p>
+        <a href="http://earthquake.usgs.gov/data/comcat/data-availability.php">
+        ComCat Documentation - Data Availability</a>
+      </p>
     </section>
     <section id="map" class="pane">
-      <h2>Map</h2>
       <div class="map"></div>
     </section>
     <section id="summary" class="pane">
-      <h2>Summary</h2>
       <div class="features"></div>
     </section>
     <div id="loading" class="hide"></div>
