@@ -1,6 +1,8 @@
 'use strict';
 
 
+var Moment = require('moment');
+
 /**
  * Handles form fields and setting address bar to match application state
  *
@@ -225,6 +227,55 @@ var EditPane = function (options) {
     queryString = '?' + pairs.join('&');
 
     window.history.replaceState({}, '', queryString + hash);
+  };
+
+  /**
+   * Display mainshock's details
+   */
+  _this.showEqDetails = function (mainshock) {
+    var coords,
+        depth,
+        details,
+        eqMoment,
+        html,
+        isoTime,
+        latlng,
+        localTime,
+        mag,
+        props,
+        utcTime;
+
+    coords = mainshock.geometry.coordinates;
+    props = mainshock.properties;
+
+    eqMoment = Moment.utc(props.time, 'x');
+    isoTime = eqMoment.toISOString();
+    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
+
+    //localTime = '';
+    if (props.tz) {
+      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
+        ' at epicenter';
+    }
+
+    depth = Math.round(coords[2] * 10) / 10;
+    latlng = Math.round(coords[1] * 1000) / 1000 + ', ' +
+      Math.round(coords[0] * 1000) / 1000;
+    mag = Math.round(props.mag * 10) / 10;
+
+    html = '<h4>' + props.magType + ' ' + mag + ' - ' + props.place + '</h4>';
+    html += '<dl>' +
+        '<dt>Time</dt>' +
+        '<dd><time datetime="' + isoTime + '">' + localTime + '</time>' +
+          '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
+        '<dt>Location</dt>' +
+        '<dd>' + latlng + '</dd>' +
+        '<dt>Depth</dt>' +
+        '<dd>' + depth + ' km</dd>' +
+      '</dl>';
+
+    details = _el.querySelector('.details');
+    details.innerHTML = html;
   };
 
 
