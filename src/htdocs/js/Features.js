@@ -109,9 +109,6 @@ var Features = function (options) {
     id = 'mainshock';
     name = 'Mainshock';
 
-    // Alert user that feature is loading
-    _loadingModule.addItem(id, name);
-
     _addFeature({
       id: id,
       layerClass: EarthquakesLayer,
@@ -159,6 +156,9 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
+    // Alert user that feature is loading
+    _loadingModule.addItem(opts.id, opts.name);
+
     Xhr.ajax({
       url: opts.url,
       success: function (data) {
@@ -207,9 +207,6 @@ var Features = function (options) {
     id = 'aftershocks';
     name = 'Aftershocks';
 
-    // Alert user that feature is loading
-    _loadingModule.addItem(id, name);
-
     params = {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
@@ -237,9 +234,6 @@ var Features = function (options) {
 
     id = 'historical';
     name = 'Historical Seismicity';
-
-    // Alert user that feature is loading
-    _loadingModule.addItem(id, name);
 
     years = document.getElementById('historical-years').value;
     params = {
