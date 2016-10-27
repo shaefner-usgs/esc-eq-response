@@ -252,7 +252,6 @@ var EditPane = function (options) {
     isoTime = eqMoment.toISOString();
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
-    //localTime = '';
     if (props.tz) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         ' at epicenter';
@@ -263,15 +262,20 @@ var EditPane = function (options) {
       Math.round(coords[0] * 1000) / 1000;
     mag = Math.round(props.mag * 10) / 10;
 
-    html = '<h4>' + props.magType + ' ' + mag + ' - ' + props.place + '</h4>';
+    html = '<h2>' + props.magType + ' ' + mag + ' - ' + props.place + '</h2>';
     html += '<dl>' +
         '<dt>Time</dt>' +
-        '<dd><time datetime="' + isoTime + '">' + localTime + '</time>' +
-          '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
+        '<dd>';
+    if (localTime) {
+      html += '<time datetime="' + isoTime + '">' + localTime + '</time>';
+    }
+    html += '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
         '<dt>Location</dt>' +
         '<dd>' + latlng + '</dd>' +
         '<dt>Depth</dt>' +
         '<dd>' + depth + ' km</dd>' +
+        '<dt>Status</dt>' +
+        '<dd>' + props.status + '</dd>' +
       '</dl>';
 
     details = _el.querySelector('.details');
