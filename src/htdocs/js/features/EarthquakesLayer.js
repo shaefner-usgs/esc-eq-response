@@ -335,7 +335,7 @@ var EarthquakesLayer = function (options) {
     var template;
 
     if (type === 'label') {
-      template = 'M{mag} - {utcTime}';
+      template = 'M {mag} - {utcTime}';
     }
     else if (type === 'popup') {
       template = '<div class="popup eq">' +
