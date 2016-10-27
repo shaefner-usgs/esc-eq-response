@@ -80,12 +80,17 @@ var Application = function (options) {
    * Create a new earthquake instance using event id provided by user
    */
   _createEarthquake = function () {
-    Earthquake({
-      callback: _features.initFeatures, // add features to map and summary panes
-      editPane: _editPane,
-      id: _eqid.value,
-      loadingModule: _loadingModule,
-    });
+    // Clear any previous mainshock details
+    document.querySelector('.details').innerHTML = '';
+
+    if (_eqid.value !== '') {
+      Earthquake({
+        callback: _features.initFeatures, // add features to map and summary panes
+        editPane: _editPane,
+        id: _eqid.value,
+        loadingModule: _loadingModule,
+      });
+    }
   };
 
 
