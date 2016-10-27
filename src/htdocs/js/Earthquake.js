@@ -11,7 +11,8 @@ var Xhr = require('util/Xhr');
  *   {
  *     callback: {Function},
  *     editPane: {Object}, // EditPane instance
- *     id: {String}
+ *     id: {String},
+ *     loadingModule: {Object}, // LoadingModule instance
  *   }
  */
 var Earthquake = function (options) {
@@ -21,6 +22,7 @@ var Earthquake = function (options) {
       _callback,
       _editPane,
       _id,
+      _loadingModule,
 
       _createGeoJson,
       _getFeatures,
@@ -34,6 +36,7 @@ var Earthquake = function (options) {
     _callback = options.callback;
     _editPane = options.editPane;
     _id = options.id;
+    _loadingModule = options.loadingModule;
 
     _loadDetailFeed();
   };
@@ -103,6 +106,9 @@ var Earthquake = function (options) {
   _loadDetailFeed = function () {
     var url;
 
+    // Alert user that feature is loading
+    _loadingModule.addItem('mainshock', 'Mainshock');
+
     url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
       _id + '.geojson';
 
@@ -115,6 +121,10 @@ var Earthquake = function (options) {
       },
       error: function (status) {
         console.log(status);
+        if (status === 404) {
+          _loadingModule.showError('mainshock', 'Error Loading Mainshock' +
+            ' <span>Earthquake id (' + _id + ') not found</span>');
+        }
       }
     });
   };
