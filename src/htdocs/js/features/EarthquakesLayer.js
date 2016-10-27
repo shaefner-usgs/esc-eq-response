@@ -49,6 +49,7 @@ var EarthquakesLayer = function (options) {
 
       _id,
       _bins,
+      _eqList,
       _lastAftershock,
       _mainshock,
       _markerOptions,
@@ -56,14 +57,13 @@ var EarthquakesLayer = function (options) {
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
-      _summaryTable,
       _threshold,
 
       _addEqToBin,
       _getAge,
-      _getBinnedData,
+      _getBinnedTable,
       _getBubbles,
-      _getEventListTable,
+      _getEqListTable,
       _getIntervals,
       _getSummary,
       _getTemplate,
@@ -87,7 +87,7 @@ var EarthquakesLayer = function (options) {
     _pastDayMoment = _nowMoment.subtract(1, 'days');
     _pastHourMoment = _nowMoment.subtract(1, 'hours');
     _pastWeekMoment = _nowMoment.subtract(1, 'weeks');
-    _summaryTable = '';
+    _eqList = '';
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -178,7 +178,7 @@ var EarthquakesLayer = function (options) {
    *
    * @return html {Html}
    */
-  _getBinnedData = function (period) {
+  _getBinnedTable = function (period) {
     var cell,
         html,
         total;
@@ -252,10 +252,17 @@ var EarthquakesLayer = function (options) {
     return bubbles;
   };
 
-  _getEventListTable = function (data) {
+  /**
+   * Get table containing a list of earthquakes
+   *
+   * @param data {Html}
+   *
+   * @return table {Html}
+   */
+  _getEqListTable = function (data) {
     var table;
 
-    if (_summaryTable) {
+    if (data) {
       table = '<table>' +
           '<tr>' +
             '<th>Mag</th>' +
@@ -317,21 +324,21 @@ var EarthquakesLayer = function (options) {
 
         summary += '. The duration of the aftershock sequence is <strong>' +
           duration + ' days</strong>.</p>';
-        summary += _getBinnedData('First');
-        summary += _getBinnedData('Past');
+        summary += _getBinnedTable('First');
+        summary += _getBinnedTable('Past');
         summary += '<h3>Last Aftershock</h3>';
-        summary += _getEventListTable(_lastAftershock);
+        summary += _getEqListTable(_lastAftershock);
       }
       else if (_id === 'historical') {
         summary += ' in the <strong>prior ' + formValues[_id + 'Years'] +
           ' years</strong>.</p>';
-        summary += _getBinnedData('Prior');
+        summary += _getBinnedTable('Prior');
       }
 
       summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes</h3>';
     }
 
-    summary += _getEventListTable(_summaryTable);
+    summary += _getEqListTable(_eqList);
 
     return summary;
   };
@@ -456,7 +463,7 @@ var EarthquakesLayer = function (options) {
     if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
         (props.time < _mainshock.time && props.mag > _threshold.historical) ||
          props.time === _mainshock.time) {
-      _summaryTable += L.Util.template(summaryTemplate, data);
+      _eqList += L.Util.template(summaryTemplate, data);
     }
 
     // Bin eq totals by magnitude and time
