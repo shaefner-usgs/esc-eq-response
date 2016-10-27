@@ -49,6 +49,7 @@ var EarthquakesLayer = function (options) {
 
       _id,
       _bins,
+      _lastAftershock,
       _mainshock,
       _markerOptions,
       _nowMoment,
@@ -62,6 +63,7 @@ var EarthquakesLayer = function (options) {
       _getAge,
       _getBinnedData,
       _getBubbles,
+      _getEventListTable,
       _getIntervals,
       _getSummary,
       _getTemplate,
@@ -250,6 +252,26 @@ var EarthquakesLayer = function (options) {
     return bubbles;
   };
 
+  _getEventListTable = function (data) {
+    var table;
+
+    if (_summaryTable) {
+      table = '<table>' +
+          '<tr>' +
+            '<th>Mag</th>' +
+            '<th>Time</th>' +
+            '<th>Location</th>' +
+            '<th>Depth</th>' +
+          '</tr>' +
+          data +
+        '</table>';
+    } else {
+      table = '<p>None.</p>';
+    }
+
+    return table;
+  };
+
   /**
    * Get intervals to store binned data in
    *
@@ -280,9 +302,6 @@ var EarthquakesLayer = function (options) {
     summary = '';
 
     if (_id !== 'mainshock') {
-      duration = Math.round(Moment.duration(_nowMoment - _mainshock.moment)
-        .asDays() * 10) / 10;
-
       formValues = {
         aftershocksDist: document.getElementById('aftershocks-dist').value,
         historicalDist: document.getElementById('historical-dist').value,
@@ -293,10 +312,15 @@ var EarthquakesLayer = function (options) {
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
+        duration = Math.round(Moment.duration(_nowMoment - _mainshock.moment)
+          .asDays() * 10) / 10;
+
         summary += '. The duration of the aftershock sequence is <strong>' +
           duration + ' days</strong>.</p>';
         summary += _getBinnedData('First');
         summary += _getBinnedData('Past');
+        summary += '<h3>Last Aftershock</h3>';
+        summary += _getEventListTable(_lastAftershock);
       }
       else if (_id === 'historical') {
         summary += ' in the <strong>prior ' + formValues[_id + 'Years'] +
@@ -304,22 +328,10 @@ var EarthquakesLayer = function (options) {
         summary += _getBinnedData('Prior');
       }
 
-      summary += '<h4>M ' + _threshold[_id] + '+ Earthquakes</h4>';
+      summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes</h3>';
     }
 
-    if (_summaryTable) {
-      summary += '<table>' +
-          '<tr>' +
-            '<th>Mag</th>' +
-            '<th>Time</th>' +
-            '<th>Location</th>' +
-            '<th>Depth</th>' +
-          '</tr>' +
-          _summaryTable +
-        '</table>';
-    } else {
-      summary += '<p>None.</p>';
-    }
+    summary += _getEventListTable(_summaryTable);
 
     return summary;
   };
@@ -454,6 +466,9 @@ var EarthquakesLayer = function (options) {
 
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, props.mag, 'Past');
+
+      // Last aftershock will be last in list; overwrite each time thru loop
+      _lastAftershock = L.Util.template(summaryTemplate, data);
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
