@@ -83,7 +83,8 @@ var Application = function (options) {
     Earthquake({
       callback: _features.initFeatures, // add features to map and summary panes
       editPane: _editPane,
-      id: _eqid.value
+      id: _eqid.value,
+      loadingModule: _loadingModule,
     });
   };
 
