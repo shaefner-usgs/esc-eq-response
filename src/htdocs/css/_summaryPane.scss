@@ -22,6 +22,19 @@
     }
   }
 
+  .bins {
+    display: flex;
+    flex-wrap: wrap;
+
+    table {
+      margin-right: 1em;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
   .empty {
     background: none;
     border: 0;

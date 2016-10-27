@@ -324,8 +324,10 @@ var EarthquakesLayer = function (options) {
 
         summary += '. The duration of the aftershock sequence is <strong>' +
           duration + ' days</strong>.</p>';
+        summary += '<div class="bins">';
         summary += _getBinnedTable('First');
         summary += _getBinnedTable('Past');
+        summary += '</div>';
         summary += '<h3>Last Aftershock</h3>';
         summary += _getEqListTable(_lastAftershock);
       }
