@@ -48,7 +48,7 @@ var Navigation = function (options) {
   _addListeners = function () {
     var i;
 
-    // Update UI when user changes mode
+    // Update UI when user changes pane
     for (i = 0; i < _panes.length; i ++) {
       _panes[i].addEventListener('click', _changePane);
     }
@@ -82,7 +82,7 @@ var Navigation = function (options) {
   };
 
   /**
-   * Hide all panes in UI; set all mode buttons to unselected
+   * Hide all panes in UI; set all nav buttons to unselected
    */
   _hidePanes = function () {
     var button,
@@ -100,7 +100,7 @@ var Navigation = function (options) {
   };
 
   /**
-   * Show selected pane in UI; set appropriate mode button to selected
+   * Show selected pane in UI; set appropriate nav button to selected
    *
    * @param id {String}
    *    id of pane to show
