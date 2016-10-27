@@ -312,7 +312,7 @@ var EarthquakesLayer = function (options) {
           '<tr>' +
             '<th>Mag</th>' +
             '<th>Time</th>' +
-            '<th>Cooordinates</th>' +
+            '<th>Location</th>' +
             '<th>Depth</th>' +
           '</tr>' +
           _summaryTable +
