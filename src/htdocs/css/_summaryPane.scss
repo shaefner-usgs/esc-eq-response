@@ -27,11 +27,6 @@
     border: 0;
   }
 
-  .features {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   .feature {
     h2 {
       margin-top: 0;
@@ -43,6 +38,11 @@
     &:first-child {
       border: 0;
     }
+  }
+
+  .features {
+    display: flex;
+    flex-wrap: wrap;
   }
 }
 

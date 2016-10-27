@@ -41,24 +41,22 @@ var Application = function (options) {
   _initialize = function (options) {
     _eqid = document.getElementById('eqid');
 
-    // Initialize map, summary panes & navigation
+    // Initialize loading module, map / summary panes & navigation
+    _loadingModule = LoadingModule({
+      el: options.loading
+    });
     _mapPane = MapPane({
       el: options.map
-    });
-    _summaryPane = SummaryPane({
-      el: options.summary
     });
     _navigation = Navigation({
       el: options.navigation,
       mapPane: _mapPane
     });
-
-    // Initialize loading module
-    _loadingModule = LoadingModule({
-      el: options.loading
+    _summaryPane = SummaryPane({
+      el: options.summary
     });
 
-    // Initialize features (event-specific layers) on map and summary panes
+    // Initialize features (event-specific layers) for map and summary panes
     _features = Features({
       loadingModule: _loadingModule,
       mapPane: _mapPane,

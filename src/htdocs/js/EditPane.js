@@ -21,9 +21,9 @@ var EditPane = function (options) {
       _inputs,
 
       _addListener,
-      _initListeners,
       _getDefaults,
       _getParams,
+      _initListeners,
       _refreshAftershocks,
       _refreshHistorical,
       _setFormFields,
@@ -45,24 +45,6 @@ var EditPane = function (options) {
     _initListeners();
     _setFormFields();
     _setQueryString();
-  };
-
-  /**
-   * Initialize event listeners
-   */
-  _initListeners = function () {
-    var aftershocks,
-        historical;
-
-    aftershocks = _el.querySelectorAll('.aftershocks');
-    historical = _el.querySelectorAll('.historical');
-
-    // Update querystring when input is changed
-    _addListener(_inputs, _updateQueryString);
-
-    // Update earthquake layer(s) when input is changed
-    _addListener(aftershocks, _refreshAftershocks);
-    _addListener(historical, _refreshHistorical);
   };
 
   /**
@@ -114,6 +96,24 @@ var EditPane = function (options) {
     });
 
     return params;
+  };
+
+  /**
+   * Initialize event listeners
+   */
+  _initListeners = function () {
+    var aftershocks,
+        historical;
+
+    aftershocks = _el.querySelectorAll('.aftershocks');
+    historical = _el.querySelectorAll('.historical');
+
+    // Update querystring when input is changed
+    _addListener(_inputs, _updateQueryString);
+
+    // Update earthquake layer(s) when input is changed
+    _addListener(aftershocks, _refreshAftershocks);
+    _addListener(historical, _refreshHistorical);
   };
 
   /**
