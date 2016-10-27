@@ -262,13 +262,13 @@ var Features = function (options) {
   /**
    * Set up environment / map and call methods for adding 'feature' layers
    *
-   * @param geojson {Object}
+   * @param mainshock {Object}
    *     GeoJson data returned by Earthquake class
    */
-  _this.initFeatures = function (geojson) {
+  _this.initFeatures = function (mainshock) {
     var coords;
 
-    _mainshock = geojson;
+    _mainshock = mainshock;
     coords = _mainshock.geometry.coordinates;
 
     _mapPane.map.setView([coords[1], coords[0]], 10, true);
