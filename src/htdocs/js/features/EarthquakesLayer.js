@@ -111,11 +111,8 @@ var EarthquakesLayer = function (options) {
    * @param mag {Float}
    * @param period {String}
    */
-  _addEqToBin = function (days, mag, period) {
-    var intervals,
-        magInt;
-
-    magInt = Math.floor(mag);
+  _addEqToBin = function (days, magInt, period) {
+    var intervals;
 
     if (!_bins[period]) {
       _bins[period] = [];
@@ -375,7 +372,7 @@ var EarthquakesLayer = function (options) {
       '</div>';
     }
     else if (type === 'summary') {
-      template = '<tr>' +
+      template = '<tr class="m{magInt}">' +
         '<td>{magType} {mag}</td>' +
         '<td>{localTime}</td>' +
         '<td>{latlng}</td>' +
@@ -401,6 +398,7 @@ var EarthquakesLayer = function (options) {
         label,
         labelTemplate,
         localTime,
+        magInt,
         popup,
         popupTemplate,
         props,
@@ -409,7 +407,9 @@ var EarthquakesLayer = function (options) {
 
     coords = feature.geometry.coordinates;
     props = feature.properties;
+
     eqMoment = Moment.utc(props.time, 'x');
+    magInt = Math.floor(props.mag);
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
@@ -430,6 +430,7 @@ var EarthquakesLayer = function (options) {
         Math.round(coords[0] * 1000) / 1000,
       localTime: localTime,
       mag: Math.round(props.mag * 10) / 10,
+      magInt: magInt,
       magType: props.magType,
       mmi: _romanize(props.mmi), // ShakeMap
       place: props.place,
@@ -471,17 +472,17 @@ var EarthquakesLayer = function (options) {
     // Bin eq totals by magnitude and time
     if (_id === 'aftershocks') {
       days = Math.floor(Moment.duration(eqMoment - _mainshock.moment).asDays());
-      _addEqToBin(days, props.mag, 'First');
+      _addEqToBin(days, magInt, 'First');
 
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
-      _addEqToBin(days, props.mag, 'Past');
+      _addEqToBin(days, magInt, 'Past');
 
       // Last aftershock will be last in list; overwrite each time thru loop
       _lastAftershock = L.Util.template(summaryTemplate, data);
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
-      _addEqToBin(days, props.mag, 'Prior');
+      _addEqToBin(days, magInt, 'Prior');
     }
   };
 
