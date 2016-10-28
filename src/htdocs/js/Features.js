@@ -31,8 +31,7 @@ var Features = function (options) {
       _addFeature,
       _addMainshock,
       _getFeedUrl,
-      _loadFeed,
-      _removeFeatures;
+      _loadFeed;
 
 
   _this = {};
@@ -186,17 +185,6 @@ var Features = function (options) {
   };
 
   /**
-   * Remove all feature layers from map / layer controller, summary pane
-   */
-  _removeFeatures = function () {
-    if (_layers) {
-      Object.keys(_layers).forEach(function(id) {
-        _this.removeFeature(id);
-      });
-    }
-  };
-
-  /**
    * Aftershocks feature layer
    *   loads feed then adds it to map, summary panes thru callbacks
    */
@@ -269,7 +257,7 @@ var Features = function (options) {
     _mapPane.map.setView([coords[1], coords[0]], 10, true);
 
     // First, remove any existing event-specific features
-    _removeFeatures();
+    _this.removeFeatures();
 
     // Now, add event-specific features
     _addMainshock(_mainshock);
@@ -294,6 +282,17 @@ var Features = function (options) {
     _mapPane.layerController.removeLayer(layer);
 
     _summaryPane.removeSummary(summary);
+  };
+
+  /**
+   * Remove all feature layers from map / layer controller, summary pane
+   */
+  _this.removeFeatures = function () {
+    if (_layers) {
+      Object.keys(_layers).forEach(function(id) {
+        _this.removeFeature(id);
+      });
+    }
   };
 
 
