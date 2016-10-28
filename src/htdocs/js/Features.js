@@ -178,7 +178,8 @@ var Features = function (options) {
         console.log(status);
         if (status === 400) {
           _loadingModule.showError(opts.id, 'Error Loading ' + opts.name +
-            ' <span>Modify the parameters to match fewer events (20,000 max)</span>');
+            ' <span>You might need to modify parameters to match fewer ' +
+              ' events (20,000 max)</span>');
         }
       }
     });
