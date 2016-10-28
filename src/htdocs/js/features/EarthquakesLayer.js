@@ -87,7 +87,7 @@ var EarthquakesLayer = function (options) {
     _pastDayMoment = _nowMoment.subtract(1, 'days');
     _pastHourMoment = _nowMoment.subtract(1, 'hours');
     _pastWeekMoment = _nowMoment.subtract(1, 'weeks');
-    _eqList = '';
+    _eqList = [];
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -256,10 +256,17 @@ var EarthquakesLayer = function (options) {
    *
    * @return table {Html}
    */
-  _getEqListTable = function (data) {
-    var table;
+  _getEqListTable = function (rows) {
+    var data,
+        table;
 
-    if (data) {
+    data = '';
+    if (rows.length > 0) {
+      // Eqs are ordered ASC by time for Leaflet; reverse for summary table
+      rows.reverse();
+      rows.forEach(function(row) {
+        data += row;
+      });
       table = '<table>' +
           '<tr>' +
             '<th>Mag</th>' +
@@ -466,7 +473,7 @@ var EarthquakesLayer = function (options) {
     if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
         (props.time < _mainshock.time && props.mag > _threshold.historical) ||
          props.time === _mainshock.time) {
-      _eqList += L.Util.template(summaryTemplate, data);
+      _eqList.push(L.Util.template(summaryTemplate, data));
     }
 
     // Bin eq totals by magnitude and time
@@ -478,7 +485,7 @@ var EarthquakesLayer = function (options) {
       _addEqToBin(days, magInt, 'Past');
 
       // Last aftershock will be last in list; overwrite each time thru loop
-      _lastAftershock = L.Util.template(summaryTemplate, data);
+      _lastAftershock = [L.Util.template(summaryTemplate, data)];
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
