@@ -2,8 +2,6 @@
   padding-bottom: 2em;
 
   form {
-    width: 18rem;
-
     h3 {
       margin: 1.5em 0 .5em;
     }
@@ -28,12 +26,20 @@
   }
 
   .column {
-    margin: 1em;
+    border-left: 1px solid #d6dde8;
+    margin: 1em 0 1em -1px;
+    padding: 0 1.2em;
   }
 
-  .details {
-    /*border-left: 1px solid #d6dde8;
-    padding-left: 1em;*/
+  .eqid {
+    h3 {
+      margin-top: 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
   }
 
   .mainshock {
@@ -41,6 +47,7 @@
     border: 1px solid #d6dde8;
     display: flex;
     flex-wrap: wrap;
+    overflow: hidden;
 
     dd {
       margin: 0 0 1em 0;
