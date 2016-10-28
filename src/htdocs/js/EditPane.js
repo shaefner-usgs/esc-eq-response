@@ -51,13 +51,15 @@ var EditPane = function (options) {
    * Add event listener
    *
    * @param els {Elements}
+   * @param type {String}
+   *     Event type
    * @param listener {Function}
    */
-  _addListener = function (els, listener) {
+  _addListener = function (els, type, listener) {
     var i;
 
     for (i = 0; i < els.length; i ++) {
-      els[i].addEventListener('change', listener);
+      els[i].addEventListener(type, listener);
     }
   };
 
@@ -109,11 +111,11 @@ var EditPane = function (options) {
     historical = _el.querySelectorAll('.historical');
 
     // Update querystring when input is changed
-    _addListener(_inputs, _updateQueryString);
+    _addListener(_inputs, 'change', _updateQueryString);
 
     // Update earthquake layer(s) when input is changed
-    _addListener(aftershocks, _refreshAftershocks);
-    _addListener(historical, _refreshHistorical);
+    _addListener(aftershocks, 'change', _refreshAftershocks);
+    _addListener(historical, 'change', _refreshHistorical);
   };
 
   /**
