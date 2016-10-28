@@ -32,7 +32,8 @@ var EditPane = function (options) {
       _refreshHistorical,
       _setFormFields,
       _setQueryString,
-      _updateQueryString;
+      _updateQueryString,
+      _verifyEqId;
 
 
   _this = {};
@@ -144,6 +145,8 @@ var EditPane = function (options) {
 
     // Update mainshock (pass elem as array b/c _addListener expects an array)
     _addListener([_eqid], 'change', _createEarthquake);
+    //_addListener([_eqid], 'keyup', _verifyEqId);
+    //_addListener([_eqid], 'paste', _verifyEqId);
 
     // Update aftershocks, historical layers
     _addListener(aftershocks, 'change', _refreshAftershocks);
@@ -203,6 +206,18 @@ var EditPane = function (options) {
     value = document.getElementById(id).value;
 
     _this.setParam(id, value);
+  };
+
+  /**
+   * Check that eqid is valid (it follow conventions; not that it exists)
+   */
+  _verifyEqId = function () {
+    var regex;
+
+    regex = /[a-zA-Z]{2}[a-zA-Z0-9]{8}/;
+    if (regex.test(_eqid.value)) {
+      _createEarthquake();
+    }
   };
 
   /**
