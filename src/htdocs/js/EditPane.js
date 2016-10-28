@@ -79,9 +79,11 @@ var EditPane = function (options) {
    * Create a new earthquake instance using event id provided by user
    */
   _createEarthquake = function () {
-    // Clear any previous mainshock details
+    // Clear any previous details, layers, and messages
     document.querySelector('.details').innerHTML = '';
     _features.removeFeatures();
+    _loadingModule.clearAll();
+
 
     if (_eqid.value !== '') {
       Earthquake({
