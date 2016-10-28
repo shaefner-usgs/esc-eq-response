@@ -19,6 +19,17 @@
     font-size: .9rem;
     padding: 5px;
     width: 12em;
+
+    &:focus {
+    }
+    &:invalid {
+      outline: 0;
+      box-shadow: none;
+      background: rgb(255, 180, 180);
+    }
+    &:-webkit-autofill {
+      background: none !important;
+    }
   }
 
   time {
