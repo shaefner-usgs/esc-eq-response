@@ -21,9 +21,10 @@
         digest information used in talking points and scientific response.</p>
       <h3>Instructions</h3>
       <ol>
-        <li>Enter an Earthquake id</li>
-        <li>Optionally tweak the parameters for Aftershocks / Historical
-          Seismicity</li>
+        <li>Enter an <strong>Earthquake id</strong></li>
+        <li>Optionally tweak the parameters for <strong>Aftershocks</strong> /
+          <strong>Historical Seismicity</strong> (if empty, values will be set
+          automatically based on mainshock&rsquo;s magnitude)</li>
         <li>Click the &lsquo;Map&rsquo; or &lsquo;Summary&rsquo; tab</li>
       </ol>
       <div class="mainshock">
@@ -31,21 +32,24 @@
           <label for="eqid">
             <h3>Earthquake id</h3>
           </label>
-          <input type="text" id="eqid" />
+          <input type="text" id="eqid" required="required" value="" />
           <h3>Aftershocks</h3>
           <label for="aftershocks-dist">
             <p>Max distance from mainshock (km)</p>
           </label>
-          <input type="number" id="aftershocks-dist" class="aftershocks" value="" />
+          <input type="number" id="aftershocks-dist" class="aftershocks"
+            required="required" pattern="^[0-9.]+$" value="" />
           <h3>Historical Seismicity</h3>
           <label for="historical-dist">
             <p>Max distance from mainshock (km)</p>
           </label>
-          <input type="number" id="historical-dist" class="historical" value="" />
+          <input type="number" id="historical-dist" class="historical"
+            required="required" pattern="^[0-9.]+$" value="" />
           <label for="historical-years">
             <p>Max time before mainshock (years)</p>
           </label>
-          <input type="number" id="historical-years" class="historical" value="10">
+          <input type="number" id="historical-years" class="historical"
+            required="required" pattern="^[0-9.]+$" value="10">
         </form>
         <div class="column eqid">
           <h3>Find an Earthquake</h3>
