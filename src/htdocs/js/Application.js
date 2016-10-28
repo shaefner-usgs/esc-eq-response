@@ -82,6 +82,7 @@ var Application = function (options) {
   _createEarthquake = function () {
     // Clear any previous mainshock details
     document.querySelector('.details').innerHTML = '';
+    _features.removeFeatures();
 
     if (_eqid.value !== '') {
       Earthquake({
