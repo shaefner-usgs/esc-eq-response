@@ -65,6 +65,13 @@ var LoadingModule = function (options) {
   };
 
   /**
+   * Clear all messages from loading module
+   */
+  _this.clearAll = function () {
+    _el.innerHTML = '';
+  };
+
+  /**
    * Remove message from loading module (and hide if empty)
    *
    * @param id {String}
@@ -75,7 +82,7 @@ var LoadingModule = function (options) {
     p = _el.querySelector('.' + id);
 
     p.parentNode.removeChild(p);
-    
+
     if (_el.children.length === 0) {
         _hideModule();
     }
