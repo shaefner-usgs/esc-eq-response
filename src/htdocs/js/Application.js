@@ -1,8 +1,7 @@
 'use strict';
 
 
-var Earthquake = require('Earthquake'),
-    EditPane = require('EditPane'),
+var EditPane = require('EditPane'),
     Features = require('Features'),
     LoadingModule = require('LoadingModule'),
     MapPane = require('MapPane'),
@@ -26,21 +25,16 @@ var Application = function (options) {
       _initialize,
 
       _editPane,
-      _eqid,
       _features,
       _loadingModule,
       _mapPane,
       _navigation,
-      _summaryPane,
-
-      _createEarthquake;
+      _summaryPane;
 
 
   _this = {};
 
   _initialize = function (options) {
-    _eqid = document.getElementById('eqid');
-
     // Initialize loading module, map / summary panes & navigation
     _loadingModule = LoadingModule({
       el: options.loading
@@ -66,32 +60,9 @@ var Application = function (options) {
     // Initialize edit pane
     _editPane = EditPane({
       el: options.edit,
-      features: _features
+      features: _features,
+      loadingModule: _loadingModule
     });
-
-    // Call _createEarthquake() when eqid is supplied
-    if (_eqid.value) {
-      _createEarthquake();
-    }
-    _eqid.addEventListener('change', _createEarthquake);
-  };
-
-  /**
-   * Create a new earthquake instance using event id provided by user
-   */
-  _createEarthquake = function () {
-    // Clear any previous mainshock details
-    document.querySelector('.details').innerHTML = '';
-    _features.removeFeatures();
-
-    if (_eqid.value !== '') {
-      Earthquake({
-        callback: _features.initFeatures, // add features to map and summary panes
-        editPane: _editPane,
-        id: _eqid.value,
-        loadingModule: _loadingModule,
-      });
-    }
   };
 
 

@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Moment = require('moment');
+var Earthquake = require('Earthquake'),
+    Moment = require('moment');
 
 /**
  * Handles form fields and setting address bar to match application state
@@ -17,10 +18,13 @@ var EditPane = function (options) {
       _initialize,
 
       _el,
+      _eqid,
       _features,
       _inputs,
+      _loadingModule,
 
       _addListener,
+      _createEarthquake,
       _getDefaults,
       _getParams,
       _initListeners,
@@ -37,14 +41,21 @@ var EditPane = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
     _features = options.features;
+    _loadingModule = options.loadingModule;
 
-    document.getElementById('eqid').focus();
+    _eqid = document.getElementById('eqid');
+    _eqid.focus();
 
     _inputs = _el.querySelectorAll('input');
 
     _initListeners();
     _setFormFields();
     _setQueryString();
+
+    // Call _createEarthquake() if eqid is set when initialized
+    if (_eqid.value) {
+      _createEarthquake();
+    }
   };
 
   /**
@@ -60,6 +71,24 @@ var EditPane = function (options) {
 
     for (i = 0; i < els.length; i ++) {
       els[i].addEventListener(type, listener);
+    }
+  };
+
+  /**
+   * Create a new earthquake instance using event id provided by user
+   */
+  _createEarthquake = function () {
+    // Clear any previous mainshock details
+    document.querySelector('.details').innerHTML = '';
+    _features.removeFeatures();
+
+    if (_eqid.value !== '') {
+      Earthquake({
+        callback: _features.initFeatures, // add features to map and summary panes
+        editPane: _this,
+        id: _eqid.value,
+        loadingModule: _loadingModule,
+      });
     }
   };
 
@@ -110,10 +139,13 @@ var EditPane = function (options) {
     aftershocks = _el.querySelectorAll('.aftershocks');
     historical = _el.querySelectorAll('.historical');
 
-    // Update querystring when input is changed
+    // Update querystring
     _addListener(_inputs, 'change', _updateQueryString);
 
-    // Update earthquake layer(s) when input is changed
+    // Update mainshock (pass elem as array b/c _addListener expects an array)
+    _addListener([_eqid], 'change', _createEarthquake);
+
+    // Update aftershocks, historical layers
     _addListener(aftershocks, 'change', _refreshAftershocks);
     _addListener(historical, 'change', _refreshHistorical);
   };
