@@ -79,7 +79,7 @@ var Features = function (options) {
     _layers[id] = layer;
 
     // Render mainshock on top of other features
-    if (opts.name === 'Mainshock') {
+    if (name === 'Mainshock') {
       layer.bringToFront();
     } else {
       layer.bringToBack();
