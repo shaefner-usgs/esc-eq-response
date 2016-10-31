@@ -21,19 +21,19 @@
         digest information used in talking points and scientific response.</p>
       <h3>Instructions</h3>
       <ol>
-        <li>Enter an <strong>Earthquake id</strong></li>
+        <li>Enter the <strong>Mainshock</strong> Event id</li>
         <li>Optionally tweak the parameters for <strong>Aftershocks</strong> /
           <strong>Historical Seismicity</strong> (if empty, values will be set
           automatically based on mainshock&rsquo;s magnitude)</li>
         <li>Click the &lsquo;Map&rsquo; or &lsquo;Summary&rsquo; tab</li>
       </ol>
       <div class="mainshock">
-        <form class="column" autocomplete="off">
+        <form class="column">
+          <h3>Mainshock</h3>
           <label for="eqid">
-            <h3>Earthquake id</h3>
+            <p>Event id</p>
           </label>
-          <input type="text" id="eqid" required="required" value=""
-            autocomplete="off" />
+          <input type="text" id="eqid" required="required" value="" />
           <h3>Aftershocks</h3>
           <label for="aftershocks-dist">
             <p>Max distance from mainshock (km)</p>
