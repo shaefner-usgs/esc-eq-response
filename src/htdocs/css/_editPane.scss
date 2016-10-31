@@ -5,7 +5,7 @@
     h3 {
       margin: 1.5em 0 .5em;
     }
-    label h3 {
+    h3:first-of-type {
       margin-top: 0;
     }
 
@@ -20,12 +20,10 @@
     padding: 5px;
     width: 12em;
 
-    &:focus {
-    }
     &:invalid {
-      outline: 0;
+      border: 2px solid #c00;
       box-shadow: none;
-      background: rgb(255, 180, 180);
+      outline: 0;
     }
     &:-webkit-autofill {
       background: none !important;
