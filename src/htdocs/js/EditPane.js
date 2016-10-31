@@ -282,6 +282,8 @@ var EditPane = function (options) {
 
   /**
    * Display mainshock's details
+   *
+   * @param mainshock {Object}
    */
   _this.showEqDetails = function (mainshock) {
     var coords,
@@ -313,7 +315,8 @@ var EditPane = function (options) {
       Math.round(coords[0] * 1000) / 1000;
     mag = Math.round(props.mag * 10) / 10;
 
-    html = '<h2>' + props.magType + ' ' + mag + ' - ' + props.place + '</h2>';
+    html = '<h2><a href="' + props.url + '">' + props.magType + ' ' + mag +
+      ' - ' + props.place + '</a></h2>';
     html += '<dl>' +
         '<dt>Time</dt>' +
         '<dd>';
