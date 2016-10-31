@@ -142,15 +142,15 @@ var EditPane = function (options) {
     aftershocks = _el.querySelectorAll('.aftershocks');
     historical = _el.querySelectorAll('.historical');
 
-    // Update querystring
-    _addListener(_inputs, 'change', _updateQueryString);
+    // Update querystring when params changed
+    _addListener(_inputs, 'input', _updateQueryString);
 
     // Update mainshock (pass elem as array b/c _addListener expects an array)
+    // (input event included so user doesn't have to unfocus input first)
     _addListener([_eqid], 'change', _createEarthquake);
-    //_addListener([_eqid], 'keyup', _verifyEqId);
-    //_addListener([_eqid], 'paste', _verifyEqId);
+    _addListener([_eqid], 'input', _verifyEqId);
 
-    // Update aftershocks, historical layers
+    // Update aftershocks, historical layers when params change
     _addListener(aftershocks, 'change', _refreshAftershocks);
     _addListener(historical, 'change', _refreshHistorical);
   };
@@ -211,7 +211,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Check that eqid is valid (it follow conventions; not that it exists)
+   * Check that eqid is valid format, and if so call _createEarthquake()
    */
   _verifyEqId = function () {
     var regex;
@@ -236,7 +236,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Set default form field values based on mainshock's details
+   * Set default form field values / url params based on mainshock's details
    *
    * @param mainshock {Object}
    */
