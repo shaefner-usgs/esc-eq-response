@@ -13,12 +13,12 @@ var _COLORS,
     _MARKER_DEFAULTS;
 
 _COLORS = {
-  historical: '#ccd',
+  historical: '#cce',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  older: '#ffe'
+  older: '#ffd'
 };
 _MARKER_DEFAULTS = {
   weight: 1,
