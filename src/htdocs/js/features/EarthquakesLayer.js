@@ -180,7 +180,7 @@ var EarthquakesLayer = function (options) {
         html,
         total;
 
-    if (_bins[period].length > 0) {
+    if (_bins[period] && _bins[period].length > 0) {
       html = '<table>' +
         '<tr>' +
           '<th class="empty"></th>' +
