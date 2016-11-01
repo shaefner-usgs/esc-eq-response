@@ -316,7 +316,7 @@ var EarthquakesLayer = function (options) {
       formValues = {
         aftershocksDist: document.getElementById('aftershocks-dist').value,
         historicalDist: document.getElementById('historical-dist').value,
-        historicalYears: document.getElementById('historical-years').value
+        historicalYears: document.getElementById('historical-years').value || 0
       };
 
       summary += '<p>Earthquakes <strong> within ' + formValues[_id + 'Dist'] +
