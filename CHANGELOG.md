@@ -9,12 +9,13 @@ An in-progress version being developed on the `master` branch.
 
 App is fully functional for Step 1 priorities and all known bugs squashed
 
-* Add loading module to show loading progress, error messages
 * Add css styles for page layout and map display, etc. and improve presentation
 * Add title, description, instructions, etc to edit pane
+* Add loading module to show loading progress, error messages
 * Add html5 form validation
 * Show mainshock details on edit pane
 * Add listeners to aftershocks / historical form fields to trigger updates when changed
+* Update url params / validate event id as user types
 * Plot mainshock as top layer on map
 * Allow scrollwheel zoom on map
 * Add impact bubbles to map popups
