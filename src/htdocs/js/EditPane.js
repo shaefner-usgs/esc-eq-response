@@ -147,8 +147,6 @@ var EditPane = function (options) {
     _addListener(_inputs, 'input', _updateQueryString);
 
     // Update mainshock (pass elem as array b/c _addListener expects an array)
-    // (input event included so user doesn't have to unfocus input first)
-    _addListener([_eqid], 'change', _createEarthquake);
     _addListener([_eqid], 'input', _verifyEqId);
 
     // Update aftershocks, historical layers when params change
