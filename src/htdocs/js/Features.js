@@ -200,7 +200,8 @@ var Features = function (options) {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('aftershocks-dist').value,
-      starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString().slice(0, -5)
+      starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString()
+        .slice(0, -5)
     };
 
     _loadFeed({
@@ -224,14 +225,15 @@ var Features = function (options) {
     id = 'historical';
     name = 'Historical Seismicity';
 
-    years = document.getElementById('historical-years').value;
+    years = document.getElementById('historical-years').value || 'empty';
     params = {
-      endtime: Moment(_mainshock.properties.time).utc().toISOString().slice(0, -5),
+      endtime: Moment(_mainshock.properties.time).utc().toISOString()
+        .slice(0, -5),
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('historical-dist').value,
-      starttime: Moment(_mainshock.properties.time).utc().subtract(years, 'years')
-        .toISOString().slice(0, -5)
+      starttime: Moment(_mainshock.properties.time).utc()
+        .subtract(years, 'years').toISOString().slice(0, -5)
     };
 
     _loadFeed({
