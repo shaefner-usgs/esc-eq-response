@@ -66,7 +66,7 @@ var Features = function (options) {
     count = opts.count;
     id = opts.id;
     name = opts.name;
-    if (count) {
+    if (count >= 0) {
       name += ' (' + count + ')';
     }
 
