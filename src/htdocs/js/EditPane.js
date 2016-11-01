@@ -216,7 +216,7 @@ var EditPane = function (options) {
   _verifyEqId = function () {
     var regex;
 
-    regex = /[a-zA-Z]{2}[a-zA-Z0-9]{8}/;
+    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
     if (regex.test(_eqid.value)) {
       _createEarthquake();
     }
