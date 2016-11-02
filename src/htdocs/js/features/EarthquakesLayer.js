@@ -84,9 +84,9 @@ var EarthquakesLayer = function (options) {
       time: options.mainshock.properties.time
     };
     _nowMoment = Moment.utc();
-    _pastDayMoment = _nowMoment.subtract(1, 'days');
-    _pastHourMoment = _nowMoment.subtract(1, 'hours');
-    _pastWeekMoment = _nowMoment.subtract(1, 'weeks');
+    _pastDayMoment = Moment.utc().subtract(1, 'days');
+    _pastHourMoment = Moment.utc().subtract(1, 'hours');
+    _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
     _eqList = [];
 
     // Mag threshold for list on summary pane
