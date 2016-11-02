@@ -5,9 +5,10 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-## 0.1.0 (2016-10-28)
 
-App is fully functional for Step 1 priorities and all known bugs squashed
+## 0.1.0 (2016-11-02)
+
+App is fully functional for Step 1 priorities and all known bugs squashed.
 
 * Add css styles for page layout and map display, etc. and improve presentation
 * Add title, description, instructions, etc to edit pane
@@ -24,6 +25,7 @@ App is fully functional for Step 1 priorities and all known bugs squashed
 * Add last aftershock to summary
 * Reverse order of eqs in summary tables (newest first)
 * Add point feature (eq) count to layer name
+* Bug fixes
 
 
 ## 0.0.0 (2016-10-13)
