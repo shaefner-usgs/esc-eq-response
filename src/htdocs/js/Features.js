@@ -70,6 +70,9 @@ var Features = function (options) {
       name += ' (' + count + ')';
     }
 
+    // Feature should be removed already, but stacked ajax requests cause issues
+    _this.removeFeature(id);
+
     // Create Leaflet layer using Layer class specified in opts
     layer = opts.layerClass(opts.layerOptions);
 
@@ -280,10 +283,14 @@ var Features = function (options) {
     layer = _layers[id];
     summary = document.getElementById(id);
 
-    _mapPane.map.removeLayer(layer);
-    _mapPane.layerController.removeLayer(layer);
+    if (layer) {
+      _mapPane.map.removeLayer(layer);
+      _mapPane.layerController.removeLayer(layer);
+    }
 
-    _summaryPane.removeSummary(summary);
+    if (summary) {
+      _summaryPane.removeSummary(summary);
+    }
   };
 
   /**
