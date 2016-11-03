@@ -15,8 +15,9 @@ var EditPane = require('EditPane'),
  * @param options {Object}
  *   {
  *     edit: {ELement},
+ *     loading: {Element},
  *     map: {Element},
- *     nav: {Element},
+ *     navigation: {Element},
  *     summary: {Element}
  *   }
  */
