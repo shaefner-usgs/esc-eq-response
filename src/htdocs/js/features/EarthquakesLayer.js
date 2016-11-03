@@ -180,6 +180,7 @@ var EarthquakesLayer = function (options) {
         html,
         total;
 
+    html = '';
     if (_bins[period] && _bins[period].length > 0) {
       html = '<table>' +
         '<tr>' +
@@ -203,8 +204,6 @@ var EarthquakesLayer = function (options) {
         html += total + '</tr>';
       });
       html += '</table>';
-    } else {
-      html = '<p>None.</p>';
     }
 
     return html;
@@ -261,7 +260,7 @@ var EarthquakesLayer = function (options) {
         table;
 
     data = '';
-    if (rows.length > 0) {
+    if (rows && rows.length > 0) {
       // Eqs are ordered ASC by time for Leaflet; reverse for summary table
       rows.reverse();
       rows.forEach(function(row) {
