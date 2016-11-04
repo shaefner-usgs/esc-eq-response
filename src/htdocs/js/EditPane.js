@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -27,6 +28,7 @@ var EditPane = function (options) {
       _createEarthquake,
       _getDefaults,
       _getParams,
+      _hideZoomControl,
       _initListeners,
       _refreshAftershocks,
       _refreshHistorical,
@@ -49,11 +51,12 @@ var EditPane = function (options) {
 
     _inputs = _el.querySelectorAll('input');
 
+    _hideZoomControl();
     _initListeners();
     _setFormFields();
     _setQueryString();
 
-    // Call _createEarthquake() if eqid is set when initialized
+    // Call _createEarthquake() if eqid is already set when initialized
     if (_eqid.value) {
       _createEarthquake();
     }
@@ -131,6 +134,18 @@ var EditPane = function (options) {
     });
 
     return params;
+  };
+
+  /**
+   * Hide zoom controller on mobile (in favor of pinch-to-zoom)
+   */
+  _hideZoomControl = function () {
+    var control;
+
+    control = document.querySelector('.leaflet-control-zoom');
+    if (L.Browser.mobile) {
+      control.classList.add('hide');
+    }
   };
 
   /**

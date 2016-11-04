@@ -13,6 +13,10 @@
   white-space: nowrap;
 }
 
+.leaflet-control-zoom.hide {
+  display: none;
+}
+
 /* Leaflet label mouseovers */
 .leaflet-label {
   background: rgba(255, 255, 255, .85);
