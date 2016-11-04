@@ -29,6 +29,7 @@ var Map = function (options) {
       _el,
 
       _getMapLayers,
+      _hideZoomControl,
       _initMap;
 
 
@@ -39,6 +40,7 @@ var Map = function (options) {
     _el = options.el || document.createElement('div');
 
     _initMap();
+    _hideZoomControl();
   };
 
   /**
@@ -78,6 +80,18 @@ var Map = function (options) {
     };
 
     return layers;
+  };
+
+  /**
+   * Hide zoom controller on mobile (in favor of pinch-to-zoom)
+   */
+  _hideZoomControl = function () {
+    var control;
+
+    control = _el.querySelector('.leaflet-control-zoom');
+    if (L.Browser.mobile) {
+      control.classList.add('hide');
+    }
   };
 
   /**
