@@ -152,14 +152,14 @@ var EarthquakesLayer = function (options) {
     eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
     if (eqMoment.isBefore(_mainshock.moment)) {
       age = 'historical';
+    } else if (eqMoment.isSame(_mainshock.moment)) {
+      age = 'mainshock';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
       age = 'pasthour';
     } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
       age = 'pastday';
     } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
       age = 'pastweek';
-    } else if (eqMoment.isSame(_mainshock.moment)) {
-      age = 'mainshock';
     } else {
       age = 'older';
     }
