@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Move "Find Earthquake" links to instructions; add image showing Event Id
+* Mobile friendly: hide Leaflet zoom controls; disable zoom when focusing form
+* Bug fixes
 
 ## 0.1.0 (2016-11-02)
 
