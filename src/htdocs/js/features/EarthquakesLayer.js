@@ -124,7 +124,7 @@ var EarthquakesLayer = function (options) {
     }
 
     _bins[period][magInt][0] ++; // total
-    if (days <= 365) { // bin eqs less than one year apart
+    if (days <= 365) { // bin eqs within one year of period
       _bins[period][magInt][365] ++;
       if (days <= 30) {
         _bins[period][magInt][30] ++;
@@ -469,8 +469,8 @@ var EarthquakesLayer = function (options) {
       summaryTemplate = _getTemplate('summary');
     }
     // Only add eq to summary if above magnitude threshold
-    if ((props.time > _mainshock.time && props.mag > _threshold.aftershocks) ||
-        (props.time < _mainshock.time && props.mag > _threshold.historical) ||
+    if ((props.time > _mainshock.time && props.mag >= _threshold.aftershocks) ||
+        (props.time < _mainshock.time && props.mag >= _threshold.historical) ||
          props.time === _mainshock.time) {
       _eqList.push(L.Util.template(summaryTemplate, data));
     }
