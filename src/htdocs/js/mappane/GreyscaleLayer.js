@@ -55,7 +55,7 @@ var GreyscaleLayer = function (provider, options) {
     _ref = L.tileLayer(
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
     );
-		return L.layerGroup([_base, _ref]);
+    return L.layerGroup([_base, _ref]);
   } else {
     return _base;
   }
