@@ -107,9 +107,21 @@ var EditPane = function (options) {
 
     mag = mainshock.properties.mag;
 
+    /* 
+     * Default values for aftershock and historical seismicity differences are 
+     * based on rupture length, which we estimate from the Hanks-Bakun (2014) 
+     * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
+     *
+     * A = 10**(M-4), L(approx) = A**0.7
+     * 
+     * Aftershock distance = L, historical distance = 1.5*L
+     */
+      var A = Math.pow(10, mag-4);
+      var L = Math.pow(A, 0.7);
+
     return {
-      'aftershocks-dist': Math.max(5, Math.round(mag - 2) * 5),
-      'historical-dist': Math.max(10, Math.round(mag - 2) * 10),
+      'aftershocks-dist': Math.max(5, 10*Math.round(0.1*L)),
+      'historical-dist': Math.max(10, 15*Math.round(0.1*L)),
       'historical-years': 10
     };
   };
