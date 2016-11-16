@@ -35,7 +35,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Add timestamp to summary page
+   * Add timestamp to summary pane
    */
   _addTimestamp = function () {
     var time;
