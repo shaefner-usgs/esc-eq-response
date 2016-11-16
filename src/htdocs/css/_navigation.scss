@@ -3,6 +3,7 @@ section.hide {
 }
 
 #navigation {
+  background-color: rgba(77,68,130,.9);
   display: flex;
   margin: 0;
   padding: 0;
@@ -15,7 +16,7 @@ section.hide {
     text-decoration: none;
 
     &.selected {
-      background-color: #00c;
+      background-color: #b0a7f3;
     }
   }
   li {

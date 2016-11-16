@@ -10,7 +10,7 @@
   }
 
   th {
-    background-color: rgba(0, 0, 0, .03);
+    background-color: #f1f1f1;
     font-weight: 700;
   }
 
@@ -32,6 +32,10 @@
       &:last-child {
         margin-right: 0;
       }
+    }
+
+    td:not(:first-child) {
+      text-align: right;
     }
   }
 
