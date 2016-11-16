@@ -28,12 +28,12 @@ var EditPane = function (options) {
       _getDefaults,
       _getParams,
       _initListeners,
+      _isValidEqId,
       _refreshAftershocks,
       _refreshHistorical,
       _setFormFields,
       _setQueryString,
-      _updateQueryString,
-      _verifyEqId;
+      _updateQueryString;
 
 
   _this = {};
@@ -53,8 +53,8 @@ var EditPane = function (options) {
     _setFormFields();
     _setQueryString();
 
-    // Call _createEarthquake() if eqid is already set when initialized
-    if (_eqid.value) {
+    // Get things rolling if eqid is already set when initialized
+    if (_eqid.value !== '') {
       _createEarthquake();
     }
   };
@@ -84,8 +84,7 @@ var EditPane = function (options) {
     _features.removeFeatures();
     _loadingModule.clearAll();
 
-
-    if (_eqid.value !== '') {
+    if (_isValidEqId()) {
       Earthquake({
         callback: _features.initFeatures, // add features to map and summary panes
         editPane: _this,
@@ -103,23 +102,23 @@ var EditPane = function (options) {
    * @return {Object}
    */
   _getDefaults = function (mainshock) {
-    var mag, 
-        ruptureArea, 
+    var mag,
+        ruptureArea,
         ruptureLength;
 
     mag = mainshock.properties.mag;
 
-    /* 
-     * Default values for aftershock and historical seismicity differences are 
-     * based on rupture length, which we estimate from the Hanks-Bakun (2014) 
+    /*
+     * Default values for aftershock and historical seismicity differences are
+     * based on rupture length, which we estimate from the Hanks-Bakun (2014)
      * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
      *
      * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
-     * 
+     *
      * Aftershock distance = ruptureLength, historical distance = 1.5*ruptureLength
      */
-      ruptureArea = Math.pow(10, mag-4);
-      ruptureLength = Math.pow(ruptureArea, 0.7);
+    ruptureArea = Math.pow(10, mag-4);
+    ruptureLength = Math.pow(ruptureArea, 0.7);
 
     return {
       'aftershocks-dist': Math.max(5, 10*Math.round(0.1*ruptureLength)),
@@ -161,7 +160,7 @@ var EditPane = function (options) {
     _addListener(_inputs, 'input', _updateQueryString);
 
     // Update mainshock (pass elem as array b/c _addListener expects an array)
-    _addListener([_eqid], 'input', _verifyEqId);
+    _addListener([_eqid], 'input', _createEarthquake);
 
     // Update aftershocks, historical layers when params change
     _addListener(aftershocks, 'change', _refreshAftershocks);
@@ -174,6 +173,20 @@ var EditPane = function (options) {
   _refreshAftershocks = function () {
     _features.removeFeature('aftershocks');
     _features.addAftershocks();
+  };
+
+  /**
+   * Check that eqid is valid format (2 letters followed by 8 characters)
+   */
+  _isValidEqId = function () {
+    var regex;
+
+    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
+    if (regex.test(_eqid.value)) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   /**
@@ -221,18 +234,6 @@ var EditPane = function (options) {
     value = document.getElementById(id).value;
 
     _this.setParam(id, value);
-  };
-
-  /**
-   * Check that eqid is valid format, and if so call _createEarthquake()
-   */
-  _verifyEqId = function () {
-    var regex;
-
-    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
-    if (regex.test(_eqid.value)) {
-      _createEarthquake();
-    }
   };
 
   /**
