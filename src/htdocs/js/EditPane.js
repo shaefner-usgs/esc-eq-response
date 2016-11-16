@@ -103,7 +103,9 @@ var EditPane = function (options) {
    * @return {Object}
    */
   _getDefaults = function (mainshock) {
-    var mag, ruptureArea, ruptureLength;
+    var mag, 
+        ruptureArea, 
+        ruptureLength;
 
     mag = mainshock.properties.mag;
 
