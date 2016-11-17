@@ -84,8 +84,12 @@ var Features = function (options) {
     _mapPane.layerController.addOverlay(layer, name);
     _layers[id] = layer;
 
+    // Set bounds to contain added layer
+    _bounds.extend(layer.getBounds());
+    _mapPane.map.fitBounds(_bounds, { reset: true });
+
     // Render mainshock on top of other features
-    if (name === 'Mainshock') {
+    if (id === 'mainshock') {
       layer.bringToFront();
     } else {
       layer.bringToBack();
@@ -265,7 +269,10 @@ var Features = function (options) {
     _mainshock = mainshock;
     coords = _mainshock.geometry.coordinates;
 
-    _mapPane.map.setView([coords[1], coords[0]], 10, true);
+    // Center map around mainshock for now
+    //   (each added feature will set map extent to contain itself)
+    _mapPane.map.setView([coords[1], coords[0]], 11, { reset: true });
+    _bounds = _mapPane.map.getBounds();
 
     // First, remove any existing event-specific features
     _this.removeFeatures();
