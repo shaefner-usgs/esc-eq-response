@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -22,6 +23,7 @@ var Features = function (options) {
   var _this,
       _initialize,
 
+      _bounds,
       _layers,
       _loadingModule,
       _mainshock,
@@ -42,6 +44,7 @@ var Features = function (options) {
     _mapPane = options.mapPane;
     _summaryPane = options.summaryPane;
 
+    _bounds = new L.LatLngBounds();
     _layers = {};
   };
 
@@ -50,11 +53,11 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     count: {Integer}, // number of features in feature layer
-   *     id: {String}, // layer id
-   *     layerClass: {Function}, // creates Leaflet layer
-   *     layerOptions: {Object}, // contains data prop (req'd) with geojson data
-   *     name: {String} // layer name
+   *     count: {Integer}, // number of features in layer (optional)
+   *     id: {String}, // layer id (req'd)
+   *     layerClass: {Function}, // class that creates Leaflet layer (req'd)
+   *     layerOptions: {Object}, // contains data prop with geojson data (req'd)
+   *     name: {String} // layer name (req'd)
    *   }
    */
   _addFeature = function (opts) {
@@ -66,7 +69,7 @@ var Features = function (options) {
     count = opts.count;
     id = opts.id;
     name = opts.name;
-    if (count >= 0) {
+    if (count && count >= 0) {
       name += ' (' + count + ')';
     }
 
@@ -76,7 +79,7 @@ var Features = function (options) {
     // Create Leaflet layer using Layer class specified in opts
     layer = opts.layerClass(opts.layerOptions);
 
-    // Add it (and store it in _layers for potential removal later)
+    // Add layer to map (and store it in _layers for potential removal later)
     _mapPane.map.addLayer(layer);
     _mapPane.layerController.addOverlay(layer, name);
     _layers[id] = layer;
@@ -88,11 +91,14 @@ var Features = function (options) {
       layer.bringToBack();
     }
 
-    _summaryPane.addSummary({
-      id: id,
-      name: name,
-      summary: layer.summary
-    });
+    // Add Summary
+    if (layer.summary) {
+      _summaryPane.addSummary({
+        id: id,
+        name: name,
+        summary: layer.summary
+      });
+    }
 
     // Feature done loading; remove alert
     _loadingModule.removeItem(id);
