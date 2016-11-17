@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Tweak colors so navbar is more prominent
+* Right align columns (mag, depth, binned totals) in tables for readability
+* Use rupture length for calculating default params
 * Move "Find Earthquake" links to instructions; add image showing Event Id
 * Mobile friendly: hide Leaflet zoom controls; disable zoom when focusing form
 * Bug fixes
