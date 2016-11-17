@@ -69,7 +69,8 @@ var EarthquakesLayer = function (options) {
       _getTemplate,
       _onEachFeature,
       _pointToLayer,
-      _romanize;
+      _romanize,
+      _round;
 
 
   _initialize = function (options) {
@@ -182,7 +183,7 @@ var EarthquakesLayer = function (options) {
 
     html = '';
     if (_bins[period] && _bins[period].length > 0) {
-      html = '<table>' +
+      html = '<table class="bin">' +
         '<tr>' +
           '<th class="empty"></th>' +
           '<th>' + period + ' day</th>' +
@@ -322,8 +323,8 @@ var EarthquakesLayer = function (options) {
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
-        duration = Math.round(Moment.duration(_nowMoment - _mainshock.moment)
-          .asDays() * 10) / 10;
+        duration = _round(Moment.duration(_nowMoment - _mainshock.moment)
+          .asDays(), 1);
 
         summary += '. The duration of the aftershock sequence is <strong>' +
           duration + ' days</strong>.</p>';
@@ -379,10 +380,10 @@ var EarthquakesLayer = function (options) {
     }
     else if (type === 'summary') {
       template = '<tr class="m{magInt}">' +
-        '<td>{magType} {mag}</td>' +
+        '<td class="mag">{magType} {mag}</td>' +
         '<td>{localTime}</td>' +
         '<td>{latlng}</td>' +
-        '<td>{depth} km</td>' +
+        '<td class="depth">{depth} km</td>' +
       '</tr>';
     }
 
@@ -429,13 +430,12 @@ var EarthquakesLayer = function (options) {
     data = {
       alert: props.alert, // PAGER
       cdi: _romanize(props.cdi), // DYFI
-      depth: Math.round(coords[2] * 10) / 10,
+      depth: _round(coords[2], 1),
       felt: props.felt,
       isoTime: eqMoment.toISOString(),
-      latlng: Math.round(coords[1] * 1000) / 1000 + ', ' +
-        Math.round(coords[0] * 1000) / 1000,
+      latlng: _round(coords[1], 3) + ', ' + _round(coords[0], 3),
       localTime: localTime,
-      mag: Math.round(props.mag * 10) / 10,
+      mag: _round(props.mag, 1),
       magInt: magInt,
       magType: props.magType,
       mmi: _romanize(props.mmi), // ShakeMap
@@ -544,6 +544,29 @@ var EarthquakesLayer = function (options) {
     }
 
     return Array(+digits.join('') + 1).join('M') + roman;
+  };
+
+  /**
+   * Round a number to given number of decimal places
+   *
+   * @param num {Number}
+   * @param precision {Number}
+   *
+   * @return {String}
+   *     Note that it does not return a Number b/c toFixed() returns a string
+   */
+  _round = function (num, precision) {
+    var multiplier,
+        rounded;
+
+    if (typeof num !== 'number') {
+      return false;
+    }
+
+    multiplier = Math.pow(10, precision || 0);
+    rounded = Math.round(num * multiplier) / multiplier;
+
+    return rounded.toFixed(precision);
   };
 
 

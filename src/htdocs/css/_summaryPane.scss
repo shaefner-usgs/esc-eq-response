@@ -2,6 +2,10 @@
   table {
     border-collapse: collapse;
     margin: .5em 0;
+
+    .depth, .mag {
+      text-align: right;
+    }
   }
 
   td, th {
@@ -22,6 +26,12 @@
     }
   }
 
+  .bin {
+    td:not(:first-child) {
+      text-align: right;
+    }
+  }
+
   .bins {
     display: flex;
     flex-wrap: wrap;
@@ -32,10 +42,6 @@
       &:last-child {
         margin-right: 0;
       }
-    }
-
-    td:not(:first-child) {
-      text-align: right;
     }
   }
 
