@@ -1,6 +1,13 @@
 @import 'leaflet.label.css';
 @import '_MousePosition.scss';
 
+/* Hide attribution text on (small screen) mobile devices */
+@media all and (max-width: $breakpoint-tablet-width) {
+  .leaflet-control-attribution {
+    display: none;
+  }
+}
+
 #map, .map {
   height: 100%;
 }
