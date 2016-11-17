@@ -5,11 +5,12 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Set map bounds to fully contain each feature layer as it is added
 * Tweak colors so navbar is more prominent
 * Right align columns (mag, depth, binned totals) in tables for readability
 * Use rupture length for calculating default params
 * Move "Find Earthquake" links to instructions; add image showing Event Id
-* Mobile friendly: hide Leaflet zoom controls; disable zoom when focusing form
+* Mobile friendly: hide Leaflet zoom/attr controls; disable zoom when focusing form input
 * Bug fixes
 
 ## 0.1.0 (2016-11-02)
