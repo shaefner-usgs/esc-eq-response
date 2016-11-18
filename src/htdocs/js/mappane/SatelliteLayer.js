@@ -8,7 +8,8 @@ var Util = require('util/Util');
 /**
  * Factory for Satellite base layer
  *
- * @param provider {String} default is 'esri'
+ * @param provider {String}
+ *     default is 'esri'
  * @param options {Object}
  *     L.TileLayer options
  *
