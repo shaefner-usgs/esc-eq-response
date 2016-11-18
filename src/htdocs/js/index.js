@@ -1,6 +1,8 @@
 'use strict';
 
 
+require('manup');
+
 var Application = require('Application');
 
 Application({
