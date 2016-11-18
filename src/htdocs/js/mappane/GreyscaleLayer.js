@@ -8,9 +8,10 @@ var Util = require('util/Util');
 /**
  * Factory for Greyscale base layer
  *
- * @param provider {String} default is 'cartodb'
+ * @param provider {String}
+ *     default is 'cartodb'
  * @param options {Object}
- *      L.TileLayer options
+ *     L.TileLayer options
  *
  * @return {L.TileLayer}
  */
@@ -27,12 +28,13 @@ var GreyscaleLayer = function (provider, options) {
         'CartoDB</a>',
       maxZoom: 19,
       subdomains: 'abcd',
-      url: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+      url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png'
     },
     esri: {
       attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
       maxZoom: 16,
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+      subdomains: ['server', 'services'],
+      url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
     },
     stamen: {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
