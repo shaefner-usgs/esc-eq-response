@@ -15,7 +15,7 @@ var FaultsLayer = function () {
       _plates,
       _urlPrefix;
 
-  _urlPrefix = 'http://escweb.wr.usgs.gov/template/functions/tiles/';
+  _urlPrefix = 'https://escweb.wr.usgs.gov/template/functions/tiles/';
 
   // L.mouseOverLayer is an extended L.layerGroup class that adds utfGrid mouseovers
   _faults = L.mouseOverLayer({
