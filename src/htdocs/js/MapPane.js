@@ -102,9 +102,9 @@ var Map = function (options) {
 
     // Create map
     _this.map = L.map(_el, {
-      center: [38, -118],
+      center: [40, -96],
       layers: _this.layers.defaults,
-      zoom: 7
+      zoom: 4
     });
 
     // Add controllers
