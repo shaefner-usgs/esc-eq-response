@@ -145,7 +145,7 @@ var Features = function (options) {
         pairs,
         queryString;
 
-    baseUri = 'http://earthquake.usgs.gov/fdsnws/event/1/query';
+    baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
 
     pairs = ['format=geojson', 'orderby=time-asc'];
     Object.keys(params).forEach(function(key) {

@@ -109,7 +109,7 @@ var Earthquake = function (options) {
     // Alert user that feature is loading
     _loadingModule.addItem('mainshock', 'Mainshock');
 
-    url = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
+    url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
       _id + '.geojson';
 
     Xhr.ajax({
