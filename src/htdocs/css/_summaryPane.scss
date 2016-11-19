@@ -3,19 +3,30 @@
     border-collapse: collapse;
     margin: .5em 0;
 
-    .depth, .mag {
-      text-align: right;
+    abbr {
+      border-bottom: 1px dotted #999;
+      cursor: help;
     }
   }
 
   td, th {
-    border: 1px solid #e8e8e8;
-    padding: .666em .75em;
+    border: solid #e8e8e8;
+    border-width: 1px 0 1px 0;
+    padding: .5em;
+  }
+
+  td {
+    &.depth, &.distance, &.mag {
+      text-align: right;
+    }
+    &.rowlabel {
+      font-weight: 500;
+    }
   }
 
   th {
-    background-color: #f1f1f1;
-    font-weight: 700;
+    background-color: #f7f7f7;
+    font-weight: 500;
   }
 
   time {
@@ -37,7 +48,7 @@
     flex-wrap: wrap;
 
     table {
-      margin-right: 1em;
+      margin-right: 2em;
 
       &:last-child {
         margin-right: 0;
@@ -54,7 +65,7 @@
     h2 {
       margin-top: 0;
     }
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #ccc;
   	padding: 2em 0;
     width: 100%;
 
@@ -71,6 +82,10 @@
 
 #mainshock {
   order: 0;
+
+  .distance {
+    display: none;
+  }
 }
 #aftershocks {
   order: 1;
