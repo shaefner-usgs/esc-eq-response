@@ -1,7 +1,7 @@
 'use strict';
 
 
-require('manup');
+//require('manup');
 
 var Application = require('Application');
 
