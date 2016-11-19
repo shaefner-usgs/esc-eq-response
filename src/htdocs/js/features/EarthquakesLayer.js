@@ -2,7 +2,8 @@
 'use strict';
 
 
-var Moment = require('moment'),
+var LatLon = require('LatLon'),
+    Moment = require('moment'),
     Util = require('util/Util');
 
 require('leaflet.label');
@@ -74,21 +75,27 @@ var EarthquakesLayer = function (options) {
 
 
   _initialize = function (options) {
-    options = Util.extend({}, _DEFAULTS, options);
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
+    var coords,
+        props;
 
-    _id = options.id;
+    options = Util.extend({}, _DEFAULTS, options);
+    coords = options.mainshock.geometry.coordinates;
+    props = options.mainshock.properties;
+
     _bins = {};
+    _eqList = [];
+    _id = options.id;
     _mainshock = {
-      mag: options.mainshock.properties.mag,
-      moment: Moment.utc(options.mainshock.properties.time, 'x'),
-      time: options.mainshock.properties.time
+      latlon: LatLon(coords[1], coords[0]),
+      mag: props.mag,
+      moment: Moment.utc(props.time, 'x'),
+      time: props.time
     };
+    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
     _nowMoment = Moment.utc();
     _pastDayMoment = Moment.utc().subtract(1, 'days');
     _pastHourMoment = Moment.utc().subtract(1, 'hours');
     _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
-    _eqList = [];
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -193,7 +200,7 @@ var EarthquakesLayer = function (options) {
           '<th>Total</th>' +
         '</tr>';
       _bins[period].forEach(function(cols, mag) {
-        html += '<tr><td>M ' + mag + '+</td>';
+        html += '<tr><td class="rowlabel">M ' + mag + '+</td>';
         cols.forEach(function(col, i) {
           cell = '<td>' + col + '</td>';
           if (i === 0) { // store total and add to table as last column
@@ -272,6 +279,9 @@ var EarthquakesLayer = function (options) {
             '<th>Mag</th>' +
             '<th>Time</th>' +
             '<th>Location</th>' +
+            '<th class="distance">' +
+              '<abbr title="Distance to mainshock">Distance</abbr>' +
+            '</th>' +
             '<th>Depth</th>' +
           '</tr>' +
           data +
@@ -383,6 +393,7 @@ var EarthquakesLayer = function (options) {
         '<td class="mag">{magType} {mag}</td>' +
         '<td>{localTime}</td>' +
         '<td>{latlng}</td>' +
+        '<td class="distance">{distance} km</td>' +
         '<td class="depth">{depth} km</td>' +
       '</tr>';
     }
@@ -401,6 +412,7 @@ var EarthquakesLayer = function (options) {
     var coords,
         data,
         days,
+        distance,
         eqMoment,
         label,
         labelTemplate,
@@ -414,6 +426,8 @@ var EarthquakesLayer = function (options) {
 
     coords = feature.geometry.coordinates;
     props = feature.properties;
+
+    distance = _mainshock.latlon.distanceTo(LatLon(coords[1], coords[0])) / 1000;
 
     eqMoment = Moment.utc(props.time, 'x');
     magInt = Math.floor(props.mag);
@@ -431,6 +445,7 @@ var EarthquakesLayer = function (options) {
       alert: props.alert, // PAGER
       cdi: _romanize(props.cdi), // DYFI
       depth: _round(coords[2], 1),
+      distance: _round(distance, 1),
       felt: props.felt,
       isoTime: eqMoment.toISOString(),
       latlng: _round(coords[1], 3) + ', ' + _round(coords[0], 3),
