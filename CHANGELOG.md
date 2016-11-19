@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add distance to mainshock field in summary tables
 * Set map bounds to fully contain each feature layer as it is added
 * Tweak colors so navbar is more prominent
 * Right align columns (mag, depth, binned totals) in tables for readability
