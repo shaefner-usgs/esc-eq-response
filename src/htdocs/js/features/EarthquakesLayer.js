@@ -59,6 +59,7 @@ var EarthquakesLayer = function (options) {
       _pastHourMoment,
       _pastWeekMoment,
       _threshold,
+      _utc,
 
       _addEqToBin,
       _getAge,
@@ -92,6 +93,7 @@ var EarthquakesLayer = function (options) {
       time: props.time
     };
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
+
     _nowMoment = Moment.utc();
     _pastDayMoment = Moment.utc().subtract(1, 'days');
     _pastHourMoment = Moment.utc().subtract(1, 'hours');
@@ -102,6 +104,9 @@ var EarthquakesLayer = function (options) {
       aftershocks: Math.floor(_mainshock.mag - 2.5),
       historical: Math.floor(_mainshock.mag - 1)
     };
+
+    // Flag for using utc (when local time at epicenter is not available in feed)
+    _utc = false;
 
     _this = L.geoJson(options.data, {
       onEachFeature: _onEachFeature,
@@ -286,6 +291,11 @@ var EarthquakesLayer = function (options) {
           '</tr>' +
           data +
         '</table>';
+
+      if (_utc) {
+        table += '<p class="utc">Using UTC time when local time at epicenter' +
+         ' is not available.</p>';
+      }
     } else {
       table = '<p>None.</p>';
     }
@@ -438,6 +448,7 @@ var EarthquakesLayer = function (options) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         ' at epicenter';
     } else {
+      _utc = true;
       localTime = utcTime;
     }
 
