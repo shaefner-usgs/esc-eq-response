@@ -10,8 +10,6 @@
   }
 
   td, th {
-    border: solid #e8e8e8;
-    border-width: 1px 0 1px 0;
     padding: .5em;
   }
 
@@ -27,6 +25,15 @@
   th {
     background-color: #f7f7f7;
     font-weight: 500;
+  }
+
+  tr {
+    border: solid #e8e8e8;
+    border-width: 0 0 1px;
+
+    &:first-child {
+      border-color: #ddd;
+    }
   }
 
   time {
@@ -77,6 +84,11 @@
   .features {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .utc {
+    font-size: .9rem;
+    margin: 0 0 0 3px;
   }
 }
 
