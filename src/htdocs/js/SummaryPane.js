@@ -63,8 +63,8 @@ var SummaryPane = function (options) {
    * @param opts {Object}
    *   {
    *     id: {String}, // id for container elem
-   *     name: {String}, // Layer name
-   *     summary: {Html} // Summary text
+   *     name: {String}, // feature name
+   *     summary: {Html} // summary text
    *   }
    */
   _this.addSummary = function (opts) {
