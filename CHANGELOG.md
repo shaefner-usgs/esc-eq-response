@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add note when eq time at epicenter is not available in geojson feed
 * Add distance to mainshock field in summary tables
 * Set map bounds to fully contain each feature layer as it is added
 * Tweak colors so navbar is more prominent
