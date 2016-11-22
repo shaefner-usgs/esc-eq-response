@@ -69,43 +69,51 @@ var Features = function (options) {
     count = opts.count;
     id = opts.id;
     name = opts.name;
-    if (count && count >= 0) {
-      name += ' (' + count + ')';
+
+    try {
+      if (count && count >= 0) {
+        name += ' (' + count + ')';
+      }
+
+      // Feature should be removed already, but stacked ajax requests cause issues
+      _this.removeFeature(id);
+
+      // Create Leaflet layer using Layer class specified in opts
+      layer = opts.layerClass(opts.layerOptions);
+
+      // Add layer to map (and store it in _layers for potential removal later)
+      _mapPane.map.addLayer(layer);
+      _mapPane.layerController.addOverlay(layer, name);
+      _layers[id] = layer;
+
+      // Set bounds to contain added layer
+      _bounds.extend(layer.getBounds());
+      _mapPane.map.fitBounds(_bounds, { reset: true });
+
+      // Render mainshock on top of other features
+      if (id === 'mainshock') {
+        layer.bringToFront();
+      } else {
+        layer.bringToBack();
+      }
+
+      // Add Summary
+      if (layer.summary) {
+        _summaryPane.addSummary({
+          id: id,
+          name: name,
+          summary: layer.summary
+        });
+      }
+
+      // Feature done loading; remove alert
+      _loadingModule.removeItem(id);
     }
-
-    // Feature should be removed already, but stacked ajax requests cause issues
-    _this.removeFeature(id);
-
-    // Create Leaflet layer using Layer class specified in opts
-    layer = opts.layerClass(opts.layerOptions);
-
-    // Add layer to map (and store it in _layers for potential removal later)
-    _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, name);
-    _layers[id] = layer;
-
-    // Set bounds to contain added layer
-    _bounds.extend(layer.getBounds());
-    _mapPane.map.fitBounds(_bounds, { reset: true });
-
-    // Render mainshock on top of other features
-    if (id === 'mainshock') {
-      layer.bringToFront();
-    } else {
-      layer.bringToBack();
+    catch (error) {
+      console.error(error);
+      _loadingModule.showError(opts.id, 'Error Loading ' + opts.name +
+        '<span>' + error + '</span>');
     }
-
-    // Add Summary
-    if (layer.summary) {
-      _summaryPane.addSummary({
-        id: id,
-        name: name,
-        summary: layer.summary
-      });
-    }
-
-    // Feature done loading; remove alert
-    _loadingModule.removeItem(id);
   };
 
   /**
@@ -168,6 +176,8 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
+    var msg;
+
     // Alert user that feature is loading
     _loadingModule.addItem(opts.id, opts.name);
 
@@ -187,11 +197,12 @@ var Features = function (options) {
         });
       },
       error: function (status) {
-        console.log(status);
+        console.error('Error loading feed (' + status + ').');
         if (status === 400) {
+          msg = 'You might need to modify parameters to match fewer ' +
+              ' events (20,000 max)';
           _loadingModule.showError(opts.id, 'Error Loading ' + opts.name +
-            ' <span>You might need to modify parameters to match fewer ' +
-              ' events (20,000 max)</span>');
+            ' <span>' + msg + '</span>');
         }
       }
     });
@@ -237,8 +248,8 @@ var Features = function (options) {
 
     id = 'historical';
     name = 'Historical Seismicity';
+    years = document.getElementById('historical-years').value;
 
-    years = document.getElementById('historical-years').value || 'empty';
     params = {
       endtime: Moment(_mainshock.properties.time).utc().toISOString()
         .slice(0, -5),
