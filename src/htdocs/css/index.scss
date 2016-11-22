@@ -2,6 +2,7 @@ $breakpoint-tablet-width: 1024px;
 
 @import '_editPane.scss';
 @import '_header.scss';
+@import '_helpPane.scss';
 @import '_loadingModule.scss';
 @import '_mapPane.scss';
 @import '_navigation.scss';
@@ -34,13 +35,6 @@ h2 {
 }
 h3 {
   font-size: 1.2rem;
-}
-
-.eventid {
-  display: block;
-  margin: .25em 0;
-  max-width: 100%;
-  max-height: 36px;
 }
 
 .pane {
