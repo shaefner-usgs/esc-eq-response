@@ -71,7 +71,7 @@ var Features = function (options) {
     name = opts.name;
 
     try {
-      if (count && count >= 0) {
+      if (count >= 0) {
         name += ' (' + count + ')';
       }
 
@@ -282,7 +282,7 @@ var Features = function (options) {
 
     // Center map around mainshock for now
     //   (each added feature will set map extent to contain itself)
-    _mapPane.map.setView([coords[1], coords[0]], 11, { reset: true });
+    _mapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
     _bounds = _mapPane.map.getBounds();
 
     // First, remove any existing event-specific features
