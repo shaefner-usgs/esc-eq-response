@@ -49,9 +49,9 @@ var SatelliteLayer = function (provider, options) {
 
   // Esri satellite layer doesn't inlcude labels; add them
   if (provider === 'esri') {
-    _placesUrl = 'http://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
+    _placesUrl = 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
     _places = L.tileLayer(_placesUrl, options);
-    _transportationUrl = 'http://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}';
+    _transportationUrl = 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}';
     _transportation = L.tileLayer(_transportationUrl, options);
     return L.layerGroup([_base, _places]);
   } else {
