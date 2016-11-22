@@ -31,7 +31,8 @@ var EditPane = function (options) {
       _isValidEqId,
       _refreshAftershocks,
       _refreshHistorical,
-      _reset,
+      _resetApp,
+      _resetForm,
       _setFormFields,
       _setQueryString,
       _updateQueryString;
@@ -80,10 +81,7 @@ var EditPane = function (options) {
    * Create a new earthquake instance using event id provided by user
    */
   _createEarthquake = function () {
-    // Clear any previous details, layers, and messages
-    document.querySelector('.details').innerHTML = '';
-    _features.removeFeatures();
-    _loadingModule.clearAll();
+    _resetApp();
 
     if (_isValidEqId()) {
       Earthquake({
@@ -170,7 +168,7 @@ var EditPane = function (options) {
     _addListener(historical, 'change', _refreshHistorical);
 
     // Clear features when reset button pressed
-    _addListener([reset], 'click', _reset);
+    _addListener([reset], 'click', _resetForm);
   };
 
   /**
@@ -202,12 +200,21 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset app by removing features and clearing url params (and form fields)
+   * Reset app: clear any previous mainshock details, features, and messages
    */
-  _reset = function () {
+  _resetApp = function () {
+    document.querySelector('.details').innerHTML = '';
     _features.removeFeatures();
+    _loadingModule.clearAll();
+  };
 
-    // Set a delay so reset button clears form fields first
+  /**
+   * Reset form: calls resetApp and also resets querystring after form cleared
+   */
+  _resetForm = function () {
+    _resetApp();
+
+    // Set a slight delay so reset button can clear form fields first
     setTimeout(function () {
       _setQueryString();
     }, 10);
