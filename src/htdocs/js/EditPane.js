@@ -31,6 +31,7 @@ var EditPane = function (options) {
       _isValidEqId,
       _refreshAftershocks,
       _refreshHistorical,
+      _reset,
       _setFormFields,
       _setQueryString,
       _updateQueryString;
@@ -47,7 +48,7 @@ var EditPane = function (options) {
     _eqid = document.getElementById('eqid');
     _eqid.focus();
 
-    _inputs = _el.querySelectorAll('input');
+    _inputs = _el.querySelectorAll('input:not(.reset)');
 
     _initListeners();
     _setFormFields();
@@ -151,28 +152,25 @@ var EditPane = function (options) {
    */
   _initListeners = function () {
     var aftershocks,
-        historical;
+        historical,
+        reset;
 
     aftershocks = _el.querySelectorAll('.aftershocks');
     historical = _el.querySelectorAll('.historical');
+    reset = _el.querySelector('.reset');
 
     // Update querystring when params changed
     _addListener(_inputs, 'input', _updateQueryString);
 
-    // Update mainshock (pass elem as array b/c _addListener expects an array)
+    // Update mainshock (_addListener expects an array for 1st arg)
     _addListener([_eqid], 'input', _createEarthquake);
 
     // Update aftershocks, historical layers when params change
     _addListener(aftershocks, 'change', _refreshAftershocks);
     _addListener(historical, 'change', _refreshHistorical);
-  };
 
-  /**
-   * Refresh aftershocks feature layer
-   */
-  _refreshAftershocks = function () {
-    _features.removeFeature('aftershocks');
-    _features.addAftershocks();
+    // Clear features when reset button pressed
+    _addListener([reset], 'click', _reset);
   };
 
   /**
@@ -184,9 +182,15 @@ var EditPane = function (options) {
     regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
     if (regex.test(_eqid.value)) {
       return true;
-    } else {
-      return false;
     }
+  };
+
+  /**
+   * Refresh aftershocks feature layer
+   */
+  _refreshAftershocks = function () {
+    _features.removeFeature('aftershocks');
+    _features.addAftershocks();
   };
 
   /**
@@ -195,6 +199,18 @@ var EditPane = function (options) {
   _refreshHistorical = function () {
     _features.removeFeature('historical');
     _features.addHistorical();
+  };
+
+  /**
+   * Reset app by removing features and clearing url params (and form fields)
+   */
+  _reset = function () {
+    _features.removeFeatures();
+
+    // Set a delay so reset button clears form fields first
+    setTimeout(function () {
+      _setQueryString();
+    }, 10);
   };
 
   /**

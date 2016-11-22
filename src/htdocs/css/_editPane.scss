@@ -18,7 +18,7 @@
   input {
     font-size: .9rem;
     padding: 5px;
-    width: 12em;
+    width: 12rem;
 
     &:invalid {
       border: 2px solid #c00;
@@ -61,6 +61,23 @@
     h2 {
       line-height: 1.3;
       margin-top: 0;
+    }
+  }
+
+  .reset {
+    appearance: none;
+    background: #ffd097;
+    border: 2px outset #fdb962;
+    border-radius: 4px;
+    color: #906936;
+    display: block;
+    font-size: 16px;
+    margin-top: 2em;
+    outline: 0;
+    padding: 4px;
+
+    &:active {
+      border-style: inset;
     }
   }
 }
