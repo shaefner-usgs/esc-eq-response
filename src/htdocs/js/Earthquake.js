@@ -123,7 +123,7 @@ var Earthquake = function (options) {
         console.log(status);
         if (status === 404) {
           _loadingModule.showError('mainshock', 'Error Loading Mainshock' +
-            ' <span>Event id (' + _id + ') not found</span>');
+            ' <span>Event ID: ' + _id + ' not found</span>');
         }
       }
     });
