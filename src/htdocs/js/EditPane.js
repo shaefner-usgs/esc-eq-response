@@ -187,16 +187,20 @@ var EditPane = function (options) {
    * Refresh aftershocks feature layer
    */
   _refreshAftershocks = function () {
-    _features.removeFeature('aftershocks');
-    _features.addAftershocks();
+    if (_isValidEqId()) {
+      _features.removeFeature('aftershocks');
+      _features.addAftershocks();
+    }
   };
 
   /**
    * Refresh historical seismicity feature layer
    */
   _refreshHistorical = function () {
-    _features.removeFeature('historical');
-    _features.addHistorical();
+    if (_isValidEqId()) {
+      _features.removeFeature('historical');
+      _features.addHistorical();
+    }
   };
 
   /**
