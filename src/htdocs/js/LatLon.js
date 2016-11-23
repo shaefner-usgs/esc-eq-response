@@ -77,7 +77,7 @@ LatLon.prototype.distanceTo = function(point, radius) {
  */
 LatLon.prototype.bearing = function(point) {
     if (!(point instanceof LatLon)) {
-	throw new TypeError('point is not LatLon object');
+        throw new TypeError('point is not LatLon object');
     }
 
     var φ1 = this.lat.toRadians(),  λ1 = this.lon.toRadians();
