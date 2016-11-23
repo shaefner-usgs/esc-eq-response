@@ -111,7 +111,7 @@ var Features = function (options) {
     }
     catch (error) {
       console.error(error);
-      _loadingModule.showError(opts.id, 'Error Loading ' + opts.name +
+      _loadingModule.addError(opts.id, 'Error Loading ' + opts.name +
         '<span>' + error + '</span>');
     }
   };
@@ -201,7 +201,7 @@ var Features = function (options) {
         if (status === 400) {
           msg = 'You might need to modify parameters to match fewer ' +
               ' events (20,000 max)';
-          _loadingModule.showError(opts.id, 'Error Loading ' + opts.name +
+          _loadingModule.addError(opts.id, 'Error Loading ' + opts.name +
             ' <span>' + msg + '</span>');
         }
       }
