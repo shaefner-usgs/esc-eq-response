@@ -285,7 +285,7 @@ var EarthquakesLayer = function (options) {
             '<th>Time</th>' +
             '<th>Location</th>' +
             '<th class="distance">' +
-              '<abbr title="Distance to mainshock">Distance</abbr>' +
+              '<abbr title="Distance and direction to mainshock">Distance</abbr>' +
             '</th>' +
             '<th>Depth</th>' +
           '</tr>' +
@@ -403,7 +403,7 @@ var EarthquakesLayer = function (options) {
         '<td class="mag">{magType} {mag}</td>' +
         '<td>{localTime}</td>' +
         '<td>{latlng}</td>' +
-        '<td class="distance">{distance} km {distanceDir}</td>' +
+        '<td class="distance">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="depth">{depth} km</td>' +
       '</tr>';
     }

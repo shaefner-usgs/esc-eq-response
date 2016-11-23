@@ -17,6 +17,11 @@
     &.depth, &.distance, &.mag {
       text-align: right;
     }
+    &.distance span {
+      display: inline-block;
+      text-align: left;
+      width: 1.5em;
+    }
     &.rowlabel {
       font-weight: 500;
     }
