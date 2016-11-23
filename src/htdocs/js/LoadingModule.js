@@ -72,6 +72,20 @@ var LoadingModule = function (options) {
   };
 
   /**
+   * Check if error message is present
+   *
+   * @param id {String}
+   */
+  _this.hasError = function (id) {
+    var p;
+
+    p = _el.querySelector('.' + id + '.error');
+    if (p) {
+      return true;
+    }
+  };
+
+  /**
    * Remove message from loading module (and hide if empty)
    *
    * @param id {String}
