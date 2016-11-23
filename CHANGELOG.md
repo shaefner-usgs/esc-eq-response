@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Fix for browser's back/fwd buttons to navigate between panes
 * Add reset button / req'd fields text
 * Move instructions to new help pane; update text
 * Improve error handling
