@@ -173,6 +173,9 @@ var EditPane = function (options) {
 
   /**
    * Check that eqid is valid format (2 letters followed by 8 characters)
+   * and that eqid exists (if known - error is shown after it was not found)
+   *
+   * @return {Boolean}
    */
   _isValidEqId = function () {
     var regex;
