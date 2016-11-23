@@ -70,18 +70,24 @@
 
   .reset {
     appearance: none;
-    background: #ffd097;
-    border: 2px outset #fdb962;
-    border-radius: 4px;
-    color: #906936;
-    display: block;
-    font-size: 16px;
-    margin-top: 2em;
+    background: none;
+    border: none;
+    color: $link-color;
+    cursor: pointer;
+    display: inline-block;
+    font: 16px $font-family;
     outline: 0;
-    padding: 4px;
+    text-align: left;
+    text-decoration: underline;
+    width: auto;
 
     &:active {
-      border-style: inset;
+      color: $link-color-active;
     }
+  }
+
+  .required {
+    color: #c00;
+    margin-top: 1em;
   }
 }
