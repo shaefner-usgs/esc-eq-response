@@ -177,6 +177,10 @@ var EditPane = function (options) {
   _isValidEqId = function () {
     var regex;
 
+    if (_loadingModule.hasError('mainshock')) {
+      return false;
+    }
+
     regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
     if (regex.test(_eqid.value)) {
       return true;
