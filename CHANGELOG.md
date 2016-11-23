@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add reset button
+* Move instructions to new help pane
+* Improve error handling
 * Add note when eq time at epicenter is not available in geojson feed
 * Add distance to mainshock field in summary tables
 * Set map bounds to fully contain each feature layer as it is added
