@@ -429,6 +429,7 @@ var EarthquakesLayer = function (options) {
         eqMoment,
         label,
         labelTemplate,
+        latlon,
         localTime,
         magInt,
         popup,
@@ -440,8 +441,9 @@ var EarthquakesLayer = function (options) {
     coords = feature.geometry.coordinates;
     props = feature.properties;
 
-    distance = _mainshock.latlon.distanceTo(LatLon(coords[1], coords[0])) / 1000;
-    bearing = _mainshock.latlon.bearing(LatLon(coords[1], coords[0]));
+    latlon = LatLon(coords[1], coords[0]);
+    distance = _mainshock.latlon.distanceTo(latlon) / 1000;
+    bearing = _mainshock.latlon.bearing(latlon);
     compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
     bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
