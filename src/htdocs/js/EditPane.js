@@ -64,7 +64,8 @@ var EditPane = function (options) {
   /**
    * Add event listener
    *
-   * @param els {Elements}
+   * @param els {Array}
+   *     Elements
    * @param type {String}
    *     Event type
    * @param listener {Function}
@@ -160,10 +161,10 @@ var EditPane = function (options) {
     // Update querystring when params changed
     _addListener(_inputs, 'input', _updateQueryString);
 
-    // Update mainshock (_addListener expects an array for 1st arg)
+    // Update mainshock when eqid changed
     _addListener([_eqid], 'input', _createEarthquake);
 
-    // Update aftershocks, historical layers when params change
+    // Update aftershocks, historical layers when params changed
     _addListener(aftershocks, 'change', _refreshAftershocks);
     _addListener(historical, 'change', _refreshHistorical);
 
