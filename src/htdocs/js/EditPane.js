@@ -5,12 +5,14 @@ var Earthquake = require('Earthquake'),
     Moment = require('moment');
 
 /**
- * Handles form fields and setting address bar to match application state
+ * Handles form fields (kicks off fetching of data feeds), displays mainshock,
+ *   and sets address bar to match application state
  *
  * @param options {Object}
  *   {
  *     el: {Element},
  *     features: {Object} // Features instance
+ *     loadingModule: {Object}, // LoadingModule instance
  *   }
  */
 var EditPane = function (options) {

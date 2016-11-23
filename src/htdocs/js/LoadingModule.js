@@ -1,6 +1,14 @@
 'use strict';
 
 
+/**
+ * Sets up a status bar to inform user of app's status
+ *
+ * @param options {Object}
+ *   {
+ *     el: {Element}
+ *   }
+ */
 var LoadingModule = function (options) {
   var _this,
       _initialize,

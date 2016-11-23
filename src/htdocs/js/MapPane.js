@@ -15,7 +15,7 @@ require('mappane/TerrainLayer');
 
 
 /**
- * Sets up leaflet map instance
+ * Sets up leaflet map instance and adds 'static' layers (non-event-specific)
  *
  * @param options {Object}
  *   {

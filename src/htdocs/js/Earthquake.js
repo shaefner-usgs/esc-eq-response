@@ -5,7 +5,7 @@ var Xhr = require('util/Xhr');
 
 
 /**
- * Factory for creating an earthquake instance
+ * Factory for creating an earthquake (mainshock) instance
  *
  * @param options {Object}
  *   {

@@ -11,10 +11,11 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
  * Adds 'feature' layers to map, summary panes
  *
  * Feature layers are event specific layers added dynamically to the map
- * and summary panes, based on the eqid entered by user
+ * and summary panes, based on the Event ID entered by user
  *
  * @param options {Object}
  *   {
+ *     loadingModule: {Object}, // LoadingModule instance
  *     mapPane: {Object}, // MapPane instance
  *     summaryPane: {Object} // SummaryPane instance
  *   }

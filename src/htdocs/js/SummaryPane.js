@@ -5,7 +5,7 @@ var Moment = require('moment');
 
 
 /**
- * Adds / removes summary info for selected event
+ * Adds / removes summary info from summary pane
  *
  * @param options {Object}
  *   {
