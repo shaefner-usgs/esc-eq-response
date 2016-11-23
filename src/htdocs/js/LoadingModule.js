@@ -7,7 +7,6 @@ var LoadingModule = function (options) {
 
       _el,
 
-      _clearError,
       _hideModule,
       _showModule;
 
@@ -17,18 +16,6 @@ var LoadingModule = function (options) {
   _initialize = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
-  };
-
-  /**
-   * Clear error message in loading module
-   */
-  _clearError = function (id) {
-    var error;
-
-    error = _el.querySelector('.error.' + id);
-    if (error) {
-      error.parentNode.removeChild(error);
-    }
   };
 
   /**
@@ -46,63 +33,13 @@ var LoadingModule = function (options) {
   };
 
   /**
-   * Add message to loading module
+   * Add error to loading module
    *
    * @param id {String}
-   * @param name {String}
+   *     CSS class
+   * @param error {String}
    */
-  _this.addItem = function (id, name) {
-    var p;
-
-    _clearError(id);
-    _showModule();
-
-    p = document.createElement('p');
-    p.classList.add(id);
-    p.innerHTML = 'Loading ' + name + '&hellip;';
-
-    _el.appendChild(p);
-  };
-
-  /**
-   * Clear all messages from loading module
-   */
-  _this.clearAll = function () {
-    _el.innerHTML = '';
-  };
-
-  /**
-   * Check if error message is present
-   *
-   * @param id {String}
-   */
-  _this.hasError = function (id) {
-    var p;
-
-    p = _el.querySelector('.' + id + '.error');
-    if (p) {
-      return true;
-    }
-  };
-
-  /**
-   * Remove message from loading module (and hide if empty)
-   *
-   * @param id {String}
-   */
-  _this.removeItem = function (id) {
-    var p;
-
-    p = _el.querySelector('.' + id);
-
-    p.parentNode.removeChild(p);
-
-    if (_el.children.length === 0) {
-        _hideModule();
-    }
-  };
-
-  _this.showError = function (id, error) {
+  _this.addError = function (id, error) {
     var p;
 
     _showModule();
@@ -115,6 +52,84 @@ var LoadingModule = function (options) {
 
     // clean up stranded loading message for this feature
     _this.removeItem(id);
+  };
+
+  /**
+   * Add item to loading module
+   *
+   * @param id {String}
+   *     CSS class
+   * @param name {String}
+   */
+  _this.addItem = function (id, name) {
+    var item;
+
+    _this.removeError(id); // remove any leftover errors
+    _showModule();
+
+    item = document.createElement('p');
+    item.classList.add(id);
+    item.innerHTML = 'Loading ' + name + '&hellip;';
+
+    _el.appendChild(item);
+  };
+
+  /**
+   * Clear all messages from loading module
+   */
+  _this.clearAll = function () {
+    _el.innerHTML = '';
+  };
+
+  /**
+   * Check if error(s) exist(s)
+   *
+   * @param id {String}
+   *     CSS class
+   *
+   * @return {Boolean}
+   */
+  _this.hasError = function (id) {
+    var error;
+
+    error = _el.querySelector('.' + id + '.error');
+    if (error) {
+      return true;
+    }
+  };
+
+  /**
+   * Remove error from loading module
+   *
+   * @param id {String}
+   *     CSS class
+   */
+  _this.removeError = function (id) {
+    var error;
+
+    error = _el.querySelector('.error.' + id);
+    if (error) {
+      error.parentNode.removeChild(error);
+    }
+  };
+
+  /**
+   * Remove item from loading module (and hide if empty)
+   *
+   * @param id {String}
+   *     CSS class
+   */
+  _this.removeItem = function (id) {
+    var item;
+
+    item = _el.querySelector('.' + id);
+    if (item) {
+      item.parentNode.removeChild(item);
+    }
+
+    if (_el.children.length === 0) {
+      _hideModule();
+    }
   };
 
 
