@@ -17,9 +17,9 @@ var Navigation = function (options) {
       _el,
       _panes,
 
-      _addListeners,
+      _addListener,
       _changePane,
-      _getDefaultPaneId,
+      _getPaneId,
       _hidePanes,
       _map,
       _showPane;
@@ -35,9 +35,9 @@ var Navigation = function (options) {
     _map = options.mapPane.map;
 
     _panes = _el.querySelectorAll('.panes a');
-    id = _getDefaultPaneId();
+    id = _getPaneId();
 
-    _addListeners();
+    _addListener();
     _hidePanes();
     _showPane(id);
   };
@@ -45,13 +45,14 @@ var Navigation = function (options) {
   /**
    * Add Event Listeners
    */
-  _addListeners = function () {
-    var i;
+  _addListener = function () {
+    var id;
 
     // Update UI when user changes pane
-    for (i = 0; i < _panes.length; i ++) {
-      _panes[i].addEventListener('click', _changePane);
-    }
+    window.onhashchange = function () {
+      id = _getPaneId();
+      _changePane(id);
+    };
   };
 
   /**
@@ -59,19 +60,17 @@ var Navigation = function (options) {
    *
    * @param e {Event}
    */
-  _changePane = function (e) {
-    var id = e.target.hash.substr(1);
-
+  _changePane = function (id) {
     _hidePanes();
     _showPane(id);
   };
 
   /**
-   * Get id of default pane to show ('edit' unless set in url string)
+   * Get id of pane to show (default to 'edit' unless set in url string)
    *
    * @return id {String}
    */
-  _getDefaultPaneId = function () {
+  _getPaneId = function () {
     var id = 'edit';
 
     if (location.hash) {
