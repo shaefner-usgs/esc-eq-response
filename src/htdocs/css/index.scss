@@ -1,4 +1,7 @@
 $breakpoint-tablet-width: 1024px;
+$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$link-color: rgb(0, 0, 238);
+$link-color-active: rgb(238, 0, 0);
 
 @import '_editPane.scss';
 @import '_header.scss';
@@ -9,7 +12,7 @@ $breakpoint-tablet-width: 1024px;
 @import '_summaryPane.scss';
 
 html, body {
-  font: 16px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font: 16px $font-family;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -25,6 +28,14 @@ html {
 }
 *, *:before, *:after {
   box-sizing: inherit;
+}
+
+a {
+  color: $link-color;
+
+  &:active {
+    color: $link-color-active;
+  }
 }
 
 h1 {
