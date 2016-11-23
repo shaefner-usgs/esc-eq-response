@@ -403,7 +403,7 @@ var EarthquakesLayer = function (options) {
         '<td class="mag">{magType} {mag}</td>' +
         '<td>{localTime}</td>' +
         '<td>{latlng}</td>' +
-        '<td class="distance">{distance} km</td>' +
+        '<td class="distance">{distance} km {distanceDir}</td>' +
         '<td class="depth">{depth} km</td>' +
       '</tr>';
     }
@@ -419,7 +419,10 @@ var EarthquakesLayer = function (options) {
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
-    var coords,
+    var bearing,
+        bearingString,
+        compassPoints,
+        coords,
         data,
         days,
         distance,
@@ -438,6 +441,9 @@ var EarthquakesLayer = function (options) {
     props = feature.properties;
 
     distance = _mainshock.latlon.distanceTo(LatLon(coords[1], coords[0])) / 1000;
+    bearing = _mainshock.latlon.bearing(LatLon(coords[1], coords[0]));
+    compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
+    bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
     eqMoment = Moment.utc(props.time, 'x');
     magInt = Math.floor(props.mag);
@@ -457,6 +463,7 @@ var EarthquakesLayer = function (options) {
       cdi: _romanize(props.cdi), // DYFI
       depth: _round(coords[2], 1),
       distance: _round(distance, 1),
+      distanceDir: bearingString,
       felt: props.felt,
       isoTime: eqMoment.toISOString(),
       latlng: _round(coords[1], 3) + ', ' + _round(coords[0], 3),

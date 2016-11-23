@@ -62,6 +62,34 @@ LatLon.prototype.distanceTo = function(point, radius) {
   return d;
 };
 
+/**
+ * Foward azimuth (takeoff bearing) from point to destination.
+ *
+ * @param {LatLon}
+ *     point - Latitude/longitude of destination point.
+ * @returns {number}
+ *     Foward azimuth (degrees) from point to destination (-180.0, 180.0).
+ *
+ * @example
+ *     var p1 = new LatLon(52.205, 0.119);
+ *     var p2 = new LatLon(48.857, 2.351);
+ *     var b = p1.bearing(p2); // 156.167 degrees
+ */
+LatLon.prototype.bearing = function(point) {
+    if (!(point instanceof LatLon)) {
+	throw new TypeError('point is not LatLon object');
+    }
+
+    var φ1 = this.lat.toRadians(),  λ1 = this.lon.toRadians();
+    var φ2 = point.lat.toRadians(), λ2 = point.lon.toRadians();
+
+    var y = Math.sin(λ2-λ1) * Math.cos(φ2);
+    var x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
+    var bearing = Math.atan2(y, x).toDegrees();
+
+    return bearing;
+};
+
 /** Extend Number object with method to convert numeric degrees to radians */
 if (Number.prototype.toRadians === undefined) {
   Number.prototype.toRadians = function() { return this * Math.PI / 180; };
