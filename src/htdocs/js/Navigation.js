@@ -6,7 +6,7 @@
  *
  * @param options {Object}
  *   {
- *     el: {Element}
+ *     el: {Element},
  *     mapPane: {Object} // MapPane instance
  *   }
  */
