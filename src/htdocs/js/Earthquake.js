@@ -12,7 +12,7 @@ var Xhr = require('util/Xhr');
  *     callback: {Function},
  *     editPane: {Object}, // EditPane instance
  *     id: {String},
- *     loadingModule: {Object}, // LoadingModule instance
+ *     loadingModule: {Object} // LoadingModule instance
  *   }
  */
 var Earthquake = function (options) {
@@ -26,7 +26,7 @@ var Earthquake = function (options) {
 
       _createGeoJson,
       _getFeatures,
-      _loadDetailFeed;
+      _loadFeed;
 
 
   _this = {};
@@ -38,7 +38,7 @@ var Earthquake = function (options) {
     _id = options.id;
     _loadingModule = options.loadingModule;
 
-    _loadDetailFeed();
+    _loadFeed();
   };
 
   /**
@@ -101,9 +101,9 @@ var Earthquake = function (options) {
   };
 
   /**
-   * Load GeoJson detail feed for selected event id, then call _createGeoJson()
+   * Load GeoJson feed for selected event id, then call _createGeoJson()
    */
-  _loadDetailFeed = function () {
+  _loadFeed = function () {
     var url;
 
     // Alert user that feature is loading
