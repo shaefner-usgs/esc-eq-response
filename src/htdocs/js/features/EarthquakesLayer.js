@@ -285,7 +285,7 @@ var EarthquakesLayer = function (options) {
             '<th>Time</th>' +
             '<th>Location</th>' +
             '<th class="distance">' +
-              '<abbr title="Distance and direction to mainshock">Distance</abbr>' +
+              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</th>' +
             '<th>Depth</th>' +
           '</tr>' +
