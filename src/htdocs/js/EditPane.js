@@ -2,7 +2,8 @@
 
 
 var Earthquake = require('Earthquake'),
-    Moment = require('moment');
+    Moment = require('moment'),
+    SignificantEqs = require('SignificantEqs');
 
 /**
  * Handles form fields (kicks off fetching of data feeds), displays mainshock,
@@ -12,7 +13,7 @@ var Earthquake = require('Earthquake'),
  *   {
  *     el: {Element},
  *     features: {Object} // Features instance
- *     loadingModule: {Object}, // LoadingModule instance
+ *     loadingModule: {Object} // LoadingModule instance
  *   }
  */
 var EditPane = function (options) {
@@ -24,6 +25,7 @@ var EditPane = function (options) {
       _features,
       _inputs,
       _loadingModule,
+      _significantEqs,
 
       _addListener,
       _createEarthquake,
@@ -35,8 +37,10 @@ var EditPane = function (options) {
       _refreshHistorical,
       _resetApp,
       _resetForm,
+      _selSignificantEq,
       _setFormFields,
       _setQueryString,
+      _showSignificantEqs,
       _updateQueryString;
 
 
@@ -52,6 +56,11 @@ var EditPane = function (options) {
     _eqid.focus();
 
     _inputs = _el.querySelectorAll('input:not(.reset)');
+
+    _significantEqs = SignificantEqs({
+      callback: _showSignificantEqs,
+      loadingModule: _loadingModule
+    });
 
     _initListeners();
     _setFormFields();
@@ -91,7 +100,7 @@ var EditPane = function (options) {
         callback: _features.initFeatures, // add features to map and summary panes
         editPane: _this,
         id: _eqid.value,
-        loadingModule: _loadingModule,
+        loadingModule: _loadingModule
       });
     }
   };
@@ -214,10 +223,10 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset app: clear any previous mainshock details, features, and messages
+   * Reset app: clear any previous mainshock details, features, and alerts
    */
   _resetApp = function () {
-    document.querySelector('.details').innerHTML = '';
+    _el.querySelector('.details').innerHTML = '';
     _features.removeFeatures();
     _loadingModule.clearAll();
   };
@@ -232,6 +241,19 @@ var EditPane = function (options) {
     setTimeout(function () {
       _setQueryString();
     }, 10);
+  };
+
+  /**
+   * Set user selected significant eq as mainshock
+   */
+  _selSignificantEq = function () {
+    var index,
+        significant;
+
+    significant = _el.querySelector('.significant');
+    index = significant.selectedIndex;
+
+    _eqid.value = significant.options[index].value;
   };
 
   /**
@@ -256,6 +278,33 @@ var EditPane = function (options) {
     for (i = 0; i < _inputs.length; i ++) {
       _this.setParam(_inputs[i].id, _inputs[i].value);
     }
+  };
+
+  /**
+   * Show list of significant earthquakes
+   *
+   * @param data {Object}
+   *     GeoJson data
+   */
+  _showSignificantEqs = function (data) {
+    var div,
+        refNode,
+        select,
+        significant;
+
+    refNode = _el.querySelector('label[for=eqid]');
+    select = _significantEqs.getHtml(data);
+
+    div = document.createElement('div');
+    div.innerHTML = select;
+    refNode.parentNode.insertBefore(div, refNode);
+
+    // Add listener here b/c we have to wait til it exists
+    significant = _el.querySelector('.significant');
+    _addListener([significant], 'change', _selSignificantEq);
+
+    // Finished loading; remove alert
+    _loadingModule.removeItem('significant');
   };
 
   /**
