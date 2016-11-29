@@ -73,19 +73,31 @@ var EditPane = function (options) {
   };
 
   /**
-   * Add event listener
+   * Add event listener(s)
    *
-   * @param els {Array}
-   *     Elements
-   * @param type {String}
-   *     Event type
+   * @param els {Element or NodeList}
+   *     Element(s)
+   * @param types {Array or String}
+   *     Event type(s)
    * @param listener {Function}
    */
-  _addListener = function (els, type, listener) {
-    var i;
+  _addListener = function (els, types, listener) {
+    var i,
+        j;
+
+    // If els is an Element and not a NodeList, convert to array for iterating
+    if (!els.length) {
+      els = [els];
+    }
+    // Convert type to array for iterating
+    if (!Array.isArray(types)) {
+      types = [types];
+    }
 
     for (i = 0; i < els.length; i ++) {
-      els[i].addEventListener(type, listener);
+      for (j = 0; j < types.length; j ++) {
+        els[i].addEventListener(types[j], listener);
+      }
     }
   };
 
@@ -173,14 +185,14 @@ var EditPane = function (options) {
     _addListener(_inputs, 'input', _updateQueryString);
 
     // Update mainshock when eqid changed
-    _addListener([_eqid], 'input', _createEarthquake);
+    _addListener(_eqid, 'input', _createEarthquake);
 
     // Update aftershocks, historical layers when params changed
     _addListener(aftershocks, 'change', _refreshAftershocks);
     _addListener(historical, 'change', _refreshHistorical);
 
     // Clear features when reset button pressed
-    _addListener([reset], 'click', _resetForm);
+    _addListener(reset, 'click', _resetForm);
   };
 
   /**
