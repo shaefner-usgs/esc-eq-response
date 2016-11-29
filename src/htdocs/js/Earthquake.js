@@ -106,7 +106,7 @@ var Earthquake = function (options) {
   _loadFeed = function () {
     var url;
 
-    // Alert user that feature is loading
+    // Alert user that feature is loading (removed by Features class)
     _loadingModule.addItem('mainshock', 'Mainshock');
 
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
