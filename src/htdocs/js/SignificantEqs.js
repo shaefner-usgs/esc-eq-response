@@ -1,10 +1,11 @@
 'use strict';
 
 
-var Xhr = require('util/Xhr');
+var Moment = require('moment'),
+    Xhr = require('util/Xhr');
 
 /**
- * Factory for creating an array of significant earthquakes (past 30 days)
+ * Factory for getting significant earthquakes and creating html pulldown menu
  *
  * @param options {Object}
  *   {
@@ -53,6 +54,35 @@ var SignificantEqs = function (options) {
         _loadingModule.addError('significant', 'Error Loading Significant Earthquakes');
       }
     });
+  };
+
+  /**
+   * Get html for pulldown menu of significant eqs
+   *
+   * @param data {Object}
+   *     GeoJson data
+   *
+   * @return html {String}
+   */
+  _this.getHtml = function (data) {
+    var date,
+        html,
+        props;
+
+    html = '<select class="significant">';
+    html += '<option value="">Significant Earthquakes in the Past Month (UTC)</option>';
+    if (data.features) {
+      data.features.forEach(function(feature) {
+        props = feature.properties;
+        date = Moment.utc(props.time).format('MMM D HH:mm:ss');
+        html += '<option value="' + feature.id + '">' +
+            'M ' + props.mag + ' - ' + props.place + ' (' + date + ')' +
+          '</option>';
+      });
+      html += '</select>';
+    }
+
+    return html;
   };
 
 
