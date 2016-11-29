@@ -2,7 +2,6 @@
 
 
 var Earthquake = require('Earthquake'),
-    Moment = require('moment'),
     SignificantEqs = require('SignificantEqs');
 
 /**
@@ -25,6 +24,7 @@ var EditPane = function (options) {
       _features,
       _inputs,
       _loadingModule,
+      _mainshock,
       _significantEqs,
 
       _addListener,
@@ -108,7 +108,7 @@ var EditPane = function (options) {
     _resetApp();
 
     if (_isValidEqId()) {
-      Earthquake({
+      _mainshock = Earthquake({
         callback: _features.initFeatures, // add features to map and summary panes
         editPane: _this,
         id: _eqid.value,
@@ -313,7 +313,7 @@ var EditPane = function (options) {
 
     // Add listener here b/c we have to wait til it exists
     significant = _el.querySelector('.significant');
-    _addListener([significant], 'change', _selSignificantEq);
+    _addListener(significant, 'change', _selSignificantEq);
 
     // Finished loading; remove alert
     _loadingModule.removeItem('significant');
@@ -395,56 +395,16 @@ var EditPane = function (options) {
   /**
    * Display mainshock's details
    *
-   * @param mainshock {Object}
+   * @param data {Object}
+   *     GeoJson data
    */
-  _this.showEqDetails = function (mainshock) {
-    var coords,
-        depth,
-        details,
-        eqMoment,
-        html,
-        isoTime,
-        latlng,
-        localTime,
-        mag,
-        props,
-        utcTime;
-
-    coords = mainshock.geometry.coordinates;
-    props = mainshock.properties;
-
-    eqMoment = Moment.utc(props.time, 'x');
-    isoTime = eqMoment.toISOString();
-    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
-
-    if (props.tz) {
-      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
-        ' at epicenter';
-    }
-
-    depth = Math.round(coords[2] * 10) / 10;
-    latlng = Math.round(coords[1] * 1000) / 1000 + ', ' +
-      Math.round(coords[0] * 1000) / 1000;
-    mag = Math.round(props.mag * 10) / 10;
-
-    html = '<h2><a href="' + props.url + '">' + props.magType + ' ' + mag +
-      ' - ' + props.place + '</a></h2>';
-    html += '<dl>' +
-        '<dt>Time</dt>' +
-        '<dd>';
-    if (localTime) {
-      html += '<time datetime="' + isoTime + '">' + localTime + '</time>';
-    }
-    html += '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
-        '<dt>Location</dt>' +
-        '<dd>' + latlng + '</dd>' +
-        '<dt>Depth</dt>' +
-        '<dd>' + depth + ' km</dd>' +
-        '<dt>Status</dt>' +
-        '<dd>' + props.status + '</dd>' +
-      '</dl>';
+  _this.showEqDetails = function (data) {
+    var details,
+        html;
 
     details = _el.querySelector('.details');
+    html = _mainshock.getHtml(data);
+
     details.innerHTML = html;
   };
 

@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Xhr = require('util/Xhr');
+var Moment = require('moment'),
+    Xhr = require('util/Xhr');
 
 
 /**
@@ -127,6 +128,63 @@ var Earthquake = function (options) {
         }
       }
     });
+  };
+
+  /**
+   * Get html for pulldown menu of significant eqs
+   *
+   * @param data {Object}
+   *     GeoJson data
+   *
+   * @return html {String}
+   */
+  _this.getHtml = function (data) {
+    var coords,
+        depth,
+        eqMoment,
+        html,
+        isoTime,
+        latlng,
+        localTime,
+        mag,
+        props,
+        utcTime;
+
+    coords = data.geometry.coordinates;
+    props = data.properties;
+
+    eqMoment = Moment.utc(props.time, 'x');
+    isoTime = eqMoment.toISOString();
+    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
+
+    if (props.tz) {
+      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
+        ' at epicenter';
+    }
+
+    depth = Math.round(coords[2] * 10) / 10;
+    latlng = Math.round(coords[1] * 1000) / 1000 + ', ' +
+      Math.round(coords[0] * 1000) / 1000;
+    mag = Math.round(props.mag * 10) / 10;
+
+    html = '<h2><a href="' + props.url + '">' + props.magType + ' ' + mag +
+      ' - ' + props.place + '</a></h2>';
+    html += '<dl>' +
+        '<dt>Time</dt>' +
+        '<dd>';
+    if (localTime) {
+      html += '<time datetime="' + isoTime + '">' + localTime + '</time>';
+    }
+    html += '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
+        '<dt>Location</dt>' +
+        '<dd>' + latlng + '</dd>' +
+        '<dt>Depth</dt>' +
+        '<dd>' + depth + ' km</dd>' +
+        '<dt>Status</dt>' +
+        '<dd>' + props.status + '</dd>' +
+      '</dl>';
+
+    return html;
   };
 
 
