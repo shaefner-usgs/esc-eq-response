@@ -254,6 +254,10 @@ var EditPane = function (options) {
     index = significant.selectedIndex;
 
     _eqid.value = significant.options[index].value;
+
+    // Call these manually since input event is not triggered when value changed
+    _createEarthquake();
+    _setQueryString();
   };
 
   /**
