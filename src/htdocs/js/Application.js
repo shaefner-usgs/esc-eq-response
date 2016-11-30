@@ -62,7 +62,8 @@ var Application = function (options) {
     _editPane = EditPane({
       el: options.edit,
       features: _features,
-      loadingModule: _loadingModule
+      loadingModule: _loadingModule,
+      summaryPane: _summaryPane
     });
   };
 
