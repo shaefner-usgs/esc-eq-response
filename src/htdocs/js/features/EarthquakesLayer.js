@@ -40,6 +40,7 @@ _DEFAULTS = {
  * @param options {Object}
  *   {
  *     data: {Object}, // Geojson data
+ *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
  *     mainshock: {Object} // magnitude, time, etc.
  *   }
  *
