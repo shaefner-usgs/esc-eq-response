@@ -26,6 +26,7 @@ var EditPane = function (options) {
       _loadingModule,
       _mainshock,
       _significantEqs,
+      _summaryPane,
 
       _addListener,
       _createEarthquake,
@@ -53,6 +54,7 @@ var EditPane = function (options) {
     _el = options.el || document.createElement('div');
     _features = options.features;
     _loadingModule = options.loadingModule;
+    _summaryPane = options.summaryPane;
 
     _eqid = document.getElementById('eqid');
     _eqid.focus();
@@ -251,6 +253,7 @@ var EditPane = function (options) {
    */
   _resetForm = function () {
     _resetApp();
+    _summaryPane.resetTimeStamp();
 
     // Set a slight delay so reset button can clear form fields first
     setTimeout(function () {
