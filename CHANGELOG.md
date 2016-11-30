@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Always set default values for mainshock even if fields aren't empty
+* Add Significant Earthquakes pulldown menu
 * Fix for browser's back/fwd buttons to navigate between panes
 * Add reset button / req'd fields text
 * Move instructions to new help pane; update text
