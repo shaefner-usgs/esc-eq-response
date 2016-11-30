@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0,
       maximum-scale=1.0, user-scalable=0" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Earthquake Response App</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="lib/leaflet-0.7.7/leaflet.css" />
     <link rel="stylesheet" href="css/index.css" />
   </head>
@@ -22,8 +22,8 @@
     <section id="edit" class="pane">
       <h1>Earthquake Response App</h1>
       <p>This web application creates a map and summary to help collect and
-        digest information used in talking points and scientific response.
-        Enter the <em>Mainshock</em> Event ID, then select &lsquo;Map&rsquo; or
+        digest information used in talking points and scientific response.</p>
+      <p>Enter the <em>Mainshock</em> Event ID, then select &lsquo;Map&rsquo; or
         &lsquo;Summary&rsquo;.</p>
       <div class="mainshock">
         <form class="column">
@@ -37,26 +37,25 @@
           <label for="aftershocks-dist">
             <p>Max distance from mainshock (km)</p>
           </label>
-          <input type="number" id="aftershocks-dist" class="aftershocks" min="1"
+          <input type="number" min="1" id="aftershocks-dist" class="aftershocks"
             required="required" pattern="^[0-9.]+$" value="" autocomplete="off" />
           <h3>Historical Seismicity</h3>
           <label for="historical-dist">
             <p>Max distance from mainshock (km)</p>
           </label>
-          <input type="number" id="historical-dist" class="historical" min="1"
+          <input type="number" min="1" id="historical-dist" class="historical"
             required="required" pattern="^[0-9.]+$" value="" autocomplete="off" />
           <label for="historical-years">
             <p>Max time before mainshock (years)</p>
           </label>
-          <input type="number" id="historical-years" class="historical" min="1"
+          <input type="number" min="1" id="historical-years" class="historical"
             required="required" pattern="^[0-9.]+$" value="10" autocomplete="off" />
           <p class="required">* All fields are required</p>
-          <input type="reset" value="Reset" class="reset" />
+          <input type="reset" class="reset" value="Reset" />
         </form>
         <div class="column details"></div>
       </div>
-      <p>
-        Earthquake data is from ComCat:
+      <p>Earthquake data is from ComCat:
         <a href="https://earthquake.usgs.gov/data/comcat/data-availability.php">
           ComCat Documentation - Data Availability</a>.
       </p>
@@ -71,8 +70,10 @@
       <h2>Instructions</h2>
       <ol>
         <li>Enter the <em>Mainshock</em> Event ID
+          <p>Select an earthquake from &lsquo;Significant Earthquakes in the
+            Past Month&rsquo; or enter an Event ID manually.</p>
           <p>You can find an Event ID in the URL of an Event Page for a
-            specific earthquake. For example:
+            specific earthquake. For example:</p>
             <img src="img/eventid.png" alt="image showing the URL"
             class="eventid" />
           <h3>Find an Earthquake:</h3>
