@@ -152,7 +152,7 @@ var EditPane = function (options) {
 
     return params[name];
   };
-  
+
   /**
    * Get all url param name/value pairs
    *
@@ -375,14 +375,13 @@ var EditPane = function (options) {
     var defaults;
 
     defaults = _getDefaults(mainshock);
+
+    // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
-      // first, update url params
-      if (_getParam(key) === '') { // only set empty fields
-        _setParam(key, defaults[key]);
-      }
+      _setParam(key, defaults[key]);
     });
 
-    // next, update all form fields to match url params
+    // Next, update all form fields to match url params
     _setFormFields();
   };
 
