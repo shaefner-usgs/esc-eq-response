@@ -40,7 +40,6 @@ var Map = function (options) {
     _el = options.el || document.createElement('div');
 
     _initMap();
-    _hideZoomControl();
   };
 
   /**
@@ -100,18 +99,18 @@ var Map = function (options) {
   _initMap = function () {
     _this.layers = _getMapLayers();
 
-    // Create map
+    // Create map and set initial view
     _this.map = L.map(_el, {
-      center: [40, -96],
-      layers: _this.layers.defaults,
-      zoom: 4
+      layers: _this.layers.defaults
     });
+    _this.setDefaultView();
 
-    // Add controllers
+    // Add / remove controllers
     _this.layerController = L.control.layers(_this.layers.baseLayers,
       _this.layers.overlays).addTo(_this.map);
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
+    _hideZoomControl();
 
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
@@ -120,6 +119,13 @@ var Map = function (options) {
     //   overlays: _this.layers.overlays,
     //   scope: 'response'
     // });
+  };
+
+  /**
+   * Set default map extent
+   */
+  _this.setDefaultView = function () {
+    _this.map.setView([40, -96], 4);
   };
 
 
