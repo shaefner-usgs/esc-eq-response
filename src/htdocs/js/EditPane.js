@@ -30,6 +30,7 @@ var EditPane = function (options) {
       _addListener,
       _createEarthquake,
       _getDefaults,
+      _getParam,
       _getParams,
       _initListeners,
       _isValidEqId,
@@ -40,6 +41,7 @@ var EditPane = function (options) {
       _selSignificantEq,
       _setFormFields,
       _setQueryString,
+      _setParam,
       _showSignificantEqs,
       _updateQueryString;
 
@@ -138,6 +140,19 @@ var EditPane = function (options) {
     };
   };
 
+  /**
+   * Get value of url param
+   *
+   * @param name {String}
+   *
+   * @return {Mixed}
+   */
+  _getParam = function (name) {
+    var params = _getParams();
+
+    return params[name];
+  };
+  
   /**
    * Get all url param name/value pairs
    *
@@ -274,13 +289,38 @@ var EditPane = function (options) {
   };
 
   /**
+   * Set the value of a url parameter
+   *
+   * @param name {String}
+   * @param value {Mixed}
+   */
+  _setParam = function (name, value) {
+    var hash,
+        pairs,
+        params,
+        queryString;
+
+    hash = location.hash;
+    params = _getParams();
+    params[name] = value;
+
+    pairs = [];
+    Object.keys(params).forEach(function(key) {
+      pairs.push(key + '=' + params[key]);
+    });
+    queryString = '?' + pairs.join('&');
+
+    window.history.replaceState({}, '', queryString + hash);
+  };
+
+  /**
    * Set all querystring values to match values in form fields
    */
   _setQueryString = function () {
     var i;
 
     for (i = 0; i < _inputs.length; i ++) {
-      _this.setParam(_inputs[i].id, _inputs[i].value);
+      _setParam(_inputs[i].id, _inputs[i].value);
     }
   };
 
@@ -323,20 +363,7 @@ var EditPane = function (options) {
     id = e.target.id;
     value = document.getElementById(id).value;
 
-    _this.setParam(id, value);
-  };
-
-  /**
-   * Get value of url param
-   *
-   * @param name {String}
-   *
-   * @return {Mixed}
-   */
-  _this.getParam = function (name) {
-    var params = _getParams();
-
-    return params[name];
+    _setParam(id, value);
   };
 
   /**
@@ -350,38 +377,13 @@ var EditPane = function (options) {
     defaults = _getDefaults(mainshock);
     Object.keys(defaults).forEach(function(key) {
       // first, update url params
-      if (_this.getParam(key) === '') { // only set empty fields
-        _this.setParam(key, defaults[key]);
+      if (_getParam(key) === '') { // only set empty fields
+        _setParam(key, defaults[key]);
       }
     });
 
     // next, update all form fields to match url params
     _setFormFields();
-  };
-
-  /**
-   * Set the value of a url parameter
-   *
-   * @param name {String}
-   * @param value {Mixed}
-   */
-  _this.setParam = function (name, value) {
-    var hash,
-        pairs,
-        params,
-        queryString;
-
-    hash = location.hash;
-    params = _getParams();
-    params[name] = value;
-
-    pairs = [];
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-    queryString = '?' + pairs.join('&');
-
-    window.history.replaceState({}, '', queryString + hash);
   };
 
   /**
