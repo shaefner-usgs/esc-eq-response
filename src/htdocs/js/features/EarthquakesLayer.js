@@ -465,7 +465,7 @@ var EarthquakesLayer = function (options) {
       depth: AppUtil.round(coords[2], 1),
       distance: AppUtil.round(distance, 1),
       distanceDir: bearingString,
-      felt: props.felt,
+      felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
       latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
       localTime: localTime,
