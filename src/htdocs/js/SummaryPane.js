@@ -92,6 +92,16 @@ var SummaryPane = function (options) {
     }
   };
 
+  /**
+   * Reset timestamp
+   */
+  _this.resetTimeStamp = function () {
+    var time;
+
+    time = _el.querySelector('time');
+    time.innerHTML = '';
+  };
+
 
   _initialize(options);
   options = null;
