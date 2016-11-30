@@ -208,12 +208,14 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset app: clear any previous mainshock details, features, and alerts
+   * Reset app: clear previous mainshock details, features, alerts, etc.
    */
   _resetApp = function () {
     _el.querySelector('.details').innerHTML = '';
     _features.removeFeatures();
     _loadingModule.clearAll();
+    _mapPane.setDefaultView();
+    _summaryPane.resetTimeStamp();
   };
 
   /**
@@ -221,8 +223,6 @@ var EditPane = function (options) {
    */
   _resetForm = function () {
     _resetApp();
-    _mapPane.setDefaultView();
-    _summaryPane.resetTimeStamp();
 
     // Set a slight delay so reset button can clear form fields first
     setTimeout(function () {
