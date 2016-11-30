@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Moment = require('moment'),
+var AppUtil = require('AppUtil'),
+    Moment = require('moment'),
     Xhr = require('util/Xhr');
 
 
@@ -162,10 +163,9 @@ var Earthquake = function (options) {
         ' at epicenter';
     }
 
-    depth = Math.round(coords[2] * 10) / 10;
-    latlng = Math.round(coords[1] * 1000) / 1000 + ', ' +
-      Math.round(coords[0] * 1000) / 1000;
-    mag = Math.round(props.mag * 10) / 10;
+    depth = AppUtil.round(coords[2], 1);
+    latlng = AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3);
+    mag = AppUtil.round(props.mag, 1);
 
     html = '<h2><a href="' + props.url + '">' + props.magType + ' ' + mag +
       ' - ' + props.place + '</a></h2>';

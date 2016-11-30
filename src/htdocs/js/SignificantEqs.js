@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Moment = require('moment'),
+var AppUtil = require('AppUtil'),
+    Moment = require('moment'),
     Xhr = require('util/Xhr');
 
 /**
@@ -67,6 +68,7 @@ var SignificantEqs = function (options) {
   _this.getHtml = function (data) {
     var date,
         html,
+        mag,
         props;
 
     html = '<select class="significant">';
@@ -75,8 +77,10 @@ var SignificantEqs = function (options) {
       data.features.forEach(function(feature) {
         props = feature.properties;
         date = Moment.utc(props.time).format('MMM D HH:mm:ss');
+        mag = AppUtil.round(props.mag, 1);
+
         html += '<option value="' + feature.id + '">' +
-            'M ' + props.mag + ' - ' + props.place + ' (' + date + ')' +
+            'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
           '</option>';
       });
       html += '</select>';
