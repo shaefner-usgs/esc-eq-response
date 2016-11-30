@@ -2,7 +2,8 @@
 'use strict';
 
 
-var LatLon = require('LatLon'),
+var AppUtil = require('AppUtil'),
+    LatLon = require('LatLon'),
     Moment = require('moment'),
     Util = require('util/Util');
 
@@ -70,9 +71,7 @@ var EarthquakesLayer = function (options) {
       _getSummary,
       _getTemplate,
       _onEachFeature,
-      _pointToLayer,
-      _romanize,
-      _round;
+      _pointToLayer;
 
 
   _initialize = function (options) {
@@ -343,7 +342,7 @@ var EarthquakesLayer = function (options) {
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
-        duration = _round(Moment.duration(_nowMoment - _mainshock.moment)
+        duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
           .asDays(), 1);
 
         summary += '. The duration of the aftershock sequence is <strong>' +
@@ -462,18 +461,18 @@ var EarthquakesLayer = function (options) {
 
     data = {
       alert: props.alert, // PAGER
-      cdi: _romanize(props.cdi), // DYFI
-      depth: _round(coords[2], 1),
-      distance: _round(distance, 1),
+      cdi: AppUtil.romanize(props.cdi), // DYFI
+      depth: AppUtil.round(coords[2], 1),
+      distance: AppUtil.round(distance, 1),
       distanceDir: bearingString,
       felt: props.felt,
       isoTime: eqMoment.toISOString(),
-      latlng: _round(coords[1], 3) + ', ' + _round(coords[0], 3),
+      latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
       localTime: localTime,
-      mag: _round(props.mag, 1),
+      mag: AppUtil.round(props.mag, 1),
       magInt: magInt,
       magType: props.magType,
-      mmi: _romanize(props.mmi), // ShakeMap
+      mmi: AppUtil.romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
       url: props.url,
@@ -548,60 +547,6 @@ var EarthquakesLayer = function (options) {
     _markerOptions.radius = radius;
 
     return L.circleMarker(latlng, _markerOptions);
-  };
-
-  /**
-   * Convert number to roman numeral
-   *
-   * @param num {Number}
-   *
-   * @return {String}
-   */
-  _romanize = function (num) {
-    var digits,
-        i,
-        key,
-        roman;
-
-    if (typeof num !== 'number') {
-      return false;
-    }
-    num = Math.round(num) || 1; // return 'I' for values less than 1
-    digits = String(num).split('');
-    key = ['','C','CC','CCC','CD','D','DC','DCC','DCCC','CM',
-           '','X','XX','XXX','XL','L','LX','LXX','LXXX','XC',
-           '','I','II','III','IV','V','VI','VII','VIII','IX'];
-    roman = '';
-    i = 3;
-
-    while (i--) {
-      roman = (key[+digits.pop() + (i * 10)] || '') + roman;
-    }
-
-    return Array(+digits.join('') + 1).join('M') + roman;
-  };
-
-  /**
-   * Round a number to given number of decimal places
-   *
-   * @param num {Number}
-   * @param precision {Number}
-   *
-   * @return {String}
-   *     Note that it does not return a Number b/c toFixed() returns a string
-   */
-  _round = function (num, precision) {
-    var multiplier,
-        rounded;
-
-    if (typeof num !== 'number') {
-      return false;
-    }
-
-    multiplier = Math.pow(10, precision || 0);
-    rounded = Math.round(num * multiplier) / multiplier;
-
-    return rounded.toFixed(precision);
   };
 
 
