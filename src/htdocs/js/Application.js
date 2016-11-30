@@ -63,6 +63,7 @@ var Application = function (options) {
       el: options.edit,
       features: _features,
       loadingModule: _loadingModule,
+      mapPane: _mapPane,
       summaryPane: _summaryPane
     });
   };
