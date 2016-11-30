@@ -6,6 +6,38 @@ var AppUtil = function () {
 
 
 /**
+ * Get value of url param
+ *
+ * @param name {String}
+ *
+ * @return {Mixed}
+ */
+AppUtil.getParam = function (name) {
+  var params = AppUtil.getParams();
+
+  return params[name];
+};
+
+/**
+ * Get all url param name/value pairs
+ *
+ * @return params {Object}
+ */
+AppUtil.getParams = function () {
+  var params,
+      queryString;
+
+  params = {};
+  queryString = location.search.slice(1);
+
+  queryString.replace(/([^=]*)=([^&]*)&*/g, function (match, key, value) {
+    params[key] = value;
+  });
+
+  return params;
+};
+
+/**
  * Convert number to roman numeral
  *
  * @param num {Number}
@@ -57,6 +89,31 @@ AppUtil.round = function (num, precision) {
   rounded = Math.round(num * multiplier) / multiplier;
 
   return rounded.toFixed(precision);
+};
+
+/**
+ * Set the value of a url parameter
+ *
+ * @param name {String}
+ * @param value {Mixed}
+ */
+AppUtil.setParam = function (name, value) {
+  var hash,
+      pairs,
+      params,
+      queryString;
+
+  hash = location.hash;
+  params = AppUtil.getParams();
+  params[name] = value;
+
+  pairs = [];
+  Object.keys(params).forEach(function(key) {
+    pairs.push(key + '=' + params[key]);
+  });
+  queryString = '?' + pairs.join('&');
+
+  window.history.replaceState({}, '', queryString + hash);
 };
 
 
