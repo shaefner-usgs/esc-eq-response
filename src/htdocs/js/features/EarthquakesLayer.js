@@ -352,7 +352,7 @@ var EarthquakesLayer = function (options) {
         summary += _getBinnedTable('First');
         summary += _getBinnedTable('Past');
         summary += '</div>';
-        summary += '<h3>Last Aftershock</h3>';
+        summary += '<h3>Most Recent Aftershock</h3>';
         summary += _getEqListTable(_lastAftershock);
       }
       else if (_id === 'historical') {
