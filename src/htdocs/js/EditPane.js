@@ -22,6 +22,7 @@ var EditPane = function (options) {
 
       _el,
       _eqid,
+      _eqidPrevValue,
       _features,
       _inputs,
       _loadingModule,
@@ -58,6 +59,7 @@ var EditPane = function (options) {
 
     _eqid = document.getElementById('eqid');
     _eqid.focus();
+    _eqidPrevValue = null;
 
     _inputs = _el.querySelectorAll('input:not(.reset)');
 
@@ -319,13 +321,22 @@ var EditPane = function (options) {
    * @param mainshock {Object}
    */
   _this.setDefaults = function (mainshock) {
-    var defaults;
+    var defaults,
+        newEvent;
 
     defaults = _getDefaults(mainshock);
 
+    if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
+      newEvent = true;
+    }
+    _eqidPrevValue = _eqid.value;
+
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
-      AppUtil.setParam(key, defaults[key]);
+      // Only set default value if empty or user entered a 'new' Event ID
+      if (AppUtil.getParam(key) === '' || newEvent) {
+        AppUtil.setParam(key, defaults[key]);
+      }
     });
 
     // Next, update all form fields to match url params
