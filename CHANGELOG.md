@@ -5,7 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-* Always set default values for mainshock even if fields aren't empty
+* Add mainshock title (place) to <title> tag
+* Only set default values for mainshock if empty or new eqid entered by user
 * Add Significant Earthquakes pulldown menu
 * Fix for browser's back/fwd buttons to navigate between panes
 * Add reset button / req'd fields text
@@ -18,7 +19,9 @@ An in-progress version being developed on the `master` branch.
 * Right align columns (mag, distance, depth, binned totals) in tables for readability
 * Use rupture length for calculating default params
 * Move "Find Earthquake" links to instructions; add image showing Event Id
-* Mobile friendly: hide Leaflet zoom/attr controls; disable zoom when focusing form input
+* More mobile friendly:
+  - hide Leaflet zoom/attr controls; disable zoom when focusing form input
+  - css tweaks
 * Bug fixes
 
 ## 0.1.0 (2016-11-02)
