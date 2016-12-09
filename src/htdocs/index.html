@@ -20,45 +20,55 @@
       </ul>
     </header>
     <section id="edit" class="pane">
-      <h1>Earthquake Response App</h1>
-      <p>This web application creates a map and summary to help collect and
-        digest information used in talking points and scientific response.</p>
-      <p>Enter the <em>Mainshock</em> Event ID, then select &lsquo;Map&rsquo; or
-        &lsquo;Summary&rsquo;.</p>
-      <div class="mainshock">
-        <form class="column">
-          <h3>Mainshock</h3>
-          <label for="eqid">
-            <p>Event ID (2 letters followed by 8 characters)</p>
-          </label>
-          <input type="text" id="eqid" required="required" value=""
-            pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{8}$" />
-          <h3>Aftershocks</h3>
-          <label for="aftershocks-dist">
-            <p>Max distance from mainshock (km)</p>
-          </label>
-          <input type="number" min="1" id="aftershocks-dist" class="aftershocks"
-            required="required" pattern="^[0-9.]+$" value="" autocomplete="off" />
-          <h3>Historical Seismicity</h3>
-          <label for="historical-dist">
-            <p>Max distance from mainshock (km)</p>
-          </label>
-          <input type="number" min="1" id="historical-dist" class="historical"
-            required="required" pattern="^[0-9.]+$" value="" autocomplete="off" />
-          <label for="historical-years">
-            <p>Max time before mainshock (years)</p>
-          </label>
-          <input type="number" min="1" id="historical-years" class="historical"
-            required="required" pattern="^[0-9.]+$" value="10" autocomplete="off" />
-          <p class="required">* All fields are required</p>
-          <input type="reset" class="reset" value="Reset" />
-        </form>
-        <div class="column details"></div>
+      <div class="content lighter">
+        <h1>Earthquake Response App</h1>
+        <p>This web application creates a map and summary to help collect and
+          digest information used in talking points and scientific response.</p>
+        <p>Enter the <em>Mainshock</em> Event ID, then select &lsquo;Map&rsquo; or
+          &lsquo;Summary&rsquo;.</p>
       </div>
-      <p>Earthquake data is from ComCat:
-        <a href="https://earthquake.usgs.gov/data/comcat/data-availability.php">
-          ComCat Documentation - Data Availability</a>.
-      </p>
+      <div class="content darker">
+        <form>
+          <div class="mainshock">
+            <h3>Mainshock</h3>
+            <label for="eqid">
+              <p>Event ID (2 letters followed by 8 characters)</p>
+            </label>
+            <input type="text" id="eqid" required="required" value=""
+              pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{8}$" />
+          </div>
+          <div class="aftershocks">
+            <h3>Aftershocks</h3>
+            <label for="aftershocks-dist">
+              <p>Max distance from mainshock (km)</p>
+            </label>
+            <input type="number" min="1" id="aftershocks-dist" required="required"
+              pattern="^[0-9.]+$" value="" autocomplete="off" />
+          </div>
+          <div class="historical">
+            <h3>Historical Seismicity</h3>
+            <label for="historical-dist">
+              <p>Max distance from mainshock (km)</p>
+            </label>
+            <input type="number" min="1" id="historical-dist" required="required"
+              pattern="^[0-9.]+$" value="" autocomplete="off" />
+            <label for="historical-years">
+              <p>Max time before mainshock (years)</p>
+            </label>
+            <input type="number" min="1" id="historical-years" required="required"
+              pattern="^[0-9.]+$" value="10" autocomplete="off" />
+          </div>
+          <div class="details"></div>
+        </form>
+        <p class="required">* All fields are required</p>
+        <input type="reset" class="reset" value="Reset" />
+      </div>
+      <div class="content lighter">
+        <p class="comcat">Earthquake data is from ComCat:
+          <a href="https://earthquake.usgs.gov/data/comcat/data-availability.php">
+            ComCat Documentation - Data Availability</a>.
+        </p>
+      </div>
     </section>
     <section id="map" class="pane">
       <div class="map"></div>
@@ -67,30 +77,32 @@
       <div class="features"></div>
     </section>
     <section id="help" class="pane">
-      <h2>Instructions</h2>
-      <ol>
-        <li>Enter the <em>Mainshock</em> Event ID
-          <p>Select an earthquake from &lsquo;Significant Earthquakes in the
-            Past Month&rsquo; or enter an Event ID manually.</p>
-          <p>You can find an Event ID in the URL of an Event Page for a
-            specific earthquake. For example:</p>
-            <img src="img/eventid.png" alt="image showing the URL"
-            class="eventid" />
-          <h3>Find an Earthquake:</h3>
-          <ul class="find">
-            <li><a href="https://earthquake.usgs.gov/earthquakes/map">Latest
-              Earthquakes</a></li>
-            <li><a href="https://earthquake.usgs.gov/earthquakes/search">Search
-              Earthquake Archives</a></li>
-          </ul>
-        </li>
-        <li>Tweak the parameters for <em>Aftershocks</em> /
-          <em>Historical Seismicity</em> <strong>(optional)</strong>
-          <p>Initial values will be set automatically based on the
-            mainshock&rsquo;s magnitude and estimated rupture length.</p>
-        </li>
-        <li>Select the &lsquo;Map&rsquo; or &lsquo;Summary&rsquo; tab</li>
-      </ol>
+      <div class="content lighter">
+        <h2>Instructions</h2>
+        <ol>
+          <li>Enter the <em>Mainshock</em> Event ID
+            <p>Select an earthquake from &lsquo;Significant Earthquakes in the
+              Past Month&rsquo; or enter an Event ID manually.</p>
+            <p>You can find an Event ID in the URL of an Event Page for a
+              specific earthquake. For example:</p>
+              <img src="img/eventid.png" alt="image showing the URL"
+              class="eventid" />
+            <h3>Find an Earthquake:</h3>
+            <ul class="find">
+              <li><a href="https://earthquake.usgs.gov/earthquakes/map">Latest
+                Earthquakes</a></li>
+              <li><a href="https://earthquake.usgs.gov/earthquakes/search">Search
+                Earthquake Archives</a></li>
+            </ul>
+          </li>
+          <li>Tweak the parameters for <em>Aftershocks</em> /
+            <em>Historical Seismicity</em> <strong>(optional)</strong>
+            <p>Initial values will be set automatically based on the
+              mainshock&rsquo;s magnitude and estimated rupture length.</p>
+          </li>
+          <li>Select the &lsquo;Map&rsquo; or &lsquo;Summary&rsquo; tab</li>
+        </ol>
+      </div>
     </section>
     <div id="loading" class="hide"></div>
   </body>
