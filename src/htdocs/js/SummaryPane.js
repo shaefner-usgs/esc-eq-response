@@ -71,11 +71,17 @@ var SummaryPane = function (options) {
     var div;
 
     div = document.createElement('div');
-    div.classList.add('feature');
+    div.classList.add('content', 'feature');
     div.setAttribute('id', opts.id);
     div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.summary;
 
     _features.appendChild(div);
+
+    if (opts.id === 'aftershocks') {
+      div.classList.add('darker');
+    } else {
+      div.classList.add('lighter');
+    }
 
     _updateTimestamp();
   };
