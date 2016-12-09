@@ -167,8 +167,8 @@ var Earthquake = function (options) {
     latlng = AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3);
     mag = AppUtil.round(props.mag, 1);
 
-    html = '<h2><a href="' + props.url + '">' + props.magType + ' ' + mag +
-      ' - ' + props.place + '</a></h2>';
+    html = '<h4><a href="' + props.url + '">' + props.magType + ' ' + mag +
+      ' - ' + props.place + '</a></h4>';
     html += '<dl>' +
         '<dt>Time</dt>' +
         '<dd>';
