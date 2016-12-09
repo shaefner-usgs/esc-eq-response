@@ -350,13 +350,16 @@ var EditPane = function (options) {
    *     GeoJson data
    */
   _this.showEqDetails = function (data) {
-    var details,
+    var appTitle,
+        details,
         html;
 
+    appTitle = document.title.split('|')[1] || document.title.split('|')[0];
     details = _el.querySelector('.details');
     html = _mainshock.getHtml(data);
 
     details.innerHTML = html;
+    document.title = data.properties.place + ' | ' + appTitle;
   };
 
 
