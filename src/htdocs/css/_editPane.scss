@@ -1,17 +1,16 @@
 #edit {
-  padding-bottom: 2em;
-
   form {
+    display: flex;
+    flex-flow: column wrap;
+    max-height: 37rem;
+
     h3 {
-      margin: 1.5em 0 .5em;
-    }
-    h3:first-of-type {
-      margin-top: 0;
+      margin: 1.75rem 0 .5rem;
     }
 
     p {
       font-weight: 300;
-      margin: .75em 0 .25em ;
+      margin: .75rem 0 .25rem ;
     }
   }
 
@@ -30,42 +29,38 @@
     }
   }
 
-  time {
-    display: block;
-  }
-
-  .column {
-    border-left: 1px solid #d6dde8;
-    margin: 1em 0 1em -1px;
-    padding: 0 1.2em;
+  .comcat {
+    margin: 0;
   }
 
   .details {
-    h2 {
-      font-size: 1.6rem;
+    a {
+      color: #333;
     }
-  }
-
-  .mainshock {
-    background: #f4f8ff;
-    border: 1px solid #d6dde8;
-    display: flex;
-    flex-wrap: wrap;
-    overflow: hidden;
 
     dd {
-      margin: 0 0 1em 0;
+      margin: 0 0 1rem 0;
     }
-
+    dl {
+      margin: 0;
+    }
     dt {
       color: #333;
       font-weight: 300;
     }
 
-    h2 {
+    h4 {
       line-height: 1.3;
-      margin-top: 0;
+      margin: .25rem 0 1rem;
     }
+
+    time {
+      display: block;
+    }
+  }
+
+  .mainshock h3 {
+    margin-top: 0;
   }
 
   .reset {
@@ -88,6 +83,31 @@
 
   .required {
     color: #c00;
-    margin-top: 1em;
+    margin-top: 1rem;
+  }
+
+  @media only screen
+    and (max-width: 1023px) {
+    form {
+      flex-wrap: nowrap;
+      max-height: none;
+    }
+    .mainshock {
+      order: 1;
+    }
+    .details {
+      margin: 1.5rem 0 -1rem;
+      order: 2;
+
+      h4 {
+        margin-top: 0;
+      }
+    }
+    .aftershocks {
+      order: 3;
+    }
+    .historical {
+      order: 4;
+    }
   }
 }

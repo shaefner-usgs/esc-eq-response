@@ -1,14 +1,8 @@
 @import 'leaflet.label.css';
 @import '_MousePosition.scss';
 
-/* Hide attribution text on (small screen) mobile devices */
-@media all and (max-width: $breakpoint-tablet-width) {
-  .leaflet-control-attribution {
-    display: none;
-  }
-}
-
-#map, .map {
+#map,
+.map {
   height: 100%;
 }
 
@@ -45,8 +39,8 @@
 
 /* UtfGrid mouseovers */
 .leaflet-mouseover-tooltip {
-  background: #fff;
   background: rgba(255, 255, 255, .85);
+  background: #fff;
   border: 2px solid;
   border-color: rgba(0, 0, 0, .25);
   border-radius: 4px;
@@ -75,7 +69,8 @@
 .popup {
   font-size: 1.1em;
 
-  dd, dt {
+  dd,
+  dt {
     line-height: 1.7;
   }
 
@@ -85,7 +80,7 @@
     display: block;
     float: left;
     font-weight: 400;
-    width: 5em
+    width: 5em;
   }
 
   h2 {
@@ -150,7 +145,8 @@
   }
 }
 
-.intensity, .roman {
+.intensity,
+.roman {
   color: #333;
   font-family: Tahoma, Verdana, Segoe, sans-serif;
   text-transform: uppercase;
@@ -186,7 +182,8 @@ a.mmiI {
   color: #000;
 }
 
-a.mmiII, a.mmiIII {
+a.mmiII,
+a.mmiIII {
   background-color: #acd8e9;
   color: #000;
 }
@@ -221,7 +218,17 @@ a.mmiIX {
   color: #000;
 }
 
-a.mmiX, a.mmiXI, a.mmiXII {
+a.mmiX,
+a.mmiXI,
+a.mmiXII {
   background-color: #c80f0a;
   color: #000;
+}
+
+/* Hide attribution text on (small screen) mobile devices */
+@media only screen
+  and (max-width: $breakpoint-tablet-width) {
+  .leaflet-control-attribution {
+    display: none;
+  }
 }

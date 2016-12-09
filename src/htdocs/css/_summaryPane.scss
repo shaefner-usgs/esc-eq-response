@@ -1,7 +1,10 @@
 #summary {
+  h3 {
+    margin-top: 1.5em;
+  }
   table {
     border-collapse: collapse;
-    margin: .5em 0;
+    margin: 0 0 1em;
 
     abbr {
       border-bottom: 1px dotted #999;
@@ -9,12 +12,12 @@
     }
   }
 
-  td, th {
-    padding: .5em;
-  }
-
   td {
-    &.depth, &.distance, &.mag {
+    padding: .4em .5em;
+
+    &.depth,
+    &.distance,
+    &.mag {
       text-align: right;
     }
     &.distance span {
@@ -28,8 +31,8 @@
   }
 
   th {
-    background-color: #f7f7f7;
     font-weight: 500;
+    padding: .25em .5em;
   }
 
   tr {
@@ -37,12 +40,14 @@
     border-width: 0 0 1px;
 
     &:first-child {
-      border-color: #ddd;
+      border-color: #ccc;
     }
   }
 
   time {
     display: block;
+    margin: 1em 1em 0;
+    text-align: right;
 
     &:before {
       content: 'Updated: ';
@@ -58,6 +63,7 @@
   .bins {
     display: flex;
     flex-wrap: wrap;
+    margin-bottom: -1em;
 
     table {
       margin-right: 2em;
@@ -74,12 +80,10 @@
   }
 
   .feature {
+    width: 100%;
     h2 {
       margin-top: 0;
     }
-    border-top: 1px solid #ccc;
-  	padding: 2em 0;
-    width: 100%;
 
     &:first-child {
       border: 0;
@@ -92,8 +96,9 @@
   }
 
   .utc {
+    color: #666;
     font-size: .9rem;
-    margin: 0 0 0 3px;
+    margin: -.75rem 0 0 3px;
   }
 }
 

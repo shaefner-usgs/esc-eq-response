@@ -18,16 +18,15 @@ html, body {
   padding: 0;
 }
 
-body {
-  position: relative;
-  line-height: 1.6;
-}
-
 html {
   box-sizing: border-box;
 }
 *, *:before, *:after {
   box-sizing: inherit;
+}
+
+body {
+  position: relative;
 }
 
 a {
@@ -39,19 +38,42 @@ a {
 }
 
 h1 {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
 }
 h2 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
 }
 h3 {
   font-size: 1.2rem;
 }
+h4 {
+  font-size: 1.1rem;
+}
+
+.content {
+  line-height: 1.6;
+  padding: 1em;
+}
+
+.darker {
+  background: #f5f8fd;
+}
+
+.lighter {
+  background: #fff;
+}
 
 .pane {
-  padding: 3.5em 1em 1em;
+  padding: 2.5em 0;
 
   &#map {
     padding: 0;
   }
+}
+
+@media only screen
+  and (max-width: 667px) {
+    .content {
+      padding: 1em .5em;
+    }
 }
