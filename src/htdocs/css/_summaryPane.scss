@@ -1,6 +1,6 @@
 #summary {
   h3 {
-    margin-top: 1.5em;
+    margin: 2.5em 0 .5em;
   }
   table {
     border-collapse: collapse;
@@ -25,14 +25,19 @@
       text-align: left;
       width: 1.5em;
     }
+    &.location {
+      text-align: center;
+    }
     &.rowlabel {
       font-weight: 500;
     }
   }
 
   th {
+    color: #333;
     font-weight: 500;
     padding: .25em .5em;
+    /*text-transform: uppercase;*/
   }
 
   tr {
@@ -63,7 +68,7 @@
   .bins {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: -1em;
+    margin-bottom: -1.5em;
 
     table {
       margin-right: 2em;
@@ -72,11 +77,6 @@
         margin-right: 0;
       }
     }
-  }
-
-  .empty {
-    background: none;
-    border: 0;
   }
 
   .feature {
@@ -95,10 +95,15 @@
     flex-wrap: wrap;
   }
 
-  .utc {
+  .note {
     color: #666;
     font-size: .9rem;
+    line-height: 1.4;
     margin: -.75rem 0 0 3px;
+  }
+
+  .star {
+    display: none;
   }
 }
 
@@ -114,4 +119,17 @@
 }
 #historical {
   order: 2;
+}
+
+@media only screen
+and (max-width: $breakpoint-phone-width) {
+  #summary {
+    .star {
+      display: inline-block;
+      margin-left: 2px;
+    }
+    .tz {
+      display: none;
+    }
+  }
 }

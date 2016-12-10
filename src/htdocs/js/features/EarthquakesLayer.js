@@ -197,11 +197,11 @@ var EarthquakesLayer = function (options) {
     if (_bins[period] && _bins[period].length > 0) {
       html = '<table class="bin">' +
         '<tr>' +
-          '<th class="empty"></th>' +
-          '<th>' + period + ' day</th>' +
-          '<th>' + period + ' week</th>' +
-          '<th>' + period + ' month</th>' +
-          '<th>' + period + ' year</th>' +
+          '<th class="period">' + period + ' </th>' +
+          '<th>Day</th>' +
+          '<th>Week</th>' +
+          '<th>Month</th>' +
+          '<th>Year</th>' +
           '<th>Total</th>' +
         '</tr>';
       _bins[period].forEach(function(cols, mag) {
@@ -270,9 +270,15 @@ var EarthquakesLayer = function (options) {
    */
   _getEqListTable = function (rows) {
     var data,
+        note,
         table;
 
     data = '';
+    note = '<span class="star">* = local time at epicenter.</span>';
+    if (_utc) {
+      note += ' Using UTC when local time is not available.';
+    }
+
     if (rows && rows.length > 0) {
       // Eqs are ordered ASC by time for Leaflet; reverse for summary table
       rows.reverse();
@@ -292,10 +298,7 @@ var EarthquakesLayer = function (options) {
           data +
         '</table>';
 
-      if (_utc) {
-        table += '<p class="utc">Using UTC time when local time at epicenter' +
-         ' is not available.</p>';
-      }
+      table += '<p class="note">' + note + '</p>';
     } else {
       table = '<p>None.</p>';
     }
@@ -401,8 +404,8 @@ var EarthquakesLayer = function (options) {
     else if (type === 'summary') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag">{magType} {mag}</td>' +
-        '<td>{localTime}</td>' +
-        '<td>{latlng}</td>' +
+        '<td class="time">{localTime}</td>' +
+        '<td class="location">{latlng}</td>' +
         '<td class="distance">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="depth">{depth} km</td>' +
       '</tr>';
@@ -449,12 +452,12 @@ var EarthquakesLayer = function (options) {
 
     eqMoment = Moment.utc(props.time, 'x');
     magInt = Math.floor(props.mag);
-    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
+    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
     if (props.tz) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
-        ' at epicenter';
+        '<span class="star">*</span><span class="tz"> at epicenter</span>';
     } else {
       _utc = true;
       localTime = utcTime;
