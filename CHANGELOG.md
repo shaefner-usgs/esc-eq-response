@@ -21,7 +21,7 @@ An in-progress version being developed on the `master` branch.
 * Move "Find Earthquake" links to instructions; add image showing Event Id
 * More mobile friendly:
   - hide Leaflet zoom/attr controls; disable zoom when focusing form input
-  - css tweaks
+  - css tweaks: summary tables shorter, less R/L padding, etc.
 * Bug fixes
 
 ## 0.1.0 (2016-11-02)
