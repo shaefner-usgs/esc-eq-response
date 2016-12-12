@@ -1,8 +1,8 @@
 $breakpoint-phone-width: 735px;
 $breakpoint-tablet-width: 1023px;
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$link-color: rgb(0, 0, 238);
-$link-color-active: rgb(238, 0, 0);
+$link-color: rgb(78, 78, 202);
+$link-color-active: rgb(204, 0, 0);
 
 @import '_editPane.scss';
 @import '_header.scss';
@@ -49,6 +49,7 @@ h3 {
 }
 h4 {
   font-size: 1.1rem;
+  font-weight: normal;
 }
 
 .content {
