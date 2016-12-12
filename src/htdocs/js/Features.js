@@ -121,7 +121,7 @@ var Features = function (options) {
    * Wrapper for mainshock layer (_addFeature adds it to map, summary panes)
    *
    * @param data {Object}
-   *     GeoJson data returned by Earthquake class
+   *     GeoJson data returned by Mainshock class
    */
   _addMainshock = function (data) {
     var id,
@@ -273,7 +273,7 @@ var Features = function (options) {
    * Set up environment / map and call methods for adding 'feature' layers
    *
    * @param mainshock {Object}
-   *     GeoJson data returned by Earthquake class
+   *     GeoJson data returned by Mainshock class
    */
   _this.initFeatures = function (mainshock) {
     var coords;

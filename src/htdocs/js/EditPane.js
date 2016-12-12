@@ -2,7 +2,7 @@
 
 
 var AppUtil = require('AppUtil'),
-    Earthquake = require('Earthquake'),
+    Mainshock = require('Mainshock'),
     SignificantEqs = require('SignificantEqs');
 
 /**
@@ -32,7 +32,7 @@ var EditPane = function (options) {
       _summaryPane,
 
       _addListener,
-      _createEarthquake,
+      _createMainshock,
       _getDefaults,
       _initListeners,
       _isValidEqId,
@@ -74,7 +74,7 @@ var EditPane = function (options) {
 
     // Get things rolling if eqid is already set when initialized
     if (_eqid.value !== '') {
-      _createEarthquake();
+      _createMainshock();
     }
   };
 
@@ -96,13 +96,13 @@ var EditPane = function (options) {
   };
 
   /**
-   * Create a new earthquake instance using event id provided by user
+   * Create a new mainshock instance using event id provided by user
    */
-  _createEarthquake = function () {
+  _createMainshock = function () {
     _resetApp();
 
     if (_isValidEqId()) {
-      _mainshock = Earthquake({
+      _mainshock = Mainshock({
         callback: _features.initFeatures, // add features to map and summary panes
         editPane: _this,
         id: _eqid.value,
@@ -160,7 +160,7 @@ var EditPane = function (options) {
     _addListener(_inputs, 'input', _updateQueryString);
 
     // Update mainshock when eqid changed
-    _addListener([_eqid], 'input', _createEarthquake);
+    _addListener([_eqid], 'input', _createMainshock);
 
     // Update aftershocks, historical layers when params changed
     _addListener(aftershocks, 'change', _refreshAftershocks);
@@ -245,7 +245,7 @@ var EditPane = function (options) {
     _eqid.value = significant.options[index].value;
 
     // Call these manually since input event is not triggered when value changed
-    _createEarthquake();
+    _createMainshock();
     _setQueryString();
   };
 
