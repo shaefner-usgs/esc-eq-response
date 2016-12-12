@@ -76,22 +76,18 @@ var EarthquakesLayer = function (options) {
 
 
   _initialize = function (options) {
-    var coords,
-        props;
+    var coords;
 
     options = Util.extend({}, _DEFAULTS, options);
     coords = options.mainshock.geometry.coordinates;
-    props = options.mainshock.properties;
 
     _bins = {};
     _eqList = [];
     _id = options.id;
-    _mainshock = {
+    _mainshock = Util.extend({}, options.mainshock, {
       latlon: LatLon(coords[1], coords[0]),
-      mag: props.mag,
-      moment: Moment.utc(props.time, 'x'),
-      time: props.time
-    };
+      moment: Moment.utc(options.mainshock.properties.time, 'x')
+    });
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _nowMoment = Moment.utc();
@@ -101,8 +97,8 @@ var EarthquakesLayer = function (options) {
 
     // Mag threshold for list on summary pane
     _threshold = {
-      aftershocks: Math.floor(_mainshock.mag - 2.5),
-      historical: Math.floor(_mainshock.mag - 1)
+      aftershocks: Math.floor(_mainshock.properties.mag - 2.5),
+      historical: Math.floor(_mainshock.properties.mag - 1)
     };
 
     // Flag for using utc (when local time at epicenter is not available in feed)
@@ -335,7 +331,11 @@ var EarthquakesLayer = function (options) {
 
     summary = '';
 
-    if (_id !== 'mainshock') {
+    if (_id === 'mainshock') {
+      summary += '<h4><a href="' + _mainshock.properties.url + '">' +
+        _mainshock.properties.place + '</a></h4>';
+    }
+    else {
       formValues = {
         aftershocksDist: document.getElementById('aftershocks-dist').value,
         historicalDist: document.getElementById('historical-dist').value,
@@ -434,6 +434,7 @@ var EarthquakesLayer = function (options) {
         labelTemplate,
         latlon,
         localTime,
+        mainshockTime,
         magInt,
         popup,
         popupTemplate,
@@ -502,14 +503,16 @@ var EarthquakesLayer = function (options) {
       minWidth: '250'
     }).bindLabel(label);
 
-    // Create summary html
+    // Get template (once) to create summary html
     if (!summaryTemplate) {
       summaryTemplate = _getTemplate('summary');
     }
-    // Only add eq to summary if above magnitude threshold
-    if ((props.time > _mainshock.time && props.mag >= _threshold.aftershocks) ||
-        (props.time < _mainshock.time && props.mag >= _threshold.historical) ||
-         props.time === _mainshock.time) {
+
+    // Add eq to summary if it's above magnitude threshold
+    mainshockTime = _mainshock.properties.time;
+    if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
+        (props.time < mainshockTime && props.mag >= _threshold.historical) ||
+         props.time === mainshockTime) {
       _eqList.push(L.Util.template(summaryTemplate, data));
     }
 
