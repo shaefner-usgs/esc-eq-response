@@ -29,11 +29,17 @@
     }
   }
 
+  .aftershocks {
+    order: 2;
+  }
+
   .comcat {
     margin: 0;
   }
 
   .details {
+    order: 5;
+
     dd {
       margin: 0 0 1rem 0;
     }
@@ -55,8 +61,20 @@
     }
   }
 
-  .mainshock h3 {
-    margin-top: 0;
+  .historical {
+    order: 3;
+  }
+
+  .mainshock {
+    order: 1;
+
+    h3 {
+      margin-top: 0;
+    }
+  }
+
+  .meta {
+    order: 4;
   }
 
   .reset {
@@ -67,6 +85,7 @@
     cursor: pointer;
     display: inline-block;
     font: 16px $font-family;
+    margin-top: 1.5rem;
     outline: 0;
     text-align: left;
     text-decoration: underline;
@@ -90,9 +109,11 @@
       flex-wrap: nowrap;
       max-height: none;
     }
-    .mainshock {
-      order: 1;
+
+    .aftershocks {
+      order: 3;
     }
+
     .details {
       margin: 1.5rem 0 -1rem;
       order: 2;
@@ -101,11 +122,17 @@
         margin-top: 0;
       }
     }
-    .aftershocks {
-      order: 3;
-    }
+
     .historical {
       order: 4;
+    }
+
+    .mainshock {
+      order: 1;
+    }
+
+    .meta {
+      order: 5;
     }
   }
 }
