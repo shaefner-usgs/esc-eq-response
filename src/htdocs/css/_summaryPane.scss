@@ -13,7 +13,7 @@
   }
 
   td {
-    padding: .4em .25em;
+    padding: .4em .5em;
 
     &.depth,
     &.distance,
@@ -31,17 +31,16 @@
     &.rowlabel {
       color: #333;
       font-weight: 500;
-      padding-left: .5em;
-      padding-right: 1.5em;
     }
   }
 
   th {
     color: #333;
+    font-size: .95rem;
     font-weight: 500;
     padding: .25em .5em;
     text-align: center;
-    /*text-transform: uppercase;*/
+    text-transform: uppercase;
 
     &.period {
       text-align: right;
@@ -68,8 +67,18 @@
   }
 
   .bin {
-    td:not(:first-child) {
-      text-align: right;
+    td {
+      &:not(:first-child) {
+        text-align: right;
+      }
+      &.rowlabel {
+        padding-right: 1.5em;
+      }
+    }
+
+    th {
+      padding-left: .25em;
+      padding-right: .25em;
     }
   }
 
@@ -91,6 +100,9 @@
     td.rowlabel {
       background: url(../img/gradient-darker.png) repeat-y;
       background-position: right;
+    }
+    td.total {
+      background-color: #edf1f7;
     }
   }
 
@@ -114,6 +126,9 @@
     td.rowlabel {
       background: url(../img/gradient-lighter.png) repeat-y;
       background-position: right;
+    }
+    td.total {
+      background-color: #fafafa;
     }
   }
 
