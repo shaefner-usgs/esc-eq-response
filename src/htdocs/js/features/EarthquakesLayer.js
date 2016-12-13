@@ -193,7 +193,7 @@ var EarthquakesLayer = function (options) {
     if (_bins[period] && _bins[period].length > 0) {
       html = '<table class="bin">' +
         '<tr>' +
-          '<th class="period">' + period + ' </th>' +
+          '<th class="period">' + period + ':</th>' +
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +

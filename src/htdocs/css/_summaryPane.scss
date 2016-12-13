@@ -13,7 +13,7 @@
   }
 
   td {
-    padding: .4em .5em;
+    padding: .4em .25em;
 
     &.depth,
     &.distance,
@@ -31,6 +31,8 @@
     &.rowlabel {
       color: #333;
       font-weight: 500;
+      padding-left: .5em;
+      padding-right: 1.5em;
     }
   }
 
@@ -38,7 +40,12 @@
     color: #333;
     font-weight: 500;
     padding: .25em .5em;
+    text-align: center;
     /*text-transform: uppercase;*/
+
+    &.period {
+      text-align: right;
+    }
   }
 
   tr {
@@ -80,6 +87,13 @@
     }
   }
 
+  .darker {
+    td.rowlabel {
+      background: url(../img/gradient-darker.png) repeat-y;
+      background-position: right;
+    }
+  }
+
   .feature {
     width: 100%;
     h2 {
@@ -94,6 +108,13 @@
   .features {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .lighter {
+    td.rowlabel {
+      background: url(../img/gradient-lighter.png) repeat-y;
+      background-position: right;
+    }
   }
 
   .note {
