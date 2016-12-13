@@ -323,10 +323,12 @@ var EarthquakesLayer = function (options) {
    * @return summary {Html}
    */
   _getSummary = function () {
-    var duration,
+    var count,
+        duration,
         formValues,
         summary;
 
+    count = _eqList.length;
     summary = '';
 
     if (_id === 'mainshock') {
@@ -362,7 +364,7 @@ var EarthquakesLayer = function (options) {
         summary += _getBinnedTable('Prior');
       }
 
-      summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes</h3>';
+      summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes (' + count + ')</h3>';
     }
 
     summary += _getEqListTable(_eqList);
