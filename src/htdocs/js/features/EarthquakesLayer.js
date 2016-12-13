@@ -185,8 +185,7 @@ var EarthquakesLayer = function (options) {
    * @return html {Html}
    */
   _getBinnedTable = function (period) {
-    var cell,
-        html,
+    var html,
         total;
 
     html = '';
@@ -198,16 +197,15 @@ var EarthquakesLayer = function (options) {
           '<th>Week</th>' +
           '<th>Month</th>' +
           '<th>Year</th>' +
-          '<th>Total</th>' +
+          '<th class="total">Total</th>' +
         '</tr>';
       _bins[period].forEach(function(cols, mag) {
         html += '<tr><td class="rowlabel">M ' + mag + '+</td>';
         cols.forEach(function(col, i) {
-          cell = '<td>' + col + '</td>';
           if (i === 0) { // store total and add to table as last column
-            total = cell;
+            total = '<td class="total">' + col + '</td>';
           } else {
-            html += cell;
+            html += '<td>' + col + '</td>';
           }
         });
         html += total + '</tr>';
