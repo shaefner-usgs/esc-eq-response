@@ -478,7 +478,7 @@ var EarthquakesLayer = function (options) {
       localTime: localTime,
       mag: AppUtil.round(props.mag, 1),
       magInt: magInt,
-      magType: props.magType,
+      magType: props.magType || 'M',
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
