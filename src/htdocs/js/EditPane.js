@@ -352,14 +352,17 @@ var EditPane = function (options) {
   _this.showEqDetails = function (data) {
     var appTitle,
         details,
-        html;
+        html,
+        props;
 
     appTitle = document.title.split('|')[1] || document.title.split('|')[0];
     details = _el.querySelector('.details');
     html = _mainshock.getHtml(data);
+    props = data.properties;
 
     details.innerHTML = html;
-    document.title = data.properties.place + ' | ' + appTitle;
+    document.title = props.magType + ' ' + AppUtil.round(props.mag, 1) + ' - ' +
+      props.place + ' | ' + appTitle;
   };
 
 
