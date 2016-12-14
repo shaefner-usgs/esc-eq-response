@@ -334,6 +334,7 @@ var EarthquakesLayer = function (options) {
     if (_id === 'mainshock') {
       summary += '<h4><a href="' + _mainshock.properties.url + '">' +
         _mainshock.properties.place + '</a></h4>';
+      summary += '';
     }
     else {
       formValues = {
@@ -401,7 +402,7 @@ var EarthquakesLayer = function (options) {
         '</dl>' +
       '</div>';
     }
-    else if (type === 'summary') {
+    else if (type === 'table') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag">{magType} {mag}</td>' +
         '<td class="time">{localTime}</td>' +
@@ -439,7 +440,7 @@ var EarthquakesLayer = function (options) {
         popup,
         popupTemplate,
         props,
-        summaryTemplate,
+        tableTemplate,
         utcTime;
 
     coords = feature.geometry.coordinates;
@@ -503,9 +504,9 @@ var EarthquakesLayer = function (options) {
       minWidth: '250'
     }).bindLabel(label);
 
-    // Get template (once) to create summary html
-    if (!summaryTemplate) {
-      summaryTemplate = _getTemplate('summary');
+    // Get template (once) used to create summary table
+    if (!tableTemplate) {
+      tableTemplate = _getTemplate('table');
     }
 
     // Add eq to summary if it's above magnitude threshold
@@ -513,7 +514,7 @@ var EarthquakesLayer = function (options) {
     if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
          props.time === mainshockTime) {
-      _eqList.push(L.Util.template(summaryTemplate, data));
+      _eqList.push(L.Util.template(tableTemplate, data));
     }
 
     // Bin eq totals by magnitude and time
@@ -525,7 +526,7 @@ var EarthquakesLayer = function (options) {
       _addEqToBin(days, magInt, 'Past');
 
       // Last aftershock will be last in list; overwrite each time thru loop
-      _lastAftershock = [L.Util.template(summaryTemplate, data)];
+      _lastAftershock = [L.Util.template(tableTemplate, data)];
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
