@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add mainshock impact bubbles to summary pane; reformat
+* Add time at epicenter to map popups (when available)
 * Add mainshock title (place) to <title> tag
 * Only set default values for mainshock if empty or new eqid entered by user
 * Add Significant Earthquakes pulldown menu
