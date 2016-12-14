@@ -388,7 +388,7 @@ var EarthquakesLayer = function (options) {
     }
     else if (type === 'popup') {
       template = '<div class="popup eq">' +
-        '<h2><a href="{url}" target="_blank">{magType} {mag} - {place}</a></h2>' +
+        '<h4><a href="{url}" target="_blank">{magType} {mag} - {place}</a></h4>' +
         '<div class="impact-bubbles">{bubbles}</div>' +
         '<dl>' +
           '<dt>Time</dt>' +
