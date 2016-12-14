@@ -41,6 +41,7 @@ var SummaryPane = function (options) {
     var time;
 
     time = document.createElement('time');
+    time.classList.add('updated');
     _el.insertBefore(time, _features);
   };
 

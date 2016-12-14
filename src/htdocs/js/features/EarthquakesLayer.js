@@ -335,9 +335,7 @@ var EarthquakesLayer = function (options) {
     summary = '';
 
     if (_id === 'mainshock') {
-      summary += '<h4><a href="' + _mainshock.properties.url + '">' +
-        _mainshock.properties.place + '</a></h4>';
-      summary += '';
+      summary += _mainshock.details;
     }
     else {
       formValues = {
@@ -369,9 +367,8 @@ var EarthquakesLayer = function (options) {
       }
 
       summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes (' + count + ')</h3>';
+      summary += _getEqListTable(_eqList);
     }
-
-    summary += _getEqListTable(_eqList);
 
     return summary;
   };
@@ -502,6 +499,9 @@ var EarthquakesLayer = function (options) {
       _popupTemplate = _getTemplate('popup');
     }
     popup = L.Util.template(_popupTemplate, data);
+    if (_id === 'mainshock') {
+      _mainshock.details = popup;
+    }
 
     // Bind popup and label to marker
     layer.bindPopup(popup, {
