@@ -39,8 +39,8 @@
 
 /* UtfGrid mouseovers */
 .leaflet-mouseover-tooltip {
-  background: rgba(255, 255, 255, .85);
   background: #fff;
+  background: rgba(255, 255, 255, .85);
   border: 2px solid;
   border-color: rgba(0, 0, 0, .25);
   border-radius: 4px;
@@ -73,7 +73,9 @@
   dt {
     line-height: 1.7;
   }
-
+  dd {
+    margin-left: 5em;
+  }
   dt {
     clear: left;
     color: #333;
@@ -84,9 +86,19 @@
   }
 
   h4 {
+    margin: 0;
+
     > a {
       color: $link-color;
     }
+  }
+
+  time {
+    display: block;
+  }
+
+  .star {
+    display: none;
   }
 }
 

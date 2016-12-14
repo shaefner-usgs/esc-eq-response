@@ -392,7 +392,7 @@ var EarthquakesLayer = function (options) {
         '<div class="impact-bubbles">{bubbles}</div>' +
         '<dl>' +
           '<dt>Time</dt>' +
-          '<dd><time datetime="{isoTime}">{utcTime}</time></dd>' +
+          '<dd>{time}</dd>' +
           '<dt>Location</dt>' +
           '<dd>{latlng}</dd>' +
           '<dt>Depth</dt>' +
@@ -405,7 +405,7 @@ var EarthquakesLayer = function (options) {
     else if (type === 'table') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag">{magType} {mag}</td>' +
-        '<td class="time">{localTime}</td>' +
+        '<td class="time">{localTime}</td>' + // set to UTC if no localTime
         '<td class="location">{latlng}</td>' +
         '<td class="distance">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="depth">{depth} km</td>' +
@@ -441,6 +441,7 @@ var EarthquakesLayer = function (options) {
         popupTemplate,
         props,
         tableTemplate,
+        timeTemplate,
         utcTime;
 
     coords = feature.geometry.coordinates;
@@ -457,13 +458,16 @@ var EarthquakesLayer = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
+    timeTemplate = ''; // Time value for leaflet popupTemplate
     if (props.tz) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         '<span class="star">*</span><span class="tz"> at epicenter</span>';
+      timeTemplate += '<time class="localtime" datetime="{isoTime}">{localTime}</time>';
     } else {
       _utc = true;
       localTime = utcTime;
     }
+    timeTemplate += '<time datetime="{isoTime}">{utcTime}</time>';
 
     data = {
       alert: props.alert, // PAGER
@@ -485,6 +489,7 @@ var EarthquakesLayer = function (options) {
       utcTime: utcTime
     };
     data.bubbles = _getBubbles(data);
+    data.time = L.Util.template(timeTemplate, data);
 
     // Create label
     if (!labelTemplate) {
