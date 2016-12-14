@@ -53,6 +53,7 @@ var EarthquakesLayer = function (options) {
       _id,
       _bins,
       _eqList,
+      _labelTemplate,
       _lastAftershock,
       _mainshock,
       _markerOptions,
@@ -60,6 +61,8 @@ var EarthquakesLayer = function (options) {
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
+      _popupTemplate,
+      _tableTemplate,
       _threshold,
       _utc,
 
@@ -432,15 +435,12 @@ var EarthquakesLayer = function (options) {
         distance,
         eqMoment,
         label,
-        labelTemplate,
         latlon,
         localTime,
         mainshockTime,
         magInt,
         popup,
-        popupTemplate,
         props,
-        tableTemplate,
         timeTemplate,
         utcTime;
 
@@ -458,7 +458,7 @@ var EarthquakesLayer = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
-    timeTemplate = ''; // Time value for leaflet popupTemplate
+    timeTemplate = ''; // Time value for leaflet _popupTemplate
     if (props.tz) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         '<span class="star">*</span><span class="tz"> at epicenter</span>';
@@ -492,16 +492,16 @@ var EarthquakesLayer = function (options) {
     data.time = L.Util.template(timeTemplate, data);
 
     // Create label
-    if (!labelTemplate) {
-      labelTemplate = _getTemplate('label');
+    if (!_labelTemplate) {
+      _labelTemplate = _getTemplate('label');
     }
-    label = L.Util.template(labelTemplate, data);
+    label = L.Util.template(_labelTemplate, data);
 
     // Create popup html
-    if (!popupTemplate) {
-      popupTemplate = _getTemplate('popup');
+    if (!_popupTemplate) {
+      _popupTemplate = _getTemplate('popup');
     }
-    popup = L.Util.template(popupTemplate, data);
+    popup = L.Util.template(_popupTemplate, data);
 
     // Bind popup and label to marker
     layer.bindPopup(popup, {
@@ -509,17 +509,15 @@ var EarthquakesLayer = function (options) {
       minWidth: '250'
     }).bindLabel(label);
 
-    // Get template (once) used to create summary table
-    if (!tableTemplate) {
-      tableTemplate = _getTemplate('table');
+    // Add eq to array for summary table if it's above magnitude threshold
+    if (!_tableTemplate) {
+      _tableTemplate = _getTemplate('table');
     }
-
-    // Add eq to summary if it's above magnitude threshold
     mainshockTime = _mainshock.properties.time;
     if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
          props.time === mainshockTime) {
-      _eqList.push(L.Util.template(tableTemplate, data));
+      _eqList.push(L.Util.template(_tableTemplate, data));
     }
 
     // Bin eq totals by magnitude and time
@@ -531,7 +529,7 @@ var EarthquakesLayer = function (options) {
       _addEqToBin(days, magInt, 'Past');
 
       // Last aftershock will be last in list; overwrite each time thru loop
-      _lastAftershock = [L.Util.template(tableTemplate, data)];
+      _lastAftershock = [L.Util.template(_tableTemplate, data)];
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
