@@ -201,14 +201,19 @@ var Features = function (options) {
           name: opts.name
         });
       },
-      error: function (status) {
-        console.error('Error loading feed (' + status + ').');
-        if (status === 400) {
-          msg = 'You might need to modify parameters to match fewer ' +
-              ' events (20,000 max)';
-          _loadingModule.addError(opts.id, 'Error Loading ' + opts.name +
-            ' <span>' + msg + '</span>');
+      error: function (status, xhr) {
+        console.error(xhr.responseText);
+
+        msg = 'Error Loading ' + opts.name;
+        if (xhr.responseText.match('limit of 20000')) {
+          msg += ' <span>Modify the parameters to match fewer earthquakes' +
+            ' (max 20,000)</span>';
         }
+        else if (xhr.responseText.match('parameter combination')){
+          msg += ' <span>All parameters are required</span>';
+        }
+
+        _loadingModule.addError(opts.id, msg);
       }
     });
   };

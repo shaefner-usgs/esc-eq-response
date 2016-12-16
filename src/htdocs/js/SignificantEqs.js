@@ -50,8 +50,9 @@ var SignificantEqs = function (options) {
       success: function (data) {
         _callback(data);
       },
-      error: function (status) {
-        console.log(status);
+      error: function (status, xhr) {
+        console.error(xhr.responseText);
+
         _loadingModule.addError('significant', 'Error Loading Significant Earthquakes');
       }
     });

@@ -106,7 +106,8 @@ var Earthquake = function (options) {
    * Load GeoJson feed for selected event id, then call _createGeoJson()
    */
   _loadFeed = function () {
-    var url;
+    var msg,
+        url;
 
     // Alert user that feature is loading (removed by Features class)
     _loadingModule.addItem('mainshock', 'Mainshock');
@@ -121,11 +122,13 @@ var Earthquake = function (options) {
         _editPane.showEqDetails(data);
         _createGeoJson(data);
       },
-      error: function (status) {
-        console.log(status);
+      error: function (status, xhr) {
+        console.error(xhr.responseText);
+
+        msg = 'Error Loading Mainshock';
         if (status === 404) {
-          _loadingModule.addError('mainshock', 'Error Loading Mainshock' +
-            ' <span>Event ID: ' + _id + ' not found</span>');
+          msg += ' <span>Event ID ' + _id + ' not found</span>';
+          _loadingModule.addError('mainshock', msg);
         }
       }
     });
