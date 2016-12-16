@@ -81,7 +81,7 @@ var EditPane = function (options) {
   /**
    * Add event listener
    *
-   * @param els {NodeList}
+   * @param els {NodeList | Array}
    *     Elements
    * @param type {String}
    *     Event type
@@ -146,6 +146,8 @@ var EditPane = function (options) {
 
   /**
    * Initialize event listeners
+   *
+   * Note that _addListener expects a NodeList (or an array) as the first arg
    */
   _initListeners = function () {
     var aftershocks,
