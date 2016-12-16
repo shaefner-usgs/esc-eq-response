@@ -5,15 +5,15 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-* Add mainshock impact bubbles to summary pane; reformat
+* Add mainshock impact bubbles to summary pane; reformat eq details
 * Add time at epicenter to map popups (when available)
-* Add mainshock title (place) to <title> tag
+* Add mainshock details to <title> tag
 * Only set default values for mainshock if empty or new eqid entered by user
 * Add Significant Earthquakes pulldown menu
 * Fix for browser's back/fwd buttons to navigate between panes
 * Add reset button / req'd fields text
 * Move instructions to new help pane; update text
-* Improve error handling
+* Improve error handling, and error messages
 * Add note when eq time at epicenter is not available in geojson feed
 * Add distance / direction to mainshock field in summary tables
 * Set map bounds to fully contain each feature layer as it is added
