@@ -26,8 +26,9 @@
     }
 
     &.error {
-      background-color: rgb(255, 180, 180);
-      border-color: #dc8f8f;
+      background-color: rgb(239, 0, 0);
+      border-color: rgb(195, 0, 0);
+      color: #fff;
       padding: 3px 0;
       z-index: 1002;
     }
