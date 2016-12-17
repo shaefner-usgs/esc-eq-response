@@ -234,6 +234,7 @@ var Features = function (options) {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('aftershocks-dist').value,
+      minmagnitude: document.getElementById('aftershocks-minmag').value,
       starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
@@ -266,6 +267,7 @@ var Features = function (options) {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
       maxradiuskm: document.getElementById('historical-dist').value,
+      minmagnitude: document.getElementById('historical-minmag').value,
       starttime: Moment(_mainshock.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };

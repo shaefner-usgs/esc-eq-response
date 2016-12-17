@@ -45,6 +45,11 @@
             </label>
             <input type="number" min="1" id="aftershocks-dist" required="required"
               pattern="^[0-9.]+$" value="" />
+            <label for="aftershocks-minmag">
+              <p>Min magnitude</p>
+            </label>
+            <input type="number" min="0" id="aftershocks-minmag" required="required"
+              pattern="^[0-9.]+$" value="0.0" />
           </div>
           <div class="historical">
             <h3>Historical Seismicity</h3>
@@ -58,6 +63,11 @@
             </label>
             <input type="number" min="1" id="historical-years" required="required"
               pattern="^[0-9.]+$" value="10" />
+            <label for="historical-minmag">
+              <p>Min magnitude</p>
+            </label>
+            <input type="number" min="0" id="historical-minmag" required="required"
+              pattern="^[0-9.]+$" value="3.0" />
           </div>
           <div class="meta">
             <input type="reset" class="reset" value="Reset" />
