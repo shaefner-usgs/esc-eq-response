@@ -81,10 +81,7 @@ AppUtil.round = function (num, precision) {
   var multiplier,
       rounded;
 
-  if (typeof num !== 'number') {
-    return false;
-  }
-
+  num = Number(num);
   multiplier = Math.pow(10, precision || 0);
   rounded = Math.round(num * multiplier) / multiplier;
 
