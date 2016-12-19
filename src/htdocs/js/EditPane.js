@@ -139,10 +139,10 @@ var EditPane = function (options) {
 
     return {
       'aftershocks-dist': Math.max(5, 10*Math.round(0.1*ruptureLength)),
+      'aftershocks-minmag': 0.0,
       'historical-dist': Math.max(10, 15*Math.round(0.1*ruptureLength)),
-      'historical-years': 10,
       'historical-minmag': 3.0,
-      'aftershocks-minmag': 3.0,
+      'historical-years': 10,
     };
   };
 
