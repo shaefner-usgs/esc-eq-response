@@ -203,7 +203,7 @@ var EarthquakesLayer = function (options) {
           '<th class="total">Total</th>' +
         '</tr>';
       _bins[period].forEach(function(cols, mag) {
-        html += '<tr><td class="rowlabel">M ' + mag + '+</td>';
+        html += '<tr><td class="rowlabel">M ' + mag + '</td>';
         cols.forEach(function(col, i) {
           if (i === 0) { // store total and add to table as last column
             total = '<td class="total">' + col + '</td>';
@@ -369,7 +369,8 @@ var EarthquakesLayer = function (options) {
         summary += _getBinnedTable('Prior');
       }
 
-      summary += '<h3>M ' + _threshold[_id] + '+ Earthquakes (' + count + ')</h3>';
+      summary += '<h3>M ' + Math.max(_threshold[_id], Number(formValues[_id + 'MinMag'])).toFixed(1) + 
+        '+ Earthquakes (' + count + ')</h3>';
       summary += _getEqListTable(_eqList);
     }
 
