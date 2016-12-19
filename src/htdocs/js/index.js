@@ -6,9 +6,9 @@
 var Application = require('Application');
 
 Application({
-  edit: document.getElementById('edit'),
+  edit: document.getElementById('editPane'),
   loading: document.getElementById('loading'),
-  map: document.querySelector('#map .map'),
+  map: document.querySelector('.map'),
   navigation: document.getElementById('navigation'),
-  summary: document.getElementById('summary')
+  summary: document.getElementById('summaryPane')
 });
