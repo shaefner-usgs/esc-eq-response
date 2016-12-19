@@ -340,11 +340,14 @@ var EarthquakesLayer = function (options) {
     else {
       formValues = {
         aftershocksDist: document.getElementById('aftershocks-dist').value,
+	aftershocksMinMag: document.getElementById('aftershocks-minmag').value,
         historicalDist: document.getElementById('historical-dist').value,
+	historicalMinMag: document.getElementById('historical-minmag').value,
         historicalYears: document.getElementById('historical-years').value || 0
       };
 
-      summary += '<p>Earthquakes <strong> within ' + formValues[_id + 'Dist'] +
+      summary += '<p><strong>M ' + Number(formValues[_id + 'MinMag']).toFixed(1) + 
+        '+ </strong> earthquakes <strong> within ' + Number(formValues[_id + 'Dist']).toFixed(0) +
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
