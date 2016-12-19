@@ -41,14 +41,14 @@ var Application = function (options) {
       el: options.loading
     });
     _mapPane = MapPane({
-      el: options.map
+      el: options.mapPane
     });
     _navigation = Navigation({
       el: options.navigation,
       mapPane: _mapPane
     });
     _summaryPane = SummaryPane({
-      el: options.summary
+      el: options.summaryPane
     });
 
     // Initialize features (event-specific layers) for map and summary panes
@@ -60,7 +60,7 @@ var Application = function (options) {
 
     // Initialize edit pane
     _editPane = EditPane({
-      el: options.edit,
+      el: options.editPane,
       features: _features,
       loadingModule: _loadingModule,
       mapPane: _mapPane,
