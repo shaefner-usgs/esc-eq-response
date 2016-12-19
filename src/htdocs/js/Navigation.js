@@ -66,15 +66,21 @@ var Navigation = function (options) {
   };
 
   /**
-   * Get id of pane to show (default to 'edit' unless set in url string)
+   * Get id of pane to show (default to 'editPane' unless set in url string)
    *
    * @return id {String}
    */
   _getPaneId = function () {
-    var id = 'edit';
+    var hash,
+        id,
+        paneExists;
 
-    if (location.hash) {
-      id = location.hash.substr(1);
+    id = 'editPane'; // default
+
+    hash = location.hash;
+    paneExists = document.querySelector('section' + hash);
+    if (hash && paneExists) {
+      id = hash.substr(1);
     }
 
     return id;
