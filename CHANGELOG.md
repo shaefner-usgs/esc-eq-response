@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add minmag params for aftershocks, historical seismicity
 * Add mainshock impact bubbles to summary pane; reformat eq details
 * Add time at epicenter to map popups (when available)
 * Add mainshock details to <title> tag
@@ -24,6 +25,7 @@ An in-progress version being developed on the `master` branch.
 * More mobile friendly:
   - hide Leaflet zoom/attr controls; disable zoom when focusing form input
   - css tweaks: summary tables shorter, less R/L padding, etc.
+  - hide location field in summary tables
 * Bug fixes
 
 ## 0.1.0 (2016-11-02)
