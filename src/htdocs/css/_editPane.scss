@@ -2,8 +2,8 @@
   form {
     display: flex;
     flex-flow: column wrap;
-    max-height: 40rem;
-    min-height: 36rem; /* 'hack' for Safari, which does not calculate flex parent height correctly */
+    max-height: 49rem;
+    min-height: 45rem; /* 'hack' for Safari, which does not calculate flex parent height correctly */
 
     h3 {
       margin: 1.75rem 0 .5rem;
