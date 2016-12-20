@@ -27,6 +27,7 @@ var Map = function (options) {
       _initialize,
 
       _el,
+      _map,
 
       _getMapLayers,
       _hideZoomControl,
@@ -38,6 +39,7 @@ var Map = function (options) {
   _initialize = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
+    _map = _el.querySelector('.map');
 
     _initMap();
   };
@@ -100,7 +102,7 @@ var Map = function (options) {
     _this.layers = _getMapLayers();
 
     // Create map and set initial view
-    _this.map = L.map(_el, {
+    _this.map = L.map(_map, {
       layers: _this.layers.defaults
     });
     _this.setDefaultView();
