@@ -12,8 +12,8 @@ var AppUtil = require('AppUtil'),
  * @param options {Object}
  *   {
  *     el: {Element},
- *     features: {Object} // Features instance
- *     loadingModule: {Object} // LoadingModule instance
+ *     features: {Object}, // Features instance
+ *     statusBar: {Object} // StatusBar instance
  *   }
  */
 var EditPane = function (options) {
@@ -25,10 +25,10 @@ var EditPane = function (options) {
       _eqidPrevValue,
       _features,
       _inputs,
-      _loadingModule,
       _mainshock,
       _mapPane,
       _significantEqs,
+      _statusBar,
       _summaryPane,
 
       _addListener,
@@ -53,8 +53,8 @@ var EditPane = function (options) {
     options = options || {};
     _el = options.el || document.createElement('div');
     _features = options.features;
-    _loadingModule = options.loadingModule;
     _mapPane = options.mapPane;
+    _statusBar = options.statusBar;
     _summaryPane = options.summaryPane;
 
     _eqid = document.getElementById('eqid');
@@ -65,7 +65,7 @@ var EditPane = function (options) {
 
     _significantEqs = SignificantEqs({
       callback: _showSignificantEqs,
-      loadingModule: _loadingModule
+      statusBar: _statusBar
     });
 
     _initListeners();
@@ -106,7 +106,7 @@ var EditPane = function (options) {
         callback: _features.initFeatures, // add features to map and summary panes
         editPane: _this,
         id: _eqid.value,
-        loadingModule: _loadingModule
+        statusBar: _statusBar
       });
     }
   };
@@ -183,7 +183,7 @@ var EditPane = function (options) {
   _isValidEqId = function () {
     var regex;
 
-    if (_loadingModule.hasError('mainshock')) {
+    if (_statusBar.hasError('mainshock')) {
       return false;
     }
 
@@ -219,7 +219,7 @@ var EditPane = function (options) {
   _resetApp = function () {
     _el.querySelector('.details').innerHTML = '';
     _features.removeFeatures();
-    _loadingModule.clearAll();
+    _statusBar.clearAll();
     _mapPane.setDefaultView();
     _summaryPane.resetTimeStamp();
   };
@@ -301,7 +301,7 @@ var EditPane = function (options) {
     _addListener([significant], 'change', _selSignificantEq);
 
     // Finished loading; remove alert
-    _loadingModule.removeItem('significant');
+    _statusBar.removeItem('significant');
   };
 
   /**

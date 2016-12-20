@@ -15,8 +15,8 @@ var EarthquakesLayer = require('features/EarthquakesLayer'),
  *
  * @param options {Object}
  *   {
- *     loadingModule: {Object}, // LoadingModule instance
  *     mapPane: {Object}, // MapPane instance
+ *     statusBar: {Object}, // StatusBar instance
  *     summaryPane: {Object} // SummaryPane instance
  *   }
  */
@@ -26,9 +26,9 @@ var Features = function (options) {
 
       _bounds,
       _layers,
-      _loadingModule,
       _mainshock,
       _mapPane,
+      _statusBar,
       _summaryPane,
 
       _addFeature,
@@ -41,8 +41,8 @@ var Features = function (options) {
 
   _initialize = function (options) {
     options = options || {};
-    _loadingModule = options.loadingModule;
     _mapPane = options.mapPane;
+    _statusBar = options.statusBar;
     _summaryPane = options.summaryPane;
 
     _bounds = new L.LatLngBounds();
@@ -112,11 +112,11 @@ var Features = function (options) {
       }
 
       // Feature done loading; remove alert
-      _loadingModule.removeItem(id);
+      _statusBar.removeItem(id);
     }
     catch (error) {
       console.error(error);
-      _loadingModule.addError(opts.id, 'Error Loading ' + opts.name +
+      _statusBar.addError(opts.id, 'Error Loading ' + opts.name +
         '<span>' + error + '</span>');
     }
   };
@@ -184,7 +184,7 @@ var Features = function (options) {
     var msg;
 
     // Alert user that feature is loading
-    _loadingModule.addItem(opts.id, opts.name);
+    _statusBar.addItem(opts.id, opts.name);
 
     Xhr.ajax({
       url: opts.url,
@@ -213,7 +213,7 @@ var Features = function (options) {
           msg += ' <span>All parameters are required</span>';
         }
 
-        _loadingModule.addError(opts.id, msg);
+        _statusBar.addError(opts.id, msg);
       }
     });
   };

@@ -7,8 +7,8 @@ var Application = require('Application');
 
 Application({
   editPane: document.getElementById('editPane'),
-  loading: document.getElementById('loading'),
   mapPane: document.querySelector('.map'),
-  navigation: document.getElementById('navigation'),
+  navBar: document.getElementById('navBar'),
+  statusBar: document.getElementById('statusBar'),
   summaryPane: document.getElementById('summaryPane')
 });

@@ -9,7 +9,7 @@
  *     el: {Element}
  *   }
  */
-var LoadingModule = function (options) {
+var StatusBar = function (options) {
   var _this,
       _initialize,
 
@@ -150,4 +150,4 @@ var LoadingModule = function (options) {
 };
 
 
-module.exports = LoadingModule;
+module.exports = StatusBar;

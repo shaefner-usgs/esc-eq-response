@@ -11,7 +11,7 @@ var AppUtil = require('AppUtil'),
  * @param options {Object}
  *   {
  *     callback: {Function},
- *     loadingModule: {Object} // LoadingModule instance
+ *     statusBar: {Object} // StatusBar instance
  *   }
  */
 var SignificantEqs = function (options) {
@@ -19,7 +19,7 @@ var SignificantEqs = function (options) {
       _initialize,
 
       _callback,
-      _loadingModule,
+      _statusBar,
 
       _loadFeed;
 
@@ -29,7 +29,7 @@ var SignificantEqs = function (options) {
   _initialize = function (options) {
     options = options || {};
     _callback = options.callback;
-    _loadingModule = options.loadingModule;
+    _statusBar = options.statusBar;
 
     _loadFeed();
   };
@@ -41,7 +41,7 @@ var SignificantEqs = function (options) {
     var url;
 
     // Alert user that feed is loading (removed by EditPane class)
-    _loadingModule.addItem('significant', 'Significant Earthquakes');
+    _statusBar.addItem('significant', 'Significant Earthquakes');
 
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 
@@ -53,7 +53,7 @@ var SignificantEqs = function (options) {
       error: function (status, xhr) {
         console.error(xhr.responseText);
 
-        _loadingModule.addError('significant', 'Error Loading Significant Earthquakes');
+        _statusBar.addError('significant', 'Error Loading Significant Earthquakes');
       }
     });
   };

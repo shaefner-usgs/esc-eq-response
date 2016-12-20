@@ -14,7 +14,7 @@ var AppUtil = require('AppUtil'),
  *     callback: {Function},
  *     editPane: {Object}, // EditPane instance
  *     id: {String},
- *     loadingModule: {Object} // LoadingModule instance
+ *     statusBar: {Object} // StatusBar instance
  *   }
  */
 var Earthquake = function (options) {
@@ -24,7 +24,7 @@ var Earthquake = function (options) {
       _callback,
       _editPane,
       _id,
-      _loadingModule,
+      _statusBar,
 
       _createGeoJson,
       _getFeatures,
@@ -38,7 +38,7 @@ var Earthquake = function (options) {
     _callback = options.callback;
     _editPane = options.editPane;
     _id = options.id;
-    _loadingModule = options.loadingModule;
+    _statusBar = options.statusBar;
 
     _loadFeed();
   };
@@ -110,7 +110,7 @@ var Earthquake = function (options) {
         url;
 
     // Alert user that feature is loading (removed by Features class)
-    _loadingModule.addItem('mainshock', 'Mainshock');
+    _statusBar.addItem('mainshock', 'Mainshock');
 
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
       _id + '.geojson';
@@ -128,7 +128,7 @@ var Earthquake = function (options) {
         msg = 'Error Loading Mainshock';
         if (status === 404) {
           msg += ' <span>Event ID ' + _id + ' not found</span>';
-          _loadingModule.addError('mainshock', msg);
+          _statusBar.addError('mainshock', msg);
         }
       }
     });

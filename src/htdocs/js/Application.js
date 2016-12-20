@@ -3,9 +3,9 @@
 
 var EditPane = require('EditPane'),
     Features = require('Features'),
-    LoadingModule = require('LoadingModule'),
     MapPane = require('MapPane'),
-    Navigation = require('Navigation'),
+    NavBar = require('NavBar'),
+    StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane');
 
 
@@ -14,11 +14,11 @@ var EditPane = require('EditPane'),
  *
  * @param options {Object}
  *   {
- *     edit: {ELement},
- *     loading: {Element},
- *     map: {Element},
- *     navigation: {Element},
- *     summary: {Element}
+ *     editPane: {ELement},
+ *     mapPane: {Element},
+ *     navBar: {Element},
+ *     statusBar: {Element},
+ *     summaryPane: {Element}
  *   }
  */
 var Application = function (options) {
@@ -27,9 +27,9 @@ var Application = function (options) {
 
       _editPane,
       _features,
-      _loadingModule,
       _mapPane,
-      _navigation,
+      _navBar,
+      _statusBar,
       _summaryPane;
 
 
@@ -37,15 +37,15 @@ var Application = function (options) {
 
   _initialize = function (options) {
     // Initialize loading module, map / summary panes & navigation
-    _loadingModule = LoadingModule({
-      el: options.loading
-    });
     _mapPane = MapPane({
       el: options.mapPane
     });
-    _navigation = Navigation({
-      el: options.navigation,
+    _navBar = NavBar({
+      el: options.navBar,
       mapPane: _mapPane
+    });
+    _statusBar = StatusBar({
+      el: options.statusBar
     });
     _summaryPane = SummaryPane({
       el: options.summaryPane
@@ -53,8 +53,8 @@ var Application = function (options) {
 
     // Initialize features (event-specific layers) for map and summary panes
     _features = Features({
-      loadingModule: _loadingModule,
       mapPane: _mapPane,
+      statusBar: _statusBar,
       summaryPane: _summaryPane
     });
 
@@ -62,8 +62,8 @@ var Application = function (options) {
     _editPane = EditPane({
       el: options.editPane,
       features: _features,
-      loadingModule: _loadingModule,
       mapPane: _mapPane,
+      statusBar: _statusBar,
       summaryPane: _summaryPane
     });
   };

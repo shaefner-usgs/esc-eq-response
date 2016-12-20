@@ -7,9 +7,9 @@ $link-color-active: rgb(204, 0, 0);
 @import '_editPane.scss';
 @import '_header.scss';
 @import '_helpPane.scss';
-@import '_loadingModule.scss';
 @import '_mapPane.scss';
-@import '_navigation.scss';
+@import '_navBar.scss';
+@import '_statusBar.scss';
 @import '_summaryPane.scss';
 
 html, body {
@@ -51,6 +51,10 @@ h3 {
 h4 {
   font-size: 1.1rem;
   font-weight: normal;
+}
+
+section.hide {
+  display: none;
 }
 
 .content {

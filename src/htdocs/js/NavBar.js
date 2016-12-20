@@ -2,7 +2,7 @@
 
 
 /**
- * Switches between panes ('pages') of single page app
+ * Sets up navbar to switch between panes ('pages') of single page app
  *
  * @param options {Object}
  *   {
@@ -10,7 +10,7 @@
  *     mapPane: {Object} // MapPane instance
  *   }
  */
-var Navigation = function (options) {
+var NavBar = function (options) {
   var _this,
       _initialize,
 
@@ -133,4 +133,4 @@ var Navigation = function (options) {
 };
 
 
-module.exports = Navigation;
+module.exports = NavBar;
