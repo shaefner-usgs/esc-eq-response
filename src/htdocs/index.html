@@ -34,8 +34,8 @@
             <label for="eqid">
               <p>Event ID (2 letters followed by 8 characters)</p>
             </label>
-            <input type="text" id="eqid" required="required" value=""
-              pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{8}$" />
+            <input type="text" id="eqid" required="required"
+              pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{8}$" value="" />
           </div>
           <div class="details"></div>
           <div class="aftershocks">
@@ -43,31 +43,31 @@
             <label for="aftershocks-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
-            <input type="number" min="1" id="aftershocks-dist" required="required"
-              pattern="^[0-9.]+$" value="" />
+            <input type="number" id="aftershocks-dist" required="required"
+              pattern="^[0-9]+$" value="" min="1"  />
             <label for="aftershocks-minmag">
               <p>Min magnitude</p>
             </label>
-            <input type="number" min="0" id="aftershocks-minmag" required="required"
-              pattern="^[0-9.]+$" value="0.0" />
+            <input type="number" id="aftershocks-minmag" required="required"
+              pattern="^[0-9.]+$" value="0.0" min="0" max="9" step="0.1" />
           </div>
           <div class="historical">
             <h3>Historical Seismicity</h3>
             <label for="historical-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
-            <input type="number" min="1" id="historical-dist" required="required"
-              pattern="^[0-9.]+$" value="" />
+            <input type="number" id="historical-dist" required="required"
+              pattern="^[0-9]+$" value="" min="1" />
             <label for="historical-years">
               <p>Max time before mainshock (years)</p>
             </label>
-            <input type="number" min="1" id="historical-years" required="required"
-              pattern="^[0-9.]+$" value="10" />
+            <input type="number" id="historical-years" required="required"
+              pattern="^[0-9]+$" value="10" min="1" />
             <label for="historical-minmag">
               <p>Min magnitude</p>
             </label>
-            <input type="number" min="0" id="historical-minmag" required="required"
-              pattern="^[0-9.]+$" value="3.0" />
+            <input type="number" id="historical-minmag" required="required"
+              pattern="^[0-9.]+$" value="3.0" min="0" max="9" step="0.1" />
           </div>
           <div class="meta">
             <input type="reset" class="reset" value="Reset" />
