@@ -5,7 +5,7 @@
 var AppUtil = require('AppUtil'),
     LatLon = require('LatLon'),
     Moment = require('moment'),
-    Util = require('util/Util');
+    Util = require('hazdev-webutils/src/util/Util');
 
 require('leaflet.label');
 
@@ -120,7 +120,7 @@ var EarthquakesLayer = function (options) {
    * Bin earthquakes by magnitude and time period
    *
    * @param days {Integer}
-   * @param mag {Float}
+   * @param magInt {Integer}
    * @param period {String}
    */
   _addEqToBin = function (days, magInt, period) {
