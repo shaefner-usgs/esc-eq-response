@@ -151,10 +151,6 @@
 
 #mainshock {
   order: 0;
-
-  .distance {
-    display: none;
-  }
 }
 #aftershocks {
   order: 1;
@@ -166,6 +162,9 @@
 @media only screen
 and (max-width: $breakpoint-phone-width) {
   #summaryPane {
+    .location {
+      display: none;
+    }
     .star {
       display: inline-block;
       margin-left: 2px;
