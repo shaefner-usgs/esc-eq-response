@@ -13,7 +13,9 @@ var AppUtil = require('AppUtil'),
  *   {
  *     el: {Element},
  *     features: {Object}, // Features instance
+ *     mapPane: {Object}, // MapPane instance
  *     statusBar: {Object} // StatusBar instance
+ *     summaryPane: {Object} // SummaryPane instance
  *   }
  */
 var EditPane = function (options) {
