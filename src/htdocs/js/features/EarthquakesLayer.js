@@ -25,7 +25,7 @@ _COLORS = {
 _MARKER_DEFAULTS = {
   weight: 1,
   opacity: 0.5,
-  fillOpacity: 0.7,
+  fillOpacity: 0.85,
   color: '#333'
 };
 _DEFAULTS = {
