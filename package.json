@@ -46,7 +46,8 @@
     "postcss-calc": "^5.0.0",
     "postcss-import": "^7.1.0",
     "precss": "^1.3.0",
-    "sinon": "^1.17.1"
+    "sinon": "^1.17.1",
+    "tablesort": "^4.1.0"
   },
   "engines": {
     "node": ">=0.10.0"
