@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add option for user to sort data tables
 * Add minmag params for aftershocks, historical seismicity
 * Add mainshock impact bubbles to summary pane; reformat eq details
 * Add time at epicenter to map popups (when available)

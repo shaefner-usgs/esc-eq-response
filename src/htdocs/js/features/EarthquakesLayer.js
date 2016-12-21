@@ -261,13 +261,14 @@ var EarthquakesLayer = function (options) {
   /**
    * Get table containing a list of earthquakes
    *
-   * @param data {Html}
+   * @param rows {Array}
    *
    * @return table {Html}
    */
   _getEqListTable = function (rows) {
     var data,
         note,
+        sortClass,
         table;
 
     data = '';
@@ -275,6 +276,7 @@ var EarthquakesLayer = function (options) {
     if (_utc) {
       note += ' Using UTC when local time is not available.';
     }
+    sortClass = 'non-sortable';
 
     if (rows && rows.length > 0) {
       // Eqs are ordered ASC by time for Leaflet; reverse for summary table
@@ -282,15 +284,18 @@ var EarthquakesLayer = function (options) {
       rows.forEach(function(row) {
         data += row;
       });
-      table = '<table>' +
-          '<tr>' +
-            '<th>Mag</th>' +
-            '<th>Time</th>' +
+      if (rows.length > 1) {
+        sortClass = 'sortable';
+      }
+      table = '<table class="' + sortClass + '">' +
+          '<tr class="no-sort">' +
+            '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
+            '<th data-sort-order="desc">Time</th>' +
             '<th class="location">Location</th>' +
-            '<th class="distance">' +
+            '<th class="distance" data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</th>' +
-            '<th>Depth</th>' +
+            '<th data-sort-method="number">Depth</th>' +
           '</tr>' +
           data +
         '</table>';
@@ -399,11 +404,11 @@ var EarthquakesLayer = function (options) {
     }
     else if (type === 'table') {
       template = '<tr class="m{magInt}">' +
-        '<td class="mag">{magType} {mag}</td>' +
-        '<td class="time">{localTime}</td>' + // set to UTC if no localTime
+        '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
+        '<td class="time" data-sort="{isoTime}">{localTime}</td>' + // set to UTC if no localTime
         '<td class="location">{latlng}</td>' +
-        '<td class="distance">{distance} km <span>{distanceDir}</span></td>' +
-        '<td class="depth">{depth} km</td>' +
+        '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
+        '<td class="depth" data-sort="{depth}">{depth} km</td>' +
       '</tr>';
     }
 

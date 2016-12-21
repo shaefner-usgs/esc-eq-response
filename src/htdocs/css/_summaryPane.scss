@@ -50,6 +50,34 @@
     &.period {
       text-align: right;
     }
+
+    &.sort-header {
+      cursor: pointer;
+
+      &:selection {
+        background: transparent;
+      }
+
+      &:after {
+        border-color: #404040 transparent;
+        border-style: solid;
+        border-width: 0 4px 4px;
+        content: '';
+        display: inline-block;
+        margin: 4px 0 4px 2px;
+        visibility: hidden;
+      }
+
+      &.sort-up:after,
+      &.sort-down:after {
+        opacity: 1.0;
+        visibility: visible;
+      }
+      &.sort-up:after {
+        border-bottom: none;
+        border-width: 4px 4px 0;
+      }
+    }
   }
 
   tr {
