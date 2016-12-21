@@ -328,7 +328,6 @@ var EarthquakesLayer = function (options) {
   _getSummary = function () {
     var count,
         duration,
-        formValues,
         summary;
 
     count = _eqList.length;
@@ -338,16 +337,8 @@ var EarthquakesLayer = function (options) {
       summary += _mainshock.details;
     }
     else {
-      formValues = {
-        aftershocksDist: document.getElementById('aftershocks-dist').value,
-        aftershocksMinMag: document.getElementById('aftershocks-minmag').value,
-        historicalDist: document.getElementById('historical-dist').value,
-        historicalMinMag: document.getElementById('historical-minmag').value,
-        historicalYears: document.getElementById('historical-years').value || 0
-      };
-
-      summary += '<p><strong>M ' + formValues[_id + 'MinMag'] +
-        '+ </strong> earthquakes <strong> within ' + formValues[_id + 'Dist'] +
+      summary += '<p><strong>M ' + AppUtil.getParam(_id + '-minmag') +
+        '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_id + '-dist') +
         ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
@@ -364,12 +355,12 @@ var EarthquakesLayer = function (options) {
         summary += _getEqListTable(_lastAftershock);
       }
       else if (_id === 'historical') {
-        summary += ' in the <strong>prior ' + formValues.historicalYears +
+        summary += ' in the <strong>prior ' + AppUtil.getParam('historical-years') +
           ' years</strong>.</p>';
         summary += _getBinnedTable('Prior');
       }
 
-      summary += '<h3>M ' + Math.max(_threshold[_id], formValues[_id + 'MinMag']) +
+      summary += '<h3>M ' + Math.max(_threshold[_id], AppUtil.getParam(_id + '-minmag')) +
         '+ Earthquakes (' + count + ')</h3>';
       summary += _getEqListTable(_eqList);
     }
