@@ -290,7 +290,7 @@ var EarthquakesLayer = function (options) {
       table = '<table class="' + sortClass + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-            '<th data-sort-order="desc">Time</th>' +
+            '<th class="sort-up" data-sort-order="desc">Time</th>' +
             '<th class="location">Location</th>' +
             '<th class="distance" data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
