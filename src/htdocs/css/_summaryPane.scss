@@ -53,6 +53,7 @@
 
     &.sort-header {
       cursor: pointer;
+      white-space: nowrap;
 
       &:selection {
         background: transparent;
