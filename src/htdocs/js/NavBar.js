@@ -121,7 +121,7 @@ var NavBar = function (options) {
     pane.classList.remove('hide');
 
     // Update map container so it displays correctly when unhidden
-    if (id === 'map') {
+    if (id === 'mapPane') {
       _map.invalidateSize();
     }
   };
