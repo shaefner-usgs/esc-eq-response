@@ -21,6 +21,7 @@ var SummaryPane = function (options) {
       _features,
 
       _addTimestamp,
+      _getTimeZone,
       _initTableSort,
       _updateTimestamp;
 
@@ -45,6 +46,37 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
+  };
+
+  /**
+   * Get timezone of user's device
+   * http://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
+   *  offset-amount-in-js/12496442#12496442
+   *
+   * @return tz {String}
+   *     PST, CST, etc
+   */
+  _getTimeZone = function () {
+    var now,
+        tz;
+
+    now = new Date().toString();
+    try {
+      if (now.indexOf('(') > -1) {
+        tz = now.match(/\([^\)]+\)/)[0].match(/[A-Z]/g).join('');
+      } else {
+        tz = now.match(/[A-Z]{3,4}/)[0];
+      }
+
+      if (tz === 'GMT' && /(GMT\W*\d{4})/.test(now)) {
+        tz = RegExp.$1;
+      }
+    }
+    catch (error) {
+      console.error(error);
+    }
+
+    return tz;
   };
 
   /*
@@ -93,10 +125,13 @@ var SummaryPane = function (options) {
    */
   _updateTimestamp = function () {
     var time,
-        timestamp;
+        timestamp,
+        tz;
 
     time = _el.querySelector('time');
-    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A');
+    tz = _getTimeZone();
+    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
+      ' (' + tz + ')';
 
     time.innerHTML = timestamp;
   };
