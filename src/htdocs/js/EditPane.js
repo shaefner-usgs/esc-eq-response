@@ -46,7 +46,7 @@ var EditPane = function (options) {
       _setFormFields,
       _setQueryString,
       _showSignificantEqs,
-      _updateQueryString;
+      _updateParam;
 
 
   _this = {};
@@ -162,8 +162,8 @@ var EditPane = function (options) {
     historical = _el.querySelectorAll('.historical');
     reset = _el.querySelector('.reset');
 
-    // Update querystring when params changed
-    _addListener(_inputs, 'input', _updateQueryString);
+    // Update querystring when param changed
+    _addListener(_inputs, 'input', _updateParam);
 
     // Update mainshock when eqid changed
     _addListener([_eqid], 'input', _createMainshock);
@@ -178,7 +178,7 @@ var EditPane = function (options) {
 
   /**
    * Check that eqid is valid format (2 letters followed by 8 characters)
-   * and that eqid exists (if known - error is shown after it was not found)
+   * and that eqid exists (if known - error is returned after getting a 404)
    *
    * @return {Boolean}
    */
@@ -307,16 +307,19 @@ var EditPane = function (options) {
   };
 
   /**
-   * Update querystring (e.g. called when a form field value changes)
+   * Update parameter (called when a form field is changed)
    *
    * @param e {Event}
    */
-  _updateQueryString = function (e) {
-    var id,
+  _updateParam = function (e) {
+    var el,
+        id,
         value;
 
     id = e.target.id;
-    value = document.getElementById(id).value;
+    el = document.getElementById(id);
+    value = el.value.replace(/\s+/g, ''); // strip whitespace
+    el.value = value;
 
     AppUtil.setParam(id, value);
   };
