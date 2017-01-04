@@ -89,17 +89,14 @@ var Features = function (options) {
 
       // Set bounds to contain added layer
       _bounds.extend(layer.getBounds());
-      //console.log(name, _bounds._northEast, _bounds._southWest);
       _mapPane.map.fitBounds(_bounds, {
-        paddingTopLeft: L.Point(0,90), // accommodate navbar
+        paddingTopLeft: L.Point(0, 90), // accommodate navbar
         reset: true
       });
 
       // Render mainshock on top of other features
-      if (id === 'mainshock') {
-        layer.bringToFront();
-      } else {
-        layer.bringToBack();
+      if (_layers.mainshock) {
+        _layers.mainshock.bringToFront();
       }
 
       // Add Summary
