@@ -143,7 +143,7 @@ var Features = function (options) {
       // Feature should be removed already, but stacked ajax requests cause issues
       _this.removeFeature(id);
 
-      // Create Leaflet layer (and store it in _layers for potential removal later)
+      // Create Leaflet layer (and store it in _layers for access later)
       layer = opts.feature(opts.featureParams);
       layer.name = name;
       _layers[id] = layer;
@@ -152,6 +152,9 @@ var Features = function (options) {
       if (id === 'aftershocks' || id === 'historical') {
         // ensure aftershocks are plotted on top of historical
         if (_layers.aftershocks && _layers.historical) {
+          // remove pre-existing layers so order is correct when hist. params tweaked
+          _mapPane.map.removeLayer(_layers.aftershocks);
+          _mapPane.map.removeLayer(_layers.historical);
           _addLayer(_layers.historical);
           _addLayer(_layers.aftershocks);
         }
