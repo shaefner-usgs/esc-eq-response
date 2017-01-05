@@ -46,9 +46,6 @@ var Features = function (options) {
     _mapPane = options.mapPane;
     _statusBar = options.statusBar;
     _summaryPane = options.summaryPane;
-
-    _bounds = new L.LatLngBounds();
-    _layers = {};
   };
 
   /**
@@ -57,9 +54,9 @@ var Features = function (options) {
    * @param layer {Object}
    * @param name {String}
    */
-  _addLayer = function (layer, name) {
+  _addLayer = function (layer) {
     _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, name);
+    _mapPane.layerController.addOverlay(layer, layer.name);
 
     // Set bounds to contain added layer
     _bounds.extend(layer.getBounds());
@@ -106,11 +103,11 @@ var Features = function (options) {
    * @param layer {Object}
    * @param name {String}
    */
-  _addSummary = function (id, layer, name) {
+  _addSummary = function (id, layer) {
     if (layer.summary) {
       _summaryPane.addSummary({
         id: id,
-        name: name,
+        name: layer.name,
         summary: layer.summary
       });
     }
@@ -148,11 +145,20 @@ var Features = function (options) {
 
       // Create Leaflet layer (and store it in _layers for potential removal later)
       layer = opts.feature(opts.featureParams);
+      layer.name = name;
       _layers[id] = layer;
 
-      // Display layer on map, summary panes
-      _addLayer(layer, name);
-      _addSummary(id, layer, name);
+      // Add feature layer to map, summary panes
+      if (id === 'aftershocks' || id === 'historical') {
+        // ensure aftershocks are plotted on top of historical
+        if (_layers.aftershocks && _layers.historical) {
+          _addLayer(_layers.historical);
+          _addLayer(_layers.aftershocks);
+        }
+      } else {
+        _addLayer(layer);
+      }
+      _addSummary(id, layer);
 
       // Feature done loading; remove alert
       _statusBar.removeItem(id);
@@ -307,7 +313,10 @@ var Features = function (options) {
   _this.initFeatures = function (mainshock) {
     var coords;
 
+    _bounds = new L.LatLngBounds();
+    _layers = {};
     _mainshock = mainshock;
+
     coords = _mainshock.geometry.coordinates;
 
     // Center map around mainshock for now
