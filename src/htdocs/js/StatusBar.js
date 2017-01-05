@@ -15,8 +15,8 @@ var StatusBar = function (options) {
 
       _el,
 
-      _hideModule,
-      _showModule;
+      _hideStatusBar,
+      _showStatusBar;
 
 
   _this = {};
@@ -27,21 +27,21 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Hide loading module
+   * Hide status bar
    */
-  _hideModule = function () {
+  _hideStatusBar = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Show loading module
+   * Show status bar
    */
-  _showModule = function () {
+  _showStatusBar = function () {
     _el.classList.remove('hide');
   };
 
   /**
-   * Add error to loading module
+   * Add error to status bar
    *
    * @param id {String}
    *     CSS class
@@ -51,7 +51,7 @@ var StatusBar = function (options) {
     var error;
 
     _this.removeItem(id); // remove any leftover loading messages
-    _showModule();
+    _showStatusBar();
 
     error = document.createElement('p');
     error.classList.add(id, 'error');
@@ -61,7 +61,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Add item to loading module
+   * Add item to status bar
    *
    * @param id {String}
    *     CSS class
@@ -71,7 +71,7 @@ var StatusBar = function (options) {
     var item;
 
     _this.removeError(id); // remove any leftover errors
-    _showModule();
+    _showStatusBar();
 
     item = document.createElement('p');
     item.classList.add(id);
@@ -81,11 +81,11 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Clear all messages from loading module
+   * Clear all messages from status bar
    */
   _this.clearAll = function () {
     _el.innerHTML = '';
-    _hideModule();
+    _hideStatusBar();
   };
 
   /**
@@ -106,7 +106,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove error from loading module (and hide if empty)
+   * Remove error from status bar (and hide if empty)
    *
    * @param id {String}
    *     CSS class
@@ -120,12 +120,12 @@ var StatusBar = function (options) {
     }
 
     if (_el.children.length === 0) {
-      _hideModule();
+      _hideStatusBar();
     }
   };
 
   /**
-   * Remove item from loading module (and hide if empty)
+   * Remove item from status bar (and hide if empty)
    *
    * @param id {String}
    *     CSS class
@@ -139,7 +139,7 @@ var StatusBar = function (options) {
     }
 
     if (_el.children.length === 0) {
-      _hideModule();
+      _hideStatusBar();
     }
   };
 
