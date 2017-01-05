@@ -36,7 +36,7 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    // Initialize loading module, map / summary panes & navigation
+    // Initialize map / summary panes & navigation / status bar
     _mapPane = MapPane({
       el: options.mapPane
     });
