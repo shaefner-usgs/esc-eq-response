@@ -22,7 +22,7 @@ require('mappane/TerrainLayer');
  *     el: {Element}
  *   }
  */
-var Map = function (options) {
+var MapPane = function (options) {
   var _this,
       _initialize,
 
@@ -137,4 +137,4 @@ var Map = function (options) {
 };
 
 
-module.exports = Map;
+module.exports = MapPane;

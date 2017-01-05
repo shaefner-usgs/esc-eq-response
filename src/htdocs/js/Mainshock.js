@@ -7,7 +7,7 @@ var AppUtil = require('AppUtil'),
 
 
 /**
- * Factory for creating an earthquake (mainshock) instance
+ * Factory for creating a mainshock (earthquake) instance
  *
  * @param options {Object}
  *   {
@@ -17,7 +17,7 @@ var AppUtil = require('AppUtil'),
  *     statusBar: {Object} // StatusBar instance
  *   }
  */
-var Earthquake = function (options) {
+var Mainshock = function (options) {
   var _this,
       _initialize,
 
@@ -196,4 +196,4 @@ var Earthquake = function (options) {
 };
 
 
-module.exports = Earthquake;
+module.exports = Mainshock;
