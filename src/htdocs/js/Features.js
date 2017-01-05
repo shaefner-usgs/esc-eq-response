@@ -2,7 +2,7 @@
 'use strict';
 
 
-var EarthquakesLayer = require('features/EarthquakesLayer'),
+var Earthquakes = require('features/Earthquakes'),
     Moment = require('moment'),
     Xhr = require('util/Xhr');
 
@@ -56,8 +56,8 @@ var Features = function (options) {
    *   {
    *     count: {Integer}, // number of features in layer (optional)
    *     id: {String}, // layer id (req'd)
-   *     layerClass: {Function}, // class that creates Leaflet layer (req'd)
-   *     layerOptions: {Object}, // contains data prop with geojson data (req'd)
+   *     feature: {Function}, // class that creates Leaflet layer (req'd)
+   *     featureParams: {Object}, // contains data prop with geojson data (req'd)
    *     name: {String} // layer name (req'd)
    *   }
    */
@@ -80,7 +80,7 @@ var Features = function (options) {
       _this.removeFeature(id);
 
       // Create Leaflet layer using Layer class specified in opts
-      layer = opts.layerClass(opts.layerOptions);
+      layer = opts.feature(opts.featureParams);
 
       // Add layer to map (and store it in _layers for potential removal later)
       _mapPane.map.addLayer(layer);
@@ -133,8 +133,8 @@ var Features = function (options) {
 
     _addFeature({
       id: id,
-      layerClass: EarthquakesLayer,
-      layerOptions: {
+      feature: Earthquakes,
+      featureParams: {
         id: id,
         data: data,
         mainshock: _mainshock,
@@ -172,7 +172,7 @@ var Features = function (options) {
    * @param opts {Object}
    *   {
    *     id: {String},
-   *     layerClass: {Function},
+   *     feature: {Function},
    *     name: {String},
    *     url: {String}
    *   }
@@ -189,8 +189,8 @@ var Features = function (options) {
         _addFeature({
           count: data.metadata.count,
           id: opts.id,
-          layerClass: opts.layerClass,
-          layerOptions: {
+          feature: opts.feature,
+          featureParams: {
             id: opts.id,
             data: data,
             mainshock: _mainshock
@@ -238,7 +238,7 @@ var Features = function (options) {
 
     _loadFeed({
       id: id,
-      layerClass: EarthquakesLayer,
+      feature: Earthquakes,
       name: name,
       url: _getFeedUrl(params)
     });
@@ -271,7 +271,7 @@ var Features = function (options) {
 
     _loadFeed({
       id: id,
-      layerClass: EarthquakesLayer,
+      feature: Earthquakes,
       name: name,
       url: _getFeedUrl(params)
     });
@@ -299,8 +299,8 @@ var Features = function (options) {
 
     // Now, add event-specific features
     _addMainshock(_mainshock);
-    _this.addAftershocks();
     _this.addHistorical();
+    _this.addAftershocks();
   };
 
   /**

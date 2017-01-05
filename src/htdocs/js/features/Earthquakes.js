@@ -46,7 +46,7 @@ _DEFAULTS = {
  *
  * @return {L.FeatureGroup}
  */
-var EarthquakesLayer = function (options) {
+var Earthquakes = function (options) {
   var _this,
       _initialize,
 
@@ -567,6 +567,6 @@ var EarthquakesLayer = function (options) {
 };
 
 
-L.earthquakesLayer = EarthquakesLayer;
+L.earthquakesLayer = Earthquakes;
 
-module.exports = EarthquakesLayer;
+module.exports = Earthquakes;
