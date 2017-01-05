@@ -79,7 +79,7 @@ var Features = function (options) {
       // Feature should be removed already, but stacked ajax requests cause issues
       _this.removeFeature(id);
 
-      // Create Leaflet layer using Layer class specified in opts
+      // Create Leaflet layer
       layer = opts.feature(opts.featureParams);
 
       // Add layer to map (and store it in _layers for potential removal later)
@@ -90,7 +90,7 @@ var Features = function (options) {
       // Set bounds to contain added layer
       _bounds.extend(layer.getBounds());
       _mapPane.map.fitBounds(_bounds, {
-        paddingTopLeft: L.Point(0, 90), // accommodate navbar
+        paddingTopLeft: L.point(0, 45), // accommodate navbar
         reset: true
       });
 
