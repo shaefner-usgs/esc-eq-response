@@ -31,8 +31,10 @@ var Features = function (options) {
       _statusBar,
       _summaryPane,
 
-      _addFeature,
+      _addLayer,
       _addMainshock,
+      _addSummary,
+      _createFeature,
       _getFeedUrl,
       _loadFeed;
 
@@ -50,7 +52,72 @@ var Features = function (options) {
   };
 
   /**
-   * Create and add a feature layer to map / layer controller, summary pane
+   * Add feature layer to map
+   *
+   * @param layer {Object}
+   * @param name {String}
+   */
+  _addLayer = function (layer, name) {
+    _mapPane.map.addLayer(layer);
+    _mapPane.layerController.addOverlay(layer, name);
+
+    // Set bounds to contain added layer
+    _bounds.extend(layer.getBounds());
+    _mapPane.map.fitBounds(_bounds, {
+      paddingTopLeft: L.point(0, 45), // accommodate navbar
+      reset: true
+    });
+
+    // Render mainshock on top of other features
+    if (_layers.mainshock) {
+      _layers.mainshock.bringToFront();
+    }
+  };
+
+  /**
+   * Wrapper for creating mainshock feature
+   *
+   * @param data {Object}
+   *     GeoJson data returned by Mainshock class
+   */
+  _addMainshock = function (data) {
+    var id,
+        name;
+
+    id = 'mainshock';
+    name = 'Mainshock';
+
+    _createFeature({
+      id: id,
+      feature: Earthquakes,
+      featureParams: {
+        id: id,
+        data: data,
+        mainshock: _mainshock,
+      },
+      name: name
+    });
+  };
+
+  /**
+   * Add feature layer to summary pane
+   *
+   * @param id {String}
+   * @param layer {Object}
+   * @param name {String}
+   */
+  _addSummary = function (id, layer, name) {
+    if (layer.summary) {
+      _summaryPane.addSummary({
+        id: id,
+        name: name,
+        summary: layer.summary
+      });
+    }
+  };
+
+  /**
+   * Create feature layer for map, summary panes
    *
    * @param opts {Object}
    *   {
@@ -61,7 +128,7 @@ var Features = function (options) {
    *     name: {String} // layer name (req'd)
    *   }
    */
-  _addFeature = function (opts) {
+  _createFeature = function (opts) {
     var count,
         id,
         layer,
@@ -79,34 +146,13 @@ var Features = function (options) {
       // Feature should be removed already, but stacked ajax requests cause issues
       _this.removeFeature(id);
 
-      // Create Leaflet layer
+      // Create Leaflet layer (and store it in _layers for potential removal later)
       layer = opts.feature(opts.featureParams);
-
-      // Add layer to map (and store it in _layers for potential removal later)
-      _mapPane.map.addLayer(layer);
-      _mapPane.layerController.addOverlay(layer, name);
       _layers[id] = layer;
 
-      // Set bounds to contain added layer
-      _bounds.extend(layer.getBounds());
-      _mapPane.map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 45), // accommodate navbar
-        reset: true
-      });
-
-      // Render mainshock on top of other features
-      if (_layers.mainshock) {
-        _layers.mainshock.bringToFront();
-      }
-
-      // Add Summary
-      if (layer.summary) {
-        _summaryPane.addSummary({
-          id: id,
-          name: name,
-          summary: layer.summary
-        });
-      }
+      // Display layer on map, summary panes
+      _addLayer(layer, name);
+      _addSummary(id, layer, name);
 
       // Feature done loading; remove alert
       _statusBar.removeItem(id);
@@ -116,31 +162,6 @@ var Features = function (options) {
       _statusBar.addError(opts.id, 'Error Loading ' + opts.name +
         '<span>' + error + '</span>');
     }
-  };
-
-  /**
-   * Wrapper for mainshock layer (_addFeature adds it to map, summary panes)
-   *
-   * @param data {Object}
-   *     GeoJson data returned by Mainshock class
-   */
-  _addMainshock = function (data) {
-    var id,
-        name;
-
-    id = 'mainshock';
-    name = 'Mainshock';
-
-    _addFeature({
-      id: id,
-      feature: Earthquakes,
-      featureParams: {
-        id: id,
-        data: data,
-        mainshock: _mainshock,
-      },
-      name: name
-    });
   };
 
   /**
@@ -167,7 +188,7 @@ var Features = function (options) {
   };
 
   /**
-   * Load data feed and then call _addFeature when it's finished loading
+   * Load data feed and then call _createFeature when it's finished loading
    *
    * @param opts {Object}
    *   {
@@ -186,7 +207,7 @@ var Features = function (options) {
     Xhr.ajax({
       url: opts.url,
       success: function (data) {
-        _addFeature({
+        _createFeature({
           count: data.metadata.count,
           id: opts.id,
           feature: opts.feature,
