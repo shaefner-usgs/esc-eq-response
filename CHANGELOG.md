@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Always plot aftershocks on top of historical
+* Add timezone to updated stamp on summary pane
+* Strip whitespace from param values in form fields
 * Add option for user to sort data tables
 * Add minmag params for aftershocks, historical seismicity
 * Add mainshock impact bubbles to summary pane; reformat eq details
