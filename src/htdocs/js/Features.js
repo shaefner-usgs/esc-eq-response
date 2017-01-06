@@ -112,7 +112,6 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     id: {String}, // layer id (req'd)
    *     feature: {Function}, // class that creates Leaflet layer (req'd)
    *     featureParams: {Object} // contains geojson data, etc (req'd)
    *     {
