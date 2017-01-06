@@ -25,6 +25,7 @@ var Features = function (options) {
       _initialize,
 
       _bounds,
+      _initialLoad,
       _layers,
       _mainshock,
       _mapPane,
@@ -58,12 +59,14 @@ var Features = function (options) {
     _mapPane.map.addLayer(layer);
     _mapPane.layerController.addOverlay(layer, layer.name);
 
-    // Set bounds to contain added layer
-    _bounds.extend(layer.getBounds());
-    _mapPane.map.fitBounds(_bounds, {
-      paddingTopLeft: L.point(0, 45), // accommodate navbar
-      reset: true
-    });
+    // Set bounds to contain added layer if adding for the first time
+    if (_initialLoad) {
+      _bounds.extend(layer.getBounds());
+      _mapPane.map.fitBounds(_bounds, {
+        paddingTopLeft: L.point(0, 45), // accommodate navbar
+        reset: true
+      });
+    }
 
     // Render mainshock on top of other features
     if (_layers.mainshock) {
@@ -150,13 +153,15 @@ var Features = function (options) {
 
       // Add feature layer to map, summary panes
       if (id === 'aftershocks' || id === 'historical') {
-        // ensure aftershocks are plotted on top of historical
+        // Load both layers before adding to ensure aftershocks are on top
         if (_layers.aftershocks && _layers.historical) {
-          // remove pre-existing layers so order is correct when hist. params tweaked
+          // Remove / add both layers so order is correct after params tweaked
           _mapPane.map.removeLayer(_layers.aftershocks);
           _mapPane.map.removeLayer(_layers.historical);
           _addLayer(_layers.historical);
           _addLayer(_layers.aftershocks);
+
+          _initialLoad = false;
         }
       } else {
         _addLayer(layer);
@@ -316,6 +321,7 @@ var Features = function (options) {
   _this.initFeatures = function (mainshock) {
     var coords;
 
+    _initialLoad = true;
     _bounds = new L.LatLngBounds();
     _layers = {};
     _mainshock = mainshock;
