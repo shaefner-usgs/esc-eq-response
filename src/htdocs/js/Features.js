@@ -2,7 +2,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes'),
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/Earthquakes'),
     Moment = require('moment'),
     Xhr = require('util/Xhr');
 
@@ -53,7 +54,6 @@ var Features = function (options) {
    * Add feature layer to map
    *
    * @param layer {Object}
-   * @param name {String}
    */
   _addLayer = function (layer) {
     _mapPane.map.addLayer(layer);
@@ -81,35 +81,30 @@ var Features = function (options) {
    *     GeoJson data returned by Mainshock class
    */
   _addMainshock = function (data) {
-    var id,
-        name;
+    var id;
 
     id = 'mainshock';
-    name = 'Mainshock';
 
     _createFeature({
-      id: id,
       feature: Earthquakes,
       featureParams: {
-        id: id,
         data: data,
+        id: id,
         mainshock: _mainshock,
+        name: 'Mainshock'
       },
-      name: name
     });
   };
 
   /**
    * Add feature layer to summary pane
    *
-   * @param id {String}
    * @param layer {Object}
-   * @param name {String}
    */
-  _addSummary = function (id, layer) {
+  _addSummary = function (layer) {
     if (layer.summary) {
       _summaryPane.addSummary({
-        id: id,
+        id: layer.id,
         name: layer.name,
         summary: layer.summary
       });
@@ -121,34 +116,29 @@ var Features = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     count: {Integer}, // number of features in layer (optional)
    *     id: {String}, // layer id (req'd)
    *     feature: {Function}, // class that creates Leaflet layer (req'd)
-   *     featureParams: {Object}, // contains data prop with geojson data (req'd)
-   *     name: {String} // layer name (req'd)
+   *     featureParams: {Object} // contains geojson data, etc (req'd)
+   *     {
+   *       data: {Object},
+   *       id: {String},
+   *       mainshock: {Object},
+   *       name: {String}
+   *     }
    *   }
    */
   _createFeature = function (opts) {
-    var count,
-        id,
-        layer,
-        name;
+    var id,
+        layer;
 
-    count = opts.count;
-    id = opts.id;
-    name = opts.name;
+    id = opts.featureParams.id;
 
     try {
-      if (count >= 0) {
-        name += ' (' + count + ')';
-      }
-
       // Feature should be removed already, but stacked ajax requests cause issues
       _this.removeFeature(id);
 
       // Create Leaflet layer (and store it in _layers for access later)
       layer = opts.feature(opts.featureParams);
-      layer.name = name;
       _layers[id] = layer;
 
       // Add feature layer to map, summary panes
@@ -166,14 +156,14 @@ var Features = function (options) {
       } else {
         _addLayer(layer);
       }
-      _addSummary(id, layer);
+      _addSummary(layer);
 
       // Feature done loading; remove alert
       _statusBar.removeItem(id);
     }
     catch (error) {
       console.error(error);
-      _statusBar.addError(opts.id, 'Error Loading ' + opts.name +
+      _statusBar.addError(opts.id, 'Error Loading ' + opts.featureParams.name +
         '<span>' + error + '</span>');
     }
   };
@@ -222,15 +212,13 @@ var Features = function (options) {
       url: opts.url,
       success: function (data) {
         _createFeature({
-          count: data.metadata.count,
-          id: opts.id,
           feature: opts.feature,
           featureParams: {
-            id: opts.id,
             data: data,
-            mainshock: _mainshock
-          },
-          name: opts.name
+            id: opts.id,
+            mainshock: _mainshock,
+            name: opts.name
+          }
         });
       },
       error: function (status, xhr) {
@@ -255,26 +243,21 @@ var Features = function (options) {
    *   loads feed then adds it to map, summary panes thru callbacks
    */
   _this.addAftershocks = function () {
-    var id,
-        name,
-        params;
-
-    id = 'aftershocks';
-    name = 'Aftershocks';
+    var params;
 
     params = {
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('aftershocks-dist').value,
-      minmagnitude: document.getElementById('aftershocks-minmag').value,
+      maxradiuskm: AppUtil.getParam('aftershocks-dist'),
+      minmagnitude: AppUtil.getParam('aftershocks-minmag'),
       starttime: Moment(_mainshock.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
 
     _loadFeed({
-      id: id,
+      id: 'aftershocks',
       feature: Earthquakes,
-      name: name,
+      name: 'Aftershocks',
       url: _getFeedUrl(params)
     });
   };
@@ -284,30 +267,26 @@ var Features = function (options) {
    *   loads feed then adds it to map, summary panes thru callbacks
    */
   _this.addHistorical = function () {
-    var id,
-        name,
-        params,
+    var params,
         years;
 
-    id = 'historical';
-    name = 'Historical Seismicity';
-    years = document.getElementById('historical-years').value;
+    years = AppUtil.getParam('historical-years');
 
     params = {
       endtime: Moment(_mainshock.properties.time).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshock.geometry.coordinates[1],
       longitude: _mainshock.geometry.coordinates[0],
-      maxradiuskm: document.getElementById('historical-dist').value,
-      minmagnitude: document.getElementById('historical-minmag').value,
+      maxradiuskm: AppUtil.getParam('historical-dist'),
+      minmagnitude: AppUtil.getParam('historical-minmag'),
       starttime: Moment(_mainshock.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };
 
     _loadFeed({
-      id: id,
+      id: 'historical',
       feature: Earthquakes,
-      name: name,
+      name: 'Historical Seismicity',
       url: _getFeedUrl(params)
     });
   };

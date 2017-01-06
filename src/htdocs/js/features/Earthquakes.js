@@ -39,9 +39,10 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     data: {Object}, // Geojson data
+ *     data: {Object}, // geojson data
  *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
- *     mainshock: {Object} // magnitude, time, etc.
+ *     mainshock: {Object}, // magnitude, time, etc.
+ *     name: {String} // layer name
  *   }
  *
  * @return {L.FeatureGroup}
@@ -50,9 +51,9 @@ var Earthquakes = function (options) {
   var _this,
       _initialize,
 
-      _id,
       _bins,
       _eqList,
+      _id,
       _labelTemplate,
       _lastAftershock,
       _mainshock,
@@ -72,6 +73,7 @@ var Earthquakes = function (options) {
       _getBubbles,
       _getEqListTable,
       _getIntervals,
+      _getLayerName,
       _getSummary,
       _getTemplate,
       _onEachFeature,
@@ -79,10 +81,12 @@ var Earthquakes = function (options) {
 
 
   _initialize = function (options) {
-    var coords;
+    var coords,
+        data;
 
     options = Util.extend({}, _DEFAULTS, options);
     coords = options.mainshock.geometry.coordinates;
+    data = options.data;
 
     _bins = {};
     _eqList = [];
@@ -107,12 +111,14 @@ var Earthquakes = function (options) {
     // Flag for using utc (when local time at epicenter is not available in feed)
     _utc = false;
 
-    _this = L.geoJson(options.data, {
+    _this = L.geoJson(data, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
 
-    // Attach html summary to layer
+    // Attach html summary, etc to layer
+    _this.id = _id;
+    _this.name = _getLayerName(options.name, data.metadata.count);
     _this.summary = _getSummary();
   };
 
@@ -326,6 +332,22 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get layer name used for display purposes
+   *
+   * @param name {String}
+   * @param count {Integer}
+   *
+   * @return name {String}
+   */
+  _getLayerName = function (name, count) {
+    if (count >= 0) {
+      name += ' (' + count + ')';
+    }
+
+    return name;
+  };
+
+  /**
    * Get summary html for summary pane
    *
    * @return summary {Html}
@@ -343,8 +365,8 @@ var Earthquakes = function (options) {
     }
     else {
       summary += '<p><strong>M ' + AppUtil.getParam(_id + '-minmag') +
-        '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_id + '-dist') +
-        ' km</strong> of mainshock epicenter';
+        '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_id +
+        '-dist') + ' km</strong> of mainshock epicenter';
 
       if (_id === 'aftershocks') {
         duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
@@ -360,12 +382,13 @@ var Earthquakes = function (options) {
         summary += _getEqListTable(_lastAftershock);
       }
       else if (_id === 'historical') {
-        summary += ' in the <strong>prior ' + AppUtil.getParam('historical-years') +
-          ' years</strong>.</p>';
+        summary += ' in the <strong>prior ' +
+          AppUtil.getParam('historical-years') + ' years</strong>.</p>';
         summary += _getBinnedTable('Prior');
       }
 
-      summary += '<h3>M ' + Math.max(_threshold[_id], AppUtil.getParam(_id + '-minmag')) +
+      summary += '<h3>M ' +
+        Math.max(_threshold[_id], AppUtil.getParam(_id + '-minmag')) +
         '+ Earthquakes (' + count + ')</h3>';
       summary += _getEqListTable(_eqList);
     }
