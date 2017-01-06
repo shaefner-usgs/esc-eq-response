@@ -81,15 +81,11 @@ var Features = function (options) {
    *     GeoJson data returned by Mainshock class
    */
   _addMainshock = function (data) {
-    var id;
-
-    id = 'mainshock';
-
     _createFeature({
       feature: Earthquakes,
       featureParams: {
         data: data,
-        id: id,
+        id: 'mainshock',
         mainshock: _mainshock,
         name: 'Mainshock'
       },
