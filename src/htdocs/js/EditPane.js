@@ -37,6 +37,7 @@ var EditPane = function (options) {
       _createMainshock,
       _getDefaults,
       _initListeners,
+      _isNewEvent,
       _isValidEqId,
       _refreshAftershocks,
       _refreshHistorical,
@@ -174,6 +175,22 @@ var EditPane = function (options) {
 
     // Clear features when reset button pressed
     _addListener([reset], 'click', _resetForm);
+  };
+
+  /**
+   * Check if event id entered by user is 'new' (different from previous value)
+   *
+   * @return newEvent {Boolean}
+   */
+  _isNewEvent = function () {
+    var isNew = false;
+
+    if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
+      isNew = true;
+    }
+    _eqidPrevValue = _eqid.value;
+
+    return isNew;
   };
 
   /**
@@ -330,20 +347,14 @@ var EditPane = function (options) {
    * @param mainshock {Object}
    */
   _this.setDefaults = function (mainshock) {
-    var defaults,
-        newEvent;
+    var defaults;
 
     defaults = _getDefaults(mainshock);
-
-    if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
-      newEvent = true;
-    }
-    _eqidPrevValue = _eqid.value;
 
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (AppUtil.getParam(key) === '' || newEvent) {
+      if (AppUtil.getParam(key) === '' || _isNewEvent()) {
         AppUtil.setParam(key, defaults[key]);
       }
     });
