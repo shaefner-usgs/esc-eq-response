@@ -23,10 +23,10 @@ _COLORS = {
   older: '#ffb'
 };
 _MARKER_DEFAULTS = {
-  weight: 1,
-  opacity: 0.5,
+  color: '#000',
   fillOpacity: 0.85,
-  color: '#333'
+  opacity: 0.6,
+  weight: 1
 };
 _DEFAULTS = {
   data: {},
@@ -226,7 +226,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get USGS 'Bubbles' HTML for popups
+   * Get USGS 'Bubbles' (DYFI, ShakeMap, etc) HTML for popups
    *
    * @param data {Object}
    *
