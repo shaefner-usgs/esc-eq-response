@@ -6,7 +6,8 @@
 require('mappane/MousePosition');
 require('mappane/RestoreMap');
 
-// Factories for creating map layers (returns e.g. "L.earthquakesLayer()")
+// Factories for creating map layers
+//   layers are added to global Leaflet instance, e.g. "L.faultsLayer()"
 require('mappane/DarkLayer');
 require('mappane/FaultsLayer');
 require('mappane/GreyscaleLayer');
@@ -16,6 +17,7 @@ require('mappane/TerrainLayer');
 
 /**
  * Sets up leaflet map instance and adds 'static' layers (non-event-specific)
+ *   (dynamic layer classes are in js/features)
  *
  * @param options {Object}
  *   {
