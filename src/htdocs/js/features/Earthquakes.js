@@ -272,12 +272,12 @@ var Earthquakes = function (options) {
    * @return table {Html}
    */
   _getEqListTable = function (rows) {
-    var data,
-        note,
+    var note,
         sortClass,
-        table;
+        table,
+        tableData;
 
-    data = '';
+    tableData = '';
     note = '<span class="star">* = local time at epicenter.</span>';
     if (_utc) {
       note += ' Using UTC when local time is not available.';
@@ -285,10 +285,10 @@ var Earthquakes = function (options) {
     sortClass = 'non-sortable';
 
     if (rows && rows.length > 0) {
-      // Eqs are ordered ASC by time for Leaflet; reverse for summary table
+      // Eqs are ordered by time (ASC) for Leaflet; reverse for summary table
       rows.reverse();
       rows.forEach(function(row) {
-        data += row;
+        tableData += row;
       });
       if (rows.length > 1) {
         sortClass = 'sortable';
@@ -303,7 +303,7 @@ var Earthquakes = function (options) {
             '</th>' +
             '<th data-sort-method="number">Depth</th>' +
           '</tr>' +
-          data +
+          tableData +
         '</table>';
 
       table += '<p class="note">' + note + '</p>';
@@ -478,13 +478,12 @@ var Earthquakes = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
-    timeTemplate = ''; // Time value for leaflet _popupTemplate
+    timeTemplate = ''; // Time field for leaflet popup
     if (props.tz) {
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         '<span class="star">*</span><span class="tz"> at epicenter</span>';
       timeTemplate += '<time class="localtime" datetime="{isoTime}">{localTime}</time>';
     } else {
-      _utc = true;
       localTime = utcTime;
     }
     timeTemplate += '<time datetime="{isoTime}">{utcTime}</time>';
@@ -541,6 +540,10 @@ var Earthquakes = function (options) {
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
          props.time === mainshockTime) {
       _eqList.push(L.Util.template(_tableTemplate, data));
+      // Flag to show note about UTC time when localTime unavailable
+      if (!props.tz) {
+        _utc = true;
+      }
     }
 
     // Bin eq totals by magnitude and time
