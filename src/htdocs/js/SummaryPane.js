@@ -19,6 +19,7 @@ var SummaryPane = function (options) {
 
       _el,
       _features,
+      _tz,
 
       _addTimestamp,
       _getTimeZone,
@@ -30,9 +31,10 @@ var SummaryPane = function (options) {
 
   _initialize = function (options) {
     options = options || {};
-    _el = options.el || document.createElement('div');
 
+    _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
+    _tz = _getTimeZone();
 
     _addTimestamp();
   };
@@ -125,19 +127,18 @@ var SummaryPane = function (options) {
    */
   _updateTimestamp = function () {
     var time,
-        timestamp,
-        tz;
+        timestamp;
 
     time = _el.querySelector('time');
-    tz = _getTimeZone();
     timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
-      ' (' + tz + ')';
+      ' (' + _tz + ')';
 
     time.innerHTML = timestamp;
   };
 
   /**
    * Add summary text to summary pane (text plus <div> container)
+   *   (called by Features.js)
    *
    * @param opts {Object}
    *   {
@@ -168,6 +169,7 @@ var SummaryPane = function (options) {
 
   /**
    * Remove summary text from summary pane (text plus <div> container)
+   *   (called by Features.js)
    *
    * @param el {Element}
    *     Element to remove
