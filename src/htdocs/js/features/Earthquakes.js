@@ -458,6 +458,7 @@ var Earthquakes = function (options) {
         latlon,
         localTime,
         mainshockTime,
+        mag,
         magInt,
         popup,
         props,
@@ -474,7 +475,8 @@ var Earthquakes = function (options) {
     bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
     eqMoment = Moment.utc(props.time, 'x');
-    magInt = Math.floor(props.mag);
+    mag = AppUtil.round(props.mag, 1);
+    magInt = Math.floor(mag);
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
     // Calculate local time if tz prop included in feed; otherwise use UTC
@@ -498,7 +500,7 @@ var Earthquakes = function (options) {
       isoTime: eqMoment.toISOString(),
       latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
       localTime: localTime,
-      mag: AppUtil.round(props.mag, 1),
+      mag: mag,
       magInt: magInt,
       magType: props.magType || 'M',
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
@@ -560,6 +562,7 @@ var Earthquakes = function (options) {
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
+      console.log(magInt);
     }
   };
 
