@@ -364,7 +364,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Display mainshock's details
+   * Display mainshock's details on edit pane
    *
    * @param data {Object}
    *     GeoJson data
