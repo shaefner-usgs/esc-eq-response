@@ -562,7 +562,6 @@ var Earthquakes = function (options) {
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
-      console.log(magInt);
     }
   };
 
