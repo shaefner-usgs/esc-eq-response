@@ -135,7 +135,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get html for pulldown menu of significant eqs
+   * Get html for mainshock details
    *
    * @param data {Object}
    *     GeoJson data
