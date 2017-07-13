@@ -5,6 +5,7 @@ var EditPane = require('EditPane'),
     Features = require('Features'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
+    PlotsPane = require('PlotsPane'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane');
 
@@ -29,6 +30,7 @@ var Application = function (options) {
       _features,
       _mapPane,
       _navBar,
+      _plotsPane,
       _statusBar,
       _summaryPane;
 
@@ -36,13 +38,16 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    // Initialize map / summary panes & navigation / status bar
+    // Initialize map / plots / summary panes & navigation / status bar
     _mapPane = MapPane({
       el: options.mapPane
     });
     _navBar = NavBar({
       el: options.navBar,
       mapPane: _mapPane
+    });
+    _plotsPane = PlotsPane({
+      el: options.plotsPane
     });
     _statusBar = StatusBar({
       el: options.statusBar
