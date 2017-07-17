@@ -9,9 +9,9 @@ var AppUtil = require('AppUtil'),
 
 
 /**
- * Adds 'feature' layers to map, summary panes
+ * Adds 'feature' layers to map, plots, summary panes
  *
- * Feature layers are event specific layers added dynamically to the map
+ * Feature layers are event specific layers added dynamically to the map, plots
  * and summary panes, based on the Event ID entered by user
  *
  * @param options {Object}
@@ -108,7 +108,7 @@ var Features = function (options) {
   };
 
   /**
-   * Create feature layer for map, summary panes
+   * Create feature layer for map, plots, summary panes
    *
    * @param opts {Object}
    *   {
@@ -136,7 +136,7 @@ var Features = function (options) {
       layer = opts.feature(opts.featureParams);
       _layers[id] = layer;
 
-      // Add feature layer to map, summary panes
+      // Add feature layer to map, plots, summary panes
       if (id === 'aftershocks' || id === 'historical') {
         // Load both layers before adding to ensure aftershocks are on top
         if (_layers.aftershocks && _layers.historical) {
@@ -235,7 +235,7 @@ var Features = function (options) {
 
   /**
    * Aftershocks feature layer
-   *   loads feed then adds it to map, summary panes thru callbacks
+   *   loads feed then adds it to map, plots, summary panes thru callbacks
    */
   _this.addAftershocks = function () {
     var params;

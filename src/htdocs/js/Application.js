@@ -18,6 +18,7 @@ var EditPane = require('EditPane'),
  *     editPane: {ELement},
  *     mapPane: {Element},
  *     navBar: {Element},
+ *     plotsPane: {Element},
  *     statusBar: {Element},
  *     summaryPane: {Element}
  *   }
@@ -56,7 +57,7 @@ var Application = function (options) {
       el: options.summaryPane
     });
 
-    // Initialize features (event-specific layers) for map and summary panes
+    // Initialize features (event-specific layers) for map, plots and summary panes
     _features = Features({
       mapPane: _mapPane,
       statusBar: _statusBar,
