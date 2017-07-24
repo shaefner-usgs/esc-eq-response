@@ -90,7 +90,8 @@ var SummaryPane = function (options) {
   _initTableSort = function (id) {
     var table,
         cleanNumber,
-        compareNumber;
+        compareNumber,
+        cssClass;
 
     // Add number sorting plugin to Tablesort
     // https://gist.github.com/tristen/e79963856608bf54e046
@@ -116,7 +117,8 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    table = _el.querySelector('#' + id + ' .sortable');
+    cssClass = id;
+    table = _el.querySelector('.' + cssClass + ' .sortable');
     if (table) {
       new Tablesort(table);
     }
@@ -148,11 +150,12 @@ var SummaryPane = function (options) {
    *   }
    */
   _this.addSummary = function (opts) {
-    var div;
+    var cssClass,
+        div;
 
+    cssClass = opts.id;
     div = document.createElement('div');
-    div.classList.add('content', 'feature');
-    div.setAttribute('id', opts.id);
+    div.classList.add('content', 'feature', cssClass);
     div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.summary;
 
     _features.appendChild(div);
@@ -164,7 +167,7 @@ var SummaryPane = function (options) {
     }
 
     _updateTimestamp();
-    _initTableSort(opts.id);
+    _initTableSort(cssClass);
   };
 
   /**

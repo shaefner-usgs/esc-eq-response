@@ -6,7 +6,7 @@ var PlotsPane = function (options) {
       _initialize,
 
       _el,
-      _plots;
+      _features;
 
 
   _this = {};
@@ -15,9 +15,9 @@ var PlotsPane = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _plots = _el.querySelector('.plots');
+    _features = _el.querySelector('.features');
 
-    _plots.innerHTML = '<h2>Plots</h2>';
+    _features.innerHTML = '<h2>Plots</h2>';
   };
 
 

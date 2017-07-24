@@ -350,12 +350,15 @@ var Features = function (options) {
    *     id of feature to remove
    */
   _removeFeature = function (id) {
-    var mapLayer,
+    var cssClass,
+        mapLayer,
         summary;
+
+    cssClass = id;
 
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
-      summary = document.getElementById(id);
+      summary = document.querySelector('#summaryPane .' + cssClass);
     }
 
     if (mapLayer) {
