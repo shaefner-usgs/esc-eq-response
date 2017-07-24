@@ -1,192 +1,56 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Moment = require('moment'),
-    Xhr = require('util/Xhr');
+var Earthquakes = require('features/Earthquakes');
 
 
-/**
- * Factory for creating a mainshock (earthquake) instance
- *
- * @param options {Object}
- *   {
- *     callback: {Function},
- *     editPane: {Object}, // EditPane instance
- *     id: {String},
- *     statusBar: {Object} // StatusBar instance
- *   }
- */
 var Mainshock = function (options) {
   var _this,
       _initialize,
 
-      _callback,
-      _editPane,
-      _id,
-      _statusBar,
-
-      _createGeoJson,
-      _getFeatures,
-      _loadFeed;
+      _earthquakes;
 
 
   _this = {};
 
   _initialize = function (options) {
+    var id = 'mainshock';
+
     options = options || {};
-    _callback = options.callback;
-    _editPane = options.editPane;
-    _id = options.id;
-    _statusBar = options.statusBar;
+    options.id = id;
 
-    _loadFeed();
+    _earthquakes = Earthquakes(options);
+
+    _this.id = id;
+    _this.name = options.name;
   };
 
   /**
-   * Create GeoJson object for selected earthquake and return via _callback()
+   * Get map layer of feature
    *
-   * @param data {Object}
-   *     GeoJson data
+   * @return {L.FeatureGroup}
    */
-  _createGeoJson = function (data) {
-    var geojson,
-        props;
-
-    props = data.properties;
-
-    geojson = {
-      id: data.id,
-      geometry: data.geometry,
-      metadata: {
-        generated: Date.now(),
-        title: 'Mainshock'
-      },
-      properties: {
-        alert: props.alert,
-        cdi: props.cdi,
-        features: _getFeatures(data.properties.products),
-        felt: props.felt,
-        mag: props.mag,
-        magType: props.magType,
-        mmi: props.mmi,
-        place: props.place,
-        status: props.status,
-        time: props.time,
-        tz: props.tz,
-        updated: props.updated,
-        url: props.url
-      },
-      type: 'Feature'
-    };
-
-    _callback(geojson);
+  _this.getMapLayer = function () {
+    return _earthquakes.mapLayer;
   };
 
   /**
-   * Get urls to data feeds needed for feature layers on map, summary panes
+   * Get plot data of feature
    *
-   * @param products {Object}
-   *
-   * @return features {Object}
+   * @return {Array}
    */
-  _getFeatures = function (products) {
-    var features;
+  _this.getPlotData = function () {
 
-    if (products.shakemap) {
-      features = {
-        shakemap_mmi: products.shakemap[0].contents['download/cont_mi.json'].url
-      };
-    }
-
-    return features;
   };
 
   /**
-   * Load GeoJson feed for selected event id, then call _createGeoJson()
-   */
-  _loadFeed = function () {
-    var msg,
-        url;
-
-    // Alert user that feature is loading (removed by Features class)
-    _statusBar.addItem('mainshock', 'Mainshock');
-
-    url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _id + '.geojson';
-
-    Xhr.ajax({
-      url: url,
-      success: function (data) {
-        _editPane.setDefaults(data);
-        _editPane.showEqDetails(data);
-        _createGeoJson(data);
-      },
-      error: function (status, xhr) {
-        console.error(xhr.responseText);
-
-        msg = 'Error Loading Mainshock';
-        if (status === 404) {
-          msg += ' <span>Event ID ' + _id + ' not found</span>';
-          _statusBar.addError('mainshock', msg);
-        }
-      }
-    });
-  };
-
-  /**
-   * Get html for mainshock details
+   * Get summary of feature
    *
-   * @param data {Object}
-   *     GeoJson data
-   *
-   * @return html {String}
+   * @return summary {Html}
    */
-  _this.getHtml = function (data) {
-    var coords,
-        depth,
-        eqMoment,
-        html,
-        isoTime,
-        latlng,
-        localTime,
-        mag,
-        props,
-        utcTime;
-
-    coords = data.geometry.coordinates;
-    props = data.properties;
-
-    eqMoment = Moment.utc(props.time, 'x');
-    isoTime = eqMoment.toISOString();
-    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' UTC';
-
-    if (props.tz) {
-      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
-        ' at epicenter';
-    }
-
-    depth = AppUtil.round(coords[2], 1);
-    latlng = AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3);
-    mag = AppUtil.round(props.mag, 1);
-
-    html = '<h4>' + props.magType + ' ' + mag + ' - ' + props.place + '</h4>';
-    html += '<dl>' +
-        '<dt>Time</dt>' +
-        '<dd>';
-    if (localTime) {
-      html += '<time datetime="' + isoTime + '">' + localTime + '</time>';
-    }
-    html += '<time datetime="' + isoTime + '">' + utcTime + '</time></dd>' +
-        '<dt>Location</dt>' +
-        '<dd>' + latlng + '</dd>' +
-        '<dt>Depth</dt>' +
-        '<dd>' + depth + ' km</dd>' +
-        '<dt>Status</dt>' +
-        '<dd>' + props.status + '</dd>' +
-      '</dl>';
-
-    return html;
+  _this.getSummary = function () {
+    // Earthquake data is stored in Earthquakes instance (where it was parsed)
+    return _earthquakes.getSummary();
   };
 
 

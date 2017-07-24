@@ -47,8 +47,8 @@ var SignificantEqs = function (options) {
 
     Xhr.ajax({
       url: url,
-      success: function (data) {
-        _callback(data);
+      success: function (json) {
+        _callback(json);
       },
       error: function (status, xhr) {
         console.error(xhr.responseText);
@@ -61,12 +61,12 @@ var SignificantEqs = function (options) {
   /**
    * Get html for pulldown menu of significant eqs
    *
-   * @param data {Object}
+   * @param json {Object}
    *     GeoJson data
    *
    * @return html {String}
    */
-  _this.getHtml = function (data) {
+  _this.getHtml = function (json) {
     var date,
         html,
         mag,
@@ -74,8 +74,8 @@ var SignificantEqs = function (options) {
 
     html = '<select class="significant">';
     html += '<option value="">Significant Earthquakes in the Past Month (UTC)</option>';
-    if (data.features) {
-      data.features.forEach(function(feature) {
+    if (json.features) {
+      json.features.forEach(function(feature) {
         props = feature.properties;
         date = Moment.utc(props.time).format('MMM D HH:mm:ss');
         mag = AppUtil.round(props.mag, 1);

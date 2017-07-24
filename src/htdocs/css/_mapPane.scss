@@ -67,41 +67,6 @@
   margin-top: 55px;
 }
 
-/* also styles mainshock details on summary pane */
-.popup {
-  dd,
-  dt {
-    line-height: 1.7;
-  }
-  dd {
-    margin-left: 5em;
-  }
-  dt {
-    clear: left;
-    color: #333;
-    display: block;
-    float: left;
-    font-weight: 300;
-    width: 5em;
-  }
-
-  h4 {
-    margin: 0;
-
-    > a {
-      color: $link-color;
-    }
-  }
-
-  time {
-    display: block;
-  }
-
-  .star {
-    display: none;
-  }
-}
-
 /* Hide attribution text on (small screen) mobile devices */
 @media only screen
   and (max-width: $breakpoint-tablet-width) {

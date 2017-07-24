@@ -29,7 +29,7 @@ _MARKER_DEFAULTS = {
   weight: 1
 };
 _DEFAULTS = {
-  data: {},
+  json: {},
   markerOptions: _MARKER_DEFAULTS
 };
 
@@ -39,9 +39,9 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     data: {Object}, // geojson data
  *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
- *     mainshock: {Object}, // magnitude, time, etc.
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
  *     name: {String} // layer name
  *   }
  *
@@ -73,27 +73,27 @@ var Earthquakes = function (options) {
       _getBubbles,
       _getEqListTable,
       _getIntervals,
-      _getLayerName,
-      _getSummary,
       _getTemplate,
       _onEachFeature,
       _pointToLayer;
 
 
+  _this = {};
+
   _initialize = function (options) {
     var coords,
-        data;
+        json;
 
     options = Util.extend({}, _DEFAULTS, options);
-    coords = options.mainshock.geometry.coordinates;
-    data = options.data;
+    coords = options.mainshockJson.geometry.coordinates;
+    json = options.json;
 
     _bins = {};
     _eqList = [];
     _id = options.id;
-    _mainshock = Util.extend({}, options.mainshock, {
+    _mainshock = Util.extend({}, options.mainshockJson, {
       latlon: LatLon(coords[1], coords[0]),
-      moment: Moment.utc(options.mainshock.properties.time, 'x')
+      moment: Moment.utc(options.mainshockJson.properties.time, 'x')
     });
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
@@ -111,15 +111,10 @@ var Earthquakes = function (options) {
     // Flag for using utc (when local time at epicenter is not available in feed)
     _utc = false;
 
-    _this = L.geoJson(data, {
+    _this.mapLayer = L.geoJson(json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-
-    // Attach html summary, etc to layer
-    _this.id = _id;
-    _this.name = _getLayerName(options.name, data.metadata.count);
-    _this.summary = _getSummary();
   };
 
   /**
@@ -332,71 +327,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get layer name used for display purposes
-   *
-   * @param name {String}
-   * @param count {Integer}
-   *
-   * @return name {String}
-   */
-  _getLayerName = function (name, count) {
-    if (count >= 0) {
-      name += ' (' + count + ')';
-    }
-
-    return name;
-  };
-
-  /**
-   * Get summary html for summary pane
-   *
-   * @return summary {Html}
-   */
-  _getSummary = function () {
-    var count,
-        duration,
-        summary;
-
-    count = _eqList.length;
-    summary = '';
-
-    if (_id === 'mainshock') {
-      summary += _mainshock.details;
-    }
-    else {
-      summary += '<p><strong>M ' + AppUtil.getParam(_id + '-minmag') +
-        '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_id +
-        '-dist') + ' km</strong> of mainshock epicenter';
-
-      if (_id === 'aftershocks') {
-        duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
-          .asDays(), 1);
-
-        summary += '. The duration of the aftershock sequence is <strong>' +
-          duration + ' days</strong>.</p>';
-        summary += '<div class="bins">';
-        summary += _getBinnedTable('First');
-        summary += _getBinnedTable('Past');
-        summary += '</div>';
-        summary += '<h3>Most Recent Aftershock</h3>';
-        summary += _getEqListTable(_lastAftershock);
-      }
-      else if (_id === 'historical') {
-        summary += ' in the <strong>prior ' +
-          AppUtil.getParam('historical-years') + ' years</strong>.</p>';
-        summary += _getBinnedTable('Prior');
-      }
-
-      summary += '<h3>M ' +
-        Math.max(_threshold[_id], AppUtil.getParam(_id + '-minmag')) +
-        '+ Earthquakes (' + count + ')</h3>';
-      summary += _getEqListTable(_eqList);
-    }
-
-    return summary;
-  };
-
-  /**
    * Get html template for displaying eq details
    *
    * @param type {String}
@@ -410,7 +340,7 @@ var Earthquakes = function (options) {
       template = 'M {mag} - {utcTime}';
     }
     else if (type === 'popup') {
-      template = '<div class="popup eq">' +
+      template = '<div class="earthquake">' +
         '<h4><a href="{url}">{magType} {mag} - {place}</a></h4>' +
         '<div class="impact-bubbles">{bubbles}</div>' +
         '<dl>' +
@@ -523,8 +453,10 @@ var Earthquakes = function (options) {
       _popupTemplate = _getTemplate('popup');
     }
     popup = L.Util.template(_popupTemplate, data);
+
+    // Store popup html to use as summary html for mainshock
     if (_id === 'mainshock') {
-      _mainshock.details = popup;
+      _mainshock.summary = popup;
     }
 
     // Bind popup and label to marker
@@ -586,6 +518,39 @@ var Earthquakes = function (options) {
     _markerOptions.radius = radius;
 
     return L.circleMarker(latlng, _markerOptions);
+  };
+
+  /**
+   * Get eqs html for summary pane
+   *
+   * @return summary {Html}
+   */
+  _this.getSummary = function () {
+    var summary;
+
+    if (_id === 'mainshock') {
+      summary = _mainshock.summary;
+    }
+    else {
+      if (_id === 'aftershocks') {
+        summary = '<div class="bins">';
+        summary += _getBinnedTable('First');
+        summary += _getBinnedTable('Past');
+        summary += '</div>';
+        summary += '<h3>Most Recent Aftershock</h3>';
+        summary += _getEqListTable(_lastAftershock);
+      }
+      else if (_id === 'historical') {
+        summary = _getBinnedTable('Prior');
+      }
+
+      summary += '<h3>M ' + Math.max(_threshold[_id],
+        AppUtil.getParam(_id + '-minmag')) + '+ Earthquakes (' + _eqList.length +
+        ')</h3>';
+      summary += _getEqListTable(_eqList);
+    }
+
+    return summary;
   };
 
 
