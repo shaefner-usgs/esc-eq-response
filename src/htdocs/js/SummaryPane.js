@@ -148,7 +148,7 @@ var SummaryPane = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     id: {String}, // id for container elem
+   *     id: {String}, // used for css class on container elem
    *     name: {String}, // feature name
    *     summary: {Html} // summary text
    *   }
