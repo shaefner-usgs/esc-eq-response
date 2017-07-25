@@ -31,15 +31,15 @@ var NavBar = function (options) {
     var id;
 
     options = options || {};
+
     _el = options.el || document.createElement('div');
     _map = options.mapPane.map;
-
     _panes = _el.querySelectorAll('.panes a');
+
     id = _getPaneId();
 
     _addListener();
-    _hidePanes();
-    _showPane(id);
+    _changePane(id);
   };
 
   /**
