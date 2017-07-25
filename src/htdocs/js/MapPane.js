@@ -40,6 +40,7 @@ var MapPane = function (options) {
 
   _initialize = function (options) {
     options = options || {};
+    
     _el = options.el || document.createElement('div');
     _map = _el.querySelector('.map');
 
