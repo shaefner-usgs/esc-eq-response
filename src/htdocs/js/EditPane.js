@@ -25,12 +25,13 @@ var EditPane = function (options) {
       _el,
       _eqid,
       _eqidPrevValue,
-      _features,
       _fields,
-      _mapPane,
       _significantEqs,
-      _statusBar,
-      _summaryPane,
+
+      _Features,
+      _MapPane,
+      _StatusBar,
+      _SummaryPane,
 
       _addListener,
       _addSignificantEqs,
@@ -54,12 +55,12 @@ var EditPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _el = options.el || document.createElement('div');
-    _features = options.features;
-    _mapPane = options.mapPane;
-    _statusBar = options.statusBar;
-    _summaryPane = options.summaryPane;
+    _Features = options.features;
+    _MapPane = options.mapPane;
+    _StatusBar = options.statusBar;
+    _SummaryPane = options.summaryPane;
 
+    _el = options.el || document.createElement('div');
     _eqid = document.getElementById('eqid');
     _eqid.focus();
     _eqidPrevValue = null;
@@ -69,7 +70,7 @@ var EditPane = function (options) {
 
     _significantEqs = SignificantEqs({
       callback: _addSignificantEqs,
-      statusBar: _statusBar
+      statusBar: _StatusBar
     });
 
     _initListeners();
@@ -123,7 +124,7 @@ var EditPane = function (options) {
     _addListener([significant], 'change', _selSignificantEq);
 
     // Finished loading; remove alert
-    _statusBar.removeItem('significant');
+    _StatusBar.removeItem('significant');
   };
 
   /*
@@ -170,7 +171,7 @@ var EditPane = function (options) {
 
     // Pass editPane instance so we can call its public methods from xhr callback in Features
     if (_isValidEqId()) {
-      _features.getFeatures({
+      _Features.getFeatures({
         editPane: _this
       });
     }
@@ -229,7 +230,7 @@ var EditPane = function (options) {
     var regex;
 
     // Check if eqid exists (returns 404 error if not)
-    if (_statusBar.hasError('mainshock')) {
+    if (_StatusBar.hasError('mainshock')) {
       return false;
     }
 
@@ -248,7 +249,7 @@ var EditPane = function (options) {
 
     if (_isValidEqId()) {
       id = this.className; // 'afershocks' or 'historical'
-      _features.refresh(id);
+      _Features.refresh(id);
     }
   };
 
@@ -264,10 +265,10 @@ var EditPane = function (options) {
    */
   _resetApp = function () {
     _removeMainshock();
-    _statusBar.clearAll();
-    _features.removeFeatures();
-    _mapPane.setDefaultView();
-    _summaryPane.resetTimeStamp();
+    _StatusBar.clearAll();
+    _Features.removeFeatures();
+    _MapPane.setDefaultView();
+    _SummaryPane.resetTimeStamp();
   };
 
   /**

@@ -19,7 +19,8 @@ var SignificantEqs = function (options) {
       _initialize,
 
       _callback,
-      _statusBar,
+
+      _StatusBar,
 
       _loadFeed;
 
@@ -28,8 +29,10 @@ var SignificantEqs = function (options) {
 
   _initialize = function (options) {
     options = options || {};
+
+    _StatusBar = options.statusBar;
+
     _callback = options.callback;
-    _statusBar = options.statusBar;
 
     _loadFeed();
   };
@@ -41,7 +44,7 @@ var SignificantEqs = function (options) {
     var url;
 
     // Alert user that feed is loading (removed by EditPane class)
-    _statusBar.addItem('significant', 'Significant Earthquakes');
+    _StatusBar.addItem('significant', 'Significant Earthquakes');
 
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 
@@ -53,7 +56,7 @@ var SignificantEqs = function (options) {
       error: function (status, xhr) {
         console.error(xhr.responseText);
 
-        _statusBar.addError('significant', 'Error Loading Significant Earthquakes');
+        _StatusBar.addError('significant', 'Error Loading Significant Earthquakes');
       }
     });
   };

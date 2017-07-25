@@ -35,9 +35,10 @@ var Features = function (options) {
       _features,
       _initialLoad,
       _mainshockJson,
-      _mapPane,
-      _statusBar,
-      _summaryPane,
+
+      _MapPane,
+      _StatusBar,
+      _SummaryPane,
 
       _addFeature,
       _addMapLayer,
@@ -57,9 +58,9 @@ var Features = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _mapPane = options.mapPane;
-    _statusBar = options.statusBar;
-    _summaryPane = options.summaryPane;
+    _MapPane = options.mapPane;
+    _StatusBar = options.statusBar;
+    _SummaryPane = options.summaryPane;
   };
 
   /**
@@ -102,8 +103,8 @@ var Features = function (options) {
         // Load both layers before adding
         if (_features.aftershocks && _features.historical) {
           // Always plot aftershocks above historical on map
-          _mapPane.map.removeLayer(_features.aftershocks.getMapLayer());
-          _mapPane.map.removeLayer(_features.historical.getMapLayer());
+          _MapPane.map.removeLayer(_features.aftershocks.getMapLayer());
+          _MapPane.map.removeLayer(_features.historical.getMapLayer());
           _addMapLayer(_features.historical);
           _addMapLayer(_features.aftershocks);
 
@@ -115,11 +116,11 @@ var Features = function (options) {
       _addSummary(feature);
 
       // Feature finished loading; remove alert
-      _statusBar.removeItem(statusBarId);
+      _StatusBar.removeItem(statusBarId);
     }
     catch (error) {
       console.error(error);
-      _statusBar.addError(statusBarId, 'Error Loading ' + name +
+      _StatusBar.addError(statusBarId, 'Error Loading ' + name +
         '<span>' + error + '</span>');
     }
   };
@@ -133,13 +134,13 @@ var Features = function (options) {
     var layer;
 
     layer = feature.getMapLayer();
-    _mapPane.map.addLayer(layer);
-    _mapPane.layerController.addOverlay(layer, feature.name);
+    _MapPane.map.addLayer(layer);
+    _MapPane.layerController.addOverlay(layer, feature.name);
 
     // Set bounds to contain added layer if adding for the first time
     if (_initialLoad) {
       _bounds.extend(layer.getBounds());
-      _mapPane.map.fitBounds(_bounds, {
+      _MapPane.map.fitBounds(_bounds, {
         paddingTopLeft: L.point(0, 45), // accommodate navbar
         reset: true
       });
@@ -167,7 +168,7 @@ var Features = function (options) {
    */
   _addSummary = function (feature) {
     if (feature.getSummary) {
-      _summaryPane.addSummary({
+      _SummaryPane.addSummary({
         id: feature.id,
         name: feature.name,
         summary: feature.getSummary()
@@ -295,7 +296,7 @@ var Features = function (options) {
     statusBarId = _getStatusBarId(name);
 
     // Alert user that feature is loading
-    _statusBar.addItem(statusBarId, name);
+    _StatusBar.addItem(statusBarId, name);
 
     Xhr.ajax({
       url: opts.url,
@@ -309,8 +310,8 @@ var Features = function (options) {
           // Center map around mainshock for now
           //   (each added feature will set map extent to contain itself)
           coords = _mainshockJson.geometry.coordinates;
-          _mapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
-          _bounds = _mapPane.map.getBounds();
+          _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
+          _bounds = _MapPane.map.getBounds();
 
           // Recursively call getFeatures() to add other (non-mainshock) features
           _this.getFeatures();
@@ -338,7 +339,7 @@ var Features = function (options) {
           msg += ' <span>Missing required parameters</span>';
         }
 
-        _statusBar.addError(statusBarId, msg);
+        _StatusBar.addError(statusBarId, msg);
       }
     });
   };
@@ -362,12 +363,12 @@ var Features = function (options) {
     }
 
     if (mapLayer) {
-      _mapPane.map.removeLayer(mapLayer);
-      _mapPane.layerController.removeLayer(mapLayer);
+      _MapPane.map.removeLayer(mapLayer);
+      _MapPane.layerController.removeLayer(mapLayer);
     }
 
     if (summary) {
-      _summaryPane.removeSummary(summary);
+      _SummaryPane.removeSummary(summary);
     }
   };
 

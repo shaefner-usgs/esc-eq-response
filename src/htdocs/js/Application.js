@@ -27,50 +27,50 @@ var Application = function (options) {
   var _this,
       _initialize,
 
-      _editPane,
-      _features,
-      _mapPane,
-      _navBar,
-      _plotsPane,
-      _statusBar,
-      _summaryPane;
+      _EditPane,
+      _Features,
+      _MapPane,
+      _NavBar,
+      _PlotsPane,
+      _StatusBar,
+      _SummaryPane;
 
 
   _this = {};
 
   _initialize = function (options) {
     // Initialize map / plots / summary panes & navigation / status bar
-    _mapPane = MapPane({
+    _MapPane = MapPane({
       el: options.mapPane
     });
-    _navBar = NavBar({
+    _NavBar = NavBar({
       el: options.navBar,
-      mapPane: _mapPane
+      mapPane: _MapPane
     });
-    _plotsPane = PlotsPane({
+    _PlotsPane = PlotsPane({
       el: options.plotsPane
     });
-    _statusBar = StatusBar({
+    _StatusBar = StatusBar({
       el: options.statusBar
     });
-    _summaryPane = SummaryPane({
+    _SummaryPane = SummaryPane({
       el: options.summaryPane
     });
 
     // Initialize features (event-specific layers) for map, plots and summary panes
-    _features = Features({
-      mapPane: _mapPane,
-      statusBar: _statusBar,
-      summaryPane: _summaryPane
+    _Features = Features({
+      mapPane: _MapPane,
+      statusBar: _StatusBar,
+      summaryPane: _SummaryPane
     });
 
     // Initialize edit pane
-    _editPane = EditPane({
+    _EditPane = EditPane({
       el: options.editPane,
-      features: _features,
-      mapPane: _mapPane,
-      statusBar: _statusBar,
-      summaryPane: _summaryPane
+      features: _Features,
+      mapPane: _MapPane,
+      statusBar: _StatusBar,
+      summaryPane: _SummaryPane
     });
   };
 
