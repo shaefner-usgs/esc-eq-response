@@ -81,6 +81,16 @@
     }
   }
 
+  time.updated {
+    display: block;
+    margin: 1em 1em 0;
+    text-align: right;
+
+    &:before {
+      content: 'Updated: ';
+    }
+  }
+
   tr {
     border: solid #e8e8e8;
     border-width: 0 0 1px;
@@ -90,14 +100,14 @@
     }
   }
 
-  time.updated {
-    display: block;
-    margin: 1em 1em 0;
-    text-align: right;
-
-    &:before {
-      content: 'Updated: ';
-    }
+  .mainshock {
+    order: 0;
+  }
+  .aftershocks {
+    order: 1;
+  }
+  .historical {
+    order: 2;
   }
 
   .bin {
@@ -176,16 +186,6 @@
   .star {
     display: none;
   }
-}
-
-#mainshock {
-  order: 0;
-}
-#aftershocks {
-  order: 1;
-}
-#historical {
-  order: 2;
 }
 
 @media only screen
