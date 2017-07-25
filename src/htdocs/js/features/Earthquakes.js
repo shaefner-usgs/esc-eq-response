@@ -520,6 +520,10 @@ var Earthquakes = function (options) {
     return L.circleMarker(latlng, _markerOptions);
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Get eqs html for summary pane
    *

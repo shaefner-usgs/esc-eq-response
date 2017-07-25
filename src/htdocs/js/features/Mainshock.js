@@ -25,6 +25,10 @@ var Mainshock = function (options) {
     _this.name = options.name;
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Get map layer of feature
    *

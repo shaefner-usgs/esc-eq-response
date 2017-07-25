@@ -40,6 +40,10 @@ var StatusBar = function (options) {
     _el.classList.remove('hide');
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Add error to status bar
    *

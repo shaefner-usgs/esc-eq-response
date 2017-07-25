@@ -138,6 +138,10 @@ var SummaryPane = function (options) {
     time.innerHTML = timestamp;
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Add summary text to summary pane (text plus <div> container)
    *   (called by Features.js)

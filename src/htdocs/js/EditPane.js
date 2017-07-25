@@ -341,6 +341,10 @@ var EditPane = function (options) {
     AppUtil.setParam(id, value);
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Display mainshock's details on edit pane and also update <title>
    *

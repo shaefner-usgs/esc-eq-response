@@ -58,6 +58,10 @@ var SignificantEqs = function (options) {
     });
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Get html for pulldown menu of significant eqs
    *

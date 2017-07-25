@@ -37,6 +37,10 @@ var Historical = function (options) {
     return options.name + ' (' + options.json.metadata.count + ')';
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Get map layer of feature
    *

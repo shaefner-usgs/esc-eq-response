@@ -371,6 +371,10 @@ var Features = function (options) {
     }
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Initialize features and begin process of adding new features
    *   called each time a new Event ID is entered by user
