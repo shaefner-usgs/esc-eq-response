@@ -60,6 +60,7 @@ var Application = function (options) {
     // Initialize features (event-specific layers) for map, plots and summary panes
     _Features = Features({
       mapPane: _MapPane,
+      plotsPane: _PlotsPane,
       statusBar: _StatusBar,
       summaryPane: _SummaryPane
     });

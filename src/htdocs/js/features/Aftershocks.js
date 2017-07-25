@@ -56,10 +56,10 @@ var Aftershocks = function (options) {
   /**
    * Get plot data of feature
    *
-   * @return {Array}
+   * @return {Object}
    */
   _this.getPlotData = function () {
-
+    return _earthquakes.getPlotData();
   };
 
   /**

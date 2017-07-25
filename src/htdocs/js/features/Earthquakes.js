@@ -62,6 +62,7 @@ var Earthquakes = function (options) {
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
+      _plotdata,
       _popupTemplate,
       _tableTemplate,
       _threshold,
@@ -85,12 +86,23 @@ var Earthquakes = function (options) {
         json;
 
     options = Util.extend({}, _DEFAULTS, options);
+
     coords = options.mainshockJson.geometry.coordinates;
     json = options.json;
 
+    _id = options.id;
+
     _bins = {};
     _eqList = [];
-    _id = options.id;
+    _plotdata = {
+      color: [],
+      size: [],
+      text: [],
+      x: [],
+      y: [],
+      z: []
+    };
+
     _mainshock = Util.extend({}, options.mainshockJson, {
       latlon: LatLon(coords[1], coords[0]),
       moment: Moment.utc(options.mainshockJson.properties.time, 'x')
@@ -101,6 +113,11 @@ var Earthquakes = function (options) {
     _pastDayMoment = Moment.utc().subtract(1, 'days');
     _pastHourMoment = Moment.utc().subtract(1, 'hours');
     _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
+
+    // Templates for L.Util.template
+    _labelTemplate = _getTemplate('label');
+    _popupTemplate = _getTemplate('popup');
+    _tableTemplate = _getTemplate('table');
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -369,8 +386,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: called on each created feature layer. Useful for
-   * attaching events and popups to features.
+   * Leaflet GeoJSON option: called once for each Marker, after it has been
+   * created and styled. Used to creates labels, popups, and summary tables.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -392,6 +409,7 @@ var Earthquakes = function (options) {
         magInt,
         popup,
         props,
+        text,
         timeTemplate,
         utcTime;
 
@@ -442,33 +460,24 @@ var Earthquakes = function (options) {
     data.bubbles = _getBubbles(data);
     data.time = L.Util.template(timeTemplate, data);
 
-    // Create label
-    if (!_labelTemplate) {
-      _labelTemplate = _getTemplate('label');
-    }
+    // Create label / popup and bind to marker
     label = L.Util.template(_labelTemplate, data);
-
-    // Create popup html
-    if (!_popupTemplate) {
-      _popupTemplate = _getTemplate('popup');
-    }
     popup = L.Util.template(_popupTemplate, data);
-
-    // Store popup html to use as summary html for mainshock
-    if (_id === 'mainshock') {
-      _mainshock.summary = popup;
-    }
-
-    // Bind popup and label to marker
     layer.bindPopup(popup, {
       autoPanPadding: L.point(50, 50),
       minWidth: '250'
     }).bindLabel(label);
 
-    // Add eq to array for summary table if it's above magnitude threshold
-    if (!_tableTemplate) {
-      _tableTemplate = _getTemplate('table');
+    // Store mainshock's popup html to use for summary pane html
+    if (_id === 'mainshock') {
+      _mainshock.summary = popup;
     }
+
+    // Add text prop to _plotdata (other props are added in _pointToLayer)
+    text = props.title + '<br />' + localTime;
+    _plotdata.text.push(text);
+
+    // Add eq to array for summary table if it's above magnitude threshold
     mainshockTime = _mainshock.properties.time;
     if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
@@ -498,24 +507,36 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: used for creating layers for GeoJSON points
+   * Leaflet GeoJSON option: creates markers and plot data from GeoJSON points
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
    *
-   * @return marker {L.CircleMarker}
+   * @return {L.CircleMarker}
    */
   _pointToLayer = function (feature, latlng) {
     var age,
+        coords,
         fillColor,
+        props,
         radius;
 
-    age = _getAge(feature.properties.time);
+    coords = feature.geometry.coordinates;
+    props = feature.properties;
+
+    age = _getAge(props.time);
     fillColor = _COLORS[age];
-    radius = 3 * parseInt(Math.pow(10, (0.11 * feature.properties.mag)), 10);
+    radius = 3 * parseInt(Math.pow(10, (0.11 * props.mag)), 10);
 
     _markerOptions.fillColor = fillColor;
     _markerOptions.radius = radius;
+
+    // Add props to _plotdata (text prop is set in _onEachFeature)
+    _plotdata.color.push(fillColor);
+    _plotdata.size.push(props.mag);
+    _plotdata.x.push(coords[0]);
+    _plotdata.y.push(coords[1]);
+    _plotdata.z.push(coords[2]);
 
     return L.circleMarker(latlng, _markerOptions);
   };
@@ -523,6 +544,15 @@ var Earthquakes = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Get data for 3d plot
+   *
+   * @return _plotdata {Array}
+   */
+  _this.getPlotData = function () {
+    return _plotdata;
+  };
 
   /**
    * Get eqs html for summary pane

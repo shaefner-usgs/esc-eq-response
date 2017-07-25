@@ -35,14 +35,16 @@ var Features = function (options) {
       _features,
       _initialLoad,
       _mainshockJson,
+      _plotdata,
 
       _MapPane,
+      _PlotsPane,
       _StatusBar,
       _SummaryPane,
 
       _addFeature,
       _addMapLayer,
-      _addPlots,
+      _addPlot,
       _addSummary,
       _getAftershocks,
       _getEqFeedUrl,
@@ -59,6 +61,7 @@ var Features = function (options) {
     options = options || {};
 
     _MapPane = options.mapPane;
+    _PlotsPane = options.plotsPane;
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
   };
@@ -93,12 +96,23 @@ var Features = function (options) {
       //   (should be removed already, but stacked ajax requests can cause issues)
       _removeFeature(id);
 
-      // Show mainshock details on editPane
       if (id === 'mainshock') {
+        // Show mainshock details on editPane
         _editPane.addMainshock(feature.getSummary(), opts.mainshockJson.properties);
+
+        // Store mainshock's plotdata for 3d plot of aftershocks
+        _plotdata.push(feature.getPlotData());
       }
 
-      // Add feature to map, plots, summary panes
+      // Add 3d aftershocks plot to plots pane
+      if (id === 'aftershocks') {
+        _plotdata.push(feature.getPlotData());
+        feature.data = _plotdata;
+
+        _addPlot(feature);
+      }
+
+      // Add feature to map, summary panes
       if (id === 'aftershocks' || id === 'historical') {
         // Load both layers before adding
         if (_features.aftershocks && _features.historical) {
@@ -120,7 +134,7 @@ var Features = function (options) {
     }
     catch (error) {
       console.error(error);
-      _StatusBar.addError(statusBarId, 'Error Loading ' + name +
+      _StatusBar.addError(statusBarId, 'Error Creating ' + name +
         '<span>' + error + '</span>');
     }
   };
@@ -157,8 +171,8 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _addPlots = function (/*feature*/) {
-
+  _addPlot = function (feature) {
+    _PlotsPane.addPlot(feature);
   };
 
   /**
@@ -301,8 +315,8 @@ var Features = function (options) {
     Xhr.ajax({
       url: opts.url,
       success: function (json) {
-        if (json.id === _eqid) {
-          _mainshockJson = json; // store mainshock's json; other features depend on it
+        if (json.id === _eqid) { // mainshock
+          _mainshockJson = json; // store mainshock's json (other features depend on it)
 
           // Set default param values on edit pane
           _editPane.setDefaults(_mainshockJson);
@@ -392,11 +406,11 @@ var Features = function (options) {
       _eqid = AppUtil.getParam('eqid');
       _initialLoad = true;
       _features = {};
+      _plotdata = [];
 
       // 2. Create mainshock feature
       _getMainshock();
-    }
-    else {
+    } else {
       // 3. Create additional features (called recursively via mainshock's callback)
       _getAftershocks();
       _getHistorical();
@@ -420,8 +434,6 @@ var Features = function (options) {
    * Remove all features from map, plots, summary panes
    */
   _this.removeFeatures = function () {
-    _mainshockJson = null; // clear any existing mainshock
-
     if (_features) {
       Object.keys(_features).forEach(function(id) {
         _removeFeature(id);
