@@ -1,0 +1,12 @@
+#plotsPane {
+  height: 100%;
+
+  .features, .feature {
+    height: 100%;
+  }
+  
+  /* hide some of the Plotly.js controls */
+  .modebar-group:nth-child(2n+1) {
+    display: none;
+  }
+}
