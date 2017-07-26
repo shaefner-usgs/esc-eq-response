@@ -85,7 +85,7 @@ var SummaryPane = function (options) {
    * Make table sortable
    *
    * @param id {String}
-   *     #id value of container elem
+   *     id value of container elem
    */
   _initTableSort = function (id) {
     var table,
