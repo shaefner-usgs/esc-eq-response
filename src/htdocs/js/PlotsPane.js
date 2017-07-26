@@ -1,7 +1,5 @@
+/* global Plotly */
 'use strict';
-
-
-var Plotly = require('plotly.js');
 
 
 var PlotsPane = function (options) {
