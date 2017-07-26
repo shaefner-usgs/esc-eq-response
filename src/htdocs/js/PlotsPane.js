@@ -9,6 +9,7 @@ var PlotsPane = function (options) {
       _el,
       _features,
 
+      _getRatio,
       _getDataConfig,
       _getLayout;
 
@@ -20,10 +21,6 @@ var PlotsPane = function (options) {
 
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
-
-    _features.innerHTML = '<h2>Plots</h2><div id="plot"></div>';
-
-    console.log(Plotly);
   };
 
   /**
@@ -46,8 +43,7 @@ var PlotsPane = function (options) {
           width: 1
         },
         size: data.size,
-        sizemin: 5,
-        sizeref: 0.1,
+        sizeref: 0.79, // Plotly doesn't properly honor size value; adjust it.
       },
       mode: 'markers',
       name: name,
@@ -62,10 +58,10 @@ var PlotsPane = function (options) {
   _getLayout = function (zRatio) {
     return {
       margin: {
-        b: 0,
+        b: 20,
         l: 50,
         r: 50,
-        t: 0
+        t: 20
       },
       scene: {
         aspectratio: {
@@ -96,12 +92,28 @@ var PlotsPane = function (options) {
     };
   };
 
+  _getRatio = function (trace) {
+    var depthExtent,
+        depthRange,
+        latExtent,
+        latRange,
+        ratio;
+
+    depthExtent = Plotly.d3.extent(trace.z);
+    depthRange = depthExtent[1] - depthExtent[0];
+    latExtent = Plotly.d3.extent(trace.y);
+    latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
+    ratio = depthRange / latRange;
+
+    return ratio;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Add summary text to summary pane (text plus <div> container)
+   * Add 3d plot to plot pane (plot plus <div> container)
    *   (called by Features.js)
    *
    * @param opts {Object}
@@ -111,33 +123,59 @@ var PlotsPane = function (options) {
    *     name: {String} // feature name
    *   }
    */
-  _this.addPlot = function (opts) {
+  _this.add3dPlot = function (opts) {
     var aftershocks,
+        cssClass,
         data,
-        depthExtent,
-        depthRange,
-        latExtent,
-        latRange,
+        div,
+        gd3,
         layout,
         mainshock,
+        plotContainer,
         zRatio;
 
-    aftershocks = _getDataConfig(opts.data[0], 'Aftershocks');
-    mainshock = _getDataConfig(opts.data[1], 'Mainshock');
+    cssClass = opts.id;
+    div = document.createElement('div');
+    div.classList.add('content', 'feature', cssClass);
+    div.innerHTML = '<h2>' + opts.name + '</h2>';
 
+    _features.appendChild(div);
+
+    // Make responsive (https://plot.ly/javascript/responsive-fluid-layout/)
+    gd3 = Plotly.d3.select('#plotsPane .' + cssClass)
+      .append('div')
+      .style({
+          width: '100%',
+          height: '80vh',
+      });
+    plotContainer = gd3.node();
+    window.onresize = function() {
+      Plotly.Plots.resize(plotContainer);
+    };
+
+    aftershocks = _getDataConfig(opts.data[1], 'Aftershocks');
+    mainshock = _getDataConfig(opts.data[0], 'Mainshock');
     data = [mainshock, aftershocks];
 
-    depthExtent = Plotly.d3.extent(aftershocks.z);
-    depthRange = depthExtent[1] - depthExtent[0];
-    latExtent = Plotly.d3.extent(aftershocks.y);
-    latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
-    zRatio = depthRange / latRange;
-
+    zRatio = _getRatio(aftershocks);
     layout = _getLayout(zRatio);
 
-    Plotly.plot('plot', data, layout, {
+    Plotly.plot(plotContainer, data, layout, {
       showLink: false
     });
+  };
+
+  /**
+   * Remove plot from plot pane (plot plus <div> container)
+   *   (called by Features.js)
+   *
+   * @param el {Element}
+   *     Element to remove
+   */
+  _this.removePlot = function (el) {
+    if (_el.contains(el)) {
+      el.parentNode.removeChild(el);
+    }
   };
 
 

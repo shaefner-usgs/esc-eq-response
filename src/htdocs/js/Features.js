@@ -44,7 +44,7 @@ var Features = function (options) {
 
       _addFeature,
       _addMapLayer,
-      _addPlot,
+      _add3dPlot,
       _addSummary,
       _getAftershocks,
       _getEqFeedUrl,
@@ -109,7 +109,7 @@ var Features = function (options) {
         _plotdata.push(feature.getPlotData());
         feature.data = _plotdata;
 
-        _addPlot(feature);
+        _add3dPlot(feature);
       }
 
       // Add feature to map, summary panes
@@ -171,8 +171,8 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _addPlot = function (feature) {
-    _PlotsPane.addPlot(feature);
+  _add3dPlot = function (feature) {
+    _PlotsPane.add3dPlot(feature);
   };
 
   /**
@@ -367,18 +367,24 @@ var Features = function (options) {
   _removeFeature = function (id) {
     var cssClass,
         mapLayer,
+        plot,
         summary;
 
     cssClass = id;
 
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
+      plot = document.querySelector('#plotsPane .' + cssClass);
       summary = document.querySelector('#summaryPane .' + cssClass);
     }
 
     if (mapLayer) {
       _MapPane.map.removeLayer(mapLayer);
       _MapPane.layerController.removeLayer(mapLayer);
+    }
+
+    if (plot) {
+      _PlotsPane.removePlot(plot);
     }
 
     if (summary) {

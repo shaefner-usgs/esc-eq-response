@@ -64,7 +64,7 @@ var Earthquakes = function (options) {
       _pastWeekMoment,
       _plotdata,
       _popupTemplate,
-      _tableTemplate,
+      _tablerowTemplate,
       _threshold,
       _utc,
 
@@ -117,7 +117,7 @@ var Earthquakes = function (options) {
     // Templates for L.Util.template
     _labelTemplate = _getTemplate('label');
     _popupTemplate = _getTemplate('popup');
-    _tableTemplate = _getTemplate('table');
+    _tablerowTemplate = _getTemplate('tablerow');
 
     // Mag threshold for list on summary pane
     _threshold = {
@@ -171,7 +171,8 @@ var Earthquakes = function (options) {
   /**
    * Get 'age' of earthquake (pasthour, pastday, etc)
    *
-   * @param timestamp {Int} milliseconds since 1970
+   * @param timestamp {Int}
+   *     milliseconds since 1970
    *
    * @return age {String}
    */
@@ -200,8 +201,8 @@ var Earthquakes = function (options) {
   /**
    * Get table containing binned earthquake data
    *
-   * @param period {String}
-   *     'First', 'Past', or 'Prior' depending on type (aftershocks/historical)
+   * @param period {String <First | Past | Prior>}
+   *      dependent on type (aftershocks/historical)
    *
    * @return html {Html}
    */
@@ -346,7 +347,7 @@ var Earthquakes = function (options) {
   /**
    * Get html template for displaying eq details
    *
-   * @param type {String}
+   * @param type {String <label | popup | tablerow>}
    *
    * @return template {Html}
    */
@@ -372,7 +373,7 @@ var Earthquakes = function (options) {
         '</dl>' +
       '</div>';
     }
-    else if (type === 'table') {
+    else if (type === 'tablerow') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
         '<td class="time" data-sort="{isoTime}">{localTime}</td>' + // set to UTC if no localTime
@@ -482,14 +483,14 @@ var Earthquakes = function (options) {
     if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
          props.time === mainshockTime) {
-      _eqList.push(L.Util.template(_tableTemplate, data));
+      _eqList.push(L.Util.template(_tablerowTemplate, data));
       // Flag to show note about UTC time when localTime unavailable
       if (!props.tz) {
         _utc = true;
       }
     }
 
-    // Bin eq totals by magnitude and time
+    // Bin eq totals by magnitude and time; store last aftershock
     if (_id === 'aftershocks') {
       days = Math.floor(Moment.duration(eqMoment - _mainshock.moment).asDays());
       _addEqToBin(days, magInt, 'First');
@@ -498,7 +499,7 @@ var Earthquakes = function (options) {
       _addEqToBin(days, magInt, 'Past');
 
       // Last aftershock will be last in list; overwrite each time thru loop
-      _lastAftershock = [L.Util.template(_tableTemplate, data)];
+      _lastAftershock = [L.Util.template(_tablerowTemplate, data)];
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
@@ -533,10 +534,10 @@ var Earthquakes = function (options) {
 
     // Add props to _plotdata (text prop is set in _onEachFeature)
     _plotdata.color.push(fillColor);
-    _plotdata.size.push(props.mag);
+    _plotdata.size.push(radius * 2); // plotly.js uses diameter
     _plotdata.x.push(coords[0]);
     _plotdata.y.push(coords[1]);
-    _plotdata.z.push(coords[2]);
+    _plotdata.z.push(coords[2] * -1); // return a negative number for depth
 
     return L.circleMarker(latlng, _markerOptions);
   };
