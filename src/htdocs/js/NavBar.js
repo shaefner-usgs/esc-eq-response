@@ -7,7 +7,8 @@
  * @param options {Object}
  *   {
  *     el: {Element},
- *     mapPane: {Object} // MapPane instance
+ *     mapPane: {Object}, // MapPane instance
+ *     plotsPane: {Object} // PlotsPane instance
  *   }
  */
 var NavBar = function (options) {
@@ -17,11 +18,13 @@ var NavBar = function (options) {
       _el,
       _panes,
 
+      _MapPane,
+      _PlotsPane,
+
       _addListener,
       _changePane,
       _getPaneId,
       _hidePanes,
-      _map,
       _showPane;
 
 
@@ -33,17 +36,18 @@ var NavBar = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _map = options.mapPane.map;
     _panes = _el.querySelectorAll('.panes a');
 
-    id = _getPaneId();
+    _MapPane = options.mapPane;
+    _PlotsPane = options.plotsPane;
 
+    id = _getPaneId();
     _addListener();
     _changePane(id);
   };
 
   /**
-   * Add Event Listeners
+   * Add event listener for changing panes
    */
   _addListener = function () {
     var id;
@@ -58,7 +62,7 @@ var NavBar = function (options) {
   /**
    * Switch between panes in UI
    *
-   * @param e {Event}
+   * @param id {String}
    */
   _changePane = function (id) {
     _hidePanes();
@@ -108,7 +112,6 @@ var NavBar = function (options) {
    * Show selected pane in UI; set appropriate nav button to selected
    *
    * @param id {String}
-   *    id of pane to show
    */
   _showPane = function (id) {
     var button,
@@ -120,9 +123,11 @@ var NavBar = function (options) {
     button.classList.add('selected');
     pane.classList.remove('hide');
 
-    // Update map container so it displays correctly when unhidden
+    // Update map container / plots so they display correctly when unhidden
     if (id === 'mapPane') {
-      _map.invalidateSize();
+      _MapPane.map.invalidateSize();
+    } else if (id === 'plotsPane') {
+      _PlotsPane.resizePlots();
     }
   };
 
