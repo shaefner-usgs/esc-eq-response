@@ -2,16 +2,25 @@
 'use strict';
 
 
+/**
+ * Adds / removes plot from plots pane
+ *
+ * @param options {Object}
+ *   {
+ *     el: {Element}
+ *   }
+ */
 var PlotsPane = function (options) {
   var _this,
       _initialize,
 
       _el,
       _features,
+      _plots,
 
       _getRatio,
       _getDataConfig,
-      _getLayout;
+      _getLayoutConfig;
 
 
   _this = {};
@@ -21,10 +30,16 @@ var PlotsPane = function (options) {
 
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
+    _plots = [];
+
+    // Make plots responsive
+    window.onresize = function() {
+      _this.resizePlots();
+    };
   };
 
   /**
-   * Get plot data in format expected by plotly.js charting library
+   * Get plot data in format expected by plotly.js
    *
    * @param data {Object}
    *     eq data
@@ -55,7 +70,18 @@ var PlotsPane = function (options) {
     };
   };
 
-  _getLayout = function (zRatio) {
+  /**
+   * Get plot layout for plotly.js
+   *
+   * @param zRatio {Number}
+   *
+   * @return {Object}
+   */
+  _getLayoutConfig = function (zRatio) {
+    var titlefont = {
+      color: 'rgb(0,0,0)'
+    };
+
     return {
       margin: {
         b: 20,
@@ -71,27 +97,29 @@ var PlotsPane = function (options) {
         },
         xaxis: {
           title: 'longitude',
-          titlefont: {
-            color: 'rgb(0,0,0)'
-          }
+          titlefont: titlefont
         },
         yaxis: {
           title: 'latitude',
-          titlefont: {
-            color: 'rgb(0,0,0)'
-          }
+          titlefont: titlefont
         },
         zaxis: {
           title: 'depth (km)',
-          titlefont: {
-            color: 'rgb(0,0,0)'
-          }
+          titlefont: titlefont
         }
       },
       showlegend: false,
     };
   };
 
+  /**
+   * Get ratio of depth values to latitude values
+   *
+   * @param trace {Object}
+   *     plot's data trace
+   *
+   * @return ratio {Number}
+   */
   _getRatio = function (trace) {
     var depthExtent,
         depthRange,
@@ -128,39 +156,29 @@ var PlotsPane = function (options) {
         cssClass,
         data,
         div,
-        gd3,
         layout,
         mainshock,
-        plotContainer,
+        plot,
         zRatio;
 
     cssClass = opts.id;
     div = document.createElement('div');
     div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = '<h2>' + opts.name + '</h2>';
+    div.innerHTML = '<h2>' + opts.name + '</h2><div class="plot"></div>';
 
     _features.appendChild(div);
 
-    // Make responsive (https://plot.ly/javascript/responsive-fluid-layout/)
-    gd3 = Plotly.d3.select('#plotsPane .' + cssClass)
-      .append('div')
-      .style({
-          width: '100%',
-          height: '80vh',
-      });
-    plotContainer = gd3.node();
-    window.onresize = function() {
-      Plotly.Plots.resize(plotContainer);
-    };
+    plot = div.querySelector('.plot');
+    _plots.push(plot);
 
     aftershocks = _getDataConfig(opts.data[1], 'Aftershocks');
     mainshock = _getDataConfig(opts.data[0], 'Mainshock');
     data = [mainshock, aftershocks];
 
     zRatio = _getRatio(aftershocks);
-    layout = _getLayout(zRatio);
+    layout = _getLayoutConfig(zRatio);
 
-    Plotly.plot(plotContainer, data, layout, {
+    Plotly.plot(plot, data, layout, {
       showLink: false
     });
   };
@@ -176,6 +194,15 @@ var PlotsPane = function (options) {
     if (_el.contains(el)) {
       el.parentNode.removeChild(el);
     }
+  };
+
+  /**
+   * Resize plots
+   */
+  _this.resizePlots = function () {
+    _plots.forEach(function(plot) {
+      Plotly.Plots.resize(plot);
+    });
   };
 
 
