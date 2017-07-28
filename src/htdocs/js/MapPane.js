@@ -4,7 +4,7 @@
 
 // Leaflet plugins
 require('mappane/MousePosition');
-require('mappane/RestoreMap');
+//require('mappane/RestoreMap');
 
 // Factories for creating map layers
 //   layers are added to global Leaflet instance, e.g. "L.faultsLayer()"
@@ -40,7 +40,7 @@ var MapPane = function (options) {
 
   _initialize = function (options) {
     options = options || {};
-    
+
     _el = options.el || document.createElement('div');
     _map = _el.querySelector('.map');
 
