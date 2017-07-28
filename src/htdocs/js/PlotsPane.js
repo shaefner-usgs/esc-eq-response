@@ -51,11 +51,17 @@ var PlotsPane = function (options) {
   _getDataConfig = function  (data, name) {
     return {
       hoverinfo: 'text+x+y',
+      hoverlabel: {
+        bgcolor: 'rgba(255,255,255,.85)',
+        bordercolor: 'rgb(153,153,153)',
+        font: {
+          color: 'rgb(0,0,0)'
+        }
+      },
       marker: {
         color: data.color, // fill
-        line: { //  stroke
-          color: 'rgb(153,153,153)',
-          width: 1
+        line: {
+          color: 'rgb(102,102,102)' // stroke
         },
         size: data.size,
         sizeref: 0.79, // Plotly doesn't properly honor size value; adjust it.
@@ -197,7 +203,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Resize plots
+   * Resize plots: useful to set initial size and responsive-fluid-layout size
    */
   _this.resizePlots = function () {
     _plots.forEach(function(plot) {
