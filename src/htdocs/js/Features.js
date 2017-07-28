@@ -101,12 +101,12 @@ var Features = function (options) {
         _editPane.addMainshock(feature.getSummary(), opts.mainshockJson.properties);
 
         // Store mainshock's plotdata for 3d plot of aftershocks
-        _plotdata.push(feature.getPlotData());
+        _plotdata[id] = feature.getPlotData();
       }
 
       // Add 3d aftershocks plot to plots pane
       if (id === 'aftershocks') {
-        _plotdata.push(feature.getPlotData());
+        _plotdata[id] = feature.getPlotData();
         feature.data = _plotdata;
 
         _add3dPlot(feature);
@@ -412,7 +412,7 @@ var Features = function (options) {
       _eqid = AppUtil.getParam('eqid');
       _initialLoad = true;
       _features = {};
-      _plotdata = [];
+      _plotdata = {};
 
       // 2. Create mainshock feature
       _getMainshock();

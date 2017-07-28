@@ -18,9 +18,9 @@ var PlotsPane = function (options) {
       _features,
       _plots,
 
+      _getLayout,
       _getRatio,
-      _getDataConfig,
-      _getLayoutConfig;
+      _getTrace;
 
 
   _this = {};
@@ -39,51 +39,13 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot data in format expected by plotly.js
-   *
-   * @param data {Object}
-   *     eq data
-   * @param name {String}
-   *     Name of trace
-   *
-   * @return {Object}
-   */
-  _getDataConfig = function  (data, name) {
-    return {
-      hoverinfo: 'text+x+y',
-      hoverlabel: {
-        bgcolor: 'rgba(255,255,255,.85)',
-        bordercolor: 'rgb(153,153,153)',
-        font: {
-          color: 'rgb(0,0,0)'
-        }
-      },
-      marker: {
-        color: data.color, // fill
-        line: {
-          color: 'rgb(102,102,102)' // stroke
-        },
-        size: data.size,
-        sizeref: 0.79, // Plotly doesn't properly honor size value; adjust it.
-      },
-      mode: 'markers',
-      name: name,
-      text: data.text,
-      type: 'scatter3d',
-      x: data.x,
-      y: data.y,
-      z: data.z
-    };
-  };
-
-  /**
-   * Get plot layout for plotly.js
+   * Get plot layout config for plotly.js
    *
    * @param zRatio {Number}
    *
    * @return {Object}
    */
-  _getLayoutConfig = function (zRatio) {
+  _getLayout = function (zRatio) {
     var titlefont = {
       color: 'rgb(0,0,0)'
     };
@@ -142,6 +104,44 @@ var PlotsPane = function (options) {
     return ratio;
   };
 
+  /**
+   * Get plot trace config for plotly.js
+   *
+   * @param data {Object}
+   *     eq data
+   * @param name {String}
+   *     Name of trace
+   *
+   * @return {Object}
+   */
+  _getTrace = function  (data, name) {
+    return {
+      hoverinfo: 'text+x+y',
+      hoverlabel: {
+        bgcolor: 'rgba(255,255,255,.85)',
+        bordercolor: 'rgb(153,153,153)',
+        font: {
+          color: 'rgb(0,0,0)'
+        }
+      },
+      marker: {
+        color: data.color, // fill
+        line: {
+          color: 'rgb(102,102,102)' // stroke
+        },
+        size: data.size,
+        sizeref: 0.79, // Plotly doesn't properly honor size value; adjust it.
+      },
+      mode: 'markers',
+      name: name,
+      text: data.text,
+      type: 'scatter3d',
+      x: data.x,
+      y: data.y,
+      z: data.z
+    };
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -158,13 +158,12 @@ var PlotsPane = function (options) {
    *   }
    */
   _this.add3dPlot = function (opts) {
-    var aftershocks,
-        cssClass,
+    var cssClass,
         data,
         div,
         layout,
-        mainshock,
         plot,
+        trace,
         zRatio;
 
     cssClass = opts.id;
@@ -175,14 +174,17 @@ var PlotsPane = function (options) {
     _features.appendChild(div);
 
     plot = div.querySelector('.plot');
-    _plots.push(plot);
+    _plots.push(plot); // store plot in closure
 
-    aftershocks = _getDataConfig(opts.data[1], 'Aftershocks');
-    mainshock = _getDataConfig(opts.data[0], 'Mainshock');
-    data = [mainshock, aftershocks];
+    // Get data trace(s) for plot and store in data
+    data = [];
+    Object.keys(opts.data).forEach(function(key) {
+      trace = _getTrace(opts.data[key], key);
+      data.push(trace);
+    });
 
-    zRatio = _getRatio(aftershocks);
-    layout = _getLayoutConfig(zRatio);
+    zRatio = _getRatio(opts.data[opts.id]);
+    layout = _getLayout(zRatio);
 
     Plotly.plot(plot, data, layout, {
       showLink: false
