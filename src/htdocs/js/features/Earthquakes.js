@@ -35,7 +35,8 @@ _DEFAULTS = {
 
 
 /**
- * Factory for creating earthquakes overlay, summary
+ * Factory for parsing earthquake feeds and creating Leaflet map layers and
+ *   data used on plot and summary panes
  *
  * @param options {Object}
  *   {
@@ -52,10 +53,11 @@ var Earthquakes = function (options) {
       _initialize,
 
       _bins,
+      _details,
       _eqList,
       _id,
       _labelTemplate,
-      _lastAftershock,
+      _lastId,
       _mainshock,
       _markerOptions,
       _nowMoment,
@@ -70,9 +72,7 @@ var Earthquakes = function (options) {
 
       _addEqToBin,
       _getAge,
-      _getBinnedTable,
       _getBubbles,
-      _getEqListTable,
       _getIntervals,
       _getTemplate,
       _onEachFeature,
@@ -93,7 +93,7 @@ var Earthquakes = function (options) {
     _id = options.id;
 
     _bins = {};
-    _eqList = [];
+    _eqList = {};
     _plotdata = {
       color: [],
       size: [],
@@ -199,46 +199,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get table containing binned earthquake data
-   *
-   * @param period {String <First | Past | Prior>}
-   *      dependent on type (aftershocks/historical)
-   *
-   * @return html {Html}
-   */
-  _getBinnedTable = function (period) {
-    var html,
-        total;
-
-    html = '';
-    if (_bins[period] && _bins[period].length > 0) {
-      html = '<table class="bin">' +
-        '<tr>' +
-          '<th class="period">' + period + ':</th>' +
-          '<th>Day</th>' +
-          '<th>Week</th>' +
-          '<th>Month</th>' +
-          '<th>Year</th>' +
-          '<th class="total">Total</th>' +
-        '</tr>';
-      _bins[period].forEach(function(cols, mag) {
-        html += '<tr><td class="rowlabel">M ' + mag + '</td>';
-        cols.forEach(function(col, i) {
-          if (i === 0) { // store total and add to table as last column
-            total = '<td class="total">' + col + '</td>';
-          } else {
-            html += '<td>' + col + '</td>';
-          }
-        });
-        html += total + '</tr>';
-      });
-      html += '</table>';
-    }
-
-    return html;
-  };
-
-  /**
    * Get USGS 'Bubbles' (DYFI, ShakeMap, etc) HTML for popups
    *
    * @param data {Object}
@@ -275,56 +235,6 @@ var Earthquakes = function (options) {
     bubbles = L.Util.template(bubblesTemplate, data);
 
     return bubbles;
-  };
-
-  /**
-   * Get table containing a list of earthquakes
-   *
-   * @param rows {Array}
-   *
-   * @return table {Html}
-   */
-  _getEqListTable = function (rows) {
-    var note,
-        sortClass,
-        table,
-        tableData;
-
-    tableData = '';
-    note = '<span class="star">* = local time at epicenter.</span>';
-    if (_utc) {
-      note += ' Using UTC when local time is not available.';
-    }
-    sortClass = 'non-sortable';
-
-    if (rows && rows.length > 0) {
-      // Eqs are ordered by time (ASC) for Leaflet; reverse for summary table
-      rows.reverse();
-      rows.forEach(function(row) {
-        tableData += row;
-      });
-      if (rows.length > 1) {
-        sortClass = 'sortable';
-      }
-      table = '<table class="' + sortClass + '">' +
-          '<tr class="no-sort">' +
-            '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-            '<th class="sort-up" data-sort-order="desc">Time</th>' +
-            '<th class="location">Location</th>' +
-            '<th class="distance" data-sort-method="number">' +
-              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-            '</th>' +
-            '<th data-sort-method="number">Depth</th>' +
-          '</tr>' +
-          tableData +
-        '</table>';
-
-      table += '<p class="note">' + note + '</p>';
-    } else {
-      table = '<p>None.</p>';
-    }
-
-    return table;
   };
 
   /**
@@ -401,6 +311,8 @@ var Earthquakes = function (options) {
         data,
         days,
         distance,
+        duration,
+        eqid,
         eqMoment,
         label,
         latlon,
@@ -415,6 +327,7 @@ var Earthquakes = function (options) {
         utcTime;
 
     coords = feature.geometry.coordinates;
+    eqid = feature.id;
     props = feature.properties;
 
     latlon = LatLon(coords[1], coords[0]);
@@ -469,10 +382,30 @@ var Earthquakes = function (options) {
       minWidth: '250'
     }).bindLabel(label);
 
-    // Store mainshock's popup html to use for summary pane html
+    // Feed details: mainshock params or text description for aftershocks / historical
     if (_id === 'mainshock') {
-      _mainshock.summary = popup;
+      _details = popup; // set to same text as map popup
     }
+    else if (_id === 'aftershocks') {
+      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
+        .asDays(), 1);
+
+      _details = '<p><strong>M ' + AppUtil.getParam('aftershocks-minmag') +
+        '+ </strong> earthquakes <strong> within ' +
+        AppUtil.getParam('aftershocks-dist') + ' km</strong> of mainshock ' +
+        'epicenter. The duration of the aftershock sequence is <strong>' +
+        duration + ' days</strong>.</p>';
+    }
+    else if (_id === 'historical') {
+      _details = '<p><strong>M ' + AppUtil.getParam('historical-minmag') +
+      '+ </strong> earthquakes <strong> within ' +
+      AppUtil.getParam('historical-dist') + ' km</strong> of mainshock ' +
+      'epicenter in the <strong>prior ' + AppUtil.getParam('historical-years') +
+      ' years</strong>.</p>';
+    }
+
+    // Last earthquake will be last in list; overwrite each time thru loop
+    _lastId = eqid;
 
     // Add text prop to _plotdata (other props are added in _pointToLayer)
     text = props.title + '<br />' + localTime;
@@ -483,7 +416,7 @@ var Earthquakes = function (options) {
     if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
         (props.time < mainshockTime && props.mag >= _threshold.historical) ||
          props.time === mainshockTime) {
-      _eqList.push(L.Util.template(_tablerowTemplate, data));
+      _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
       // Flag to show note about UTC time when localTime unavailable
       if (!props.tz) {
         _utc = true;
@@ -497,9 +430,6 @@ var Earthquakes = function (options) {
 
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Past');
-
-      // Last aftershock will be last in list; overwrite each time thru loop
-      _lastAftershock = [L.Util.template(_tablerowTemplate, data)];
     }
     else if (_id === 'historical') {
       days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
@@ -547,45 +477,48 @@ var Earthquakes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get data for 3d plot
+   * Get binned earthquake data
    *
-   * @return _plotdata {Array}
+   * @return _bins {Object}
    */
-  _this.getPlotData = function () {
-    return _plotdata;
+  _this.getBinnedData = function () {
+    return _bins;
   };
 
   /**
-   * Get eqs html for summary pane
+   * Get feed details (mainshock) / description (aftershocks, historical)
    *
-   * @return summary {Html}
+   * @return _details {String}
    */
-  _this.getSummary = function () {
-    var summary;
+  _this.getDetails = function () {
+    return _details;
+  };
 
-    if (_id === 'mainshock') {
-      summary = _mainshock.summary;
-    }
-    else {
-      if (_id === 'aftershocks') {
-        summary = '<div class="bins">';
-        summary += _getBinnedTable('First');
-        summary += _getBinnedTable('Past');
-        summary += '</div>';
-        summary += '<h3>Most Recent Aftershock</h3>';
-        summary += _getEqListTable(_lastAftershock);
-      }
-      else if (_id === 'historical') {
-        summary = _getBinnedTable('Prior');
-      }
+  /**
+   * Get id of 'last' (most recent) earthquake in feed (ordered by time-asc)
+   *
+   * @return {String}
+   */
+  _this.getLastId = function () {
+    return _lastId;
+  };
 
-      summary += '<h3>M ' + Math.max(_threshold[_id],
-        AppUtil.getParam(_id + '-minmag')) + '+ Earthquakes (' + _eqList.length +
-        ')</h3>';
-      summary += _getEqListTable(_eqList);
-    }
+  /**
+   * Get a list of earthquakes in feed above mag threshold
+   *
+   * @return _eqList {Object}
+   */
+  _this.getList = function () {
+    return _eqList;
+  };
 
-    return summary;
+  /**
+   * Get data for 3d plot
+   *
+   * @return _plotdata {Object}
+   */
+  _this.getPlotData = function () {
+    return _plotdata;
   };
 
 

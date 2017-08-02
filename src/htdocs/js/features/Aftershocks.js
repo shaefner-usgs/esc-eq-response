@@ -1,9 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes'),
-    Moment = require('moment');
+var Earthquakes = require('features/Earthquakes');
 
 
 var Aftershocks = function (options) {
@@ -63,29 +61,17 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get summary of feature
+   * Get summary data of feature
    *
-   * @return summary {Html}
+   * @return {Object}
    */
-  _this.getSummary = function () {
-    var description,
-        duration,
-        mainshockMoment,
-        summary;
-
-    mainshockMoment = Moment.utc(_mainshockJson.properties.time, 'x');
-    duration = AppUtil.round(Moment.duration(Moment.utc() - mainshockMoment)
-      .asDays(), 1);
-
-    description = '<p><strong>M ' + AppUtil.getParam(_this.id + '-minmag') +
-      '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_this.id +
-      '-dist') + ' km</strong> of mainshock epicenter. The duration of the ' +
-      'aftershock sequence is <strong>' + duration + ' days</strong>.</p>';
-
-    // Earthquake data is stored in Earthquakes instance (where it was parsed)
-    summary = _earthquakes.getSummary();
-
-    return description + summary;
+  _this.getSummaryData = function () {
+    return {
+      bins: _earthquakes.getBinnedData(),
+      details: _earthquakes.getDetails(),
+      lastId: _earthquakes.getLastId(),
+      list : _earthquakes.getList()
+    };
   };
 
 

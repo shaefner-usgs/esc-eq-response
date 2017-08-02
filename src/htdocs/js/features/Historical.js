@@ -1,8 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/Earthquakes');
 
 
 var Historical = function (options) {
@@ -51,23 +50,16 @@ var Historical = function (options) {
   };
 
   /**
-   * Get summary of feature
+   * Get summary data of feature
    *
-   * @return summary {Html}
+   * @return {Object}}
    */
-  _this.getSummary = function () {
-    var description,
-        summary;
-
-    description = '<p><strong>M ' + AppUtil.getParam(_this.id + '-minmag') +
-      '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_this.id +
-      '-dist') + ' km</strong> of mainshock epicenter in the <strong>prior ' +
-      AppUtil.getParam('historical-years') + ' years</strong>.</p>';
-
-    // Earthquake data is stored in Earthquakes instance (where it was parsed)
-    summary = _earthquakes.getSummary();
-
-    return description + summary;
+  _this.getSummaryData = function () {
+    return {
+      bins: _earthquakes.getBinnedData(),
+      details: _earthquakes.getDetails(),
+      list : _earthquakes.getList()
+    };
   };
 
 

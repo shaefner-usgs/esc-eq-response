@@ -22,6 +22,8 @@ var SummaryPane = function (options) {
       _tz,
 
       _addTimestamp,
+      _getBinnedTable,
+      _getEqListTable
       _getTimeZone,
       _initTableSort,
       _updateTimestamp;
@@ -48,6 +50,129 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
+  };
+
+  /**
+   * Get table containing binned earthquake data
+   *
+   * @param period {String <First | Past | Prior>}
+   *      dependent on type (aftershocks/historical)
+   *
+   * @return html {Html}
+   */
+  _getBinnedTable = function (bins, period) {
+    var html,
+        total;
+
+    html = '';
+    if (bins[period] && bins[period].length > 0) {
+      html = '<table class="bin">' +
+        '<tr>' +
+          '<th class="period">' + period + ':</th>' +
+          '<th>Day</th>' +
+          '<th>Week</th>' +
+          '<th>Month</th>' +
+          '<th>Year</th>' +
+          '<th class="total">Total</th>' +
+        '</tr>';
+      bins[period].forEach(function(cols, mag) {
+        html += '<tr><td class="rowlabel">M ' + mag + '</td>';
+        cols.forEach(function(col, i) {
+          if (i === 0) { // store total
+            total = '<td class="total">' + col + '</td>';
+          } else {
+            html += '<td>' + col + '</td>';
+          }
+        });
+        html += total + '</tr>'; // add total to table as last column
+      });
+      html += '</table>';
+    }
+
+    return html;
+  };
+
+  /**
+   * Get table containing a list of earthquakes
+   *
+   * @param rows {Array}
+   *
+   * @return table {Html}
+   */
+  _getEqListTable = function (rows) {
+    var note,
+        sortClass,
+        table,
+        tableData;
+
+    tableData = '';
+    note = '<span class="star">* = local time at epicenter.</span>';
+    if (_utc) {
+      note += ' Using UTC when local time is not available.';
+    }
+    sortClass = 'non-sortable';
+
+    if (rows && rows.length > 0) {
+      // Eqs are ordered by time (ASC) for Leaflet; reverse for summary table
+      rows.reverse();
+      rows.forEach(function(row) {
+        tableData += row;
+      });
+      if (rows.length > 1) {
+        sortClass = 'sortable';
+      }
+      table = '<table class="' + sortClass + '">' +
+          '<tr class="no-sort">' +
+            '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
+            '<th class="sort-up" data-sort-order="desc">Time</th>' +
+            '<th class="location">Location</th>' +
+            '<th class="distance" data-sort-method="number">' +
+              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+            '</th>' +
+            '<th data-sort-method="number">Depth</th>' +
+          '</tr>' +
+          tableData +
+        '</table>';
+
+      table += '<p class="note">' + note + '</p>';
+    } else {
+      table = '<p>None.</p>';
+    }
+
+    return table;
+  };
+
+  /**
+   * Get eqs html for summary pane
+   *
+   * @return summary {Html}
+   */
+  _getSummary = function () {
+    var summary;
+
+    if (_id === 'mainshock') {
+      summary = _mainshock.summary;
+    }
+    else {
+      if (_id === 'aftershocks') {
+        summary = '<div class="bins">';
+        summary += _getBinnedTable('First');
+        summary += _getBinnedTable('Past');
+        summary += '</div>';
+        summary += '<h3>Most Recent Aftershock</h3>';
+        summary += _getEqListTable(_lastAftershock);
+      }
+      else if (_id === 'historical') {
+        summary = _getBinnedTable('Prior');
+      }
+
+      summary += '<h3>M ' + Math.max(_threshold[_id],
+        AppUtil.getParam(_id + '-minmag')) + '+ Earthquakes (' + _eqList.length +
+        ')</h3>';
+      summary += _getEqListTable(_eqList);
+    }
+
+    return summary;
   };
 
   /**

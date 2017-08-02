@@ -48,13 +48,14 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get summary of feature
+   * Get summary data of feature
    *
-   * @return summary {Html}
+   * @return {Object}
    */
-  _this.getSummary = function () {
-    // Earthquake data is stored in Earthquakes instance (where it was parsed)
-    return _earthquakes.getSummary();
+  _this.getSummaryData = function () {
+    return {
+      details: _earthquakes.getDetails()
+    };
   };
 
 
