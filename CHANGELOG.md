@@ -5,6 +5,14 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Change order of input fields (show mag first) on edit pane
+* Refactor: better separation of concerns, more readable code
+* Add impact bubbles / link to mainshock details on edit pane
+* Add 3d aftershocks plot
+* Bug fix: calculate magInt based on rounded mag so data in tables is accurate
+* Bug fix: only show utc note when filtered quakes contain utc time
+* Darken stroke width so eqs stand out more
+* Only set map bounds on initial loading of layers for each eqid
 * Always plot aftershocks on top of historical
 * Add timezone to updated stamp on summary pane
 * Strip whitespace from param values in form fields
