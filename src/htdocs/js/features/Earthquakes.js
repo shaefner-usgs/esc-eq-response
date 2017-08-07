@@ -35,18 +35,15 @@ _DEFAULTS = {
 
 
 /**
- * Factory for parsing earthquake feeds and creating Leaflet map layers and
- *   data used on plot and summary panes
+ * Parses an earthquake feed to create a Leaflet map layer as well as the data
+ *   used on the plot and summary panes
  *
  * @param options {Object}
  *   {
  *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
  *     json: {Object}, // geojson data for feature
  *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
  *   }
- *
- * @return {L.FeatureGroup}
  */
 var Earthquakes = function (options) {
   var _this,
@@ -67,12 +64,11 @@ var Earthquakes = function (options) {
       _plotdata,
       _popupTemplate,
       _tablerowTemplate,
-      _threshold,
-      _utc,
 
       _addEqToBin,
       _getAge,
       _getBubbles,
+      _getDescription,
       _getIntervals,
       _getTemplate,
       _onEachFeature,
@@ -119,14 +115,10 @@ var Earthquakes = function (options) {
     _popupTemplate = _getTemplate('popup');
     _tablerowTemplate = _getTemplate('tablerow');
 
-    // Mag threshold for list on summary pane
-    _threshold = {
-      aftershocks: Math.floor(_mainshock.properties.mag - 2.5),
-      historical: Math.floor(_mainshock.properties.mag - 1)
-    };
-
-    // Flag for using utc (when local time at epicenter is not available in feed)
-    _utc = false;
+    // Feed description (aftershocks and historical)
+    if (_id === 'aftershocks' || _id === 'historical') {
+      _details = _getDescription();
+    }
 
     _this.mapLayer = L.geoJson(json, {
       onEachFeature: _onEachFeature,
@@ -139,7 +131,7 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param period {String}
+   * @param period {String <First | Past | Prior>}
    */
   _addEqToBin = function (days, magInt, period) {
     var intervals;
@@ -238,6 +230,37 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get feed description (aftershocks / historical)
+   *
+   * @return description {Html}
+   */
+  _getDescription = function () {
+    var description,
+        duration;
+
+    description = '<p><strong>M ' + AppUtil.getParam(_id + '-minmag') +
+      '+ </strong> earthquakes <strong> within ' +
+      AppUtil.getParam(_id + '-dist') + ' km</strong> of mainshock ' +
+      'epicenter';
+
+    if (_id === 'aftershocks') {
+      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
+        .asDays(), 1);
+
+      description += '. The duration of the aftershock sequence is <strong>' +
+        duration + ' days</strong>';
+    }
+    else if (_id === 'historical') {
+      description += ' in the <strong>prior ' +
+      AppUtil.getParam('historical-years') + ' years</strong>';
+    }
+
+    description += '.</p>';
+
+    return description;
+  };
+
+  /**
    * Get intervals to store binned data in
    *
    * @return intervals {Array}
@@ -311,13 +334,11 @@ var Earthquakes = function (options) {
         data,
         days,
         distance,
-        duration,
         eqid,
         eqMoment,
         label,
         latlon,
         localTime,
-        mainshockTime,
         mag,
         magInt,
         popup,
@@ -382,26 +403,9 @@ var Earthquakes = function (options) {
       minWidth: '250'
     }).bindLabel(label);
 
-    // Feed details: mainshock params or text description for aftershocks / historical
+    // Feed details (set to text description for aftershocks / historical)
     if (_id === 'mainshock') {
       _details = popup; // set to same text as map popup
-    }
-    else if (_id === 'aftershocks') {
-      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
-        .asDays(), 1);
-
-      _details = '<p><strong>M ' + AppUtil.getParam('aftershocks-minmag') +
-        '+ </strong> earthquakes <strong> within ' +
-        AppUtil.getParam('aftershocks-dist') + ' km</strong> of mainshock ' +
-        'epicenter. The duration of the aftershock sequence is <strong>' +
-        duration + ' days</strong>.</p>';
-    }
-    else if (_id === 'historical') {
-      _details = '<p><strong>M ' + AppUtil.getParam('historical-minmag') +
-      '+ </strong> earthquakes <strong> within ' +
-      AppUtil.getParam('historical-dist') + ' km</strong> of mainshock ' +
-      'epicenter in the <strong>prior ' + AppUtil.getParam('historical-years') +
-      ' years</strong>.</p>';
     }
 
     // Last earthquake will be last in list; overwrite each time thru loop
@@ -411,17 +415,8 @@ var Earthquakes = function (options) {
     text = props.title + '<br />' + localTime;
     _plotdata.text.push(text);
 
-    // Add eq to array for summary table if it's above magnitude threshold
-    mainshockTime = _mainshock.properties.time;
-    if ((props.time > mainshockTime && props.mag >= _threshold.aftershocks) ||
-        (props.time < mainshockTime && props.mag >= _threshold.historical) ||
-         props.time === mainshockTime) {
-      _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
-      // Flag to show note about UTC time when localTime unavailable
-      if (!props.tz) {
-        _utc = true;
-      }
-    }
+    // Add eq to list for summary
+    _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
 
     // Bin eq totals by magnitude and time; store last aftershock
     if (_id === 'aftershocks') {
@@ -504,7 +499,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get a list of earthquakes in feed above mag threshold
+   * Get a list of earthquakes in feed as html table rows
    *
    * @return _eqList {Object}
    */

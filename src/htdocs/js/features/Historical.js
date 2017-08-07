@@ -4,11 +4,22 @@
 var Earthquakes = require('features/Earthquakes');
 
 
+/**
+ * Creates Historical Seismicity feature
+ *
+ * @param options {Object}
+ *   {
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     name: {String} // layer name
+ *   }
+ */
 var Historical = function (options) {
   var _this,
       _initialize,
 
       _earthquakes,
+      _magThreshold,
 
       _getName;
 
@@ -19,9 +30,13 @@ var Historical = function (options) {
     var id = 'historical';
 
     options = options || {};
-    options.id = id;
 
-    _earthquakes = Earthquakes(options);
+    _earthquakes = Earthquakes({
+      id: id,
+      json: options.json,
+      mainshockJson: options.mainshockJson
+    });
+    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
 
     _this.id = id;
     _this.name = _getName();
@@ -50,15 +65,16 @@ var Historical = function (options) {
   };
 
   /**
-   * Get summary data of feature
+   * Get feature's data for summary pane
    *
    * @return {Object}}
    */
   _this.getSummaryData = function () {
     return {
       bins: _earthquakes.getBinnedData(),
-      details: _earthquakes.getDetails(),
-      list : _earthquakes.getList()
+      detailsHtml: _earthquakes.getDetails(),
+      list: _earthquakes.getList(),
+      magThreshold: _magThreshold
     };
   };
 

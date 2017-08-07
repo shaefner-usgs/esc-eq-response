@@ -4,6 +4,16 @@
 var Earthquakes = require('features/Earthquakes');
 
 
+/**
+ * Creates Mainshock feature
+ *
+ * @param options {Object}
+ *   {
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     name: {String} // layer name
+ *   }
+ */
 var Mainshock = function (options) {
   var _this,
       _initialize,
@@ -17,9 +27,12 @@ var Mainshock = function (options) {
     var id = 'mainshock';
 
     options = options || {};
-    options.id = id;
 
-    _earthquakes = Earthquakes(options);
+    _earthquakes = Earthquakes({
+      id: id,
+      json: options.json,
+      mainshockJson: options.mainshockJson
+    });
 
     _this.id = id;
     _this.name = options.name;
@@ -39,7 +52,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get plot data of feature
+   * Get feature's data for plots pane
    *
    * @return {Object}
    */
@@ -48,13 +61,13 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get summary data of feature
+   * Get feature's data for summary pane
    *
    * @return {Object}
    */
   _this.getSummaryData = function () {
     return {
-      details: _earthquakes.getDetails()
+      detailsHtml: _earthquakes.getDetails()
     };
   };
 

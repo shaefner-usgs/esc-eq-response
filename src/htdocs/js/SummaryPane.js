@@ -1,12 +1,13 @@
 'use strict';
 
 
-var Moment = require('moment'),
+var AppUtil = require('AppUtil'),
+    Moment = require('moment'),
     Tablesort = require('tablesort');
 
 
 /**
- * Adds / removes summary info from summary pane
+ * Creates, adds, and removes summary info from summary pane
  *
  * @param options {Object}
  *   {
@@ -23,7 +24,8 @@ var SummaryPane = function (options) {
 
       _addTimestamp,
       _getBinnedTable,
-      _getEqListTable
+      _getListTable,
+      _getSummary,
       _getTimeZone,
       _initTableSort,
       _updateTimestamp;
@@ -55,8 +57,9 @@ var SummaryPane = function (options) {
   /**
    * Get table containing binned earthquake data
    *
+   * @param bins {Object}
+   *     earthquake data binned by mag/time
    * @param period {String <First | Past | Prior>}
-   *      dependent on type (aftershocks/historical)
    *
    * @return html {Html}
    */
@@ -93,38 +96,51 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get table containing a list of earthquakes
+   * Get table containing a list of earthquakes above mag threshold
    *
-   * @param rows {Array}
+   * @param rows {Object}
+   *     tr html for each earthquake in list keyed by eqid
+   * @param magThreshold {Number}
    *
-   * @return table {Html}
+   * @return {Object}
    */
-  _getEqListTable = function (rows) {
-    var note,
+  _getListTable = function (rows, magThreshold) {
+    var count,
+        html,
+        length,
+        mag,
+        note,
+        row,
         sortClass,
-        table,
-        tableData;
+        tableData,
+        utc;
 
-    tableData = '';
+    count = 0;
+    length = Object.keys(rows).length;
     note = '<span class="star">* = local time at epicenter.</span>';
-    if (_utc) {
-      note += ' Using UTC when local time is not available.';
-    }
     sortClass = 'non-sortable';
+    tableData = '';
+    utc = false;
 
-    if (rows && rows.length > 0) {
-      // Eqs are ordered by time (ASC) for Leaflet; reverse for summary table
-      rows.reverse();
-      rows.forEach(function(row) {
-        tableData += row;
+    if (rows && length > 0) {
+      Object.keys(rows).forEach(function(key) {
+        row = rows[key];
+        mag = /tr\s+class="m(\d+)"/.exec(row);
+        if (!magThreshold || mag[1] >= magThreshold) {
+          count ++;
+          tableData += row;
+          if (row.match(/UTC/)) {
+            utc = true;
+          }
+        }
       });
-      if (rows.length > 1) {
+      if (length > 1) {
         sortClass = 'sortable';
       }
-      table = '<table class="' + sortClass + '">' +
+      html = '<table class="' + sortClass + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-            '<th class="sort-up" data-sort-order="desc">Time</th>' +
+            '<th data-sort-order="desc" class="sort-default">Time</th>' +
             '<th class="location">Location</th>' +
             '<th class="distance" data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
@@ -133,43 +149,66 @@ var SummaryPane = function (options) {
           '</tr>' +
           tableData +
         '</table>';
-
-      table += '<p class="note">' + note + '</p>';
     } else {
-      table = '<p>None.</p>';
+      html = '<p>None.</p>';
     }
+    if (utc) {
+      note += ' Using UTC when local time is not available.';
+    }
+    html += '<p class="note">' + note + '</p>';
 
-    return table;
+    return {
+      count: count,
+      html: html
+    };
   };
 
   /**
-   * Get eqs html for summary pane
+   * Get summary html for feature
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // summary data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
    *
    * @return summary {Html}
    */
-  _getSummary = function () {
-    var summary;
+  _getSummary = function (opts) {
+    var data,
+        id,
+        listTable,
+        summary;
 
-    if (_id === 'mainshock') {
-      summary = _mainshock.summary;
-    }
-    else {
-      if (_id === 'aftershocks') {
-        summary = '<div class="bins">';
-        summary += _getBinnedTable('First');
-        summary += _getBinnedTable('Past');
+    data = opts.data;
+    id = opts.id;
+
+    summary = '<h2>' + opts.name + '</h2>';
+    summary += data.detailsHtml;
+
+    if (id === 'aftershocks' || id === 'historical') {
+      if (id === 'aftershocks') {
+        summary += '<div class="bins">';
+        summary += _getBinnedTable(data.bins, 'First');
+        summary += _getBinnedTable(data.bins, 'Past');
         summary += '</div>';
-        summary += '<h3>Most Recent Aftershock</h3>';
-        summary += _getEqListTable(_lastAftershock);
+        if (data.lastId) {
+          summary += '<h3>Most Recent Aftershock</h3>';
+          summary += _getListTable({
+            lastAftershock: data.list[data.lastId]
+          }, false).html;
+        }
       }
-      else if (_id === 'historical') {
-        summary = _getBinnedTable('Prior');
+      if (id === 'historical') {
+        summary += _getBinnedTable(data.bins, 'Prior');
       }
 
-      summary += '<h3>M ' + Math.max(_threshold[_id],
-        AppUtil.getParam(_id + '-minmag')) + '+ Earthquakes (' + _eqList.length +
-        ')</h3>';
-      summary += _getEqListTable(_eqList);
+      listTable = _getListTable(data.list, data.magThreshold);
+      summary += '<h3>M ' + Math.max(data.magThreshold,
+        AppUtil.getParam(id + '-minmag')) + '+ Earthquakes (' +
+        listTable.count + ')</h3>';
+      summary += listTable.html;
     }
 
     return summary;
@@ -209,14 +248,13 @@ var SummaryPane = function (options) {
   /*
    * Make table sortable
    *
-   * @param id {String}
-   *     id value of container elem
+   * @param cssClass {String}
+   *     cssClass value of container elem
    */
-  _initTableSort = function (id) {
+  _initTableSort = function (cssClass) {
     var table,
         cleanNumber,
-        compareNumber,
-        cssClass;
+        compareNumber;
 
     // Add number sorting plugin to Tablesort
     // https://gist.github.com/tristen/e79963856608bf54e046
@@ -242,7 +280,6 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    cssClass = id;
     table = _el.querySelector('.' + cssClass + ' .sortable');
     if (table) {
       new Tablesort(table);
@@ -268,14 +305,14 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add summary text to summary pane (text plus <div> container)
+   * Add feature to summary pane (text plus <div> container)
    *   (called by Features.js)
    *
    * @param opts {Object}
    *   {
+   *     data: {Object}, // summary data
    *     id: {String}, // used for css class on container elem
-   *     name: {String}, // feature name
-   *     summary: {Html} // summary text
+   *     name: {String} // feature name
    *   }
    */
   _this.addSummary = function (opts) {
@@ -285,7 +322,7 @@ var SummaryPane = function (options) {
     cssClass = opts.id;
     div = document.createElement('div');
     div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.summary;
+    div.innerHTML = _getSummary(opts);
 
     _features.appendChild(div);
 
@@ -300,7 +337,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove summary text from summary pane (text plus <div> container)
+   * Remove feature from summary pane (including container)
    *   (called by Features.js)
    *
    * @param el {Element}
