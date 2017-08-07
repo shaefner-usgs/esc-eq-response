@@ -1,12 +1,13 @@
 'use strict';
 
 
-var Moment = require('moment'),
+var AppUtil = require('AppUtil'),
+    Moment = require('moment'),
     Tablesort = require('tablesort');
 
 
 /**
- * Adds / removes summary info from summary pane
+ * Creates, adds, and removes summary info from summary pane
  *
  * @param options {Object}
  *   {
@@ -22,6 +23,9 @@ var SummaryPane = function (options) {
       _tz,
 
       _addTimestamp,
+      _getBinnedTable,
+      _getListTable,
+      _getSummary,
       _getTimeZone,
       _initTableSort,
       _updateTimestamp;
@@ -48,6 +52,166 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
+  };
+
+  /**
+   * Get table containing binned earthquake data
+   *
+   * @param bins {Object}
+   *     earthquake data binned by mag/time
+   * @param period {String <First | Past | Prior>}
+   *
+   * @return html {Html}
+   */
+  _getBinnedTable = function (bins, period) {
+    var html,
+        total;
+
+    html = '';
+    if (bins[period] && bins[period].length > 0) {
+      html = '<table class="bin">' +
+        '<tr>' +
+          '<th class="period">' + period + ':</th>' +
+          '<th>Day</th>' +
+          '<th>Week</th>' +
+          '<th>Month</th>' +
+          '<th>Year</th>' +
+          '<th class="total">Total</th>' +
+        '</tr>';
+      bins[period].forEach(function(cols, mag) {
+        html += '<tr><td class="rowlabel">M ' + mag + '</td>';
+        cols.forEach(function(col, i) {
+          if (i === 0) { // store total
+            total = '<td class="total">' + col + '</td>';
+          } else {
+            html += '<td>' + col + '</td>';
+          }
+        });
+        html += total + '</tr>'; // add total to table as last column
+      });
+      html += '</table>';
+    }
+
+    return html;
+  };
+
+  /**
+   * Get table containing a list of earthquakes above mag threshold
+   *
+   * @param rows {Object}
+   *     tr html for each earthquake in list keyed by eqid
+   * @param magThreshold {Number}
+   *
+   * @return {Object}
+   */
+  _getListTable = function (rows, magThreshold) {
+    var count,
+        html,
+        length,
+        mag,
+        note,
+        row,
+        sortClass,
+        tableData,
+        utc;
+
+    count = 0;
+    length = Object.keys(rows).length;
+    note = '<span class="star">* = local time at epicenter.</span>';
+    sortClass = 'non-sortable';
+    tableData = '';
+    utc = false;
+
+    if (rows && length > 0) {
+      Object.keys(rows).forEach(function(key) {
+        row = rows[key];
+        mag = /tr\s+class="m(\d+)"/.exec(row);
+        if (!magThreshold || mag[1] >= magThreshold) {
+          count ++;
+          tableData += row;
+          if (row.match(/UTC/)) {
+            utc = true;
+          }
+        }
+      });
+      if (length > 1) {
+        sortClass = 'sortable';
+      }
+      html = '<table class="' + sortClass + '">' +
+          '<tr class="no-sort">' +
+            '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
+            '<th data-sort-order="desc" class="sort-default">Time</th>' +
+            '<th class="location">Location</th>' +
+            '<th class="distance" data-sort-method="number">' +
+              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+            '</th>' +
+            '<th data-sort-method="number">Depth</th>' +
+          '</tr>' +
+          tableData +
+        '</table>';
+    } else {
+      html = '<p>None.</p>';
+    }
+    if (utc) {
+      note += ' Using UTC when local time is not available.';
+    }
+    html += '<p class="note">' + note + '</p>';
+
+    return {
+      count: count,
+      html: html
+    };
+  };
+
+  /**
+   * Get summary html for feature
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // summary data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
+   *
+   * @return summary {Html}
+   */
+  _getSummary = function (opts) {
+    var data,
+        id,
+        listTable,
+        summary;
+
+    data = opts.data;
+    id = opts.id;
+
+    summary = '<h2>' + opts.name + '</h2>';
+    summary += data.detailsHtml;
+
+    if (id === 'aftershocks' || id === 'historical') {
+      if (id === 'aftershocks') {
+        summary += '<div class="bins">';
+        summary += _getBinnedTable(data.bins, 'First');
+        summary += _getBinnedTable(data.bins, 'Past');
+        summary += '</div>';
+        if (data.lastId) {
+          summary += '<h3>Most Recent Aftershock</h3>';
+          summary += _getListTable({
+            lastAftershock: data.list[data.lastId]
+          }, false).html;
+        }
+      }
+      if (id === 'historical') {
+        summary += _getBinnedTable(data.bins, 'Prior');
+      }
+
+      listTable = _getListTable(data.list, data.magThreshold);
+      summary += '<h3>M ' + Math.max(data.magThreshold,
+        AppUtil.getParam(id + '-minmag')) + '+ Earthquakes (' +
+        listTable.count + ')</h3>';
+      summary += listTable.html;
+    }
+
+    return summary;
   };
 
   /**
@@ -84,14 +248,13 @@ var SummaryPane = function (options) {
   /*
    * Make table sortable
    *
-   * @param id {String}
-   *     id value of container elem
+   * @param cssClass {String}
+   *     cssClass value of container elem
    */
-  _initTableSort = function (id) {
+  _initTableSort = function (cssClass) {
     var table,
         cleanNumber,
-        compareNumber,
-        cssClass;
+        compareNumber;
 
     // Add number sorting plugin to Tablesort
     // https://gist.github.com/tristen/e79963856608bf54e046
@@ -117,7 +280,6 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    cssClass = id;
     table = _el.querySelector('.' + cssClass + ' .sortable');
     if (table) {
       new Tablesort(table);
@@ -143,14 +305,14 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add summary text to summary pane (text plus <div> container)
+   * Add feature to summary pane (text plus <div> container)
    *   (called by Features.js)
    *
    * @param opts {Object}
    *   {
+   *     data: {Object}, // summary data
    *     id: {String}, // used for css class on container elem
-   *     name: {String}, // feature name
-   *     summary: {Html} // summary text
+   *     name: {String} // feature name
    *   }
    */
   _this.addSummary = function (opts) {
@@ -160,7 +322,7 @@ var SummaryPane = function (options) {
     cssClass = opts.id;
     div = document.createElement('div');
     div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.summary;
+    div.innerHTML = _getSummary(opts);
 
     _features.appendChild(div);
 
@@ -175,7 +337,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove summary text from summary pane (text plus <div> container)
+   * Remove feature from summary pane (including container)
    *   (called by Features.js)
    *
    * @param el {Element}

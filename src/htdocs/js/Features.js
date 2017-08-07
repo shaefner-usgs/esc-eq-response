@@ -11,16 +11,17 @@ var Aftershocks = require('features/Aftershocks'),
 
 
 /**
- * Retrieves and adds 'features' to map, plots, summary panes
+ * Retrieves and adds 'features' to map, plot, and summary panes
  *
- * Features are event-specific layers added dynamically to the map, plots
- * and summary panes, based on the mainshock Event ID entered by user.
+ * Features are event-specific layers added dynamically, based on the mainshock
+ * Event ID entered by user
  *
- * Feature data comes from GeoJson web services hosted on earthquake.usgs.gov
+ * Feature data comes from GeoJson web services on earthquake.usgs.gov
  *
  * @param options {Object}
  *   {
  *     mapPane: {Object}, // MapPane instance
+ *     plotsPane: {Object}, // PlotsPane instance
  *     statusBar: {Object}, // StatusBar instance
  *     summaryPane: {Object} // SummaryPane instance
  *   }
@@ -42,9 +43,9 @@ var Features = function (options) {
       _StatusBar,
       _SummaryPane,
 
+      _add3dPlot,
       _addFeature,
       _addMapLayer,
-      _add3dPlot,
       _addSummary,
       _getAftershocks,
       _getEqFeedUrl,
@@ -64,6 +65,19 @@ var Features = function (options) {
     _PlotsPane = options.plotsPane;
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
+  };
+
+  /**
+   * Add feature to plots pane
+   *
+   * @param feature {Object}
+   */
+  _add3dPlot = function (feature) {
+    _PlotsPane.add3dPlot({
+      id: feature.id,
+      name: feature.name,
+      data: _plotdata
+    });
   };
 
   /**
@@ -88,7 +102,11 @@ var Features = function (options) {
 
     try {
       // Create feature (and store it in _features for access later)
-      feature = opts.jsClass(opts);
+      feature = opts.jsClass({
+        json: opts.json,
+        mainshockJson: opts.mainshockJson,
+        name: name
+      });
       id = feature.id;
       _features[id] = feature;
 
@@ -98,7 +116,8 @@ var Features = function (options) {
 
       if (id === 'mainshock') {
         // Show mainshock details on editPane
-        _editPane.addMainshock(feature.getSummary(), opts.mainshockJson.properties);
+        _editPane.addMainshock(feature.getSummaryData().detailsHtml,
+          opts.mainshockJson.properties);
 
         // Store mainshock's plotdata for 3d plot of aftershocks
         _plotdata[id] = feature.getPlotData();
@@ -107,7 +126,6 @@ var Features = function (options) {
       // Add 3d aftershocks plot to plots pane
       if (id === 'aftershocks') {
         _plotdata[id] = feature.getPlotData();
-        feature.data = _plotdata;
 
         _add3dPlot(feature);
       }
@@ -167,25 +185,16 @@ var Features = function (options) {
   };
 
   /**
-   * Add feature to plots pane
-   *
-   * @param feature {Object}
-   */
-  _add3dPlot = function (feature) {
-    _PlotsPane.add3dPlot(feature);
-  };
-
-  /**
    * Add feature to summary pane
    *
    * @param feature {Object}
    */
   _addSummary = function (feature) {
-    if (feature.getSummary) {
+    if (feature.getSummaryData) { // check 1st if feature has summary to add
       _SummaryPane.addSummary({
         id: feature.id,
         name: feature.name,
-        summary: feature.getSummary()
+        data: feature.getSummaryData()
       });
     }
   };
@@ -398,7 +407,8 @@ var Features = function (options) {
 
   /**
    * Initialize features and begin process of adding new features
-   *   called each time a new Event ID is entered by user
+   *
+   * Called each time a new Event ID is entered by user
    *
    * @param opts {Object}
    *   {
@@ -417,14 +427,16 @@ var Features = function (options) {
       // 2. Create mainshock feature
       _getMainshock();
     } else {
-      // 3. Create additional features (called recursively via mainshock's callback)
+      // 3. Create other features (called 'recursively' via mainshock's callback)
       _getAftershocks();
       _getHistorical();
     }
   };
 
   /**
-   * Refresh earthquakes feature layer when user tweaks form field params
+   * Refresh earthquakes feature layer when user tweaks form fields on edit pane
+   *
+   * @param id {String}
    */
   _this.refresh = function (id) {
     _removeFeature(id);

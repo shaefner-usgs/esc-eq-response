@@ -1,17 +1,25 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes'),
-    Moment = require('moment');
+var Earthquakes = require('features/Earthquakes');
 
 
+/**
+ * Creates Aftershocks feature
+ *
+ * @param options {Object}
+ *   {
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     name: {String} // layer name
+ *   }
+ */
 var Aftershocks = function (options) {
   var _this,
       _initialize,
 
       _earthquakes,
-      _mainshockJson,
+      _magThreshold,
 
       _getName;
 
@@ -22,10 +30,13 @@ var Aftershocks = function (options) {
     var id = 'aftershocks';
 
     options = options || {};
-    options.id = id;
 
-    _earthquakes = Earthquakes(options);
-    _mainshockJson = options.mainshockJson;
+    _earthquakes = Earthquakes({
+      id: id,
+      json: options.json,
+      mainshockJson: options.mainshockJson
+    });
+    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 2.5);
 
     _this.id = id;
     _this.name = _getName();
@@ -54,7 +65,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get plot data of feature
+   * Get feature's data for plots pane
    *
    * @return {Object}
    */
@@ -63,29 +74,18 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get summary of feature
+   * Get feature's data for summary pane
    *
-   * @return summary {Html}
+   * @return {Object}
    */
-  _this.getSummary = function () {
-    var description,
-        duration,
-        mainshockMoment,
-        summary;
-
-    mainshockMoment = Moment.utc(_mainshockJson.properties.time, 'x');
-    duration = AppUtil.round(Moment.duration(Moment.utc() - mainshockMoment)
-      .asDays(), 1);
-
-    description = '<p><strong>M ' + AppUtil.getParam(_this.id + '-minmag') +
-      '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_this.id +
-      '-dist') + ' km</strong> of mainshock epicenter. The duration of the ' +
-      'aftershock sequence is <strong>' + duration + ' days</strong>.</p>';
-
-    // Earthquake data is stored in Earthquakes instance (where it was parsed)
-    summary = _earthquakes.getSummary();
-
-    return description + summary;
+  _this.getSummaryData = function () {
+    return {
+      bins: _earthquakes.getBinnedData(),
+      detailsHtml: _earthquakes.getDetails(),
+      lastId: _earthquakes.getLastId(),
+      list : _earthquakes.getList(),
+      magThreshold: _magThreshold
+    };
   };
 
 

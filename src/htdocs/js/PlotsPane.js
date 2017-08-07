@@ -3,7 +3,7 @@
 
 
 /**
- * Adds / removes plot from plots pane
+ * Creates, adds, and removes plot from plots pane
  *
  * @param options {Object}
  *   {
@@ -32,7 +32,7 @@ var PlotsPane = function (options) {
     _features = _el.querySelector('.features');
     _plots = [];
 
-    // Make plots responsive
+    // Make plot(s) responsive
     window.onresize = function() {
       _this.resizePlots();
     };
@@ -108,9 +108,9 @@ var PlotsPane = function (options) {
    * Get plot trace config for plotly.js
    *
    * @param data {Object}
-   *     eq data
+   *     earthquake data
    * @param name {String}
-   *     Name of trace
+   *     name of trace
    *
    * @return {Object}
    */
@@ -147,7 +147,7 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add 3d plot to plot pane (plot plus <div> container)
+   * Add feature (3d plot) to plot pane (plot plus <div> container)
    *   (called by Features.js)
    *
    * @param opts {Object}
@@ -176,7 +176,7 @@ var PlotsPane = function (options) {
     plot = div.querySelector('.plot');
     _plots.push(plot); // store plot in closure
 
-    // Get data trace(s) for plot and store in data
+    // Get trace(s) for plot and store in data (mainshock is in a separate trace)
     data = [];
     Object.keys(opts.data).forEach(function(key) {
       trace = _getTrace(opts.data[key], key);
@@ -192,7 +192,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Remove plot from plot pane (plot plus <div> container)
+   * Remove feature from plot pane (including container)
    *   (called by Features.js)
    *
    * @param el {Element}
@@ -205,7 +205,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Resize plots: useful to set initial size and responsive-fluid-layout size
+   * Resize plots: Sets initial size and adds responsive / fluid sizing
    */
   _this.resizePlots = function () {
     _plots.forEach(function(plot) {

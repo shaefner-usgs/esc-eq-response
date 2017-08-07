@@ -1,15 +1,25 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/Earthquakes');
 
 
+/**
+ * Creates Historical Seismicity feature
+ *
+ * @param options {Object}
+ *   {
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     name: {String} // layer name
+ *   }
+ */
 var Historical = function (options) {
   var _this,
       _initialize,
 
       _earthquakes,
+      _magThreshold,
 
       _getName;
 
@@ -20,9 +30,13 @@ var Historical = function (options) {
     var id = 'historical';
 
     options = options || {};
-    options.id = id;
 
-    _earthquakes = Earthquakes(options);
+    _earthquakes = Earthquakes({
+      id: id,
+      json: options.json,
+      mainshockJson: options.mainshockJson
+    });
+    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
 
     _this.id = id;
     _this.name = _getName();
@@ -51,23 +65,17 @@ var Historical = function (options) {
   };
 
   /**
-   * Get summary of feature
+   * Get feature's data for summary pane
    *
-   * @return summary {Html}
+   * @return {Object}}
    */
-  _this.getSummary = function () {
-    var description,
-        summary;
-
-    description = '<p><strong>M ' + AppUtil.getParam(_this.id + '-minmag') +
-      '+ </strong> earthquakes <strong> within ' + AppUtil.getParam(_this.id +
-      '-dist') + ' km</strong> of mainshock epicenter in the <strong>prior ' +
-      AppUtil.getParam('historical-years') + ' years</strong>.</p>';
-
-    // Earthquake data is stored in Earthquakes instance (where it was parsed)
-    summary = _earthquakes.getSummary();
-
-    return description + summary;
+  _this.getSummaryData = function () {
+    return {
+      bins: _earthquakes.getBinnedData(),
+      detailsHtml: _earthquakes.getDetails(),
+      list: _earthquakes.getList(),
+      magThreshold: _magThreshold
+    };
   };
 
 
