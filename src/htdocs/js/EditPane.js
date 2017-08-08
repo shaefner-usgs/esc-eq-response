@@ -47,7 +47,8 @@ var EditPane = function (options) {
       _selSignificantEq,
       _setFormFields,
       _setQueryString,
-      _updateParam;
+      _updateParam,
+      _viewMap;
 
 
   _this = {};
@@ -169,8 +170,10 @@ var EditPane = function (options) {
   _getFeatures = function () {
     _resetApp(); // first reset app to default state
 
-    // Pass editPane instance so we can call its public methods from xhr callback in Features
     if (_isValidEqId()) {
+      _el.querySelector('.viewmap').removeAttribute('disabled');
+
+      // Pass editPane instance to expose its public methods to xhr callback in Features
       _Features.getFeatures({
         editPane: _this
       });
@@ -185,11 +188,13 @@ var EditPane = function (options) {
   _initListeners = function () {
     var aftershocks,
         historical,
-        reset;
+        reset,
+        viewmap;
 
     aftershocks = _el.querySelectorAll('.aftershocks');
     historical = _el.querySelectorAll('.historical');
     reset = _el.querySelector('.reset');
+    viewmap = _el.querySelector('.viewmap');
 
     // Update querystring param when form field is changed
     _addListener(_fields, 'input', _updateParam);
@@ -203,6 +208,9 @@ var EditPane = function (options) {
 
     // Clear features when reset button pressed
     _addListener([reset], 'click', _resetForm);
+
+    // Switch to mapPane when 'View Map' button is clicked
+    _addListener([viewmap], 'click', _viewMap);
   };
 
   /**
@@ -264,6 +272,8 @@ var EditPane = function (options) {
    * Reset app: clear mainshock details, features, status bar, etc.
    */
   _resetApp = function () {
+    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
+
     _removeMainshock();
     _StatusBar.clearAll();
     _Features.removeFeatures();
@@ -340,6 +350,15 @@ var EditPane = function (options) {
     el.value = value;
 
     AppUtil.setParam(id, value);
+  };
+
+  /**
+   * Switch to map pane (triggered when 'View map' button clicked)
+   */
+  _viewMap = function () {
+    if (!_el.querySelector('.viewmap').hasAttribute('disabled')) {
+      location.hash = '#mapPane';
+    }
   };
 
   // ----------------------------------------------------------
