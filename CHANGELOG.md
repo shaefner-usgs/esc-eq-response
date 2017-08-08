@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Switch to using UTC time by default (only show localtime on map popups, ms details)
 * Handle case of no eqs/no eqs above threshold more elegantly on summary pane
 * Add view map button on edit pane; change reset link to a button
 * Change order of input fields (show mag first) on edit pane

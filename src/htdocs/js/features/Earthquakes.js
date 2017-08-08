@@ -309,7 +309,7 @@ var Earthquakes = function (options) {
     else if (type === 'tablerow') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
-        '<td class="time" data-sort="{isoTime}">{localTime}</td>' + // set to UTC if no localTime
+        '<td class="time" data-sort="{isoTime}">{utcTime}</td>' +
         '<td class="location">{latlng}</td>' +
         '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="depth" data-sort="{depth}">{depth} km</td>' +
@@ -360,18 +360,15 @@ var Earthquakes = function (options) {
     eqMoment = Moment.utc(props.time, 'x');
     mag = AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
-    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + '<span class="tz"> UTC</span>';
 
-    // Calculate local time if tz prop included in feed; otherwise use UTC
-    timeTemplate = ''; // Time field for leaflet popup
-    if (props.tz) {
+    // Time field for leaflet popup, etc.
+    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
+    timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
+    if (props.tz) { // calculate local time if tz prop included in feed
       localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
-        '<span class="star">*</span><span class="tz"> at epicenter</span>';
-      timeTemplate += '<time class="localtime" datetime="{isoTime}">{localTime}</time>';
-    } else {
-      localTime = utcTime;
+        ' <span class="tz">at epicenter</span>';
+      timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
     }
-    timeTemplate += '<time datetime="{isoTime}">{utcTime}</time>';
 
     data = {
       alert: props.alert, // PAGER
@@ -412,7 +409,7 @@ var Earthquakes = function (options) {
     _lastId = eqid;
 
     // Add text prop to _plotdata (other props are added in _pointToLayer)
-    text = props.title + '<br />' + localTime;
+    text = props.title + '<br />' + utcTime;
     _plotdata.text.push(text);
 
     // Add eq to list for summary

@@ -109,18 +109,14 @@ var SummaryPane = function (options) {
         html,
         length,
         mag,
-        note,
         row,
         sortClass,
-        tableData,
-        utc;
+        tableData;
 
     count = 0;
     length = Object.keys(rows).length;
-    note = '<span class="star">* = local time at epicenter.</span>';
     sortClass = 'non-sortable';
     tableData = '';
-    utc = false;
 
     if (length > 0) {
       Object.keys(rows).forEach(function(key) {
@@ -129,9 +125,6 @@ var SummaryPane = function (options) {
         if (!magThreshold || mag[1] >= magThreshold) {
           count ++;
           tableData += row;
-          if (row.match(/UTC/)) {
-            utc = true;
-          }
         }
       });
       if (count > 1) {
@@ -140,7 +133,7 @@ var SummaryPane = function (options) {
       html = '<table class="' + sortClass + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-            '<th data-sort-order="desc" class="sort-default">Time</th>' +
+            '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
             '<th class="location">Location</th>' +
             '<th class="distance" data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
@@ -153,10 +146,6 @@ var SummaryPane = function (options) {
     if (count === 0) {
       html = '<p>None.</p>';
     }
-    if (utc) {
-      note += ' Using UTC when local time is not available.';
-    }
-    html += '<p class="note">' + note + '</p>';
 
     return {
       count: count,

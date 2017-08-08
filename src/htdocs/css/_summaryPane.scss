@@ -18,7 +18,7 @@
   }
 
   td {
-    padding: .4em .5em;
+    padding: .4em 1em;
 
     &.depth,
     &.distance,
@@ -112,6 +112,8 @@
 
   .bin {
     td {
+      padding: .4em .5em;
+      
       &:not(:first-child) {
         text-align: right;
       }
@@ -175,30 +177,12 @@
       background-color: #fafafa;
     }
   }
-
-  .note {
-    color: #666;
-    font-size: .9rem;
-    line-height: 1.4;
-    margin: -.75rem 0 0 3px;
-  }
-
-  .star {
-    display: none;
-  }
 }
 
 @media only screen
 and (max-width: $breakpoint-phone-width) {
   #summaryPane {
     .location {
-      display: none;
-    }
-    .star {
-      display: inline-block;
-      margin-left: 2px;
-    }
-    .tz {
       display: none;
     }
   }
