@@ -169,7 +169,8 @@ var PlotsPane = function (options) {
     cssClass = opts.id;
     div = document.createElement('div');
     div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = '<h2>' + opts.name + '</h2><div class="plot"></div>';
+    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[opts.id].detailsHtml +
+      '<div class="plot"></div>';
 
     _features.appendChild(div);
 
@@ -179,11 +180,11 @@ var PlotsPane = function (options) {
     // Get trace(s) for plot and store in data (mainshock is in a separate trace)
     data = [];
     Object.keys(opts.data).forEach(function(key) {
-      trace = _getTrace(opts.data[key], key);
+      trace = _getTrace(opts.data[key].plotdata, key);
       data.push(trace);
     });
 
-    zRatio = _getRatio(opts.data[opts.id]);
+    zRatio = _getRatio(opts.data[opts.id].plotdata);
     layout = _getLayout(zRatio);
 
     Plotly.plot(plot, data, layout, {

@@ -57,7 +57,9 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _this.getPlotData = function () {
-    return _earthquakes.getPlotData();
+    return {
+      plotdata: _earthquakes.getPlotData()
+    };
   };
 
   /**

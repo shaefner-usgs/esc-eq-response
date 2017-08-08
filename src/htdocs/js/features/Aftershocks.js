@@ -70,7 +70,10 @@ var Aftershocks = function (options) {
    * @return {Object}
    */
   _this.getPlotData = function () {
-    return _earthquakes.getPlotData();
+    return {
+      detailsHtml: _earthquakes.getDetails(),
+      plotdata: _earthquakes.getPlotData()
+    };
   };
 
   /**
