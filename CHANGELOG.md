@@ -5,10 +5,12 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Handle case of no eqs/no eqs above threshold more elegantly on summary pane
+* Add view map button on edit pane; change reset link to a button
 * Change order of input fields (show mag first) on edit pane
+* Add 3d aftershocks plot
 * Refactor: better separation of concerns, more readable code
 * Add impact bubbles / link to mainshock details on edit pane
-* Add 3d aftershocks plot
 * Bug fix: calculate magInt based on rounded mag so data in tables is accurate
 * Bug fix: only show utc note when filtered quakes contain utc time
 * Darken stroke width so eqs stand out more
