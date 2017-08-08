@@ -54,6 +54,12 @@ h4 {
   font-weight: normal;
 }
 
+p.description {
+  > strong {
+    font-weight: 500;
+  }
+}
+
 section.hide {
   display: none;
 }

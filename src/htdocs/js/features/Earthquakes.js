@@ -238,10 +238,10 @@ var Earthquakes = function (options) {
     var description,
         duration;
 
-    description = '<p><strong>M ' + AppUtil.getParam(_id + '-minmag') +
-      '+ </strong> earthquakes <strong> within ' +
-      AppUtil.getParam(_id + '-dist') + ' km</strong> of mainshock ' +
-      'epicenter';
+    description = '<p class="description"><strong>M ' +
+      AppUtil.getParam(_id + '-minmag') + '+ </strong> earthquakes <strong> ' +
+      'within ' + AppUtil.getParam(_id + '-dist') + ' km</strong> of the ' +
+      'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
       duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
