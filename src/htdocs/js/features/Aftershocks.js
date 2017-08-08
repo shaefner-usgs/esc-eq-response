@@ -83,7 +83,7 @@ var Aftershocks = function (options) {
       bins: _earthquakes.getBinnedData(),
       detailsHtml: _earthquakes.getDetails(),
       lastId: _earthquakes.getLastId(),
-      list : _earthquakes.getList(),
+      list: _earthquakes.getList(),
       magThreshold: _magThreshold
     };
   };
