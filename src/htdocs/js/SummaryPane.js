@@ -122,7 +122,7 @@ var SummaryPane = function (options) {
     tableData = '';
     utc = false;
 
-    if (rows && length > 0) {
+    if (length > 0) {
       Object.keys(rows).forEach(function(key) {
         row = rows[key];
         mag = /tr\s+class="m(\d+)"/.exec(row);
@@ -134,7 +134,7 @@ var SummaryPane = function (options) {
           }
         }
       });
-      if (length > 1) {
+      if (count > 1) {
         sortClass = 'sortable';
       }
       html = '<table class="' + sortClass + '">' +
@@ -149,7 +149,8 @@ var SummaryPane = function (options) {
           '</tr>' +
           tableData +
         '</table>';
-    } else {
+    }
+    if (count === 0) {
       html = '<p>None.</p>';
     }
     if (utc) {
@@ -179,6 +180,7 @@ var SummaryPane = function (options) {
     var data,
         id,
         listTable,
+        subheader,
         summary;
 
     data = opts.data;
@@ -205,9 +207,12 @@ var SummaryPane = function (options) {
       }
 
       listTable = _getListTable(data.list, data.magThreshold);
-      summary += '<h3>M ' + Math.max(data.magThreshold,
-        AppUtil.getParam(id + '-minmag')) + '+ Earthquakes (' +
-        listTable.count + ')</h3>';
+      subheader = 'M ' + Math.max(data.magThreshold,
+        AppUtil.getParam(id + '-minmag')) + '+ Earthquakes';
+      if (listTable.count !== 0) {
+        subheader += ' (' + listTable.count + ')';
+      }
+      summary += '<h3>' + subheader + '</h3>';
       summary += listTable.html;
     }
 
