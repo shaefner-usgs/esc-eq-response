@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Remember user's scroll position when switching between panes
+* Bug fix: set all default values properly when selecting a new event
 * Switch to using UTC time by default (only show localtime on map popups, ms details)
 * Handle case of no eqs/no eqs above threshold more elegantly on summary pane
 * Add view map button on edit pane; change reset link to a button
