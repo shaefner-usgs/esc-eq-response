@@ -21,10 +21,12 @@ var NavBar = function (options) {
       _MapPane,
       _PlotsPane,
 
-      _addListener,
+      _addListeners,
       _changePane,
       _getPaneId,
       _hidePanes,
+      _saveScrollPosition,
+      _setScrollPosition,
       _showPane;
 
 
@@ -42,21 +44,27 @@ var NavBar = function (options) {
     _PlotsPane = options.plotsPane;
 
     id = _getPaneId();
-    _addListener();
     _changePane(id);
+
+    _addListeners();
   };
 
   /**
    * Add event listener for changing panes
    */
-  _addListener = function () {
+  _addListeners = function () {
     var id;
 
+    // Save current scroll postion when user scrolls
+    window.addEventListener('scroll', function() {
+      _saveScrollPosition();
+    });
+
     // Update UI when user changes pane
-    window.onhashchange = function () {
+    window.addEventListener('hashchange', function () {
       id = _getPaneId();
       _changePane(id);
-    };
+    });
   };
 
   /**
@@ -95,16 +103,45 @@ var NavBar = function (options) {
    */
   _hidePanes = function () {
     var button,
+        i,
         id,
         pane;
 
-    for (var i = 0; i < _panes.length; i ++) {
+    for (i = 0; i < _panes.length; i ++) {
       id = _panes[i].hash.substr(1);
       button = _el.querySelector('[href="#' + id + '"]');
       pane = document.getElementById(id);
 
       button.classList.remove('selected');
       pane.classList.add('hide');
+    }
+  };
+
+  /**
+   * Save user's current scroll position in session storage
+   */
+  _saveScrollPosition = function () {
+    var id,
+        position;
+
+    id = _getPaneId();
+    position = document.body.scrollTop;
+
+    window.sessionStorage.setItem(id, position);
+  };
+
+  /**
+   * Get user's former scroll position from session storage
+   */
+  _setScrollPosition = function () {
+    var id,
+        position;
+
+    id = _getPaneId();
+    position = window.sessionStorage.getItem(id);
+
+    if (position) {
+      document.body.scrollTop = position;
     }
   };
 
@@ -123,11 +160,31 @@ var NavBar = function (options) {
     button.classList.add('selected');
     pane.classList.remove('hide');
 
+    // Scroll to user's former position
+    _setScrollPosition();
+
     // Update map container / plots so they display correctly when unhidden
     if (id === 'mapPane') {
       _MapPane.map.invalidateSize();
     } else if (id === 'plotsPane') {
       _PlotsPane.resizePlots();
+    }
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Clear saved scroll positions from session storage
+   */
+  _this.clearScrollPositions = function () {
+    var i,
+        id;
+
+    for (i = 0; i < _panes.length; i ++) {
+      id = _panes[i].hash.substr(1);
+      window.sessionStorage.removeItem(id);
     }
   };
 

@@ -71,6 +71,7 @@ var Application = function (options) {
       el: options.editPane,
       features: _Features,
       mapPane: _MapPane,
+      navBar: _NavBar,
       statusBar: _StatusBar,
       summaryPane: _SummaryPane
     });

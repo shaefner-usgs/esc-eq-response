@@ -14,6 +14,7 @@ var AppUtil = require('AppUtil'),
  *     el: {Element},
  *     features: {Object}, // Features instance
  *     mapPane: {Object}, // MapPane instance
+ *     navBar: {Object}, // NavBar instance
  *     statusBar: {Object}, // StatusBar instance
  *     summaryPane: {Object} // SummaryPane instance
  *   }
@@ -30,6 +31,7 @@ var EditPane = function (options) {
 
       _Features,
       _MapPane,
+      _NavBar,
       _StatusBar,
       _SummaryPane,
 
@@ -58,6 +60,7 @@ var EditPane = function (options) {
 
     _Features = options.features;
     _MapPane = options.mapPane;
+    _NavBar = options.navBar;
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
 
@@ -279,6 +282,7 @@ var EditPane = function (options) {
     _Features.removeFeatures();
     _MapPane.setDefaultView();
     _SummaryPane.resetTimeStamp();
+    _NavBar.clearScrollPositions();
   };
 
   /**
