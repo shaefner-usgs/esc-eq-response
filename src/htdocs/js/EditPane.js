@@ -391,14 +391,16 @@ var EditPane = function (options) {
    *     GeoJson data
    */
   _this.setDefaults = function (mainshockJson) {
-    var defaults;
+    var defaults,
+        isNewEvent;
 
     defaults = _getDefaults(mainshockJson);
+    isNewEvent = _isNewEvent();
 
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (AppUtil.getParam(key) === '' || _isNewEvent()) {
+      if (AppUtil.getParam(key) === '' || isNewEvent) {
         AppUtil.setParam(key, defaults[key]);
       }
     });
