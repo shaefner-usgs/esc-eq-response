@@ -20,6 +20,10 @@
   td {
     padding: .4em 1em;
 
+    .tz {
+      display: none;
+    }
+
     &.depth,
     &.distance,
     &.mag {
@@ -113,7 +117,7 @@
   .bin {
     td {
       padding: .4em .5em;
-      
+
       &:not(:first-child) {
         text-align: right;
       }
