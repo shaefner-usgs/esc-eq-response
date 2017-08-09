@@ -132,12 +132,12 @@ var NavBar = function (options) {
 
   /**
    * Get user's former scroll position from session storage
+   *
+   * @param id {String}
    */
-  _setScrollPosition = function () {
-    var id,
-        position;
+  _setScrollPosition = function (id) {
+    var position;
 
-    id = _getPaneId();
     position = window.sessionStorage.getItem(id);
 
     if (position) {
@@ -161,7 +161,7 @@ var NavBar = function (options) {
     pane.classList.remove('hide');
 
     // Scroll to user's former position
-    _setScrollPosition();
+    _setScrollPosition(id);
 
     // Update map container / plots so they display correctly when unhidden
     if (id === 'mapPane') {
