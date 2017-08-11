@@ -15,7 +15,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *
  * @return {L.TileLayer}
  */
-var SatelliteLayer = function (provider, options) {
+L.SatelliteLayer = function (provider, options) {
   var _base,
       _places,
       _placesUrl,
@@ -60,6 +60,8 @@ var SatelliteLayer = function (provider, options) {
 };
 
 
-L.satelliteLayer = SatelliteLayer;
+L.satelliteLayer = function () {
+  return new L.SatelliteLayer();
+};
 
-module.exports = SatelliteLayer;
+module.exports = L.SatelliteLayer;

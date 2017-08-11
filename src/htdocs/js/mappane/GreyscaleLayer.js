@@ -15,7 +15,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *
  * @return {L.TileLayer}
  */
-var GreyscaleLayer = function (provider, options) {
+L.GreyscaleLayer = function (provider, options) {
   var _base,
       _providers,
       _ref,
@@ -64,6 +64,8 @@ var GreyscaleLayer = function (provider, options) {
 };
 
 
-L.greyscaleLayer = GreyscaleLayer;
+L.greyscaleLayer = function () {
+  return new L.GreyscaleLayer();
+};
 
-module.exports = GreyscaleLayer;
+module.exports = L.GreyscaleLayer;

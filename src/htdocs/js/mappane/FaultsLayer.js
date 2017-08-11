@@ -10,7 +10,7 @@ require('mappane/MouseOverLayer');
  *
  * @return {L.LayerGroup}
  */
-var FaultsLayer = function () {
+L.FaultsLayer = function () {
   var _faults,
       _plates,
       _urlPrefix;
@@ -37,6 +37,8 @@ var FaultsLayer = function () {
 };
 
 
-L.faultsLayer = FaultsLayer;
+L.faultsLayer = function () {
+  return new L.FaultsLayer();
+};
 
-module.exports = FaultsLayer;
+module.exports = L.FaultsLayer;

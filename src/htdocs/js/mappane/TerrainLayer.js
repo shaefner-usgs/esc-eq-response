@@ -13,7 +13,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *
  * @return {L.TileLayer}
  */
-var TerrainLayer = function (options) {
+L.TerrainLayer = function (options) {
   options = Util.extend({
     attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, ' +
       'Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance ' +
@@ -28,6 +28,8 @@ var TerrainLayer = function (options) {
 };
 
 
-L.terrainLayer = TerrainLayer;
+L.terrainLayer = function () {
+  return new L.TerrainLayer();
+};
 
-module.exports = TerrainLayer;
+module.exports = L.TerrainLayer;

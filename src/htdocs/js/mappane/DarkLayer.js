@@ -15,7 +15,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *
  * @return {L.TileLayer}
  */
-var DarkLayer = function (provider, options) {
+L.DarkLayer = function (provider, options) {
   var _base,
       _providers,
       _ref,
@@ -56,6 +56,8 @@ var DarkLayer = function (provider, options) {
 };
 
 
-L.darkLayer = DarkLayer;
+L.darkLayer = function () {
+  return new L.DarkLayer();
+};
 
-module.exports = DarkLayer;
+module.exports = L.DarkLayer;
