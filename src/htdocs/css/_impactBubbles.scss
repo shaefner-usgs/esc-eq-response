@@ -1,3 +1,5 @@
+$hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
+
 .impact-bubbles {
   display: flex;
   margin: 1em 0;
@@ -9,7 +11,7 @@
     display: block;
     letter-spacing: .03em;
     line-height: 1em;
-    max-width: 8em;
+    max-width: 6em;
     overflow: hidden;
     padding: 6px 0;
     text-align: center;
@@ -28,8 +30,11 @@
       white-space: nowrap;
     }
 
+    &:active {
+      color: #000;
+    }
     &:hover {
-      background-image: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
+      background-image: $hover;
     }
 
     + a {
@@ -38,13 +43,27 @@
   }
 
   > .tsunami {
-    height: 43px;
     padding: 0;
+    position: relative;
+
+    > img, span {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
 
     > img {
-      height: 100%;
-      max-width: none;
-      width: 100%;
+      z-index: 1;
+    }
+
+    > span {
+      z-index: 10;
+
+      &:hover {
+        background-image: $hover;
+      }
     }
   }
 }
