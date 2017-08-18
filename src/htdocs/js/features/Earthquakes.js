@@ -221,7 +221,7 @@ var Earthquakes = function (options) {
     }
     if (data.tsunami) {
       bubblesTemplate += '<a href="http://www.tsunami.gov/" class="tsunami"' +
-      ' title="Tsunami Warning Center"><img src="/img/tsunami.jpg"' +
+      ' title="Tsunami Warning Center"><img src="/img/tsunami.png"' +
       ' alt="Tsunami Warning Center"></a>';
     }
     bubbles = L.Util.template(bubblesTemplate, data);
