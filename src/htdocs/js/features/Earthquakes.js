@@ -386,6 +386,7 @@ var Earthquakes = function (options) {
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
+      tsunami: props.tsunami,
       url: props.url,
       utcTime: utcTime
     };
