@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add tsunami button to large events in oceanic regions
 * Remember user's scroll position when switching between panes
 * Bug fix: set all default values properly when selecting a new event
 * Switch to using UTC time by default (only show localtime on map popups, ms details)
