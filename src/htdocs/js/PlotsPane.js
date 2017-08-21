@@ -18,6 +18,7 @@ var PlotsPane = function (options) {
       _features,
       _plots,
 
+      _addContainer,
       _getLayout,
       _getRatio,
       _getTrace;
@@ -36,6 +37,40 @@ var PlotsPane = function (options) {
     window.onresize = function() {
       _this.resizePlots();
     };
+  };
+
+  /**
+   * Add plot container to DOM and store it in _plots
+   *
+   * @param containerClass {String}
+   * @param opts {Object}
+   *
+   * @return container {Element}
+   */
+  _addContainer = function (containerClass, opts) {
+    var container,
+        parentClass,
+        parent;
+
+    container = document.createElement('div');
+    container.classList.add(containerClass);
+
+    parentClass = opts.id;
+    parent = _features.querySelector('.' + parentClass);
+
+    if (!parent) { // create parent container if it doesn't already exist
+      parent = document.createElement('div');
+      parent.classList.add('content', 'feature', parentClass);
+      parent.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[opts.id].detailsHtml;
+
+      _features.appendChild(parent);
+    }
+
+    // Add and store plot container
+    parent.appendChild(container);
+    _plots.push(container);
+
+    return container;
   };
 
   /**
@@ -112,10 +147,19 @@ var PlotsPane = function (options) {
    * @param name {String}
    *     name of trace
    *
-   * @return {Object}
+   * @return trace {Object}
    */
-  _getTrace = function  (data, name) {
-    return {
+  _getTrace = function  (type, data, name) {
+    var trace,
+        x,
+        y;
+
+    if (type === 'scatter3d') {
+      x = data.lon;
+      y = data.lat;
+    }
+
+    trace = {
       hoverinfo: 'text+x+y',
       hoverlabel: {
         bgcolor: 'rgba(255,255,255,.85)',
@@ -135,11 +179,13 @@ var PlotsPane = function (options) {
       mode: 'markers',
       name: name,
       text: data.text,
-      type: 'scatter3d',
-      x: data.x,
-      y: data.y,
-      z: data.z
+      type: type,
+      x: x,
+      y: y,
+      z: data.depth
     };
+
+    return trace;
   };
 
   // ----------------------------------------------------------
@@ -158,36 +204,25 @@ var PlotsPane = function (options) {
    *   }
    */
   _this.add3dPlot = function (opts) {
-    var cssClass,
+    var container,
         data,
-        div,
         layout,
-        plot,
         trace,
         zRatio;
 
-    cssClass = opts.id;
-    div = document.createElement('div');
-    div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[opts.id].detailsHtml +
-      '<div class="plot"></div>';
+    container = _addContainer('plot3d', opts);
 
-    _features.appendChild(div);
-
-    plot = div.querySelector('.plot');
-    _plots.push(plot); // store plot in closure
-
-    // Get trace(s) for plot and store in data (mainshock is in a separate trace)
+    // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
     Object.keys(opts.data).forEach(function(key) {
-      trace = _getTrace(opts.data[key].plotdata, key);
+      trace = _getTrace('scatter3d', opts.data[key].plotdata, key);
       data.push(trace);
     });
 
-    zRatio = _getRatio(opts.data[opts.id].plotdata);
+    zRatio = _getRatio(trace);
     layout = _getLayout(zRatio);
 
-    Plotly.plot(plot, data, layout, {
+    Plotly.plot(container, data, layout, {
       showLink: false
     });
   };
