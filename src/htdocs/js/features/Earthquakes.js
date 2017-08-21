@@ -92,11 +92,13 @@ var Earthquakes = function (options) {
     _eqList = {};
     _plotdata = {
       color: [],
+      depth: [],
+      lat: [],
+      lon: [],
+      mag: [],
       size: [],
       text: [],
-      x: [],
-      y: [],
-      z: []
+      time: []
     };
 
     _mainshock = Util.extend({}, options.mainshockJson, {
@@ -343,7 +345,6 @@ var Earthquakes = function (options) {
         magInt,
         popup,
         props,
-        text,
         timeTemplate,
         utcTime;
 
@@ -409,9 +410,13 @@ var Earthquakes = function (options) {
     // Last earthquake will be last in list; overwrite each time thru loop
     _lastId = eqid;
 
-    // Add text prop to _plotdata (other props are added in _pointToLayer)
-    text = props.title + '<br />' + utcTime;
-    _plotdata.text.push(text);
+    // Add props to _plotdata (additional props are added in _pointToLayer)
+    _plotdata.depth.push(coords[2] * -1); // return a negative number for depth
+    _plotdata.lat.push(coords[1]);
+    _plotdata.lon.push(coords[0]);
+    _plotdata.mag.push(data.mag);
+    _plotdata.text.push(props.title + '<br />' + utcTime);
+    _plotdata.time.push(props.time);
 
     // Add eq to list for summary
     _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
@@ -440,12 +445,10 @@ var Earthquakes = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     var age,
-        coords,
         fillColor,
         props,
         radius;
 
-    coords = feature.geometry.coordinates;
     props = feature.properties;
 
     age = _getAge(props.time);
@@ -455,12 +458,9 @@ var Earthquakes = function (options) {
     _markerOptions.fillColor = fillColor;
     _markerOptions.radius = radius;
 
-    // Add props to _plotdata (text prop is set in _onEachFeature)
+    // Add props to _plotdata (additional props are added in _onEachFeature)
     _plotdata.color.push(fillColor);
     _plotdata.size.push(radius * 2); // plotly.js uses diameter
-    _plotdata.x.push(coords[0]);
-    _plotdata.y.push(coords[1]);
-    _plotdata.z.push(coords[2] * -1); // return a negative number for depth
 
     return L.circleMarker(latlng, _markerOptions);
   };
