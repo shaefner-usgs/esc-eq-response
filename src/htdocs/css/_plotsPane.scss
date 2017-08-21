@@ -9,13 +9,16 @@
     height: 100%;
   }
 
+  .js-plotly-plot {
+    width: 100%;
+  }
+
   /* hide some of the Plotly.js controls */
   .modebar-group:nth-child(2n+1) {
     display: none;
   }
 
-  .plot {
+  .plot3d {
     height: 80vh;
-    width: 100%;
   }
 }
