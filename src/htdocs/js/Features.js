@@ -43,9 +43,9 @@ var Features = function (options) {
       _StatusBar,
       _SummaryPane,
 
-      _add3dPlot,
       _addFeature,
       _addMapLayer,
+      _addPlots,
       _addSummary,
       _getAftershocks,
       _getEqFeedUrl,
@@ -65,19 +65,6 @@ var Features = function (options) {
     _PlotsPane = options.plotsPane;
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
-  };
-
-  /**
-   * Add feature to plots pane
-   *
-   * @param feature {Object}
-   */
-  _add3dPlot = function (feature) {
-    _PlotsPane.add3dPlot({
-      id: feature.id,
-      name: feature.name,
-      data: _plotdata
-    });
   };
 
   /**
@@ -127,7 +114,7 @@ var Features = function (options) {
       if (id === 'aftershocks') {
         _plotdata[id] = feature.getPlotData();
 
-        _add3dPlot(feature);
+        _addPlots(feature);
       }
 
       // Add feature to map, summary panes
@@ -182,6 +169,19 @@ var Features = function (options) {
     if (_features.mainshock) {
       _features.mainshock.getMapLayer().bringToFront();
     }
+  };
+
+  /**
+   * Add feature to plots pane
+   *
+   * @param feature {Object}
+   */
+  _addPlots = function (feature) {
+    _PlotsPane.addPlots({
+      id: feature.id,
+      name: feature.name,
+      data: _plotdata
+    });
   };
 
   /**

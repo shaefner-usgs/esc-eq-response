@@ -416,7 +416,7 @@ var Earthquakes = function (options) {
     _plotdata.lon.push(coords[0]);
     _plotdata.mag.push(data.mag);
     _plotdata.text.push(props.title + '<br />' + utcTime);
-    _plotdata.time.push(props.time);
+    _plotdata.time.push(new Date(eqMoment.format()));
 
     // Add eq to list for summary
     _eqList[eqid] = L.Util.template(_tablerowTemplate, data);

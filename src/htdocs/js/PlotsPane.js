@@ -18,7 +18,9 @@ var PlotsPane = function (options) {
       _features,
       _plots,
 
+      _add3dPlot,
       _addContainer,
+      _addMagTimePlot,
       _getLayout,
       _getRatio,
       _getTrace;
@@ -40,6 +42,40 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Add 3d plot to plot pane
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // plot data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
+   */
+  _add3dPlot = function (opts) {
+    var container,
+        data,
+        layout,
+        trace,
+        zRatio;
+
+    container = _addContainer('plot3d', 'Hypocenters', opts);
+
+    // Get traces for plot and store in data (mainshock is in a separate trace)
+    data = [];
+    Object.keys(opts.data).forEach(function(key) {
+      trace = _getTrace('scatter3d', opts.data[key].plotdata, key);
+      data.push(trace);
+    });
+
+    zRatio = _getRatio(trace);
+    layout = _getLayout(zRatio);
+
+    Plotly.plot(container, data, layout, {
+      showLink: false
+    });
+  };
+
+  /**
    * Add plot container to DOM and store it in _plots
    *
    * @param containerClass {String}
@@ -47,13 +83,17 @@ var PlotsPane = function (options) {
    *
    * @return container {Element}
    */
-  _addContainer = function (containerClass, opts) {
+  _addContainer = function (containerClass, title, opts) {
     var container,
+        h3,
         parentClass,
         parent;
 
     container = document.createElement('div');
     container.classList.add(containerClass);
+
+    h3 = document.createElement('h3');
+    h3.innerHTML = title;
 
     parentClass = opts.id;
     parent = _features.querySelector('.' + parentClass);
@@ -67,10 +107,43 @@ var PlotsPane = function (options) {
     }
 
     // Add and store plot container
+    parent.appendChild(h3);
     parent.appendChild(container);
     _plots.push(container);
 
     return container;
+  };
+
+  /**
+   * Add mag-time plot to plot pane
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // plot data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
+   */
+  _addMagTimePlot = function (opts) {
+    var container,
+        data,
+        layout,
+        trace;
+
+    container = _addContainer('plotmt', 'Magnitude vs. Time', opts);
+
+    // Get traces for plot and store in data (mainshock is in a separate trace)
+    data = [];
+    Object.keys(opts.data).forEach(function(key) {
+      trace = _getTrace('scatter', opts.data[key].plotdata, key);
+      data.push(trace);
+    });
+
+    layout = _getLayout();
+
+    Plotly.plot(container, data, layout, {
+      showLink: false
+    });
   };
 
   /**
@@ -81,18 +154,15 @@ var PlotsPane = function (options) {
    * @return {Object}
    */
   _getLayout = function (zRatio) {
-    var titlefont = {
+    var scene,
+        titlefont;
+
+    titlefont = {
       color: 'rgb(0,0,0)'
     };
 
-    return {
-      margin: {
-        b: 20,
-        l: 50,
-        r: 50,
-        t: 20
-      },
-      scene: {
+    if (zRatio) { // if set, assume this is a 3d plot
+      scene = {
         aspectratio: {
           x: 1,
           y: 1,
@@ -110,7 +180,28 @@ var PlotsPane = function (options) {
           title: 'depth (km)',
           titlefont: titlefont
         }
+      };
+    } else {
+      scene = {
+        xaxis: {
+          title: 'time',
+          titlefont: titlefont
+        },
+        yaxis: {
+          title: 'magnitude',
+          titlefont: titlefont
+        }
+      };
+    }
+
+    return {
+      margin: {
+        b: 20,
+        l: 50,
+        r: 50,
+        t: 20
       },
+      scene: scene,
       showlegend: false,
     };
   };
@@ -152,11 +243,16 @@ var PlotsPane = function (options) {
   _getTrace = function  (type, data, name) {
     var trace,
         x,
-        y;
+        y,
+        z;
 
     if (type === 'scatter3d') {
       x = data.lon;
       y = data.lat;
+      z = data.depth;
+    } else {
+      x = data.time;
+      y = data.mag;
     }
 
     trace = {
@@ -182,7 +278,7 @@ var PlotsPane = function (options) {
       type: type,
       x: x,
       y: y,
-      z: data.depth
+      z: z
     };
 
     return trace;
@@ -193,42 +289,16 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature (3d plot) to plot pane (plot plus <div> container)
+   * Add feature to plots pane
    *   (called by Features.js)
-   *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
    */
-  _this.add3dPlot = function (opts) {
-    var container,
-        data,
-        layout,
-        trace,
-        zRatio;
-
-    container = _addContainer('plot3d', opts);
-
-    // Get traces for plot and store in data (mainshock is in a separate trace)
-    data = [];
-    Object.keys(opts.data).forEach(function(key) {
-      trace = _getTrace('scatter3d', opts.data[key].plotdata, key);
-      data.push(trace);
-    });
-
-    zRatio = _getRatio(trace);
-    layout = _getLayout(zRatio);
-
-    Plotly.plot(container, data, layout, {
-      showLink: false
-    });
+  _this.addPlots = function (opts) {
+    _addMagTimePlot(opts);
+    _add3dPlot(opts);
   };
 
   /**
-   * Remove feature from plot pane (including container)
+   * Remove feature from plots pane (including container)
    *   (called by Features.js)
    *
    * @param el {Element}
