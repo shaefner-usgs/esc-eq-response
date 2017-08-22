@@ -295,10 +295,10 @@ var Earthquakes = function (options) {
     else if (type === 'popup') {
       template = '<div class="earthquake">' +
         '<h4><a href="{url}">{magType} {mag} - {place}</a></h4>' +
-        '<div class="impact-bubbles">{bubbles}</div>' +
+        '<div class="impact-bubbles">{bubblesHtml}</div>' +
         '<dl>' +
           '<dt>Time</dt>' +
-          '<dd>{time}</dd>' +
+          '<dd>{timeHtml}</dd>' +
           '<dt>Location</dt>' +
           '<dd>{latlng}</dd>' +
           '<dt>Depth</dt>' +
@@ -391,8 +391,8 @@ var Earthquakes = function (options) {
       url: props.url,
       utcTime: utcTime
     };
-    data.bubbles = _getBubbles(data);
-    data.time = L.Util.template(timeTemplate, data);
+    data.bubblesHtml = _getBubbles(data);
+    data.timeHtml = L.Util.template(timeTemplate, data);
 
     // Create label / popup and bind to marker
     label = L.Util.template(_labelTemplate, data);
