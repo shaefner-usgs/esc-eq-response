@@ -55,8 +55,9 @@ var Earthquakes = function (options) {
       _id,
       _labelTemplate,
       _lastId,
-      _mainshock,
       _markerOptions,
+      _mainshockLatlon,
+      _mainshockMoment,
       _nowMoment,
       _pastDayMoment,
       _pastHourMoment,
@@ -78,15 +79,10 @@ var Earthquakes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var coords,
-        json;
+    var coords;
 
     options = Util.extend({}, _DEFAULTS, options);
-
     coords = options.mainshockJson.geometry.coordinates;
-    json = options.json;
-
-    _id = options.id;
 
     _bins = {};
     _eqList = {};
@@ -101,12 +97,12 @@ var Earthquakes = function (options) {
       time: []
     };
 
-    _mainshock = Util.extend({}, options.mainshockJson, {
-      latlon: LatLon(coords[1], coords[0]),
-      moment: Moment.utc(options.mainshockJson.properties.time, 'x')
-    });
+    _id = options.id;
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
+    _mainshockLatlon = LatLon(coords[1], coords[0]);
+
+    _mainshockMoment = Moment.utc(options.mainshockJson.properties.time, 'x');
     _nowMoment = Moment.utc();
     _pastDayMoment = Moment.utc().subtract(1, 'days');
     _pastHourMoment = Moment.utc().subtract(1, 'hours');
@@ -117,12 +113,12 @@ var Earthquakes = function (options) {
     _popupTemplate = _getTemplate('popup');
     _tablerowTemplate = _getTemplate('tablerow');
 
-    // Feed description (aftershocks and historical)
+    // Store feed description for aftershocks and historical
     if (_id === 'aftershocks' || _id === 'historical') {
       _details = _getDescription();
     }
 
-    _this.mapLayer = L.geoJson(json, {
+    _this.mapLayer = L.geoJson(options.json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
@@ -175,9 +171,9 @@ var Earthquakes = function (options) {
         eqMoment;
 
     eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (eqMoment.isBefore(_mainshock.moment)) {
+    if (eqMoment.isBefore(_mainshockMoment)) {
       age = 'historical';
-    } else if (eqMoment.isSame(_mainshock.moment)) {
+    } else if (eqMoment.isSame(_mainshockMoment)) {
       age = 'mainshock';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
       age = 'pasthour';
@@ -246,7 +242,7 @@ var Earthquakes = function (options) {
       'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshock.moment)
+      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
         .asDays(), 1);
 
       description += '. The duration of the aftershock sequence is <strong>' +
@@ -353,8 +349,8 @@ var Earthquakes = function (options) {
     props = feature.properties;
 
     latlon = LatLon(coords[1], coords[0]);
-    distance = _mainshock.latlon.distanceTo(latlon) / 1000;
-    bearing = _mainshock.latlon.bearing(latlon);
+    distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+    bearing = _mainshockLatlon.bearing(latlon);
     compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
     bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
@@ -423,14 +419,14 @@ var Earthquakes = function (options) {
 
     // Bin eq totals by magnitude and time; store last aftershock
     if (_id === 'aftershocks') {
-      days = Math.floor(Moment.duration(eqMoment - _mainshock.moment).asDays());
+      days = Math.floor(Moment.duration(eqMoment - _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'First');
 
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Past');
     }
     else if (_id === 'historical') {
-      days = Math.floor(Moment.duration(_mainshock.moment - eqMoment).asDays());
+      days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
     }
   };
