@@ -366,7 +366,7 @@ var Earthquakes = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
-      localTime = eqMoment.utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
+      localTime = eqMoment.clone().utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at epicenter</span>';
       timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
     }
@@ -416,7 +416,7 @@ var Earthquakes = function (options) {
     _plotdata.lon.push(coords[0]);
     _plotdata.mag.push(data.mag);
     _plotdata.text.push(props.title + '<br />' + utcTime);
-    _plotdata.time.push(new Date(eqMoment.format()));
+    _plotdata.time.push(eqMoment.format());
 
     // Add eq to list for summary
     _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
