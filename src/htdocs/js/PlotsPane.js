@@ -144,6 +144,9 @@ var PlotsPane = function (options) {
     Plotly.plot(container, data, layout, {
       showLink: false
     });
+
+    // Select 'closest' instead of 'compare' for hover data
+    document.querySelector('[data-title="Show closest data on hover"]').click();
   };
 
   /**
