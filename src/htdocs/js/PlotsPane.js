@@ -149,20 +149,30 @@ var PlotsPane = function (options) {
   /**
    * Get plot layout config for plotly.js
    *
-   * @param zRatio {Number}
+   * @param zRatio {Number} optional
    *
-   * @return {Object}
+   * @return layout {Object}
    */
   _getLayout = function (zRatio) {
-    var scene,
+    var layout,
         titlefont;
 
     titlefont = {
       color: 'rgb(0,0,0)'
     };
 
+    layout = {
+      margin: {
+        b: 40,
+        l: 50,
+        r: 50,
+        t: 0
+      },
+      showlegend: false
+    };
+
     if (zRatio) { // if set, assume this is a 3d plot
-      scene = {
+      layout.scene = {
         aspectratio: {
           x: 1,
           y: 1,
@@ -182,28 +192,17 @@ var PlotsPane = function (options) {
         }
       };
     } else {
-      scene = {
-        xaxis: {
-          title: 'time',
-          titlefont: titlefont
-        },
-        yaxis: {
-          title: 'magnitude',
-          titlefont: titlefont
-        }
+      layout.xaxis = {
+        title: 'time',
+        titlefont: titlefont
+      };
+      layout.yaxis = {
+        title: 'magnitude',
+        titlefont: titlefont
       };
     }
 
-    return {
-      margin: {
-        b: 20,
-        l: 50,
-        r: 50,
-        t: 20
-      },
-      scene: scene,
-      showlegend: false,
-    };
+    return layout;
   };
 
   /**
@@ -241,22 +240,25 @@ var PlotsPane = function (options) {
    * @return trace {Object}
    */
   _getTrace = function  (type, data, name) {
-    var trace,
+    var sizeref,
+        trace,
         x,
         y,
         z;
 
     if (type === 'scatter3d') {
+      sizeref = 0.79; // Plotly doesn't honor size value on 3d plots; adjust it.
       x = data.lon;
       y = data.lat;
       z = data.depth;
     } else {
+      sizeref = 1;
       x = data.time;
       y = data.mag;
     }
 
     trace = {
-      hoverinfo: 'text+x+y',
+      hoverinfo: 'text',
       hoverlabel: {
         bgcolor: 'rgba(255,255,255,.85)',
         bordercolor: 'rgb(153,153,153)',
@@ -270,7 +272,7 @@ var PlotsPane = function (options) {
           color: 'rgb(102,102,102)' // stroke
         },
         size: data.size,
-        sizeref: 0.79, // Plotly doesn't properly honor size value; adjust it.
+        sizeref: sizeref,
       },
       mode: 'markers',
       name: name,
