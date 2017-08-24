@@ -309,7 +309,7 @@ var PlotsPane = function (options) {
    * @param el {Element}
    *     Element to remove
    */
-  _this.removePlot = function (el) {
+  _this.removePlots = function (el) {
     if (_el.contains(el)) {
       el.parentNode.removeChild(el);
     }

@@ -376,14 +376,14 @@ var Features = function (options) {
   _removeFeature = function (id) {
     var cssClass,
         mapLayer,
-        plot,
+        plots,
         summary;
 
     cssClass = id;
 
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
-      plot = document.querySelector('#plotsPane .' + cssClass);
+      plots = document.querySelector('#plotsPane .' + cssClass);
       summary = document.querySelector('#summaryPane .' + cssClass);
     }
 
@@ -392,8 +392,8 @@ var Features = function (options) {
       _MapPane.layerController.removeLayer(mapLayer);
     }
 
-    if (plot) {
-      _PlotsPane.removePlot(plot);
+    if (plots) {
+      _PlotsPane.removePlots(plots);
     }
 
     if (summary) {
