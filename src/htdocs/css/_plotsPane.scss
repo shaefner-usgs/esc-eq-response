@@ -14,10 +14,23 @@
   }
 
   /* hide some of the Plotly.js controls */
-  .modebar-group:nth-child(2n+1) {
-    display: none;
+  .modebar-group {
+    [data-title="Save and edit plot in cloud"],
+    [data-title="Reset camera to default"],
+    [data-title="Reset camera to last save"],
+    [data-title="Lasso Select"],
+    [data-title="Box Select"],
+    [data-title="Reset axes"],
+    [data-title="Toggle Spike Lines"],
+    [data-title="Compare data on hover"],
+    [data-title="Produced with Plotly"] {
+      display: none;
+    }
   }
 
+  .plotmt {
+    height: 40vh;
+  }
   .plot3d {
     height: 80vh;
   }
