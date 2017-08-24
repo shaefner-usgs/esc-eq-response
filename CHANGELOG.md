@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add magnitude vs. time plot
+* Bug fix: clone eq moment before manipulating it in Earthquakes.js
 * Add tsunami button to large events in oceanic regions
 * Remember user's scroll position when switching between panes
 * Bug fix: set all default values properly when selecting a new event
