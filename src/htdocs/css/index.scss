@@ -3,6 +3,7 @@ $breakpoint-tablet-width: 1023px;
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $link-color: rgb(78, 78, 202);
 $link-color-active: rgb(204, 0, 0);
+$link-color-visited: rgb(140, 78, 202);
 
 @import '_editPane.scss';
 @import '_helpPane.scss';
@@ -30,6 +31,9 @@ html {
 a {
   color: $link-color;
 
+  &:visited {
+    color: $link-color-visited;
+  }
   &:active {
     color: $link-color-active;
   }
@@ -96,6 +100,13 @@ section.hide {
 
     > a {
       color: $link-color;
+
+      &:visited {
+        color: $link-color-visited;
+      }
+      &:active {
+        color: $link-color-active;
+      }
     }
   }
 
