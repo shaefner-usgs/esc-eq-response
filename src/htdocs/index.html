@@ -50,7 +50,7 @@
               <p>Max distance from mainshock (km)</p>
             </label>
             <input type="number" id="aftershocks-dist" required="required"
-              pattern="^[0-9]+$" value="" min="1"  />
+              pattern="^[0-9.]+$" value="" min="1" step="1" />
           </div>
           <div class="historical">
             <h3>Historical Seismicity</h3>
@@ -63,12 +63,12 @@
               <p>Max distance from mainshock (km)</p>
             </label>
             <input type="number" id="historical-dist" required="required"
-              pattern="^[0-9]+$" value="" min="1" />
+              pattern="^[0-9.]+$" value="" min="1" step="1" />
             <label for="historical-years">
               <p>Max time before mainshock (years)</p>
             </label>
             <input type="number" id="historical-years" required="required"
-              pattern="^[0-9]+$" value="10" min="1" />
+              pattern="^[0-9.]+$" value="10" min="1" step="1" />
           </div>
           <div class="meta">
             <button type="reset" class="reset">Reset</button>
