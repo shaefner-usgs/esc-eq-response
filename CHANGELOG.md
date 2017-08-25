@@ -5,9 +5,10 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-## 0.2.0 (2017-08-25)
+## 0.3.0 (2017-08-25)
 
-* Add magnitude vs. time plot
+* Add :visited link color
+* Add plot: aftershocks - magnitude vs. time
 * Bug fix: clone eq moment before manipulating it in Earthquakes.js
 * Add tsunami button to large events in oceanic regions
 * Remember user's scroll position when switching between panes
@@ -16,13 +17,16 @@ An in-progress version being developed on the `master` branch.
 * Handle case of no eqs/no eqs above threshold more elegantly on summary pane
 * Add view map button on edit pane; change reset link to a button
 * Change order of input fields (show mag first) on edit pane
-* Add 3d aftershocks plot
+* Add plot: aftershocks - 3d hypocenters
 * Refactor: better separation of concerns, more readable code
 * Add impact bubbles / link to mainshock details on edit pane
 * Bug fix: calculate magInt based on rounded mag so data in tables is accurate
 * Bug fix: only show utc note when filtered quakes contain utc time
 * Darken stroke width so eqs stand out more
 * Only set map bounds on initial loading of layers for each eqid
+
+## 0.2.0 (2017-01-05)
+
 * Always plot aftershocks on top of historical
 * Add timezone to updated stamp on summary pane
 * Strip whitespace from param values in form fields
