@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+## 0.2.0 (2017-08-25)
+
 * Add magnitude vs. time plot
 * Bug fix: clone eq moment before manipulating it in Earthquakes.js
 * Add tsunami button to large events in oceanic regions
@@ -66,7 +68,7 @@ App is fully functional for Step 1 priorities and all known bugs squashed.
 * Add binned earthquake data to summary
 * Add last aftershock to summary
 * Reverse order of eqs in summary tables (newest first)
-* Add point feature (eq) count to layer name
+* Add earthquake count to layer names
 * Bug fixes
 
 
