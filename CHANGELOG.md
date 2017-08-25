@@ -23,10 +23,10 @@ An in-progress version being developed on the `master` branch.
 * Bug fix: calculate magInt based on rounded mag so data in tables is accurate
 * Bug fix: only show utc note when filtered quakes contain utc time
 * Darken stroke width so eqs stand out more
+
+## 0.2.0 (2017-02-04)
+
 * Only set map bounds on initial loading of layers for each eqid
-
-## 0.2.0 (2017-01-05)
-
 * Always plot aftershocks on top of historical
 * Add timezone to updated stamp on summary pane
 * Strip whitespace from param values in form fields
