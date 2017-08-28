@@ -7,8 +7,6 @@ var AppUtil = require('AppUtil'),
     Moment = require('moment'),
     Util = require('hazdev-webutils/src/util/Util');
 
-require('leaflet.label');
-
 
 var _COLORS,
     _DEFAULTS,
@@ -53,7 +51,6 @@ var Earthquakes = function (options) {
       _details,
       _eqList,
       _id,
-      _labelTemplate,
       _lastId,
       _markerOptions,
       _mainshockLatlon,
@@ -65,6 +62,7 @@ var Earthquakes = function (options) {
       _plotdata,
       _popupTemplate,
       _tablerowTemplate,
+      _tooltipTemplate,
 
       _addEqToBin,
       _getAge,
@@ -109,7 +107,7 @@ var Earthquakes = function (options) {
     _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
 
     // Templates for L.Util.template
-    _labelTemplate = _getTemplate('label');
+    _tooltipTemplate = _getTemplate('tooltip');
     _popupTemplate = _getTemplate('popup');
     _tablerowTemplate = _getTemplate('tablerow');
 
@@ -278,17 +276,14 @@ var Earthquakes = function (options) {
   /**
    * Get html template for displaying eq details
    *
-   * @param type {String <label | popup | tablerow>}
+   * @param type {String <popup | tablerow | tooltip>}
    *
    * @return template {Html}
    */
   _getTemplate = function (type) {
     var template;
 
-    if (type === 'label') {
-      template = 'M {mag} - {utcTime}';
-    }
-    else if (type === 'popup') {
+    if (type === 'popup') {
       template = '<div class="earthquake">' +
         '<h4><a href="{url}">{magType} {mag} - {place}</a></h4>' +
         '<div class="impact-bubbles">{bubblesHtml}</div>' +
@@ -313,13 +308,16 @@ var Earthquakes = function (options) {
         '<td class="depth" data-sort="{depth}">{depth} km</td>' +
       '</tr>';
     }
+    else if (type === 'tooltip') {
+      template = 'M {mag} - {utcTime}';
+    }
 
     return template;
   };
 
   /**
    * Leaflet GeoJSON option: called once for each Marker, after it has been
-   * created and styled. Used to creates labels, popups, and summary tables.
+   * created and styled. Creates popups, tooltips and data for summary/plots.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -334,7 +332,6 @@ var Earthquakes = function (options) {
         distance,
         eqid,
         eqMoment,
-        label,
         latlon,
         localTime,
         mag,
@@ -342,6 +339,7 @@ var Earthquakes = function (options) {
         popup,
         props,
         timeTemplate,
+        tooltip,
         utcTime;
 
     coords = feature.geometry.coordinates;
@@ -390,13 +388,13 @@ var Earthquakes = function (options) {
     data.bubblesHtml = _getBubbles(data);
     data.timeHtml = L.Util.template(timeTemplate, data);
 
-    // Create label / popup and bind to marker
-    label = L.Util.template(_labelTemplate, data);
+    // Create popup/tooltip and bind to marker
     popup = L.Util.template(_popupTemplate, data);
+    tooltip = L.Util.template(_tooltipTemplate, data);
     layer.bindPopup(popup, {
       autoPanPadding: L.point(50, 50),
       minWidth: '250'
-    }).bindLabel(label);
+    }).bindTooltip(tooltip);
 
     // Feed details (set to text description for aftershocks / historical)
     if (_id === 'mainshock') {
