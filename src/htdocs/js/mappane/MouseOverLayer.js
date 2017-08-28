@@ -61,7 +61,7 @@ L.MouseOverLayer = L.LayerGroup.extend({
     L.LayerGroup.prototype.onAdd.apply(this, arguments);
 
     if (this._tooltip) {
-      map.getPanes().popupPane.appendChild(this._tooltip);
+      map.getPanes().tooltipPane.appendChild(this._tooltip);
     }
   },
 
