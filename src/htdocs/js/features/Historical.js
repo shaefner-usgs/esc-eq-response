@@ -27,6 +27,7 @@ var Historical = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    // Unique id; note that value is "baked into" app's js/css
     var id = 'historical';
 
     options = options || {};

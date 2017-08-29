@@ -27,6 +27,7 @@ var Aftershocks = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    // Unique id; note that value is "baked into" app's js/css
     var id = 'aftershocks';
 
     options = options || {};

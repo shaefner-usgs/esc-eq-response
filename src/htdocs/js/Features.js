@@ -18,6 +18,8 @@ var Aftershocks = require('features/Aftershocks'),
  *
  * Feature data comes from GeoJson web services on earthquake.usgs.gov
  *
+ * The rendering order of features is set in the css file for each app pane
+ *
  * @param options {Object}
  *   {
  *     mapPane: {Object}, // MapPane instance

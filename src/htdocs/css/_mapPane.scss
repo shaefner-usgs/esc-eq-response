@@ -5,7 +5,7 @@
   height: 100%;
 }
 
-/* Order of feature layers (placed within overlayPane which has a z-index of 400) */
+/* Rendering order of features (placed within overlayPane which has a z-index of 400) */
 .leaflet-aftershocks-pane {
   z-index: 422;
 }
