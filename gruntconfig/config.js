@@ -34,8 +34,7 @@ config = {
 
   cssPath: [
     'src/htdocs/css',
-    'node_modules/hazdev-webutils/src',
-    'node_modules/leaflet.label/dist'
+    'node_modules/hazdev-webutils/src'
   ],
 
   jsPath: {
