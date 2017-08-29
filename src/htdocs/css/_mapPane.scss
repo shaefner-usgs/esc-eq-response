@@ -5,6 +5,17 @@
   height: 100%;
 }
 
+/* Order of feature layers (placed within overlayPane which has a z-index of 400) */
+.leaflet-aftershocks-pane {
+  z-index: 422;
+}
+.leaflet-historical-pane {
+  z-index: 421;
+}
+.leaflet-mainshock-pane {
+  z-index: 423;
+}
+
 /* Quell long attributions */
 .leaflet-control-attribution {
   max-width: 300px;

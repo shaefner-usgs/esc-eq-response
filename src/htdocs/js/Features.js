@@ -110,32 +110,26 @@ var Features = function (options) {
         _plotdata[id] = feature.getPlotData();
       }
 
-      // Add 3d aftershocks plot to plots pane
+      // Create a separate map pane within overlayPane for feature
+      _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
+
+      // Add feature to map, summary panes
+      _addMapLayer(feature);
+      _addSummary(feature);
+
+      // Add aftershock plots to plots pane
       if (id === 'aftershocks') {
         _plotdata[id] = feature.getPlotData();
 
         _addPlots(feature);
       }
 
-      // Add feature to map, summary panes
-      if (id === 'aftershocks' || id === 'historical') {
-        // Load both layers before adding
-        if (_features.aftershocks && _features.historical) {
-          // Always plot aftershocks above historical on map
-          _MapPane.map.removeLayer(_features.aftershocks.getMapLayer());
-          _MapPane.map.removeLayer(_features.historical.getMapLayer());
-          _addMapLayer(_features.historical);
-          _addMapLayer(_features.aftershocks);
-
-          _initialLoad = false;
-        }
-      } else {
-        _addMapLayer(feature);
-      }
-      _addSummary(feature);
-
       // Feature finished loading; remove alert
       _StatusBar.removeItem(statusBarId);
+
+      if (_features.aftershocks && _features.historical) {
+        _initialLoad = false;
+      }
     }
     catch (error) {
       console.error(error);

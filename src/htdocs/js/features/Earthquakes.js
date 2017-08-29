@@ -450,6 +450,7 @@ var Earthquakes = function (options) {
     radius = 3 * parseInt(Math.pow(10, (0.11 * props.mag)), 10);
 
     _markerOptions.fillColor = fillColor;
+    _markerOptions.pane = _id;
     _markerOptions.radius = radius;
 
     // Add props to _plotdata (additional props are added in _onEachFeature)
