@@ -7,9 +7,6 @@ require('mappane/Utfgrid');
 var CLASSES = 'leaflet-mouseover-tooltip';
 
 L.MouseOverLayer = L.LayerGroup.extend({
-
-  _initialized: false, // Flag to tell if constructor has finished
-
   /**
    * @param options {Object}
    *      tileUrl: URL to image tiles
@@ -32,13 +29,11 @@ L.MouseOverLayer = L.LayerGroup.extend({
     }
 
     // Call parent constructor
-    L.LayerGroup.prototype.initialize.call(this, []);
+    L.LayerGroup.prototype.initialize.call(this);
     this.addLayer(this._tileLayer);
     if (!L.Browser.mobile) {
       this.addLayer(this._dataLayer);
     }
-
-    this._initialized = true;
   },
 
   // --------------------------------------------------
@@ -58,47 +53,18 @@ L.MouseOverLayer = L.LayerGroup.extend({
   // --------------------------------------------------
 
   onAdd: function (map) {
-    L.LayerGroup.prototype.onAdd.apply(this, arguments);
+    L.LayerGroup.prototype.onAdd.call(this, map);
 
     if (this._tooltip) {
       map.getPanes().tooltipPane.appendChild(this._tooltip);
     }
   },
 
-  onRemove: function (/*map*/) {
-    L.LayerGroup.prototype.onRemove.apply(this, arguments);
+  onRemove: function (map) {
+    L.LayerGroup.prototype.onRemove.call(this, map);
 
-    if (this._tooltip && this._tooltip.parentNode) {
-      this._tooltip.parentNode.removeChild(this._tooltip);
-    }
-  },
-
-  // --------------------------------------------------
-  // Suppress these methods inherited from LayerGroup
-  // --------------------------------------------------
-
-  addLayer: function (/*layer*/) {
-    if (!this._initialized) {
-      L.LayerGroup.prototype.addLayer.apply(this, arguments);
-    } else {
-      try {console.log('MouseOverLayer::addLayer - Immutable object');}
-      catch (e) { /* Ignore */ }
-    }
-  },
-  removeLayer: function (/*layer*/) {
-    if (!this._initialized) {
-      L.LayerGroup.prototype.removeLayer.apply(this, arguments);
-    } else {
-      try {console.log('MouseOverLayer::removeLayer - Immutable object');}
-      catch (e) { /* Ignore */ }
-    }
-  },
-  clearLayers: function () {
-    if (!this._initialized) {
-      L.LayerGroup.prototype.clearLayers.apply(this, arguments);
-    } else {
-      try {console.log('MouseOverLayer::clearLayers - Immutable object');}
-      catch (e) { /* Ignore */ }
+    if (this._tooltip) {
+      L.DomUtil.remove(this._tooltip);
     }
   },
 
