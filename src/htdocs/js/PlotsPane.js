@@ -199,7 +199,7 @@ var PlotsPane = function (options) {
       };
     } else {
       layout.xaxis = {
-        title: 'time',
+        title: 'time (UTC)',
         titlefont: titlefont
       };
       layout.yaxis = {
