@@ -5,6 +5,17 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Change 'View Map' button to green to be more intuitive
+* Set z-index on status bar entries to control display order
+* Add link to Napa quake (as an example)
+* Bug fix: suppress DOM errors from fault mouseover layer (Utfgrid.js patch)
+* Bug fix: ensure navbar is above plot controls
+* Bug fix: only show 'Event ID not found' error for mainshock feed 404s
+* Upgrade to Leaflet 1.x
+  - Use new pane management feature to control order of layers on map
+  - Bug fix: layers now stay in correct order when toggling on/off
+  - Bug fix: map always zoomed to correct extent on initial load (hopefully)
+
 ## 0.3.0 (2017-08-25)
 
 * Add :visited link color
@@ -18,7 +29,7 @@ An in-progress version being developed on the `master` branch.
 * Add view map button on edit pane; change reset link to a button
 * Change order of input fields (show mag first) on edit pane
 * Add plot: aftershocks - 3d hypocenters
-* Refactor: better separation of concerns, more readable code
+* Refactor features: better separation of concerns, more readable code
 * Add impact bubbles / link to mainshock details on edit pane
 * Bug fix: calculate magInt based on rounded mag so data in tables is accurate
 * Bug fix: only show utc note when filtered quakes contain utc time
