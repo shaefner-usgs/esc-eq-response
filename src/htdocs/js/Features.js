@@ -347,7 +347,9 @@ var Features = function (options) {
         console.error(xhr.responseText);
 
         msg = 'Error Loading ' + name;
-        if (status === 404) {
+
+        // Add additional info to error message
+        if (status === 404 && name === 'Mainshock') {
           msg += ' <span>Event ID ' + _eqid + ' not found</span>';
         }
         else if (xhr.responseText.match('limit of 20000')) {
@@ -402,7 +404,7 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Initialize features and begin process of adding new features
+   * Initialize and begin process of adding feature layers
    *
    * Called each time a new Event ID is entered by user
    *
@@ -423,7 +425,7 @@ var Features = function (options) {
       // 2. Create mainshock feature
       _getMainshock();
     } else {
-      // 3. Create other features (called 'recursively' via mainshock's callback)
+      // 3. Create other features (called via mainshock's callback)
       _getAftershocks();
       _getHistorical();
     }
