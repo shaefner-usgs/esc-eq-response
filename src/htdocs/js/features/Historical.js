@@ -62,7 +62,7 @@ var Historical = function (options) {
    * @return {L.FeatureGroup}
    */
   _this.getMapLayer = function () {
-    return _earthquakes.mapLayer;
+    return _earthquakes.getMapLayer();
   };
 
   /**

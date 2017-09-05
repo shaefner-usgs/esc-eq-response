@@ -55,6 +55,7 @@ var Earthquakes = function (options) {
       _markerOptions,
       _mainshockLatlon,
       _mainshockMoment,
+      _mapLayer,
       _nowMoment,
       _pastDayMoment,
       _pastHourMoment,
@@ -116,7 +117,7 @@ var Earthquakes = function (options) {
       _details = _getDescription();
     }
 
-    _this.mapLayer = L.geoJson(options.json, {
+    _mapLayer = L.geoJson(options.json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
@@ -499,6 +500,15 @@ var Earthquakes = function (options) {
   _this.getList = function () {
     return _eqList;
   };
+
+  /**
+   * Get Leaflet layer for feature
+   *
+   * @return {L.GeoJSON layer}
+   */
+  _this.getMapLayer = function () {
+    return _mapLayer;
+  }
 
   /**
    * Get data for 3d plot
