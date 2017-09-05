@@ -508,7 +508,7 @@ var Earthquakes = function (options) {
    */
   _this.getMapLayer = function () {
     return _mapLayer;
-  }
+  };
 
   /**
    * Get data for 3d plot
