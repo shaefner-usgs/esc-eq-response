@@ -4,7 +4,6 @@
   left: 0;
   position: fixed;
   width: 100%;
-  z-index: 1000;
 
   p {
     background-color: rgb(255, 255, 120);
@@ -18,7 +17,6 @@
     text-align: center;
     position: absolute;
     width: 100%;
-    z-index: 1001;
 
     span {
       display: block;
@@ -30,7 +28,6 @@
       border-color: rgb(195, 0, 0);
       color: #fff;
       padding: 3px 0;
-      z-index: 1002;
     }
   }
 

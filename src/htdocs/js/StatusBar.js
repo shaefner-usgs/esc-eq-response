@@ -14,8 +14,10 @@ var StatusBar = function (options) {
       _initialize,
 
       _el,
+      _zIndex,
 
       _hideStatusBar,
+      _getZindex,
       _showStatusBar;
 
 
@@ -25,6 +27,19 @@ var StatusBar = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
+    _zIndex = 10000;
+  };
+
+  /**
+   * Get z-index value for status bar entry
+   *   counts down so that previous entries are displayed until they're loaded
+   *
+   * @return _zIndex {Integer}
+   */
+  _getZindex = function () {
+    _zIndex --;
+
+    return _zIndex;
   };
 
   /**
@@ -55,12 +70,13 @@ var StatusBar = function (options) {
   _this.addError = function (id, errorMsg) {
     var error;
 
-    _this.removeItem(id); // remove any leftover loading messages
+    _this.removeItem(id); // remove any leftover items for this feature
     _showStatusBar();
 
     error = document.createElement('p');
     error.classList.add(id, 'error');
     error.innerHTML = errorMsg;
+    error.style.zIndex = _getZindex();
 
     _el.appendChild(error);
   };
@@ -75,12 +91,13 @@ var StatusBar = function (options) {
   _this.addItem = function (id, name) {
     var item;
 
-    _this.removeError(id); // remove any leftover errors
+    _this.removeError(id); // remove any leftover errors for this feature
     _showStatusBar();
 
     item = document.createElement('p');
     item.classList.add(id);
     item.innerHTML = 'Loading ' + name + '&hellip;';
+    item.style.zIndex = _getZindex();
 
     _el.appendChild(item);
   };
