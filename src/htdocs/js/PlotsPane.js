@@ -169,7 +169,7 @@ var PlotsPane = function (options) {
         family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
       },
       margin: {
-        b: 40,
+        b: 50,
         l: 50,
         r: 50,
         t: 0
