@@ -276,7 +276,7 @@ var PlotsPane = function (options) {
       marker: {
         color: data.color, // fill
         line: {
-          color: 'rgb(102, 102, 102)' // stroke
+          color: 'rgb(0, 0, 0)' // stroke
         },
         size: data.size,
         sizeref: sizeref,
