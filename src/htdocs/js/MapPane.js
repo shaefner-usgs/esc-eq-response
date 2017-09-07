@@ -31,9 +31,12 @@ var MapPane = function (options) {
       _el,
       _map,
 
+      _compareLayers,
       _getMapLayers,
+      _getZindex,
       _hideZoomControl,
-      _initMap;
+      _initMap,
+      _isBaseLayer;
 
 
   _this = {};
@@ -45,6 +48,39 @@ var MapPane = function (options) {
     _map = _el.querySelector('.map');
 
     _initMap();
+  };
+
+  /**
+   * Comparison function for sorting feature overlays in layer controller
+   *
+   * @return {Integer}
+   */
+  _compareLayers = function (layerA, layerB, nameA, nameB) {
+    var zIndexLayerA,
+        zIndexLayerB;
+
+    // Don't sort baselayers
+    if (_isBaseLayer(nameA) || _isBaseLayer(nameB)) {
+      return;
+    }
+
+    // Put faults layer on bottom
+    if (nameA === 'Faults') {
+      return 1;
+    }
+    if (nameB === 'Faults') {
+      return -1;
+    }
+
+    zIndexLayerA = _getZindex(layerA);
+    zIndexLayerB = _getZindex(layerB);
+    if (zIndexLayerA < zIndexLayerB) {
+      return -1;
+    }
+    if (zIndexLayerA > zIndexLayerB) {
+      return 1;
+    }
+    return 0;
   };
 
   /**
@@ -87,6 +123,25 @@ var MapPane = function (options) {
   };
 
   /**
+   * Get z-index of Leaflet layer
+   *
+   * @param layer {L.Layer}
+   *
+   * @return {Integer}
+   */
+  _getZindex = function (layer) {
+    var cssClass,
+        pane,
+        styles;
+
+    cssClass = 'leaflet-' + layer.id + '-pane';
+    pane = document.querySelector('.' + cssClass);
+    styles = window.getComputedStyle(pane);
+
+    return styles.getPropertyValue('zIndex');
+  };
+
+  /**
    * Hide zoom controller on mobile (in favor of pinch-to-zoom)
    */
   _hideZoomControl = function () {
@@ -111,8 +166,14 @@ var MapPane = function (options) {
     _this.setDefaultView();
 
     // Add / remove controllers
-    _this.layerController = L.control.layers(_this.layers.baseLayers,
-      _this.layers.overlays).addTo(_this.map);
+    _this.layerController = L.control.layers(
+      _this.layers.baseLayers,
+      _this.layers.overlays,
+      {
+        sortFunction: _compareLayers,
+        sortLayers: true
+      }
+    ).addTo(_this.map);
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
     _hideZoomControl();
@@ -124,6 +185,25 @@ var MapPane = function (options) {
     //   overlays: _this.layers.overlays,
     //   scope: 'response'
     // });
+  };
+
+  /**
+   * Determine if Leaflet layer is a baselayer or not
+   *
+   * @param name {String}
+   *
+   * @return r {Boolean}
+   */
+  _isBaseLayer = function (name) {
+    var r = false;
+
+    Object.keys(_this.layers.baseLayers).forEach(function(key) {
+      if (key === name) {
+        r = true;
+      }
+    });
+
+    return r;
   };
 
   // ----------------------------------------------------------
