@@ -394,7 +394,8 @@ var Earthquakes = function (options) {
     tooltip = L.Util.template(_tooltipTemplate, data);
     layer.bindPopup(popup, {
       autoPanPadding: L.point(50, 50),
-      minWidth: '250'
+      maxWidth: 350,
+      minWidth: 250
     }).bindTooltip(tooltip);
 
     // Feed details (set to text description for aftershocks / historical)

@@ -269,7 +269,8 @@ var PlotsPane = function (options) {
         bgcolor: 'rgba(255,255,255,.85)',
         bordercolor: 'rgb(153,153,153)',
         font: {
-          color: 'rgb(0,0,0)'
+          color: 'rgb(0,0,0)',
+          size: 14.4
         }
       },
       marker: {

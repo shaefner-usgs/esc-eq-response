@@ -9,6 +9,15 @@
     height: 100%;
   }
 
+  .hovertext {
+    path {
+      stroke: #ccc !important;
+    }
+    text {
+      fill: #222 !important;
+    }
+  }
+
   .js-plotly-plot {
     width: 100%;
   }
