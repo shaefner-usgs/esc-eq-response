@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: ensure status bar stays on top of all panes
+* Make font sizes / colors more consistent btwn app panes
 * Change 'View Map' button to green to be more intuitive
 * Set z-index on status bar entries to control display order
 * Add link to Napa quake (as an example)
@@ -18,6 +20,7 @@ An in-progress version being developed on the `master` branch.
 
 ## 0.3.0 (2017-08-25)
 
+* Use same font stack for plots as rest of app
 * Add :visited link color
 * Add plot: aftershocks - magnitude vs. time
 * Bug fix: clone eq moment before manipulating it in Earthquakes.js
