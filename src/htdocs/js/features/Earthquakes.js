@@ -121,6 +121,7 @@ var Earthquakes = function (options) {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
+    _mapLayer.id = _id; // Attach id to L.Layer
   };
 
   /**
