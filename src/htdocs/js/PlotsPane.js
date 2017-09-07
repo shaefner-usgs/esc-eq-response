@@ -58,7 +58,7 @@ var PlotsPane = function (options) {
         trace,
         zRatio;
 
-    container = _addContainer('plot3d', 'Hypocenters', opts);
+    container = _addContainer('plot3d', '3D Hypocenters', opts);
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
