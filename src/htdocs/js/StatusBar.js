@@ -37,6 +37,10 @@ var StatusBar = function (options) {
    * @return _zIndex {Integer}
    */
   _getZindex = function () {
+    // Don't let z-index get "too low" (sorta hacky, but does the trick)
+    if (_zIndex < 9000) {
+      _zIndex = 10000;
+    }
     _zIndex --;
 
     return _zIndex;
