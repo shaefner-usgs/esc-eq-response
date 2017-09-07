@@ -161,7 +161,7 @@ var PlotsPane = function (options) {
         titlefont;
 
     titlefont = {
-      color: 'rgb(0,0,0)'
+      color: 'rgb(0, 0, 0)'
     };
 
     layout = {
@@ -266,17 +266,17 @@ var PlotsPane = function (options) {
     trace = {
       hoverinfo: 'text',
       hoverlabel: {
-        bgcolor: 'rgba(255,255,255,.85)',
-        bordercolor: 'rgb(153,153,153)',
+        bgcolor: 'rgba(255, 255, 255, .85)',
+        bordercolor: 'rgb(153, 153, 153)',
         font: {
-          color: 'rgb(0,0,0)',
+          color: 'rgb(0, 0, 0)',
           size: 14.4
         }
       },
       marker: {
         color: data.color, // fill
         line: {
-          color: 'rgb(102,102,102)' // stroke
+          color: 'rgb(102, 102, 102)' // stroke
         },
         size: data.size,
         sizeref: sizeref,
