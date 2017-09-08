@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: layer order in layer controller should be same as rendered on map
 * Sort layers in layer controller
 * Bug fix: ensure status bar stays on top of all panes
 * Make font sizes / colors more consistent btwn app panes
