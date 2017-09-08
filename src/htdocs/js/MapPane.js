@@ -61,7 +61,7 @@ var MapPane = function (options) {
 
     // Don't sort baselayers
     if (_isBaseLayer(nameA) || _isBaseLayer(nameB)) {
-      return;
+      return 0;
     }
 
     // Put faults layer on bottom
@@ -75,10 +75,10 @@ var MapPane = function (options) {
     zIndexLayerA = _getZindex(layerA);
     zIndexLayerB = _getZindex(layerB);
     if (zIndexLayerA < zIndexLayerB) {
-      return -1;
+      return 1;
     }
     if (zIndexLayerA > zIndexLayerB) {
-      return 1;
+      return -1;
     }
     return 0;
   };
@@ -127,18 +127,20 @@ var MapPane = function (options) {
    *
    * @param layer {L.Layer}
    *
-   * @return {Integer}
+   * @return zIndex {Integer}
    */
   _getZindex = function (layer) {
     var cssClass,
-        pane,
-        styles;
+        leafletPane,
+        styles,
+        zIndex;
 
     cssClass = 'leaflet-' + layer.id + '-pane';
-    pane = document.querySelector('.' + cssClass);
-    styles = window.getComputedStyle(pane);
+    leafletPane = document.querySelector('.' + cssClass);
+    styles = window.getComputedStyle(leafletPane);
+    zIndex = parseInt(styles.getPropertyValue('z-index'), 10);
 
-    return styles.getPropertyValue('zIndex');
+    return zIndex;
   };
 
   /**
