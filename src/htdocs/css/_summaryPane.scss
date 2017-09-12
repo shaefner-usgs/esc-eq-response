@@ -7,19 +7,7 @@
     margin: 2em 0 .5em;
   }
 
-  table {
-    border-collapse: collapse;
-    margin: 0 0 1em;
-
-    abbr {
-      border-bottom: 1px dotted #999;
-      cursor: help;
-    }
-  }
-
   td {
-    padding: .4em 1em;
-
     .tz {
       display: none;
     }
@@ -44,13 +32,6 @@
   }
 
   th {
-    color: #333;
-    font-size: .95rem;
-    font-weight: 500;
-    padding: .25em .5em;
-    text-align: center;
-    text-transform: uppercase;
-
     &.period {
       text-align: right;
     }
@@ -92,15 +73,6 @@
 
     &:before {
       content: 'Updated: ';
-    }
-  }
-
-  tr {
-    border: solid #e8e8e8;
-    border-width: 0 0 1px;
-
-    &:first-child {
-      border-color: #ccc;
     }
   }
 

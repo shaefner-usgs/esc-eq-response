@@ -69,6 +69,38 @@ section.hide {
   display: none;
 }
 
+table {
+  border-collapse: collapse;
+  margin: 0 0 1em;
+
+  abbr {
+    border-bottom: 1px dotted #999;
+    cursor: help;
+  }
+}
+
+td {
+  padding: .4em 1em;
+}
+
+th {
+  color: #333;
+  font-size: .95rem;
+  font-weight: 500;
+  padding: .25em .5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+tr {
+  border: solid #e8e8e8;
+  border-width: 0 0 1px;
+
+  &:first-child {
+    border-color: #ccc;
+  }
+}
+
 .content {
   line-height: 1.6;
   padding: 1em;
@@ -78,8 +110,12 @@ section.hide {
   background: #f5f8fd;
 }
 
-/* Earthquake details: map popups, mainshock on edit, summary panes */
-.earthquake {
+.lighter {
+  background: #fff;
+}
+
+/* Leaflet popups, earthquake details: mainshock on edit, summary panes */
+.leaflet-popup-content, .earthquake {
   dd,
   dt {
     line-height: 1.7;
@@ -90,7 +126,7 @@ section.hide {
   dt {
     clear: left;
     color: #333;
-    display: block;
+    display: inline-block;
     float: left;
     font-weight: 300;
     width: 5em;
@@ -114,10 +150,6 @@ section.hide {
   time {
     display: block;
   }
-}
-
-.lighter {
-  background: #fff;
 }
 
 .pane {
