@@ -217,7 +217,7 @@ var Stations = function (options) {
 
   _generatePopupContent = function (feature) {
     var p = feature.properties,
-        romanIntensity = AppUtil.romanize(p.intensity);
+        romanIntensity = AppUtil.romanize(p.intensity) || 'I';
 
     var markup = ['<div class="station-popup">',
       '<h4 class="station-title">', _formatTitle(feature), '</h4>',
@@ -227,15 +227,15 @@ var Stations = function (options) {
           '<br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
         '</li>',
         '<li class="station-summary-pga">',
-          AppUtil.round(p.pga, 3/*, '&ndash;'*/),
+          AppUtil.round(p.pga, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Velocity (%g)">PGA</abbr></br>',
         '</li>',
         '<li class="station-summary-pgv">',
-          AppUtil.round(p.pgv, 3/*, '&ndash;'*/),
+          AppUtil.round(p.pgv, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
         '</li>',
         '<li class="station-summary-distance">',
-          AppUtil.round(p.distance, 1/*, '&ndash;'*/),' km',
+          AppUtil.round(p.distance, 1, '&ndash;'),' km',
           '<br><abbr title="Distance (km)">Dist</abbr></br>',
         '</li>',
       '</ul>',
@@ -273,7 +273,8 @@ var Stations = function (options) {
     tooltip = _formatTitle(feature, true);
     layer.bindPopup(_generatePopupContent(feature), {
       autoPanPadding: L.point(50, 50),
-      minWidth: 300
+      minWidth: 300,
+      maxWidth: 400
     }).bindTooltip(tooltip);
   };
 
@@ -290,7 +291,7 @@ var Stations = function (options) {
         romanIntensity;
 
     props = feature.properties;
-    romanIntensity = AppUtil.romanize(props.intensity);
+    romanIntensity = AppUtil.romanize(props.intensity) || 'I';
 
     _markerOptions.className = 'station-layer-icon station-mmi' + romanIntensity;
 
