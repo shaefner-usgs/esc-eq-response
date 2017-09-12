@@ -7,6 +7,7 @@ var Aftershocks = require('features/Aftershocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
     Moment = require('moment'),
+    Stations = require('features/Stations'),
     Xhr = require('util/Xhr');
 
 
@@ -53,6 +54,7 @@ var Features = function (options) {
       _getEqFeedUrl,
       _getHistorical,
       _getMainshock,
+      _getStations,
       _getStatusBarId,
       _loadFeed,
       _removeFeature;
@@ -284,6 +286,25 @@ var Features = function (options) {
   };
 
   /**
+   * Get ShakeMap stations feature
+   */
+  _getStations = function () {
+    var shakemap,
+        url;
+
+    shakemap = _mainshockJson.properties.products.shakemap[0];
+    if (shakemap) {
+      url = shakemap.contents['download/stationlist.json'].url;
+    }
+
+    _loadFeed({
+      name: 'ShakeMap Stations',
+      jsClass: Stations,
+      url: url
+    });
+  };
+
+  /**
    * Get id for status bar item (first word in name, lowercase)
    *
    * @param name {String}
@@ -428,6 +449,7 @@ var Features = function (options) {
       // 3. Create other features (called via mainshock's callback)
       _getAftershocks();
       _getHistorical();
+      _getStations();
     }
   };
 
