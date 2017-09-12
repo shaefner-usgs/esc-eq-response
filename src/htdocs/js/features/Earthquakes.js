@@ -318,8 +318,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: called once for each Marker, after it has been
-   * created and styled. Creates popups, tooltips and data for summary/plots.
+   * Leaflet GeoJSON option: creates popups, tooltips and data for summary/plots
    *
    * @param feature {Object}
    * @param layer (L.Layer)
