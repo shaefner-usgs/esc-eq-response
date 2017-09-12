@@ -73,13 +73,19 @@ AppUtil.romanize = function (num) {
  *
  * @param num {Number}
  * @param precision {Number}
+ * @param empty {String}
+ *   optional string to return if num is null
  *
  * @return {String}
  *     Note that it does not return a Number b/c toFixed() returns a string
  */
-AppUtil.round = function (num, precision) {
+AppUtil.round = function (num, precision, empty) {
   var multiplier,
       rounded;
+
+  if (!num && num !== 0) {
+    return empty || '&ndash;';
+  }
 
   num = Number(num);
   multiplier = Math.pow(10, precision || 0);
