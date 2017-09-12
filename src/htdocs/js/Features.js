@@ -162,11 +162,6 @@ var Features = function (options) {
         reset: true
       });
     }
-
-    // Render mainshock on top of other features
-    if (_features.mainshock) {
-      _features.mainshock.getMapLayer().bringToFront();
-    }
   };
 
   /**
@@ -348,7 +343,7 @@ var Features = function (options) {
           _editPane.setDefaults(_mainshockJson);
 
           // Center map around mainshock for now
-          //   (each added feature will set map extent to contain itself)
+          //   (some added features set map extent to contain feature)
           coords = _mainshockJson.geometry.coordinates;
           _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
           _bounds = _MapPane.map.getBounds();
