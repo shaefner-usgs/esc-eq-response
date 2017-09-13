@@ -19,8 +19,8 @@ _FLAG_DESCRIPTIONS = {
 };
 _MARKER_DEFAULTS = {
   iconSize: [14, 10],
-  iconAnchor: [7, 8],
-  popupAnchor: [0, -4]
+  iconAnchor: [7, 5],
+  popupAnchor: [0, -5]
 };
 _DEFAULTS = {
   json: {},
@@ -42,6 +42,7 @@ var Stations = function (options) {
   var _this,
       _initialize,
 
+      _count,
       _id,
       _mapLayer,
       _markerOptions,
@@ -54,6 +55,7 @@ var Stations = function (options) {
       _formatLocation,
       _formatTitle,
       _generatePopupContent,
+      _getName,
       _onEachFeature,
       _pointToLayer;
 
@@ -63,14 +65,11 @@ var Stations = function (options) {
   _initialize = function () {
     // Unique id; note that value is "baked into" app's js/css
     _id = 'stations';
+    _count = 0;
 
     options = options || {};
 
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
-
-    _this.displayLayer = false;
-    _this.id = _id;
-    _this.name = options.name;
 
     _mapLayer = L.geoJson(options.json, {
       filter: _filter,
@@ -78,6 +77,10 @@ var Stations = function (options) {
       pointToLayer: _pointToLayer
     });
     _mapLayer.id = _id; // Attach id to L.Layer
+
+    _this.displayLayer = false;
+    _this.id = _id;
+    _this.name = _getName();
   };
 
   _createAmplitudesObject = function (amplitudes) {
@@ -263,6 +266,15 @@ var Stations = function (options) {
   };
 
   /**
+   * Get layer name of feature (adds number of features to name)
+   *
+   * @return {String}
+   */
+  _getName = function () {
+    return options.name + ' (' + _count + ')';
+  };
+
+  /**
    * Leaflet GeoJSON option: creates popups and tooltips
    *
    * @param feature {Object}
@@ -277,6 +289,8 @@ var Stations = function (options) {
       minWidth: 300,
       maxWidth: 400
     }).bindTooltip(tooltip);
+
+    _count ++;
   };
 
   /**
