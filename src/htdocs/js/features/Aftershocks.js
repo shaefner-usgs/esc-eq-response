@@ -39,6 +39,7 @@ var Aftershocks = function (options) {
     });
     _magThreshold = Math.floor(options.mainshockJson.properties.mag - 2.5);
 
+    _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();
   };

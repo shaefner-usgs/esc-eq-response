@@ -35,6 +35,7 @@ var Mainshock = function (options) {
       mainshockJson: options.mainshockJson
     });
 
+    _this.displayLayer = true;
     _this.id = id;
     _this.name = options.name;
   };

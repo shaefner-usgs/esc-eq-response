@@ -151,16 +151,21 @@ var Features = function (options) {
     var layer;
 
     layer = feature.getMapLayer();
-    _MapPane.map.addLayer(layer);
     _MapPane.layerController.addOverlay(layer, feature.name);
 
-    // Set bounds to contain added layer if adding for the first time
-    if (_initialLoad) {
-      _bounds.extend(layer.getBounds());
-      _MapPane.map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 45), // accommodate navbar
-        reset: true
-      });
+    // Turn layer "on" if it is set to be displayed by default
+    if (feature.displayLayer) {
+      _MapPane.map.addLayer(layer);
+
+      // Set bounds to contain added layer if adding for the first time
+      if (_initialLoad) {
+        _bounds.extend(layer.getBounds());
+        _MapPane.map.fitBounds(_bounds, {
+          paddingTopLeft: L.point(0, 45), // accommodate navbar
+          reset: true
+        });
+      }
+
     }
   };
 

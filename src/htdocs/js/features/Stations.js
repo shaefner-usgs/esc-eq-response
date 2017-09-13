@@ -68,6 +68,7 @@ var Stations = function (options) {
 
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
+    _this.displayLayer = false;
     _this.id = _id;
     _this.name = options.name;
 

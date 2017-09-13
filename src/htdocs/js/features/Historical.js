@@ -39,6 +39,7 @@ var Historical = function (options) {
     });
     _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
 
+    _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();
   };
