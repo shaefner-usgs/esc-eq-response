@@ -391,6 +391,8 @@ var PlotsPane = function (options) {
   /**
    * Add feature to plots pane
    *   (called by Features.js)
+   *
+   * @param opts {Object}
    */
   _this.addPlots = function (opts) {
     _addMagTimePlot(opts);
