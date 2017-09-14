@@ -99,10 +99,12 @@ var PlotsPane = function (options) {
         trace;
 
     plotId = 'cumulative';
-    container = _addContainer(plotId, 'Cumulative # of Aftershocks', opts);
+    container = _addContainer(plotId, 'Cumulative Aftershocks', opts);
 
     trace = _getTrace({
-      data: opts.data.aftershocks.plotdata, 
+      data: opts.data.aftershocks.plotdata,
+      mainshockDate: opts.data.mainshock.plotdata.date[0],
+      mainshockTime: opts.data.mainshock.plotdata.time[0],
       plot: plotId,
       type: 'scatter'
     });
@@ -310,25 +312,42 @@ var PlotsPane = function (options) {
     var data,
         mode,
         sizeref,
+        text,
         trace,
         x,
         y,
         z;
 
     data = opts.data;
-    mode = 'markers';
 
     if (opts.plot === 'cumulative') {
       mode = 'lines';
       x = data.time;
-      y = Array.from(new Array(x.length), function (val, i) { return i + 1; });
+      // Fill y with values from 1 to length of x
+      y = Array.from(new Array(x.length), function (val, i) {
+        return i + 1;
+      });
+
+      // Add origin point to beginning of trace
+      x.unshift(opts.mainshockTime);
+      y.unshift(0);
+      data.date.unshift(opts.mainshockDate);
+
+      // Add date field to hover text
+      text = y.map(function(val, i) {
+        return val + '<br />' + data.date[i];
+      });
     } else if (opts.plot === 'hypocenters') {
+      mode = 'markers';
       sizeref = 0.79; // Plotly doesn't honor size value on 3d plots; adjust it.
+      text = data.text;
       x = data.lon;
       y = data.lat;
       z = data.depth;
     } else if (opts.plot === 'magtime') {
+      mode = 'markers';
       sizeref = 1;
+      text = data.text;
       x = data.time;
       y = data.mag;
     }
@@ -343,22 +362,24 @@ var PlotsPane = function (options) {
           size: 15
         }
       },
-      marker: {
+      mode: mode,
+      text: text,
+      type: opts.type,
+      x: x,
+      y: y,
+      z: z
+    };
+
+    if (mode === 'markers') {
+      trace.marker = {
         color: data.color, // fill
         line: {
           color: 'rgb(51, 51, 51)' // stroke
         },
         size: data.size,
         sizeref: sizeref,
-      },
-      mode: mode,
-      //name: opts.name,
-      text: data.text,
-      type: opts.type,
-      x: x,
-      y: y,
-      z: z
-    };
+      };
+    }
 
     return trace;
   };
