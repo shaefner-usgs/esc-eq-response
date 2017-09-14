@@ -18,8 +18,9 @@ var PlotsPane = function (options) {
       _features,
       _plots,
 
-      _add3dPlot,
       _addContainer,
+      _addCumulativePlot,
+      _addHypocentersPlot,
       _addMagTimePlot,
       _getLayout,
       _getRatio,
@@ -35,50 +36,17 @@ var PlotsPane = function (options) {
     _features = _el.querySelector('.features');
     _plots = [];
 
-    // Make plot(s) responsive
+    // Make plots responsive
     window.onresize = function() {
       _this.resizePlots();
     };
   };
 
   /**
-   * Add 3d plot to plot pane
-   *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
-   */
-  _add3dPlot = function (opts) {
-    var container,
-        data,
-        layout,
-        trace,
-        zRatio;
-
-    container = _addContainer('plot3d', '3D Hypocenters', opts);
-
-    // Get traces for plot and store in data (mainshock is in a separate trace)
-    data = [];
-    Object.keys(opts.data).forEach(function(key) {
-      trace = _getTrace('scatter3d', opts.data[key].plotdata, key);
-      data.push(trace);
-    });
-
-    zRatio = _getRatio(trace);
-    layout = _getLayout(zRatio);
-
-    Plotly.plot(container, data, layout, {
-      showLink: false
-    });
-  };
-
-  /**
    * Add plot container to DOM and store it in _plots
    *
    * @param containerClass {String}
+   * @param title {String}
    * @param opts {Object}
    *
    * @return container {Element}
@@ -115,6 +83,86 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Add cumulative aftershocks plot to plot pane
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // plot data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
+   */
+  _addCumulativePlot = function (opts) {
+    var container,
+        layout,
+        plotId,
+        trace;
+
+    plotId = 'cumulative';
+    container = _addContainer(plotId, 'Cumulative # of Aftershocks', opts);
+
+    trace = _getTrace({
+      data: opts.data.aftershocks.plotdata, 
+      plot: plotId,
+      type: 'scatter'
+    });
+
+    layout = _getLayout({
+      plot: plotId
+    });
+
+    Plotly.plot(container, [trace], layout, {
+      showLink: false
+    });
+
+    // Select 'closest' instead of 'compare' for hover data
+    container.querySelector('[data-title="Show closest data on hover"]').click();
+  };
+
+  /**
+   * Add Hypocenters plot to plot pane
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // plot data
+   *     id: {String}, // used for css class on container elem
+   *     name: {String} // feature name
+   *   }
+   */
+  _addHypocentersPlot = function (opts) {
+    var container,
+        data,
+        layout,
+        plotId,
+        trace,
+        zRatio;
+
+    plotId = 'hypocenters';
+    container = _addContainer(plotId, '3D Hypocenters', opts);
+
+    // Get traces for plot and store in data (mainshock is in a separate trace)
+    data = [];
+    Object.keys(opts.data).forEach(function(key) {
+      trace = _getTrace({
+        data: opts.data[key].plotdata,
+        plot: plotId,
+        type: 'scatter3d'
+      });
+      data.push(trace);
+    });
+
+    zRatio = _getRatio(trace);
+    layout = _getLayout({
+      plot: plotId,
+      zRatio: zRatio
+    });
+
+    Plotly.plot(container, data, layout, {
+      showLink: false
+    });
+  };
+
+  /**
    * Add mag-time plot to plot pane
    *
    * @param opts {Object}
@@ -128,35 +176,43 @@ var PlotsPane = function (options) {
     var container,
         data,
         layout,
+        plotId,
         trace;
 
-    container = _addContainer('plotmt', 'Magnitude vs. Time', opts);
+    plotId = 'magtime';
+    container = _addContainer(plotId, 'Magnitude vs. Time', opts);
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
     Object.keys(opts.data).forEach(function(key) {
-      trace = _getTrace('scatter', opts.data[key].plotdata, key);
+      trace = _getTrace({
+        data: opts.data[key].plotdata,
+        plot: plotId,
+        type: 'scatter'
+      });
       data.push(trace);
     });
 
-    layout = _getLayout();
+    layout = _getLayout({
+      plot: plotId
+    });
 
     Plotly.plot(container, data, layout, {
       showLink: false
     });
 
     // Select 'closest' instead of 'compare' for hover data
-    document.querySelector('[data-title="Show closest data on hover"]').click();
+    container.querySelector('[data-title="Show closest data on hover"]').click();
   };
 
   /**
    * Get plot layout config for plotly.js
    *
-   * @param zRatio {Number} optional
+   * @param opts {Object}
    *
    * @return layout {Object}
    */
-  _getLayout = function (zRatio) {
+  _getLayout = function (opts) {
     var layout,
         titlefont;
 
@@ -177,12 +233,12 @@ var PlotsPane = function (options) {
       showlegend: false
     };
 
-    if (zRatio) { // if set, assume this is a 3d plot
+    if (opts.plot === 'hypocenters') {
       layout.scene = {
         aspectratio: {
           x: 1,
           y: 1,
-          z: zRatio
+          z: opts.zRatio
         },
         xaxis: {
           title: 'longitude',
@@ -202,8 +258,16 @@ var PlotsPane = function (options) {
         title: 'time (UTC)',
         titlefont: titlefont
       };
+    }
+
+    if (opts.plot === 'magtime') {
       layout.yaxis = {
         title: 'magnitude',
+        titlefont: titlefont
+      };
+    } else {
+      layout.yaxis = {
+        title: 'aftershocks',
         titlefont: titlefont
       };
     }
@@ -238,26 +302,32 @@ var PlotsPane = function (options) {
   /**
    * Get plot trace config for plotly.js
    *
-   * @param data {Object}
-   *     earthquake data
-   * @param name {String}
-   *     name of trace
+   * @param opts {Object}
    *
    * @return trace {Object}
    */
-  _getTrace = function  (type, data, name) {
-    var sizeref,
+  _getTrace = function  (opts) {
+    var data,
+        mode,
+        sizeref,
         trace,
         x,
         y,
         z;
 
-    if (type === 'scatter3d') {
+    data = opts.data;
+    mode = 'markers';
+
+    if (opts.plot === 'cumulative') {
+      mode = 'lines';
+      x = data.time;
+      y = Array.from(new Array(x.length), function (val, i) { return i + 1; });
+    } else if (opts.plot === 'hypocenters') {
       sizeref = 0.79; // Plotly doesn't honor size value on 3d plots; adjust it.
       x = data.lon;
       y = data.lat;
       z = data.depth;
-    } else {
+    } else if (opts.plot === 'magtime') {
       sizeref = 1;
       x = data.time;
       y = data.mag;
@@ -270,7 +340,7 @@ var PlotsPane = function (options) {
         bordercolor: 'rgb(153, 153, 153)',
         font: {
           color: 'rgb(0, 0, 0)',
-          size: 14.4
+          size: 15
         }
       },
       marker: {
@@ -281,10 +351,10 @@ var PlotsPane = function (options) {
         size: data.size,
         sizeref: sizeref,
       },
-      mode: 'markers',
-      name: name,
+      mode: mode,
+      //name: opts.name,
       text: data.text,
-      type: type,
+      type: opts.type,
       x: x,
       y: y,
       z: z
@@ -303,7 +373,8 @@ var PlotsPane = function (options) {
    */
   _this.addPlots = function (opts) {
     _addMagTimePlot(opts);
-    _add3dPlot(opts);
+    _addCumulativePlot(opts);
+    _addHypocentersPlot(opts);
   };
 
   /**

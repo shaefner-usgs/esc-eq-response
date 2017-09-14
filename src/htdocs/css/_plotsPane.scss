@@ -32,16 +32,21 @@
     [data-title="Reset axes"],
     [data-title="Toggle Spike Lines"],
     [data-title="Compare data on hover"],
-    [data-title="Produced with Plotly"] {
+    [data-title="Produced with Plotly"],
+    [data-title="Show closest data on hover"],
+    [data-title="Toggle show closest data on hover"] {
       display: none;
     }
   }
 
-  .plotmt {
+  .cumulative {
     height: 40vh;
   }
-  .plot3d {
+  .hypocenters {
     height: 80vh;
+  }
+  .magtime {
+    height: 40vh;
   }
 
   .xtitle, .ytitle {
