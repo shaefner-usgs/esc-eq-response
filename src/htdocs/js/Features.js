@@ -115,7 +115,9 @@ var Features = function (options) {
       }
 
       // Create a separate map pane within overlayPane for feature
-      _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
+      if (!_MapPane.map.getPane(id)) {
+        _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
+      }
 
       // Add feature to map, summary panes
       _addMapLayer(feature);
