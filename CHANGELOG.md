@@ -5,10 +5,12 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: don't recreate map panes for features if they already exist
+* Add cumulative aftershocks plot
 * Add ShakeMap stations layer
 * Bug fix: layer order in layer controller should be same as rendered on map
 * Sort layers in layer controller
-* Bug fix: ensure status bar stays on top of all panes
+* Bug fix: ensure status bar displays on top of map pane
 * Make font sizes / colors more consistent btwn app panes
 * Change 'View Map' button to green to be more intuitive
 * Set z-index on status bar entries to control display order
@@ -19,7 +21,7 @@ An in-progress version being developed on the `master` branch.
 * Upgrade to Leaflet 1.x
   - Use new pane management feature to control order of layers on map
   - Bug fix: layers now stay in correct order when toggling on/off
-  - Bug fix: map always zoomed to correct extent on initial load (hopefully)
+  - Bug fix: map always zooms to correct extent on initial load (hopefully)
 
 ## 0.3.0 (2017-08-25)
 
