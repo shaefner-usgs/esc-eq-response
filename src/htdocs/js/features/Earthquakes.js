@@ -87,6 +87,7 @@ var Earthquakes = function (options) {
     _eqList = {};
     _plotdata = {
       color: [],
+      date: [],
       depth: [],
       lat: [],
       lon: [],
@@ -407,6 +408,7 @@ var Earthquakes = function (options) {
     _lastId = eqid;
 
     // Add props to _plotdata (additional props are added in _pointToLayer)
+    _plotdata.date.push(utcTime);
     _plotdata.depth.push(coords[2] * -1); // return a negative number for depth
     _plotdata.lat.push(coords[1]);
     _plotdata.lon.push(coords[0]);
