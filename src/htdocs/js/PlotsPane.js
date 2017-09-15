@@ -116,9 +116,6 @@ var PlotsPane = function (options) {
     Plotly.plot(container, [trace], layout, {
       showLink: false
     });
-
-    // Select 'closest' instead of 'compare' for hover data
-    container.querySelector('[data-title="Show closest data on hover"]').click();
   };
 
   /**
@@ -202,9 +199,6 @@ var PlotsPane = function (options) {
     Plotly.plot(container, data, layout, {
       showLink: false
     });
-
-    // Select 'closest' instead of 'compare' for hover data
-    container.querySelector('[data-title="Show closest data on hover"]').click();
   };
 
   /**
@@ -228,6 +222,7 @@ var PlotsPane = function (options) {
       font: {
         family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
       },
+      hovermode: 'closest',
       margin: {
         b: 50,
         l: 50,
