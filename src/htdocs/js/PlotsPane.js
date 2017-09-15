@@ -216,8 +216,10 @@ var PlotsPane = function (options) {
    */
   _getLayout = function (opts) {
     var layout,
+        spikecolor,
         titlefont;
 
+    spikecolor = '#999';
     titlefont = {
       color: 'rgb(0, 0, 0)'
     };
@@ -237,22 +239,36 @@ var PlotsPane = function (options) {
 
     if (opts.plot === 'hypocenters') {
       layout.scene = {
+        aspectmode: 'manual',
         aspectratio: {
           x: 1,
           y: 1,
           z: opts.zRatio
         },
+        camera: {
+          eye: {
+            'x': 0,
+            'y': -0.001,
+            'z': 2
+          }
+        },
         xaxis: {
+          spikecolor: spikecolor,
           title: 'longitude',
-          titlefont: titlefont
+          titlefont: titlefont,
+          zeroline: false
         },
         yaxis: {
+          spikecolor: spikecolor,
           title: 'latitude',
-          titlefont: titlefont
+          titlefont: titlefont,
+          zeroline: false
         },
         zaxis: {
+          spikecolor: spikecolor,
           title: 'depth (km)',
-          titlefont: titlefont
+          titlefont: titlefont,
+          zeroline: false
         }
       };
     } else {
