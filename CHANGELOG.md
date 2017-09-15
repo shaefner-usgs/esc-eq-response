@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add 'autoscale' button to hypocenters plot
+* Set default view of hypocenters plot to map view
 * Bug fix: don't recreate map panes for features if they already exist
 * Add cumulative aftershocks plot
 * Add ShakeMap stations layer
