@@ -177,6 +177,7 @@ var NavBar = function (options) {
 
   /**
    * Clear saved scroll positions from session storage
+   *   set to '0' instead of removing so all values are explicitly set
    */
   _this.clearScrollPositions = function () {
     var i,
@@ -184,7 +185,7 @@ var NavBar = function (options) {
 
     for (i = 0; i < _panes.length; i ++) {
       id = _panes[i].hash.substr(1);
-      window.sessionStorage.removeItem(id);
+      window.sessionStorage.setItem(id, 0);
     }
   };
 
