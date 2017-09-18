@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: set scroll position to '0' instead of just removing value
+* Bug fix: tweak shakemap check so app doesn't bomb when event has no shakemap
 * Add 'autoscale' button to hypocenters plot
 * Set default view of hypocenters plot to map view
 * Bug fix: don't recreate map panes for features if they already exist
