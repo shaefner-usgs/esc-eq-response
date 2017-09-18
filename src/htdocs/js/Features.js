@@ -294,16 +294,16 @@ var Features = function (options) {
     var shakemap,
         url;
 
-    shakemap = _mainshockJson.properties.products.shakemap[0];
+    shakemap = _mainshockJson.properties.products.shakemap;
     if (shakemap) {
-      url = shakemap.contents['download/stationlist.json'].url;
-    }
+      url = shakemap[0].contents['download/stationlist.json'].url;
 
-    _loadFeed({
-      name: 'ShakeMap Stations',
-      jsClass: Stations,
-      url: url
-    });
+      _loadFeed({
+        name: 'ShakeMap Stations',
+        jsClass: Stations,
+        url: url
+      });
+    }
   };
 
   /**
@@ -350,7 +350,7 @@ var Features = function (options) {
           _editPane.setDefaults(_mainshockJson);
 
           // Center map around mainshock for now
-          //   (some added features set map extent to contain feature)
+          //   (some added features set map extent to contain itself)
           coords = _mainshockJson.geometry.coordinates;
           _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
           _bounds = _MapPane.map.getBounds();
