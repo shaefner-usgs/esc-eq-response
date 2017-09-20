@@ -1,35 +1,49 @@
 'use strict';
 
-var BasicPinView = require('core/BasicPinView'),
-    BeachBallView = require('moment-tensor/BeachBallView'),
-    MomentTensorModule = require('moment-tensor/MomentTensorModule'),
-    Tensor = require('moment-tensor/Tensor'),
-    Util = require('util/Util');
+var BeachBallView = require('beachballs/BeachBallView'),
+    Tensor = require('beachballs/Tensor'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _DEFAULTS = {
   className: 'moment-tensor-pin-beachball',
   fillColor: '#6ea8ff',
-  module: MomentTensorModule
+  labelAxes: false,
+  labelPlanes: false,
+  size: 200,
+  type: 'moment-tensor'
 };
 
 
-var MomentTensorPinView = function (options) {
+var MomentTensor = function (options) {
   var _this,
       _initialize,
 
       _beachballView,
       _className,
+      _data,
       _fillColor,
-      _tensor;
+      _labelAxes,
+      _labelPlanes,
+      _size,
+      _tensor,
+      _type;
 
-  options = Util.extend({}, _DEFAULTS, options);
-  _this = BasicPinView(options);
+  _this = {};
 
   _initialize = function (options) {
+    options = Util.extend({}, _DEFAULTS, options);
+
+    _data = options.data;
     _className = options.className;
     _fillColor = options.fillColor;
-    _tensor = Tensor.fromProduct(_this.model);
+    _labelAxes = options.labelAxes;
+    _labelPlanes = options.labelPlanes;
+    _size = options.size;
+    _type = options.type;
+
+    _data.type = _type; // attach _type so it's available to Tensor class
+    _tensor = Tensor.fromProduct(_data);
   };
 
   _this.destroy = Util.compose(function () {
@@ -47,21 +61,24 @@ var MomentTensorPinView = function (options) {
   }, _this.destroy);
 
   /**
-   * Creats pin content
+   * Create/render beachball
    */
-  _this.renderPinContent = function () {
-    Util.empty(_this.content);
+  _this.render = function (el) {
+    var beachball;
+
+    beachball = document.createElement('div');
+    beachball.classList.add(_className);
+    el.appendChild(beachball);
 
     _beachballView = BeachBallView({
+      el: beachball,
       fillColor: _fillColor,
-      labelAxes: false,
-      labelPlanes: false,
-      size: 200,
+      labelAxes: _labelAxes,
+      labelPlanes: _labelPlanes,
+      size: _size,
       tensor: _tensor
     });
 
-    _beachballView.el.classList.add(_className);
-    _this.content.appendChild(_beachballView.el);
     _beachballView.render();
   };
 
@@ -72,4 +89,4 @@ var MomentTensorPinView = function (options) {
 };
 
 
-module.exports = MomentTensorPinView;
+module.exports = MomentTensor;

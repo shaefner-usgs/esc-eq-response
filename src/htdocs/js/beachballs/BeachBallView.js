@@ -1,9 +1,8 @@
 /* This is based on code in GMT, utilmeca.c. */
 'use strict';
 
-var Canvas = require('moment-tensor/Canvas'),
-    Util = require('util/Util'),
-    View = require('mvc/View');
+var Canvas = require('beachballs/Canvas'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _D2R,
@@ -134,10 +133,12 @@ var BeachBallView = function (options) {
       _x0,
       _y0;
 
-  _this = View(options);
+  _this = {};
 
   _initialize = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
+
+    _this.el = options.el;
 
     _bgColor = options.bgColor;
     _fillColor = options.fillColor;

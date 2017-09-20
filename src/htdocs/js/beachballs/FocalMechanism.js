@@ -1,31 +1,30 @@
 'use strict';
 
 
-var FocalMechanismModule = require('focal-mechanism/FocalMechanismModule'),
-    MomentTensorPinView = require('moment-tensor/MomentTensorPinView'),
-    Util = require('util/Util');
+var MomentTensor = require('beachballs/MomentTensor'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _DEFAULTS = {
   className: 'focal-mechanism-pin-beachball',
   fillColor: '#ffaa69',
-  module: FocalMechanismModule
+  type: 'focal-mechanism'
 };
 
 
 /**
- * This view is used for rendering a focal mechanism pin. Currently it
- * does the same thing as the {MomentTensorPinView} (i.e. a beachball), but
+ * This class for rendering a focal mechanism. Currently it
+ * does the same thing as {MomentTensor} (i.e. a beachball), but
  * uses a different color and className by default.
  *
- * @see {moment-tensor/MomentTensorPinView}
+ * @see {beachballs/MomentTensor}
  */
-var FocalMechanismPinView = function (options) {
+var FocalMechanism = function (options) {
   var _this;
 
 
   options = Util.extend({}, _DEFAULTS, options);
-  _this = MomentTensorPinView(options);
+  _this = MomentTensor(options);
 
 
   options = null;
@@ -33,4 +32,4 @@ var FocalMechanismPinView = function (options) {
 };
 
 
-module.exports = FocalMechanismPinView;
+module.exports = FocalMechanism;

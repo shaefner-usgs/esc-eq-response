@@ -60,42 +60,40 @@ __calculatePlane = function (v1, v2) {
  */
 __fromProduct = function (product) {
   var depth,
-      props,
       type,
       tensor;
 
   tensor = null;
-  type = product.get('type');
-  props = product.get('properties') || {};
+  type = product.type;
 
   if (type === 'focal-mechanism') {
     tensor = __fromStrikeDipRake(
-        Number(props['nodal-plane-1-strike']),
-        Number(props['nodal-plane-1-dip']),
-        Number(props['nodal-plane-1-rake'] || props['nodal-plane-1-slip'] || 0),
-        Number(props['scalar-moment'] || Math.SQRT2));
+        Number(product['nodal-plane-1-strike']),
+        Number(product['nodal-plane-1-dip']),
+        Number(product['nodal-plane-1-rake'] || product['nodal-plane-1-slip'] || 0),
+        Number(product['scalar-moment'] || Math.SQRT2));
   } else if (type === 'moment-tensor') {
     tensor = Tensor({
-      mrr: Number(props['tensor-mrr']),
-      mtt: Number(props['tensor-mtt']),
-      mpp: Number(props['tensor-mpp']),
-      mrt: Number(props['tensor-mrt']),
-      mrp: Number(props['tensor-mrp']),
-      mtp: Number(props['tensor-mtp'])
+      mrr: Number(product['tensor-mrr']),
+      mtt: Number(product['tensor-mtt']),
+      mpp: Number(product['tensor-mpp']),
+      mrt: Number(product['tensor-mrt']),
+      mrp: Number(product['tensor-mrp']),
+      mtp: Number(product['tensor-mtp'])
     });
 
-    depth = product.getProperty('derived-depth');
+    depth = product['derived-depth'];
     if (depth === null)  {
-      depth = product.getProperty('depth');
+      depth = product.depth;
     }
 
     tensor.depth = depth;
   }
 
   if (tensor) {
-    type = product.getProperty('derived-magnitude-type');
+    type = product['derived-magnitude-type'];
     if (!type) {
-      type = product.getProperty('beachball-type');
+      type = product['beachball-type'];
       if (type && _BEACHBALL_METHODS.hasOwnProperty(type)) {
         type = _BEACHBALL_METHODS[type];
       }
