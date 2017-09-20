@@ -64,14 +64,8 @@ var MomentTensor = function (options) {
    * Create/render beachball
    */
   _this.render = function (el) {
-    var beachball;
-
-    beachball = document.createElement('div');
-    beachball.classList.add(_className);
-    el.appendChild(beachball);
-
     _beachballView = BeachBallView({
-      el: beachball,
+      el: el,
       fillColor: _fillColor,
       labelAxes: _labelAxes,
       labelPlanes: _labelPlanes,
