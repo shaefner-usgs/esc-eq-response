@@ -1,7 +1,9 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/Earthquakes'),
+    FocalMechanism = require('beachballs/FocalMechanism'),
+    MomentTensor = require('beachballs/MomentTensor');
 
 
 /**
@@ -18,7 +20,11 @@ var Mainshock = function (options) {
   var _this,
       _initialize,
 
-      _earthquakes;
+      _earthquakes,
+      _mainshockJson,
+
+      _getFocalMechanism,
+      _getMomentTensor;
 
 
   _this = {};
@@ -29,15 +35,55 @@ var Mainshock = function (options) {
 
     options = options || {};
 
+    _mainshockJson = options.mainshockJson;
+
     _earthquakes = Earthquakes({
       id: id,
       json: options.json,
-      mainshockJson: options.mainshockJson
+      mainshockJson: _mainshockJson
     });
 
     _this.displayLayer = true;
     _this.id = id;
     _this.name = options.name;
+  };
+
+  /**
+   * Get focal mechanism
+   *
+   * @return beachball {Object}
+   */
+  _getFocalMechanism = function () {
+    var beachball,
+        focalMechanism;
+
+    focalMechanism = _mainshockJson.properties.products['focal-mechanism'];
+    if (focalMechanism) {
+      beachball = FocalMechanism({
+        data: focalMechanism[0].properties
+      });
+    }
+
+    return beachball;
+  };
+
+  /**
+   * Get moment tensor
+   *
+   * @return beachball {Object}
+   */
+  _getMomentTensor = function () {
+    var beachball,
+        momentTensor;
+
+    momentTensor = _mainshockJson.properties.products['moment-tensor'];
+    if (momentTensor) {
+      beachball = MomentTensor({
+        data: momentTensor[0].properties
+      });
+    }
+
+    return beachball;
   };
 
   // ----------------------------------------------------------
@@ -71,7 +117,9 @@ var Mainshock = function (options) {
    */
   _this.getSummaryData = function () {
     return {
-      detailsHtml: _earthquakes.getDetails()
+      detailsHtml: _earthquakes.getDetails(),
+      focalMechanism: _getFocalMechanism(),
+      momentTensor: _getMomentTensor()
     };
   };
 
