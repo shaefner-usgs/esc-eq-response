@@ -108,7 +108,7 @@
   .bins {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: -1.5em;
+    margin-bottom: -1.25em;
 
     table {
       margin-right: 2em;
@@ -152,6 +152,24 @@
     }
     td.total {
       background-color: #fafafa;
+    }
+  }
+
+  .modules {
+    display: flex;
+    flex-wrap: wrap;
+
+    > div {
+      margin-right: 2em;
+      padding-right: 2em;
+
+      &:last-child {
+        border: 0;
+      }
+    }
+
+    h4 {
+      margin-top: 0;
     }
   }
 }

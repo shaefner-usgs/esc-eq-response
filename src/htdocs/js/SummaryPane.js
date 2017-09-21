@@ -176,12 +176,16 @@ var SummaryPane = function (options) {
     id = opts.id;
 
     summary = '<h2>' + opts.name + '</h2>';
-    summary += data.detailsHtml;
 
     if (id === 'mainshock') {
+      summary += '<div class="modules">';
+      summary += data.detailsHtml;
       // Add placeholders; beachballs are actually added in addSummary()
       summary += '<div class="focal-mechanism"><h4>Focal Mechanism</h4></div>';
       summary += '<div class="moment-tensor"><h4>Moment Tensor</h4></div>';
+      summary += '</div>';
+    } else {
+      summary += data.detailsHtml;
     }
 
     if (id === 'aftershocks' || id === 'historical') {
