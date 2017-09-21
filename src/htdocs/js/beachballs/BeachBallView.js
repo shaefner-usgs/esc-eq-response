@@ -863,7 +863,7 @@ var BeachBallView = function (options) {
     // draw azimuth labels
     azimuthLabels.forEach(_this.labelAzimuth);
 
-    Util.empty(_this.el);
+    //Util.empty(_this.el);
     _this.el.appendChild(_canvas.canvas);
     _canvas.destroy();
     _canvas = null;
