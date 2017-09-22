@@ -10,11 +10,17 @@
 .leaflet-aftershocks-pane {
   z-index: 422;
 }
+.leaflet-focal-mechanism-pane {
+  z-index: 425;
+}
 .leaflet-historical-pane {
   z-index: 421;
 }
 .leaflet-mainshock-pane {
   z-index: 423;
+}
+.leaflet-moment-tensor-pane {
+  z-index: 424;
 }
 .leaflet-stations-pane {
   z-index: 420;
