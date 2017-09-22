@@ -43,7 +43,6 @@ var Stations = function (options) {
       _initialize,
 
       _count,
-      _id,
       _mapLayer,
       _markerOptions,
 
@@ -64,11 +63,15 @@ var Stations = function (options) {
 
   _initialize = function () {
     // Unique id; note that value is "baked into" app's js/css
-    _id = 'stations';
-    _count = 0;
+    var id = 'stations';
 
     options = options || {};
 
+    _this.displayLayer = false;
+    _this.id = id;
+    _this.name = _getName();
+
+    _count = 0;
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _mapLayer = L.geoJson(options.json, {
@@ -76,11 +79,7 @@ var Stations = function (options) {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _mapLayer.id = _id; // Attach id to L.Layer
-
-    _this.displayLayer = false;
-    _this.id = _id;
-    _this.name = _getName();
+    _mapLayer.id = id; // Attach id to L.Layer
   };
 
   _createAmplitudesObject = function (amplitudes) {
@@ -312,7 +311,7 @@ var Stations = function (options) {
 
     return L.marker(latlng, {
       icon: L.divIcon(_markerOptions),
-      pane: _id
+      pane: _this.id
     });
   };
 
