@@ -7,6 +7,7 @@ var Aftershocks = require('features/Aftershocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
     Moment = require('moment'),
+    MomentTensorFeature = require('features/MomentTensorFeature'),
     Stations = require('features/Stations'),
     Xhr = require('util/Xhr');
 
@@ -55,6 +56,7 @@ var Features = function (options) {
       _getEqFeedUrl,
       _getHistorical,
       _getMainshock,
+      _getMomentTensor,
       _getStations,
       _getStatusBarId,
       _loadFeed,
@@ -295,6 +297,23 @@ var Features = function (options) {
   };
 
   /**
+   * Get moment tensor feature
+   */
+  _getMomentTensor = function () {
+    var momentTensor;
+
+    momentTensor = _mainshockJson.properties.products['moment-tensor'];
+    if (momentTensor) {
+      _addFeature({
+        jsClass: MomentTensorFeature,
+        json: momentTensor[0].properties,
+        mainshockJson: _mainshockJson,
+        name: 'Moment Tensor'
+      });
+    }
+  };
+
+  /**
    * Get ShakeMap stations feature
    */
   _getStations = function () {
@@ -458,6 +477,7 @@ var Features = function (options) {
       // 3. Create other features (called via mainshock's callback)
       _getAftershocks();
       _getHistorical();
+      _getMomentTensor();
       _getStations();
     }
   };
