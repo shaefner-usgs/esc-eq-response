@@ -6,7 +6,7 @@ var MomentTensor = require('beachballs/MomentTensor'),
 
 
 var _DEFAULTS = {
-  className: 'focal-mechanism-pin-beachball',
+  className: 'focal-mechanism',
   fillColor: '#ffaa69',
   type: 'focal-mechanism'
 };

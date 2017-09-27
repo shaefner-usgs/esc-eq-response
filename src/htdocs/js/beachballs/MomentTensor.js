@@ -6,7 +6,7 @@ var BeachBallView = require('beachballs/BeachBallView'),
 
 
 var _DEFAULTS = {
-  className: 'moment-tensor-pin-beachball',
+  className: 'moment-tensor',
   fillColor: '#6ea8ff',
   labelAxes: false,
   labelPlanes: false,
@@ -65,6 +65,7 @@ var MomentTensor = function (options) {
    */
   _this.render = function (el) {
     _beachballView = BeachBallView({
+      className: _className,
       el: el,
       fillColor: _fillColor,
       labelAxes: _labelAxes,

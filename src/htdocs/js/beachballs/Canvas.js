@@ -17,6 +17,9 @@ var _DEFAULTS = {
  * @param options.canvas {DOMElement}
  *        Optional, An existing canvas element.
  *        If omitted, a new canvas element is created.
+ * @param options.className {String}
+ *        Optional
+ *        CSS class attached to canvas el
  * @param options.width {Number}
  *        Optional, default 100.
  *        Width of canvas, when options.canvas is null.
@@ -41,6 +44,9 @@ var Canvas = function (options) {
       _canvas = document.createElement('canvas');
       _canvas.width = options.width;
       _canvas.height = options.height;
+      if (options.className) {
+        _canvas.classList.add(options.className);
+      }
     }
     _context = _canvas.getContext('2d');
     // expose these as public properties

@@ -116,6 +116,7 @@ var BeachBallView = function (options) {
       _axisSize,
       _bgColor,
       _canvas,
+      _className,
       _fillColor,
       _height,
       _labelAxes,
@@ -141,6 +142,7 @@ var BeachBallView = function (options) {
     _this.el = options.el;
 
     _bgColor = options.bgColor;
+    _className = options.className;
     _fillColor = options.fillColor;
     _labelAxes = options.labelAxes;
     _labelAxesFont = options.labelAxesFont;
@@ -803,6 +805,7 @@ var BeachBallView = function (options) {
     azimuthLabels.forEach(_this.makeRoomForAzimuthLabel);
 
     _canvas = Canvas({
+      className: _className,
       height: _height,
       width: _width
     });
