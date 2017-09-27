@@ -346,7 +346,7 @@ var PlotsPane = function (options) {
     data = opts.data;
 
     if (opts.plot === 'cumulative') {
-      mode = 'lines';
+      mode = 'markers+lines';
       x = data.time;
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
@@ -403,6 +403,10 @@ var PlotsPane = function (options) {
         },
         size: data.size,
         sizeref: sizeref,
+      };
+    } else {
+      trace.marker = {
+        size: 4
       };
     }
 
