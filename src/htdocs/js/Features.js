@@ -50,6 +50,7 @@ var Features = function (options) {
       _addMapLayer,
       _addPlots,
       _addSummary,
+      _createMapPane,
       _getAftershocks,
       _getEqFeedUrl,
       _getHistorical,
@@ -114,12 +115,8 @@ var Features = function (options) {
         _plotdata[id] = feature.getPlotData();
       }
 
-      // Create a separate map pane within overlayPane for feature
-      if (!_MapPane.map.getPane(id)) {
-        _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
-      }
-
-      // Add feature to map, summary panes
+      // Create a new map pane and add feature to map, summary panes
+      _createMapPane(id);
       _addMapLayer(feature);
       _addSummary(feature);
 
@@ -167,7 +164,6 @@ var Features = function (options) {
           reset: true
         });
       }
-
     }
   };
 
@@ -196,6 +192,17 @@ var Features = function (options) {
         name: feature.name,
         data: feature.getSummaryData()
       });
+    }
+  };
+
+  /**
+   * Create a separate map pane within overlayPane for each feature
+   *
+   * @param id {String}
+   */
+  _createMapPane = function (id) {
+    if (!_MapPane.map.getPane(id)) {
+      _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
     }
   };
 
