@@ -2,13 +2,13 @@
 'use strict';
 
 
-var Aftershocks = require('features/Aftershocks'),
+var Aftershocks = require('features/AftershocksFeature'),
     AppUtil = require('AppUtil'),
-    Historical = require('features/Historical'),
-    Mainshock = require('features/Mainshock'),
+    Historical = require('features/HistoricalFeature'),
+    Mainshock = require('features/MainshockFeature'),
     Moment = require('moment'),
     MomentTensorFeature = require('features/MomentTensorFeature'),
-    Stations = require('features/Stations'),
+    Stations = require('features/StationsFeature'),
     Xhr = require('util/Xhr');
 
 
