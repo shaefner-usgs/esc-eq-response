@@ -180,7 +180,7 @@ var SummaryPane = function (options) {
     if (id === 'mainshock') {
       summary += '<div class="modules">';
       summary += data.detailsHtml;
-      // Add placeholders; beachballs are actually added in addSummary()
+      // Add placeholders for beachballs
       summary += '<div class="focal-mechanism"><h4>Focal Mechanism</h4></div>';
       summary += '<div class="moment-tensor"><h4>Moment Tensor</h4></div>';
       summary += '</div>';
@@ -322,10 +322,7 @@ var SummaryPane = function (options) {
   _this.addSummary = function (opts) {
     var cssClass,
         data,
-        div,
-        el,
-        focalMechanism,
-        momentTensor;
+        div;
 
     cssClass = opts.id;
     data = opts.data;
@@ -335,25 +332,6 @@ var SummaryPane = function (options) {
     div.classList.add('content', 'feature', cssClass);
     div.innerHTML = _getSummary(opts);
     _features.appendChild(div);
-
-    // Add focal mechanism and moment tensor to summary
-    if (opts.id === 'mainshock') {
-      el = _el.querySelector('.focal-mechanism');
-      focalMechanism = data.focalMechanism;
-      if (focalMechanism) {
-        focalMechanism.render(el);
-      } else { // clean up
-        el.parentNode.removeChild(el);
-      }
-
-      el = _el.querySelector('.moment-tensor');
-      momentTensor = data.momentTensor;
-      if (momentTensor) {
-        momentTensor.render(el);
-      } else { // clean up
-        el.parentNode.removeChild(el);
-      }
-    }
 
     if (opts.id === 'aftershocks') {
       div.classList.add('darker');

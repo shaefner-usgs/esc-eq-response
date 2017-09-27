@@ -1,9 +1,7 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes'),
-    FocalMechanism = require('beachballs/FocalMechanism'),
-    MomentTensor = require('beachballs/MomentTensor');
+var Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -21,10 +19,7 @@ var Mainshock = function (options) {
       _initialize,
 
       _earthquakes,
-      _mainshockJson,
-
-      _getFocalMechanism,
-      _getMomentTensor;
+      _mainshockJson;
 
 
   _this = {};
@@ -46,44 +41,6 @@ var Mainshock = function (options) {
     _this.displayLayer = true;
     _this.id = id;
     _this.name = options.name;
-  };
-
-  /**
-   * Get focal mechanism
-   *
-   * @return beachball {Object}
-   */
-  _getFocalMechanism = function () {
-    var beachball,
-        focalMechanism;
-
-    focalMechanism = _mainshockJson.properties.products['focal-mechanism'];
-    if (focalMechanism) {
-      beachball = FocalMechanism({
-        data: focalMechanism[0].properties
-      });
-    }
-
-    return beachball;
-  };
-
-  /**
-   * Get moment tensor
-   *
-   * @return beachball {Object}
-   */
-  _getMomentTensor = function () {
-    var beachball,
-        momentTensor;
-
-    momentTensor = _mainshockJson.properties.products['moment-tensor'];
-    if (momentTensor) {
-      beachball = MomentTensor({
-        data: momentTensor[0].properties
-      });
-    }
-
-    return beachball;
   };
 
   // ----------------------------------------------------------
@@ -117,9 +74,7 @@ var Mainshock = function (options) {
    */
   _this.getSummaryData = function () {
     return {
-      detailsHtml: _earthquakes.getDetails(),
-      focalMechanism: _getFocalMechanism(),
-      momentTensor: _getMomentTensor()
+      detailsHtml: _earthquakes.getDetails()
     };
   };
 
