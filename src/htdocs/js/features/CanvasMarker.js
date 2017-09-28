@@ -11,18 +11,18 @@ L.CanvasMarker = L.Marker.extend({
   onAdd: function(map) {
     var canvas,
         className,
-        markerDiv;
+        marker;
 
     // Call L.Marker's onAdd method first
     L.Marker.prototype.onAdd.call(this, map);
 
     // Move canvas element from below map to marker
-    //   Added to DOM when it's created, but marker doesn't exist yet.
+    // (it's added to the DOM when it's created and the marker doesn't exist yet)
     className = this.options.icon.options.className;
     canvas = document.querySelector('#mapPane canvas.' + className);
-    markerDiv = document.querySelector('.leaflet-marker-icon.' + className + ' div');
+    marker = document.querySelector('.leaflet-map-pane .' + className);
 
-    markerDiv.appendChild(canvas);
+    marker.appendChild(canvas);
   },
 
   onRemove: function(map) {
@@ -30,7 +30,7 @@ L.CanvasMarker = L.Marker.extend({
         className;
 
     className = this.options.icon.options.className;
-    canvas = document.querySelector('.leaflet-marker-icon.' + className + ' canvas');
+    canvas = document.querySelector('.' + className + ' canvas');
 
     // Move canvas element back to below map
     document.querySelector('#mapPane').appendChild(canvas);

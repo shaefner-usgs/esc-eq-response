@@ -73,7 +73,6 @@ var MomentTensorLayer = function (options) {
     _mapLayer = L.canvasMarker(coords, {
       icon: L.divIcon({
         className: _this.id,
-        html: '<div class="canvas"></div>', // placeholder for canvas element
         iconSize: L.point(size, size)
       }),
       pane: _this.id
