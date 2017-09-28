@@ -2,6 +2,10 @@
 'use strict';
 
 
+/**
+ * This class extends L.Marker by adding an existing canvas element in the page
+ * to the Leaflet Marker whenever it is turned on by user in the layer controller
+ */
 L.CanvasMarker = L.Marker.extend({
   initialize: function (latlng, options) {
     L.Util.setOptions(this, options);
