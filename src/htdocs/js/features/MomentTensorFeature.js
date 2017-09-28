@@ -5,44 +5,19 @@
 var MomentTensor = require('beachballs/MomentTensor'),
     Util = require('hazdev-webutils/src/util/Util');
 
+require('features/CanvasMarker');
 
-L.CanvasMarker = L.Marker.extend({
-  initialize: function (latlng, options) {
-    L.Util.setOptions(this, options);
-    L.Marker.prototype.initialize.call(this, latlng, this.options);
-  },
 
-  onAdd: function(map) {
-    var canvas,
-        className,
-        markerDiv;
-
-    L.Marker.prototype.onAdd.call(this, map);
-
-    className = this.options.icon.options.className;
-    canvas = document.querySelector('#mapPane canvas.' + className);
-    markerDiv = document.querySelector('.leaflet-marker-icon.' + className + ' div');
-
-    markerDiv.appendChild(canvas);
-  },
-
-  onRemove: function(map) {
-    var canvas,
-        className;
-
-    className = this.options.icon.options.className;
-    canvas = document.querySelector('.leaflet-marker-icon.' + className + ' canvas');
-
-    document.querySelector('#mapPane').appendChild(canvas);
-
-    L.Marker.prototype.onRemove.call(this, map);
-  }
-});
-
-L.canvasMarker = function(latlng, options) {
-  return new L.CanvasMarker(latlng, options);
-};
-
+/**
+ * Creates Moment Tensor feature
+ *
+ * @param options {Object}
+ *   {
+ *     json: {Object}, // geojson data for feature
+ *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     name: {String} // layer name
+ *   }
+ */
 var MomentTensorLayer = function (options) {
   var _this,
       _initialize,
@@ -73,6 +48,9 @@ var MomentTensorLayer = function (options) {
     _createLayer();
   };
 
+  /**
+   * Create Leaflet Layer
+   */
   _createLayer = function () {
     var beachball,
         coords,
@@ -95,7 +73,7 @@ var MomentTensorLayer = function (options) {
     _mapLayer = L.canvasMarker(coords, {
       icon: L.divIcon({
         className: _this.id,
-        html: '<div></div>',
+        html: '<div class="canvas"></div>', // placeholder for canvas element
         iconSize: L.point(size, size)
       }),
       pane: _this.id
