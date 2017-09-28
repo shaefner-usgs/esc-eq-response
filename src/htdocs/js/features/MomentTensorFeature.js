@@ -78,7 +78,7 @@ var MomentTensorLayer = function (options) {
         coords,
         size;
 
-    size = 30;
+    size = 40;
 
     // Render beachball under map for now (hidden by css)
     beachball = _getBeachBall({
