@@ -178,12 +178,15 @@ var SummaryPane = function (options) {
 
     if (id === 'focal-mechanism' || id === 'moment-tensor') {
       var beachball,
-          parent;
+          className,
+          h4;
 
       beachball = opts.data;
-      parent = _el.querySelector('.' + id + ' a');
+      className = '.' + id;
+      h4 = _el.querySelector(className + ' h4');
 
-      beachball.render(parent);
+      beachball.render(_el.querySelector(className + ' a'));
+      h4.innerHTML = opts.name;
 
       return;
     }
@@ -197,9 +200,9 @@ var SummaryPane = function (options) {
       summary += '<div class="modules">';
       summary += data.detailsHtml;
       // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism"><h4>Focal Mechanism</h4>' +
+      summary += '<div class="focal-mechanism"><h4></h4>' +
         '<a href="' + url + '#focal-mechanism"></a></div>';
-      summary += '<div class="moment-tensor"><h4>Moment Tensor</h4>' +
+      summary += '<div class="moment-tensor"><h4></h4>' +
         '<a href="' + url + '#moment-tensor"></a></div>';
       summary += '</div>';
     } else {
