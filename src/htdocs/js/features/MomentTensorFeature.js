@@ -18,7 +18,7 @@ require('features/CanvasMarker');
  *     name: {String} // layer name
  *   }
  */
-var MomentTensorLayer = function (options) {
+var MomentTensorFeature = function (options) {
   var _this,
       _initialize,
 
@@ -124,4 +124,4 @@ var MomentTensorLayer = function (options) {
 };
 
 
-module.exports = MomentTensorLayer;
+module.exports = MomentTensorFeature;
