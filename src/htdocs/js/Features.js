@@ -4,6 +4,7 @@
 
 var Aftershocks = require('features/AftershocksFeature'),
     AppUtil = require('AppUtil'),
+    FocalMechanismFeature = require('features/FocalMechanismFeature'),
     Historical = require('features/HistoricalFeature'),
     Mainshock = require('features/MainshockFeature'),
     Moment = require('moment'),
@@ -54,6 +55,7 @@ var Features = function (options) {
       _createMapPane,
       _getAftershocks,
       _getEqFeedUrl,
+      _getFocalMechanism,
       _getHistorical,
       _getMainshock,
       _getMomentTensor,
@@ -252,6 +254,23 @@ var Features = function (options) {
     queryString = '?' + pairs.join('&');
 
     return baseUri + queryString;
+  };
+
+  /**
+   * Get focal mechanism feature
+   */
+  _getFocalMechanism = function () {
+    var focalmechanism;
+
+    focalmechanism = _mainshockJson.properties.products['focal-mechanism'];
+    if (focalmechanism) {
+      _addFeature({
+        jsClass: FocalMechanismFeature,
+        json: focalmechanism[0].properties,
+        mainshockJson: _mainshockJson,
+        name: 'Focal Mechanism'
+      });
+    }
   };
 
   /**
@@ -476,6 +495,7 @@ var Features = function (options) {
       _getAftershocks();
       _getHistorical();
       _getMomentTensor();
+      _getFocalMechanism();
       _getStations();
     }
   };
