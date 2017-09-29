@@ -160,8 +160,7 @@
     flex-wrap: wrap;
 
     > div {
-      margin-right: 2em;
-      padding-right: 2em;
+      margin-right: 3em;
 
       &:last-child {
         border: 0;
@@ -169,7 +168,7 @@
     }
 
     h4 {
-      margin-top: 0;
+      margin: 0 0 1em;
       text-align: center;
     }
 
