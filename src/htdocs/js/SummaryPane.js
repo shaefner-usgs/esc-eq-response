@@ -170,19 +170,37 @@ var SummaryPane = function (options) {
         id,
         listTable,
         subheader,
-        summary;
+        summary,
+        url;
 
     data = opts.data;
     id = opts.id;
 
+    if (id === 'focal-mechanism' || id === 'moment-tensor') {
+      var beachball,
+          parent;
+
+      beachball = opts.data;
+      parent = _el.querySelector('.' + id + ' a');
+
+      beachball.render(parent);
+
+      return;
+    }
+
     summary = '<h2>' + opts.name + '</h2>';
 
     if (id === 'mainshock') {
+      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
+        AppUtil.getParam('eqid');
+
       summary += '<div class="modules">';
       summary += data.detailsHtml;
       // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism"><h4>Focal Mechanism</h4></div>';
-      summary += '<div class="moment-tensor"><h4>Moment Tensor</h4></div>';
+      summary += '<div class="focal-mechanism"><h4>Focal Mechanism</h4>' +
+        '<a href="' + url + '#focal-mechanism"></a></div>';
+      summary += '<div class="moment-tensor"><h4>Moment Tensor</h4>' +
+        '<a href="' + url + '#moment-tensor"></a></div>';
       summary += '</div>';
     } else {
       summary += data.detailsHtml;
@@ -322,21 +340,25 @@ var SummaryPane = function (options) {
   _this.addSummary = function (opts) {
     var cssClass,
         data,
-        div;
+        div,
+        summary;
 
     cssClass = opts.id;
     data = opts.data;
+    summary = _getSummary(opts);
 
     // Add feature to summary
-    div = document.createElement('div');
-    div.classList.add('content', 'feature', cssClass);
-    div.innerHTML = _getSummary(opts);
-    _features.appendChild(div);
+    if (summary) {
+      div = document.createElement('div');
+      div.classList.add('content', 'feature', cssClass);
+      div.innerHTML = summary;
+      _features.appendChild(div);
 
-    if (opts.id === 'aftershocks') {
-      div.classList.add('darker');
-    } else {
-      div.classList.add('lighter');
+      if (opts.id === 'aftershocks') {
+        div.classList.add('darker');
+      } else {
+        div.classList.add('lighter');
+      }
     }
 
     _updateTimestamp();

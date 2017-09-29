@@ -114,9 +114,9 @@ var MomentTensorLayer = function (options) {
    *
    * @return {Object}
    */
-  // _this.getSummaryData = function () {
-  //   return _getBeachBall();
-  // };
+  _this.getSummaryData = function () {
+    return _getBeachBall();
+  };
 
   _initialize(options);
   options = null;

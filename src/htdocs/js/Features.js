@@ -108,22 +108,23 @@ var Features = function (options) {
       //   (should be removed already, but stacked ajax requests can cause issues)
       _removeFeature(id);
 
-      if (id === 'mainshock') {
-        // Show mainshock details on editPane
-        _editPane.addMainshock(feature.getSummaryData().detailsHtml,
-          opts.mainshockJson.properties);
-
-        // Store mainshock's plotdata for 3d plot of aftershocks
-        _plotdata[id] = feature.getPlotData();
-      }
-
       // Create a new map pane and add feature to map, summary panes
       _createMapPane(id);
       _addMapLayer(feature);
       _addSummary(feature);
 
-      // Add aftershock plots to plots pane
-      if (id === 'aftershocks') {
+      if (id === 'mainshock') {
+        // Show mainshock details on editPane
+        _editPane.addMainshock(feature.getSummaryData().detailsHtml,
+        opts.mainshockJson.properties);
+
+        // Store mainshock's plotdata for 3d plot of aftershocks
+        _plotdata[id] = feature.getPlotData();
+
+        // Add other (non-mainshock) features
+        _this.getFeatures();
+      } else if (id === 'aftershocks') {
+        // Add aftershock plots to plots pane
         _plotdata[id] = feature.getPlotData();
 
         _addPlots(feature);
@@ -380,9 +381,6 @@ var Features = function (options) {
           coords = _mainshockJson.geometry.coordinates;
           _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
           _bounds = _MapPane.map.getBounds();
-
-          // Recursively call getFeatures() to add other (non-mainshock) features
-          _this.getFeatures();
         }
 
         _addFeature({
@@ -431,7 +429,7 @@ var Features = function (options) {
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
       plots = document.querySelector('#plotsPane .' + cssClass);
-      summary = document.querySelector('#summaryPane .' + cssClass);
+      summary = document.querySelector('#summaryPane .feature.' + cssClass);
     }
 
     if (mapLayer) {
