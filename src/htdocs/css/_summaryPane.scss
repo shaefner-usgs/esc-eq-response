@@ -162,6 +162,10 @@
     > div {
       margin-right: 3em;
 
+      &.hide {
+        display: none;
+      }
+
       &:last-child {
         border: 0;
       }

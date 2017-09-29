@@ -185,8 +185,10 @@ var SummaryPane = function (options) {
       className = '.' + id;
       h4 = _el.querySelector(className + ' h4');
 
+      // Display beachball
       beachball.render(_el.querySelector(className + ' a'));
       h4.innerHTML = opts.name;
+      _el.querySelector(className).classList.remove('hide');
 
       return;
     }
@@ -200,9 +202,9 @@ var SummaryPane = function (options) {
       summary += '<div class="modules">';
       summary += data.detailsHtml;
       // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism"><h4></h4>' +
+      summary += '<div class="focal-mechanism hide"><h4></h4>' +
         '<a href="' + url + '#focal-mechanism"></a></div>';
-      summary += '<div class="moment-tensor"><h4></h4>' +
+      summary += '<div class="moment-tensor hide"><h4></h4>' +
         '<a href="' + url + '#moment-tensor"></a></div>';
       summary += '</div>';
     } else {
