@@ -29,10 +29,11 @@ var MapPane = function (options) {
       _initialize,
 
       _el,
-      _map,
+      _layers,
 
       _compareLayers,
-      _getMapLayers,
+
+      _getStaticMapLayers,
       _getZindex,
       _hideZoomControl,
       _initMap,
@@ -45,13 +46,13 @@ var MapPane = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _map = _el.querySelector('.map');
+    _layers = _getStaticMapLayers();
 
     _initMap();
   };
 
   /**
-   * Comparison function for sorting feature overlays in layer controller
+   * Comparison function for sorting overlays in layer controller
    *
    * @return {Integer}
    */
@@ -59,21 +60,8 @@ var MapPane = function (options) {
     var zIndexLayerA,
         zIndexLayerB;
 
-    // Don't sort baselayers
-    if (_isBaseLayer(nameA) || _isBaseLayer(nameB)) {
-      return 0;
-    }
-
-    // Put faults layer on bottom
-    if (nameA === 'Faults') {
-      return 1;
-    }
-    if (nameB === 'Faults') {
-      return -1;
-    }
-
-    zIndexLayerA = _getZindex(layerA);
-    zIndexLayerB = _getZindex(layerB);
+    zIndexLayerA = _getZindex(layerA, nameA);
+    zIndexLayerB = _getZindex(layerB, nameB);
     if (zIndexLayerA < zIndexLayerB) {
       return 1;
     }
@@ -93,7 +81,7 @@ var MapPane = function (options) {
    *      overlays: {Object}
    *    }
    */
-  _getMapLayers = function () {
+  _getStaticMapLayers = function () {
     var dark,
         faults,
         greyscale,
@@ -129,16 +117,20 @@ var MapPane = function (options) {
    *
    * @return zIndex {Integer}
    */
-  _getZindex = function (layer) {
+  _getZindex = function (layer, name) {
     var cssClass,
         leafletPane,
         styles,
         zIndex;
 
-    cssClass = 'leaflet-' + layer.id + '-pane';
-    leafletPane = document.querySelector('.' + cssClass);
-    styles = window.getComputedStyle(leafletPane);
-    zIndex = parseInt(styles.getPropertyValue('z-index'), 10);
+    if (_isBaseLayer(name)) {
+      zIndex = 1; // base layers don't have a z-index; just return 1
+    } else {
+      cssClass = 'leaflet-' + layer.id + '-pane';
+      leafletPane = document.querySelector('.' + cssClass);
+      styles = window.getComputedStyle(leafletPane);
+      zIndex = parseInt(styles.getPropertyValue('z-index'), 10);
+    }
 
     return zIndex;
   };
@@ -159,19 +151,21 @@ var MapPane = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
-    _this.layers = _getMapLayers();
-
     // Create map and set initial view
-    _this.map = L.map(_map, {
-      layers: _this.layers.defaults
-    });
+    _this.map = L.map(_el.querySelector('.map'));
     _this.setDefaultView();
+
+    // Create custom pane for Faults overlay
+    _this.map.createPane('faults', _this.map.getPane('tilePane'));
+
+    // Add default layers to map
+    _layers.defaults.forEach(function(layer) {
+      _this.map.addLayer(layer);
+    });
 
     // Add / remove controllers
     _this.layerController = L.control.layers(
-      _this.layers.baseLayers,
-      _this.layers.overlays,
-      {
+      _layers.baseLayers, _layers.overlays, {
         sortFunction: _compareLayers,
         sortLayers: true
       }
@@ -182,9 +176,9 @@ var MapPane = function (options) {
 
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
-    //   baseLayers: _this.layers.baseLayers,
+    //   baseLayers: _layers.baseLayers,
     //   id: 'eqid', // TODO: insert actual eqid
-    //   overlays: _this.layers.overlays,
+    //   overlays: _layers.overlays,
     //   scope: 'response'
     // });
   };
@@ -199,7 +193,7 @@ var MapPane = function (options) {
   _isBaseLayer = function (name) {
     var r = false;
 
-    Object.keys(_this.layers.baseLayers).forEach(function(key) {
+    Object.keys(_layers.baseLayers).forEach(function(key) {
       if (key === name) {
         r = true;
       }

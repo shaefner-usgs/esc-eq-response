@@ -12,6 +12,7 @@ require('mappane/MouseOverLayer');
  */
 L.FaultsLayer = function () {
   var _faults,
+      _layer,
       _plates,
       _urlPrefix;
 
@@ -22,7 +23,8 @@ L.FaultsLayer = function () {
     dataUrl: _urlPrefix + 'faults/{z}/{x}/{y}.grid.json?callback={cb}',
     tileOpts: {
       minZoom: 6,
-      maxZoom: 17
+      maxZoom: 17,
+      pane: 'faults'
     },
     tileUrl: _urlPrefix + 'faults/{z}/{x}/{y}.png',
     tiptext: '{NAME}'
@@ -33,7 +35,10 @@ L.FaultsLayer = function () {
     maxZoom: 5
   });
 
-  return L.layerGroup([_plates, _faults]);
+  _layer = L.layerGroup([_plates, _faults]);
+  _layer.id = 'faults';
+  
+  return _layer;
 };
 
 
