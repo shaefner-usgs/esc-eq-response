@@ -232,7 +232,7 @@ var Stations = function (options) {
         '</li>',
         '<li class="station-summary-pga">',
           AppUtil.round(p.pga, 3, '&ndash;'),
-          '<br><abbr title="Maximum Horizontal Peak Ground Velocity (%g)">PGA</abbr></br>',
+          '<br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
         '</li>',
         '<li class="station-summary-pgv">',
           AppUtil.round(p.pgv, 3, '&ndash;'),
