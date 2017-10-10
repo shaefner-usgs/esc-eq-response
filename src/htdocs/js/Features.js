@@ -21,7 +21,7 @@ var Aftershocks = require('features/AftershocksFeature'),
  *
  * Feature data comes from GeoJson web services on earthquake.usgs.gov
  *
- * The rendering order of features is set in the css file for each app pane
+ * The stacking order of features is set via css
  *
  * @param options {Object}
  *   {
@@ -201,7 +201,7 @@ var Features = function (options) {
   };
 
   /**
-   * Create a separate map pane within overlayPane for each feature
+   * Create a separate map pane for each feature - used to control stacking order
    *
    * @param id {String}
    */
