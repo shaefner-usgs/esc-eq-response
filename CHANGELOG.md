@@ -5,7 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-* Add focal mechanism and moment tensor to summary pane
+* Bug fix: sort layers correctly in layer controller
+* Add focal mechanism and moment tensor to summary pane and map
 * Bug fix: set scroll position to '0' instead of just removing value
 * Bug fix: tweak shakemap check so app doesn't bomb when event has no shakemap
 * Add 'autoscale' button to hypocenters plot
