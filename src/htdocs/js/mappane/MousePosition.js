@@ -4,7 +4,7 @@
 
 // Copyright 2013 Ardhi Lukianto
 // https://github.com/ardhi/Leaflet.MousePosition
-var MousePosition = L.Control.extend({
+L.Control.MousePosition = L.Control.extend({
   options: {
     position: 'bottomleft',
     separator: ', ',
@@ -55,11 +55,9 @@ L.Map.addInitHook(function () {
   }
 });
 
-L.Control.MousePosition = MousePosition;
-
 L.control.mousePosition = function (options) {
   return new L.Control.MousePosition(options);
 };
 
 
-module.exports = MousePosition;
+module.exports = L.Control.MousePosition;
