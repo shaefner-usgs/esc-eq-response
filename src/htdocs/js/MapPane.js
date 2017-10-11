@@ -16,8 +16,8 @@ require('mappane/TerrainLayer');
 
 
 /**
- * Sets up leaflet map instance and adds 'static' layers (non-event-specific)
- *   (dynamic layer classes are in js/features)
+ * Sets up leaflet map instance and adds (non-event-specific) 'static' layers
+ *   (event-specific feature layers are added by Features.js)
  *
  * @param options {Object}
  *   {
@@ -31,9 +31,10 @@ var MapPane = function (options) {
       _el,
       _layers,
 
+      _addLayerControl,
       _compareLayers,
       _getSortValue,
-      _getStaticMapLayers,
+      _getStaticLayers,
       _hideZoomControl,
       _initMap,
       _isBaseLayer;
@@ -45,21 +46,39 @@ var MapPane = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _layers = _getStaticMapLayers();
+    _layers = _getStaticLayers();
 
     _initMap();
   };
 
   /**
-   * Comparison function for sorting overlays in layer controller
+   * Add layer control
+   *
+   * @return control {L.Control}
+   */
+  _addLayerControl = function () {
+    var control;
+
+    control = L.control.layers(
+      _layers.baseLayers, _layers.overlays, {
+        sortFunction: _compareLayers,
+        sortLayers: true
+      }
+    ).addTo(_this.map);
+
+    return control;
+  };
+
+  /**
+   * Comparison function for sorting overlays in layer control
    *
    * @return {Integer}
    */
-  _compareLayers = function (layerA, layerB, nameA, nameB) {
+  _compareLayers = function (layerA, layerB) {
     var sortValue = [];
 
-    sortValue[0] = _getSortValue(layerA, nameA);
-    sortValue[1] = _getSortValue(layerB, nameB);
+    sortValue[0] = _getSortValue(layerA);
+    sortValue[1] = _getSortValue(layerB);
     if (sortValue[0] < sortValue[1]) {
       return 1;
     }
@@ -73,17 +92,18 @@ var MapPane = function (options) {
    * Get sort value of Leaflet layer
    *
    * @param layer {L.Layer}
+   * @param name {String}
    *
    * @return sortValue {Integer}
    *   z-index value or 1 if no z-index
    */
-  _getSortValue = function (layer, name) {
+  _getSortValue = function (layer) {
     var className,
         leafletPane,
         sortValue,
         styles;
 
-    if (_isBaseLayer(name)) {
+    if (_isBaseLayer(layer)) {
       sortValue = 1; // base layers don't have a z-index
     } else {
       className = 'leaflet-' + layer.id + '-pane';
@@ -105,7 +125,7 @@ var MapPane = function (options) {
    *      overlays: {Object}
    *    }
    */
-  _getStaticMapLayers = function () {
+  _getStaticLayers = function () {
     var dark,
         faults,
         greyscale,
@@ -135,7 +155,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Hide zoom controller on mobile (in favor of pinch-to-zoom)
+   * Hide zoom control on mobile (in favor of pinch-to-zoom)
    */
   _hideZoomControl = function () {
     var control;
@@ -153,22 +173,18 @@ var MapPane = function (options) {
     // Create map and set initial view
     _this.map = L.map(_el.querySelector('.map'));
     _this.setDefaultView();
+    _this.bounds = _this.map.getBounds();
 
-    // Create custom pane for Faults overlay
-    _this.map.createPane('faults', _this.map.getPane('tilePane'));
+    // Create custom pane for Faults overlay within tilePane
+    _this.createMapPane('faults', 'tilePane');
 
     // Add default layers to map
     _layers.defaults.forEach(function(layer) {
       _this.map.addLayer(layer);
     });
 
-    // Add / remove controllers
-    _this.layerController = L.control.layers(
-      _layers.baseLayers, _layers.overlays, {
-        sortFunction: _compareLayers,
-        sortLayers: true
-      }
-    ).addTo(_this.map);
+    // Add / remove controls
+    _this.layerControl = _addLayerControl();
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
     _hideZoomControl();
@@ -189,11 +205,11 @@ var MapPane = function (options) {
    *
    * @return r {Boolean}
    */
-  _isBaseLayer = function (name) {
+  _isBaseLayer = function (layer) {
     var r = false;
 
     Object.keys(_layers.baseLayers).forEach(function(key) {
-      if (key === name) {
+      if (_layers.baseLayers[key] === layer) {
         r = true;
       }
     });
@@ -206,7 +222,45 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set default map extent
+   * Add feature layer to map
+   *
+   * @param feature {Object}
+   */
+  _this.addFeatureLayer = function (feature, initialLoad) {
+    var layer;
+
+    layer = feature.getMapLayer();
+    _this.layerControl.addOverlay(layer, feature.name);
+
+    // Turn layer "on" if it is set to be displayed by default
+    if (feature.displayLayer) {
+      _this.map.addLayer(layer);
+
+      // Set bounds to contain added layer if adding for the first time
+      if (initialLoad) {
+        _this.bounds.extend(layer.getBounds());
+        _this.map.fitBounds(_this.bounds, {
+          paddingTopLeft: L.point(0, 45), // accommodate navbar
+          reset: true
+        });
+      }
+    }
+  };
+
+  /**
+   * Create a separate map pane for each feature - used to control stacking order
+   *
+   * @param id {String}
+   * @param parent {String}
+   */
+  _this.createMapPane = function (id, parent) {
+    if (!_this.map.getPane(id)) {
+      _this.map.createPane(id, _this.map.getPane(parent));
+    }
+  };
+
+  /**
+   * Set default map extent (United States)
    */
   _this.setDefaultView = function () {
     _this.map.setView([40, -96], 4);

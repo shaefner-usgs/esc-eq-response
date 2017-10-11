@@ -1,4 +1,3 @@
-/* global L */
 'use strict';
 
 
@@ -35,7 +34,6 @@ var Features = function (options) {
   var _this,
       _initialize,
 
-      _bounds,
       _editPane,
       _eqid,
       _features,
@@ -49,10 +47,8 @@ var Features = function (options) {
       _SummaryPane,
 
       _addFeature,
-      _addMapLayer,
       _addPlots,
       _addSummary,
-      _createMapPane,
       _getAftershocks,
       _getEqFeedUrl,
       _getFocalMechanism,
@@ -111,8 +107,8 @@ var Features = function (options) {
       _removeFeature(id);
 
       // Create a new map pane and add feature to map, summary panes
-      _createMapPane(id);
-      _addMapLayer(feature);
+      _MapPane.createMapPane(id, 'overlayPane');
+      _MapPane.addFeatureLayer(feature, _initialLoad);
       _addSummary(feature);
 
       if (id === 'mainshock') {
@@ -120,7 +116,7 @@ var Features = function (options) {
         _editPane.addMainshock(feature.getSummaryData().detailsHtml,
         opts.mainshockJson.properties);
 
-        // Store mainshock's plotdata for 3d plot of aftershocks
+        // Store mainshock's plotdata
         _plotdata[id] = feature.getPlotData();
 
         // Add other (non-mainshock) features
@@ -143,32 +139,6 @@ var Features = function (options) {
       console.error(error);
       _StatusBar.addError(statusBarId, 'Error Creating ' + name +
         '<span>' + error + '</span>');
-    }
-  };
-
-  /**
-   * Add feature to map pane
-   *
-   * @param feature {Object}
-   */
-  _addMapLayer = function (feature) {
-    var layer;
-
-    layer = feature.getMapLayer();
-    _MapPane.layerController.addOverlay(layer, feature.name);
-
-    // Turn layer "on" if it is set to be displayed by default
-    if (feature.displayLayer) {
-      _MapPane.map.addLayer(layer);
-
-      // Set bounds to contain added layer if adding for the first time
-      if (_initialLoad) {
-        _bounds.extend(layer.getBounds());
-        _MapPane.map.fitBounds(_bounds, {
-          paddingTopLeft: L.point(0, 45), // accommodate navbar
-          reset: true
-        });
-      }
     }
   };
 
@@ -200,16 +170,6 @@ var Features = function (options) {
     }
   };
 
-  /**
-   * Create a separate map pane for each feature - used to control stacking order
-   *
-   * @param id {String}
-   */
-  _createMapPane = function (id) {
-    if (!_MapPane.map.getPane(id)) {
-      _MapPane.map.createPane(id, _MapPane.map.getPane('overlayPane'));
-    }
-  };
 
   /**
    * Get aftershocks feature
@@ -227,8 +187,8 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      name: 'Aftershocks',
       jsClass: Aftershocks,
+      name: 'Aftershocks',
       url: _getEqFeedUrl(params)
     });
   };
@@ -294,8 +254,8 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      name: 'Historical Seismicity',
       jsClass: Historical,
+      name: 'Historical Seismicity',
       url: _getEqFeedUrl(params)
     });
   };
@@ -310,8 +270,8 @@ var Features = function (options) {
       _eqid + '.geojson';
 
     _loadFeed({
-      name: 'Mainshock',
       jsClass: Mainshock,
+      name: 'Mainshock',
       url: url
     });
   };
@@ -345,8 +305,8 @@ var Features = function (options) {
       url = shakemap[0].contents['download/stationlist.json'].url;
 
       _loadFeed({
-        name: 'ShakeMap Stations',
         jsClass: Stations,
+        name: 'ShakeMap Stations',
         url: url
       });
     }
@@ -399,7 +359,7 @@ var Features = function (options) {
           //   (some added features set map extent to contain itself)
           coords = _mainshockJson.geometry.coordinates;
           _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
-          _bounds = _MapPane.map.getBounds();
+          _MapPane.bounds = _MapPane.map.getBounds();
         }
 
         _addFeature({
@@ -453,7 +413,7 @@ var Features = function (options) {
 
     if (mapLayer) {
       _MapPane.map.removeLayer(mapLayer);
-      _MapPane.layerController.removeLayer(mapLayer);
+      _MapPane.layerControl.removeLayer(mapLayer);
     }
 
     if (plots) {
