@@ -32,9 +32,8 @@ var MapPane = function (options) {
       _layers,
 
       _compareLayers,
-
+      _getSortValue,
       _getStaticMapLayers,
-      _getZindex,
       _hideZoomControl,
       _initMap,
       _isBaseLayer;
@@ -57,18 +56,43 @@ var MapPane = function (options) {
    * @return {Integer}
    */
   _compareLayers = function (layerA, layerB, nameA, nameB) {
-    var zIndexLayerA,
-        zIndexLayerB;
+    var sortValue = [];
 
-    zIndexLayerA = _getZindex(layerA, nameA);
-    zIndexLayerB = _getZindex(layerB, nameB);
-    if (zIndexLayerA < zIndexLayerB) {
+    sortValue[0] = _getSortValue(layerA, nameA);
+    sortValue[1] = _getSortValue(layerB, nameB);
+    if (sortValue[0] < sortValue[1]) {
       return 1;
     }
-    if (zIndexLayerA > zIndexLayerB) {
+    if (sortValue[0] > sortValue[1]) {
       return -1;
     }
     return 0;
+  };
+
+  /**
+   * Get sort value of Leaflet layer
+   *
+   * @param layer {L.Layer}
+   *
+   * @return sortValue {Integer}
+   *   z-index value or 1 if no z-index
+   */
+  _getSortValue = function (layer, name) {
+    var className,
+        leafletPane,
+        sortValue,
+        styles;
+
+    if (_isBaseLayer(name)) {
+      sortValue = 1; // base layers don't have a z-index
+    } else {
+      className = 'leaflet-' + layer.id + '-pane';
+      leafletPane = document.querySelector('.' + className);
+      styles = window.getComputedStyle(leafletPane);
+      sortValue = parseInt(styles.getPropertyValue('z-index'), 10);
+    }
+
+    return sortValue;
   };
 
   /**
@@ -108,31 +132,6 @@ var MapPane = function (options) {
     };
 
     return layers;
-  };
-
-  /**
-   * Get z-index of Leaflet layer
-   *
-   * @param layer {L.Layer}
-   *
-   * @return zIndex {Integer}
-   */
-  _getZindex = function (layer, name) {
-    var cssClass,
-        leafletPane,
-        styles,
-        zIndex;
-
-    if (_isBaseLayer(name)) {
-      zIndex = 1; // base layers don't have a z-index; just return 1
-    } else {
-      cssClass = 'leaflet-' + layer.id + '-pane';
-      leafletPane = document.querySelector('.' + cssClass);
-      styles = window.getComputedStyle(leafletPane);
-      zIndex = parseInt(styles.getPropertyValue('z-index'), 10);
-    }
-
-    return zIndex;
   };
 
   /**
