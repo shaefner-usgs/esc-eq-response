@@ -77,7 +77,7 @@ var MomentTensorFeature = function (options) {
       }),
       pane: _this.id
     });
-    _mapLayer.id = _this.id; // Attach id to L.Layer for layer controller
+    _mapLayer.id = _this.id; // Attach id to L.Layer for layer control
   };
 
   /**
