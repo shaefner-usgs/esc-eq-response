@@ -438,17 +438,17 @@ var Features = function (options) {
    *     id of feature to remove
    */
   _removeFeature = function (id) {
-    var cssClass,
+    var className,
         mapLayer,
         plots,
         summary;
 
-    cssClass = id;
+    className = id;
 
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
-      plots = document.querySelector('#plotsPane .' + cssClass);
-      summary = document.querySelector('#summaryPane .feature.' + cssClass);
+      plots = document.querySelector('#plotsPane .' + className);
+      summary = document.querySelector('#summaryPane .feature.' + className);
     }
 
     if (mapLayer) {

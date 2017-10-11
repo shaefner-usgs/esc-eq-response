@@ -67,17 +67,17 @@ var StatusBar = function (options) {
   /**
    * Add error to status bar
    *
-   * @param cssClass {String}
+   * @param className {String}
    * @param error {String}
    */
-  _this.addError = function (cssClass, errorMsg) {
+  _this.addError = function (className, errorMsg) {
     var error;
 
-    _this.removeItem(cssClass); // remove any leftover items for this feature
+    _this.removeItem(className); // remove any leftover items for this feature
     _showStatusBar();
 
     error = document.createElement('p');
-    error.classList.add(cssClass, 'error');
+    error.classList.add(className, 'error');
     error.innerHTML = errorMsg;
     error.style.zIndex = _getZindex();
 
@@ -87,17 +87,17 @@ var StatusBar = function (options) {
   /**
    * Add item to status bar
    *
-   * @param cssClass {String}
+   * @param className {String}
    * @param name {String}
    */
-  _this.addItem = function (cssClass, name) {
+  _this.addItem = function (className, name) {
     var item;
 
-    _this.removeError(cssClass); // remove any leftover errors for this feature
+    _this.removeError(className); // remove any leftover errors for this feature
     _showStatusBar();
 
     item = document.createElement('p');
-    item.classList.add(cssClass);
+    item.classList.add(className);
     item.innerHTML = 'Loading ' + name + '&hellip;';
     item.style.zIndex = _getZindex();
 
@@ -115,14 +115,14 @@ var StatusBar = function (options) {
   /**
    * Check if error(s) exist(s)
    *
-   * @param cssClass {String}
+   * @param className {String}
    *
    * @return {Boolean}
    */
-  _this.hasError = function (cssClass) {
+  _this.hasError = function (className) {
     var error;
 
-    error = _el.querySelector('.' + cssClass + '.error');
+    error = _el.querySelector('.' + className + '.error');
     if (error) {
       return true;
     }
@@ -131,12 +131,12 @@ var StatusBar = function (options) {
   /**
    * Remove error from status bar (and hide if empty)
    *
-   * @param cssClass {String}
+   * @param className {String}
    */
-  _this.removeError = function (cssClass) {
+  _this.removeError = function (className) {
     var error;
 
-    error = _el.querySelector('.error.' + cssClass);
+    error = _el.querySelector('.error.' + className);
     if (error) {
       error.parentNode.removeChild(error);
     }
@@ -149,12 +149,12 @@ var StatusBar = function (options) {
   /**
    * Remove item from status bar (and hide if empty)
    *
-   * @param cssClass {String}
+   * @param className {String}
    */
-  _this.removeItem = function (cssClass) {
+  _this.removeItem = function (className) {
     var item;
 
-    item = _el.querySelector('.' + cssClass);
+    item = _el.querySelector('.' + className);
     if (item) {
       item.parentNode.removeChild(item);
     }

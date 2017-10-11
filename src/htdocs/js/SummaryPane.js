@@ -275,10 +275,10 @@ var SummaryPane = function (options) {
   /*
    * Make table sortable
    *
-   * @param cssClass {String}
-   *     cssClass value of container elem
+   * @param className {String}
+   *     className value of container elem
    */
-  _initTableSort = function (cssClass) {
+  _initTableSort = function (className) {
     var table,
         cleanNumber,
         compareNumber;
@@ -307,7 +307,7 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    table = _el.querySelector('.' + cssClass + ' .sortable');
+    table = _el.querySelector('.' + className + ' .sortable');
     if (table) {
       new Tablesort(table);
     }
@@ -343,19 +343,19 @@ var SummaryPane = function (options) {
    *   }
    */
   _this.addSummary = function (opts) {
-    var cssClass,
+    var className,
         data,
         div,
         summary;
 
-    cssClass = opts.id;
+    className = opts.id;
     data = opts.data;
     summary = _getSummary(opts);
 
     // Add feature to summary
     if (summary) {
       div = document.createElement('div');
-      div.classList.add('content', 'feature', cssClass);
+      div.classList.add('content', 'feature', className);
       div.innerHTML = summary;
       _features.appendChild(div);
 
@@ -367,7 +367,7 @@ var SummaryPane = function (options) {
     }
 
     _updateTimestamp();
-    _initTableSort(cssClass);
+    _initTableSort(className);
   };
 
   /**
