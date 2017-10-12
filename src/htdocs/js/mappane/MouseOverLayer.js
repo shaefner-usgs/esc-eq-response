@@ -4,8 +4,6 @@
 
 require('mappane/Utfgrid');
 
-var CLASSES = 'leaflet-mouseover-tooltip';
-
 L.MouseOverLayer = L.LayerGroup.extend({
   /**
    * @param options {Object}
@@ -16,14 +14,18 @@ L.MouseOverLayer = L.LayerGroup.extend({
    *      tiptext: Template string to be used for auto-tooltipping on hover
    */
   initialize: function (options) {
+    var className;
 
     // Create the two layers
     this._tileLayer = new L.TileLayer(options.tileUrl, options.tileOpts);
     this._dataLayer = new L.UtfGrid(options.dataUrl, options.dataOpts);
 
     if (typeof options.tiptext === 'string') {
+      className = 'leaflet-tooltip leaflet-zoom-animated';
+
       this._tiptext = options.tiptext;
-      this._tooltip = L.DomUtil.create('span', CLASSES);
+      this._tooltip = L.DomUtil.create('div', className);
+
       this.on('mouseover', this._onMouseOver, this);
       this.on('mouseout', this._onMouseOut, this);
     }
@@ -74,31 +76,45 @@ L.MouseOverLayer = L.LayerGroup.extend({
 
   _onMouseOver: function (evt) {
     var centerPoint,
+        direction,
+        map,
         pos,
+        tooltip,
         tooltipPoint;
 
-    // Update text
-    this._tooltip.innerHTML = L.Util.template(this._tiptext, evt.data);
+    map = this._map;
+    tooltip = this._tooltip;
 
-    // Position tooltip to right of cursor by default
-    pos = this._map.latLngToLayerPoint(evt.latlng);
+    pos = map.latLngToLayerPoint(evt.latlng);
+    pos = pos.subtract(L.point(0, 10, true)); // shift tooltip up
+
+    // Update text
+    tooltip.innerHTML = L.Util.template(this._tiptext, evt.data);
 
     // Show the tooltip
-    this._tooltip.style.display = 'block';
+    tooltip.style.display = 'block';
+    L.DomUtil.setOpacity(tooltip, 0.9);
 
-    // Position tooltip to left of cursor on the right side of map
-    centerPoint = this._map.latLngToContainerPoint(this._map.getCenter());
+    // Position tooltip to left / right of cursor
+    centerPoint = this._map.latLngToContainerPoint(map.getCenter());
     tooltipPoint = this._map.layerPointToContainerPoint(pos);
-    if (tooltipPoint.x > centerPoint.x) {
-      pos = pos.subtract(L.point(this._tooltip.offsetWidth + 18, 3, true));
+    if (tooltipPoint.x < centerPoint.x) { // left side of map, shift right
+      direction = 'right';
+      pos = pos.add(L.point(8, 0, true));
+    } else { // right side of map, shift left
+      direction = 'left';
+      pos = pos.subtract(L.point(tooltip.offsetWidth + 3, 0, true));
     }
 
-    L.DomUtil.setPosition(this._tooltip, pos);
+    L.DomUtil.removeClass(tooltip, 'leaflet-tooltip-left');
+    L.DomUtil.removeClass(tooltip, 'leaflet-tooltip-right');
+    L.DomUtil.addClass(tooltip, 'leaflet-tooltip-' + direction);
+    L.DomUtil.setPosition(tooltip, pos);
   },
 
   _onMouseOut: function (/*evt*/) {
     // Hide the tooltip
-    this._tooltip.style.display = '';
+    this._tooltip.style.display = 'none';
   }
 });
 

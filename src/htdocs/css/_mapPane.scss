@@ -1,4 +1,4 @@
-@import '_MousePosition.scss';
+@import 'mappane/_MousePosition.scss';
 @import 'features/_stations.scss';
 
 #mapPane,
@@ -6,12 +6,13 @@
   height: 100%;
 }
 
+/* hide 'placeholder' moment tensor / focal mech. beachballs */
 #mapPane > canvas {
   display: none;
 }
 
 /* Rendering order of features
-  (most are rendered in leaflet-overlay-pane which has a z-index of 400) */
+  (all but faults rendered in leaflet-overlay-pane which has a z-index of 400) */
 .leaflet-focal-mechanism-pane {
   z-index: 425;
 }
@@ -52,25 +53,8 @@
   display: none;
 }
 
-/* UtfGrid mouseovers */
-.leaflet-mouseover-tooltip {
-  background: rgba(255, 255, 255, .90);
-  border: 1px solid #fff;
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
-  color: #222;
-  display: none;
-  left: 12px;
-  padding: 6px;
-  pointer-events: none;
-  position: absolute;
-  top: -6px;
-  user-select: none;
-  white-space: nowrap;
-}
-
-/* Make font-size a bit smaller for all map mouseovers */
-.leaflet-mouseover-tooltip, .leaflet-tooltip {
+/* Make font-size a bit smaller for tooltips */
+.leaflet-tooltip {
   font-size: .9em;
 }
 
