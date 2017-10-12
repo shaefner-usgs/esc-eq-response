@@ -1,14 +1,14 @@
 'use strict';
 
 
-var Aftershocks = require('features/AftershocksFeature'),
+var AftershocksFeature = require('features/AftershocksFeature'),
     AppUtil = require('AppUtil'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
-    Historical = require('features/HistoricalFeature'),
-    Mainshock = require('features/MainshockFeature'),
+    HistoricalFeature = require('features/HistoricalFeature'),
+    MainshockFeature = require('features/MainshockFeature'),
     Moment = require('moment'),
     MomentTensorFeature = require('features/MomentTensorFeature'),
-    Stations = require('features/StationsFeature'),
+    StationsFeature = require('features/StationsFeature'),
     Xhr = require('util/Xhr');
 
 
@@ -20,7 +20,7 @@ var Aftershocks = require('features/AftershocksFeature'),
  *
  * Feature data comes from GeoJson web services on earthquake.usgs.gov
  *
- * The stacking order of features is set via css
+ * The stacking order of features is set via css (baseLayers are rendered as defined)
  *
  * @param options {Object}
  *   {
@@ -187,7 +187,7 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      jsClass: Aftershocks,
+      jsClass: AftershocksFeature,
       name: 'Aftershocks',
       url: _getEqFeedUrl(params)
     });
@@ -254,7 +254,7 @@ var Features = function (options) {
     };
 
     _loadFeed({
-      jsClass: Historical,
+      jsClass: HistoricalFeature,
       name: 'Historical Seismicity',
       url: _getEqFeedUrl(params)
     });
@@ -270,7 +270,7 @@ var Features = function (options) {
       _eqid + '.geojson';
 
     _loadFeed({
-      jsClass: Mainshock,
+      jsClass: MainshockFeature,
       name: 'Mainshock',
       url: url
     });
@@ -305,7 +305,7 @@ var Features = function (options) {
       url = shakemap[0].contents['download/stationlist.json'].url;
 
       _loadFeed({
-        jsClass: Stations,
+        jsClass: StationsFeature,
         name: 'ShakeMap Stations',
         url: url
       });
