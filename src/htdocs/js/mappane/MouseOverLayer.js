@@ -73,15 +73,27 @@ L.MouseOverLayer = L.LayerGroup.extend({
   // --------------------------------------------------
 
   _onMouseOver: function (evt) {
+    var centerPoint,
+        pos,
+        tooltipPoint;
+
     // Update text
     this._tooltip.innerHTML = L.Util.template(this._tiptext, evt.data);
 
-    // Update position
-    L.DomUtil.setPosition(this._tooltip, this._map.latLngToLayerPoint(
-        evt.latlng));
+    // Position tooltip to right of cursor by default
+    pos = this._map.latLngToLayerPoint(evt.latlng);
 
     // Show the tooltip
     this._tooltip.style.display = 'block';
+
+    // Position tooltip to left of cursor on the right side of map
+    centerPoint = this._map.latLngToContainerPoint(this._map.getCenter());
+    tooltipPoint = this._map.layerPointToContainerPoint(pos);
+    if (tooltipPoint.x > centerPoint.x) {
+      pos = pos.subtract(L.point(this._tooltip.offsetWidth + 18, 3, true));
+    }
+
+    L.DomUtil.setPosition(this._tooltip, pos);
   },
 
   _onMouseOut: function (/*evt*/) {
