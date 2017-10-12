@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Patch: position mouseovers to left on right side of map; use built-in leaflet styles
+* Minor refactor: mv map-related methods from Features.js to MapPane.js
 * Bug fix: sort layers correctly in layer controller
 * Add focal mechanism and moment tensor to summary pane and map
 * Bug fix: set scroll position to '0' instead of just removing value
