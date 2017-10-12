@@ -114,8 +114,8 @@ tr {
   background: #fff;
 }
 
-/* Leaflet popups, earthquake details: mainshock on edit, summary panes */
-.leaflet-popup-content, .earthquake {
+/* Earthquake details: mainshock on edit, summary panes (als0 Leaflet popups) */
+.earthquake, .leaflet-popup-content {
   dd,
   dt {
     line-height: 1.7;

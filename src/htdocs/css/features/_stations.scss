@@ -1,4 +1,4 @@
-@import '_mmi-variables.scss';
+@import '_impact-variables.scss';
 
 .bubble,
 .mmi {
@@ -28,67 +28,116 @@
 
 .roman {
   font-family: $mmi-font-family;
+  text-transform: uppercase;
 }
 
 .mmiI {
   background-color: $mmiI !important;
   box-shadow: 0 0 1px #666;
   color: $mmiI-text-color !important;
+
+  > abbr {
+    color: $mmiI-text-color !important;
+  }
 }
 
-.mmiII{
-  background-color: $mmiII !important;
+.mmiII {
+  background-color: $mmiII-color !important;
   color: $mmiII-text-color !important;
+
+  > abbr {
+    color: $mmiII-text-color !important;
+  }
 }
 
 .mmiIII {
-  background-color: $mmiIII !important;
+  background-color: $mmiIII-color !important;
   color: $mmiIII-text-color !important;
+
+  > abbr {
+    color: $mmiIII-text-color !important;
+  }
 }
 
 .mmiIV {
-  background-color: $mmiIV !important;
+  background-color: $mmiIV-color !important;
   color: $mmiIV-text-color !important;
+
+  > abbr {
+    color: $mmiIV-text-color !important;
+  }
 }
 
 .mmiV {
-  background-color: $mmiV !important;
+  background-color: $mmiV-color !important;
   color: $mmiV-text-color !important;
+
+  > abbr {
+    color: $mmiV-text-color !important;
+  }
 }
 
 .mmiVI {
-  background-color: $mmiVI !important;
+  background-color: $mmiVI-color !important;
   color: $mmiVI-text-color !important;
+
+  > abbr {
+    color: $mmiVI-text-color !important;
+  }
 }
 
 .mmiVII {
-  background-color: $mmiVII !important;
+  background-color: $mmiVII-color !important;
   color: $mmiVII-text-color !important;
+
+  > abbr {
+    color: $mmiVII-text-color !important;
+  }
 }
 
 .mmiVIII {
-  background-color: $mmiVIII !important;
+  background-color: $mmiVIII-color !important;
   color: $mmiVIII-text-color !important;
+
+  > abbr {
+    color: $mmiVIII-text-color !important;
+  }
 }
 
 .mmiIX {
-  background-color: $mmiIX !important;
+  background-color: $mmiIX-color !important;
   color: $mmiIX-text-color !important;
+
+  > abbr {
+    color: $mmiIX-text-color !important;
+  }
 }
 
 .mmiX {
-  background-color: $mmiX !important;
+  background-color: $mmiX-color !important;
   color: $mmiX-text-color !important;
+
+  > abbr {
+    color: $mmiX-text-color !important;
+  }
 }
 
 .mmiXI {
-  background-color: $mmiXI !important;
+  background-color: $mmiXI-color !important;
   color: $mmiXI-text-color !important;
+
+  > abbr {
+    color: $mmiXI-text-color !important;
+  }
 }
 
 .mmiXII {
-  background-color: $mmiXII !important;
+  background-color: $mmiXII-color !important;
   color: $mmiXII-text-color !important;
+
+  > abbr {
+    color: $mmiXII-text-color !important;
+  }
 }
 
 .station-summary {
@@ -171,38 +220,38 @@
 }
 
 .station-mmiI:before {
-  border-bottom-color: $mmiI;
+  border-bottom-color: $mmiI-color;
 }
 .station-mmiII:before {
-  border-bottom-color: $mmiII;
+  border-bottom-color: $mmiII-color;
 }
 .station-mmiIII:before {
-  border-bottom-color: $mmiIII;
+  border-bottom-color: $mmiIII-color;
 }
 .station-mmiIV:before {
-  border-bottom-color: $mmiIV;
+  border-bottom-color: $mmiIV-color;
 }
 .station-mmiV:before {
-  border-bottom-color: $mmiV;
+  border-bottom-color: $mmiV-color;
 }
 .station-mmiVI:before {
-  border-bottom-color: $mmiVI;
+  border-bottom-color: $mmiVI-color;
 }
 .station-mmiVII:before {
-  border-bottom-color: $mmiVII;
+  border-bottom-color: $mmiVII-color;
 }
 .station-mmiVIII:before {
-  border-bottom-color: $mmiVIII;
+  border-bottom-color: $mmiVIII-color;
 }
 .station-mmiIX:before {
-  border-bottom-color: $mmiIX;
+  border-bottom-color: $mmiIX-color;
 }
 .station-mmiX:before {
-  border-bottom-color: $mmiX;
+  border-bottom-color: $mmiX-color;
 }
 .station-mmiXI:before {
-  border-bottom-color: $mmiXI;
+  border-bottom-color: $mmiXI-color;
 }
 .station-mmiXII:before {
-  border-bottom-color: $mmiXII;
+  border-bottom-color: $mmiXII-color;
 }

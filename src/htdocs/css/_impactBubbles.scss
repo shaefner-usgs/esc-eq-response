@@ -1,3 +1,5 @@
+@import '_impact-variables.scss';
+
 $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
 
 .impact-bubbles {
@@ -30,9 +32,6 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
       white-space: nowrap;
     }
 
-    &:active, &:visited {
-      color: #000;
-    }
     &:hover {
       background-image: $hover;
     }
@@ -68,82 +67,92 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
   }
 }
 
-.intensity,
 .roman {
-  color: #333;
-  font-family: Tahoma, Verdana, Segoe, sans-serif;
+  font-family: $mmi-font-family;
   text-transform: uppercase;
 }
 
 .pager-alertlevel-pending {
-  background-color: #fff;
-  color: #000;
+  background-color: $pager-pending-color;
+  color: $pager-pending-text-color;
 }
 
 .pager-alertlevel-green {
-  background-color: #00b04f !important;
-  color: #000 !important;
+  background-color: $pager-green-color !important;
+  color: $pager-green-text-color !important;
 }
 
 .pager-alertlevel-yellow {
-  background-color: #ff0 !important;
-  color: #000 !important;
+  background-color: $pager-yellow-color !important;
+  color: $pager-yellow-text-color !important;
 }
 
 .pager-alertlevel-orange {
-  background-color: #f90 !important;
-  color: #000 !important;
+  background-color: $pager-orange-color !important;
+  color: $pager-orange-text-color !important;
 }
 
 .pager-alertlevel-red {
-  background-color: red !important;
-  color: #000 !important;
+  background-color: $pager-red-color !important;
+  color: $pager-red-text-color !important;
 }
 
 a.mmiI {
-  background-color: #fff;
-  color: #000;
+  background-color: $mmiI-color;
+  color: $mmiI-text-color;
 }
 
-a.mmiII,
-a.mmiIII {
-  background-color: #acd8e9;
-  color: #000;
+a.mmiII {
+  background-color: $mmiII-color;
+  color: $mmiII-text-color;
+}
+
+a.mmiIII  {
+  background-color: $mmiIII-color;
+  color: $mmiIII-text-color;
 }
 
 a.mmiIV {
-  background-color: #83d0da;
-  color: #000;
+  background-color: $mmiIV-color;
+  color: $mmiIV-text-color;
 }
 
 a.mmiV {
-  background-color: #7bc87f;
-  color: #000;
+  background-color: $mmiV-color;
+  color: $mmiV-text-color;
 }
 
 a.mmiVI {
-  background-color: #f9f518;
-  color: #000;
+  background-color: $mmiVI-color;
+  color: $mmiVI-text-color;
 }
 
 a.mmiVII {
-  background-color: #fac611;
-  color: #000;
+  background-color: $mmiVII-color;
+  color: $mmiVII-text-color;
 }
 
 a.mmiVIII {
-  background-color: #fa8a11;
-  color: #000;
+  background-color: $mmiVIII-color;
+  color: $mmiVIII-text-color;
 }
 
 a.mmiIX {
-  background-color: #f7100c;
-  color: #000;
+  background-color: $mmiIX-color;
+  color: $mmiIX-text-color;
 }
 
-a.mmiX,
-a.mmiXI,
+a.mmiX {
+  background-color: $mmiX-color;
+  color: $mmiX-text-color;
+}
+
+a.mmiXI {
+  background-color: $mmiXI-color;
+  color: $mmiXI-text-color;
+}
+
 a.mmiXII {
-  background-color: #c80f0a;
-  color: #000;
+  background-color: $mmiXII-color;
+  color: $mmiXII-text-color;
 }
