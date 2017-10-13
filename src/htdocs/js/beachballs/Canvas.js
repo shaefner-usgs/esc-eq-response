@@ -37,18 +37,25 @@ var Canvas = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    var scale = window.devicePixelRatio || 1;
+
     options = Util.extend({}, _DEFAULTS, options);
 
     _canvas = options.canvas;
     if (_canvas === null) {
       _canvas = document.createElement('canvas');
-      _canvas.width = options.width;
-      _canvas.height = options.height;
+      _canvas.width = options.width * scale;
+      _canvas.height = options.height * scale;
+      _canvas.style.width = options.width + 'px';
+      _canvas.style.height = options.height + 'px';
+
       if (options.className) {
         _canvas.classList.add(options.className);
       }
     }
     _context = _canvas.getContext('2d');
+    _context.scale(scale, scale);
+
     // expose these as public properties
     _this.canvas = _canvas;
     _this.context = _context;
