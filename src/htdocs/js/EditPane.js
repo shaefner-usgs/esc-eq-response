@@ -70,7 +70,7 @@ var EditPane = function (options) {
     _eqidPrevValue = null;
 
     // All form fields
-    _fields = _el.querySelectorAll('input:not(.reset)');
+    _fields = _el.querySelectorAll('input');
 
     _significantEqs = SignificantEqs({
       callback: _addSignificantEqs,
@@ -153,7 +153,8 @@ var EditPane = function (options) {
      *
      * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
      *
-     * Aftershock distance = ruptureLength, Historical distance = 1.5*ruptureLength
+     * Aftershock / Forshock distance = ruptureLength,
+     * Historical distance = 1.5 * ruptureLength
      */
     ruptureArea = Math.pow(10, mag - 4);
     ruptureLength = Math.pow(ruptureArea, 0.7);
@@ -161,9 +162,12 @@ var EditPane = function (options) {
     return {
       'aftershocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'aftershocks-minmag': 0.0,
-      'historical-dist': Math.max(10, 15 * Math.round(0.1 * ruptureLength)),
-      'historical-minmag': 3.0,
-      'historical-years': 10,
+      'foreshocks-days': 30,
+      'foreshocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'foreshocks-minmag': 1.0,
+      'historical-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'historical-minmag': Math.round(Math.max(5, mag - 1)),
+      'historical-years': 10
     };
   };
 

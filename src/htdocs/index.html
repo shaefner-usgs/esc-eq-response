@@ -54,13 +54,31 @@
             <input type="number" id="aftershocks-dist" required="required"
               pattern="^[0-9.]+$" value="" min="1" step="1" />
           </div>
+          <div class="foreshocks">
+            <h3>Foreshocks</h3>
+            <label for="foreshocks-minmag">
+              <p>Min magnitude</p>
+            </label>
+            <input type="number" id="foreshocks-minmag" required="required"
+            pattern="^[0-9.]+$" value="1.0" min="0" max="9" step="0.1" />
+            <label for="foreshocks-dist">
+              <p>Max distance from mainshock (km)</p>
+            </label>
+            <input type="number" id="foreshocks-dist" required="required"
+              pattern="^[0-9.]+$" value="" min="1" step="1" />
+            <label for="foreshocks-days">
+              <p>Max time before mainshock (days)</p>
+            </label>
+            <input type="number" id="foreshocks-days" required="required"
+              pattern="^[0-9.]+$" value="30" min="1" step="1" />
+          </div>
           <div class="historical">
             <h3>Historical Seismicity</h3>
             <label for="historical-minmag">
               <p>Min magnitude</p>
             </label>
             <input type="number" id="historical-minmag" required="required"
-            pattern="^[0-9.]+$" value="3.0" min="0" max="9" step="0.1" />
+            pattern="^[0-9.]+$" value="" min="0" max="9" step="0.1" />
             <label for="historical-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
