@@ -245,8 +245,8 @@ var EditPane = function (options) {
       return false;
     }
 
-    // Check eqid format (2 letters followed by 8 characters)
-    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{8}$/;
+    // Check eqid format (2 letters followed by 5-8 characters)
+    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/;
     if (regex.test(_eqid.value)) {
       return true;
     }
