@@ -245,7 +245,7 @@ var EditPane = function (options) {
       return false;
     }
 
-    // Check eqid format (2 letters followed by 5 characters)
+    // Check eqid format (2 letters followed by 5 or more characters)
     regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,}$/;
     if (regex.test(_eqid.value)) {
       return true;
