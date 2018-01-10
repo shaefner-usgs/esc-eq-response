@@ -346,6 +346,7 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
+        order,
         summary;
 
     className = opts.id;
@@ -359,10 +360,11 @@ var SummaryPane = function (options) {
       div.innerHTML = summary;
       _features.appendChild(div);
 
-      if (opts.id === 'aftershocks') {
-        div.classList.add('darker');
-      } else {
+      order = window.getComputedStyle(div).getPropertyValue('order');
+      if (order % 2 === 0) { // even
         div.classList.add('lighter');
+      } else { // odd
+        div.classList.add('darker');
       }
     }
 
