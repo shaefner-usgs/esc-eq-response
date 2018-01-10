@@ -83,8 +83,11 @@
   .aftershocks {
     order: 1;
   }
+  .foreshocks {
+    order: 2
+  }
   .historical {
-    order: 2;
+    order: 3;
   }
 
   .bin {
