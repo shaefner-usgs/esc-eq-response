@@ -122,7 +122,7 @@ var SummaryPane = function (options) {
       Object.keys(rows).forEach(function(key) {
         row = rows[key];
         mag = /tr\s+class="m(\d+)"/.exec(row);
-        if (!magThreshold || mag[1] >= magThreshold) {
+        if (!magThreshold || parseInt(mag[1], 10) >= magThreshold) {
           count ++;
           tableData += row;
         }
