@@ -13,7 +13,8 @@ var _COLORS,
     _MARKER_DEFAULTS;
 
 _COLORS = {
-  historical: '#ccd',
+  historical: '#dde',
+  foreshock: '#99a',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
@@ -173,7 +174,11 @@ var Earthquakes = function (options) {
 
     eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
     if (eqMoment.isBefore(_mainshockMoment)) {
-      age = 'historical';
+      if (_id === 'foreshocks') {
+        age = 'foreshock';
+      } else {
+        age = 'historical';
+      }
     } else if (eqMoment.isSame(_mainshockMoment)) {
       age = 'mainshock';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
