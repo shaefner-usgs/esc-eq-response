@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -37,7 +38,7 @@ var Foreshocks = function (options) {
       json: options.json,
       mainshockJson: options.mainshockJson
     });
-    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
+    _magThreshold = Math.floor(AppUtil.getParam('foreshocks-minmag'));
 
     _this.displayLayer = true;
     _this.id = id;
