@@ -4,6 +4,7 @@
 var AftershocksFeature = require('features/AftershocksFeature'),
     AppUtil = require('AppUtil'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
+    ForeshocksFeature = require('features/ForeshocksFeature'),
     HistoricalFeature = require('features/HistoricalFeature'),
     MainshockFeature = require('features/MainshockFeature'),
     Moment = require('moment'),
@@ -52,6 +53,7 @@ var Features = function (options) {
       _getAftershocks,
       _getEqFeedUrl,
       _getFocalMechanism,
+      _getForeshocks,
       _getHistorical,
       _getMainshock,
       _getMomentTensor,
@@ -170,7 +172,6 @@ var Features = function (options) {
     }
   };
 
-
   /**
    * Get aftershocks feature
    */
@@ -214,6 +215,33 @@ var Features = function (options) {
     queryString = '?' + pairs.join('&');
 
     return baseUri + queryString;
+  };
+
+  /**
+   * Get foreshocks feature
+   */
+  _getForeshocks = function () {
+    var days,
+        params;
+
+    days = AppUtil.getParam('foreshocks-days');
+
+    params = {
+      endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
+        .slice(0, -5),
+      latitude: _mainshockJson.geometry.coordinates[1],
+      longitude: _mainshockJson.geometry.coordinates[0],
+      maxradiuskm: AppUtil.getParam('foreshocks-dist'),
+      minmagnitude: AppUtil.getParam('foreshocks-minmag'),
+      starttime: Moment(_mainshockJson.properties.time).utc()
+        .subtract(days, 'days').toISOString().slice(0, -5)
+    };
+
+    _loadFeed({
+      jsClass: ForeshocksFeature,
+      name: 'Foreshocks',
+      url: _getEqFeedUrl(params)
+    });
   };
 
   /**
@@ -453,6 +481,7 @@ var Features = function (options) {
     } else {
       // 3. Create other features (called via mainshock's callback)
       _getAftershocks();
+      _getForeshocks();
       _getHistorical();
       _getMomentTensor();
       _getFocalMechanism();
