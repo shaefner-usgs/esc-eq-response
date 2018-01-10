@@ -166,7 +166,7 @@ var EditPane = function (options) {
       'foreshocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'foreshocks-minmag': 1.0,
       'historical-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
-      'historical-minmag': Math.round(Math.max(5, mag - 1)),
+      'historical-minmag': Math.round(Math.max(4, mag - 2)),
       'historical-years': 10
     };
   };
