@@ -245,17 +245,16 @@ var Earthquakes = function (options) {
     if (_id === 'aftershocks') {
       duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
         .asDays(), 1);
-
       description += '. The duration of the aftershock sequence is <strong>' +
         duration + ' days</strong>';
     }
     else if (_id === 'foreshocks') {
-      description += ' in the <strong>prior ' +
-      AppUtil.getParam('foreshocks-days') + ' days</strong>';
+      duration = AppUtil.getParam('foreshocks-days');
+      description += ' in the <strong>prior ' + duration + ' days</strong>';
     }
     else if (_id === 'historical') {
-      description += ' in the <strong>prior ' +
-      AppUtil.getParam('historical-years') + ' years</strong>';
+      duration = AppUtil.getParam('historical-years');
+      description += ' in the <strong>prior ' + duration + ' years</strong>';
     }
 
     description += '.</p>';
