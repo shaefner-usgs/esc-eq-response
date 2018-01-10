@@ -499,6 +499,8 @@ var Features = function (options) {
 
     if (id === 'aftershocks') {
       _getAftershocks();
+    } else if (id === 'foreshocks') {
+      _getForeshocks();
     } else if (id === 'historical') {
       _getHistorical();
     }
