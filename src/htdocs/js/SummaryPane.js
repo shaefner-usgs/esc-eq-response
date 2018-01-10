@@ -211,7 +211,7 @@ var SummaryPane = function (options) {
       summary += data.detailsHtml;
     }
 
-    if (id === 'aftershocks' || id === 'historical') {
+    if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
       if (id === 'aftershocks') {
         summary += '<div class="bins">';
         summary += _getBinnedTable(data.bins, 'First');

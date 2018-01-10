@@ -38,7 +38,7 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
+ *     id: {String}, // 'mainshock', 'aftershocks', 'foreshocks', 'historical'
  *     json: {Object}, // geojson data for feature
  *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
  *   }
@@ -113,8 +113,8 @@ var Earthquakes = function (options) {
     _popupTemplate = _getTemplate('popup');
     _tablerowTemplate = _getTemplate('tablerow');
 
-    // Store feed description for aftershocks and historical
-    if (_id === 'aftershocks' || _id === 'historical') {
+    // Store feed description for aftershocks, foreshocks, and historical
+    if (_id === 'aftershocks' || _id === 'foreshocks' || _id === 'historical') {
       _details = _getDescription();
     }
 
@@ -229,7 +229,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (aftershocks / historical)
+   * Get feed description (aftershocks / foreshocks / historical)
    *
    * @return description {Html}
    */
@@ -248,6 +248,10 @@ var Earthquakes = function (options) {
 
       description += '. The duration of the aftershock sequence is <strong>' +
         duration + ' days</strong>';
+    }
+    else if (_id === 'foreshocks') {
+      description += ' in the <strong>prior ' +
+      AppUtil.getParam('foreshocks-days') + ' days</strong>';
     }
     else if (_id === 'historical') {
       description += ' in the <strong>prior ' +
@@ -399,7 +403,7 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    // Feed details (set to text description for aftershocks / historical)
+    // Feed details (set via _getDescription() for other features besides mainshock)
     if (_id === 'mainshock') {
       _details = popup; // set to same text as map popup
     }
@@ -478,7 +482,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed details (mainshock) / description (aftershocks, historical)
+   * Get feed details (mainshock) / description (others)
    *
    * @return _details {String}
    */
