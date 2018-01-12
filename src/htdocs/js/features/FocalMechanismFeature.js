@@ -81,7 +81,7 @@ var FocalMechanismFeature = function (options) {
   };
 
   /**
-   * Get moment tensor beachball
+   * Get focal mechanism beachball
    *
    * @return beachball {Object}
    */
