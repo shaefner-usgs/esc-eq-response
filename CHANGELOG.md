@@ -5,6 +5,13 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Remove decimal points from default values for magnitude thresholds
+* Add eqid to data tables on summary pane
+* Allow eqid's that have fewer characters for older events
+* Add separate 'foreshocks' layer in addition to historical seismicity
+* use gl3d bundle of plotly.js which is smaller
+* Use 2x retina images for fm, mt canvas
+* Optimize css file structure / organization
 * Patch: position mouseovers to left on right side of map; use built-in leaflet styles
 * Minor refactor: mv map-related methods from Features.js to MapPane.js
 * Bug fix: sort layers correctly in layer controller
