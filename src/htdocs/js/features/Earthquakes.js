@@ -13,7 +13,8 @@ var _COLORS,
     _MARKER_DEFAULTS;
 
 _COLORS = {
-  historical: '#ccd',
+  historical: '#dde',
+  foreshock: '#99a',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
@@ -38,7 +39,7 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     id: {String}, // 'mainshock', 'aftershocks', or 'historical'
+ *     id: {String}, // 'mainshock', 'aftershocks', 'foreshocks', 'historical'
  *     json: {Object}, // geojson data for feature
  *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
  *   }
@@ -113,8 +114,8 @@ var Earthquakes = function (options) {
     _popupTemplate = _getTemplate('popup');
     _tablerowTemplate = _getTemplate('tablerow');
 
-    // Store feed description for aftershocks and historical
-    if (_id === 'aftershocks' || _id === 'historical') {
+    // Store feed description for aftershocks, foreshocks, and historical
+    if (_id === 'aftershocks' || _id === 'foreshocks' || _id === 'historical') {
       _details = _getDescription();
     }
 
@@ -146,7 +147,9 @@ var Earthquakes = function (options) {
 
     _bins[period][magInt][0] ++; // total
     if (days <= 365) { // bin eqs within one year of period
-      _bins[period][magInt][365] ++;
+      if (_id !== 'foreshocks') {
+        _bins[period][magInt][365] ++;
+      }
       if (days <= 30) {
         _bins[period][magInt][30] ++;
         if (days <= 7) {
@@ -173,7 +176,11 @@ var Earthquakes = function (options) {
 
     eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
     if (eqMoment.isBefore(_mainshockMoment)) {
-      age = 'historical';
+      if (_id === 'foreshocks') {
+        age = 'foreshock';
+      } else {
+        age = 'historical';
+      }
     } else if (eqMoment.isSame(_mainshockMoment)) {
       age = 'mainshock';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
@@ -229,7 +236,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (aftershocks / historical)
+   * Get feed description (aftershocks / foreshocks / historical)
    *
    * @return description {Html}
    */
@@ -245,13 +252,16 @@ var Earthquakes = function (options) {
     if (_id === 'aftershocks') {
       duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
         .asDays(), 1);
-
       description += '. The duration of the aftershock sequence is <strong>' +
         duration + ' days</strong>';
     }
+    else if (_id === 'foreshocks') {
+      duration = AppUtil.getParam('foreshocks-days');
+      description += ' in the <strong>prior ' + duration + ' days</strong>';
+    }
     else if (_id === 'historical') {
-      description += ' in the <strong>prior ' +
-      AppUtil.getParam('historical-years') + ' years</strong>';
+      duration = AppUtil.getParam('historical-years');
+      description += ' in the <strong>prior ' + duration + ' years</strong>';
     }
 
     description += '.</p>';
@@ -271,7 +281,9 @@ var Earthquakes = function (options) {
     intervals[1] = 0;
     intervals[7] = 0;
     intervals[30] = 0;
-    intervals[365] = 0;
+    if (_id !== 'foreshocks') {
+      intervals[365] = 0;
+    }
 
     return intervals;
   };
@@ -399,7 +411,7 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    // Feed details (set to text description for aftershocks / historical)
+    // Feed details (set via _getDescription() for other features besides mainshock)
     if (_id === 'mainshock') {
       _details = popup; // set to same text as map popup
     }
@@ -427,7 +439,7 @@ var Earthquakes = function (options) {
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Past');
     }
-    else if (_id === 'historical') {
+    else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
     }
@@ -478,7 +490,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed details (mainshock) / description (aftershocks, historical)
+   * Get feed details (mainshock) / description (others)
    *
    * @return _details {String}
    */

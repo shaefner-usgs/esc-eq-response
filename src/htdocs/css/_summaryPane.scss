@@ -83,8 +83,11 @@
   .aftershocks {
     order: 1;
   }
+  .foreshocks {
+    order: 2
+  }
   .historical {
-    order: 2;
+    order: 3;
   }
 
   .bin {
@@ -143,6 +146,10 @@
   .features {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .foreshocks .year {
+    display: none; /* hide year header on foreshocks binned data table */
   }
 
   .lighter {

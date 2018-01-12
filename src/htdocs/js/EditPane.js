@@ -70,7 +70,7 @@ var EditPane = function (options) {
     _eqidPrevValue = null;
 
     // All form fields
-    _fields = _el.querySelectorAll('input:not(.reset)');
+    _fields = _el.querySelectorAll('input');
 
     _significantEqs = SignificantEqs({
       callback: _addSignificantEqs,
@@ -153,7 +153,8 @@ var EditPane = function (options) {
      *
      * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
      *
-     * Aftershock distance = ruptureLength, Historical distance = 1.5*ruptureLength
+     * Aftershock / Forshock distance = ruptureLength,
+     * Historical distance = 1.5 * ruptureLength
      */
     ruptureArea = Math.pow(10, mag - 4);
     ruptureLength = Math.pow(ruptureArea, 0.7);
@@ -161,9 +162,12 @@ var EditPane = function (options) {
     return {
       'aftershocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'aftershocks-minmag': 0.0,
-      'historical-dist': Math.max(10, 15 * Math.round(0.1 * ruptureLength)),
-      'historical-minmag': 3.0,
-      'historical-years': 10,
+      'foreshocks-days': 30,
+      'foreshocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'foreshocks-minmag': 1.0,
+      'historical-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'historical-minmag': Math.round(Math.max(4, mag - 2)),
+      'historical-years': 10
     };
   };
 
@@ -186,15 +190,17 @@ var EditPane = function (options) {
   /**
    * Initialize event listeners
    *
-   * Note that _addListener expects a NodeList (or an array) as the first arg
+   * Note that _addListener() expects a NodeList (or an array) as the first arg
    */
   _initListeners = function () {
     var aftershocks,
+        foreshocks,
         historical,
         reset,
         viewmap;
 
     aftershocks = _el.querySelectorAll('.aftershocks');
+    foreshocks = _el.querySelectorAll('.foreshocks');
     historical = _el.querySelectorAll('.historical');
     reset = _el.querySelector('.reset');
     viewmap = _el.querySelector('.viewmap');
@@ -205,8 +211,9 @@ var EditPane = function (options) {
     // Get new set of feature layers when eqid is changed
     _addListener([_eqid], 'input', _getFeatures);
 
-    // Update aftershocks, historical features when params changed
+    // Update eq features when params changed
     _addListener(aftershocks, 'change', _refreshEqs);
+    _addListener(foreshocks, 'change', _refreshEqs);
     _addListener(historical, 'change', _refreshEqs);
 
     // Clear features when reset button pressed
@@ -259,7 +266,7 @@ var EditPane = function (options) {
     var id;
 
     if (_isValidEqId()) {
-      id = this.className; // 'afershocks' or 'historical'
+      id = this.className; // 'afershocks', 'foreshocks' or 'historical'
       _Features.refresh(id);
     }
   };

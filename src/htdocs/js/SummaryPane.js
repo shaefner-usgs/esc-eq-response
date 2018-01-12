@@ -75,7 +75,7 @@ var SummaryPane = function (options) {
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +
-          '<th>Year</th>' +
+          '<th class="year">Year</th>' +
           '<th class="total">Total</th>' +
         '</tr>';
       bins[period].forEach(function(cols, mag) {
@@ -122,7 +122,7 @@ var SummaryPane = function (options) {
       Object.keys(rows).forEach(function(key) {
         row = rows[key];
         mag = /tr\s+class="m(\d+)"/.exec(row);
-        if (!magThreshold || mag[1] >= magThreshold) {
+        if (!magThreshold || parseInt(mag[1], 10) >= magThreshold) {
           count ++;
           tableData += row;
         }
@@ -211,7 +211,7 @@ var SummaryPane = function (options) {
       summary += data.detailsHtml;
     }
 
-    if (id === 'aftershocks' || id === 'historical') {
+    if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
       if (id === 'aftershocks') {
         summary += '<div class="bins">';
         summary += _getBinnedTable(data.bins, 'First');
@@ -224,7 +224,7 @@ var SummaryPane = function (options) {
           }, false).html;
         }
       }
-      if (id === 'historical') {
+      if (id === 'historical' || id === 'foreshocks') {
         summary += _getBinnedTable(data.bins, 'Prior');
       }
 
@@ -346,6 +346,7 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
+        order,
         summary;
 
     className = opts.id;
@@ -359,10 +360,11 @@ var SummaryPane = function (options) {
       div.innerHTML = summary;
       _features.appendChild(div);
 
-      if (opts.id === 'aftershocks') {
-        div.classList.add('darker');
-      } else {
+      order = window.getComputedStyle(div).getPropertyValue('order');
+      if (order % 2 === 0) { // even
         div.classList.add('lighter');
+      } else { // odd
+        div.classList.add('darker');
       }
     }
 
