@@ -319,8 +319,9 @@ var Earthquakes = function (options) {
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
         '<td class="time" data-sort="{isoTime}">{utcTime}</td>' +
         '<td class="location">{latlng}</td>' +
-        '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="depth" data-sort="{depth}">{depth} km</td>' +
+        '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
+        '<td class="eqid">{eqid}</td>' +
       '</tr>';
     }
     else if (type === 'tooltip') {
@@ -385,6 +386,7 @@ var Earthquakes = function (options) {
       depth: AppUtil.round(coords[2], 1),
       distance: AppUtil.round(distance, 1),
       distanceDir: bearingString,
+      eqid: eqid,
       felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
       latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),

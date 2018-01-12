@@ -135,10 +135,11 @@ var SummaryPane = function (options) {
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
             '<th class="location">Location</th>' +
-            '<th class="distance" data-sort-method="number">' +
+            '<th data-sort-method="number">Depth</th>' +
+            '<th data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</th>' +
-            '<th data-sort-method="number">Depth</th>' +
+            '<th class="eqid">Event ID</th>' +
           '</tr>' +
           tableData +
         '</table>';
