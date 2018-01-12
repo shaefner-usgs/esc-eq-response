@@ -161,10 +161,10 @@ var EditPane = function (options) {
 
     return {
       'aftershocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'aftershocks-minmag': 0.0,
+      'aftershocks-minmag': 0,
       'foreshocks-days': 30,
       'foreshocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'foreshocks-minmag': 1.0,
+      'foreshocks-minmag': 1,
       'historical-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
       'historical-minmag': Math.round(Math.max(4, mag - 2)),
       'historical-years': 10
