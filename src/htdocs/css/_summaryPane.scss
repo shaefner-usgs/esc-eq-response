@@ -148,6 +148,10 @@
     flex-wrap: wrap;
   }
 
+  .foreshocks .year {
+    display: none; /* hide year header on foreshocks binned data table */
+  }
+
   .lighter {
     td.rowlabel {
       background: url(../img/gradient-lighter.png) repeat-y;

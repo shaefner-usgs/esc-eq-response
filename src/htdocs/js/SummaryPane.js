@@ -75,7 +75,7 @@ var SummaryPane = function (options) {
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +
-          '<th>Year</th>' +
+          '<th class="year">Year</th>' +
           '<th class="total">Total</th>' +
         '</tr>';
       bins[period].forEach(function(cols, mag) {
@@ -224,7 +224,7 @@ var SummaryPane = function (options) {
           }, false).html;
         }
       }
-      if (id === 'historical') {
+      if (id === 'historical' || id === 'foreshocks') {
         summary += _getBinnedTable(data.bins, 'Prior');
       }
 

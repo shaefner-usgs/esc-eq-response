@@ -147,7 +147,9 @@ var Earthquakes = function (options) {
 
     _bins[period][magInt][0] ++; // total
     if (days <= 365) { // bin eqs within one year of period
-      _bins[period][magInt][365] ++;
+      if (_id !== 'foreshocks') {
+        _bins[period][magInt][365] ++;
+      }
       if (days <= 30) {
         _bins[period][magInt][30] ++;
         if (days <= 7) {
@@ -279,7 +281,9 @@ var Earthquakes = function (options) {
     intervals[1] = 0;
     intervals[7] = 0;
     intervals[30] = 0;
-    intervals[365] = 0;
+    if (_id !== 'foreshocks') {
+      intervals[365] = 0;
+    }
 
     return intervals;
   };
@@ -435,7 +439,7 @@ var Earthquakes = function (options) {
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Past');
     }
-    else if (_id === 'historical') {
+    else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
     }
