@@ -60,6 +60,7 @@ var Features = function (options) {
       _getStations,
       _getStatusBarId,
       _loadFeed,
+      _removeCanvasEls,
       _removeFeature;
 
 
@@ -420,6 +421,22 @@ var Features = function (options) {
   };
 
   /**
+   * Remove all canvas beachballs from map pane
+   */
+  _removeCanvasEls = function () {
+    var els,
+        i,
+        mapPane;
+
+    mapPane = document.querySelector('#mapPane');
+    els = mapPane.querySelectorAll('canvas');
+
+    for (i = 0; i < els.length; i ++) {
+      mapPane.removeChild(els[i]);
+    }
+  };
+
+  /**
    * Remove feature from map, plots, summary panes
    *
    * @param id {String}
@@ -514,6 +531,8 @@ var Features = function (options) {
       Object.keys(_features).forEach(function(id) {
         _removeFeature(id);
       });
+      // remove any leftover beachballs
+      _removeCanvasEls();
     }
   };
 
