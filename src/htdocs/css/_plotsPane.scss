@@ -5,8 +5,31 @@
     margin: -.25rem 0 1.5rem;
   }
 
-  .features, .feature {
-    height: 100%;
+  /* Rendering order of features */
+  .aftershocks {
+    order: 0;
+  }
+  .historical {
+    order: 1;
+  }
+
+  .cumulative {
+    height: 40vh;
+  }
+  .hypocenters {
+    height: 80vh;
+  }
+  .magtime {
+    height: 40vh;
+  }
+
+  .feature {
+    width: 100%;
+  }
+
+  .features {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .hovertext {
@@ -37,16 +60,6 @@
     [data-title="Toggle show closest data on hover"] {
       display: none;
     }
-  }
-
-  .cumulative {
-    height: 40vh;
-  }
-  .hypocenters {
-    height: 80vh;
-  }
-  .magtime {
-    height: 40vh;
   }
 
   .xtitle, .ytitle {

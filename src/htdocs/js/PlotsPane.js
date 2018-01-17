@@ -83,12 +83,12 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add cumulative aftershocks plot to plot pane
+   * Add cumulative plot to plot pane
    *
    * @param opts {Object}
    *   {
    *     data: {Object}, // plot data
-   *     id: {String}, // used for css class on container elem
+   *     id: {String}, // feature id
    *     name: {String} // feature name
    *   }
    */
@@ -99,10 +99,11 @@ var PlotsPane = function (options) {
         trace;
 
     plotId = 'cumulative';
-    container = _addContainer(plotId, 'Cumulative Aftershocks', opts);
+    container = _addContainer(plotId, 'Cumulative Earthquakes', opts);
 
     trace = _getTrace({
-      data: opts.data.aftershocks.plotdata,
+      data: opts.data[opts.id].plotdata,
+      id: opts.id,
       mainshockDate: opts.data.mainshock.plotdata.date[0],
       mainshockTime: opts.data.mainshock.plotdata.time[0],
       plot: plotId,
@@ -119,12 +120,12 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add aftershock hypocenters plot to plot pane
+   * Add hypocenters plot to plot pane
    *
    * @param opts {Object}
    *   {
    *     data: {Object}, // plot data
-   *     id: {String}, // used for css class on container elem
+   *     id: {String}, // feature id
    *     name: {String} // feature name
    *   }
    */
@@ -136,6 +137,7 @@ var PlotsPane = function (options) {
         plotId,
         resetButton,
         trace,
+        traces,
         zRatio;
 
     plotId = 'hypocenters';
@@ -143,9 +145,10 @@ var PlotsPane = function (options) {
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
-    Object.keys(opts.data).forEach(function(key) {
+    traces = ['mainshock', opts.id];
+    traces.forEach(function(id) {
       trace = _getTrace({
-        data: opts.data[key].plotdata,
+        data: opts.data[id].plotdata,
         plot: plotId,
         type: 'scatter3d'
       });
@@ -176,12 +179,12 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add aftershocks mag-time plot to plot pane
+   * Add mag-time plot to plot pane
    *
    * @param opts {Object}
    *   {
    *     data: {Object}, // plot data
-   *     id: {String}, // used for css class on container elem
+   *     id: {String}, // feature id
    *     name: {String} // feature name
    *   }
    */
@@ -190,16 +193,18 @@ var PlotsPane = function (options) {
         data,
         layout,
         plotId,
-        trace;
+        trace,
+        traces;
 
     plotId = 'magtime';
     container = _addContainer(plotId, 'Magnitude vs. Time', opts);
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
-    Object.keys(opts.data).forEach(function(key) {
+    traces = ['mainshock', opts.id];
+    traces.forEach(function(id) {
       trace = _getTrace({
-        data: opts.data[key].plotdata,
+        data: opts.data[id].plotdata,
         plot: plotId,
         type: 'scatter'
       });
@@ -294,7 +299,7 @@ var PlotsPane = function (options) {
       };
     } else {
       layout.yaxis = {
-        title: 'aftershocks',
+        title: 'earthquakes',
         titlefont: titlefont
       };
     }
@@ -333,7 +338,7 @@ var PlotsPane = function (options) {
    *
    * @return trace {Object}
    */
-  _getTrace = function  (opts) {
+  _getTrace = function (opts) {
     var data,
         mode,
         sizeref,
@@ -353,10 +358,12 @@ var PlotsPane = function (options) {
         return i + 1;
       });
 
-      // Add origin point to beginning of trace
-      x.unshift(opts.mainshockTime);
-      y.unshift(0);
-      data.date.unshift(opts.mainshockDate);
+      // Add origin point to beginning of aftershocks trace
+      if (opts.id === 'aftershocks') {
+        x.unshift(opts.mainshockTime);
+        data.date.unshift(opts.mainshockDate);
+        y.unshift(0);
+      }
 
       // Add date field to hover text
       text = y.map(function(val, i) {

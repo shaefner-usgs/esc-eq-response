@@ -123,8 +123,8 @@ var Features = function (options) {
 
         // Add other (non-mainshock) features
         _this.getFeatures();
-      } else if (id === 'aftershocks') {
-        // Add aftershock plots to plots pane
+      } else if (id === 'aftershocks' || id === 'historical') {
+        // Add plots to plots pane
         _plotdata[id] = feature.getPlotData();
 
         _addPlots(feature);

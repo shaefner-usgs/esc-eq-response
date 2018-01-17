@@ -67,6 +67,18 @@ var Historical = function (options) {
   };
 
   /**
+   * Get feature's data for plots pane
+   *
+   * @return {Object}
+   */
+  _this.getPlotData = function () {
+    return {
+      detailsHtml: _earthquakes.getDetails(),
+      plotdata: _earthquakes.getPlotData()
+    };
+  };
+  
+  /**
    * Get feature's data for summary pane
    *
    * @return {Object}}
