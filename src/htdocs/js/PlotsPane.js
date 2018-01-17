@@ -360,8 +360,8 @@ var PlotsPane = function (options) {
 
       // Add origin point to beginning of aftershocks trace
       if (opts.id === 'aftershocks') {
-        x.unshift(opts.mainshockTime);
         data.date.unshift(opts.mainshockDate);
+        x.unshift(opts.mainshockTime);
         y.unshift(0);
       }
 
@@ -387,10 +387,7 @@ var PlotsPane = function (options) {
     trace = {
       hoverinfo: 'text',
       hoverlabel: {
-        bgcolor: 'rgba(255, 255, 255, .85)',
-        bordercolor: 'rgb(153, 153, 153)',
         font: {
-          color: 'rgb(0, 0, 0)',
           size: 15
         }
       },
