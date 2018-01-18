@@ -73,8 +73,25 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _this.getSummaryData = function () {
+    var dyfi,
+        eqid,
+        products,
+        shakemap;
+
+    eqid = _mainshockJson.id;
+    products = _mainshockJson.properties.products;
+
+    if (products.dyfi) {
+      dyfi = products.dyfi[0].contents[eqid + '_ciim_geo.jpg'].url;
+    }
+    if (products.shakemap) {
+      shakemap = products.shakemap[0].contents['download/tvmap.jpg'].url;
+    }
+
     return {
-      detailsHtml: _earthquakes.getDetails()
+      detailsHtml: _earthquakes.getDetails(),
+      dyfi: dyfi,
+      shakemap: shakemap
     };
   };
 

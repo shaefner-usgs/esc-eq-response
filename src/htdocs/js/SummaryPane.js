@@ -200,13 +200,25 @@ var SummaryPane = function (options) {
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
         AppUtil.getParam('eqid');
 
-      summary += '<div class="modules">';
+      summary += '<div class="products">';
       summary += data.detailsHtml;
+
       // Add placeholders for beachballs
       summary += '<div class="focal-mechanism hide"><h4></h4>' +
         '<a href="' + url + '#focal-mechanism"></a></div>';
       summary += '<div class="moment-tensor hide"><h4></h4>' +
         '<a href="' + url + '#moment-tensor"></a></div>';
+
+      // Add dyfi/sm thumbnails
+      if (data.dyfi) {
+        summary += '<div class="dyfi"><h4>Did You Feel It?</h4>' +
+        '<a href="' + url + '#dyfi"><img src="' + data.dyfi + '" width="200" /></a></div>';
+      }
+      if (data.shakemap) {
+        summary += '<div class="shakemap"><h4>ShakeMap</h4>' +
+        '<a href="' + url + '#shakemap"><img src="' + data.shakemap + '" width="200" /></a></div>';
+      }
+
       summary += '</div>';
     } else {
       summary += data.detailsHtml;
