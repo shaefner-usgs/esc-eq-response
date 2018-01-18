@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add ShakeMap/DYFI thumbnails to summary pane
+* Bug fix: remove 'leftover' canvas els from mapPane when loading new event
+* Add historical plots in addition to aftershocks
 * Remove decimal points from default values for magnitude thresholds
 * Add eqid to data tables on summary pane
 * Allow eqid's that have fewer characters for older events
