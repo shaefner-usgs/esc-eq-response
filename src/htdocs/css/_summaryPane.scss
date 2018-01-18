@@ -169,6 +169,10 @@
     > div {
       margin-right: 2em;
 
+      &:last-child {
+        margin-right: -10px;
+      }
+
       &.hide {
         display: none;
       }
@@ -183,6 +187,9 @@
       text-align: center;
     }
 
+    .dyfi img {
+      margin-top: -3px;
+    }
     .earthquake h4 {
       text-align: left;
     }
