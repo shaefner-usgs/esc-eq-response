@@ -81,7 +81,7 @@ var MomentTensorFeature = function (options) {
   };
 
   /**
-   * Get moment tensor beachball
+   * Get moment tensor beachball for summary pane
    *
    * @return beachball {Object}
    */
@@ -89,7 +89,8 @@ var MomentTensorFeature = function (options) {
     var beachball;
 
     opts = Util.extend({}, {
-      data: _json
+      data: _json,
+      size: 180
     }, opts);
     beachball = MomentTensor(opts);
 

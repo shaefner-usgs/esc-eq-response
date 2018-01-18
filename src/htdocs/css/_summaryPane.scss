@@ -167,14 +167,14 @@
     flex-wrap: wrap;
 
     > div {
-      margin-right: 3em;
+      margin-right: 2em;
 
       &.hide {
         display: none;
       }
 
-      &:last-child {
-        border: 0;
+      > a img {
+        width: 180px;
       }
     }
 

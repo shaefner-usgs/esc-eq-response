@@ -212,11 +212,11 @@ var SummaryPane = function (options) {
       // Add dyfi/sm thumbnails
       if (data.dyfi) {
         summary += '<div class="dyfi"><h4>Did You Feel It?</h4>' +
-        '<a href="' + url + '#dyfi"><img src="' + data.dyfi + '" width="200" /></a></div>';
+        '<a href="' + url + '#dyfi"><img src="' + data.dyfi + '" /></a></div>';
       }
       if (data.shakemap) {
         summary += '<div class="shakemap"><h4>ShakeMap</h4>' +
-        '<a href="' + url + '#shakemap"><img src="' + data.shakemap + '" width="200" /></a></div>';
+        '<a href="' + url + '#shakemap"><img src="' + data.shakemap + '" /></a></div>';
       }
 
       summary += '</div>';

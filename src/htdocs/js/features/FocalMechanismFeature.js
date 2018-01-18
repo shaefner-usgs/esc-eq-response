@@ -81,7 +81,7 @@ var FocalMechanismFeature = function (options) {
   };
 
   /**
-   * Get focal mechanism beachball
+   * Get focal mechanism beachball for summary pane
    *
    * @return beachball {Object}
    */
@@ -89,7 +89,8 @@ var FocalMechanismFeature = function (options) {
     var beachball;
 
     opts = Util.extend({}, {
-      data: _json
+      data: _json,
+      size: 180
     }, opts);
     beachball = FocalMechanism(opts);
 
