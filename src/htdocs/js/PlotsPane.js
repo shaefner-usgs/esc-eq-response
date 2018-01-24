@@ -18,10 +18,10 @@ var PlotsPane = function (options) {
       _features,
       _plots,
 
-      _addContainer,
       _addCumulativePlot,
       _addHypocentersPlot,
       _addMagTimePlot,
+      _addPlotContainer,
       _getLayout,
       _getRatio,
       _getTrace;
@@ -43,7 +43,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add plot container to DOM and store it in _plots
+   * Add plot container / title to DOM and store container for reference
    *
    * @param containerClass {String}
    * @param title {String}
@@ -51,7 +51,7 @@ var PlotsPane = function (options) {
    *
    * @return container {Element}
    */
-  _addContainer = function (containerClass, title, opts) {
+  _addPlotContainer = function (containerClass, title, opts) {
     var container,
         h3,
         parentClass,
@@ -65,14 +65,6 @@ var PlotsPane = function (options) {
 
     parentClass = opts.id;
     parent = _features.querySelector('.' + parentClass);
-
-    if (!parent) { // create parent container if it doesn't already exist
-      parent = document.createElement('div');
-      parent.classList.add('content', 'feature', parentClass);
-      parent.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[opts.id].detailsHtml;
-
-      _features.appendChild(parent);
-    }
 
     // Add and store plot container
     parent.appendChild(h3);
@@ -99,7 +91,7 @@ var PlotsPane = function (options) {
         trace;
 
     plotId = 'cumulative';
-    container = _addContainer(plotId, 'Cumulative Earthquakes', opts);
+    container = _addPlotContainer(plotId, 'Cumulative Earthquakes', opts);
 
     trace = _getTrace({
       data: opts.data[opts.id].plotdata,
@@ -141,7 +133,7 @@ var PlotsPane = function (options) {
         zRatio;
 
     plotId = 'hypocenters';
-    container = _addContainer(plotId, '3D Hypocenters', opts);
+    container = _addPlotContainer(plotId, '3D Hypocenters', opts);
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
@@ -197,7 +189,7 @@ var PlotsPane = function (options) {
         traces;
 
     plotId = 'magtime';
-    container = _addContainer(plotId, 'Magnitude vs. Time', opts);
+    container = _addPlotContainer(plotId, 'Magnitude vs. Time', opts);
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
@@ -428,9 +420,23 @@ var PlotsPane = function (options) {
    * @param opts {Object}
    */
   _this.addPlots = function (opts) {
-    _addMagTimePlot(opts);
-    _addCumulativePlot(opts);
-    _addHypocentersPlot(opts);
+    var className,
+        count,
+        div;
+
+    className = opts.id;
+    count = opts.data[className].plotdata.date.length;
+    div = document.createElement('div');
+
+    div.classList.add('content', 'feature', className);
+    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[className].detailsHtml;
+    _features.appendChild(div);
+
+    if (count > 0) {
+      _addMagTimePlot(opts);
+      _addCumulativePlot(opts);
+      _addHypocentersPlot(opts);
+    }
   };
 
   /**
