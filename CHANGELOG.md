@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* bug fix: don't create 'empty' plots when there is no data
+* Add generic 'Loading...' message in status bar when app is initially launched
 * Add ShakeMap/DYFI thumbnails to summary pane
 * Bug fix: remove 'leftover' canvas els from mapPane when loading new event
 * Add historical plots in addition to aftershocks
@@ -13,7 +15,7 @@ An in-progress version being developed on the `master` branch.
 * Allow eqid's that have fewer characters for older events
 * Add separate 'foreshocks' layer in addition to historical seismicity
 * use gl3d bundle of plotly.js which is smaller
-* Use 2x retina images for fm, mt canvas
+* Use 2x retina images for fm, mt canvas images
 * Optimize css file structure / organization
 * Patch: position mouseovers to left on right side of map; use built-in leaflet styles
 * Minor refactor: mv map-related methods from Features.js to MapPane.js
