@@ -126,9 +126,6 @@ var EditPane = function (options) {
     // Add listener here b/c we have to wait til it exists
     significant = _el.querySelector('.significant');
     _addListener([significant], 'change', _selSignificantEq);
-
-    // Finished loading; remove alert
-    _StatusBar.removeItem('significant');
   };
 
   /*

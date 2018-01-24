@@ -43,7 +43,7 @@ var SignificantEqs = function (options) {
   _loadFeed = function () {
     var url;
 
-    // Alert user that feed is loading (removed by EditPane class)
+    // Alert user that feed is loading
     _StatusBar.addItem('significant', 'Significant Earthquakes');
 
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
@@ -52,6 +52,8 @@ var SignificantEqs = function (options) {
       url: url,
       success: function (json) {
         _callback(json);
+
+        _StatusBar.removeItem('significant');
       },
       error: function (status, xhr) {
         console.error(xhr.responseText);
