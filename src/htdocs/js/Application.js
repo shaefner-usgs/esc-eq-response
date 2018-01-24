@@ -39,7 +39,7 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    // Initialize map / plots / summary panes & navigation / status bar
+    // Instantiate map / plots / summary panes & navigation / status bar
     _MapPane = MapPane({
       el: options.mapPane
     });
@@ -58,7 +58,7 @@ var Application = function (options) {
       el: options.statusBar
     });
 
-    // Initialize features (event-specific layers) for map, plots and summary panes
+    // Instantiate features (event-specific layers) for map, plots and summary panes
     _Features = Features({
       mapPane: _MapPane,
       plotsPane: _PlotsPane,
@@ -66,7 +66,7 @@ var Application = function (options) {
       summaryPane: _SummaryPane
     });
 
-    // Initialize edit pane
+    // Instantiate edit pane
     _EditPane = EditPane({
       el: options.editPane,
       features: _Features,
@@ -75,6 +75,9 @@ var Application = function (options) {
       statusBar: _StatusBar,
       summaryPane: _SummaryPane
     });
+
+    // Remove initial loading message
+    _StatusBar.removeItem('initial');
   };
 
 

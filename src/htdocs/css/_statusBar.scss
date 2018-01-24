@@ -30,6 +30,10 @@
       color: #fff;
       padding: 3px 0;
     }
+
+    &.initial {
+      z-index: 9000;
+    }
   }
 
   &.hide {
