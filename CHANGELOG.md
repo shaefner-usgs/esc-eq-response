@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* bug fix: hide faults tooltip placeholder that was rendering on top left of map
 * bug fix: don't create 'empty' plots when there is no data
 * Add generic 'Loading...' message in status bar when app is initially launched
 * Add ShakeMap/DYFI thumbnails to summary pane
