@@ -26,6 +26,9 @@ L.MouseOverLayer = L.LayerGroup.extend({
       this._tiptext = options.tiptext;
       this._tooltip = L.DomUtil.create('div', className);
 
+      // hide this placeholder so it doesn't render on load
+      this._tooltip.setAttribute('style', 'display: none');
+
       this.on('mouseover', this._onMouseOver, this);
       this.on('mouseout', this._onMouseOut, this);
     }
