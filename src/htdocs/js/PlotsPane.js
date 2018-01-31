@@ -443,15 +443,17 @@ var PlotsPane = function (options) {
     div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[className].detailsHtml;
     _features.appendChild(div);
 
-    _plotData[className] = {
-      count: count,
-      plots: {
-        magTime: _getMagTimePlot(opts),
-        cumulative: _getCumulativePlot(opts),
-        hypocenters: _getHypocentersPlot(opts)
-      },
-      rendered: false
-    };
+    if (count > 0) {
+      _plotData[className] = {
+        count: count,
+        plots: {
+          magTime: _getMagTimePlot(opts),
+          cumulative: _getCumulativePlot(opts),
+          hypocenters: _getHypocentersPlot(opts)
+        },
+        rendered: false
+      };
+    }
 
     if (_isPlotPaneActive()) {
       _this.renderPlots();
@@ -472,7 +474,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Render plots
+   * Render plots (only call when plots pane is active)
    *
    * Plotly.js has issues if plots are rendered when plotsPane is not active
    *   (called by NavBar.js when user selects plot tab)
@@ -484,32 +486,33 @@ var PlotsPane = function (options) {
         rendered,
         resetButton;
 
-    Object.keys(_plotData).forEach(function(key) {
-      count = _plotData[key].count;
-      rendered = _plotData[key].rendered;
+    Object.keys(_plotData).forEach(function(feature) {
+      count = _plotData[feature].count;
+      plots = _plotData[feature].plots;
+      rendered = _plotData[feature].rendered;
 
       if (!rendered && count > 0) {
-        plots = _plotData[key].plots;
         Object.keys(plots).forEach(function(plot) {
           Plotly.plot(plots[plot].container, plots[plot].data, plots[plot].layout, {
             showLink: false
           });
-
-          // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
-          if (key === 'hypocenters') {
-            resetButton = plots[plot].container.querySelector('[data-title="Reset camera to last save"]');
-            resetButton.setAttribute('data-title', 'Autoscale');
-            path = resetButton.querySelector('path');
-            path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
-              '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
-              'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
-              '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
-              '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
-              '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
-              '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
-          }
         });
-        _plotData[key].rendered = true;
+
+        _plotData[feature].rendered = true;
+
+        // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
+        resetButton = plots.hypocenters.container.querySelector(
+          '[data-title="Reset camera to last save"]'
+        );
+        resetButton.setAttribute('data-title', 'Autoscale');
+        path = resetButton.querySelector('path');
+        path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 ' +
+          '187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
+          'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
+          '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
+          '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
+          '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 ' +
+          '0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
       }
     });
   };
