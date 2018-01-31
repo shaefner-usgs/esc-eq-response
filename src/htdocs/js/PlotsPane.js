@@ -16,15 +16,16 @@ var PlotsPane = function (options) {
 
       _el,
       _features,
-      _plots,
+      _plotData,
 
-      _addCumulativePlot,
-      _addHypocentersPlot,
-      _addMagTimePlot,
       _addPlotContainer,
+      _getCumulativePlot,
+      _getHypocentersPlot,
       _getLayout,
+      _getMagTimePlot,
       _getRatio,
-      _getTrace;
+      _getTrace,
+      _isPlotPaneActive;
 
 
   _this = {};
@@ -34,7 +35,7 @@ var PlotsPane = function (options) {
 
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
-    _plots = [];
+    _plotData = {};
 
     // Make plots responsive
     window.onresize = function() {
@@ -43,7 +44,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add plot container / title to DOM and store container for reference
+   * Add plot container / title to DOM
    *
    * @param containerClass {String}
    * @param title {String}
@@ -66,16 +67,15 @@ var PlotsPane = function (options) {
     parentClass = opts.id;
     parent = _features.querySelector('.' + parentClass);
 
-    // Add and store plot container
+    // Add plot container, title
     parent.appendChild(h3);
     parent.appendChild(container);
-    _plots.push(container);
 
     return container;
   };
 
   /**
-   * Add cumulative plot to plot pane
+   * Get config params for cumulative plot
    *
    * @param opts {Object}
    *   {
@@ -83,8 +83,10 @@ var PlotsPane = function (options) {
    *     id: {String}, // feature id
    *     name: {String} // feature name
    *   }
+   *
+   * @return {Object}
    */
-  _addCumulativePlot = function (opts) {
+  _getCumulativePlot = function (opts) {
     var container,
         layout,
         plotId,
@@ -106,13 +108,15 @@ var PlotsPane = function (options) {
       plot: plotId
     });
 
-    Plotly.plot(container, [trace], layout, {
-      showLink: false
-    });
+    return {
+      container: container,
+      data: [trace],
+      layout: layout
+    };
   };
 
   /**
-   * Add hypocenters plot to plot pane
+   * Get config params for hypocenters plot
    *
    * @param opts {Object}
    *   {
@@ -120,14 +124,14 @@ var PlotsPane = function (options) {
    *     id: {String}, // feature id
    *     name: {String} // feature name
    *   }
+   *
+   * @return {Object}
    */
-  _addHypocentersPlot = function (opts) {
+  _getHypocentersPlot = function (opts) {
     var container,
         data,
         layout,
-        path,
         plotId,
-        resetButton,
         trace,
         traces,
         zRatio;
@@ -153,63 +157,11 @@ var PlotsPane = function (options) {
       zRatio: zRatio
     });
 
-    Plotly.plot(container, data, layout, {
-      showLink: false
-    });
-
-    // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
-    resetButton = container.querySelector('[data-title="Reset camera to last save"]');
-    resetButton.setAttribute('data-title', 'Autoscale');
-    path = resetButton.querySelector('path');
-    path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
-      '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
-      'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
-      '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
-      '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
-      '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
-      '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
-  };
-
-  /**
-   * Add mag-time plot to plot pane
-   *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // feature id
-   *     name: {String} // feature name
-   *   }
-   */
-  _addMagTimePlot = function (opts) {
-    var container,
-        data,
-        layout,
-        plotId,
-        trace,
-        traces;
-
-    plotId = 'magtime';
-    container = _addPlotContainer(plotId, 'Magnitude vs. Time', opts);
-
-    // Get traces for plot and store in data (mainshock is in a separate trace)
-    data = [];
-    traces = ['mainshock', opts.id];
-    traces.forEach(function(id) {
-      trace = _getTrace({
-        data: opts.data[id].plotdata,
-        plot: plotId,
-        type: 'scatter'
-      });
-      data.push(trace);
-    });
-
-    layout = _getLayout({
-      plot: plotId
-    });
-
-    Plotly.plot(container, data, layout, {
-      showLink: false
-    });
+    return {
+      container: container,
+      data: data,
+      layout: layout
+    };
   };
 
   /**
@@ -297,6 +249,52 @@ var PlotsPane = function (options) {
     }
 
     return layout;
+  };
+
+  /**
+   * Get config params for mag-time plot
+   *
+   * @param opts {Object}
+   *   {
+   *     data: {Object}, // plot data
+   *     id: {String}, // feature id
+   *     name: {String} // feature name
+   *   }
+   *
+   * @return {Object}
+   */
+  _getMagTimePlot = function (opts) {
+    var container,
+        data,
+        layout,
+        plotId,
+        trace,
+        traces;
+
+    plotId = 'magtime';
+    container = _addPlotContainer(plotId, 'Magnitude vs. Time', opts);
+
+    // Get traces for plot and store in data (mainshock is in a separate trace)
+    data = [];
+    traces = ['mainshock', opts.id];
+    traces.forEach(function(id) {
+      trace = _getTrace({
+        data: opts.data[id].plotdata,
+        plot: plotId,
+        type: 'scatter'
+      });
+      data.push(trace);
+    });
+
+    layout = _getLayout({
+      plot: plotId
+    });
+
+    return {
+      container: container,
+      data: data,
+      layout: layout
+    };
   };
 
   /**
@@ -409,6 +407,19 @@ var PlotsPane = function (options) {
     return trace;
   };
 
+  /**
+   * Check if plots pane is currently active
+   *
+   * @return {Boolean}
+   */
+  _isPlotPaneActive = function () {
+    if (location.hash === '#plotsPane') {
+      return true;
+    }
+
+    return false;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -432,10 +443,18 @@ var PlotsPane = function (options) {
     div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[className].detailsHtml;
     _features.appendChild(div);
 
-    if (count > 0) {
-      _addMagTimePlot(opts);
-      _addCumulativePlot(opts);
-      _addHypocentersPlot(opts);
+    _plotData[className] = {
+      count: count,
+      plots: {
+        magTime: _getMagTimePlot(opts),
+        cumulative: _getCumulativePlot(opts),
+        hypocenters: _getHypocentersPlot(opts)
+      },
+      rendered: false
+    };
+
+    if (_isPlotPaneActive()) {
+      _this.renderPlots();
     }
   };
 
@@ -453,12 +472,61 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Resize plots: Sets initial size and adds responsive / fluid sizing
+   * Render plots
+   *
+   * Plotly.js has issues if plots are rendered when plotsPane is not active
+   *   (called by NavBar.js when user selects plot tab)
+   */
+  _this.renderPlots = function () {
+    var count,
+        path,
+        plots,
+        rendered,
+        resetButton;
+
+    Object.keys(_plotData).forEach(function(key) {
+      count = _plotData[key].count;
+      rendered = _plotData[key].rendered;
+
+      if (!rendered && count > 0) {
+        plots = _plotData[key].plots;
+        Object.keys(plots).forEach(function(plot) {
+          Plotly.plot(plots[plot].container, plots[plot].data, plots[plot].layout, {
+            showLink: false
+          });
+
+          // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
+          if (key === 'hypocenters') {
+            resetButton = plots[plot].container.querySelector('[data-title="Reset camera to last save"]');
+            resetButton.setAttribute('data-title', 'Autoscale');
+            path = resetButton.querySelector('path');
+            path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
+              '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
+              'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
+              '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
+              '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
+              '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
+              '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
+          }
+        });
+        _plotData[key].rendered = true;
+      }
+    });
+  };
+
+  /**
+   * Resize plots: adds responsive / fluid sizing
    */
   _this.resizePlots = function () {
-    _plots.forEach(function(plot) {
-      Plotly.Plots.resize(plot);
-    });
+    var i,
+        plots;
+
+    if(_isPlotPaneActive()) {
+      plots = document.querySelectorAll('.js-plotly-plot');
+      for (i = 0; i < plots.length; i ++) {
+        Plotly.Plots.resize(plots[i]);
+      }
+    }
   };
 
 
