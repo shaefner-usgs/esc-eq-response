@@ -15,6 +15,10 @@ $link-color-visited: rgb(140, 78, 202);
 @import '_statusBar.scss';
 @import '_summaryPane.scss';
 
+abbr[title] {
+  text-decoration: none; /* clean up default styling in Chrome */
+}
+
 html, body {
   font: $font-size $font-family;
   height: 100%;

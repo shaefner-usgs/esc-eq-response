@@ -163,10 +163,11 @@ var NavBar = function (options) {
     // Scroll to user's former position
     _setScrollPosition(id);
 
-    // Update map container / plots so they display correctly when unhidden
+    // Update map container / render plots so they display correctly when unhidden
     if (id === 'mapPane') {
       _MapPane.map.invalidateSize();
     } else if (id === 'plotsPane') {
+      _PlotsPane.renderPlots();
       _PlotsPane.resizePlots();
     }
   };
