@@ -49,17 +49,18 @@
 
   /* hide some of the Plotly.js controls */
   .modebar-group {
-    [data-title="Save and edit plot in cloud"],
-    [data-title="Reset camera to default"],
-    [data-title="Reset camera to last save"],
-    [data-title="Lasso Select"],
-    [data-title="Box Select"],
-    [data-title="Reset axes"],
-    [data-title="Toggle Spike Lines"],
-    [data-title="Compare data on hover"],
-    [data-title="Produced with Plotly"],
-    [data-title="Show closest data on hover"],
-    [data-title="Toggle show closest data on hover"] {
+    [data-title='Box Select'],
+    [data-title='Compare data on hover'],
+    [data-title='Edit in Chart Studio'],
+    [data-title='Lasso Select'],
+    [data-title='Produced with Plotly'],
+    [data-title='Reset axes'],
+    [data-title='Reset camera to default'],
+    [data-title='Reset camera to last save'],
+    [data-title='Save and edit plot in cloud'],
+    [data-title='Show closest data on hover'],
+    [data-title='Toggle show closest data on hover'],
+    [data-title='Toggle Spike Lines'] {
       display: none;
     }
   }
