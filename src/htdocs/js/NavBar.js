@@ -125,7 +125,7 @@ var NavBar = function (options) {
         position;
 
     id = _getPaneId();
-    position = document.body.scrollTop;
+    position = window.pageYOffset;
 
     window.sessionStorage.setItem(id, position);
   };
@@ -141,7 +141,7 @@ var NavBar = function (options) {
     position = window.sessionStorage.getItem(id);
 
     if (position) {
-      document.body.scrollTop = position;
+      window.scroll(0, position);
     }
   };
 
