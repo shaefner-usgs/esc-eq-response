@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+## 0.4.0 (2018-02-01)
+
 * bug fix: use more standard api for remembering scroll position
 * Render plots 'on the fly' when user clicks 'Plots' tab to address plotly.js issues
 * bug fix: hide faults tooltip placeholder that was rendering on top left of map
