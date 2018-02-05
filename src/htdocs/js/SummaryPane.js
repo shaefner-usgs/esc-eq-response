@@ -22,7 +22,9 @@ var SummaryPane = function (options) {
       _features,
       _tz,
 
+      _addListeners,
       _addTimestamp,
+      _clickRow,
       _getBinnedTable,
       _getListTable,
       _getSummary,
@@ -44,6 +46,29 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Add event listeners
+   *
+   * @param el {Element}
+   *     div el that contains list table(s)
+   */
+  _addListeners = function (el) {
+    var i,
+        j,
+        rows,
+        tables;
+
+    tables = el.querySelectorAll('table.list');
+    if (tables) {
+      for (i = 0; i < tables.length; i ++) {
+        rows = tables[i].rows;
+        for (j = 1; j < rows.length; j ++) {
+          rows[j].addEventListener('click', _clickRow);
+        }
+      }
+    }
+  };
+
+  /**
    * Add timestamp to summary pane
    */
   _addTimestamp = function () {
@@ -52,6 +77,13 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
+  };
+
+  /**
+   * Click handler for lists of earthquakes
+   */
+  _clickRow = function() {
+    console.log(this);
   };
 
   /**
@@ -130,7 +162,7 @@ var SummaryPane = function (options) {
       if (count > 1) {
         sortClass = 'sortable';
       }
-      html = '<table class="' + sortClass + '">' +
+      html = '<table class="list ' + sortClass + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
@@ -379,10 +411,11 @@ var SummaryPane = function (options) {
       } else { // odd
         div.classList.add('darker');
       }
-    }
 
-    _updateTimestamp();
-    _initTableSort(className);
+      _addListeners(div);
+      _initTableSort(className);
+      _updateTimestamp();
+    }
   };
 
   /**

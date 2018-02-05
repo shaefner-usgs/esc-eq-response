@@ -18,6 +18,7 @@ var PlotsPane = function (options) {
       _features,
       _plotData,
 
+      _addListeners,
       _addPlotContainer,
       _getCumulativePlot,
       _getHypocentersPlot,
@@ -41,6 +42,20 @@ var PlotsPane = function (options) {
     window.onresize = function() {
       _this.resizePlots();
     };
+  };
+
+  /**
+   * Add event listeners to earthquake circles on plots
+   */
+  _addListeners = function (plot) {
+    var eqids,
+        index;
+
+    plot.on('plotly_click', function(data) {
+      eqids = data.points[0].data.eqid;
+      index = data.points[0].pointNumber;
+      console.log(eqids[index]);
+    });
   };
 
   /**
@@ -375,6 +390,7 @@ var PlotsPane = function (options) {
     }
 
     trace = {
+      eqid: data.eqid,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
@@ -481,21 +497,26 @@ var PlotsPane = function (options) {
    */
   _this.renderPlots = function () {
     var count,
+        el,
         path,
         plots,
         rendered,
         resetButton;
 
+    // Loop thru features
     Object.keys(_plotData).forEach(function(feature) {
       count = _plotData[feature].count;
       plots = _plotData[feature].plots;
       rendered = _plotData[feature].rendered;
 
       if (!rendered && count > 0) {
-        Object.keys(plots).forEach(function(plot) {
-          Plotly.plot(plots[plot].container, plots[plot].data, plots[plot].layout, {
+        // Loop thru plot types for feature
+        Object.keys(plots).forEach(function(type) {
+          el = plots[type].container;
+          Plotly.plot(el, plots[type].data, plots[type].layout, {
             showLink: false
           });
+          _addListeners(el);
         });
 
         _plotData[feature].rendered = true;

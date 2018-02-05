@@ -90,6 +90,7 @@ var Earthquakes = function (options) {
       color: [],
       date: [],
       depth: [],
+      eqid: [],
       lat: [],
       lon: [],
       mag: [],
@@ -426,6 +427,7 @@ var Earthquakes = function (options) {
     // Add props to _plotdata (additional props are added in _pointToLayer)
     _plotdata.date.push(utcTime);
     _plotdata.depth.push(coords[2] * -1); // return a negative number for depth
+    _plotdata.eqid.push(data.eqid);
     _plotdata.lat.push(coords[1]);
     _plotdata.lon.push(coords[0]);
     _plotdata.mag.push(data.mag);
