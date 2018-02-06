@@ -22,6 +22,8 @@ var SummaryPane = function (options) {
       _features,
       _tz,
 
+      _MapPane,
+
       _addListeners,
       _addTimestamp,
       _clickRow,
@@ -41,6 +43,8 @@ var SummaryPane = function (options) {
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
     _tz = _getTimeZone();
+
+    _MapPane = options.mapPane;
 
     _addTimestamp();
   };
@@ -83,7 +87,28 @@ var SummaryPane = function (options) {
    * Click handler for lists of earthquakes
    */
   _clickRow = function() {
-    console.log(this);
+    var eqid,
+        feature,
+        features,
+        parent;
+
+    eqid = this.querySelector('.eqid').textContent;
+    features = [
+      'aftershocks',
+      'foreshocks',
+      'historical',
+      'mainshock'
+    ];
+
+    // Determine which feature was clicked
+    parent = this.closest('.feature');
+    features.forEach(function(f) {
+      if (parent.classList.contains(f)) {
+        feature = f;
+      }
+    });
+
+    _MapPane.openPopup(feature, eqid);
   };
 
   /**

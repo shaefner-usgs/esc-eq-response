@@ -17,7 +17,7 @@ require('mappane/TerrainLayer');
 
 /**
  * Sets up leaflet map instance and adds (non-event-specific) 'static' layers
- *   (event-specific feature layers are added by Features.js)
+ *   (event-specific 'feature' layers are added by Features.js)
  *
  * @param options {Object}
  *   {
@@ -29,7 +29,9 @@ var MapPane = function (options) {
       _initialize,
 
       _el,
-      _layers,
+      _featureLayers,
+      _mapNavButton,
+      _staticLayers,
 
       _addLayerControl,
       _compareLayers,
@@ -45,8 +47,11 @@ var MapPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
+    _featureLayers= {};
+    _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
+
     _el = options.el || document.createElement('div');
-    _layers = _getStaticLayers();
+    _staticLayers = _getStaticLayers();
 
     _initMap();
   };
@@ -60,7 +65,7 @@ var MapPane = function (options) {
     var control;
 
     control = L.control.layers(
-      _layers.baseLayers, _layers.overlays, {
+      _staticLayers.baseLayers, _staticLayers.overlays, {
         sortFunction: _compareLayers,
         sortLayers: true
       }
@@ -179,7 +184,7 @@ var MapPane = function (options) {
     _this.createMapPane('faults', 'tilePane');
 
     // Add default layers to map
-    _layers.defaults.forEach(function(layer) {
+    _staticLayers.defaults.forEach(function(layer) {
       _this.map.addLayer(layer);
     });
 
@@ -191,9 +196,9 @@ var MapPane = function (options) {
 
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
-    //   baseLayers: _layers.baseLayers,
+    //   baseLayers: _staticLayers.baseLayers,
     //   id: 'eqid', // TODO: insert actual eqid
-    //   overlays: _layers.overlays,
+    //   overlays: _staticLayers.overlays,
     //   scope: 'response'
     // });
   };
@@ -208,8 +213,8 @@ var MapPane = function (options) {
   _isBaseLayer = function (layer) {
     var r = false;
 
-    Object.keys(_layers.baseLayers).forEach(function(key) {
-      if (_layers.baseLayers[key] === layer) {
+    Object.keys(_staticLayers.baseLayers).forEach(function(key) {
+      if (_staticLayers.baseLayers[key] === layer) {
         r = true;
       }
     });
@@ -231,6 +236,8 @@ var MapPane = function (options) {
 
     layer = feature.getMapLayer();
     _this.layerControl.addOverlay(layer, feature.name);
+
+    _featureLayers[feature.id] = layer;
 
     // Turn layer "on" if it is set to be displayed by default
     if (feature.displayLayer) {
@@ -257,6 +264,32 @@ var MapPane = function (options) {
     if (!_this.map.getPane(id)) {
       _this.map.createPane(id, _this.map.getPane(parent));
     }
+  };
+
+  /**
+   * Open popup matching eqid in feature layer
+   *
+   * @param feature {String}
+   * @param eqid {String}
+   */
+  _this.openPopup = function (feature, eqid) {
+    var coords,
+        popup;
+
+    _featureLayers[feature].eachLayer(function(layer) {
+      if (layer.feature.id === eqid) {
+        coords = layer.feature.geometry.coordinates;
+        popup = layer.getPopup();
+        popup.setLatLng([coords[1], coords[0]]);
+        popup.openOn(_this.map);
+
+        //layer.openPopup();
+        console.log(layer, popup);
+      }
+    });
+
+    // Simulate clicking on 'Map' button on navbar
+    _mapNavButton.click();
   };
 
   /**

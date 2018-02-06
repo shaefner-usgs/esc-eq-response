@@ -18,6 +18,8 @@ var PlotsPane = function (options) {
       _features,
       _plotData,
 
+      _MapPane,
+
       _addListeners,
       _addPlotContainer,
       _getCumulativePlot,
@@ -38,6 +40,8 @@ var PlotsPane = function (options) {
     _features = _el.querySelector('.features');
     _plotData = {};
 
+    _MapPane = options.mapPane;
+
     // Make plots responsive
     window.onresize = function() {
       _this.resizePlots();
@@ -49,12 +53,17 @@ var PlotsPane = function (options) {
    */
   _addListeners = function (plot) {
     var eqids,
-        index;
+        feature,
+        index,
+        points;
 
     plot.on('plotly_click', function(data) {
-      eqids = data.points[0].data.eqid;
-      index = data.points[0].pointNumber;
-      console.log(eqids[index]);
+      points = data.points[0];
+      eqids = points.data.eqid;
+      feature = points.data.feature;
+      index = points.pointNumber;
+
+      _MapPane.openPopup(feature, eqids[index]);
     });
   };
 
@@ -160,6 +169,7 @@ var PlotsPane = function (options) {
     traces.forEach(function(id) {
       trace = _getTrace({
         data: opts.data[id].plotdata,
+        id: id,
         plot: plotId,
         type: 'scatter3d'
       });
@@ -295,6 +305,7 @@ var PlotsPane = function (options) {
     traces.forEach(function(id) {
       trace = _getTrace({
         data: opts.data[id].plotdata,
+        id: id,
         plot: plotId,
         type: 'scatter'
       });
@@ -391,6 +402,7 @@ var PlotsPane = function (options) {
 
     trace = {
       eqid: data.eqid,
+      feature: opts.id,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
