@@ -273,23 +273,20 @@ var MapPane = function (options) {
    * @param eqid {String}
    */
   _this.openPopup = function (feature, eqid) {
-    var coords,
-        popup;
-
-    _featureLayers[feature].eachLayer(function(layer) {
-      if (layer.feature.id === eqid) {
-        coords = layer.feature.geometry.coordinates;
-        popup = layer.getPopup();
-        popup.setLatLng([coords[1], coords[0]]);
-        popup.openOn(_this.map);
-
-        //layer.openPopup();
-        console.log(layer, popup);
-      }
-    });
+    var popup;
 
     // Simulate clicking on 'Map' button on navbar
     _mapNavButton.click();
+
+    _featureLayers[feature].eachLayer(function(layer) {
+      if (layer.feature.id === eqid) {
+        layer.openPopup();
+
+        popup = layer.getPopup();
+        popup.update();
+        window.popup = popup;
+      }
+    });
   };
 
   /**
