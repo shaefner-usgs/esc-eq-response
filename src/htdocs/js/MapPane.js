@@ -273,20 +273,23 @@ var MapPane = function (options) {
    * @param eqid {String}
    */
   _this.openPopup = function (feature, eqid) {
-    var popup;
+    var activeLayer,
+        popup;
 
     // Simulate clicking on 'Map' button on navbar
     _mapNavButton.click();
 
     _featureLayers[feature].eachLayer(function(layer) {
       if (layer.feature.id === eqid) {
-        layer.openPopup();
-
-        popup = layer.getPopup();
-        popup.update();
-        window.popup = popup;
+        activeLayer = layer;
       }
     });
+
+    popup = activeLayer.getPopup();
+    popup.on('add', function() {
+      popup.update();
+    });
+    activeLayer.openPopup();
   };
 
   /**
