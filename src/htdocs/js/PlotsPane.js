@@ -528,7 +528,9 @@ var PlotsPane = function (options) {
           Plotly.plot(el, plots[type].data, plots[type].layout, {
             showLink: false
           });
-          _addListeners(el);
+          if (type !== 'hypocenters') {
+            _addListeners(el); // plotly click events are buggy for 3d charts
+          }
         });
 
         _plotData[feature].rendered = true;
