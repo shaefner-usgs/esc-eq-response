@@ -274,21 +274,30 @@ var MapPane = function (options) {
    */
   _this.openPopup = function (feature, eqid) {
     var activeLayer,
+        map,
         popup;
 
     // Simulate clicking on 'Map' button on navbar
     _mapNavButton.click();
 
+    // Get 'active' layer (marker) associated with given eqid
     _featureLayers[feature].eachLayer(function(layer) {
       if (layer.feature.id === eqid) {
         activeLayer = layer;
       }
     });
 
+    map = _this.map;
     popup = activeLayer.getPopup();
-    // Call update only after map is visible so popup displays correctly
-    _this.map.on('visible', function() {
+
+    // Center on marker because popup's autopan feature doesn't always work
+    map.setView(activeLayer.getLatLng(), map.getZoom());
+
+    // Call popup.update() after map is visible so popup displays correctly
+    map.on('visible', function() {
       popup.update();
+      // Remove listener so it doesn't trigger again for following events
+      map.off('visible');
     });
 
     activeLayer.openPopup();
