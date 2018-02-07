@@ -286,9 +286,11 @@ var MapPane = function (options) {
     });
 
     popup = activeLayer.getPopup();
-    popup.on('add', function() {
+    // Call update only after map is visible so popup displays correctly
+    _this.map.on('visible', function() {
       popup.update();
     });
+
     activeLayer.openPopup();
   };
 
