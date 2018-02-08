@@ -31,6 +31,7 @@ var SummaryPane = function (options) {
       _getListTable,
       _getSummary,
       _getTimeZone,
+      _hoverRow,
       _initTableSort,
       _updateTimestamp;
 
@@ -67,6 +68,7 @@ var SummaryPane = function (options) {
         rows = tables[i].rows;
         for (j = 1; j < rows.length; j ++) {
           rows[j].addEventListener('click', _clickRow);
+          rows[j].addEventListener('mouseover', _hoverRow);
         }
       }
     }
@@ -92,15 +94,18 @@ var SummaryPane = function (options) {
         features,
         parent;
 
+    // Keep row highlighted after user clicks
+    this.classList.add('selected');
+
     eqid = this.querySelector('.eqid').textContent;
+
+    // Determine which feature was clicked
     features = [
       'aftershocks',
       'foreshocks',
       'historical',
       'mainshock'
     ];
-
-    // Determine which feature was clicked
     parent = this.closest('.feature');
     features.forEach(function(f) {
       if (parent.classList.contains(f)) {
@@ -340,6 +345,18 @@ var SummaryPane = function (options) {
     }
 
     return tz;
+  };
+
+  /**
+   * Turn off selected row when user hovers over any row
+   */
+  _hoverRow = function () {
+    var selected;
+
+    selected = _el.querySelector('.selected');
+    if (selected) {
+      selected.classList.remove('selected');
+    }
   };
 
   /*
