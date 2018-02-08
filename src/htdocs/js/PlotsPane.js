@@ -18,6 +18,9 @@ var PlotsPane = function (options) {
       _features,
       _plotData,
 
+      _MapPane,
+
+      _addListeners,
       _addPlotContainer,
       _getCumulativePlot,
       _getHypocentersPlot,
@@ -37,10 +40,33 @@ var PlotsPane = function (options) {
     _features = _el.querySelector('.features');
     _plotData = {};
 
+    _MapPane = options.mapPane;
+
     // Make plots responsive
     window.onresize = function() {
       _this.resizePlots();
     };
+  };
+
+  /**
+   * Add event listeners to earthquake circles on plots
+   *
+   * @param plot {Element}
+   */
+  _addListeners = function (plot) {
+    var eqids,
+        feature,
+        index,
+        points;
+
+    plot.on('plotly_click', function(data) {
+      points = data.points[0];
+      eqids = points.data.eqid;
+      feature = points.data.feature;
+      index = points.pointNumber;
+
+      _MapPane.openPopup(feature, eqids[index]);
+    });
   };
 
   /**
@@ -145,6 +171,7 @@ var PlotsPane = function (options) {
     traces.forEach(function(id) {
       trace = _getTrace({
         data: opts.data[id].plotdata,
+        id: id,
         plot: plotId,
         type: 'scatter3d'
       });
@@ -280,6 +307,7 @@ var PlotsPane = function (options) {
     traces.forEach(function(id) {
       trace = _getTrace({
         data: opts.data[id].plotdata,
+        id: id,
         plot: plotId,
         type: 'scatter'
       });
@@ -375,6 +403,8 @@ var PlotsPane = function (options) {
     }
 
     trace = {
+      eqid: data.eqid,
+      feature: opts.id,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
@@ -481,21 +511,28 @@ var PlotsPane = function (options) {
    */
   _this.renderPlots = function () {
     var count,
+        el,
         path,
         plots,
         rendered,
         resetButton;
 
+    // Loop thru features
     Object.keys(_plotData).forEach(function(feature) {
       count = _plotData[feature].count;
       plots = _plotData[feature].plots;
       rendered = _plotData[feature].rendered;
 
       if (!rendered && count > 0) {
-        Object.keys(plots).forEach(function(plot) {
-          Plotly.plot(plots[plot].container, plots[plot].data, plots[plot].layout, {
+        // Loop thru plot types for feature
+        Object.keys(plots).forEach(function(type) {
+          el = plots[type].container;
+          Plotly.plot(el, plots[type].data, plots[type].layout, {
             showLink: false
           });
+          if (type !== 'hypocenters') {
+            _addListeners(el); // plotly click events are buggy for 3d charts
+          }
         });
 
         _plotData[feature].rendered = true;

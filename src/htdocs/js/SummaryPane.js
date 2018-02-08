@@ -22,11 +22,16 @@ var SummaryPane = function (options) {
       _features,
       _tz,
 
+      _MapPane,
+
+      _addListeners,
       _addTimestamp,
+      _clickRow,
       _getBinnedTable,
       _getListTable,
       _getSummary,
       _getTimeZone,
+      _hoverRow,
       _initTableSort,
       _updateTimestamp;
 
@@ -40,7 +45,33 @@ var SummaryPane = function (options) {
     _features = _el.querySelector('.features');
     _tz = _getTimeZone();
 
+    _MapPane = options.mapPane;
+
     _addTimestamp();
+  };
+
+  /**
+   * Add event listeners to earthquake lists
+   *
+   * @param el {Element}
+   *     div el that contains list table(s)
+   */
+  _addListeners = function (el) {
+    var i,
+        j,
+        rows,
+        tables;
+
+    tables = el.querySelectorAll('table.list');
+    if (tables) {
+      for (i = 0; i < tables.length; i ++) {
+        rows = tables[i].rows;
+        for (j = 1; j < rows.length; j ++) {
+          rows[j].addEventListener('click', _clickRow);
+          rows[j].addEventListener('mouseover', _hoverRow);
+        }
+      }
+    }
   };
 
   /**
@@ -52,6 +83,49 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
+  };
+
+  /**
+   * Click handler for lists of earthquakes
+   *
+   * @param e {Event}
+   */
+  _clickRow = function(e) {
+    var eqid,
+        feature,
+        features,
+        isTextSelected,
+        parent,
+        selection,
+        tr;
+
+    // Keep row highlighted after user clicks
+    this.classList.add('selected');
+
+    eqid = this.querySelector('.eqid').textContent;
+
+    // Determine which feature was clicked
+    features = [
+      'aftershocks',
+      'foreshocks',
+      'historical',
+      'mainshock'
+    ];
+    parent = this.closest('.feature');
+    features.forEach(function(f) {
+      if (parent.classList.contains(f)) {
+        feature = f;
+      }
+    });
+
+    selection = window.getSelection();
+    tr = e.target.parentNode;
+    isTextSelected = tr.contains(selection.anchorNode) &&
+      selection.toString().length > 0;
+
+    if(!isTextSelected) { // suppress event if user is trying to select text
+      _MapPane.openPopup(feature, eqid);
+    }
   };
 
   /**
@@ -130,7 +204,7 @@ var SummaryPane = function (options) {
       if (count > 1) {
         sortClass = 'sortable';
       }
-      html = '<table class="' + sortClass + '">' +
+      html = '<table class="list ' + sortClass + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
@@ -285,6 +359,18 @@ var SummaryPane = function (options) {
     return tz;
   };
 
+  /**
+   * Turn off selected row when user hovers over any row
+   */
+  _hoverRow = function () {
+    var selected;
+
+    selected = _el.querySelector('.selected');
+    if (selected) {
+      selected.classList.remove('selected');
+    }
+  };
+
   /*
    * Make table sortable
    *
@@ -359,7 +445,6 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
-        order,
         summary;
 
     className = opts.id;
@@ -369,20 +454,14 @@ var SummaryPane = function (options) {
     // Add feature to summary
     if (summary) {
       div = document.createElement('div');
-      div.classList.add('content', 'feature', className);
+      div.classList.add('content', 'feature', 'lighter', className);
       div.innerHTML = summary;
       _features.appendChild(div);
 
-      order = window.getComputedStyle(div).getPropertyValue('order');
-      if (order % 2 === 0) { // even
-        div.classList.add('lighter');
-      } else { // odd
-        div.classList.add('darker');
-      }
+      _addListeners(div);
+      _initTableSort(className);
+      _updateTimestamp();
     }
-
-    _updateTimestamp();
-    _initTableSort(className);
   };
 
   /**

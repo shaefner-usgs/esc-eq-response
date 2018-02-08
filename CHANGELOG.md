@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Make eqs in plots / summary clickable - opens map pane w/ popup displayed
+
 ## 0.4.0 (2018-02-01)
 
 * bug fix: use more standard api for remembering scroll position

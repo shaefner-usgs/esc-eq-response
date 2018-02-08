@@ -44,10 +44,12 @@ var Application = function (options) {
       el: options.mapPane
     });
     _PlotsPane = PlotsPane({
-      el: options.plotsPane
+      el: options.plotsPane,
+      mapPane: _MapPane
     });
     _SummaryPane = SummaryPane({
-      el: options.summaryPane
+      el: options.summaryPane,
+      mapPane: _MapPane
     });
     _NavBar = NavBar({
       el: options.navBar,

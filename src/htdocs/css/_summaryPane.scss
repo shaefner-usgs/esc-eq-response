@@ -162,6 +162,18 @@
     }
   }
 
+  .list {
+    tr {
+      transition: background .25s ease-out;
+    }
+    tr:hover:not(.no-sort), .selected {
+      color: #014c73;
+      cursor: pointer;
+      background: #f8fbfd;
+      transition-duration: 0s;
+    }
+  }
+
   .products {
     display: flex;
     flex-wrap: wrap;
