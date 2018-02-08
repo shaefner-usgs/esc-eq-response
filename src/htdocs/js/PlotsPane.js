@@ -50,6 +50,8 @@ var PlotsPane = function (options) {
 
   /**
    * Add event listeners to earthquake circles on plots
+   *
+   * @param plot {Element}
    */
   _addListeners = function (plot) {
     var eqids,

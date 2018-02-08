@@ -167,8 +167,8 @@ var NavBar = function (options) {
     if (id === 'mapPane') {
       _MapPane.map.invalidateSize();
       // Fire an event so L.popup.update() can be called after map is visible,
-      // which seems to be necessary so Leaflet can display popup correctly
-      // when triggered from another pane besides map.
+      // which seems to be necessary for Leaflet to display popups correctly
+      // when they're added to the map from another pane
       _MapPane.map.fire('visible');
     } else if (id === 'plotsPane') {
       _PlotsPane.renderPlots();

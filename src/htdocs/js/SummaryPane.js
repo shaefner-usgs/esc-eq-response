@@ -51,7 +51,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Add event listeners
+   * Add event listeners to earthquake lists
    *
    * @param el {Element}
    *     div el that contains list table(s)
@@ -87,6 +87,8 @@ var SummaryPane = function (options) {
 
   /**
    * Click handler for lists of earthquakes
+   *
+   * @param e {Event}
    */
   _clickRow = function(e) {
     var eqid,
