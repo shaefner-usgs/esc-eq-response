@@ -88,11 +88,14 @@ var SummaryPane = function (options) {
   /**
    * Click handler for lists of earthquakes
    */
-  _clickRow = function() {
+  _clickRow = function(e) {
     var eqid,
         feature,
         features,
-        parent;
+        isTextSelected,
+        parent,
+        selection,
+        tr;
 
     // Keep row highlighted after user clicks
     this.classList.add('selected');
@@ -113,7 +116,14 @@ var SummaryPane = function (options) {
       }
     });
 
-    _MapPane.openPopup(feature, eqid);
+    selection = window.getSelection();
+    tr = e.target.parentNode;
+    isTextSelected = tr.contains(selection.anchorNode) &&
+      selection.toString().length > 0;
+
+    if(!isTextSelected) { // suppress event if user is trying to select text
+      _MapPane.openPopup(feature, eqid);
+    }
   };
 
   /**
