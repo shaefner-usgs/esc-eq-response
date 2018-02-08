@@ -416,7 +416,6 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
-        order,
         summary;
 
     className = opts.id;
@@ -426,16 +425,9 @@ var SummaryPane = function (options) {
     // Add feature to summary
     if (summary) {
       div = document.createElement('div');
-      div.classList.add('content', 'feature', className);
+      div.classList.add('content', 'feature', 'lighter', className);
       div.innerHTML = summary;
       _features.appendChild(div);
-
-      order = window.getComputedStyle(div).getPropertyValue('order');
-      if (order % 2 === 0) { // even
-        div.classList.add('lighter');
-      } else { // odd
-        div.classList.add('darker');
-      }
 
       _addListeners(div);
       _initTableSort(className);
