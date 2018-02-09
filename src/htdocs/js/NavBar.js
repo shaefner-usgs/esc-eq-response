@@ -73,8 +73,12 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
+    var loadingMsg = document.querySelector('#loading');
+
+    loadingMsg.classList.remove('hide');
     _hidePanes();
     _showPane(id);
+    loadingMsg.classList.add('hide');
   };
 
   /**
