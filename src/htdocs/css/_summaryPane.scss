@@ -54,6 +54,10 @@
         visibility: hidden;
       }
 
+      &:hover {
+        color: #000;
+      }
+
       &.sort-up:after,
       &.sort-down:after {
         opacity: 1.0;
