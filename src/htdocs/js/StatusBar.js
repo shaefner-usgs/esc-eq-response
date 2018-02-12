@@ -96,9 +96,13 @@ var StatusBar = function (options) {
     _this.removeError(className); // remove any leftover errors for this feature
     _showStatusBar();
 
+    if (name) {
+      name = ' ' + name;
+    }
+
     item = document.createElement('p');
     item.classList.add(className);
-    item.innerHTML = 'Loading ' + name + '&hellip;';
+    item.innerHTML = 'Loading' + name + '&hellip;';
     item.style.zIndex = _getZindex();
 
     _el.appendChild(item);

@@ -51,13 +51,14 @@ var Application = function (options) {
       el: options.summaryPane,
       mapPane: _MapPane
     });
+    _StatusBar = StatusBar({
+      el: options.statusBar
+    });
     _NavBar = NavBar({
       el: options.navBar,
       mapPane: _MapPane,
-      plotsPane: _PlotsPane
-    });
-    _StatusBar = StatusBar({
-      el: options.statusBar
+      plotsPane: _PlotsPane,
+      statusBar: _StatusBar
     });
 
     // Instantiate features (event-specific layers) for map, plots and summary panes

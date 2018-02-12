@@ -20,6 +20,7 @@ var NavBar = function (options) {
 
       _MapPane,
       _PlotsPane,
+      _StatusBar,
 
       _addListeners,
       _changePane,
@@ -42,6 +43,7 @@ var NavBar = function (options) {
 
     _MapPane = options.mapPane;
     _PlotsPane = options.plotsPane;
+    _StatusBar = options.statusBar;
 
     id = _getPaneId();
     _changePane(id);
@@ -73,12 +75,14 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
-    var loadingMsg = document.querySelector('#loading');
+    _StatusBar.addItem('rendering', '');
 
-    loadingMsg.classList.remove('hide');
-    _hidePanes();
-    _showPane(id);
-    loadingMsg.classList.add('hide');
+    // Add a slight delay; otherwise loading message does not display
+    window.setTimeout(function() {
+      _hidePanes();
+      _showPane(id);
+      _StatusBar.removeItem('rendering');
+    }, 10);
   };
 
   /**
