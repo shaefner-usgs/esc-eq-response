@@ -5,14 +5,15 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add loading message when rendering (now that plots are rendered on-the-fly)
 * Make eqs in plots / summary clickable - opens map pane w/ popup displayed
 
 ## 0.4.0 (2018-02-01)
 
-* bug fix: use more standard api for remembering scroll position
+* Bug fix: use more standard api for remembering scroll position
 * Render plots 'on the fly' when user clicks 'Plots' tab to address plotly.js issues
-* bug fix: hide faults tooltip placeholder that was rendering on top left of map
-* bug fix: don't create 'empty' plots when there is no data
+* Bug fix: hide faults tooltip placeholder that was rendering on top left of map
+* Bug fix: don't create 'empty' plots when there is no data
 * Add generic 'Loading...' message in status bar when app is initially launched
 * Add ShakeMap/DYFI thumbnails to summary pane
 * Bug fix: remove 'leftover' canvas els from mapPane when loading new event
@@ -46,9 +47,9 @@ An in-progress version being developed on the `master` branch.
 * Bug fix: ensure navbar is above plot controls
 * Bug fix: only show 'Event ID not found' error for mainshock feed 404s
 * Upgrade to Leaflet 1.x
-  - Use new pane management feature to control order of layers on map
-  - Bug fix: layers now stay in correct order when toggling on/off
-  - Bug fix: map always zooms to correct extent on initial load (hopefully)
+  - use new pane management feature to control order of layers on map
+  - bug fix: layers now stay in correct order when toggling on/off
+  - bug fix: map always zooms to correct extent on initial load (hopefully)
 
 ## 0.3.0 (2017-08-25)
 
