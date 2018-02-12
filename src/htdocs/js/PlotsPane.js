@@ -369,7 +369,7 @@ var PlotsPane = function (options) {
     data = opts.data;
 
     if (opts.plot === 'cumulative') {
-      mode = 'markers+lines';
+      mode = 'lines+markers';
       x = data.time;
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
@@ -422,15 +422,25 @@ var PlotsPane = function (options) {
     if (mode === 'markers') {
       trace.marker = {
         color: data.color, // fill
-        line: {
-          color: 'rgb(51, 51, 51)' // stroke
+        line: { // stroke
+          color: 'rgb(51, 51, 51)',
+          width: 1
         },
         size: data.size,
-        sizeref: sizeref,
+        sizeref: sizeref
       };
-    } else {
+    } else { // lines+markers
+      trace.line = {
+        color: 'rgb(120, 186, 232)',
+        width: 2
+      };
       trace.marker = {
-        size: 4
+        color: 'rgb(120, 186, 232)', // fill
+        line: { // stroke
+          color: 'rgb(31, 119, 180)',
+          width: 1
+        },
+        size: 3
       };
     }
 
@@ -455,7 +465,7 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to plots pane
+   * Add feature to plots pane - creates plots, but doesn't render them
    *   (called by Features.js)
    *
    * @param opts {Object}
