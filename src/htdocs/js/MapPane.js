@@ -273,34 +273,38 @@ var MapPane = function (options) {
    * @param eqid {String}
    */
   _this.openPopup = function (feature, eqid) {
-    var activeLayer,
+    var featureLayer,
         map,
-        popup;
+        marker;
+
+    featureLayer = _featureLayers[feature];
+    map = _this.map;
 
     // Simulate clicking on 'Map' button on navbar
     _mapNavButton.click();
 
-    // Get 'active' layer (marker) associated with given eqid
-    _featureLayers[feature].eachLayer(function(layer) {
+    // Get marker associated with given eqid
+    featureLayer.eachLayer(function(layer) {
       if (layer.feature.id === eqid) {
-        activeLayer = layer;
+        marker = layer;
       }
     });
 
-    map = _this.map;
-    popup = activeLayer.getPopup();
-
     // Center on marker because popup's autopan feature doesn't always work
-    map.setView(activeLayer.getLatLng(), map.getZoom());
+    map.setView(marker.getLatLng(), map.getZoom());
 
-    // Call popup.update() after map is visible so popup displays correctly
+    // Call L.popup.update() after map is visible so popup displays correctly
     map.on('visible', function() {
-      popup.update();
+      marker.getPopup().update();
       // Remove listener so it doesn't trigger again for following events
       map.off('visible');
     });
 
-    activeLayer.openPopup();
+    // Turn on feature layer (if not already) so its popup can be displayed
+    if (!map.hasLayer(featureLayer)) {
+      map.addLayer(featureLayer);
+    }
+    marker.openPopup();
   };
 
   /**
