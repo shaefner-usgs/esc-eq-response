@@ -411,7 +411,8 @@ var Earthquakes = function (options) {
     popup = L.Util.template(_popupTemplate, data);
     tooltip = L.Util.template(_tooltipTemplate, data);
     layer.bindPopup(popup, {
-      autoPanPadding: L.point(50, 50),
+      autoPanPaddingTopLeft: L.point(50, 50),
+      autoPanPaddingBottomRight: L.point(60, 40),
       maxWidth: 350,
       minWidth: 250
     }).bindTooltip(tooltip);
