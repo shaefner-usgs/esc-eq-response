@@ -73,6 +73,8 @@ var Features = function (options) {
     _PlotsPane = options.plotsPane;
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
+
+    _this.isRefreshing = false;
   };
 
   /**
@@ -105,10 +107,6 @@ var Features = function (options) {
       id = feature.id;
       _features[id] = feature;
 
-      // First, remove any existing previous version of feature
-      //   (should be removed already, but stacked ajax requests can cause issues)
-      _removeFeature(id);
-
       // Create a new map pane and add feature to map, summary panes
       _MapPane.createMapPane(id, 'overlayPane');
       _MapPane.addFeatureLayer(feature, _initialLoad);
@@ -131,8 +129,9 @@ var Features = function (options) {
         _addPlots(feature);
       }
 
-      // Feature finished loading; remove alert
+      // Feature finished loading; remove alert / set isRefreshing to false
       _StatusBar.removeItem(statusBarId);
+      _this.isRefreshing = false;
 
       if (_features.aftershocks && _features.historical) {
         _initialLoad = false;
@@ -512,6 +511,7 @@ var Features = function (options) {
    * @param id {String}
    */
   _this.refresh = function (id) {
+    _this.isRefreshing = true;
     _removeFeature(id);
 
     if (id === 'aftershocks') {
