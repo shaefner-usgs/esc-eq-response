@@ -28,7 +28,8 @@ var EditPane = function (options) {
       _eqidPrevValue,
       _fields,
       _significantEqs,
-      _throttle,
+      _throttleRefresh,
+      _throttleUpdate,
 
       _Features,
       _MapPane,
@@ -269,8 +270,8 @@ var EditPane = function (options) {
       id = formField.className; // 'afershocks', 'foreshocks' or 'historical'
 
       // Throttle requests so they don't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttle);
-      _throttle = window.setTimeout(function() {
+      window.clearTimeout(_throttleRefresh);
+      _throttleRefresh = window.setTimeout(function() {
         // Even with throttle in place, ajax requests could 'stack' up
         // Wait until previous request is finished before starting another
         if (_Features.isRefreshing) {
@@ -368,12 +369,16 @@ var EditPane = function (options) {
         id,
         value;
 
-    id = e.target.id;
-    el = document.getElementById(id);
-    value = el.value.replace(/\s+/g, ''); // strip whitespace
-    el.value = value;
+    // Throttle updates so they don't fire off repeatedly in rapid succession
+    window.clearTimeout(_throttleUpdate);
+    _throttleUpdate = window.setTimeout(function() {
+      id = e.target.id;
+      el = document.getElementById(id);
+      value = el.value.replace(/\s+/g, ''); // strip whitespace
+      el.value = value;
 
-    AppUtil.setParam(id, value);
+      AppUtil.setParam(id, value);
+    }, 100);
   };
 
   /**
