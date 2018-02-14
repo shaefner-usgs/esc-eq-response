@@ -32,7 +32,7 @@ var StatusBar = function (options) {
 
   /**
    * Get z-index value for status bar entry
-   *   counts down so that previous entries are displayed until they're loaded
+   *   counts down so that previous entries are displayed until they're removed
    *
    * @return _zIndex {Integer}
    */
