@@ -444,15 +444,15 @@ var Features = function (options) {
   _removeFeature = function (id) {
     var className,
         mapLayer,
-        plots,
-        summary;
+        plotsEl,
+        summaryEl;
 
     className = id;
 
     if (_features[id]) {
       mapLayer = _features[id].getMapLayer();
-      plots = document.querySelector('#plotsPane .' + className);
-      summary = document.querySelector('#summaryPane .feature.' + className);
+      plotsEl = document.querySelector('#plotsPane .' + className);
+      summaryEl = document.querySelector('#summaryPane .' + className);
     }
 
     if (mapLayer) {
@@ -460,12 +460,12 @@ var Features = function (options) {
       _MapPane.layerControl.removeLayer(mapLayer);
     }
 
-    if (plots) {
-      _PlotsPane.removePlots(plots);
+    if (plotsEl) {
+      _PlotsPane.removePlots(plotsEl);
     }
 
-    if (summary) {
-      _SummaryPane.removeSummary(summary);
+    if (summaryEl) {
+      _SummaryPane.removeSummary(summaryEl);
     }
   };
 
