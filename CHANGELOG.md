@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Throttle rapid-firing, repeating events in UI
+* Bug fix: previous feature layers sometimes left behind when updating params rapidly
 * Tweak display of cumulative plot so eq circles are more discernible
 * Add loading message when rendering (now that plots are rendered on-the-fly)
 * Make eqs in plots / summary clickable - opens map pane w/ popup displayed
