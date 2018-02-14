@@ -28,6 +28,7 @@ var EditPane = function (options) {
       _eqidPrevValue,
       _fields,
       _significantEqs,
+      _throttle,
 
       _Features,
       _MapPane,
@@ -264,7 +265,12 @@ var EditPane = function (options) {
 
     if (_isValidEqId()) {
       id = this.className; // 'afershocks', 'foreshocks' or 'historical'
-      _Features.refresh(id);
+
+      // Throttle requests so they can't fire off repeatedly in rapid succession
+      window.clearTimeout(_throttle);
+      _throttle = window.setTimeout(function() {
+        _Features.refresh(id);
+      }, 250);
     }
   };
 

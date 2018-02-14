@@ -17,6 +17,7 @@ var NavBar = function (options) {
 
       _el,
       _panes,
+      _throttle,
 
       _MapPane,
       _PlotsPane,
@@ -135,7 +136,11 @@ var NavBar = function (options) {
     id = _getPaneId();
     position = window.pageYOffset;
 
-    window.sessionStorage.setItem(id, position);
+    // Throttle scroll event so it doesn't fire off repeatedly in rapid succession
+    window.clearTimeout(_throttle);
+    _throttle = window.setTimeout(function() {
+      window.sessionStorage.setItem(id, position);
+    }, 25);
   };
 
   /**
