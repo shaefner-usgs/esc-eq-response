@@ -508,6 +508,13 @@ var PlotsPane = function (options) {
    *     Element to remove
    */
   _this.removePlots = function (el) {
+    var i,
+        plots;
+
+    plots = el.querySelectorAll('.js-plotly-plot');
+    for (i = 0; i < plots.length; i ++) {
+      Plotly.purge(plots[i]);
+    }
     if (_el.contains(el)) {
       el.parentNode.removeChild(el);
     }
