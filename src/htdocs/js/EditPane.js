@@ -211,9 +211,9 @@ var EditPane = function (options) {
     _addListener([_eqid], 'input', _getFeatures);
 
     // Update eq features when params changed
-    _addListener(aftershocks, 'input', _refreshEqs);
-    _addListener(foreshocks, 'input', _refreshEqs);
-    _addListener(historical, 'input', _refreshEqs);
+    _addListener(aftershocks, 'change', _refreshEqs);
+    _addListener(foreshocks, 'change', _refreshEqs);
+    _addListener(historical, 'change', _refreshEqs);
 
     // Clear features when reset button pressed
     _addListener([reset], 'click', _resetForm);
