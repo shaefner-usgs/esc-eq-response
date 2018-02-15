@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Purge plots when removing them for performance reasons
 * Throttle rapid-firing, repeating events in UI
 * Bug fix: previous feature layers sometimes left behind when updating params rapidly
 * Tweak display of cumulative plot so eq circles are more discernible
