@@ -423,9 +423,10 @@ var PlotsPane = function (options) {
       trace.marker = {
         color: data.color, // fill
         line: { // stroke
-          color: 'rgb(51, 51, 51)',
+          color: 'rgb(65, 65, 65)',
           width: 1
         },
+        opacity: 0.85,
         size: data.size,
         sizeref: sizeref
       };
