@@ -211,9 +211,9 @@ var EditPane = function (options) {
     _addListener([_eqid], 'input', _getFeatures);
 
     // Update eq features when params changed
-    _addListener(aftershocks, 'change', _refreshEqs);
-    _addListener(foreshocks, 'change', _refreshEqs);
-    _addListener(historical, 'change', _refreshEqs);
+    _addListener(aftershocks, 'input', _refreshEqs);
+    _addListener(foreshocks, 'input', _refreshEqs);
+    _addListener(historical, 'input', _refreshEqs);
 
     // Clear features when reset button pressed
     _addListener([reset], 'click', _resetForm);
@@ -365,20 +365,30 @@ var EditPane = function (options) {
    * @param e {Event}
    */
   _updateParam = function (e) {
-    var el,
+    var doUpdate,
+        el,
         id,
         value;
 
-    // Throttle updates so they don't fire off repeatedly in rapid succession
-    window.clearTimeout(_throttleUpdate);
-    _throttleUpdate = window.setTimeout(function() {
+    doUpdate = function () {
       id = e.target.id;
       el = document.getElementById(id);
       value = el.value.replace(/\s+/g, ''); // strip whitespace
       el.value = value;
 
       AppUtil.setParam(id, value);
-    }, 100);
+    };
+
+    if (e.target.id === 'eqid') {
+      // Update immediately (only need to throttle number type inputs)
+      doUpdate();
+    } else {
+      // Throttle updates so they don't fire off repeatedly in rapid succession
+      window.clearTimeout(_throttleUpdate);
+      _throttleUpdate = window.setTimeout(function() {
+        doUpdate();
+      }, 100);
+    }
   };
 
   /**
