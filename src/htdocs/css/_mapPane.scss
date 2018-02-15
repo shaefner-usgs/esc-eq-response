@@ -6,9 +6,55 @@
   height: 100%;
 }
 
-/* hide 'placeholder' moment tensor / focal mech. beachballs */
-#mapPane > canvas {
-  display: none;
+#mapPane {
+  /* hide 'placeholder' moment tensor / focal mech. beachballs */
+  > canvas {
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+    line-height: 1.3;
+    margin: 6px 0;
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    display: none;
+  }
+
+  input[type="checkbox"] + span:before, input[type="radio"] + span:before  {
+    background-color: #fff;
+    border: 1px solid #888;
+    content: '\00a0';
+    display: inline-block;
+    font-family: 'Arial Unicode MS';
+    height: 16px;
+    margin-right: 3px;
+    position: relative;
+    text-align: center;
+    top: -1px;
+    width: 16px;
+  }
+  input[type="checkbox"] + span:before {
+    border-radius: 3px;
+    font-size: 11px;
+  }
+  input[type="radio"] + span:before {
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
+    background-color: #7234DC;
+    border-color: #7234DC;
+    color: white;
+  }
+  input[type="checkbox"]:checked + span:before {
+    content: '\2713';
+  }
+  input[type="radio"]:checked + span:before {
+    content: '\25CF';
+  }
 }
 
 /* Rendering order of features

@@ -46,21 +46,28 @@
     }
   }
 
-  input {
+  input[type=text], input[type=number] {
+    border: 1px solid #DDD;
     font-size: .9rem;
-    padding: 5px;
+    margin: 0 1px 3px 0;
+    outline: none;
+    padding: 6px 0 6px 6px;
+    transition: all 0.25s ease-in-out;
     width: 12rem;
 
+    &:focus {
+      border: 1px solid $link-color;
+      box-shadow: 0 0 3px $link-color;
+    }
     &:invalid {
-      border: 2px solid #c00;
-      box-shadow: none;
-      outline: 0;
+      border: 1px solid #c00;
+      box-shadow: 0 0 3px #c00;
     }
     &:-webkit-autofill {
       background: none !important;
     }
   }
-
+  
   .aftershocks {
     order: 2;
   }

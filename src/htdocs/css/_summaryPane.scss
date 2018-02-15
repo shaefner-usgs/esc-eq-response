@@ -171,9 +171,9 @@
       transition: background .25s ease-out;
     }
     tr:hover:not(.no-sort), .selected {
-      color: #014c73;
+      color: $link-color;
       cursor: pointer;
-      background: #f8fbfd;
+      background: rgba(225, 220, 242, 0.2);
       transition-duration: 0s;
     }
   }
