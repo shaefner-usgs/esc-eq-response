@@ -81,7 +81,7 @@ var SignificantEqs = function (options) {
         mag,
         props;
 
-    html = '<select class="significant">';
+    html = '<select class="significant" tabindex="1">';
     html += '<option value="" disabled="" selected="">Significant Earthquakes in the Past Month (UTC)</option>';
     if (json.features) {
       json.features.forEach(function(feature) {

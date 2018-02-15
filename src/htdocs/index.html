@@ -38,7 +38,7 @@
               <p>Event ID (2 letters followed by 5-8 characters)</p>
             </label>
             <input type="text" id="eqid" required="required"
-              pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$" value="" />
+              pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$" value="" tabindex="2" />
           </div>
           <div class="details"></div>
           <div class="aftershocks">
@@ -47,12 +47,12 @@
               <p>Min magnitude</p>
             </label>
             <input type="number" id="aftershocks-minmag" required="required"
-            pattern="^[0-9.]+$" value="0" min="0" max="9" step="0.1" />
+            pattern="^[0-9.]+$" value="0" min="0" max="9" step="0.1" tabindex="3" />
             <label for="aftershocks-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
             <input type="number" id="aftershocks-dist" required="required"
-              pattern="^[0-9.]+$" value="" min="1" step="1" />
+              pattern="^[0-9.]+$" value="" min="1" step="1" tabindex="4" />
           </div>
           <div class="foreshocks">
             <h3>Foreshocks</h3>
@@ -60,17 +60,17 @@
               <p>Min magnitude</p>
             </label>
             <input type="number" id="foreshocks-minmag" required="required"
-            pattern="^[0-9.]+$" value="1" min="0" max="9" step="0.1" />
+            pattern="^[0-9.]+$" value="1" min="0" max="9" step="0.1" tabindex="5" />
             <label for="foreshocks-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
             <input type="number" id="foreshocks-dist" required="required"
-              pattern="^[0-9.]+$" value="" min="1" step="1" />
+              pattern="^[0-9.]+$" value="" min="1" step="1" tabindex="6" />
             <label for="foreshocks-days">
               <p>Max days before mainshock</p>
             </label>
             <input type="number" id="foreshocks-days" required="required"
-              pattern="^[0-9.]+$" value="30" min="1" step="1" />
+              pattern="^[0-9.]+$" value="30" min="1" step="1" tabindex="7" />
           </div>
           <div class="historical">
             <h3>Historical Seismicity</h3>
@@ -78,17 +78,17 @@
               <p>Min magnitude</p>
             </label>
             <input type="number" id="historical-minmag" required="required"
-            pattern="^[0-9.]+$" value="" min="0" max="9" step="0.1" />
+            pattern="^[0-9.]+$" value="" min="0" max="9" step="0.1" tabindex="8" />
             <label for="historical-dist">
               <p>Max distance from mainshock (km)</p>
             </label>
             <input type="number" id="historical-dist" required="required"
-              pattern="^[0-9.]+$" value="" min="1" step="1" />
+              pattern="^[0-9.]+$" value="" min="1" step="1" tabindex="9" />
             <label for="historical-years">
               <p>Max years before mainshock</p>
             </label>
             <input type="number" id="historical-years" required="required"
-              pattern="^[0-9.]+$" value="10" min="1" step="1" />
+              pattern="^[0-9.]+$" value="10" min="1" step="1" tabindex="10" />
           </div>
           <div class="meta">
             <button type="reset" class="reset">Reset</button>
