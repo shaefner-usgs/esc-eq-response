@@ -11,50 +11,6 @@
   > canvas {
     display: none;
   }
-
-  label {
-    cursor: pointer;
-    line-height: 1.3;
-    margin: 6px 0;
-  }
-
-  input[type="checkbox"], input[type="radio"] {
-    display: none;
-  }
-
-  input[type="checkbox"] + span:before, input[type="radio"] + span:before  {
-    background-color: #fff;
-    border: 1px solid #888;
-    content: '\00a0';
-    display: inline-block;
-    font-family: 'Arial Unicode MS';
-    height: 16px;
-    margin-right: 3px;
-    position: relative;
-    text-align: center;
-    top: -1px;
-    width: 16px;
-  }
-  input[type="checkbox"] + span:before {
-    border-radius: 3px;
-    font-size: 11px;
-  }
-  input[type="radio"] + span:before {
-    border-radius: 10px;
-    font-size: 11px;
-  }
-
-  input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
-    background-color: #7234DC;
-    border-color: #7234DC;
-    color: white;
-  }
-  input[type="checkbox"]:checked + span:before {
-    content: '\2713';
-  }
-  input[type="radio"]:checked + span:before {
-    content: '\25CF';
-  }
 }
 
 /* Rendering order of features
@@ -95,6 +51,60 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Form controls */
+.leaflet-control-layers {
+  label {
+    cursor: pointer;
+    line-height: 1.3;
+    margin: 6px 0;
+
+    span {
+      align-items: center;
+      display: flex;
+    }
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    display: none;
+  }
+
+  input[type="checkbox"] + span:before, input[type="radio"] + span:before  {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #888;
+    content: '\00a0';
+    display: flex;
+    font-family: 'Arial Unicode MS';
+    height: 16px;
+    justify-content: center;
+    margin-right: 8px;
+    position: relative;
+    text-shadow: 1px 1px 3px #666;
+    top: 0px;
+    width: 16px;
+  }
+  input[type="checkbox"] + span:before {
+    border-radius: 3px;
+    font-size: 14px;
+  }
+  input[type="radio"] + span:before {
+    border-radius: 8px;
+    font-size: 11px;
+  }
+
+  input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
+    background-color: #7234DC;
+    border-color: #7234DC;
+    color: #fff;
+  }
+  input[type="checkbox"]:checked + span:before {
+    content: '\2713';
+  }
+  input[type="radio"]:checked + span:before {
+    content: '\25CF';
+  }
 }
 
 /* Hide zoom controls on mobile device (which has pinch-to-zoom gestures) */
