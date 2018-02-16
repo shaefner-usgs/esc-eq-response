@@ -1,5 +1,5 @@
 #navBar {
-  background-color: rgba(225, 220, 242, 0.95);;
+  background-color: rgba(229, 226, 238, 0.95);
   display: flex;
   left: 0;
   margin: 0;
@@ -12,9 +12,15 @@
   a {
     color: $link-color;
     display: block;
-    font-size: 1.15rem;
+    font-size: 1rem;
     padding: 11px 15px;
     text-decoration: none;
+    text-transform: uppercase;
+    transition: all .25s ease-out;
+
+    &:hover {
+      background-color: rgba(225, 220, 242, 0.95);
+    }
 
     &.selected {
       background-color: $link-color;
