@@ -83,7 +83,7 @@ var NavBar = function (options) {
       _hidePanes();
       _showPane(id);
       _StatusBar.removeItem('rendering');
-    }, 10);
+    }, 15);
   };
 
   /**
