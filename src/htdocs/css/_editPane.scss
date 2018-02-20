@@ -57,7 +57,7 @@ $reset-color: #efefef;
         border-color: color($link-color shade(25%));
       }
       &:focus {
-        border-color: color($link-color shade(40%));
+        border-color: color($link-color shade(50%));
       }
     }
   }
