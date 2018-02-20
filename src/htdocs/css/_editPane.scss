@@ -1,3 +1,5 @@
+$reset-color: #efefef;
+
 #editPane {
   button {
     -webkit-appearance: button;
@@ -16,7 +18,7 @@
     white-space: nowrap;
 
     &:active {
-      box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, .175);
       outline: 0;
     }
     &:focus {
@@ -28,16 +30,73 @@
       cursor: not-allowed;
       opacity: .5;
     }
+
+    &.reset {
+      background-color: $reset-color;
+      border-color: color($reset-color shade(15%));
+      color: #666;
+
+      &:active,
+      &:hover {
+        background-color: color($reset-color shade(3%));
+        border-color: color($reset-color shade(25%));
+      }
+      &:focus {
+        border-color: color($reset-color shade(40%));
+      }
+    }
+
+    &.viewmap {
+      background-color: $link-color;
+      border-color: color($link-color shade(15%));
+      color: #fff;
+
+      &:active,
+      &:hover {
+        background-color: color($link-color shade(5%));
+        border-color: color($link-color shade(25%));
+      }
+      &:focus {
+        border-color: color($link-color shade(40%));
+      }
+    }
   }
 
   form {
     display: flex;
-    flex-flow: column wrap;
-    max-height: 70rem;
-    min-height: 66rem; /* 'hack' for Safari, which does not calculate flex parent height correctly */
+    flex-flow: row wrap;
+
+    fieldset {
+      border: 1px solid #eee;
+      margin-top: 1em;
+      padding: 0 2em 2em;
+
+      &:first-child {
+        margin-right: 1em;
+      }
+
+      &.buttons {
+        border: 0;
+        margin: 0 0 0 3px;
+        padding: 0;
+        width: 100%;
+      }
+    }
 
     h3 {
-      margin: 1.75rem 0 .5rem;
+      margin: 2.5rem 0 .5rem;
+    }
+
+    legend {
+      color: #ccc;
+      font-size: .8em;
+      letter-spacing: 1px;
+      margin-left: -1.8em;
+      text-transform: uppercase;
+    }
+
+    legend + div {
+      margin-top: -1em;
     }
 
     p {
@@ -67,110 +126,17 @@
       background: none !important;
     }
   }
-  
-  .aftershocks {
-    order: 2;
-  }
 
   .comcat {
     margin: 0;
   }
 
   .details {
-    order: 6;
-  }
-
-  .foreshocks {
-    order: 3;
-  }
-
-  .historical {
-    order: 4;
-  }
-
-  .mainshock {
-    order: 1;
-
-    h3 {
-      margin-top: 0;
-    }
-  }
-
-  .meta {
-    order: 5;
-  }
-
-  .reset {
-    background-color: #efefef;
-    border-color: #ccc;
-    color: #333;
-
-    &:active,
-    &:hover {
-      background-color: #e6e6e6;
-      border-color: #adadad;
-    }
-    &:focus {
-      border-color: #8c8c8c;
-    }
-  }
-
-  .viewmap {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    color: #fff;
-
-    &:active,
-    &:hover {
-      background-color: #449d44;
-      border-color: #398439;
-    }
-    &:focus {
-      border-color: #255625;
-    }
+    margin-top: 1em;
   }
 
   .required {
     color: #c00;
     margin-top: 1rem;
-  }
-}
-
-@media only screen
-  and (max-width: $breakpoint-tablet-width) {
-  #editPane {
-    form {
-      flex-wrap: nowrap;
-      max-height: none;
-    }
-
-    .aftershocks {
-      order: 3;
-    }
-
-    .details {
-      margin: 1.5rem 0 -1rem;
-      order: 2;
-
-      h4 {
-        margin-top: 0;
-      }
-    }
-
-    .foreshocks {
-      order: 4;
-    }
-
-    .historical {
-      order: 5;
-    }
-
-    .mainshock {
-      order: 1;
-    }
-
-    .meta {
-      order: 6;
-    }
   }
 }
