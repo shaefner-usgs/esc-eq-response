@@ -25,6 +25,7 @@
     &.selected {
       background-color: $link-color;
       color: #fff;
+      text-shadow: 1px 1px 3px #444;
     }
   }
   li {
