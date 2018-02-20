@@ -1,3 +1,4 @@
+@import '_forms.scss';
 @import 'mappane/_mousePosition.scss';
 @import 'features/_stationsFeature.scss';
 
@@ -64,46 +65,6 @@
       align-items: center;
       display: flex;
     }
-  }
-
-  input[type="checkbox"], input[type="radio"] {
-    display: none;
-  }
-
-  input[type="checkbox"] + span:before, input[type="radio"] + span:before  {
-    align-items: center;
-    background-color: #fff;
-    border: 1px solid #888;
-    content: '\00a0';
-    display: flex;
-    font-family: 'Arial Unicode MS';
-    height: 16px;
-    justify-content: center;
-    margin-right: 8px;
-    position: relative;
-    text-shadow: 1px 1px 3px #333;
-    top: 0px;
-    width: 16px;
-  }
-  input[type="checkbox"] + span:before {
-    border-radius: 3px;
-    font-size: 14px;
-  }
-  input[type="radio"] + span:before {
-    border-radius: 8px;
-    font-size: 11px;
-  }
-
-  input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
-    background-color: #7234DC;
-    border-color: #7234DC;
-    color: #fff;
-  }
-  input[type="checkbox"]:checked + span:before {
-    content: '\2713';
-  }
-  input[type="radio"]:checked + span:before {
-    content: '\25CF';
   }
 }
 

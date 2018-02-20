@@ -1,0 +1,101 @@
+/* Buttons
+--------------------------------------------- */
+
+button {
+  -webkit-appearance: button;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin-top: 2em;
+  padding: 6px 12px;
+  text-align: center;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  &:active {
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, .175);
+    outline: 0;
+  }
+  &:focus {
+    outline: 0;
+  }
+
+  &[disabled] {
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: .3;
+  }
+}
+
+/* Check boxes / radio inputs
+--------------------------------------------- */
+
+input[type="checkbox"], input[type="radio"] {
+  display: none;
+}
+
+input[type="checkbox"] + span:before, input[type="radio"] + span:before  {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #888;
+  content: '\00a0';
+  display: flex;
+  font-family: 'Arial Unicode MS';
+  height: 16px;
+  justify-content: center;
+  margin-right: 8px;
+  position: relative;
+  text-shadow: 1px 1px 3px #333;
+  top: 0px;
+  width: 16px;
+}
+input[type="checkbox"] + span:before {
+  border-radius: 3px;
+  font-size: 14px;
+}
+input[type="radio"] + span:before {
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
+  background-color: #7234DC;
+  border-color: #7234DC;
+  color: #fff;
+}
+input[type="checkbox"]:checked + span:before {
+  content: '\2713';
+}
+input[type="radio"]:checked + span:before {
+  content: '\25CF';
+}
+
+/* Text / number inputs
+--------------------------------------------- */
+
+input[type=text], input[type=number] {
+  border: 1px solid #DDD;
+  font-size: .9rem;
+  margin: 0 1px 3px 0;
+  outline: none;
+  padding: 6px 0 6px 6px;
+  transition: all 0.25s ease-in-out;
+  width: 12rem;
+
+  &:focus {
+    border: 1px solid $link-color;
+    box-shadow: 0 0 3px $link-color;
+  }
+  &:invalid {
+    border: 1px solid #c00;
+    box-shadow: 0 0 3px #c00;
+  }
+  &:-webkit-autofill {
+    background: none !important;
+  }
+}
