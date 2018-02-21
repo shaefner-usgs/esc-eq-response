@@ -38,6 +38,7 @@ a {
 }
 
 body {
+  background: #fff;
   position: relative;
 }
 
@@ -60,10 +61,6 @@ p.description {
   > strong {
     font-weight: 500;
   }
-}
-
-section.hide {
-  display: none;
 }
 
 table {
@@ -150,7 +147,19 @@ tr {
 }
 
 .pane {
+  left: 0;
+  opacity: 1;
   padding: 2.5em 0 0;
+  position: absolute;
+  top: 0;
+  transition: opacity .15s ease-out;
+  width: 100%;
+
+  &.hide {
+    max-height: 1vh;
+    opacity: 0;
+    overflow: hidden;
+  }
 
   &#mapPane {
     padding: 0;
