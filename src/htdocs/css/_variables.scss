@@ -1,4 +1,14 @@
-/* set MMI variables */
+$breakpoint-phone-width: 735px;
+$breakpoint-tablet-width: 1023px;
+
+$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-size: 15px;
+
+$link-color: #7234DC;
+$link-color-active: #DC406D;
+$link-color-visited: #7234DC;
+
+/* MMI / PAGER (impact bubbles) */
 
 $mmi-font-family: Tahoma, Verdana, Segoe, sans-serif;
 
@@ -37,7 +47,6 @@ $mmiXI-text-color: #000;
 
 $mmiXII-color: #c80f0a;
 $mmiXII-text-color: #000;
-
 
 $pager-pending-color: #fff;
 $pager-pending-text-color: #000;
