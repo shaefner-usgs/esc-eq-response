@@ -114,8 +114,8 @@ var Features = function (options) {
 
       if (id === 'mainshock') {
         // Show mainshock details on editPane
-        _editPane.addMainshock(feature.getSummaryData().detailsHtml,
-        opts.mainshockJson.properties);
+        _editPane.showMainshock(feature.getSummaryData().detailsHtml,
+          opts.mainshockJson.properties);
 
         // Store mainshock's plotdata
         _plotdata[id] = feature.getPlotData();

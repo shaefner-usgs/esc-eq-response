@@ -37,6 +37,10 @@
     display: flex;
     flex-flow: row wrap;
 
+    dl {
+      margin-bottom: 0;
+    }
+
     fieldset {
       border: 1px solid #eee;
       margin-top: 1em;
@@ -72,7 +76,7 @@
 
     p {
       font-weight: 300;
-      margin: .75rem 0 .25rem ;
+      margin: .75rem 0 .25rem;
     }
   }
 
@@ -81,7 +85,15 @@
   }
 
   .details {
-    margin-top: 1em;
+    max-height: 250px;
+    margin-top: 1.25em;
+    overflow: hidden;
+    transition: max-height .35s ease-out;
+
+    &.hide {
+      max-height: 0;
+      transition-duration: .1s;
+    }
   }
 
   .required {

@@ -41,11 +41,11 @@ var EditPane = function (options) {
       _addSignificantEqs,
       _getDefaults,
       _getFeatures,
+      _hideMainshock,
       _initListeners,
       _isNewEvent,
       _isValidEqId,
       _refreshEqs,
-      _removeMainshock,
       _resetApp,
       _resetForm,
       _selSignificantEq,
@@ -186,6 +186,13 @@ var EditPane = function (options) {
     }
   };
 
+  /*
+   * Hide mainshock details on edit pane
+   */
+  _hideMainshock = function () {
+    _el.querySelector('.details').classList.add('hide');
+  };
+
   /**
    * Initialize event listeners
    *
@@ -218,7 +225,7 @@ var EditPane = function (options) {
     // Clear features when reset button pressed
     _addListener([reset], 'click', _resetForm);
 
-    // Switch to mapPane when 'View Map' button is clicked
+    // Switch to map pane when 'View Map' button is clicked
     _addListener([viewmap], 'click', _viewMap);
   };
 
@@ -285,20 +292,13 @@ var EditPane = function (options) {
     }
   };
 
-  /*
-   * Remove mainshock details from editPane
-   */
-  _removeMainshock = function () {
-    _el.querySelector('.details').innerHTML = '';
-  };
-
   /**
    * Reset app: clear mainshock details, features, status bar, etc.
    */
   _resetApp = function () {
     _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
 
-    _removeMainshock();
+    _hideMainshock();
     _StatusBar.clearAll();
     _Features.removeFeatures();
     _MapPane.setDefaultView();
@@ -410,7 +410,7 @@ var EditPane = function (options) {
    * @param html {String}
    * @param props {Object}
    */
-  _this.addMainshock = function (html, props) {
+  _this.showMainshock = function (html, props) {
     var appTitle,
         details;
 
@@ -418,6 +418,7 @@ var EditPane = function (options) {
     details = _el.querySelector('.details');
 
     details.innerHTML = html;
+    details.classList.remove('hide');
 
     document.title = props.magType + ' ' + AppUtil.round(props.mag, 1) + ' - ' +
       props.place + ' | ' + appTitle;
