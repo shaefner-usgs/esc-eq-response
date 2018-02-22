@@ -16,6 +16,7 @@ var NavBar = function (options) {
       _initialize,
 
       _el,
+      _navButtons,
       _panes,
       _throttle,
 
@@ -25,6 +26,7 @@ var NavBar = function (options) {
 
       _addListeners,
       _changePane,
+      _clickNav,
       _getPaneId,
       _hidePanes,
       _saveScrollPosition,
@@ -40,7 +42,8 @@ var NavBar = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _panes = _el.querySelectorAll('.panes a');
+    _navButtons = _el.querySelectorAll('.panes a');
+    _panes = document.querySelectorAll('section.pane');
 
     _MapPane = options.mapPane;
     _PlotsPane = options.plotsPane;
@@ -56,18 +59,24 @@ var NavBar = function (options) {
    * Add event listener for changing panes
    */
   _addListeners = function () {
-    var id;
+    var i,
+        id;
 
-    // Save current scroll postion when user scrolls
+    // Save current scroll postion when user scrolls page
     window.addEventListener('scroll', function() {
       _saveScrollPosition();
     });
 
-    // Update UI when user changes pane
+    // Update UI when user changes pane via back/forward buttons
     window.addEventListener('hashchange', function () {
       id = _getPaneId();
       _changePane(id);
     });
+
+    // Update UI when user changes pane via navbar
+    for (i = 0; i < _navButtons.length; i ++) {
+      _navButtons[i].addEventListener('click', _clickNav);
+    }
   };
 
   /**
@@ -78,7 +87,7 @@ var NavBar = function (options) {
   _changePane = function (id) {
     _StatusBar.addItem('rendering', '');
 
-    // Add a slight delay; otherwise loading message does not display
+    // Add a slight delay; otherwise loading (rendering) message does not display
     window.setTimeout(function() {
       _hidePanes();
       _showPane(id);
@@ -87,7 +96,21 @@ var NavBar = function (options) {
   };
 
   /**
-   * Get id of pane to show (default to 'editPane' unless set in url string)
+   * Event handler for tabs on NavBar
+   *
+   * @param e {Event}
+   */
+  _clickNav = function (e) {
+    var id = e.target.hash.substr(1);
+
+    e.preventDefault(); // prevent scrolling to #hash to mitigate page flickering
+    window.history.pushState(null, null, e.target.hash);
+
+    _changePane(id);
+  };
+
+  /**
+   * Get id of selected pane from url (defaults to 'editPane' if not set)
    *
    * @return id {String}
    */
@@ -113,13 +136,11 @@ var NavBar = function (options) {
   _hidePanes = function () {
     var button,
         i,
-        id,
         pane;
 
     for (i = 0; i < _panes.length; i ++) {
-      id = _panes[i].hash.substr(1);
-      button = _el.querySelector('[href="#' + id + '"]');
-      pane = document.getElementById(id);
+      pane = _panes[i];
+      button = _el.querySelector('[href="#' + pane.getAttribute('id') + '"]');
 
       button.classList.remove('selected');
       pane.classList.add('hide');
@@ -202,7 +223,7 @@ var NavBar = function (options) {
         id;
 
     for (i = 0; i < _panes.length; i ++) {
-      id = _panes[i].hash.substr(1);
+      id = _panes[i].getAttribute('id');
       window.sessionStorage.setItem(id, 0);
     }
   };
