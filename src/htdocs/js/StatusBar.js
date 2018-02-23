@@ -16,8 +16,9 @@ var StatusBar = function (options) {
       _el,
       _zIndex,
 
-      _hideStatusBar,
+      _doRemove,
       _getZindex,
+      _hideStatusBar,
       _showStatusBar;
 
 
@@ -28,6 +29,12 @@ var StatusBar = function (options) {
 
     _el = options.el || document.createElement('div');
     _zIndex = 10000;
+  };
+
+  _doRemove = function (item) {
+    if (item.parentNode) {
+      item.parentNode.removeChild(item);
+    }
   };
 
   /**
@@ -156,15 +163,18 @@ var StatusBar = function (options) {
    * @param className {String}
    */
   _this.removeItem = function (className) {
-    var item;
+    var i,
+        items;
 
-    item = _el.querySelector('.' + className);
-    if (item) {
-      item.parentNode.removeChild(item);
-    }
-
-    if (_el.children.length === 0) {
-      _hideStatusBar();
+    items = _el.querySelectorAll('.' + className);
+    for (i = 0; i < items.length; i ++) {
+      if (_el.children.length === 1) {
+        _hideStatusBar();
+        // Don't remove last item until after css transition to hide is complete
+        window.setTimeout(_doRemove, 500, items[i]);
+      } else {
+        _doRemove(items[i]);
+      }
     }
   };
 

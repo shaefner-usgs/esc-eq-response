@@ -1,11 +1,4 @@
-$breakpoint-phone-width: 735px;
-$breakpoint-tablet-width: 1023px;
-$font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-size: 15px;
-$link-color: rgb(78, 78, 202);
-$link-color-active: rgb(204, 0, 0);
-$link-color-visited: rgb(140, 78, 202);
-
+@import '_variables.scss';
 @import '_editPane.scss';
 @import '_helpPane.scss';
 @import '_impactBubbles.scss';
@@ -45,32 +38,34 @@ a {
 }
 
 body {
+  background: #fff;
   position: relative;
 }
 
+h1, h2, h3, h4 {
+  font-family: $font-family-headers;
+  font-weight: 400;
+  margin: 1rem 0;
+}
 h1 {
-  font-size: 1.6rem;
-  margin-top: .5rem;
+  font-size: 2.1rem;
+  margin-top: 0;
 }
 h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  margin-top: 0;
 }
 h3 {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 h4 {
   font-size: 1.1rem;
-  font-weight: normal;
 }
 
 p.description {
   > strong {
     font-weight: 500;
   }
-}
-
-section.hide {
-  display: none;
 }
 
 table {
@@ -89,8 +84,7 @@ td {
 
 th {
   color: #333;
-  font-size: .95rem;
-  font-weight: 500;
+  font: 600 .95rem $font-family-headers;
   padding: .25em .5em;
   text-align: center;
   text-transform: uppercase;
@@ -111,14 +105,14 @@ tr {
 }
 
 .darker {
-  background: #f5f8fd;
+  background: #f9f9f9;
 }
 
 .lighter {
   background: #fff;
 }
 
-/* Earthquake details: mainshock on edit, summary panes (als0 Leaflet popups) */
+/* Earthquake details: mainshock on edit, summary panes (also Leaflet popups) */
 .earthquake, .leaflet-popup-content {
   dd,
   dt {
@@ -157,7 +151,19 @@ tr {
 }
 
 .pane {
+  left: 0;
+  opacity: 1;
   padding: 2.5em 0 0;
+  position: absolute;
+  top: 0;
+  transition: opacity .15s ease-out;
+  width: 100%;
+
+  &.hide {
+    max-height: 1vh;
+    opacity: 0;
+    overflow: hidden;
+  }
 
   &#mapPane {
     padding: 0;

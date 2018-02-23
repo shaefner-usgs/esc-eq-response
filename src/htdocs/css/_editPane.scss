@@ -1,68 +1,81 @@
+@import '_forms.scss';
+
+$reset-button-color: #efefef;
+
 #editPane {
   button {
-    -webkit-appearance: button;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.4;
-    margin-top: 2em;
-    padding: 6px 12px;
-    text-align: center;
-    user-select: none;
-    vertical-align: middle;
-    white-space: nowrap;
+    &.reset {
+      background-color: $reset-button-color;
+      border-color: color($reset-button-color shade(15%));
+      color: #666;
 
-    &:active {
-      box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-      outline: 0;
+      &:active,
+      &:hover,
+      &:focus {
+        background-color: color($reset-button-color tint(30%));
+        border-color: color($reset-button-color shade(25%));
+      }
     }
-    &:focus {
-      outline: 0;
-    }
+    &.viewmap {
+      background-color: $link-color;
+      border-color: color($link-color shade(15%));
+      color: #fff;
+      text-shadow: 1px 1px 3px #444;
 
-    &[disabled] {
-      box-shadow: none;
-      cursor: not-allowed;
-      opacity: .5;
+      &:active,
+      &:hover,
+      &:focus {
+        background-color: color($link-color tint(8%));
+        border-color: color($link-color shade(50%));
+      }
     }
   }
 
   form {
     display: flex;
-    flex-flow: column wrap;
-    max-height: 70rem;
-    min-height: 66rem; /* 'hack' for Safari, which does not calculate flex parent height correctly */
+    flex-flow: row wrap;
+
+    dl {
+      margin-bottom: 0;
+    }
+
+    fieldset {
+      border: 1px solid #eee;
+      margin-top: 1em;
+      padding: 0 1.75em 2em;
+
+      &:first-child {
+        margin-right: 1em;
+      }
+
+      &.buttons {
+        border: 0;
+        margin: 0 0 0 3px;
+        padding: 0;
+        width: 100%;
+      }
+    }
 
     h3 {
-      margin: 1.75rem 0 .5rem;
+      margin: 2.5rem 0 .5rem;
+    }
+
+    legend {
+      color: #bbb;
+      font-size: .8em;
+      letter-spacing: 1px;
+      margin-left: -1.25em;
+      text-transform: uppercase;
+    }
+
+    legend + div {
+      margin-top: -1em;
     }
 
     p {
       font-weight: 300;
-      margin: .75rem 0 .25rem ;
+      margin: .75rem 0 .25rem;
     }
-  }
-
-  input {
-    font-size: .9rem;
-    padding: 5px;
-    width: 12rem;
-
-    &:invalid {
-      border: 2px solid #c00;
-      box-shadow: none;
-      outline: 0;
-    }
-    &:-webkit-autofill {
-      background: none !important;
-    }
-  }
-
-  .aftershocks {
-    order: 2;
   }
 
   .comcat {
@@ -70,100 +83,19 @@
   }
 
   .details {
-    order: 6;
-  }
+    max-height: 250px;
+    margin-top: 1.25em;
+    overflow: hidden;
+    transition: max-height .35s ease-out;
 
-  .foreshocks {
-    order: 3;
-  }
-
-  .historical {
-    order: 4;
-  }
-
-  .mainshock {
-    order: 1;
-
-    h3 {
-      margin-top: 0;
-    }
-  }
-
-  .meta {
-    order: 5;
-  }
-
-  .reset {
-    background-color: #efefef;
-    border-color: #ccc;
-    color: #333;
-
-    &:active,
-    &:hover {
-      background-color: #e6e6e6;
-      border-color: #adadad;
-    }
-    &:focus {
-      border-color: #8c8c8c;
-    }
-  }
-
-  .viewmap {
-    background-color: #5cb85c;
-    border-color: #4cae4c;
-    color: #fff;
-
-    &:active,
-    &:hover {
-      background-color: #449d44;
-      border-color: #398439;
-    }
-    &:focus {
-      border-color: #255625;
+    &.hide {
+      max-height: 0;
+      transition-duration: .1s;
     }
   }
 
   .required {
     color: #c00;
     margin-top: 1rem;
-  }
-}
-
-@media only screen
-  and (max-width: $breakpoint-tablet-width) {
-  #editPane {
-    form {
-      flex-wrap: nowrap;
-      max-height: none;
-    }
-
-    .aftershocks {
-      order: 3;
-    }
-
-    .details {
-      margin: 1.5rem 0 -1rem;
-      order: 2;
-
-      h4 {
-        margin-top: 0;
-      }
-    }
-
-    .foreshocks {
-      order: 4;
-    }
-
-    .historical {
-      order: 5;
-    }
-
-    .mainshock {
-      order: 1;
-    }
-
-    .meta {
-      order: 6;
-    }
   }
 }

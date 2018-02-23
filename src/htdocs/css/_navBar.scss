@@ -1,7 +1,11 @@
+$background-color: rgba(229, 226, 238, 0.95);
+
 #navBar {
-  background-color: rgba(77, 68, 130, .9);
+  background-color: $background-color;
   display: flex;
+  font: 600 1rem $font-family-headers;
   left: 0;
+  line-height: 1;
   margin: 0;
   padding: 0;
   position: fixed;
@@ -10,14 +14,23 @@
   z-index: 10000;
 
   a {
-    color: #fff;
+    color: $link-color;
     display: block;
-    font-size: 1.1rem;
-    padding: 12px 16px;
+    padding: 12px 15px;
     text-decoration: none;
+    text-transform: uppercase;
+    transition: all .25s ease-out;
 
+    &:hover {
+      background-color: color($background-color lightness(94%));
+    }
     &.selected {
-      background-color: #a196f1;
+      background-color: $link-color;
+      color: #fff;
+      text-shadow: 1px 1px 3px #444;
+    }
+    &.selected:hover {
+      background-color: color($link-color tint(8%));
     }
   }
   li {

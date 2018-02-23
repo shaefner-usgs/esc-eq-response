@@ -1,10 +1,10 @@
 #summaryPane {
   h2 + p {
-    margin: -.25rem 0 1.5rem;
+    margin-bottom: 2rem;
   }
 
   h3 {
-    margin: 2em 0 .5em;
+    margin: 1.5em 0 .5em;
   }
 
   td {
@@ -138,9 +138,6 @@
 
   .feature {
     width: 100%;
-    h2 {
-      margin-top: 0;
-    }
 
     &:first-child {
       border: 0;
@@ -154,6 +151,10 @@
 
   .foreshocks .year {
     display: none; /* hide year header on foreshocks binned data table */
+  }
+
+  .impact-bubbles {
+    margin-top: 0;
   }
 
   .lighter {
@@ -171,9 +172,9 @@
       transition: background .25s ease-out;
     }
     tr:hover:not(.no-sort), .selected {
-      color: #014c73;
+      color: $link-color;
       cursor: pointer;
-      background: #f8fbfd;
+      background: rgba(225, 220, 242, 0.2);
       transition-duration: 0s;
     }
   }
@@ -199,7 +200,8 @@
     }
 
     h4 {
-      margin: 0 0 1em;
+      margin: 0;
+      padding-bottom: 1em;
       text-align: center;
     }
 

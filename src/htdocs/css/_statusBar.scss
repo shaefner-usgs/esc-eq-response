@@ -37,6 +37,7 @@
   }
 
   &.hide {
-    display: none;
+    height: 0;
+    transition: height .25s ease-out .25s;
   }
 }
