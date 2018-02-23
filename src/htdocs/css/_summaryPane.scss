@@ -153,6 +153,10 @@
     display: none; /* hide year header on foreshocks binned data table */
   }
 
+  .impact-bubbles {
+    margin-top: 0;
+  }
+
   .lighter {
     td.rowlabel {
       background: url(../img/gradient-lighter.png) repeat-y;
