@@ -38,6 +38,6 @@
 
   &.hide {
     height: 0;
-    transition: height .25s ease-out;
+    transition: height .25s ease-out .25s;
   }
 }
