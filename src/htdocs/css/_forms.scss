@@ -7,12 +7,12 @@ button {
   border-radius: 4px;
   cursor: pointer;
   display: inline-block;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.4;
+  font: 400 14px/1.4 $font-family-headers;
   margin-top: 2em;
   padding: 6px 12px;
   text-align: center;
+  text-transform: uppercase;
+  transition: all .25s ease-out;
   user-select: none;
   vertical-align: middle;
   white-space: nowrap;

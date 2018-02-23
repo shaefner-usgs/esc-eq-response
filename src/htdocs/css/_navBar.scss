@@ -1,7 +1,11 @@
+$background-color: rgba(229, 226, 238, 0.95);
+
 #navBar {
-  background-color: rgba(229, 226, 238, 0.95);
+  background-color: $background-color;
   display: flex;
+  font: 600 1rem $font-family-headers;
   left: 0;
+  line-height: 1;
   margin: 0;
   padding: 0;
   position: fixed;
@@ -12,20 +16,21 @@
   a {
     color: $link-color;
     display: block;
-    font-size: 1rem;
-    padding: 11px 15px;
+    padding: 12px 15px;
     text-decoration: none;
     text-transform: uppercase;
     transition: all .25s ease-out;
 
     &:hover {
-      background-color: rgba(225, 220, 242, 0.95);
+      background-color: color($background-color lightness(94%));
     }
-
     &.selected {
       background-color: $link-color;
       color: #fff;
       text-shadow: 1px 1px 3px #444;
+    }
+    &.selected:hover {
+      background-color: color($link-color tint(8%));
     }
   }
   li {

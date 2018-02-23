@@ -10,26 +10,22 @@ $reset-button-color: #efefef;
       color: #666;
 
       &:active,
-      &:hover {
-        background-color: color($reset-button-color shade(3%));
+      &:hover,
+      &:focus {
+        background-color: color($reset-button-color tint(30%));
         border-color: color($reset-button-color shade(25%));
       }
-      &:focus {
-        border-color: color($reset-button-color shade(40%));
-      }
     }
-
     &.viewmap {
       background-color: $link-color;
       border-color: color($link-color shade(15%));
       color: #fff;
+      text-shadow: 1px 1px 3px #444;
 
       &:active,
-      &:hover {
-        background-color: color($link-color shade(5%));
-        border-color: color($link-color shade(25%));
-      }
+      &:hover,
       &:focus {
+        background-color: color($link-color tint(8%));
         border-color: color($link-color shade(50%));
       }
     }
