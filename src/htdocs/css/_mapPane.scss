@@ -48,13 +48,14 @@
 
 /* Quell long attributions */
 .leaflet-control-attribution {
+  color: #999;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   a {
-    color: #333;
+    color: #666 !important;
   }
 }
 
