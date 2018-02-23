@@ -46,7 +46,7 @@ $reset-button-color: #efefef;
     fieldset {
       border: 1px solid #eee;
       margin-top: 1em;
-      padding: 0 2em 2em;
+      padding: 0 1.75em 2em;
 
       &:first-child {
         margin-right: 1em;
@@ -65,10 +65,10 @@ $reset-button-color: #efefef;
     }
 
     legend {
-      color: #ccc;
+      color: #bbb;
       font-size: .8em;
       letter-spacing: 1px;
-      margin-left: -1.8em;
+      margin-left: -1.25em;
       text-transform: uppercase;
     }
 
