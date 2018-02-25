@@ -138,8 +138,11 @@ var SummaryPane = function (options) {
    * @return html {Html}
    */
   _getBinnedTable = function (bins, period) {
-    var html,
-        total;
+      var html,
+	  irow,
+	  row,
+	  total,
+	  totalAll;
 
     html = '';
     if (bins[period] && bins[period].length > 0) {
@@ -155,14 +158,41 @@ var SummaryPane = function (options) {
       bins[period].forEach(function(cols, mag) {
         html += '<tr><td class="rowlabel">M ' + mag + '</td>';
         cols.forEach(function(col, i) {
-          if (i === 0) { // store total
+          if (i === 0) { // store row total
             total = '<td class="total">' + col + '</td>';
           } else {
             html += '<td>' + col + '</td>';
           }
         });
-        html += total + '</tr>'; // add total to table as last column
+        html += total + '</tr>'; // add row total to table as last column
       });
+	html += '<th>Total</th>'; // Add total for each column as last row
+	 // Find first valid row to get column indices
+	for (row=0; row < bins[period].length; ++row) {
+	    if (typeof bins[period][row] !== 'undefined') {
+		break;
+	    }
+	}
+	if (row < bins[period].length) { // if found valid row
+	    totalAll = 0;
+	    bins[period][row].forEach(function(cols, index) {
+		total = 0;
+		for (irow=0; irow < bins[period].length; ++irow) {
+		    if (typeof bins[period][irow] !== 'undefined') {
+		    if (index === 0) { // row total (last column)
+			totalAll += bins[period][irow][index];
+		    } else {
+			total += bins[period][irow][index];
+		    }
+		    }
+		}
+		if (index > 0) {
+		    html += '<td>' + total + '</td>';
+		}
+            });
+	    html += '<td>' + totalAll + '</td>';
+	    html += '</tr>';
+	}
       html += '</table>';
     }
 
