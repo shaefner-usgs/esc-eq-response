@@ -370,7 +370,7 @@ var PlotsPane = function (options) {
 
     if (opts.plot === 'cumulative') {
       mode = 'lines+markers';
-      x = data.time;
+      x = data.time.slice(0); // use copy because we modify x for 'aftershocks'
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
         return i + 1;
