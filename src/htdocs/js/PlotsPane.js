@@ -375,6 +375,7 @@ var PlotsPane = function (options) {
       // Copy date/time arrays so they can be modified w/o affecting orig. data
       date = data.date.slice(0);
       x = data.time.slice(0);
+
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
         return i + 1;
