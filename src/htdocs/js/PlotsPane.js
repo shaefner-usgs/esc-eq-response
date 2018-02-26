@@ -239,38 +239,38 @@ var PlotsPane = function (options) {
         },
         xaxis: {
           spikecolor: spikecolor,
-          title: 'longitude',
+          title: 'Longitude',
           titlefont: titlefont,
           zeroline: false
         },
         yaxis: {
           spikecolor: spikecolor,
-          title: 'latitude',
+          title: 'Latitude',
           titlefont: titlefont,
           zeroline: false
         },
         zaxis: {
           spikecolor: spikecolor,
-          title: 'depth (km)',
+          title: 'Depth (km)',
           titlefont: titlefont,
           zeroline: false
         }
       };
     } else {
       layout.xaxis = {
-        title: 'time (UTC)',
+        title: 'Time (UTC)',
         titlefont: titlefont
       };
     }
 
     if (opts.plot === 'magtime') {
       layout.yaxis = {
-        title: 'magnitude',
+        title: 'Magnitude',
         titlefont: titlefont
       };
     } else {
       layout.yaxis = {
-        title: 'earthquakes',
+        title: 'Earthquakes',
         titlefont: titlefont
       };
     }
@@ -372,9 +372,10 @@ var PlotsPane = function (options) {
     if (opts.plot === 'cumulative') {
       mode = 'lines+markers';
 
-      // copy date/time arrays so they can be modified w/o affecting orig. data
+      // Copy date/time arrays so they can be modified w/o affecting orig. data
       date = data.date.slice(0);
       x = data.time.slice(0);
+
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
         return i + 1;
