@@ -239,38 +239,38 @@ var PlotsPane = function (options) {
         },
         xaxis: {
           spikecolor: spikecolor,
-          title: 'longitude',
+          title: 'Longitude',
           titlefont: titlefont,
           zeroline: false
         },
         yaxis: {
           spikecolor: spikecolor,
-          title: 'latitude',
+          title: 'Latitude',
           titlefont: titlefont,
           zeroline: false
         },
         zaxis: {
           spikecolor: spikecolor,
-          title: 'depth (km)',
+          title: 'Depth (km)',
           titlefont: titlefont,
           zeroline: false
         }
       };
     } else {
       layout.xaxis = {
-        title: 'time (UTC)',
+        title: 'Time (UTC)',
         titlefont: titlefont
       };
     }
 
     if (opts.plot === 'magtime') {
       layout.yaxis = {
-        title: 'magnitude',
+        title: 'Magnitude',
         titlefont: titlefont
       };
     } else {
       layout.yaxis = {
-        title: 'earthquakes',
+        title: 'Earthquakes',
         titlefont: titlefont
       };
     }
