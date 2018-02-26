@@ -358,6 +358,7 @@ var PlotsPane = function (options) {
    */
   _getTrace = function (opts) {
     var data,
+        date,
         mode,
         sizeref,
         text,
@@ -370,7 +371,10 @@ var PlotsPane = function (options) {
 
     if (opts.plot === 'cumulative') {
       mode = 'lines+markers';
-      x = data.time.slice(0); // use copy because we modify x for 'aftershocks'
+
+      // Copy date/time arrays so they can be modified w/o affecting orig. data
+      date = data.date.slice(0);
+      x = data.time.slice(0);
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
         return i + 1;
@@ -378,14 +382,14 @@ var PlotsPane = function (options) {
 
       // Add origin point to beginning of aftershocks trace
       if (opts.id === 'aftershocks') {
-        data.date.unshift(opts.mainshockDate);
+        date.unshift(opts.mainshockDate);
         x.unshift(opts.mainshockTime);
         y.unshift(0);
       }
 
       // Add date field to hover text
       text = y.map(function(val, i) {
-        return val + '<br />' + data.date[i];
+        return val + '<br />' + date[i];
       });
     } else if (opts.plot === 'hypocenters') {
       mode = 'markers';
