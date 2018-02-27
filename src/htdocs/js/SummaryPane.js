@@ -152,7 +152,7 @@ var SummaryPane = function (options) {
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +
-          '<th>Year</th>' +
+          '<th class="year">Year</th>' +
           '<th>Total</th>' +
         '</tr>';
       bins[period].forEach(function(cols, mag) {
