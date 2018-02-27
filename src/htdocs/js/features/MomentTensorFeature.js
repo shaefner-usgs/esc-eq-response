@@ -5,7 +5,7 @@
 var MomentTensor = require('beachballs/MomentTensor'),
     Util = require('hazdev-webutils/src/util/Util');
 
-require('features/CanvasMarker');
+require('beachballs/CanvasMarker');
 
 
 /**
