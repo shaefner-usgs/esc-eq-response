@@ -35,8 +35,6 @@ $total-bg-color: #f7f7f7;
 
   .bin {
     td {
-      padding: .4em 1em;
-
       &:not(:first-child) {
         text-align: right;
       }
