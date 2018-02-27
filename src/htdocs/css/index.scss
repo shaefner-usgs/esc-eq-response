@@ -83,6 +83,7 @@ td {
 }
 
 th {
+  border-bottom: 1px solid $th-border-color;
   color: #333;
   font: 600 .95rem $font-family-headers;
   padding: .25em .5em;
@@ -91,11 +92,10 @@ th {
 }
 
 tr {
-  border: solid #e8e8e8;
-  border-width: 0 0 1px;
+  border-bottom: 1px solid $tr-border-color;
 
-  &:first-child {
-    border-color: #ccc;
+  &:first-child { /* header row; borders set in 'th' selector */
+    border: none;
   }
 }
 
