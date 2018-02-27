@@ -74,6 +74,7 @@ var Features = function (options) {
     _StatusBar = options.statusBar;
     _SummaryPane = options.summaryPane;
 
+    // Flag to block mult. instances of feature from refreshing at the same time
     _this.isRefreshing = false;
   };
 
@@ -141,6 +142,7 @@ var Features = function (options) {
       console.error(error);
       _StatusBar.addError(statusBarId, 'Error Creating ' + name +
         '<span>' + error + '</span>');
+      _this.isRefreshing = false;
     }
   };
 
@@ -415,6 +417,7 @@ var Features = function (options) {
         }
 
         _StatusBar.addError(statusBarId, msg);
+        _this.isRefreshing = false;
       }
     });
   };
