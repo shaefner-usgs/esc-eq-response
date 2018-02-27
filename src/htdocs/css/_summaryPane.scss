@@ -7,69 +7,6 @@
     margin: 1.5em 0 .5em;
   }
 
-  td {
-    .tz {
-      display: none;
-    }
-
-    &.depth,
-    &.distance,
-    &.mag {
-      text-align: right;
-    }
-    &.distance span {
-      display: inline-block;
-      text-align: left;
-      width: 1.5em;
-    }
-    &.location {
-      text-align: center;
-    }
-    &.rowlabel {
-      color: #333;
-      font-weight: 500;
-    }
-  }
-
-  th {
-    &.period {
-      text-align: right;
-    }
-
-    &.sort-header {
-      cursor: pointer;
-      white-space: nowrap;
-
-      &:selection {
-        background: transparent;
-      }
-
-      &:after {
-        border-color: #404040 transparent;
-        border-style: solid;
-        border-width: 0 4px 4px;
-        content: '';
-        display: inline-block;
-        margin: 4px 0 4px 2px;
-        visibility: hidden;
-      }
-
-      &:hover {
-        color: #000;
-      }
-
-      &.sort-up:after,
-      &.sort-down:after {
-        opacity: 1.0;
-        visibility: visible;
-      }
-      &.sort-up:after {
-        border-bottom: none;
-        border-width: 4px 4px 0;
-      }
-    }
-  }
-
   time.updated {
     display: block;
     margin: 1em 1em 0;
@@ -101,14 +38,33 @@
       &:not(:first-child) {
         text-align: right;
       }
-      &.rowlabel {
-        padding-right: 1.5em;
+
+      &.total {
+        background: #fafafa;
       }
     }
 
     th {
       padding-left: .25em;
       padding-right: .25em;
+
+      &.period {
+        color: #000;
+        font-weight: 400;
+        text-align: right;
+      }
+      &.rowlabel {
+        background: url(../img/gradient-lighter.png) repeat-y;
+        background-position: right;
+        padding-right: 1.5em;
+        text-align: center;
+      }
+    }
+
+    tr {
+      &.totals td {
+        background: #fafafa;
+      }
     }
   }
 
@@ -123,16 +79,6 @@
       &:last-child {
         margin-right: 0;
       }
-    }
-  }
-
-  .darker {
-    td.rowlabel {
-      background: url(../img/gradient-darker.png) repeat-y;
-      background-position: right;
-    }
-    td.total {
-      background-color: #edf1f7;
     }
   }
 
@@ -157,17 +103,60 @@
     margin-top: 0;
   }
 
-  .lighter {
-    td.rowlabel {
-      background: url(../img/gradient-lighter.png) repeat-y;
-      background-position: right;
-    }
-    td.total {
-      background-color: #fafafa;
-    }
-  }
-
   .list {
+    td {
+      .tz {
+        display: none;
+      }
+
+      &.depth,
+      &.distance,
+      &.mag {
+        text-align: right;
+      }
+      &.distance span {
+        display: inline-block;
+        text-align: left;
+        width: 1.5em;
+      }
+      &.location {
+        text-align: center;
+      }
+    }
+
+    th {
+      &.sort-header {
+        cursor: pointer;
+        white-space: nowrap;
+
+        &:after {
+          border-color: #404040 transparent;
+          border-style: solid;
+          border-width: 0 4px 4px;
+          content: '';
+          display: inline-block;
+          margin: 4px 0 4px 2px;
+          visibility: hidden;
+        }
+        &:hover {
+          color: #000;
+        }
+        &:selection {
+          background: transparent;
+        }
+
+        &.sort-up:after,
+        &.sort-down:after {
+          opacity: 1.0;
+          visibility: visible;
+        }
+        &.sort-up:after {
+          border-bottom: none;
+          border-width: 4px 4px 0;
+        }
+      }
+    }
+
     tr {
       transition: background .25s ease-out;
     }

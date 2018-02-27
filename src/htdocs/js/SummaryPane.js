@@ -152,11 +152,11 @@ var SummaryPane = function (options) {
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +
-          '<th class="year">Year</th>' +
-          '<th class="total">Total</th>' +
+          '<th>Year</th>' +
+          '<th>Total</th>' +
         '</tr>';
       bins[period].forEach(function(cols, mag) {
-        html += '<tr><td class="rowlabel">M ' + mag + '</td>';
+        html += '<tr><th class="rowlabel">M ' + mag + '</th>';
         cols.forEach(function(col, i) {
           if (i === 0) { // store row total
             total = '<td class="total">' + col + '</td>';
@@ -168,8 +168,8 @@ var SummaryPane = function (options) {
       });
 
       // Add total for each column as last row
-      html += '<tr>' +
-        '<td class="rowlabel">Total</td>';
+      html += '<tr class="totals">' +
+        '<th class="rowlabel">Total</th>';
 
       for (row=0; row < bins[period].length; ++row) { // get column indices
         if (typeof bins[period][row] !== 'undefined') {
