@@ -41,6 +41,7 @@ var Mainshock = function (options) {
     _this.displayLayer = true;
     _this.id = id;
     _this.name = options.name;
+    _this.zoomToLayer = true;
   };
 
   // ----------------------------------------------------------

@@ -43,6 +43,7 @@ var Foreshocks = function (options) {
     _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();
+    _this.zoomToLayer = true;
   };
 
   /**

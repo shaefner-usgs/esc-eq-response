@@ -70,7 +70,6 @@ var Stations = function (options) {
     _count = 0;
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
-    _this.displayLayer = false;
     _this.id = id;
 
     _mapLayer = L.geoJson(options.json, {
@@ -80,7 +79,9 @@ var Stations = function (options) {
     });
     _mapLayer.id = id; // Attach id to L.Layer
 
+    _this.displayLayer = false;
     _this.name = _getName();
+    _this.zoomToLayer = false;
   };
 
   _createAmplitudesObject = function (amplitudes) {

@@ -42,6 +42,7 @@ var Historical = function (options) {
     _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();
+    _this.zoomToLayer = true;
   };
 
   /**
@@ -77,7 +78,7 @@ var Historical = function (options) {
       plotdata: _earthquakes.getPlotData()
     };
   };
-  
+
   /**
    * Get feature's data for summary pane
    *

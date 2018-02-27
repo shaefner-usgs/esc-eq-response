@@ -44,6 +44,7 @@ var MomentTensorFeature = function (options) {
     _this.displayLayer = false;
     _this.id = id;
     _this.name = options.name;
+    _this.zoomToLayer = false;
 
     _createLayer();
   };

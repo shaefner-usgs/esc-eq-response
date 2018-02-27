@@ -244,7 +244,7 @@ var MapPane = function (options) {
       _this.map.addLayer(layer);
 
       // Set bounds to contain added layer if adding for the first time
-      if (initialLoad) {
+      if (initialLoad && feature.zoomToLayer) {
         _this.bounds.extend(layer.getBounds());
         _this.map.fitBounds(_this.bounds, {
           paddingTopLeft: L.point(0, 45), // accommodate navbar
