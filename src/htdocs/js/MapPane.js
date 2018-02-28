@@ -29,7 +29,8 @@ var MapPane = function (options) {
       _initialize,
 
       _el,
-      _featureLayers,
+      _features,
+      _initialLoad,
       _mapNavButton,
       _staticLayers,
 
@@ -47,13 +48,18 @@ var MapPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _featureLayers= {};
+    _features = {};
+    _initialLoad = true;
     _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
 
     _el = options.el || document.createElement('div');
     _staticLayers = _getStaticLayers();
 
     _initMap();
+
+    _this.map.on('visible', function () {
+      _initialLoad = false;
+    });
   };
 
   /**
@@ -231,26 +237,28 @@ var MapPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.addFeatureLayer = function (feature, initialLoad) {
-    var layer;
+  _this.addFeatureLayer = function (feature) {
+    var id,
+        layer;
 
+    id = feature.id;
     layer = feature.getMapLayer();
+
+    _features[id] = feature;
+
+    if (id === 'mainshock') {
+      _initialLoad = true; // 'new' mainshock loaded, reset state
+    }
+
+    // Add layer to controller
     _this.layerControl.addOverlay(layer, feature.name);
 
-    _featureLayers[feature.id] = layer;
-
-    // Turn layer "on" if it is set to be displayed by default
+    // Turn layer "on" / zoom map if set to be displayed / zoomed by default
     if (feature.displayLayer) {
       _this.map.addLayer(layer);
-
-      // Set bounds to contain added layer if adding for the first time
-      if (initialLoad && feature.zoomToLayer) {
-        _this.bounds.extend(layer.getBounds());
-        _this.map.fitBounds(_this.bounds, {
-          paddingTopLeft: L.point(0, 45), // accommodate navbar
-          reset: true
-        });
-      }
+    }
+    if (feature.zoomToLayer) {
+      _this.setView(feature);
     }
   };
 
@@ -273,24 +281,24 @@ var MapPane = function (options) {
    * @param eqid {String}
    */
   _this.openPopup = function (feature, eqid) {
-    var featureLayer,
+    var layer,
         map,
         marker;
 
-    featureLayer = _featureLayers[feature];
+    layer = _features[feature].getMapLayer();
     map = _this.map;
 
     // Simulate clicking on 'Map' button on navbar
     _mapNavButton.click();
 
-    // Get marker associated with given eqid
-    featureLayer.eachLayer(function(layer) {
-      if (layer.feature.id === eqid) {
-        marker = layer;
+    // Get marker associated with given eqid within feature layer
+    layer.eachLayer(function(m) {
+      if (m.feature.id === eqid) {
+        marker = m;
       }
     });
 
-    // Center on marker because popup's autopan feature doesn't always work
+    // Center on marker so user can easily zoom into feature
     map.setView(marker.getLatLng(), map.getZoom());
 
     // Call L.popup.update() after map is visible so popup displays correctly
@@ -301,8 +309,8 @@ var MapPane = function (options) {
     });
 
     // Turn on feature layer (if not already) so its popup can be displayed
-    if (!map.hasLayer(featureLayer)) {
-      map.addLayer(featureLayer);
+    if (!map.hasLayer(layer)) {
+      map.addLayer(layer);
     }
     marker.openPopup();
   };
@@ -312,6 +320,38 @@ var MapPane = function (options) {
    */
   _this.setDefaultView = function () {
     _this.map.setView([40, -96], 4);
+  };
+
+  /**
+   * Zoom map extent to contain features with 'zoomToLayer' prop set to true
+   *
+   * @param feature {String}
+   *     optional feature layer to zoom to; zooms to all layers if not set
+   */
+  _this.setView = function (feature) {
+    var bounds,
+        layer;
+
+    bounds = L.latLngBounds();
+
+    if (feature) {
+      layer = feature.getMapLayer();
+      bounds.extend(layer.getBounds());
+    } else {
+      Object.keys(_features).forEach(function(feature) {
+        if (_features[feature].zoomToLayer) {
+          layer = _features[feature].getMapLayer();
+          bounds.extend(layer.getBounds());
+        }
+      });
+    }
+
+    if (_initialLoad && bounds.isValid()) {
+      _this.map.fitBounds(bounds, {
+        paddingTopLeft: L.point(0, 45), // accommodate navbar
+        reset: true
+      });
+    }
   };
 
 

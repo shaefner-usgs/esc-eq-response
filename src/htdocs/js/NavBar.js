@@ -204,6 +204,7 @@ var NavBar = function (options) {
       // which seems to be necessary for Leaflet to display popups correctly
       // when they're added to the map from another pane
       _MapPane.map.fire('visible');
+      _MapPane.setView();
     } else if (id === 'plotsPane') {
       _PlotsPane.renderPlots();
       _PlotsPane.resizePlots();

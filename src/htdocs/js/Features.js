@@ -38,7 +38,6 @@ var Features = function (options) {
       _editPane,
       _eqid,
       _features,
-      _initialLoad,
       _mainshockJson,
       _plotdata,
 
@@ -110,7 +109,7 @@ var Features = function (options) {
 
       // Create a new map pane and add feature to map, summary panes
       _MapPane.createMapPane(id, 'overlayPane');
-      _MapPane.addFeatureLayer(feature, _initialLoad);
+      _MapPane.addFeatureLayer(feature);
       _addSummary(feature);
 
       if (id === 'mainshock') {
@@ -133,10 +132,6 @@ var Features = function (options) {
       // Feature finished loading; remove alert / set isRefreshing to false
       _StatusBar.removeItem(statusBarId);
       _this.isRefreshing = false;
-
-      if (_features.aftershocks && _features.historical) {
-        _initialLoad = false;
-      }
     }
     catch (error) {
       console.error(error);
@@ -491,7 +486,6 @@ var Features = function (options) {
       // 1. Initialize environment
       _editPane = opts.editPane;
       _eqid = AppUtil.getParam('eqid');
-      _initialLoad = true;
       _features = {};
       _plotdata = {};
 
