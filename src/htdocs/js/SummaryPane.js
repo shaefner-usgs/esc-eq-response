@@ -513,7 +513,7 @@ var SummaryPane = function (options) {
   /**
    * Reset timestamp
    */
-  _this.resetTimeStamp = function () {
+  _this.reset = function () {
     var time;
 
     time = _el.querySelector('time');

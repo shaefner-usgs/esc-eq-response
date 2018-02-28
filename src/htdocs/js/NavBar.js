@@ -216,10 +216,9 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Clear saved scroll positions from session storage
-   *   set to '0' instead of removing so all values are explicitly set
+   * Reset scroll positions (set to 0) in session storage
    */
-  _this.clearScrollPositions = function () {
+  _this.reset = function () {
     var i,
         id;
 

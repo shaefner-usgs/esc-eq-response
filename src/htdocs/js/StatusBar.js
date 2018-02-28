@@ -116,14 +116,6 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Clear all messages from status bar
-   */
-  _this.clearAll = function () {
-    _el.innerHTML = '';
-    _hideStatusBar();
-  };
-
-  /**
    * Check if error(s) exist(s)
    *
    * @param className {String}
@@ -178,6 +170,14 @@ var StatusBar = function (options) {
     }
   };
 
+  /**
+   * Clear all messages from status bar
+   */
+  _this.reset = function () {
+    _el.innerHTML = '';
+    _hideStatusBar();
+  };
+  
 
   _initialize(options);
   options = null;

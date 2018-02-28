@@ -299,11 +299,11 @@ var EditPane = function (options) {
     _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
 
     _hideMainshock();
-    _StatusBar.clearAll();
+    _StatusBar.reset();
     _Features.removeFeatures();
     _MapPane.reset();
-    _SummaryPane.resetTimeStamp();
-    _NavBar.clearScrollPositions();
+    _SummaryPane.reset();
+    _NavBar.reset();
   };
 
   /**
