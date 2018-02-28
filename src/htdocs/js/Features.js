@@ -38,7 +38,6 @@ var Features = function (options) {
       _editPane,
       _eqid,
       _features,
-      _initialLoad,
       _mainshockJson,
       _plotdata,
 
@@ -110,7 +109,7 @@ var Features = function (options) {
 
       // Create a new map pane and add feature to map, summary panes
       _MapPane.createMapPane(id, 'overlayPane');
-      _MapPane.addFeatureLayer(feature, _initialLoad);
+      _MapPane.addFeatureLayer(feature);
       _addSummary(feature);
 
       if (id === 'mainshock') {
@@ -133,10 +132,6 @@ var Features = function (options) {
       // Feature finished loading; remove alert / set isRefreshing to false
       _StatusBar.removeItem(statusBarId);
       _this.isRefreshing = false;
-
-      if (_features.aftershocks && _features.historical) {
-        _initialLoad = false;
-      }
     }
     catch (error) {
       console.error(error);
@@ -365,8 +360,7 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
-    var coords,
-        name,
+    var name,
         msg,
         statusBarId;
 
@@ -384,12 +378,6 @@ var Features = function (options) {
 
           // Set default param values on edit pane
           _editPane.setDefaults(_mainshockJson);
-
-          // Center map around mainshock for now
-          //   (some added features set map extent to contain itself)
-          coords = _mainshockJson.geometry.coordinates;
-          _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
-          _MapPane.bounds = _MapPane.map.getBounds();
         }
 
         _addFeature({
@@ -491,7 +479,6 @@ var Features = function (options) {
       // 1. Initialize environment
       _editPane = opts.editPane;
       _eqid = AppUtil.getParam('eqid');
-      _initialLoad = true;
       _features = {};
       _plotdata = {};
 
