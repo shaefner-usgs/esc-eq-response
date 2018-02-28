@@ -360,8 +360,7 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
-    var coords,
-        name,
+    var name,
         msg,
         statusBarId;
 
@@ -379,12 +378,6 @@ var Features = function (options) {
 
           // Set default param values on edit pane
           _editPane.setDefaults(_mainshockJson);
-
-          // Center map around mainshock for now
-          //   (some added features set map extent to contain itself)
-          coords = _mainshockJson.geometry.coordinates;
-          _MapPane.map.setView([coords[1], coords[0]], 13, { reset: true });
-          _MapPane.bounds = _MapPane.map.getBounds();
         }
 
         _addFeature({

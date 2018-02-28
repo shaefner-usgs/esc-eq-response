@@ -301,7 +301,7 @@ var EditPane = function (options) {
     _hideMainshock();
     _StatusBar.clearAll();
     _Features.removeFeatures();
-    _MapPane.setDefaultView();
+    _MapPane.reset();
     _SummaryPane.resetTimeStamp();
     _NavBar.clearScrollPositions();
   };

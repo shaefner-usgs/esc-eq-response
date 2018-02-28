@@ -28,6 +28,7 @@ var MapPane = function (options) {
   var _this,
       _initialize,
 
+      _bounds,
       _el,
       _features,
       _initialLoad,
@@ -48,18 +49,12 @@ var MapPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _features = {};
-    _initialLoad = true;
     _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
 
     _el = options.el || document.createElement('div');
     _staticLayers = _getStaticLayers();
 
     _initMap();
-
-    _this.map.on('visible', function () {
-      _initialLoad = false;
-    });
   };
 
   /**
@@ -181,10 +176,9 @@ var MapPane = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
-    // Create map and set initial view
+    // Create map and set initial view / state
     _this.map = L.map(_el.querySelector('.map'));
-    _this.setDefaultView();
-    _this.bounds = _this.map.getBounds();
+    _this.reset();
 
     // Create custom pane for Faults overlay within tilePane
     _this.createMapPane('faults', 'tilePane');
@@ -245,10 +239,6 @@ var MapPane = function (options) {
     layer = feature.getMapLayer();
 
     _features[id] = feature;
-
-    if (id === 'mainshock') {
-      _initialLoad = true; // 'new' mainshock loaded, reset state
-    }
 
     // Add layer to controller
     _this.layerControl.addOverlay(layer, feature.name);
@@ -316,10 +306,14 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set default map extent (United States)
+   * Reset state and set default map extent
    */
-  _this.setDefaultView = function () {
-    _this.map.setView([40, -96], 4);
+  _this.reset = function () {
+    _bounds = L.latLngBounds();
+    _features = {};
+    _initialLoad = true;
+
+    _this.map.setView([40, -96], 4); // United States
   };
 
   /**
@@ -329,28 +323,39 @@ var MapPane = function (options) {
    *     optional feature layer to zoom to; zooms to all layers if not set
    */
   _this.setView = function (feature) {
-    var bounds,
-        layer;
+    var layer,
+        setView;
 
-    bounds = L.latLngBounds();
+    // Flag to determine if map extent will be set
+    setView = false;
 
-    if (feature) {
+    if (feature) { // set bounds to feature being added
       layer = feature.getMapLayer();
-      bounds.extend(layer.getBounds());
-    } else {
-      Object.keys(_features).forEach(function(feature) {
-        if (_features[feature].zoomToLayer) {
-          layer = _features[feature].getMapLayer();
-          bounds.extend(layer.getBounds());
-        }
-      });
+      _bounds.extend(layer.getBounds());
+      setView = true;
+    } else { // set bounds to all features (called via NavBar.js)
+      if (_initialLoad) { // only need to set first time map is visible
+        setView = true;
+
+        Object.keys(_features).forEach(function(feature) {
+          if (_features[feature].zoomToLayer) {
+            layer = _features[feature].getMapLayer();
+            _bounds.extend(layer.getBounds());
+          }
+        });
+        _initialLoad = false;
+      }
     }
 
-    if (_initialLoad && bounds.isValid()) {
-      _this.map.fitBounds(bounds, {
+    if (setView && _bounds.isValid()) {
+      _this.map.fitBounds(_bounds, {
         paddingTopLeft: L.point(0, 45), // accommodate navbar
         reset: true
       });
+      // Map gets set at max zoom when mainshock is only 'zoomto' layer; Manually zoom out
+      if (_this.map.getZoom() > 17) {
+        _this.map.setZoom(10);
+      }
     }
   };
 
