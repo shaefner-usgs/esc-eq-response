@@ -14,10 +14,8 @@ var StatusBar = function (options) {
       _initialize,
 
       _el,
-      _zIndex,
 
       _doRemove,
-      _getZindex,
       _hideStatusBar,
       _showStatusBar;
 
@@ -28,29 +26,17 @@ var StatusBar = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _zIndex = 10000;
-  };
-
-  _doRemove = function (item) {
-    if (item.parentNode) {
-      item.parentNode.removeChild(item);
-    }
   };
 
   /**
-   * Get z-index value for status bar entry
-   *   counts down so that previous entries are displayed until they're removed
+   * Remove status bar entry from DOM
    *
-   * @return _zIndex {Integer}
+   * @param el {Element}
    */
-  _getZindex = function () {
-    // Don't let z-index get "too low" (sorta hacky, but does the trick)
-    if (_zIndex < 9000) {
-      _zIndex = 10000;
+  _doRemove = function (el) {
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
     }
-    _zIndex --;
-
-    return _zIndex;
   };
 
   /**
@@ -86,7 +72,6 @@ var StatusBar = function (options) {
     error = document.createElement('p');
     error.classList.add(className, 'error');
     error.innerHTML = errorMsg;
-    error.style.zIndex = _getZindex();
 
     _el.appendChild(error);
   };
@@ -110,7 +95,6 @@ var StatusBar = function (options) {
     item = document.createElement('p');
     item.classList.add(className);
     item.innerHTML = 'Loading' + name + '&hellip;';
-    item.style.zIndex = _getZindex();
 
     _el.appendChild(item);
   };
@@ -177,7 +161,7 @@ var StatusBar = function (options) {
     _el.innerHTML = '';
     _hideStatusBar();
   };
-  
+
 
   _initialize(options);
   options = null;
