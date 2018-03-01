@@ -350,7 +350,7 @@ var SummaryPane = function (options) {
 
       listTable = _getListTable(data.list, data.magThreshold);
       subheader = 'M ' + Math.max(data.magThreshold,
-        AppUtil.getParam(id + '-minmag')) + '+ Earthquakes';
+        AppUtil.getParam(AppUtil.lookup(id) + '-mag')) + '+ Earthquakes';
       if (listTable.count !== 0) {
         subheader += ' (' + listTable.count + ')';
       }

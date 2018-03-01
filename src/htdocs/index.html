@@ -40,69 +40,69 @@
               <label for="eqid">
                 <p>Event ID (2 letters followed by 5-8 characters)</p>
               </label>
-              <input type="text" id="eqid" required="required"
-                pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$" value="" tabindex="2" />
+              <input type="text" id="eqid" value="" required="required"
+                pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$" tabindex="2" />
             </div>
             <div class="details hide"></div>
             <div class="aftershocks">
               <h3>Aftershocks</h3>
-              <label for="aftershocks-minmag">
+              <label for="as-mag">
                 <p>Min magnitude</p>
               </label>
-              <input type="number" id="aftershocks-minmag" required="required"
-                pattern="^[0-9.]+$" value="0" min="0" max="9" step="0.1"
-                autocomplete="off" tabindex="3" />
-              <label for="aftershocks-dist">
+              <input type="number" id="as-mag" value="0" min="0" max="9"
+                step="0.1" autocomplete="off" pattern="^[0-9.]+$"
+                required="required" tabindex="3" />
+              <label for="as-dist">
                 <p>Max distance from mainshock (km)</p>
               </label>
-              <input type="number" id="aftershocks-dist" required="required"
-                pattern="^[0-9.]+$" value="" min="1" step="1"
-                autocomplete="off" tabindex="4" />
+              <input type="number" id="as-dist" required="required" value=""
+                 min="1" step="1" autocomplete="off" pattern="^[0-9.]+$"
+                required="required" tabindex="4" />
             </div>
           </fieldset>
           <fieldset>
             <legend>Before the Mainshock</legend>
             <div class="foreshocks">
               <h3>Foreshocks</h3>
-              <label for="foreshocks-minmag">
+              <label for="fs-mag">
                 <p>Min magnitude</p>
               </label>
-              <input type="number" id="foreshocks-minmag" required="required"
-                pattern="^[0-9.]+$" value="1" min="0" max="9" step="0.1"
-                autocomplete="off"  tabindex="5" />
-              <label for="foreshocks-dist">
+              <input type="number" id="fs-mag" value="1" min="0" max="9"
+                step="0.1" autocomplete="off" pattern="^[0-9.]+$"
+                required="required" tabindex="5" />
+              <label for="fs-dist">
                 <p>Max distance from mainshock (km)</p>
               </label>
-              <input type="number" id="foreshocks-dist" required="required"
-                pattern="^[0-9.]+$" value="" min="1" step="1" autocomplete="off"
+              <input type="number" id="fs-dist" value="" min="1" step="1"
+                autocomplete="off" pattern="^[0-9.]+$" required="required"
                 tabindex="6" />
-              <label for="foreshocks-days">
+              <label for="fs-days">
                 <p>Max days before mainshock</p>
               </label>
-              <input type="number" id="foreshocks-days" required="required"
-                pattern="^[0-9.]+$" value="30" min="1" step="1"
-                autocomplete="off" tabindex="7" />
+              <input type="number" id="fs-days" value="30" min="1" step="1"
+                autocomplete="off" pattern="^[0-9.]+$" required="required"
+                tabindex="7" />
             </div>
             <div class="historical">
               <h3>Historical Seismicity</h3>
-              <label for="historical-minmag">
+              <label for="hs-mag">
                 <p>Min magnitude</p>
               </label>
-              <input type="number" id="historical-minmag" required="required"
-                pattern="^[0-9.]+$" value="" min="0" max="9" step="0.1"
-                autocomplete="off" tabindex="8" />
-              <label for="historical-dist">
+              <input type="number" id="hs-mag" value="" min="0" max="9"
+                step="0.1" autocomplete="off" pattern="^[0-9.]+$"
+                required="required" tabindex="8" />
+              <label for="hs-dist">
                 <p>Max distance from mainshock (km)</p>
               </label>
-              <input type="number" id="historical-dist" required="required"
-                pattern="^[0-9.]+$" value="" min="1" step="1" autocomplete="off"
+              <input type="number" id="hs-dist" value="" min="1" step="1"
+                autocomplete="off" pattern="^[0-9.]+$" required="required"
                 tabindex="9" />
-              <label for="historical-years">
+              <label for="hs-years">
                 <p>Max years before mainshock</p>
               </label>
-              <input type="number" id="historical-years" required="required"
-                pattern="^[0-9.]+$" value="10" min="1" step="1"
-                autocomplete="off" tabindex="10" />
+              <input type="number" id="hs-years" value="10" min="1" step="1"
+                autocomplete="off" pattern="^[0-9.]+$" required="required"
+                tabindex="10" />
             </div>
           </fieldset>
           <fieldset class="buttons">

@@ -178,8 +178,8 @@ var Features = function (options) {
     params = {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('aftershocks-dist'),
-      minmagnitude: AppUtil.getParam('aftershocks-minmag'),
+      maxradiuskm: AppUtil.getParam('as-dist'),
+      minmagnitude: AppUtil.getParam('as-mag'),
       starttime: Moment(_mainshockJson.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
@@ -221,15 +221,15 @@ var Features = function (options) {
     var days,
         params;
 
-    days = AppUtil.getParam('foreshocks-days');
+    days = AppUtil.getParam('fs-days');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('foreshocks-dist'),
-      minmagnitude: AppUtil.getParam('foreshocks-minmag'),
+      maxradiuskm: AppUtil.getParam('fs-dist'),
+      minmagnitude: AppUtil.getParam('fs-mag'),
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(days, 'days').toISOString().slice(0, -5)
     };
@@ -265,15 +265,15 @@ var Features = function (options) {
     var params,
         years;
 
-    years = AppUtil.getParam('historical-years');
+    years = AppUtil.getParam('hs-years');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('historical-dist'),
-      minmagnitude: AppUtil.getParam('historical-minmag'),
+      maxradiuskm: AppUtil.getParam('hs-dist'),
+      minmagnitude: AppUtil.getParam('hs-mag'),
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };
