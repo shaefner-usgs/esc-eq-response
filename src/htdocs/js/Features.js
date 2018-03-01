@@ -136,7 +136,7 @@ var Features = function (options) {
     catch (error) {
       console.error(error);
       _StatusBar.addError(statusBarId, 'Error Creating ' + name +
-        '<span>' + error + '</span>');
+        '<strong>' + error + '</strong>');
       _this.isRefreshing = false;
     }
   };
@@ -394,14 +394,14 @@ var Features = function (options) {
 
         // Add additional info to error message
         if (status === 404 && name === 'Mainshock') {
-          msg += ' <span>Event ID ' + _eqid + ' not found</span>';
+          msg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
         }
         else if (xhr.responseText.match('limit of 20000')) {
-          msg += ' <span>Modify the parameters to match fewer earthquakes' +
-            ' (max 20,000)</span>';
+          msg += ' <strong>Modify the parameters to match fewer earthquakes' +
+            ' (max 20,000)</strong>';
         }
         else if (xhr.responseText.match('parameter combination')){
-          msg += ' <span>Missing required parameters</span>';
+          msg += ' <strong>Missing required parameters</strong>';
         }
 
         _StatusBar.addError(statusBarId, msg);
