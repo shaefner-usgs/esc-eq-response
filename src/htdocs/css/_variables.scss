@@ -5,9 +5,9 @@ $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
 $font-size: 15px;
 
-$link-color: #7234DC;
+$link-color: #7234dc; /*6e00ff*/
 $link-color-active: #DC406D;
-$link-color-visited: #7234DC;
+$link-color-visited: $link-color;
 
 $th-border-color: #ccc;
 $tr-border-color: #e8e8e8;
