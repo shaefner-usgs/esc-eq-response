@@ -38,6 +38,23 @@ AppUtil.getParams = function () {
 };
 
 /**
+ * Lookup table for url param from feature id
+ *
+ * @param key {String}
+ *
+ * @return {String}
+ */
+AppUtil.lookup = function (key) {
+  var lookup = {
+    aftershocks: 'as',
+    foreshocks: 'fs',
+    historical: 'hs'
+  };
+
+  return lookup[key];
+};
+
+/**
  * Convert number to roman numeral
  *
  * @param num {Number}

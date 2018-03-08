@@ -38,7 +38,7 @@ var Foreshocks = function (options) {
       json: options.json,
       mainshockJson: options.mainshockJson
     });
-    _magThreshold = Math.floor(AppUtil.getParam('foreshocks-minmag'));
+    _magThreshold = Math.floor(AppUtil.getParam('fs-mag'));
 
     _this.displayLayer = true;
     _this.id = id;

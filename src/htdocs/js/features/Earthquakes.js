@@ -256,8 +256,8 @@ var Earthquakes = function (options) {
         duration;
 
     description = '<p class="description"><strong>M ' +
-      AppUtil.getParam(_id + '-minmag') + '+ </strong> earthquakes within ' +
-      '<strong>' + AppUtil.getParam(_id + '-dist') + ' km</strong> of the ' +
+      AppUtil.getParam(AppUtil.lookup(_id) + '-mag') + '+ </strong> earthquakes within ' +
+      '<strong>' + AppUtil.getParam(AppUtil.lookup(_id) + '-dist') + ' km</strong> of the ' +
       'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
@@ -267,12 +267,12 @@ var Earthquakes = function (options) {
         duration + ' days</strong>';
     }
     else if (_id === 'foreshocks') {
-      duration = AppUtil.getParam('foreshocks-days');
+      duration = AppUtil.getParam('fs-days');
       description += ' in the prior <strong>' + duration + ' days</strong> ' +
         'before the mainshock';
     }
     else if (_id === 'historical') {
-      duration = AppUtil.getParam('historical-years');
+      duration = AppUtil.getParam('hs-years');
       description += ' in the prior <strong>' + duration + ' years</strong> ' +
       'before the mainshock';
     }

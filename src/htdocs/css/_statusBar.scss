@@ -17,28 +17,58 @@
     min-height: 40px;
     padding: 10px 0;
     text-align: center;
+    text-shadow: 1px 1px 3px #fffec6;
     position: absolute;
     width: 100%;
 
-    &:first-child {
-      display: block;
+    span {
+      animation: loading 1s infinite;
+      display: inline-block;
+      font: 1.2em georgia;
+      line-height: .25;
+
+      &:nth-child(1) {
+        padding-left: 3px;
+      }
+      &:nth-child(2) {
+        animation-delay: .15s;
+      }
+      &:nth-child(3) {
+        animation-delay: .3s;
+      }
     }
 
-    span {
+    strong {
       display: block;
       font-size: 14px;
+      font-weight: normal;
+      margin-top: 2px;
+    }
+
+    &:first-child {
+      display: block;
     }
 
     &.error {
       background-color: rgba(223, 62, 62, 0.92);
       border-color: rgb(195, 0, 0);
       color: #fff;
-      padding: 3px 0;
+      padding: 1px 0;
+      text-shadow: 1px 1px 3px #922c2c;
     }
   }
 
   &.hide {
     height: 0;
     transition: height .25s ease-out .25s;
+  }
+}
+
+@keyframes loading {
+  0%, 100% {
+    opacity: .1;
+  }
+  20% {
+    opacity: 1;
   }
 }

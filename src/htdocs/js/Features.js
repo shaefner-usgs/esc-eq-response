@@ -136,7 +136,7 @@ var Features = function (options) {
     catch (error) {
       console.error(error);
       _StatusBar.addError(statusBarId, 'Error Creating ' + name +
-        '<span>' + error + '</span>');
+        '<strong>' + error + '</strong>');
       _this.isRefreshing = false;
     }
   };
@@ -178,8 +178,8 @@ var Features = function (options) {
     params = {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('aftershocks-dist'),
-      minmagnitude: AppUtil.getParam('aftershocks-minmag'),
+      maxradiuskm: AppUtil.getParam('as-dist'),
+      minmagnitude: AppUtil.getParam('as-mag'),
       starttime: Moment(_mainshockJson.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
@@ -221,15 +221,15 @@ var Features = function (options) {
     var days,
         params;
 
-    days = AppUtil.getParam('foreshocks-days');
+    days = AppUtil.getParam('fs-days');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('foreshocks-dist'),
-      minmagnitude: AppUtil.getParam('foreshocks-minmag'),
+      maxradiuskm: AppUtil.getParam('fs-dist'),
+      minmagnitude: AppUtil.getParam('fs-mag'),
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(days, 'days').toISOString().slice(0, -5)
     };
@@ -265,15 +265,15 @@ var Features = function (options) {
     var params,
         years;
 
-    years = AppUtil.getParam('historical-years');
+    years = AppUtil.getParam('hs-years');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('historical-dist'),
-      minmagnitude: AppUtil.getParam('historical-minmag'),
+      maxradiuskm: AppUtil.getParam('hs-dist'),
+      minmagnitude: AppUtil.getParam('hs-mag'),
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };
@@ -394,14 +394,14 @@ var Features = function (options) {
 
         // Add additional info to error message
         if (status === 404 && name === 'Mainshock') {
-          msg += ' <span>Event ID ' + _eqid + ' not found</span>';
+          msg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
         }
         else if (xhr.responseText.match('limit of 20000')) {
-          msg += ' <span>Modify the parameters to match fewer earthquakes' +
-            ' (max 20,000)</span>';
+          msg += ' <strong>Modify the parameters to match fewer earthquakes' +
+            ' (max 20,000)</strong>';
         }
         else if (xhr.responseText.match('parameter combination')){
-          msg += ' <span>Missing required parameters</span>';
+          msg += ' <strong>Missing required parameters</strong>';
         }
 
         _StatusBar.addError(statusBarId, msg);

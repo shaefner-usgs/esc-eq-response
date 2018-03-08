@@ -33,12 +33,16 @@ var Application = function (options) {
       _NavBar,
       _PlotsPane,
       _StatusBar,
-      _SummaryPane;
+      _SummaryPane,
+
+      _redirect;
 
 
   _this = {};
 
   _initialize = function (options) {
+    _redirect();
+
     // Instantiate map / plots / summary panes & navigation / status bar
     _MapPane = MapPane({
       el: options.mapPane
@@ -81,6 +85,21 @@ var Application = function (options) {
 
     // Remove initial loading message
     _StatusBar.removeItem('initial');
+  };
+
+  /**
+   * URL params shortened to make URLs more succinct; redirect users using old params
+   */
+  _redirect = function () {
+    var url;
+
+    url = window.location.href;
+    url = url.replace(/aftershocks/g, 'as');
+    url = url.replace(/foreshocks/g, 'fs');
+    url = url.replace(/historical/g, 'hs');
+    url = url.replace(/minmag/g, 'mag');
+
+    history.replaceState(null, null, url);
   };
 
 

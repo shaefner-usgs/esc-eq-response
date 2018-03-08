@@ -64,8 +64,8 @@ input[type="radio"] + span:before {
 }
 
 input[type="checkbox"]:checked + span:before, input[type="radio"]:checked + span:before {
-  background-color: #7234DC;
-  border-color: #7234DC;
+  background-color: $link-color;
+  border-color: $link-color;
   color: #fff;
 }
 input[type="checkbox"]:checked + span:before {
