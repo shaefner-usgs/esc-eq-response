@@ -94,7 +94,7 @@ var StatusBar = function (options) {
 
     item = document.createElement('p');
     item.classList.add(className);
-    item.innerHTML = 'Loading' + name + '&hellip;';
+    item.innerHTML = 'Loading' + name + '<span>.</span><span>.</span><span>.</span>';
 
     _el.appendChild(item);
   };

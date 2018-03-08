@@ -159,14 +159,14 @@ var EditPane = function (options) {
     ruptureLength = Math.pow(ruptureArea, 0.7);
 
     return {
-      'aftershocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'aftershocks-minmag': 0,
-      'foreshocks-days': 30,
-      'foreshocks-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'foreshocks-minmag': 1,
-      'historical-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
-      'historical-minmag': Math.round(Math.max(4, mag - 2)),
-      'historical-years': 10
+      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'as-mag': 0,
+      'fs-days': 30,
+      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'fs-mag': 1,
+      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'hs-mag': Math.round(Math.max(4, mag - 2)),
+      'hs-years': 10
     };
   };
 

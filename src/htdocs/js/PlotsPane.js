@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('AppUtil');
+
+
 /**
  * Creates, adds, and removes plot from plots pane
  *
@@ -57,6 +60,7 @@ var PlotsPane = function (options) {
     var eqids,
         feature,
         index,
+        plotid,
         points;
 
     plot.on('plotly_click', function(data) {
@@ -64,6 +68,12 @@ var PlotsPane = function (options) {
       eqids = points.data.eqid;
       feature = points.data.feature;
       index = points.pointNumber;
+      plotid = points.data.plotid;
+
+      // First point (at index 0) on cumulative aftershocks curve is mainshock
+      if (index === 0 && plotid === 'cumulative') {
+        feature = 'mainshock';
+      }
 
       _MapPane.openPopup(feature, eqids[index]);
     });
@@ -359,6 +369,8 @@ var PlotsPane = function (options) {
   _getTrace = function (opts) {
     var data,
         date,
+        eqid,
+        mainshockId,
         mode,
         sizeref,
         text,
@@ -372,9 +384,10 @@ var PlotsPane = function (options) {
     if (opts.plot === 'cumulative') {
       mode = 'lines+markers';
 
-      // Copy date/time arrays so they can be modified w/o affecting orig. data
-      date = data.date.slice(0);
-      x = data.time.slice(0);
+      // Copy date/time/eqid arrays so they can be modified w/o affecting orig. data
+      date = data.date.slice();
+      eqid = data.eqid.slice();
+      x = data.time.slice();
 
       // Fill y with values from 1 to length of x
       y = Array.from(new Array(x.length), function (val, i) {
@@ -383,7 +396,9 @@ var PlotsPane = function (options) {
 
       // Add origin point to beginning of aftershocks trace
       if (opts.id === 'aftershocks') {
+        mainshockId = AppUtil.getParam('eqid');
         date.unshift(opts.mainshockDate);
+        eqid.unshift(mainshockId);
         x.unshift(opts.mainshockTime);
         y.unshift(0);
       }
@@ -400,6 +415,7 @@ var PlotsPane = function (options) {
       y = data.lat;
       z = data.depth;
     } else if (opts.plot === 'magtime') {
+      eqid = data.eqid;
       mode = 'markers';
       sizeref = 1;
       text = data.text;
@@ -408,7 +424,7 @@ var PlotsPane = function (options) {
     }
 
     trace = {
-      eqid: data.eqid,
+      eqid: eqid,
       feature: opts.id,
       hoverinfo: 'text',
       hoverlabel: {
@@ -417,6 +433,7 @@ var PlotsPane = function (options) {
         }
       },
       mode: mode,
+      plotid: opts.plot,
       text: text,
       type: opts.type,
       x: x,

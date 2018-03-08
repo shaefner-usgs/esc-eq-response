@@ -216,7 +216,7 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Reset scroll positions (set to 0) in session storage
+   * Reset scroll positions for plotsPane, summaryPane in session storage
    */
   _this.reset = function () {
     var i,
@@ -224,7 +224,9 @@ var NavBar = function (options) {
 
     for (i = 0; i < _panes.length; i ++) {
       id = _panes[i].getAttribute('id');
-      window.sessionStorage.setItem(id, 0);
+      if (id === 'plotsPane' || id === 'summaryPane') {
+        window.sessionStorage.setItem(id, 0);
+      }
     }
   };
 
