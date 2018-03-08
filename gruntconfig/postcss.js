@@ -4,6 +4,7 @@ var autoprefixer = require('autoprefixer'),
     cssnano = require('cssnano'),
     calc = require('postcss-calc'),
     postcssImport = require('postcss-import'),
+    postcssVar = require('postcss-advanced-variables'),
     precss = require('precss');
 
 
@@ -19,6 +20,7 @@ var postcss = {
         postcssImport({
           path: config.cssPath
         }),
+        postcssVar(),
         precss(),
         calc(),
         autoprefixer({'browsers': 'last 3 versions'})
