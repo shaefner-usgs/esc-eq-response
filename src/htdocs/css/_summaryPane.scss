@@ -9,6 +9,32 @@ $total-bg-color: #f7f7f7;
     margin: 1.5em 0 .5em;
   }
 
+  table.m0 tr.m0,
+  table.m1 tr.m1,
+  table.m2 tr.m2,
+  table.m3 tr.m3,
+  table.m4 tr.m4,
+  table.m5 tr.m5,
+  table.m6 tr.m6,
+  table.m7 tr.m7,
+  table.m8 tr.m8,
+  table.m9 tr.m9 {
+    display: table-row;
+  }
+
+  tr.m0,
+  tr.m1,
+  tr.m2,
+  tr.m3,
+  tr.m4,
+  tr.m5,
+  tr.m6,
+  tr.m7,
+  tr.m8,
+  tr.m9 {
+    display: none;
+  }
+
   time.updated {
     display: block;
     margin: 1em 1em 0;
