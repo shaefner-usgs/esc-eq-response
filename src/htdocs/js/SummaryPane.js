@@ -209,18 +209,19 @@ var SummaryPane = function (options) {
    *     tr html for each earthquake in list keyed by eqid
    * @param magThreshold {Number}
    *
-   * @return {Object}
+   * @return html {String}
    */
   _getListTable = function (rows, magThreshold) {
-    var count,
+    var cssClasses,
         html,
         length,
         mag,
+        match,
         row,
         sortClass,
         tableData;
 
-    count = 0;
+    cssClasses = ['list'];
     length = Object.keys(rows).length;
     sortClass = 'non-sortable';
     tableData = '';
@@ -228,16 +229,19 @@ var SummaryPane = function (options) {
     if (length > 0) {
       Object.keys(rows).forEach(function(key) {
         row = rows[key];
-        mag = /tr\s+class="m(\d+)"/.exec(row);
-        if (!magThreshold || parseInt(mag[1], 10) >= magThreshold) {
-          count ++;
-          tableData += row;
+
+        match = /tr\s+class="m(\d+)"/.exec(row);
+        mag = parseInt(match[1], 10);
+        if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
+          cssClasses.push('m' + mag);
         }
+
+        tableData += row;
       });
-      if (count > 1) {
-        sortClass = 'sortable';
+      if (length > 1) {
+        cssClasses.push('sortable');
       }
-      html = '<table class="list ' + sortClass + '">' +
+      html = '<table class="' + cssClasses.join(' ') + '">' +
           '<tr class="no-sort">' +
             '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
@@ -250,15 +254,11 @@ var SummaryPane = function (options) {
           '</tr>' +
           tableData +
         '</table>';
-    }
-    if (count === 0) {
+    } else {
       html = '<p>None.</p>';
     }
 
-    return {
-      count: count,
-      html: html
-    };
+    return html;
   };
 
   /**
@@ -276,7 +276,7 @@ var SummaryPane = function (options) {
   _getSummary = function (opts) {
     var data,
         id,
-        listTable,
+        mag,
         subheader,
         summary,
         url;
@@ -341,21 +341,20 @@ var SummaryPane = function (options) {
           summary += '<h3>Most Recent Aftershock</h3>';
           summary += _getListTable({
             lastAftershock: data.list[data.lastId]
-          }, false).html;
+          }, false);
         }
       }
       if (id === 'historical' || id === 'foreshocks') {
         summary += _getBinnedTable(data.bins, 'Prior');
       }
 
-      listTable = _getListTable(data.list, data.magThreshold);
-      subheader = 'M ' + Math.max(data.magThreshold,
-        AppUtil.getParam(AppUtil.lookup(id) + '-mag')) + '+ Earthquakes';
-      if (listTable.count !== 0) {
-        subheader += ' (' + listTable.count + ')';
+      mag = Math.floor(Math.max(data.magThreshold, AppUtil.getParam(id + '-minmag')));
+      subheader = 'M ' + mag + '+ Earthquakes';
+      if (data.bins.Inclusive && data.bins.Inclusive[mag] !== 0) {
+        subheader += ' (' + data.bins.Inclusive[mag] + ')';
       }
       summary += '<h3>' + subheader + '</h3>';
-      summary += listTable.html;
+      summary += _getListTable(data.list, data.magThreshold);
     }
 
     return summary;

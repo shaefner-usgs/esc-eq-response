@@ -132,31 +132,41 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param period {String <First | Past | Prior>}
+   * @param period {String <Inclusive | First | Past | Prior>}
    */
   _addEqToBin = function (days, magInt, period) {
-    var intervals;
+    var i,
+        intervals;
 
     if (!_bins[period]) {
       _bins[period] = [];
     }
 
-    if (!_bins[period][magInt]) {
-      intervals = _getIntervals();
-      _bins[period][magInt] = intervals;
-    }
-
-    _bins[period][magInt][0] ++; // total
-    if (days <= 365) { // bin eqs within one year of period
-      if (_id !== 'foreshocks') {
-        _bins[period][magInt][365] ++;
+    if (period === 'Inclusive') { // all eqs by mag, inclusive
+      for (i = magInt; i > 0; i --) {
+        if (!_bins[period][i]) {
+          _bins[period][i] = 0;
+        }
+        _bins[period][i] ++;
       }
-      if (days <= 30) {
-        _bins[period][magInt][30] ++;
-        if (days <= 7) {
-          _bins[period][magInt][7] ++;
-          if (days <= 1) {
-            _bins[period][magInt][1] ++;
+    } else {
+      if (!_bins[period][magInt]) {
+        intervals = _getIntervals();
+        _bins[period][magInt] = intervals;
+      }
+
+      _bins[period][magInt][0] ++; // total
+      if (days <= 365) { // bin eqs within one year of period
+        if (_id !== 'foreshocks') {
+          _bins[period][magInt][365] ++;
+        }
+        if (days <= 30) {
+          _bins[period][magInt][30] ++;
+          if (days <= 7) {
+            _bins[period][magInt][7] ++;
+            if (days <= 1) {
+              _bins[period][magInt][1] ++;
+            }
           }
         }
       }
@@ -438,7 +448,7 @@ var Earthquakes = function (options) {
     // Add eq to list for summary
     _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
 
-    // Bin eq totals by magnitude and time; store last aftershock
+    // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
       days = Math.floor(Moment.duration(eqMoment - _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'First');
@@ -450,6 +460,8 @@ var Earthquakes = function (options) {
       days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'Prior');
     }
+    // Bin eq totals by magnitude, inclusive (used internally)
+    _addEqToBin(null, magInt, 'Inclusive');
   };
 
   /**
