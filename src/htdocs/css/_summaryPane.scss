@@ -9,6 +9,15 @@ $total-bg-color: #f7f7f7;
     margin: 1.5em 0 .5em;
   }
 
+  h4 {
+    font-size: 1em;
+    margin-bottom: 0;
+
+    &:after {
+      content: ':';
+    }
+  }
+
   table.m0 tr.m0,
   table.m1 tr.m1,
   table.m2 tr.m2,

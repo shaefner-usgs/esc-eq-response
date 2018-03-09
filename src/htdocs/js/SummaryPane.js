@@ -20,6 +20,7 @@ var SummaryPane = function (options) {
 
       _el,
       _features,
+      _style,
       _tz,
 
       _MapPane,
@@ -29,10 +30,13 @@ var SummaryPane = function (options) {
       _clickRow,
       _getBinnedTable,
       _getListTable,
+      _getSlider,
       _getSummary,
       _getTimeZone,
+      _getValue,
       _hoverRow,
       _initTableSort,
+      _setStyleRules,
       _updateTimestamp;
 
 
@@ -43,24 +47,56 @@ var SummaryPane = function (options) {
 
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
+    _style = document.createElement('style');
     _tz = _getTimeZone();
 
     _MapPane = options.mapPane;
+
+    // Dynamic range input styles are set inside this <style> tag
+    document.body.appendChild(_style);
 
     _addTimestamp();
   };
 
   /**
-   * Add event listeners to earthquake lists
+   * Add event listeners to earthquake lists / input range sliders
    *
    * @param el {Element}
-   *     div el that contains list table(s)
+   *     div el that contains list table(s), slider
    */
   _addListeners = function (el) {
-    var i,
+    var feature,
+        i,
+        input,
         j,
+        output,
         rows,
-        tables;
+        slider,
+        span,
+        table,
+        tables,
+        value;
+
+    input = el.querySelector('.slider input');
+    if (input) {
+      feature = input.id;
+      output = input.nextElementSibling;
+      slider = input.parentNode;
+      span = el.querySelector('h3 span');
+      table = el.querySelector('.slider + .list');
+
+      input.addEventListener('input', function() {
+        value = Number(input.value);
+
+        output.value = value;
+        slider.style.setProperty('--val', value);
+        span.innerHTML = value;
+        table.classList.add('m' + value);
+        table.classList.remove('m' + (value - 1));
+
+        _setStyleRules(this, feature);
+      }, false);
+    }
 
     tables = el.querySelectorAll('table.list');
     if (tables) {
@@ -133,11 +169,11 @@ var SummaryPane = function (options) {
    *
    * @param bins {Object}
    *     earthquake data binned by mag/time
-   * @param period {String <First | Past | Prior>}
+   * @param type {String <magInclusive | first | past | prior>}
    *
    * @return html {Html}
    */
-  _getBinnedTable = function (bins, period) {
+  _getBinnedTable = function (bins, type) {
     var html,
         irow,
         row,
@@ -145,17 +181,17 @@ var SummaryPane = function (options) {
         totalAll;
 
     html = '';
-    if (bins[period] && bins[period].length > 0) {
+    if (bins[type] && bins[type].length > 0) {
       html = '<table class="bin">' +
         '<tr>' +
-          '<th class="period">' + period + ':</th>' +
+          '<th class="period">' + type + ':</th>' +
           '<th>Day</th>' +
           '<th>Week</th>' +
           '<th>Month</th>' +
           '<th class="year">Year</th>' +
           '<th>Total</th>' +
         '</tr>';
-      bins[period].forEach(function(cols, mag) {
+      bins[type].forEach(function(cols, mag) {
         html += '<tr><th class="rowlabel">M ' + mag + '</th>';
         cols.forEach(function(col, i) {
           if (i === 0) { // store row total
@@ -171,21 +207,21 @@ var SummaryPane = function (options) {
       html += '<tr class="totals">' +
         '<th class="rowlabel">Total</th>';
 
-      for (row=0; row < bins[period].length; ++row) { // get column indices
-        if (typeof bins[period][row] !== 'undefined') {
+      for (row=0; row < bins[type].length; ++row) { // get column indices
+        if (typeof bins[type][row] !== 'undefined') {
           break;
         }
       }
-      if (row < bins[period].length) { // if found valid row
+      if (row < bins[type].length) { // if found valid row
         totalAll = 0;
-        bins[period][row].forEach(function(cols, index) {
+        bins[type][row].forEach(function(cols, index) {
           total = 0;
-          for (irow=0; irow < bins[period].length; ++irow) {
-            if (typeof bins[period][irow] !== 'undefined') {
+          for (irow=0; irow < bins[type].length; ++irow) {
+            if (typeof bins[type][irow] !== 'undefined') {
               if (index === 0) { // row total (last column)
-                totalAll += bins[period][irow][index];
+                totalAll += bins[type][irow][index];
               } else {
-                total += bins[period][irow][index];
+                total += bins[type][irow][index];
               }
             }
           }
@@ -226,37 +262,62 @@ var SummaryPane = function (options) {
     sortClass = 'non-sortable';
     tableData = '';
 
-    if (length > 0) {
-      Object.keys(rows).forEach(function(key) {
-        row = rows[key];
+    Object.keys(rows).forEach(function(key) {
+      row = rows[key];
 
-        match = /tr\s+class="m(\d+)"/.exec(row);
-        mag = parseInt(match[1], 10);
-        if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
-          cssClasses.push('m' + mag);
-        }
-
-        tableData += row;
-      });
-      if (length > 1) {
-        cssClasses.push('sortable');
+      match = /tr\s+class="m(\d+)"/.exec(row);
+      mag = parseInt(match[1], 10);
+      if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
+        cssClasses.push('m' + mag);
       }
-      html = '<table class="' + cssClasses.join(' ') + '">' +
-          '<tr class="no-sort">' +
-            '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-            '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
-            '<th class="location">Location</th>' +
-            '<th data-sort-method="number">Depth</th>' +
-            '<th data-sort-method="number">' +
-              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-            '</th>' +
-            '<th class="eqid">Event ID</th>' +
-          '</tr>' +
-          tableData +
-        '</table>';
-    } else {
-      html = '<p>None.</p>';
+
+      tableData += row;
+    });
+    if (length > 1) {
+      cssClasses.push('sortable');
     }
+    html = '<table class="' + cssClasses.join(' ') + '">' +
+        '<tr class="no-sort">' +
+          '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
+          '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
+          '<th class="location">Location</th>' +
+          '<th data-sort-method="number">Depth</th>' +
+          '<th data-sort-method="number">' +
+            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+          '</th>' +
+          '<th class="eqid">Event ID</th>' +
+        '</tr>' +
+        tableData +
+      '</table>';
+
+    return html;
+  };
+
+  /**
+   * Get html for input range slider
+   *
+   * @param id {String}
+   *     feature id
+   * @param mag {Number}
+   * @param bins {Object}
+   */
+  _getSlider = function (id, mag, bins) {
+    var html,
+        mags,
+        max,
+        min;
+
+    mags = Object.keys(bins);
+    max = Math.max.apply(null, mags);
+    min = Math.min.apply(null, mags);
+
+    html = '<h4>Filter earthquake list</h4>';
+    html += '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
+      max + '; --val: ' + mag + ';">';
+    html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
+      max + '" value="' + mag + '"/>';
+    html += '<output for="'+ id + '">' + mag + '</output>';
+    html += '</div>';
 
     return html;
   };
@@ -274,7 +335,8 @@ var SummaryPane = function (options) {
    * @return summary {Html}
    */
   _getSummary = function (opts) {
-    var data,
+    var count,
+        data,
         id,
         mag,
         subheader,
@@ -332,29 +394,35 @@ var SummaryPane = function (options) {
     }
 
     if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
-      if (id === 'aftershocks') {
-        summary += '<div class="bins">';
-        summary += _getBinnedTable(data.bins, 'First');
-        summary += _getBinnedTable(data.bins, 'Past');
-        summary += '</div>';
-        if (data.lastId) {
-          summary += '<h3>Most Recent Aftershock</h3>';
-          summary += _getListTable({
-            lastAftershock: data.list[data.lastId]
-          }, false);
+      count = Object.keys(opts.data.list).length;
+      if (count > 0) {
+        if (id === 'aftershocks') {
+          summary += '<div class="bins">';
+          summary += _getBinnedTable(data.bins, 'first');
+          summary += _getBinnedTable(data.bins, 'past');
+          summary += '</div>';
+          if (data.lastId) {
+            summary += '<h3>Most Recent Aftershock</h3>';
+            summary += _getListTable({
+              lastAftershock: data.list[data.lastId]
+            }, false);
+          }
         }
-      }
-      if (id === 'historical' || id === 'foreshocks') {
-        summary += _getBinnedTable(data.bins, 'Prior');
-      }
+        if (id === 'historical' || id === 'foreshocks') {
+          summary += _getBinnedTable(data.bins, 'prior');
+        }
 
-      mag = Math.floor(Math.max(data.magThreshold, AppUtil.getParam(id + '-minmag')));
-      subheader = 'M ' + mag + '+ Earthquakes';
-      if (data.bins.Inclusive && data.bins.Inclusive[mag] !== 0) {
-        subheader += ' (' + data.bins.Inclusive[mag] + ')';
+        mag = Math.floor(Math.max(data.magThreshold,
+          AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
+
+        subheader = 'M <span>' + mag + '</span>+ Earthquakes';
+        if (data.bins.magInclusive && data.bins.magInclusive[mag] !== 0) {
+          subheader += ' (' + data.bins.magInclusive[mag] + ')';
+        }
+        summary += '<h3>' + subheader + '</h3>';
+        summary += _getSlider(id, mag, data.bins.magInclusive);
+        summary += _getListTable(data.list, data.magThreshold);
       }
-      summary += '<h3>' + subheader + '</h3>';
-      summary += _getListTable(data.list, data.magThreshold);
     }
 
     return summary;
@@ -389,6 +457,27 @@ var SummaryPane = function (options) {
     }
 
     return tz;
+  };
+
+  /**
+   * Get percentage value for colored section of input range slider
+   *
+   * @param el {Element}
+   * @param p {Number}
+   */
+  _getValue = function (el, p) {
+    var min,
+        perc,
+        value;
+
+    min = el.min || 0;
+    perc = p;
+    if (el.max) {
+      perc = Math.floor(100 * (p - min) / (el.max - min));
+    }
+    value = perc + '% 100%';
+
+    return value;
   };
 
   /**
@@ -445,6 +534,35 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Set dynamic styles (inline) for colored section of input range sliders
+   *
+   * @param el {Element}
+   *     input element
+   * @param feature {String}
+   *     feature id
+   */
+  _setStyleRules = function (el, feature) {
+    var newRules,
+        oldRules,
+        value,
+        vendorEls;
+
+    newRules = '';
+    oldRules = new RegExp('#' + feature + '[^#]+', 'g');
+    value = _getValue(el, el.value);
+    vendorEls = ['webkit-slider-runnable', 'moz-range'];
+
+    for (var i = 0; i < vendorEls.length; i ++) {
+      newRules += '#' + feature + '::-' + vendorEls[i] +
+        '-track { background-size:' + value + ' !important}';
+    }
+
+    // Remove 'old' css rules first, then add new ones
+    _style.textContent = _style.textContent.replace(oldRules, '');
+    _style.appendChild(document.createTextNode(newRules));
+  };
+
+  /**
    * Update timestamp
    */
   _updateTimestamp = function () {
@@ -477,6 +595,7 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
+        rangeInput,
         summary;
 
     className = opts.id;
@@ -489,6 +608,12 @@ var SummaryPane = function (options) {
       div.classList.add('content', 'feature', 'lighter', className);
       div.innerHTML = summary;
       _features.appendChild(div);
+
+      // Set initial colored section of range slider
+      rangeInput = div.querySelector('input');
+      if (rangeInput) {
+        _setStyleRules(rangeInput, className);
+      }
 
       _addListeners(div);
       _initTableSort(className);
@@ -510,13 +635,15 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Reset timestamp
+   * Reset timestamp, inline styles for range inputs
    */
   _this.reset = function () {
     var time;
 
     time = _el.querySelector('time');
     time.innerHTML = '';
+
+    _style.textContent = '';
   };
 
 
