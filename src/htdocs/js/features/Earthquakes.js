@@ -128,44 +128,44 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Bin earthquakes by magnitude and time period
+   * Bin earthquakes by magnitude and time period (type)
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param period {String <Inclusive | First | Past | Prior>}
+   * @param type {String <magInclusive | first | past | prior>}
    */
-  _addEqToBin = function (days, magInt, period) {
+  _addEqToBin = function (days, magInt, type) {
     var i,
         intervals;
 
-    if (!_bins[period]) {
-      _bins[period] = [];
+    if (!_bins[type]) {
+      _bins[type] = [];
     }
 
-    if (period === 'Inclusive') { // all eqs by mag, inclusive
+    if (type === 'magInclusive') { // all eqs by mag, inclusive
       for (i = magInt; i > 0; i --) {
-        if (!_bins[period][i]) {
-          _bins[period][i] = 0;
+        if (!_bins[type][i]) {
+          _bins[type][i] = 0;
         }
-        _bins[period][i] ++;
+        _bins[type][i] ++;
       }
     } else {
-      if (!_bins[period][magInt]) {
+      if (!_bins[type][magInt]) {
         intervals = _getIntervals();
-        _bins[period][magInt] = intervals;
+        _bins[type][magInt] = intervals;
       }
 
-      _bins[period][magInt][0] ++; // total
+      _bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
         if (_id !== 'foreshocks') {
-          _bins[period][magInt][365] ++;
+          _bins[type][magInt][365] ++;
         }
         if (days <= 30) {
-          _bins[period][magInt][30] ++;
+          _bins[type][magInt][30] ++;
           if (days <= 7) {
-            _bins[period][magInt][7] ++;
+            _bins[type][magInt][7] ++;
             if (days <= 1) {
-              _bins[period][magInt][1] ++;
+              _bins[type][magInt][1] ++;
             }
           }
         }
@@ -451,17 +451,17 @@ var Earthquakes = function (options) {
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
       days = Math.floor(Moment.duration(eqMoment - _mainshockMoment).asDays());
-      _addEqToBin(days, magInt, 'First');
+      _addEqToBin(days, magInt, 'first');
 
       days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
-      _addEqToBin(days, magInt, 'Past');
+      _addEqToBin(days, magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
-      _addEqToBin(days, magInt, 'Prior');
+      _addEqToBin(days, magInt, 'prior');
     }
     // Bin eq totals by magnitude, inclusive (used internally)
-    _addEqToBin(null, magInt, 'Inclusive');
+    _addEqToBin(null, magInt, 'magInclusive');
   };
 
   /**
