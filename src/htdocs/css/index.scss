@@ -1,5 +1,7 @@
 @import '_variables.scss';
+
 @import '_editPane.scss';
+@import '_forms.scss';
 @import '_helpPane.scss';
 @import '_impactBubbles.scss';
 @import '_mapPane.scss';
@@ -165,6 +167,9 @@ tr {
     overflow: hidden;
   }
 
+  &#helpPane, &#plotsPane {
+    padding-top: 3.5em;
+  }
   &#mapPane {
     padding: 0;
   }
