@@ -317,7 +317,7 @@ var SummaryPane = function (options) {
     max = Math.max.apply(null, mags);
     min = Math.min.apply(null, mags);
 
-    html = '<h4>Filter earthquake list</h4>';
+    html = '<h4 class="filter">Filter earthquakes</h4>';
     html += '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
       max + '; --val: ' + mag + ';">';
     html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
