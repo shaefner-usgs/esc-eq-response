@@ -63,36 +63,42 @@ var SummaryPane = function (options) {
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
+   * @param bins {Object}
    */
-  _addListeners = function (el) {
+  _addListeners = function (el, bins) {
     var feature,
         i,
         input,
         j,
+        mag,
+        magValue,
+        num,
+        numValue,
         output,
         rows,
         slider,
-        span,
         table,
-        tables,
-        value;
+        tables;
 
     input = el.querySelector('.slider input');
     if (input) {
       feature = input.id;
+      mag = el.querySelector('h3 .mag');
+      num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
       slider = input.parentNode;
-      span = el.querySelector('h3 span');
       table = el.querySelector('.slider + .list');
 
       input.addEventListener('input', function() {
-        value = Number(input.value);
+        magValue = Number(input.value);
+        numValue = bins[magValue];
 
-        output.value = value;
-        slider.style.setProperty('--val', value);
-        span.innerHTML = value;
-        table.classList.add('m' + value);
-        table.classList.remove('m' + (value - 1));
+        mag.innerHTML = magValue;
+        num.innerHTML = numValue;
+        output.value = magValue;
+        slider.style.setProperty('--val', magValue);
+        table.classList.add('m' + magValue);
+        table.classList.remove('m' + (magValue - 1));
 
         _setStyleRules(this, feature);
       }, false);
@@ -415,9 +421,10 @@ var SummaryPane = function (options) {
         mag = Math.floor(Math.max(data.magThreshold,
           AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
 
-        subheader = 'M <span>' + mag + '</span>+ Earthquakes';
+        subheader = 'M <span class="mag">' + mag + '</span>+ Earthquakes';
         if (data.bins.magInclusive && data.bins.magInclusive[mag] !== 0) {
-          subheader += ' (' + data.bins.magInclusive[mag] + ')';
+          subheader += ' (<span class="num">' + data.bins.magInclusive[mag] +
+            '</span>)';
         }
         summary += '<h3>' + subheader + '</h3>';
         summary += _getSlider(id, mag, data.bins.magInclusive);
@@ -595,8 +602,8 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
-        rangeInput,
-        summary;
+        summary,
+        table;
 
     className = opts.id;
     data = opts.data;
@@ -609,14 +616,14 @@ var SummaryPane = function (options) {
       div.innerHTML = summary;
       _features.appendChild(div);
 
-      // Set initial colored section of range slider
-      rangeInput = div.querySelector('input');
-      if (rangeInput) {
-        _setStyleRules(rangeInput, className);
+      table = div.querySelector('table.list');
+      if (table) {
+        _addListeners(div, data.bins.magInclusive);
+        _initTableSort(className);
+        // Set initial colored section of range slider
+        _setStyleRules(div.querySelector('input'), className);
       }
 
-      _addListeners(div);
-      _initTableSort(className);
       _updateTimestamp();
     }
   };
