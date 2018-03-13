@@ -143,7 +143,7 @@ var Earthquakes = function (options) {
     }
 
     if (type === 'magInclusive') { // all eqs by mag, inclusive
-      for (i = magInt; i > 0; i --) {
+      for (i = magInt; i >= 0; i --) {
         if (!_bins[type][i]) {
           _bins[type][i] = 0;
         }
