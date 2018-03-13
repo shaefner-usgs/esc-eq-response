@@ -63,9 +63,10 @@ var SummaryPane = function (options) {
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
-   * @param bins {Object}
+   * @param cumulativeEqs {Array}
+   *     Array of cumulative eqs by mag
    */
-  _addListeners = function (el, bins) {
+  _addListeners = function (el, cumulativeEqs) {
     var feature,
         i,
         input,
@@ -91,7 +92,7 @@ var SummaryPane = function (options) {
 
       input.addEventListener('input', function() {
         magValue = Number(input.value);
-        numValue = bins[magValue];
+        numValue = cumulativeEqs[magValue];
 
         mag.innerHTML = magValue;
         num.innerHTML = numValue;
@@ -305,17 +306,18 @@ var SummaryPane = function (options) {
    * @param id {String}
    *     feature id
    * @param mag {Number}
-   * @param bins {Object}
+   * @param cumulativeEqs {Array}
+   *     Array of cumulative eqs by mag
    */
-  _getSlider = function (id, mag, bins) {
+  _getSlider = function (id, mag, cumulativeEqs) {
     var html,
         mags,
         max,
         min;
 
-    mags = Object.keys(bins);
+    mags = Object.keys(cumulativeEqs);
     max = Math.max.apply(null, mags);
-    min = Math.min.apply(null, mags);
+    min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
 
     html = '<h4 class="filter">Filter earthquakes</h4>';
     html += '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
