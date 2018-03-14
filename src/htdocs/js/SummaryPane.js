@@ -88,7 +88,7 @@ var SummaryPane = function (options) {
       num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
       slider = input.parentNode;
-      table = el.querySelector('.slider + .list');
+      table = el.querySelector('div.filter + .list');
 
       input.addEventListener('input', function() {
         magValue = Number(input.value);
@@ -319,12 +319,16 @@ var SummaryPane = function (options) {
     max = Math.max.apply(null, mags);
     min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
 
-    html = '<h4 class="filter">Filter earthquakes</h4>';
+    html = '<h4 class="filter">Filter earthquakes by magnitude</h4>';
+    html += '<div class="filter">';
+    html += '<div class="min">' + min + '</div>';
     html += '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
       max + '; --val: ' + mag + ';">';
     html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
       max + '" value="' + mag + '"/>';
     html += '<output for="'+ id + '">' + mag + '</output>';
+    html += '</div>';
+    html += '<div class="max">' + max + '</div>';
     html += '</div>';
 
     return html;

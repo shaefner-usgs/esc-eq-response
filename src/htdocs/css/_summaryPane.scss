@@ -10,11 +10,16 @@ $total-bg-color: #f7f7f7;
   }
 
   h4 {
-    font-size: 1em;
     margin-bottom: 0;
 
-    &.filter:after {
-      content: ':';
+    &.filter {
+      font-size: 1em;
+      margin-bottom: .5em;
+      margin-top: 1.25em;
+
+      &:after {
+        content: ':';
+      }
     }
   }
 

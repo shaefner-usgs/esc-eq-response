@@ -104,11 +104,11 @@ input[type=text], input[type=number] {
    https://css-tricks.com/sliding-nightmare-understanding-range-input/
 --------------------------------------------- */
 
-$track-w: 15em;
+$track-w: 18em;
 $track-h: .25em;
 $thumb-d: 1.1em;
 $track-c: $link-color;
-$track-bg: #ccc;
+$track-bg: #ddd;
 $dist: $track-w - $thumb-d;
 
 @mixin track($color1, $color2) {
@@ -131,6 +131,24 @@ $dist: $track-w - $thumb-d;
   width: $thumb-d;
 }
 
+div.filter {
+  align-items: center;
+  display: flex;
+  margin-bottom: .75em;
+
+  .max, .min {
+    color: #888;
+    font-size: .9em;
+    font-weight: 300;
+  }
+  .max {
+    padding-left: .75em;
+  }
+  .min {
+    padding-right: .75em;
+  }
+}
+
 [type='range'] {
   &, &::-webkit-slider-thumb {
     -webkit-appearance: none
@@ -147,10 +165,10 @@ $dist: $track-w - $thumb-d;
 
   ~ output {
     background: #fff;
-    border-radius: 3px;
-    color: #333;
+    color: #666;
     display: block;
     left: calc(.5 * $thumb-d);
+    line-height: 1;
     padding: .25em .5em;
     position: absolute;
     top: 0;
@@ -203,7 +221,7 @@ $dist: $track-w - $thumb-d;
 .slider {
   align-items: center;
   display: flex;
-  height: 5.5em;
+  height: 4.5em;
   position: relative;
   width: $track-w;
 }
