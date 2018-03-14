@@ -5,6 +5,24 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add range sliders to filter visible list of eqs on summary pane
+* Simplify instructions on edit pane
+* Only reset scroll positions for plots, summary panes when user picks new event
+* Shorten url params to make url more succinct
+* Handle status bar display in css instead of js
+* Zoom map to fully contain updated features when user changes params on edit pane
+* Bug fix: setting the initial map extent to contain features was unreliable
+* Add new property to each feature that controls whether map is zoomed on initial load
+* Bug fix: mag-time plot for aftershocks was time shifted by one event
+* Add row with total for each column to binned tables
+* Add new form.scss file for all form styles
+* Add tabindex, autocomplete, autofocus attrs
+* Visual refresh
+  - use same color purple throughout interface for interactive elements
+  - product headers are now clickable links
+  - tweak fonts / spacing / layout / colors / transparency
+  - add css transitions (fades, slides, loading 'spinner')
+  - new 2-column layout on edit pane
 * Purge plots when removing them for performance reasons
 * Throttle rapid-firing, repeating events in UI
 * Bug fix: previous feature layers sometimes left behind when updating params rapidly
