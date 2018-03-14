@@ -76,6 +76,7 @@ var SummaryPane = function (options) {
         num,
         output,
         rows,
+        scrollY,
         slider,
         table,
         tables;
@@ -91,6 +92,7 @@ var SummaryPane = function (options) {
 
       input.addEventListener('input', function() {
         magValue = Number(input.value);
+        scrollY = window.pageYOffset;
 
         mag.innerHTML = magValue;
         num.innerHTML = cumulativeEqs[magValue];
@@ -103,7 +105,8 @@ var SummaryPane = function (options) {
           table.classList.remove('m' + (j - 1));
         }
 
-        _setStyleRules(this, feature);
+        window.scroll(0, scrollY); // prevent page scrolling
+        _setStyleRules(this, feature); // update slider track
       }, false);
     }
 
