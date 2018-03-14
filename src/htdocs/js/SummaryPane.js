@@ -74,7 +74,6 @@ var SummaryPane = function (options) {
         mag,
         magValue,
         num,
-        numValue,
         output,
         rows,
         slider,
@@ -92,14 +91,17 @@ var SummaryPane = function (options) {
 
       input.addEventListener('input', function() {
         magValue = Number(input.value);
-        numValue = cumulativeEqs[magValue];
 
         mag.innerHTML = magValue;
-        num.innerHTML = numValue;
+        num.innerHTML = cumulativeEqs[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
-        table.classList.add('m' + magValue);
-        table.classList.remove('m' + (magValue - 1));
+        for (i = magValue; i <= input.getAttribute('max'); i ++) {
+          table.classList.add('m' + i);
+        }
+        for (j = magValue; j >= input.getAttribute('min'); j --) {
+          table.classList.remove('m' + (j - 1));
+        }
 
         _setStyleRules(this, feature);
       }, false);
