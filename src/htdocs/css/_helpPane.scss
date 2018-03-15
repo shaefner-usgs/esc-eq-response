@@ -47,6 +47,17 @@
     padding: 0;
   }
 
+  .content {
+    div {
+      padding-right: 1em;
+    }
+
+    &:first-child {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
   .eventid {
     max-height: 36px;
     max-width: 90%;
