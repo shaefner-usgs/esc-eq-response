@@ -29,6 +29,12 @@ var HelpPane = function (options) {
 
     var line = _Svg.getLine();
     legend.appendChild(line);
+
+    var triangle = _Svg.getTriangle();
+    legend.appendChild(triangle);
+
+    var beachball = _Svg.getBeachBall();
+    legend.appendChild(beachball);
   };
 
 
