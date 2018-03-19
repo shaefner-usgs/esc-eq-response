@@ -8,9 +8,12 @@ var HelpPane = function (options) {
   var _this,
       _initialize,
 
+      _el,
+      _legend,
+
       _Svg,
 
-      _el;
+      _addSvgElements;
 
 
   _this = {};
@@ -21,20 +24,57 @@ var HelpPane = function (options) {
     _Svg = Svg();
 
     _el = options.el || document.createElement('div');
+    _legend = _el.querySelector('.legend');
 
-    var legend = _el.querySelector('.legend');
+    _addSvgElements();
+  };
 
-    var circle = _Svg.getCircle();
-    legend.appendChild(circle);
+  /**
+   * Add SVG elements to legend html
+   */
+  _addSvgElements = function () {
+    var circles,
+        line,
+        svg,
+        triangle;
 
-    var line = _Svg.getLine();
-    legend.appendChild(line);
+    circles = {
+      asDay: {
+        fillColor: '#f90'
+      },
+      asHour: {
+        fillColor: '#f00'
+      },
+      asOlder: {
+        fillColor: '#ffb'
+      },
+      asWeek: {
+        fillColor: '#ff0'
+      },
+      foreshocks: {
+        fillColor: '#99a'
+      },
+      historical: {
+        fillColor: '#dde'
+      },
+      mainshock: {
+        fillColor: '#00f'
+      },
+    };
 
-    var triangle = _Svg.getTriangle();
-    legend.appendChild(triangle);
+    Object.keys(circles).forEach(function(key) {
+      svg = _Svg.getCircle(circles[key]);
+      _legend.querySelector('.' + key).appendChild(svg);
+    });
 
-    var beachball = _Svg.getBeachBall();
-    legend.appendChild(beachball);
+    line = _Svg.getLine({
+      color: '#c00',
+      opacity: '0.5'
+    });
+    _legend.querySelector('.faults').appendChild(line);
+
+    triangle = _Svg.getTriangle();
+    _legend.querySelector('.shakemap').appendChild(triangle);
   };
 
 
