@@ -35,6 +35,7 @@ var HelpPane = function (options) {
   _addSvgElements = function () {
     var circles,
         line,
+        range,
         svg,
         triangle;
 
@@ -72,6 +73,9 @@ var HelpPane = function (options) {
       opacity: '0.5'
     });
     _legend.querySelector('.faults').appendChild(line);
+
+    range = _Svg.getCircleRange();
+    _legend.querySelector('.magnitude').appendChild(range);
 
     triangle = _Svg.getTriangle();
     _legend.querySelector('.shakemap').appendChild(triangle);

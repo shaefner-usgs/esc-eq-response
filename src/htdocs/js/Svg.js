@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
+var AppUtil = require('AppUtil'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _SVG_DEFAULTS;
@@ -112,9 +113,49 @@ var Svg = function (options) {
     return svg;
   };
 
+  /**
+   * Expose SVG circle generator as a public method
+   *
+   * @param opts {Object}
+   *
+   * @return svg {Element}
+   */
   _this.getCircle = function (opts) {
     return _getCircle(opts);
   };
+
+  /**
+   * Create a range of SVG circles
+   *
+   * @param opts {Object}
+   *
+   * @return ol {Element}
+   */
+   _this.getCircleRange = function (opts) {
+      var circle,
+          i,
+          li,
+          max,
+          min,
+          ol;
+
+      opts = opts || {};
+      max = opts.max || 7;
+      min = opts.min || 0;
+      ol = document.createElement('ol');
+      ol.classList.add('mags');
+
+      for (i = min; i <= max; i ++) {
+        li = document.createElement('li');
+        circle = _getCircle({
+          radius: AppUtil.getRadius(i)
+        });
+        li.appendChild(circle);
+        ol.appendChild(li);
+      }
+
+      return ol;
+   };
 
   /**
    * Create an SVG line segment
