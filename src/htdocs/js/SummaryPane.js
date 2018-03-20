@@ -313,6 +313,8 @@ var SummaryPane = function (options) {
    * @param mag {Number}
    * @param cumulativeEqs {Array}
    *     Array of cumulative eqs by mag
+   *
+   * @return html {String}
    */
   _getSlider = function (id, mag, cumulativeEqs) {
     var html,
@@ -421,6 +423,14 @@ var SummaryPane = function (options) {
     if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
       count = Object.keys(opts.data.list).length;
       if (count > 0) {
+        mag = Math.floor(Math.max(data.magThreshold,
+          AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
+
+        // Check if there's eq data for mag threshold; if not, decr mag by 1
+        while (!data.bins.magInclusive[mag]) {
+          mag --;
+        }
+
         if (id === 'aftershocks') {
           summary += '<div class="bins">';
           summary += _getBinnedTable(data.bins, 'first');
@@ -437,17 +447,12 @@ var SummaryPane = function (options) {
           summary += _getBinnedTable(data.bins, 'prior');
         }
 
-        mag = Math.floor(Math.max(data.magThreshold,
-          AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
-
         subheader = 'M <span class="mag">' + mag + '</span>+ Earthquakes';
-        if (data.bins.magInclusive && data.bins.magInclusive[mag] !== 0) {
-          subheader += ' (<span class="num">' + data.bins.magInclusive[mag] +
-            '</span>)';
-        }
+        subheader += ' (<span class="num">' + data.bins.magInclusive[mag] +
+          '</span>)';
         summary += '<h3>' + subheader + '</h3>';
         summary += _getSlider(id, mag, data.bins.magInclusive);
-        summary += _getListTable(data.list, data.magThreshold);
+        summary += _getListTable(data.list, mag);
       }
     }
 
@@ -486,10 +491,12 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get percentage value for colored section of input range slider
+   * Get CSS value (percentage) for colored section of input range slider
    *
    * @param el {Element}
    * @param p {Number}
+   *
+   * @return value {String}
    */
   _getValue = function (el, p) {
     var min,
