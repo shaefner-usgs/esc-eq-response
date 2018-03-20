@@ -306,7 +306,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get html for input range slider
+   * Get html for input range slider when there's at least two mag bins w/ eqs
    *
    * @param id {String}
    *     feature id
@@ -318,23 +318,31 @@ var SummaryPane = function (options) {
     var html,
         mags,
         max,
-        min;
+        min,
+        singleMagBin;
 
-    mags = Object.keys(cumulativeEqs);
-    max = Math.max.apply(null, mags);
-    min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
+    html = '';
+    singleMagBin = cumulativeEqs.every(function(value, i, array) {
+      return array[0] === value;
+    });
 
-    html = '<h4 class="filter">Filter earthquakes by magnitude</h4>';
-    html += '<div class="filter">';
-    html += '<div class="min">' + min + '</div>';
-    html += '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
-      max + '; --val: ' + mag + ';">';
-    html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
-      max + '" value="' + mag + '"/>';
-    html += '<output for="'+ id + '">' + mag + '</output>';
-    html += '</div>';
-    html += '<div class="max">' + max + '</div>';
-    html += '</div>';
+    if (!singleMagBin) {
+      mags = Object.keys(cumulativeEqs);
+      max = Math.max.apply(null, mags);
+      min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
+
+      html += '<h4 class="filter">Filter earthquakes by magnitude</h4>';
+      html += '<div class="filter">';
+      html += '<div class="min">' + min + '</div>';
+      html += '<div class="inverted slider" style="--min: ' + min +
+        '; --max: ' + max + '; --val: ' + mag + ';">';
+      html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
+        max + '" value="' + mag + '"/>';
+      html += '<output for="'+ id + '">' + mag + '</output>';
+      html += '</div>';
+      html += '<div class="max">' + max + '</div>';
+      html += '</div>';
+    }
 
     return html;
   };
@@ -613,6 +621,7 @@ var SummaryPane = function (options) {
     var className,
         data,
         div,
+        input,
         summary,
         table;
 
@@ -629,10 +638,13 @@ var SummaryPane = function (options) {
 
       table = div.querySelector('table.list');
       if (table) {
+        input = div.querySelector('input');
         _addListeners(div, data.bins.magInclusive);
         _initTableSort(className);
         // Set initial colored section of range slider
-        _setStyleRules(div.querySelector('input'), className);
+        if (input) {
+          _setStyleRules(input, className);
+        }
       }
 
       _updateTimestamp();
