@@ -3,6 +3,7 @@
 
 var EditPane = require('EditPane'),
     Features = require('Features'),
+    HelpPane = require('HelpPane'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
@@ -16,6 +17,7 @@ var EditPane = require('EditPane'),
  * @param options {Object}
  *   {
  *     editPane: {ELement},
+ *     helpPane: {ELement},
  *     mapPane: {Element},
  *     navBar: {Element},
  *     plotsPane: {Element},
@@ -29,6 +31,7 @@ var Application = function (options) {
 
       _EditPane,
       _Features,
+      _HelpPane,
       _MapPane,
       _NavBar,
       _PlotsPane,
@@ -43,7 +46,10 @@ var Application = function (options) {
   _initialize = function (options) {
     _redirect();
 
-    // Instantiate map / plots / summary panes & navigation / status bar
+    // Instantiate help / map / plots / summary panes & status / navigation bars
+    _HelpPane = HelpPane({
+      el: options.helpPane
+    });
     _MapPane = MapPane({
       el: options.mapPane
     });

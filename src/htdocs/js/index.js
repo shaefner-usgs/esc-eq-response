@@ -7,6 +7,7 @@ var Application = require('Application');
 
 Application({
   editPane: document.getElementById('editPane'),
+  helpPane: document.getElementById('helpPane'),
   mapPane: document.getElementById('mapPane'),
   navBar: document.getElementById('navBar'),
   plotsPane: document.getElementById('plotsPane'),

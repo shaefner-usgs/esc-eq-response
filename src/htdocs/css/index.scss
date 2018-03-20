@@ -55,7 +55,6 @@ h1 {
 }
 h2 {
   font-size: 2rem;
-  margin-top: 0;
 }
 h3 {
   font-size: 1.5rem;
@@ -167,9 +166,6 @@ tr {
     overflow: hidden;
   }
 
-  &#helpPane, &#plotsPane {
-    padding-top: 3.5em;
-  }
   &#mapPane {
     padding: 0;
   }

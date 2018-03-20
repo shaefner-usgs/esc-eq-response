@@ -482,7 +482,7 @@ var Earthquakes = function (options) {
 
     age = _getAge(props.time);
     fillColor = _COLORS[age];
-    radius = 3 * parseInt(Math.pow(10, (0.11 * props.mag)), 10);
+    radius = AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
     _markerOptions.pane = _id;
