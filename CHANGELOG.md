@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add legend to help pane
 * Add range sliders to filter visible list of eqs on summary pane
 * Simplify instructions on edit pane
 * Only reset scroll positions for plots, summary panes when user picks new event
