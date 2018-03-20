@@ -38,6 +38,17 @@ AppUtil.getParams = function () {
 };
 
 /**
+ * Get eq circle marker radius for a given magnitude
+ *
+ * @param mag {Number}
+ *
+ * @return {Number}
+ */
+AppUtil.getRadius = function (mag) {
+  return 3 * parseInt(Math.pow(10, (0.11 * mag)), 10);
+};
+
+/**
  * Lookup table for url param from feature id
  *
  * @param key {String}
