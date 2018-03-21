@@ -6,7 +6,8 @@
   }
 
   .column {
-    padding-right: 2em;
+    min-width: 25em;
+    padding-right: 3em;
 
     &:last-child {
       padding: 0;
@@ -43,7 +44,7 @@
       position: relative;
 
       &:before {
-        background: #4dad3d;
+        background: #666;
         border-radius: 50%;
         color: #fff;
         content: counter(item);
@@ -67,16 +68,24 @@
   }
 
   .instructions {
+    flex: 2 0 50%;
+
     h3 {
       font-size: 1.25em;
       line-height: 1.4;
       margin: 0;
     }
+
+    .iconlist > li:before {
+      background: #4dad3d;
+    }
   }
 
   .legend {
+    flex: 0 0 20%;
     font-family: $font-family-headers;
-    max-width: 17em;
+    min-width: 18em;
+    max-width: 25em;
 
     h2 + ul > li {
       border-top: 1px solid #f6f6f6;
@@ -132,5 +141,13 @@
   .navbutton {
     font-style: normal;
     text-transform: uppercase;
+  }
+
+  .tips {
+    flex: 1 0 30%;
+
+    .iconlist > li:before {
+      background: #4a8def;
+    }
   }
 }
