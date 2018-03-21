@@ -82,10 +82,10 @@
   }
 
   .legend {
-    flex: 0 0 20%;
+    flex: 1 0 20%;
     font-family: $font-family-headers;
+    max-width: 22em;
     min-width: 18em;
-    max-width: 25em;
 
     h2 + ul > li {
       border-top: 1px solid #f6f6f6;
