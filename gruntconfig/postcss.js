@@ -3,6 +3,7 @@
 var autoprefixer = require('autoprefixer'),
     cssnano = require('cssnano'),
     calc = require('postcss-calc'),
+    colorFunction = require('postcss-color-function'),
     postcssImport = require('postcss-import'),
     postcssVar = require('postcss-advanced-variables'),
     precss = require('precss');
@@ -23,6 +24,7 @@ var postcss = {
         postcssVar(),
         precss(),
         calc(),
+        colorFunction(),
         autoprefixer({'browsers': 'last 3 versions'})
       ]
     },
