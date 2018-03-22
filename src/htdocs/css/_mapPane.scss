@@ -79,11 +79,6 @@
   display: none;
 }
 
-/* Make font-size a bit smaller for tooltips */
-.leaflet-tooltip {
-  font-size: .9em;
-}
-
 /* Push top controls down to accommodate toolbar */
 .leaflet-top .leaflet-control {
   margin-top: 50px;
