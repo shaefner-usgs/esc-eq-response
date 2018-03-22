@@ -205,7 +205,7 @@ $total-bg-color: #f7f7f7;
     tr:hover:not(.no-sort), .selected {
       color: $link-color;
       cursor: pointer;
-      background: rgba(225, 220, 242, 0.2);
+      background: color($link-color alpha(3%));
       transition-duration: 0s;
     }
   }
