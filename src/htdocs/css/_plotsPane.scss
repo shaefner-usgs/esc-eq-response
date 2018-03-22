@@ -45,6 +45,26 @@
 
   .js-plotly-plot {
     width: 100%;
+
+    /* Color plotly buttons, title tips using link-color */
+    .modebar-btn path {
+      fill: $link-color;
+      opacity: 0.4;
+    }
+
+    .modebar-btn.active path,
+    .modebar-btn:hover path {
+      opacity: 1;
+    }
+
+    .plotly [data-title]:after {
+      background: color($link-color alpha(8%));
+      color: $link-color;
+    }
+
+    .plotly [data-title]:before {
+      border-color: transparent transparent color($link-color alpha(8%));
+    }
   }
 
   /* hide some of the Plotly.js controls */
