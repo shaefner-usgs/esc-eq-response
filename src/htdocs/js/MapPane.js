@@ -147,12 +147,12 @@ var MapPane = function (options) {
 
     layers = {};
     layers.baseLayers = {
+      'Greyscale': greyscale,
       'Terrain': terrain,
       'Satellite': satellite,
-      'Greyscale': greyscale,
       'Dark': dark
     };
-    layers.defaults = [terrain, faults];
+    layers.defaults = [greyscale, faults];
     layers.overlays = {
       'Faults': faults
     };
