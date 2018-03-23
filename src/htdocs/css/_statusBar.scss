@@ -4,7 +4,7 @@
   left: 0;
   position: fixed;
   width: 100%;
-  z-index: 10000;
+  z-index: 1000;
 
   p {
     background-color: rgba(255, 255, 120, 0.95);
@@ -21,6 +21,7 @@
     position: absolute;
     width: 100%;
 
+    /* Loading animation */
     span {
       animation: loading 1s infinite;
       display: inline-block;
