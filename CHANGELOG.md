@@ -5,7 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Switch default layer to greyscale so features are more visible
 * Bug fix: reset <title> when user clicks 'reset' button
+* Display loading feature status above rendering status
 * Add legend/tips to help pane
 * Add range sliders to filter visible list of eqs on summary pane
 * Simplify instructions on edit pane
