@@ -48,6 +48,7 @@ var EditPane = function (options) {
       _refreshEqs,
       _resetApp,
       _resetForm,
+      _resetTitle,
       _selSignificantEq,
       _setFormFields,
       _setQueryString,
@@ -299,6 +300,7 @@ var EditPane = function (options) {
     _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
 
     _hideMainshock();
+    _resetTitle();
     _StatusBar.reset();
     _Features.removeFeatures();
     _MapPane.reset();
@@ -316,6 +318,20 @@ var EditPane = function (options) {
     setTimeout(function () {
       _setQueryString();
     }, 10);
+  };
+
+  /**
+   * Reset page title to default and return it
+   *
+   * @return title {String}
+   */
+  _resetTitle = function () {
+    var title;
+
+    title = document.title.split('|')[1] || document.title.split('|')[0];
+    document.title = title;
+
+    return title;
   };
 
   /**
@@ -414,7 +430,7 @@ var EditPane = function (options) {
     var appTitle,
         details;
 
-    appTitle = document.title.split('|')[1] || document.title.split('|')[0];
+    appTitle = _resetTitle();
     details = _el.querySelector('.details');
 
     details.innerHTML = html;

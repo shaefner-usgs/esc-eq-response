@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: reset <title> when user clicks 'reset' button
 * Add legend/tips to help pane
 * Add range sliders to filter visible list of eqs on summary pane
 * Simplify instructions on edit pane
