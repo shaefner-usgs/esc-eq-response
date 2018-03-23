@@ -83,20 +83,26 @@ var StatusBar = function (options) {
    * @param name {String}
    */
   _this.addItem = function (className, name) {
-    var item;
+    var animEllipsis,
+        item,
+        refNode;
+
+    animEllipsis = '<span>.</span><span>.</span><span>.</span>';
+    item = document.createElement('p');
+    item.classList.add(className);
 
     _this.removeError(className); // remove any leftover errors for this feature
     _showStatusBar();
 
-    if (name) {
-      name = ' ' + name;
+    // Insert loading feature msgs 'above' rendering msgs
+    if (name) { // loading named feature
+      item.innerHTML = 'Loading ' + name + animEllipsis;
+      refNode = _el.querySelector('.rendering');
+      _el.insertBefore(item, refNode);
+    } else { // assume rendering since no name present
+      item.innerHTML = 'Loading' + animEllipsis;
+      _el.appendChild(item);
     }
-
-    item = document.createElement('p');
-    item.classList.add(className);
-    item.innerHTML = 'Loading' + name + '<span>.</span><span>.</span><span>.</span>';
-
-    _el.appendChild(item);
   };
 
   /**
