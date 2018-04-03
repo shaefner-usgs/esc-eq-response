@@ -45,7 +45,9 @@ AppUtil.getParams = function () {
  * @return {Number}
  */
 AppUtil.getRadius = function (mag) {
-  return 3 * parseInt(Math.pow(10, (0.11 * mag)), 10);
+  var radius = 2 * Math.pow(10, (0.15 * mag));
+
+  return Math.round(radius * 10) / 10; // round to 1 decimal place
 };
 
 /**

@@ -17,7 +17,11 @@ _SVG_DEFAULTS = {
   width: 20
 };
 
-
+/**
+ * Creates <svg> elements
+ *
+ * @param options {Object}
+ */
 var Svg = function (options) {
   var _this,
       _initialize,
@@ -39,17 +43,20 @@ var Svg = function (options) {
    * @return svg {Element}
    */
   _getCircle = function (opts) {
-    var svg,
+    var elemSize,
+        svg,
         svgOpts;
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
 
+    elemSize = Math.ceil(svgOpts.radius * 2 + 2);
+
     svg.innerHTML = [
       '<circle cx="',
-      svgOpts.radius + 1,
+      elemSize / 2,
       '" cy="',
-      svgOpts.radius + 1,
+      elemSize / 2,
       '" r="',
       svgOpts.radius,
       '" stroke="',
@@ -63,8 +70,8 @@ var Svg = function (options) {
       '" />'
     ].join('');
 
-    svg.setAttribute('height', svgOpts.radius * 2 + 2);
-    svg.setAttribute('width', svgOpts.radius * 2 + 2);
+    svg.setAttribute('height', elemSize);
+    svg.setAttribute('width', elemSize);
 
     return svg;
   };
