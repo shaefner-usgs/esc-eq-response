@@ -71,7 +71,7 @@ var PlotsPane = function (options) {
       plotid = points.data.plotid;
 
       // First point (at index 0) on cumulative aftershocks curve is mainshock
-      if (index === 0 && plotid === 'cumulative') {
+      if (index === 0 && plotid === 'cumulative' && feature === 'aftershocks') {
         feature = 'mainshock';
       }
 
