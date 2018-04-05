@@ -179,7 +179,7 @@ var Svg = function (options) {
     svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
 
     svg.innerHTML = [
-      '<path fill="#fff" stroke-width="1" stroke-linecap="round" stroke="',
+      '<path fill="#fff" stroke-width="2" stroke-linecap="round" stroke="',
       svgOpts.color,
       '" stroke-opacity="',
       svgOpts.opacity,
@@ -208,7 +208,7 @@ var Svg = function (options) {
     svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
 
     svg.innerHTML = [
-      '<polygon points="15,1.9 2.1,24.3 27.9,24.3" stroke-width="1" stroke="',
+      '<polygon points="10,3 19,18 1,18" stroke-width="1" stroke="',
       svgOpts.color,
       '" stroke-opacity="',
       svgOpts.opacity,
@@ -220,7 +220,7 @@ var Svg = function (options) {
     ].join('');
 
     svg.setAttribute('height', svgOpts.height);
-    svg.setAttribute('viewBox', '0 0 29 29');
+    svg.setAttribute('viewBox', '0 0 20 20');
     svg.setAttribute('width', svgOpts.width);
 
     return svg;
