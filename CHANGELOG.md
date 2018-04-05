@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: only apply index shift on aftershocks plot, not historical
+* Tweak eq-mag radius calculation for more variability
 * Switch default layer to greyscale so features are more visible
 * Bug fix: reset <title> when user clicks 'reset' button
 * Display loading feature status above rendering status
