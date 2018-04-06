@@ -360,11 +360,12 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
-    var name,
-        msg,
+    var errorMsg,
+        name,
         statusBarId;
 
     name = opts.name;
+    errorMsg = 'Error Loading ' + name;
     statusBarId = _getStatusBarId(name);
 
     // Alert user that feature is loading
@@ -388,23 +389,31 @@ var Features = function (options) {
         });
       },
       error: function (status, xhr) {
-        console.error(xhr.responseText);
-
-        msg = 'Error Loading ' + name;
+        if (xhr.responseText) {
+          console.error(xhr.responseText);
+        }
 
         // Add additional info to error message
         if (status === 404 && name === 'Mainshock') {
-          msg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
+          errorMsg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
         }
         else if (xhr.responseText.match('limit of 20000')) {
-          msg += ' <strong>Modify the parameters to match fewer earthquakes' +
+          errorMsg += ' <strong>Modify the parameters to match fewer earthquakes' +
             ' (max 20,000)</strong>';
         }
         else if (xhr.responseText.match('parameter combination')){
-          msg += ' <strong>Missing required parameters</strong>';
+          errorMsg += ' <strong>Missing required parameters</strong>';
         }
 
-        _StatusBar.addError(statusBarId, msg);
+        _StatusBar.addError(statusBarId, errorMsg);
+        _this.isRefreshing = false;
+      },
+      ontimeout: function (xhr) {
+        console.error(xhr);
+
+        errorMsg += '<strong>Request timed out</strong>';
+
+        _StatusBar.addError(statusBarId, errorMsg);
         _this.isRefreshing = false;
       }
     });

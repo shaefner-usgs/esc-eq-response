@@ -41,11 +41,13 @@ var SignificantEqs = function (options) {
    * Load GeoJson feed for significant eqs and return via _callback()
    */
   _loadFeed = function () {
-    var url;
+    var errorMsg,
+        url;
 
     // Alert user that feed is loading
     _StatusBar.addItem('significant', 'Significant Earthquakes');
 
+    errorMsg = 'Error Loading Significant Earthquakes';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 
     Xhr.ajax({
@@ -56,9 +58,17 @@ var SignificantEqs = function (options) {
         _StatusBar.removeItem('significant');
       },
       error: function (status, xhr) {
-        console.error(xhr.responseText);
+        if (xhr.responseText) {
+          console.error(xhr.responseText);
+        }
 
-        _StatusBar.addError('significant', 'Error Loading Significant Earthquakes');
+        _StatusBar.addError('significant', errorMsg);
+      },
+      ontimeout: function (xhr) {
+        console.error(xhr);
+
+        errorMsg += '<strong>Request timed out</strong>';
+        _StatusBar.addError('significant', errorMsg);
       }
     });
   };
