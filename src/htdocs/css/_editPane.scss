@@ -88,7 +88,7 @@ $reset-button-color: #efefef;
 
     &.hide {
       max-height: 0;
-      transition-duration: .1s;
+      transition: max-height .35s cubic-bezier(0, 1.05, 0, 1);
     }
   }
 
