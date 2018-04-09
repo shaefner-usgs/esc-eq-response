@@ -46,8 +46,8 @@ var Canvas = function (options) {
       _canvas = document.createElement('canvas');
       _canvas.width = options.width * scale;
       _canvas.height = options.height * scale;
-      _canvas.style.width = options.width + 'px';
-      _canvas.style.height = options.height + 'px';
+      //_canvas.style.width = options.width + 'px';
+      //_canvas.style.height = options.height + 'px';
 
       if (options.className) {
         _canvas.classList.add(options.className);

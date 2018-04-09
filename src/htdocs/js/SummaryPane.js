@@ -400,18 +400,18 @@ var SummaryPane = function (options) {
       summary += data.detailsHtml;
 
       // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism hide">' +
+      summary += '<div class="focal-mechanism hide scale">' +
         '<a href="' + url + '#focal-mechanism"><h4></h4></a></div>';
-      summary += '<div class="moment-tensor hide">' +
+      summary += '<div class="moment-tensor hide scale">' +
         '<a href="' + url + '#moment-tensor"><h4></h4></a></div>';
 
       // Add dyfi/sm thumbnails
       if (data.dyfi) {
-        summary += '<div class="dyfi"><a href="' + url + '#dyfi">' +
+        summary += '<div class="dyfi scale"><a href="' + url + '#dyfi">' +
         '<h4>Did You Feel It?</h4><img src="' + data.dyfi + '" /></a></div>';
       }
       if (data.shakemap) {
-        summary += '<div class="shakemap"><a href="' + url + '#shakemap">' +
+        summary += '<div class="shakemap scale"><a href="' + url + '#shakemap">' +
         '<h4>ShakeMap</h4><img src="' + data.shakemap + '" /></a></div>';
       }
 
