@@ -6,11 +6,10 @@
   }
 
   .column {
-    min-width: 25em;
-    padding-right: 3em;
+    padding-right: 2em;
 
     &:last-child {
-      padding: 0;
+      padding-right: 1em;
     }
   }
 
