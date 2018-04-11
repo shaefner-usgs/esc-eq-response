@@ -7,6 +7,9 @@
 }
 
 #mapPane {
+  canvas {
+    width: 40px;
+  }
   /* hide 'placeholder' moment tensor / focal mech. beachballs */
   > canvas {
     display: none;
