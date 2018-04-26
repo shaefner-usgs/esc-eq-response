@@ -1,4 +1,4 @@
-$background-color: rgba(229, 226, 238, 0.95);
+$background-color: hsla(262, 46%, 95%, .96);
 
 #navBar {
   background-color: $background-color;
@@ -22,15 +22,13 @@ $background-color: rgba(229, 226, 238, 0.95);
     transition: all .25s ease-out;
 
     &:hover {
-      background-color: color($background-color lightness(94%));
+      background-color: color($background-color lightness(92%));
+      color: color($link-color whiteness(25%));
     }
     &.selected {
       background-color: $link-color;
       color: #fff;
       text-shadow: 1px 1px 3px #444;
-    }
-    &.selected:hover {
-      background-color: color($link-color tint(8%));
     }
   }
   li {
