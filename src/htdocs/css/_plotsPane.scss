@@ -87,6 +87,6 @@
   }
 
   .xtitle, .ytitle {
-    font-weight: 500 !important;
+    font-weight: 500 !important; /* match weight of 3d plots, which can't be changed */
   }
 }
