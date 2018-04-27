@@ -213,9 +213,9 @@ var PlotsPane = function (options) {
         spikecolor,
         titlefont;
 
-    spikecolor = '#999';
+    spikecolor = '#7234dc';
     titlefont = {
-      color: 'rgb(0, 0, 0)'
+      color: '#555'
     };
 
     layout = {
@@ -452,7 +452,7 @@ var PlotsPane = function (options) {
         size: data.size,
         sizeref: sizeref
       };
-    } else { // lines+markers
+    } else { // lines+markers (cumulative plots)
       trace.line = {
         color: 'rgb(120, 186, 232)',
         width: 2
