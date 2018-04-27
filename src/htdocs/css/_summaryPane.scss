@@ -90,12 +90,12 @@ $total-bg-color: #f7f7f7;
       padding-right: .25em;
 
       &.period {
-        border-bottom: 1px solid #ececec;
+        border-bottom: 1px solid $tr-border-color;
         font-weight: 400;
         text-align: right;
       }
       &.rowlabel {
-        border-bottom: 1px solid #ececec;
+        border-bottom: 1px solid $tr-border-color;
         border-right: 1px solid $th-border-color;
         padding-right: 1em;
         text-align: center;
