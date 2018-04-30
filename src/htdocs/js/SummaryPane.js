@@ -408,11 +408,13 @@ var SummaryPane = function (options) {
       // Add dyfi/sm thumbnails
       if (data.dyfi) {
         summary += '<div class="dyfi scale"><a href="' + url + '#dyfi">' +
-        '<h4>Did You Feel It?</h4><img src="' + data.dyfi + '" /></a></div>';
+          '<h4>Did You Feel It?</h4><img src="' + data.dyfi.url + '" class="mmi' +
+          data.dyfi.cdi + '" /></a></div>';
       }
       if (data.shakemap) {
         summary += '<div class="shakemap scale"><a href="' + url + '#shakemap">' +
-        '<h4>ShakeMap</h4><img src="' + data.shakemap + '" /></a></div>';
+          '<h4>ShakeMap</h4><img src="' + data.shakemap.url + '" class="mmi' +
+          data.shakemap.mmi + '" /></a></div>';
       }
 
       summary += '</div>';

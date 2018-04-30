@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -83,10 +84,16 @@ var Mainshock = function (options) {
     products = _mainshockJson.properties.products;
 
     if (products.dyfi) {
-      dyfi = products.dyfi[0].contents[eqid + '_ciim_geo.jpg'].url;
+      dyfi = {
+        cdi: AppUtil.romanize(_mainshockJson.properties.cdi),
+        url: products.dyfi[0].contents[eqid + '_ciim_geo.jpg'].url
+      };
     }
     if (products.shakemap) {
-      shakemap = products.shakemap[0].contents['download/tvmap.jpg'].url;
+      shakemap = {
+        mmi: AppUtil.romanize(_mainshockJson.properties.mmi),
+        url: products.shakemap[0].contents['download/tvmap.jpg'].url
+      };
     }
 
     return {
