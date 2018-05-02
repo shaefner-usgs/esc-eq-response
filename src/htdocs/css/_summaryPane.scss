@@ -209,6 +209,43 @@ $total-bg-color: #f7f7f7;
     }
   }
 
+  .mmiI {
+    border-color: $mmiI-color !important;
+  }
+  .mmiII {
+    border-color: $mmiII-color !important;
+  }
+  .mmiIII {
+    border-color: $mmiIII-color !important;
+  }
+  .mmiIV {
+    border-color: $mmiIV-color !important;
+  }
+  .mmiV {
+    border-color: $mmiV-color !important;
+  }
+  .mmiVI {
+    border-color: $mmiVI-color !important;
+  }
+  .mmiVII {
+    border-color: $mmiVII-color !important;
+  }
+  .mmiVIII {
+    border-color: $mmiVIII-color !important;
+  }
+  .mmiIX {
+    border-color: $mmiIX-color !important;
+  }
+  .mmiX {
+    border-color: $mmiX-color !important;
+  }
+  .mmiXI {
+    border-color: $mmiXI-color !important;
+  }
+  .mmiXII {
+    border-color: $mmiXII-color !important;
+  }
+
   .products {
     display: flex;
     flex-wrap: wrap;
@@ -219,8 +256,10 @@ $total-bg-color: #f7f7f7;
       text-align: center;
     }
 
-    .dyfi img {
-      margin-top: -3px;
+    .dyfi img, .shakemap img {
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      padding: 2px;
     }
 
     .earthquake {
