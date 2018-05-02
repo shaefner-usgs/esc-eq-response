@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add intensity border to sm, dyfi thumbs on summary pane
 * Mobile css optimizations
 * Alert user via status bar when network requests time out
 * Bug fix: only apply index shift on aftershocks plot, not historical
