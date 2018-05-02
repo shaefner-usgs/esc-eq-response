@@ -69,7 +69,8 @@ var SignificantEqs = function (options) {
 
         errorMsg += '<strong>Request timed out</strong>';
         _StatusBar.addError('significant', errorMsg);
-      }
+      },
+      timeout: 8000
     });
   };
 
