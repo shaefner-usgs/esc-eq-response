@@ -80,15 +80,20 @@ table {
   }
 }
 
-td {
-  padding: .4em 1em;
+td, th {
+  padding: .4em .8em;
+
+  &:first-child {
+    padding-left: 5px;
+  }
+  &:last-child:not(.total) {
+    padding-right: 5px;
+  }
 }
 
 th {
   border-bottom: 1px solid $th-border-color;
-  color: #333;
   font: 600 .95rem $font-family-headers;
-  padding: .25em .5em;
   text-align: center;
   text-transform: uppercase;
 }

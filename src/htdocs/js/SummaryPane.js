@@ -216,10 +216,10 @@ var SummaryPane = function (options) {
       });
 
       // Add total for each column as last row
-      html += '<tr class="totals">' +
+      html += '<tr>' +
         '<th class="rowlabel">Total</th>';
 
-      for (row=0; row < bins[type].length; ++row) { // get column indices
+      for (row = 0; row < bins[type].length; ++row) { // get column indices
         if (typeof bins[type][row] !== 'undefined') {
           break;
         }
@@ -228,7 +228,7 @@ var SummaryPane = function (options) {
         totalAll = 0;
         bins[type][row].forEach(function(cols, index) {
           total = 0;
-          for (irow=0; irow < bins[type].length; ++irow) {
+          for (irow = 0; irow < bins[type].length; ++irow) {
             if (typeof bins[type][irow] !== 'undefined') {
               if (index === 0) { // row total (last column)
                 totalAll += bins[type][irow][index];
@@ -238,10 +238,10 @@ var SummaryPane = function (options) {
             }
           }
           if (index > 0) {
-            html += '<td>' + total + '</td>';
+            html += '<td class="total">' + total + '</td>';
           }
         });
-        html += '<td>' + totalAll + '</td>';
+        html += '<td class="total">' + totalAll + '</td>';
         html += '</tr>';
       }
       html += '</table>';

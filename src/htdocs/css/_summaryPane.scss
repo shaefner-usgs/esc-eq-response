@@ -75,6 +75,10 @@ $total-bg-color: #f7f7f7;
   }
 
   .bin {
+    td, th {
+      padding-left: .5em;
+      padding-right: .5em;
+    }
     td {
       &:not(:first-child) {
         text-align: right;
@@ -86,9 +90,6 @@ $total-bg-color: #f7f7f7;
     }
 
     th {
-      padding-left: .25em;
-      padding-right: .25em;
-
       &.period {
         border-bottom: 1px solid $tr-border-color;
         font-weight: 400;
@@ -99,12 +100,6 @@ $total-bg-color: #f7f7f7;
         border-right: 1px solid $th-border-color;
         padding-right: 1em;
         text-align: center;
-      }
-    }
-
-    tr {
-      &.totals td {
-        background-color: $total-bg-color;
       }
     }
   }
@@ -166,6 +161,8 @@ $total-bg-color: #f7f7f7;
     }
 
     th {
+      position: relative;
+
       &.sort-header {
         cursor: pointer;
         white-space: nowrap;
@@ -176,7 +173,8 @@ $total-bg-color: #f7f7f7;
           border-width: 0 4px 4px;
           content: '';
           display: inline-block;
-          margin: 4px 0 4px 2px;
+          margin: 8px 0 4px 2px;
+          position: absolute;
           visibility: hidden;
         }
         &:hover {

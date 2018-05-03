@@ -176,14 +176,16 @@
 }
 
 .station-channels-map {
-  td {
-    padding: .4em;
-  }
-  th {
-    padding: .25em;
+  td, th {
+    padding-left: .5em;
+    padding-right: .5em;
   }
   tr {
     white-space: nowrap;
+  }
+
+  .station-channel-name {
+    border-color: $tr-border-color;
   }
 }
 
