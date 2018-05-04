@@ -306,14 +306,22 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset form: calls resetApp and also resets querystring after form cleared
+   * Reset form: call _resetApp, reset querystring/pulldown after form cleared
    */
   _resetForm = function () {
+    var div;
+
     _resetApp();
 
     // Set a slight delay so reset button can clear form fields first
     setTimeout(function () {
+      // Reset query string
       _setQueryString();
+
+      // Rebuild significant eqs pulldown (to reset selected item)
+      div = _el.querySelector('.significant').parentNode;
+      div.parentNode.removeChild(div);
+      _addSignificantEqs();
     }, 10);
   };
 

@@ -88,21 +88,34 @@ var SignificantEqs = function (options) {
   _this.getHtml = function () {
     var date,
         html,
+        list,
         mag,
-        props;
+        props,
+        sel,
+        selCurrent;
 
-    html = '<select class="significant" tabindex="1">';
-    html += '<option value="" disabled="" selected="">Significant Earthquakes in the Past Month (UTC)</option>';
+    sel = ' selected="selected"';
+
     if (_json.features) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
         date = Moment.utc(props.time).format('MMM D HH:mm:ss');
         mag = AppUtil.round(props.mag, 1);
 
-        html += '<option value="' + feature.id + '">' +
+        selCurrent = '';
+        if (feature.id === AppUtil.getParam('eqid')) {
+          selCurrent = sel;
+          sel = '';
+        }
+
+        list += '<option value="' + feature.id + '"' + selCurrent + '>' +
             'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
           '</option>';
       });
+
+      html = '<select class="significant" tabindex="1">';
+      html += '<option value="" disabled="disabled"' + sel + '>Significant Earthquakes in the Past Month (UTC)</option>';
+      html += list;
       html += '</select>';
     }
 
