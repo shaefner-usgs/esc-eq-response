@@ -109,18 +109,15 @@ var EditPane = function (options) {
 
   /**
    * Add list of significant earthquakes pulldown menu
-   *
-   * @param json {Object}
-   *     GeoJson data
    */
-  _addSignificantEqs = function (json) {
+  _addSignificantEqs = function () {
     var div,
         refNode,
         select,
         significant;
 
     refNode = _el.querySelector('label[for=eqid]');
-    select = _significantEqs.getHtml(json);
+    select = _significantEqs.getHtml();
 
     div = document.createElement('div');
     div.innerHTML = select;
