@@ -75,18 +75,18 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _this.getSummaryData = function () {
-    var dyfi,
-        eqid,
+    var code,
+        dyfi,
         products,
         shakemap;
 
-    eqid = _mainshockJson.id;
     products = _mainshockJson.properties.products;
 
     if (products.dyfi) {
+      code = products.dyfi[0].code;
       dyfi = {
         cdi: AppUtil.romanize(_mainshockJson.properties.cdi),
-        url: products.dyfi[0].contents[eqid + '_ciim_geo.jpg'].url
+        url: products.dyfi[0].contents[code + '_ciim_geo.jpg'].url
       };
     }
     if (products.shakemap) {
