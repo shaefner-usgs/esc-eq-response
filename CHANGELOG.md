@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bugfix: cutoff foreshocks, historical feeds at 1 sec before mainshock
 * Select mainshock in signif. eqs pulldown when populated on initial load
 * Use 'code' prop in GeoJson feed for DYFI thumbnail which is more reliable
 * Add intensity border to sm, dyfi thumbs on summary pane
