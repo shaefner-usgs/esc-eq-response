@@ -224,7 +224,7 @@ var Features = function (options) {
     days = AppUtil.getParam('fs-days');
 
     params = {
-      endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
+      endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
@@ -268,7 +268,7 @@ var Features = function (options) {
     years = AppUtil.getParam('hs-years');
 
     params = {
-      endtime: Moment(_mainshockJson.properties.time).utc().toISOString()
+      endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
