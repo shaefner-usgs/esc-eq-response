@@ -550,12 +550,21 @@ var PlotsPane = function (options) {
    *   (called by NavBar.js when user selects plot tab)
    */
   _this.renderPlots = function () {
-    var count,
+    var config,
+        count,
         el,
         path,
         plots,
         rendered,
         resetButton;
+
+    config = {
+      displaylogo: false,
+      modeBarButtonsToRemove: ['hoverClosest3d','hoverClosestCartesian',
+        'hoverCompareCartesian', 'lasso2d', 'resetCameraDefault3d',
+        'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines'
+      ]
+    };
 
     // Loop thru features
     Object.keys(_plotData).forEach(function(feature) {
@@ -567,9 +576,7 @@ var PlotsPane = function (options) {
         // Loop thru plot types for feature
         Object.keys(plots).forEach(function(type) {
           el = plots[type].container;
-          Plotly.plot(el, plots[type].data, plots[type].layout, {
-            showLink: false
-          });
+          Plotly.plot(el, plots[type].data, plots[type].layout, config);
           if (type !== 'hypocenters') {
             _addListeners(el); // plotly click events are buggy for 3d charts
           }

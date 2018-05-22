@@ -68,24 +68,6 @@
     }
   }
 
-  /* hide some of the Plotly.js controls */
-  .modebar-group {
-    [data-title='Box Select'],
-    [data-title='Compare data on hover'],
-    [data-title='Edit in Chart Studio'],
-    [data-title='Lasso Select'],
-    [data-title='Produced with Plotly'],
-    [data-title='Reset axes'],
-    [data-title='Reset camera to default'],
-    [data-title='Reset camera to last save'],
-    [data-title='Save and edit plot in cloud'],
-    [data-title='Show closest data on hover'],
-    [data-title='Toggle show closest data on hover'],
-    [data-title='Toggle Spike Lines'] {
-      display: none;
-    }
-  }
-
   .xtitle, .ytitle {
     font-weight: 500 !important; /* match weight of 3d plots, which can't be changed */
   }
