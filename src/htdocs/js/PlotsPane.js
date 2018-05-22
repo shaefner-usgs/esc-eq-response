@@ -560,9 +560,26 @@ var PlotsPane = function (options) {
 
     config = {
       displaylogo: false,
+      modeBarButtonsToAdd: [{
+        click: function(gd) {
+          var opts = {
+            format: 'svg',
+            width: 1200
+          };
+          if (gd.classList.contains('hypocenters')) {
+            opts.height = 1000;
+          }
+
+          Plotly.downloadImage(gd, opts);
+        },
+        icon: Plotly.Icons.camera,
+        name: 'toImage2',
+        title: 'Download plot (.svg)'
+      }],
       modeBarButtonsToRemove: ['hoverClosest3d','hoverClosestCartesian',
         'hoverCompareCartesian', 'lasso2d', 'resetCameraDefault3d',
-        'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines'
+        'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines',
+        'toImage'
       ]
     };
 

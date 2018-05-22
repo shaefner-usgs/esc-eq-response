@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Change plot download to output .svg (instead of .png)
 * Bugfix: cutoff foreshocks, historical feeds at 1 sec before mainshock
 * Select mainshock in signif. eqs pulldown when populated on initial load
 * Use 'code' prop in GeoJson feed for DYFI thumbnail which is more reliable
