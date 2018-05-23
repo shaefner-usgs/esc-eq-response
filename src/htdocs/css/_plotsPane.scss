@@ -58,6 +58,10 @@
       opacity: 1;
     }
 
+    .modebar-group {
+      margin-left: 0;
+    }
+
     .plotly [data-title]:after {
       background: color($link-color alpha(8%));
       color: $link-color;
