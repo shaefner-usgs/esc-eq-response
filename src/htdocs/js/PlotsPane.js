@@ -553,17 +553,26 @@ var PlotsPane = function (options) {
     var config,
         count,
         el,
+        eqid,
+        feature,
+        opts,
         path,
         plots,
         rendered,
-        resetButton;
+        resetButton,
+        type;
 
     config = {
       displaylogo: false,
       modeBarButtonsToAdd: [{
         click: function(gd) {
-          var opts = {
+          eqid = AppUtil.getParam('eqid');
+          feature = gd.parentNode.classList.item(2);
+          type = gd.classList.item(0);
+          opts = {
+            filename: eqid + '-' + feature + '-' + type,
             format: 'svg',
+            height: 500,
             width: 1200
           };
           if (gd.classList.contains('hypocenters')) {
