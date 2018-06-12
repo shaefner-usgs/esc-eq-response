@@ -9,12 +9,12 @@ An in-progress version being developed on the `master` branch.
 
 * Add link to Event Page
 * Unselect mainshock in signif. eqs pulldown when user manually changes eqid
-* Reset scroll position for all panes except edit when resetting app state
+* Reset scroll positions for all panes except edit when resetting app state
 * Change plot download to output .svg (instead of .png)
 * Bugfix: cutoff foreshocks, historical feeds at 1 sec before mainshock
 * Select mainshock in signif. eqs pulldown when populated on initial load
 * Use 'code' prop in GeoJson feed for DYFI thumbnail which is more reliable
-* Add intensity border to sm, dyfi thumbs on summary pane
+* Add intensity border to ShakeMap/DYFI thumbs on summary pane
 * Mobile css optimizations
 * Alert user via status bar when network requests time out
 * Bug fix: only apply index shift on aftershocks plot, not historical
@@ -25,7 +25,6 @@ An in-progress version being developed on the `master` branch.
 * Add legend/tips to help pane
 * Add range sliders to filter visible list of eqs on summary pane
 * Simplify instructions on edit pane
-* Only reset scroll positions for plots, summary panes when user picks new event
 * Shorten url params to make url more succinct
 * Handle status bar display in css instead of js
 * Zoom map to fully contain updated features when user changes params on edit pane
