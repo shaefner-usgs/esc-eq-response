@@ -5,8 +5,11 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-## 0.5.0 (2018-05-25)
+## 0.5.0 (2018-06-12)
 
+* Add link to Event Page
+* Unselect mainshock in signif. eqs pulldown when user manually changes eqid
+* Reset scroll position for all panes except edit when resetting app state
 * Change plot download to output .svg (instead of .png)
 * Bugfix: cutoff foreshocks, historical feeds at 1 sec before mainshock
 * Select mainshock in signif. eqs pulldown when populated on initial load
