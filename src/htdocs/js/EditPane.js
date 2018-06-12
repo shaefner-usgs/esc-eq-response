@@ -172,7 +172,7 @@ var EditPane = function (options) {
    * Get features for map, plots, summary panes
    */
   _getFeatures = function () {
-    _resetApp(); // first reset app to default state
+    _resetForm(); // first reset form/app to default state
 
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
@@ -309,7 +309,8 @@ var EditPane = function (options) {
    * Reset form: call _resetApp, reset querystring/pulldown after form cleared
    */
   _resetForm = function () {
-    var div;
+    var div,
+        select;
 
     _resetApp();
 
@@ -318,10 +319,13 @@ var EditPane = function (options) {
       // Reset query string
       _setQueryString();
 
-      // Rebuild significant eqs pulldown (to reset selected item)
-      div = _el.querySelector('.significant').parentNode;
-      div.parentNode.removeChild(div);
-      _addSignificantEqs();
+      // Rebuild significant eqs pulldown (to set selected item)
+      select = _el.querySelector('.significant');
+      if (select) {
+        div = select.parentNode;
+        div.parentNode.removeChild(div);
+        _addSignificantEqs();
+      }
     }, 10);
   };
 
