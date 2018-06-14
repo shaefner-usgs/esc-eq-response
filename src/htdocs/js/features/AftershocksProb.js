@@ -21,10 +21,10 @@ var AftershocksProb = function (options) {
 
       _modelParams,
 
-      _generic_prob,
-      _krange,
-      _n_expect,
-      _poisson;
+      _calcNum,
+      _calcPoisson,
+      _calcProb,
+      _calcRange;
 
   _this = {};
 
@@ -47,7 +47,7 @@ var AftershocksProb = function (options) {
    *
    * @return prob {Number}
    */
-  _generic_prob = function (number) {
+  _calcProb = function (number) {
     var prob = 1 - Math.exp(-number);
 
     return prob;
@@ -63,7 +63,7 @@ var AftershocksProb = function (options) {
    *
    * @return {Array}
    */
-  _krange = function (a, conf) {
+  _calcRange = function (a, conf) {
     var f,
         lower,
         p,
@@ -80,17 +80,17 @@ var AftershocksProb = function (options) {
     } else { // accumulate probabilities until sum reaches conf
       lower = a;
       upper = lower + 1;
-      p = _poisson(a, lower);
-      q = _poisson(a, upper);
+      p = _calcPoisson(a, lower);
+      q = _calcPoisson(a, upper);
       sum = 0;
 
       while (sum < conf) {
         if (lower >= 0 && p > q) {
           sum += p;
-          p = _poisson(a, --lower);
+          p = _calcPoisson(a, --lower);
         } else {
           sum += q;
-          q = _poisson(a, ++upper);
+          q = _calcPoisson(a, ++upper);
         }
       }
 
@@ -121,7 +121,7 @@ var AftershocksProb = function (options) {
    *
    * @return {Number}
    */
-  _n_expect = function (options) {
+  _calcNum = function (options) {
     var part1,
         part2,
         qq;
@@ -151,7 +151,7 @@ var AftershocksProb = function (options) {
    *
    * @return {Number}
    */
-  _poisson = function (a, k) {
+  _calcPoisson = function (a, k) {
     var i,
         x;
 
@@ -180,9 +180,9 @@ var AftershocksProb = function (options) {
    */
   _this.calculate = function (options) {
     var defaults,
-        n3,
-        n3_range,
-        prob;
+        num,
+        prob,
+        range;
 
     if (!options.mainshock) {
       throw new Error ('mainshock parameter (magnitude) is required');
@@ -196,7 +196,7 @@ var AftershocksProb = function (options) {
     options = Util.extend({}, defaults, options);
 
     // Calculate expected number of M>=3 aftershocks
-    n3 = _n_expect({
+    num = _calcNum({
       aa: _modelParams.aa,
       bb: _modelParams.bb,
       pp: _modelParams.pp,
@@ -208,17 +208,17 @@ var AftershocksProb = function (options) {
     });
 
     // Calculate probability of 1 or more aftershocks in specified time period and magnitude range
-    prob = _generic_prob(n3);
+    prob = _calcProb(num);
 
     // Calculate range for expected number
-    n3_range = _krange(n3, _modelParams.conf);
+    range = _calcRange(num, _modelParams.conf);
 
     return {
       conf: _modelParams.conf,
       probability: prob,
-      number: n3,
-      rangeMax: n3_range[1],
-      rangeMin: n3_range[0]
+      number: num,
+      rangeMax: range[1],
+      rangeMin: range[0]
     };
   };
 
