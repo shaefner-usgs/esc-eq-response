@@ -27,13 +27,13 @@ var EditPane = function (options) {
       _eqid,
       _eqidPrevValue,
       _fields,
-      _significantEqs,
       _throttleRefresh,
       _throttleUpdate,
 
       _Features,
       _MapPane,
       _NavBar,
+      _SignificantEqs,
       _StatusBar,
       _SummaryPane,
 
@@ -75,7 +75,7 @@ var EditPane = function (options) {
     // All form fields
     _fields = _el.querySelectorAll('input');
 
-    _significantEqs = SignificantEqs({
+    _SignificantEqs = SignificantEqs({
       callback: _addSignificantEqs,
       statusBar: _StatusBar
     });
@@ -117,7 +117,7 @@ var EditPane = function (options) {
         significant;
 
     refNode = _el.querySelector('label[for=eqid]');
-    select = _significantEqs.getHtml();
+    select = _SignificantEqs.getHtml();
 
     div = document.createElement('div');
     div.innerHTML = select;

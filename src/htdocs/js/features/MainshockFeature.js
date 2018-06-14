@@ -19,8 +19,9 @@ var Mainshock = function (options) {
   var _this,
       _initialize,
 
-      _earthquakes,
-      _mainshockJson;
+      _mainshockJson,
+
+      _Earthquakes;
 
 
   _this = {};
@@ -33,7 +34,7 @@ var Mainshock = function (options) {
 
     _mainshockJson = options.mainshockJson;
 
-    _earthquakes = Earthquakes({
+    _Earthquakes = Earthquakes({
       id: id,
       json: options.json,
       mainshockJson: _mainshockJson
@@ -55,7 +56,7 @@ var Mainshock = function (options) {
    * @return {L.FeatureGroup}
    */
   _this.getMapLayer = function () {
-    return _earthquakes.getMapLayer();
+    return _Earthquakes.getMapLayer();
   };
 
   /**
@@ -65,7 +66,7 @@ var Mainshock = function (options) {
    */
   _this.getPlotData = function () {
     return {
-      plotdata: _earthquakes.getPlotData()
+      plotdata: _Earthquakes.getPlotData()
     };
   };
 
@@ -97,7 +98,7 @@ var Mainshock = function (options) {
     }
 
     return {
-      detailsHtml: _earthquakes.getDetails(),
+      detailsHtml: _Earthquakes.getDetails(),
       dyfi: dyfi,
       shakemap: shakemap
     };

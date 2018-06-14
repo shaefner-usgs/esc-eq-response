@@ -19,8 +19,9 @@ var Foreshocks = function (options) {
   var _this,
       _initialize,
 
-      _earthquakes,
       _magThreshold,
+
+      _Earthquakes,
 
       _getName;
 
@@ -33,7 +34,7 @@ var Foreshocks = function (options) {
 
     options = options || {};
 
-    _earthquakes = Earthquakes({
+    _Earthquakes = Earthquakes({
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson
@@ -65,7 +66,7 @@ var Foreshocks = function (options) {
    * @return {L.FeatureGroup}
    */
   _this.getMapLayer = function () {
-    return _earthquakes.getMapLayer();
+    return _Earthquakes.getMapLayer();
   };
 
   /**
@@ -75,9 +76,9 @@ var Foreshocks = function (options) {
    */
   _this.getSummaryData = function () {
     return {
-      bins: _earthquakes.getBinnedData(),
-      detailsHtml: _earthquakes.getDetails(),
-      list: _earthquakes.getList(),
+      bins: _Earthquakes.getBinnedData(),
+      detailsHtml: _Earthquakes.getDetails(),
+      list: _Earthquakes.getList(),
       magThreshold: _magThreshold
     };
   };

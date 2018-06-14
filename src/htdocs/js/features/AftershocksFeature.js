@@ -18,8 +18,9 @@ var Aftershocks = function (options) {
   var _this,
       _initialize,
 
-      _earthquakes,
       _magThreshold,
+
+      _Earthquakes,
 
       _getName;
 
@@ -32,7 +33,7 @@ var Aftershocks = function (options) {
 
     options = options || {};
 
-    _earthquakes = Earthquakes({
+    _Earthquakes = Earthquakes({
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson
@@ -64,7 +65,7 @@ var Aftershocks = function (options) {
    * @return {L.FeatureGroup}
    */
   _this.getMapLayer = function () {
-    return _earthquakes.getMapLayer();
+    return _Earthquakes.getMapLayer();
   };
 
   /**
@@ -74,8 +75,8 @@ var Aftershocks = function (options) {
    */
   _this.getPlotData = function () {
     return {
-      detailsHtml: _earthquakes.getDetails(),
-      plotdata: _earthquakes.getPlotData()
+      detailsHtml: _Earthquakes.getDetails(),
+      plotdata: _Earthquakes.getPlotData()
     };
   };
 
@@ -86,10 +87,10 @@ var Aftershocks = function (options) {
    */
   _this.getSummaryData = function () {
     return {
-      bins: _earthquakes.getBinnedData(),
-      detailsHtml: _earthquakes.getDetails(),
-      lastId: _earthquakes.getLastId(),
-      list: _earthquakes.getList(),
+      bins: _Earthquakes.getBinnedData(),
+      detailsHtml: _Earthquakes.getDetails(),
+      lastId: _Earthquakes.getLastId(),
+      list: _Earthquakes.getList(),
       magThreshold: _magThreshold
     };
   };
