@@ -50,6 +50,7 @@ var Earthquakes = function (options) {
 
       _bins,
       _details,
+      _duration,
       _eqList,
       _id,
       _lastId,
@@ -252,8 +253,7 @@ var Earthquakes = function (options) {
    * @return description {Html}
    */
   _getDescription = function () {
-    var description,
-        duration;
+    var description;
 
     description = '<p class="description"><strong>M ' +
       AppUtil.getParam(AppUtil.lookup(_id) + '-mag') + '+ </strong> earthquakes within ' +
@@ -261,19 +261,19 @@ var Earthquakes = function (options) {
       'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
-        .asDays(), 1);
+      _duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
+        .asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
-        duration + ' days</strong>';
+        _duration + '</strong>';
     }
     else if (_id === 'foreshocks') {
-      duration = AppUtil.getParam('fs-days');
-      description += ' in the prior <strong>' + duration + ' days</strong> ' +
+      _duration = AppUtil.getParam('fs-days') + ' days';
+      description += ' in the prior <strong>' + _duration + '</strong> ' +
         'before the mainshock';
     }
     else if (_id === 'historical') {
-      duration = AppUtil.getParam('hs-years');
-      description += ' in the prior <strong>' + duration + ' years</strong> ' +
+      _duration = AppUtil.getParam('hs-years') + ' years';
+      description += ' in the prior <strong>' + _duration + '</strong> ' +
       'before the mainshock';
     }
 
@@ -515,6 +515,15 @@ var Earthquakes = function (options) {
    */
   _this.getDetails = function () {
     return _details;
+  };
+
+  /**
+   * Get duration of earthquake sequence
+   *
+   * @return _duration {Number}
+   */
+  _this.getDuration = function () {
+    return _duration;
   };
 
   /**
