@@ -130,7 +130,7 @@ var AftershocksProb = function (options) {
     part1 = Math.pow(10, (options.aa - options.bb * options.dm1)) -
       Math.pow(10, (options.aa - options.bb * options.dm2));
 
-    if (options.qq === 0) {
+    if (qq === 0) {
       part2 = Math.log(options.t2 + options.cc) -
         Math.log(options.t1 + options.cc);
     } else {
@@ -163,6 +163,10 @@ var AftershocksProb = function (options) {
     return x * Math.exp(-a);
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
    * Calculate aftershock probability
    *
@@ -185,7 +189,7 @@ var AftershocksProb = function (options) {
         range;
 
     if (!options.mainshock) {
-      throw new Error ('mainshock parameter (magnitude) is required');
+      throw new Error ('Mainshock magnitude is required to calculate aftershock probability');
     }
 
     defaults = {
@@ -214,11 +218,15 @@ var AftershocksProb = function (options) {
     range = _calcRange(num, _modelParams.conf);
 
     return {
+      aftershock: options.aftershock,
       conf: _modelParams.conf,
-      probability: prob,
+      duration: options.duration,
+      mainshock: options.mainshock,
       number: num,
-      rangeMax: range[1],
-      rangeMin: range[0]
+      probability: prob,
+      max: range[1],
+      min: range[0],
+      start: options.start
     };
   };
 
