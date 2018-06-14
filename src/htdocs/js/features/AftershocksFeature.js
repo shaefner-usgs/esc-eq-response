@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var AftershocksProb = require('features/AftershocksProb'),
+    Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -18,11 +19,14 @@ var Aftershocks = function (options) {
   var _this,
       _initialize,
 
+      _mag,
       _magThreshold,
 
+      _AftershocksProb,
       _Earthquakes,
 
-      _getName;
+      _getName,
+      _getProbabilities;
 
 
   _this = {};
@@ -33,12 +37,15 @@ var Aftershocks = function (options) {
 
     options = options || {};
 
+    _AftershocksProb = AftershocksProb();
     _Earthquakes = Earthquakes({
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson
     });
-    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 2.5);
+
+    _mag = options.mainshockJson.properties.mag;
+    _magThreshold = Math.floor(_mag - 2.5);
 
     _this.displayLayer = true;
     _this.id = id;
@@ -53,6 +60,21 @@ var Aftershocks = function (options) {
    */
   _getName = function () {
     return options.name + ' (' + options.json.metadata.count + ')';
+  };
+
+  _getProbabilities = function () {
+    var html,
+        prob;
+
+    html = '<h3>Probabilities</h3>';
+    prob = _AftershocksProb.calculate({
+      mainshock: _mag,
+      start: parseFloat(_Earthquakes.getDuration())
+    });
+
+    console.log(prob);
+
+    return html;
   };
 
   // ----------------------------------------------------------
@@ -91,7 +113,8 @@ var Aftershocks = function (options) {
       detailsHtml: _Earthquakes.getDetails(),
       lastId: _Earthquakes.getLastId(),
       list: _Earthquakes.getList(),
-      magThreshold: _magThreshold
+      magThreshold: _magThreshold,
+      probabilities: _getProbabilities()
     };
   };
 
