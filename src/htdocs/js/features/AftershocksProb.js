@@ -66,11 +66,11 @@ var AftershocksProb = function (options) {
       Math.pow(10, (options.aa - options.bb * options.dm2));
 
     if (qq === 0) {
-      part2 = Math.log(options.t2 + options.cc) -
-        Math.log(options.t1 + options.cc);
+      part2 = (Math.log(options.t2 + options.cc) -
+        Math.log(options.t1 + options.cc)) / qq;
     } else {
-      part2 = Math.pow((options.t2 + options.cc), qq) -
-        Math.pow((options.t1 + options.cc), qq) / qq;
+      part2 = (Math.pow((options.t2 + options.cc), qq) -
+        Math.pow((options.t1 + options.cc), qq)) / qq;
     }
 
     return part1 * part2;
@@ -162,7 +162,7 @@ var AftershocksProb = function (options) {
       Number.parseInt(upper, 10)
     ];
   };
-  
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
