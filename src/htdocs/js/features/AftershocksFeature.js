@@ -1,7 +1,8 @@
 'use strict';
 
 
-var AftershocksProb = require('features/AftershocksProb'),
+var AppUtil = require('AppUtil'),
+    AftershocksProb = require('features/AftershocksProb'),
     Earthquakes = require('features/Earthquakes');
 
 
@@ -64,15 +65,51 @@ var Aftershocks = function (options) {
 
   _getProbabilities = function () {
     var html,
-        prob;
+        i,
+        num,
+        range,
+        results,
+        start;
 
-    html = '<h3>Probabilities</h3>';
-    prob = _AftershocksProb.calculate({
-      mainshock: _mag,
-      start: parseFloat(_Earthquakes.getDuration())
-    });
+    html = '';
+    start = parseFloat(_Earthquakes.getDuration());
 
-    console.log(prob);
+    for (i = Math.floor(_mag); i >= 4; i --) {
+      results = _AftershocksProb.calculate({
+        aftershock: i,
+        mainshock: _mag,
+        start: start
+      });
+
+      num = AppUtil.round(results.number, 1);
+      range = '';
+      if (results.min === results.max) {
+        if (results.min !== 0) {
+          range = ' (' + results.min + ')';
+        }
+      } else {
+        range = ' (' + results.min + '&ndash;' + results.max + ')';
+      }
+      num += range;
+
+      html += '<div class="probability">' +
+          '<h4>M ' + i + '+</h4>' +
+          '<ul>' +
+            '<li class="prob">' + AppUtil.round(100 * results.probability, 2) + '%</li>' +
+            '<li class="num">' + num + '</li>' +
+          '</ul>' +
+        '</div>';
+    }
+
+    if (html) {
+      html = '<h3>Aftershock Probabilities</h3>' +
+        '<p>The probability of one or more aftershocks in the specified ' +
+          'magnitude range during the <strong>next 7 days</strong>, based on ' +
+          'the aftershock model in Reasenberg and Jones (1989, 1994).</p>' +
+        '<p>The expected number of aftershocks and the range (' + results.conf +
+          '% confidence interval) is also included.</p>' +
+        '<div class="probabilities">' + html + '</div>';
+    }
 
     return html;
   };
