@@ -40,6 +40,65 @@ var AftershocksProb = function (options) {
   };
 
   /**
+   * Calculate expected number of events
+   *
+   * @param options {Object}
+   * @param options.aa, options.bb, options.pp, options.cc {Number}
+   *     Generic aftershock model parameters
+   * @param options.dm1 {Number}
+   *     Aftershock lower mag - mainshock mag
+   * @param options.dm2 {Number}
+   *     Aftershock upper mag - mainshock mag
+   * @param options.t1 {Number}
+   *     Starting time of interval (after mainshock)
+   * @param options.t2 {Number}
+   *     Ending time of interval (after mainshock)
+   *
+   * @return {Number}
+   */
+  _calcNum = function (options) {
+    var part1,
+        part2,
+        qq;
+
+    qq = 1 - options.pp;
+    part1 = Math.pow(10, (options.aa - options.bb * options.dm1)) -
+      Math.pow(10, (options.aa - options.bb * options.dm2));
+
+    if (qq === 0) {
+      part2 = Math.log(options.t2 + options.cc) -
+        Math.log(options.t1 + options.cc);
+    } else {
+      part2 = Math.pow((options.t2 + options.cc), qq) -
+        Math.pow((options.t1 + options.cc), qq) / qq;
+    }
+
+    return part1 * part2;
+  };
+
+  /**
+   * Calculate the probability of observing 'k' events when 'a' are expected
+   *
+   * @param a {Number}
+   *     Expected number of events in a Poisson process
+   * @param k {Number}
+   *     Number of events observed
+   *
+   * @return {Number}
+   */
+  _calcPoisson = function (a, k) {
+    var i,
+        x;
+
+    x = 1;
+    for (i = 1; i <= k; i ++) {
+      x *= a / i;
+    }
+
+    return x * Math.exp(-a);
+  };
+
+  /**
    * Calculate probability of specified event(s) occurring in the specified time periods
    *
    * @param number {Number}
@@ -103,66 +162,7 @@ var AftershocksProb = function (options) {
       Number.parseInt(upper, 10)
     ];
   };
-
-  /**
-   * Calculate expected number of events
-   *
-   * @param options {Object}
-   * @param options.aa, options.bb, options.pp, options.cc {Number}
-   *     Generic aftershock model parameters
-   * @param options.dm1 {Number}
-   *     Aftershock lower mag - mainshock mag
-   * @param options.dm2 {Number}
-   *     Aftershock upper mag - mainshock mag
-   * @param options.t1 {Number}
-   *     Starting time of interval (after mainshock)
-   * @param options.t2 {Number}
-   *     Ending time of interval (after mainshock)
-   *
-   * @return {Number}
-   */
-  _calcNum = function (options) {
-    var part1,
-        part2,
-        qq;
-
-    qq = 1 - options.pp;
-    part1 = Math.pow(10, (options.aa - options.bb * options.dm1)) -
-      Math.pow(10, (options.aa - options.bb * options.dm2));
-
-    if (qq === 0) {
-      part2 = Math.log(options.t2 + options.cc) -
-        Math.log(options.t1 + options.cc);
-    } else {
-      part2 = Math.pow((options.t2 + options.cc), qq) -
-        Math.pow((options.t1 + options.cc), qq) / qq;
-    }
-
-    return part1 * part2;
-  };
-
-  /**
-   * Calculate the probability of observing 'k' events when 'a' are expected
-   *
-   * @param a {Number}
-   *     Expected number of events in a Poisson process
-   * @param k {Number}
-   *     Number of events observed
-   *
-   * @return {Number}
-   */
-  _calcPoisson = function (a, k) {
-    var i,
-        x;
-
-    x = 1;
-    for (i = 1; i <= k; i ++) {
-      x *= a / i;
-    }
-
-    return x * Math.exp(-a);
-  };
-
+  
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
