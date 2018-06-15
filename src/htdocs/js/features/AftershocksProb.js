@@ -31,8 +31,8 @@ var AftershocksProb = function (options) {
   _initialize = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
-    // If p-value is equal to 1.0, replace with 1.00001
-    if (Math.abs(options.pp - 1.0) <  0.00001) {
+    // If p-value is equal to 1, replace with 1.00001
+    if (Math.abs(options.pp - 1) <  0.00001) {
       options.pp = 1.00001;
     }
 
@@ -198,6 +198,10 @@ var AftershocksProb = function (options) {
       start: 0.01
     };
     options = Util.extend({}, defaults, options);
+
+    if (options.start < 0.01) { // value should be >= 0.01
+      options.start = 0.01;
+    }
 
     // Calculate expected number of M>=3 aftershocks
     num = _calcNum({
