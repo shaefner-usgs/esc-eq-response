@@ -64,9 +64,9 @@ var Aftershocks = function (options) {
   };
 
   _getProbabilities = function () {
-    var html,
+    var expected,
+        html,
         i,
-        num,
         range,
         results,
         start;
@@ -77,11 +77,11 @@ var Aftershocks = function (options) {
     for (i = Math.floor(_mag); i >= 4; i --) {
       results = _AftershocksProb.calculate({
         aftershock: i,
-        mainshock: _mag,
+        mainshock: AppUtil.round(_mag, 1),
         start: start
       });
 
-      num = AppUtil.round(results.number, 1);
+      expected = Math.round(10 * results.number) / 10;
       range = '';
       if (results.min === results.max) {
         if (results.min !== 0) {
@@ -90,13 +90,14 @@ var Aftershocks = function (options) {
       } else {
         range = ' (' + results.min + '&ndash;' + results.max + ')';
       }
-      num += range;
+      expected += range;
 
-      html += '<div class="probability">' +
+      html += '<div>' +
           '<h4>M ' + i + '+</h4>' +
           '<ul>' +
-            '<li class="prob">' + AppUtil.round(100 * results.probability, 2) + '%</li>' +
-            '<li class="num">' + num + '</li>' +
+            '<li class="probability">' + AppUtil.round(100 * results.probability, 1) + '%</li>' +
+            '<li class="expected"><abbr title="Expected number (and range) ' +
+              'of aftershocks">' + expected + '</abbr></li>' +
           '</ul>' +
         '</div>';
     }
@@ -105,8 +106,8 @@ var Aftershocks = function (options) {
       html = '<h3>Aftershock Probabilities</h3>' +
         '<p>The probability of one or more aftershocks in the specified ' +
           'magnitude range during the <strong>next 7 days</strong>, based on ' +
-          'the aftershock model in Reasenberg and Jones (1989, 1994).</p>' +
-        '<p>The expected number of aftershocks and the range (' + results.conf +
+          'the aftershock model in Reasenberg and Jones (1989, 1994). The ' +
+          'expected number of aftershocks and the range (' + results.conf * 100 +
           '% confidence interval) is also included.</p>' +
         '<div class="probabilities">' + html + '</div>';
     }
