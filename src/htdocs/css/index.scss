@@ -45,6 +45,11 @@ body {
   position: relative;
 }
 
+abbr {
+  border-bottom: 1px dotted #999;
+  cursor: help;
+}
+
 h1, h2, h3, h4 {
   font-family: $font-family-headers;
   font-weight: 400;
@@ -73,11 +78,6 @@ p.description {
 table {
   border-collapse: collapse;
   margin: 0 0 1em;
-
-  abbr {
-    border-bottom: 1px dotted #999;
-    cursor: help;
-  }
 }
 
 td, th {
