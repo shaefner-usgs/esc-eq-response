@@ -69,7 +69,8 @@ var Aftershocks = function (options) {
         i,
         range,
         results,
-        start;
+        start,
+        url;
 
     html = '';
     start = parseFloat(_Earthquakes.getDuration());
@@ -92,14 +93,18 @@ var Aftershocks = function (options) {
       }
       expected += range;
 
-      html += '<div>' +
+      url = 'http://escint.wr.usgs.gov/science/software/aftershocks/?';
+      url += 'msMag=' + results.mainshock + '&asMag=' + results.aftershock +
+        '&start=' + results.start;
+
+      html += '<a href="' + url + '">' +
           '<h4>M ' + i + '+</h4>' +
           '<ul>' +
             '<li class="probability">' + AppUtil.round(100 * results.probability, 1) + '%</li>' +
             '<li class="expected"><abbr title="Expected number (and range) ' +
               'of aftershocks">' + expected + '</abbr></li>' +
           '</ul>' +
-        '</div>';
+        '</a>';
     }
 
     if (html) {

@@ -295,13 +295,19 @@ $total-bg-color: #f7f7f7;
   .probabilities {
     display: flex;
 
-    div {
+    a {
       border: 1px solid #ddd;
       border-radius: 3px;
-      padding: 0;
+      color: #333;
+      display: block;
       margin-right: 1em;
       text-align: center;
+      text-decoration: none;
       width: 6em;
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
     h4 {
       background: #f7f7f7;
@@ -314,13 +320,13 @@ $total-bg-color: #f7f7f7;
       padding: 0;
     }
 
+    .expected {
+      color: #999;
+      font-size: .8em;
+    }
     .probability {
       font-family: $mmi-font-family;
-      font-size: 1.4em;
-    }
-    .expected {
-      font-size: .8em;
-      color: #999;
+      font-size: 1.25em;
     }
   }
 }
