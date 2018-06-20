@@ -502,7 +502,7 @@ var PlotsPane = function (options) {
     count = opts.data[className].plotdata.date.length;
     div = document.createElement('div');
 
-    div.classList.add('content', 'feature', className);
+    div.classList.add('content', 'lighter', 'feature', className);
     div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[className].detailsHtml;
     _features.appendChild(div);
 

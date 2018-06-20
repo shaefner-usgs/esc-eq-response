@@ -642,7 +642,7 @@ var SummaryPane = function (options) {
     // Add feature to summary
     if (summary) {
       div = document.createElement('div');
-      div.classList.add('content', 'feature', 'lighter', className);
+      div.classList.add('content', 'lighter', 'feature', className);
       div.innerHTML = summary;
       _features.appendChild(div);
 
