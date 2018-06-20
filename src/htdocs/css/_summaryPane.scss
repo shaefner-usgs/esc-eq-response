@@ -1,5 +1,3 @@
-$total-bg-color: #f7f7f7;
-
 #summaryPane {
   h2 + p {
     margin-bottom: 2rem;
@@ -85,19 +83,19 @@ $total-bg-color: #f7f7f7;
       }
 
       &.total {
-        background-color: $total-bg-color;
+        background-color: $bg-color-darker;
       }
     }
 
     th {
       &.period {
-        border-bottom: 1px solid $tr-border-color;
+        border-bottom: 1px solid $border-color-lighter;
         font-weight: 400;
         text-align: right;
       }
       &.rowlabel {
-        border-bottom: 1px solid $tr-border-color;
-        border-right: 1px solid $th-border-color;
+        border-bottom: 1px solid $border-color-lighter;
+        border-right: 1px solid $border-color;
         padding-right: 1em;
         text-align: center;
       }
@@ -200,9 +198,9 @@ $total-bg-color: #f7f7f7;
       transition: background .25s ease-out;
     }
     tr:hover:not(.no-sort), .selected {
+      background: $accent-color-lightest;
       color: $link-color;
       cursor: pointer;
-      background: color($link-color alpha(3%));
       transition-duration: 0s;
     }
   }
@@ -296,9 +294,9 @@ $total-bg-color: #f7f7f7;
     display: flex;
 
     a {
-      border: 1px solid #ddd;
+      border: 1px solid $border-color;
       border-radius: 3px;
-      color: #333;
+      color: $text-color;
       display: block;
       margin-right: 1em;
       text-align: center;
@@ -310,7 +308,7 @@ $total-bg-color: #f7f7f7;
       }
     }
     h4 {
-      background: #f7f7f7;
+      background: $bg-color-darker;
       border-radius: 3px 3px 0 0;
       margin: 0;
     }
@@ -321,7 +319,7 @@ $total-bg-color: #f7f7f7;
     }
 
     .expected {
-      color: #999;
+      color: $text-color-lightest;
       font-size: .8em;
     }
     .probability {

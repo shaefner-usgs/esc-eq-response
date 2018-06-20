@@ -15,7 +15,6 @@ abbr[title] {
 }
 
 html, body {
-  font: $font-size $font-family;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -23,6 +22,7 @@ html, body {
 
 html {
   box-sizing: border-box;
+  font: $font-size $font-family;
 }
 *, *:before, *:after {
   box-sizing: inherit;
@@ -40,13 +40,13 @@ a {
 }
 
 body {
-  background: #fff;
-  color: #333;
+  background: $bg-color;
+  color: $text-color;
   position: relative;
 }
 
 abbr {
-  border-bottom: 1px dotted #999;
+  border-bottom: 1px dotted #bbb;
   cursor: help;
 }
 
@@ -92,14 +92,14 @@ td, th {
 }
 
 th {
-  border-bottom: 1px solid $th-border-color;
+  border-bottom: 1px solid $border-color;
   font: 600 .95rem $font-family-headers;
   text-align: center;
   text-transform: uppercase;
 }
 
 tr {
-  border-bottom: 1px solid $tr-border-color;
+  border-bottom: 1px solid $border-color-lighter;
 
   &:first-child { /* header row; borders set in 'th' selector */
     border: none;
@@ -112,11 +112,11 @@ tr {
 }
 
 .darker {
-  background: #f9f9f9;
+  background: $bg-color-darker;
 }
 
 .lighter {
-  background: #fff;
+  background: $bg-color;
 }
 
 /* Earthquake details: mainshock on edit, summary panes (also Leaflet popups) */
@@ -130,7 +130,7 @@ tr {
   }
   dt {
     clear: left;
-    color: #555;
+    color: $text-color-lighter;
     display: inline-block;
     float: left;
     font-weight: 300;

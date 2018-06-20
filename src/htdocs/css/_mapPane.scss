@@ -50,14 +50,14 @@
 
 /* Quell long attributions */
 .leaflet-control-attribution {
-  color: #999;
+  color: $text-color-lightest;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   a {
-    color: #666 !important;
+    color: $text-color-lightest !important;
   }
 }
 

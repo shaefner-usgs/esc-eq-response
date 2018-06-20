@@ -1,7 +1,5 @@
-$background-color: hsla(262, 46%, 95%, .96);
-
 #navBar {
-  background-color: $background-color;
+  background-color: $accent-color-lighter;
   display: flex;
   font: 600 1rem $font-family-headers;
   left: 0;
@@ -22,7 +20,7 @@ $background-color: hsla(262, 46%, 95%, .96);
     transition: all .25s ease-out;
 
     &:hover {
-      background-color: color($background-color lightness(92%));
+      background-color: color($accent-color-lighter lightness(92%));
       color: color($link-color whiteness(25%));
     }
     &.selected {

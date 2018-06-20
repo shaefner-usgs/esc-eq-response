@@ -5,12 +5,25 @@ $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
 $font-size: 15px;
 
-$link-color: #7234dc; /*6e00ff*/
+/* Colors */
+
+$accent-color: #7234dc; /*#6e00ff*/
+$accent-color-lighter: hsla(262, 46%, 95%, .96);
+$accent-color-lightest: color($accent-color alpha(3%));
+
+$bg-color: #fff;
+$bg-color-darker: #f7f7f7;
+
+$border-color: #ddd;
+$border-color-lighter: #efefef;
+
+$link-color: $accent-color;
 $link-color-active: #DC406D;
 $link-color-visited: $link-color;
 
-$th-border-color: #ddd;
-$tr-border-color: #efefef;
+$text-color: #333;
+$text-color-lighter: #555;
+$text-color-lightest: #999;
 
 /* MMI / PAGER (impact bubbles) */
 

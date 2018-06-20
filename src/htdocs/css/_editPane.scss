@@ -5,7 +5,7 @@ $reset-button-color: #efefef;
     &.reset {
       background-color: $reset-button-color;
       border-color: color($reset-button-color shade(15%));
-      color: #666;
+      color: $text-color-lighter;
 
       &:active,
       &:hover,
@@ -15,16 +15,16 @@ $reset-button-color: #efefef;
       }
     }
     &.viewmap {
-      background-color: $link-color;
-      border-color: color($link-color shade(15%));
+      background-color: $accent-color;
+      border-color: color($accent-color shade(15%));
       color: #fff;
       text-shadow: 1px 1px 3px #444;
 
       &:active,
       &:hover,
       &:focus {
-        background-color: color($link-color tint(8%));
-        border-color: color($link-color shade(50%));
+        background-color: color($accent-color tint(8%));
+        border-color: color($accent-color shade(50%));
       }
     }
   }
@@ -38,7 +38,7 @@ $reset-button-color: #efefef;
     }
 
     fieldset {
-      border: 1px solid #eee;
+      border: 1px solid $border-color;
       border-radius: 4px;
       margin-top: 1em;
       padding: 0 1.75em 2em;
@@ -60,7 +60,7 @@ $reset-button-color: #efefef;
     }
 
     legend {
-      color: #bbb;
+      color: $text-color-lightest;
       font-size: .8em;
       letter-spacing: 1px;
       margin-left: -1.25em;
@@ -72,7 +72,7 @@ $reset-button-color: #efefef;
     }
 
     p {
-      color: #555;
+      color: $text-color-lighter;
       font-weight: 300;
       letter-spacing: .015em;
       margin: .75rem 0 .25rem;

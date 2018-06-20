@@ -11,7 +11,7 @@
   }
 
   > abbr {
-    color: #666;
+    color: $text-color-lighter;
     font-size: 0.8em;
   }
 }
@@ -38,10 +38,8 @@
     width: 25%;
 
     > abbr {
-      border-bottom: 1px dotted #999;
       clear: left;
-      color: #999;
-      cursor: help;
+      color: $text-color-lightest;
       font-size: .6875em;
     }
   }
@@ -186,7 +184,7 @@
   }
 
   .station-channel-name {
-    border-color: $tr-border-color;
+    border-color: $border-color-lighter;
   }
 }
 
