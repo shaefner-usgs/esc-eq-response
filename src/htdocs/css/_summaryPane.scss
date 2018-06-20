@@ -303,28 +303,41 @@
       text-decoration: none;
       width: 6em;
 
+      h4 {
+        background: $bg-color-darker;
+        border-radius: 3px 3px 0 0;
+        margin: 0;
+      }
+      ul {
+        list-style: none;
+        margin: .6em 0;
+        padding: 0;
+      }
+
+      .expected {
+        color: $text-color-lightest;
+        font-size: .8em;
+      }
+      .probability {
+        font: 1.25em $mmi-font-family;
+      }
+
+      &:hover {
+        border-color: $accent-color;
+        color: $accent-color;
+
+        h4 {
+          background: $accent-color-lightest;
+        }
+
+        .expected {
+          color: $accent-color;
+        }
+      }
+
       &:last-child {
         margin-right: 0;
       }
-    }
-    h4 {
-      background: $bg-color-darker;
-      border-radius: 3px 3px 0 0;
-      margin: 0;
-    }
-    ul {
-      list-style: none;
-      margin: .6em 0;
-      padding: 0;
-    }
-
-    .expected {
-      color: $text-color-lightest;
-      font-size: .8em;
-    }
-    .probability {
-      font-family: $mmi-font-family;
-      font-size: 1.25em;
     }
   }
 }
