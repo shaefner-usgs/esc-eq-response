@@ -3,6 +3,8 @@ esc-eq-response Changelog
 
 ## master
 
+* Add aftershock probabilities on summary pane
+
 An in-progress version being developed on the `master` branch.
 
 ## 0.5.0 (2018-06-12)
