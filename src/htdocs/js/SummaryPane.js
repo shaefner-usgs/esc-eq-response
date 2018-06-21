@@ -333,8 +333,8 @@ var SummaryPane = function (options) {
       max = Math.max.apply(null, mags);
       min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
 
-      html += '<h4 class="filter">Filter earthquakes by magnitude</h4>';
       html += '<div class="filter">';
+      html += '<h4>Filter earthquakes by magnitude</h4>';
       html += '<div class="min">' + min + '</div>';
       html += '<div class="inverted slider" style="--min: ' + min +
         '; --max: ' + max + '; --val: ' + mag + ';">';
