@@ -176,7 +176,7 @@
           visibility: hidden;
         }
         &:hover {
-          color: #000;
+          color: $text-color-darker;
         }
         &:selection {
           background: transparent;

@@ -22,6 +22,7 @@ $link-color-active: #DC406D;
 $link-color-visited: $link-color;
 
 $text-color: #333;
+$text-color-darker: #000;
 $text-color-lighter: #555;
 $text-color-lightest: #999;
 
@@ -30,52 +31,52 @@ $text-color-lightest: #999;
 $mmi-font-family: Tahoma, Verdana, Segoe, sans-serif;
 
 $mmiI-color: #fff;
-$mmiI-text-color: #000;
+$mmiI-text-color: $text-color-darker;
 
 $mmiII-color: #acd8e9;
-$mmiII-text-color: #000;
+$mmiII-text-color: $text-color-darker;
 
 $mmiIII-color: #acd8e9;
-$mmiIII-text-color: #000;
+$mmiIII-text-color: $text-color-darker;
 
 $mmiIV-color: #83d0da;
-$mmiIV-text-color: #000;
+$mmiIV-text-color: $text-color-darker;
 
 $mmiV-color: #7bc87f;
-$mmiV-text-color: #000;
+$mmiV-text-color: $text-color-darker;
 
 $mmiVI-color: #f9f518;
-$mmiVI-text-color: #000;
+$mmiVI-text-color: $text-color-darker;
 
 $mmiVII-color: #fac611;
-$mmiVII-text-color: #000;
+$mmiVII-text-color: $text-color-darker;
 
 $mmiVIII-color: #fa8a11;
-$mmiVIII-text-color: #000;
+$mmiVIII-text-color: $text-color-darker;
 
 $mmiIX-color: #f7100c;
-$mmiIX-text-color: #000;
+$mmiIX-text-color: $text-color-darker;
 
 $mmiX-color: #c80f0a;
-$mmiX-text-color: #000;
+$mmiX-text-color: $text-color-darker;
 
 $mmiXI-color: #c80f0a;
-$mmiXI-text-color: #000;
+$mmiXI-text-color: $text-color-darker;
 
 $mmiXII-color: #c80f0a;
-$mmiXII-text-color: #000;
+$mmiXII-text-color: $text-color-darker;
 
 $pager-pending-color: #fff;
-$pager-pending-text-color: #000;
+$pager-pending-text-color: $text-color-darker;
 
 $pager-green-color: #00b04f;
-$pager-green-text-color: #000;
+$pager-green-text-color: $text-color-darker;
 
 $pager-yellow-color: #ff0;
-$pager-yellow-text-color: #000;
+$pager-yellow-text-color: $text-color-darker;
 
 $pager-orange-color: #f90;
-$pager-orange-text-color: #000;
+$pager-orange-text-color: $text-color-darker;
 
 $pager-red-color: #f00;
-$pager-red-text-color: #000;
+$pager-red-text-color: $text-color-darker;
