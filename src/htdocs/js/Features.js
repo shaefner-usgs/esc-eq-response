@@ -360,7 +360,9 @@ var Features = function (options) {
    *   }
    */
   _loadFeed = function (opts) {
-    var errorMsg,
+    var domain,
+        errorMsg,
+        matches,
         name,
         statusBarId;
 
@@ -411,7 +413,10 @@ var Features = function (options) {
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        errorMsg += '<strong>Request timed out</strong>';
+        matches = opts.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        domain = matches && matches[1];
+        errorMsg += '<strong>Request timed out (can&rsquo;t connect to ' +
+          domain + ')</strong>';
 
         _StatusBar.addError(statusBarId, errorMsg);
         _this.isRefreshing = false;
