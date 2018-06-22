@@ -3,6 +3,8 @@ esc-eq-response Changelog
 
 ## master
 
+* Display domain name in error message during timeout
+* CSS code cleanup
 * Add aftershock probabilities on summary pane
 
 An in-progress version being developed on the `master` branch.
