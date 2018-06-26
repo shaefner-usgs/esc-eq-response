@@ -177,7 +177,9 @@ var MapPane = function (options) {
    */
   _initMap = function () {
     // Create map and set initial view / state
-    _this.map = L.map(_el.querySelector('.map'));
+    _this.map = L.map(_el.querySelector('.map'), {
+      worldCopyJump: true
+    });
     _this.reset();
 
     // Create custom pane for Faults overlay within tilePane
