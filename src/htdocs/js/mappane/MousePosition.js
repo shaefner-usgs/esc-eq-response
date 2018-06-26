@@ -34,8 +34,20 @@ L.Control.MousePosition = L.Control.extend({
   },
 
   _onMouseMove: function (e) {
-    var lng = this.options.lngFormatter ? this.options.lngFormatter(e.latlng.lng) : L.Util.formatNum(e.latlng.lng, this.options.numDigits);
-    var lat = this.options.latFormatter ? this.options.latFormatter(e.latlng.lat) : L.Util.formatNum(e.latlng.lat, this.options.numDigits);
+    var lng = L.Util.formatNum(e.latlng.lng, this.options.numDigits);
+    // need to correct for rollover of map if user scrolls
+    if (lng >= 0) {
+      lng = ((lng + 180)%360) - 180;
+    } else {
+      lng = (((lng + 180) + (Math.ceil(Math.abs(lng + 180)/360)*360))%360) - 180;
+    }
+    if (this.options.lngFormatter) {
+      lng = this.options.lngFormatter(lng);
+    }
+    var lat = L.Util.formatNum(e.latlng.lat, this.options.numDigits);
+    if (this.options.latFormatter) {
+      lat = this.options.latFormatter(lat);
+    }
     var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
     var prefixAndValue = this.options.prefix + ' ' + value;
 
