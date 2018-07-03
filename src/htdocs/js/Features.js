@@ -3,6 +3,7 @@
 
 var AftershocksFeature = require('features/AftershocksFeature'),
     AppUtil = require('AppUtil'),
+    FieldNotesFeature = require('features/FieldNotesFeature'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
     ForeshocksFeature = require('features/ForeshocksFeature'),
     HistoricalFeature = require('features/HistoricalFeature'),
@@ -51,6 +52,7 @@ var Features = function (options) {
       _addSummary,
       _getAftershocks,
       _getEqFeedUrl,
+      _getFieldNotes,
       _getFocalMechanism,
       _getForeshocks,
       _getHistorical,
@@ -214,6 +216,53 @@ var Features = function (options) {
     return baseUri + queryString;
   };
 
+  _getFieldNotes = function () {
+    var after,
+        before,
+        pairs,
+        params,
+        url;
+
+    after = Moment(_mainshockJson.properties.time + 1000).utc().format('X');
+    before = Moment(_mainshockJson.properties.time).utc().add(30, 'days').format('X');
+    params = {
+      between: after + ',' + before,
+      lat: _mainshockJson.geometry.coordinates[1],
+      lon: _mainshockJson.geometry.coordinates[0],
+      radius: AppUtil.getParam('as-dist') // use aftershocks radius
+    };
+
+    pairs = [];
+    Object.keys(params).forEach(function(key) {
+      pairs.push(key + '=' + params[key]);
+    });
+
+    url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' + pairs.join('&');
+
+    _loadFeed({
+      jsClass: FieldNotesFeature,
+      name: 'Fieldnotes',
+      url: url
+    });
+  };
+
+  /**
+   * Get focal mechanism feature
+   */
+  _getFocalMechanism = function () {
+    var focalmechanism;
+
+    focalmechanism = _mainshockJson.properties.products['focal-mechanism'];
+    if (focalmechanism) {
+      _addFeature({
+        jsClass: FocalMechanismFeature,
+        json: focalmechanism[0].properties,
+        mainshockJson: _mainshockJson,
+        name: 'Focal Mechanism'
+      });
+    }
+  };
+
   /**
    * Get foreshocks feature
    */
@@ -239,23 +288,6 @@ var Features = function (options) {
       name: 'Foreshocks',
       url: _getEqFeedUrl(params)
     });
-  };
-
-  /**
-   * Get focal mechanism feature
-   */
-  _getFocalMechanism = function () {
-    var focalmechanism;
-
-    focalmechanism = _mainshockJson.properties.products['focal-mechanism'];
-    if (focalmechanism) {
-      _addFeature({
-        jsClass: FocalMechanismFeature,
-        json: focalmechanism[0].properties,
-        mainshockJson: _mainshockJson,
-        name: 'Focal Mechanism'
-      });
-    }
   };
 
   /**
@@ -507,6 +539,7 @@ var Features = function (options) {
       _getMomentTensor();
       _getFocalMechanism();
       _getStations();
+      _getFieldNotes();
     }
   };
 
@@ -521,6 +554,10 @@ var Features = function (options) {
 
     if (id === 'aftershocks') {
       _getAftershocks();
+
+      // Also refresh Fieldnotes
+      _removeFeature('fieldnotes');
+      _getFieldNotes();
     } else if (id === 'foreshocks') {
       _getForeshocks();
     } else if (id === 'historical') {

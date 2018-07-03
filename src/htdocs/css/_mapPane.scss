@@ -39,8 +39,11 @@
 .leaflet-stations-pane {
   z-index: 419;
 }
-.leaflet-faults-pane {
+.leaflet-fieldnotes-pane {
   z-index: 418;
+}
+.leaflet-faults-pane {
+  z-index: 417;
 }
 
 /* Match popup font-size to rest of app */
