@@ -1,0 +1,21 @@
+.leaflet-popup .fieldnotes {
+  dt {
+    width: 7.5em;
+  }
+  time {
+    color: #555;
+    font-size: .9em;
+    margin-top: 4px;
+  }
+
+  .operator {
+    a {
+      color: $link-color;
+      display: inline-block;
+      padding-top: 3px;
+    }
+
+    border-top: 1px solid $border-color-lighter;
+    margin-top: 1.4em;
+  }
+}

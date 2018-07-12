@@ -34,7 +34,8 @@ var FieldNotesFeature = function (options) {
       _mapLayer,
       _markerOptions,
 
-      _createPopupContent,
+      _genPopupContent,
+      _getCustomProps,
       _getName,
       _onEachFeature,
       _pointToLayer;
@@ -67,17 +68,55 @@ var FieldNotesFeature = function (options) {
     _this.name = _getName();
   };
 
-  _createPopupContent = function (feature) {
+  /**
+   * Create popup content
+   *
+   * @param props {Object}
+   *
+   * @return html {Html}
+   */
+  _genPopupContent = function (props) {
     var html;
 
-    html = L.Util.template('<h3>{form}</h3>' +
-      '<p>{timestamp}</p>' +
-      '<p>{description}</p>' +
-      '<p>{notes}</p>' +
-      '<p>{site}</p>' +
-      '<p>{operator}</p>',
-      feature.properties
+    html = L.Util.template('<div class="fieldnotes">' +
+        '<h4>{title}</h4>' +
+        '<time>{timestamp} {timezone}</time>' +
+        '<p class="description">{description}</p>' +
+        '<p class="notes">{notes}</p>' +
+        _getCustomProps(props) +
+        '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>' +
+      '</div>',
+      props
     );
+
+    return html;
+  };
+
+  /**
+   * Get 'custom' properties that only apply to each observation type
+   *
+   * @param props {Object}
+   *
+   * @return html {Html}
+   */
+  _getCustomProps = function (props) {
+    var html,
+        skipProps,
+        value;
+
+    // Props that are shared by all types
+    skipProps = ['accuracy', 'attachment', 'description', 'form', 'igid',
+      'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
+      'timezone', 'title', 'zaccuracy'];
+
+    html = '<dl>';
+    Object.keys(props).forEach(function (key) {
+      if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
+        value = props[key] || '&ndash;';
+        html += '<dt>' + key + '</dt><dd>' + value + '</dd>';
+      }
+    });
+    html += '</dl>';
 
     return html;
   };
@@ -99,18 +138,21 @@ var FieldNotesFeature = function (options) {
    */
   _onEachFeature = function (feature, layer) {
     var props,
-        tooltip;
+        title;
 
     props = feature.properties;
-    tooltip = props.form;
-    if (props.description) {
-      tooltip += ': ' + props.description;
+
+    title = props.form;
+    if (props.site) {
+      title += ': ' + props.site;
     }
-    layer.bindPopup(_createPopupContent(feature), {
+    props.title = title;
+
+    layer.bindPopup(_genPopupContent(props), {
       autoPanPadding: L.point(50, 50),
       minWidth: 300,
       maxWidth: 400
-    }).bindTooltip(tooltip);
+    }).bindTooltip(title);
 
     _count ++;
   };
