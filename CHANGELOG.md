@@ -3,6 +3,7 @@ esc-eq-response Changelog
 
 ## master
 
+* Add FieldNotes feature layer
 * Display domain name in error message during timeout
 * CSS code cleanup
 * Add aftershock probabilities on summary pane
