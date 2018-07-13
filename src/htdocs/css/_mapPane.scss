@@ -46,6 +46,10 @@
 /* Match popup font-size to rest of app */
 .leaflet-container {
   font-size: $font-size;
+
+  a:hover {
+    color: $link-color-hover;
+  }
 }
 
 /* Quell long attributions */
@@ -75,6 +79,14 @@
       display: flex;
     }
   }
+}
+
+/* Use accent color for Leaflet layers toggle control */
+.leaflet-control-layers-toggle {
+  background-image: url(../img/layers.png) !important;
+}
+.leaflet-retina .leaflet-control-layers-toggle {
+  background-image: url(../img/layers@2x.png) !important;
 }
 
 /* Hide zoom controls on mobile device (which has pinch-to-zoom gestures) */
