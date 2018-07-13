@@ -2,7 +2,8 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
+var AppUtil = require('AppUtil'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _DEFAULTS,
@@ -140,7 +141,11 @@ var FieldNotesFeature = function (options) {
     var props,
         title;
 
+    // Strip slashes from json encoded values
     props = feature.properties;
+    Object.keys(props).forEach(function(key) {
+      props[key] = AppUtil.stripslashes(props[key]);
+    });
 
     title = props.form;
     if (props.site) {
@@ -163,7 +168,7 @@ var FieldNotesFeature = function (options) {
    * @param feature {Object}
    * @param latlng {L.LatLng}
    *
-   * @return {L.CircleMarker}
+   * @return {L.Marker}
    */
   _pointToLayer = function (feature, latlng) {
     return L.marker(latlng, _markerOptions);
