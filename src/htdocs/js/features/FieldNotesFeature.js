@@ -35,6 +35,7 @@ var FieldNotesFeature = function (options) {
       _mapLayer,
       _markerOptions,
 
+      _addEventListener,
       _genPopupContent,
       _getCustomProps,
       _getName,
@@ -69,6 +70,16 @@ var FieldNotesFeature = function (options) {
     _this.name = _getName();
   };
 
+  _addEventListener = function () {
+    var el;
+
+    el = document.querySelector('.leaflet-popup-content .toggle');
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      this.closest('.fieldnotes').querySelector('.custom').classList.toggle('hide');
+    });
+  };
+
   /**
    * Create popup content
    *
@@ -77,14 +88,20 @@ var FieldNotesFeature = function (options) {
    * @return html {Html}
    */
   _genPopupContent = function (props) {
-    var html;
+    var html,
+        img;
+
+    img = '';
+    if (props.attachment) {
+      img = '<a href="{attachment}"><img src="{attachment}" alt="photo" /></a>';
+    }
 
     html = L.Util.template('<div class="fieldnotes">' +
         '<h4>{title}</h4>' +
         '<time>{timestamp} {timezone}</time>' +
         '<p class="description">{description}</p>' +
         '<p class="notes">{notes}</p>' +
-        _getCustomProps(props) +
+        img + _getCustomProps(props) +
         '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>' +
       '</div>',
       props
@@ -101,23 +118,31 @@ var FieldNotesFeature = function (options) {
    * @return html {Html}
    */
   _getCustomProps = function (props) {
-    var html,
+    var foundProps,
+        html,
         skipProps,
         value;
+
+    foundProps = false;
 
     // Props that are shared by all types
     skipProps = ['accuracy', 'attachment', 'description', 'form', 'igid',
       'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
       'timezone', 'title', 'zaccuracy'];
 
-    html = '<dl>';
+    html = '<dl class="custom hide">';
     Object.keys(props).forEach(function (key) {
       if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
+        foundProps = true;
         value = props[key] || '&ndash;';
         html += '<dt>' + key + '</dt><dd>' + value + '</dd>';
       }
     });
     html += '</dl>';
+
+    if (foundProps) {
+      html = '<p><a href="#" class="toggle">Additional properties</a></p>' + html;
+    }
 
     return html;
   };
@@ -138,26 +163,29 @@ var FieldNotesFeature = function (options) {
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
-    var props,
-        title;
+    var props;
+
+    props = feature.properties;
 
     // Strip slashes from json encoded values
-    props = feature.properties;
     Object.keys(props).forEach(function(key) {
       props[key] = AppUtil.stripslashes(props[key]);
     });
 
-    title = props.form;
+    // Create title prop
+    props.title = props.form;
     if (props.site) {
-      title += ': ' + props.site;
+      props.title += ': ' + props.site;
     }
-    props.title = title;
 
-    layer.bindPopup(_genPopupContent(props), {
-      autoPanPadding: L.point(50, 50),
-      minWidth: 300,
-      maxWidth: 400
-    }).bindTooltip(title);
+    layer
+      .bindPopup(_genPopupContent(props), {
+        autoPanPadding: L.point(50, 50),
+        minWidth: 300,
+        maxWidth: 400
+      })
+      .bindTooltip(props.title)
+      .on('popupopen', _addEventListener);
 
     _count ++;
   };

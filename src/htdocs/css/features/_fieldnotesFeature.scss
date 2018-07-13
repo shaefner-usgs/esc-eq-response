@@ -1,11 +1,23 @@
 .leaflet-popup .fieldnotes {
+  dl {
+    &.hide {
+      display: none;
+    }
+  }
   dt {
     width: 7.5em;
+  }
+  img {
+    max-width: 100%;
   }
   time {
     color: #555;
     font-size: .9em;
     margin-top: 4px;
+  }
+
+  .custom {
+    margin-top: -1em;
   }
 
   .operator {
