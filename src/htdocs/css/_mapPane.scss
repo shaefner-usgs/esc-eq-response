@@ -47,9 +47,13 @@
   z-index: 417;
 }
 
-/* Match popup font-size to rest of app */
+/* Match popup font-size, link colors to rest of app */
 .leaflet-container {
   font-size: $font-size;
+
+  a {
+    color: $link-color;
+  }
 }
 
 /* Quell long attributions */
