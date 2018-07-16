@@ -76,7 +76,7 @@ var FieldNotesFeature = function (options) {
     el = document.querySelector('.leaflet-popup-content .toggle');
     el.addEventListener('click', function(e) {
       e.preventDefault();
-      this.closest('.fieldnotes').querySelector('.custom').classList.toggle('hide');
+      this.closest('.fieldnotes').querySelector('.properties').classList.toggle('hide');
     });
   };
 
@@ -130,7 +130,7 @@ var FieldNotesFeature = function (options) {
       'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
       'timezone', 'title', 'zaccuracy'];
 
-    html = '<dl class="custom hide">';
+    html = '<dl class="custom">';
     Object.keys(props).forEach(function (key) {
       if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
         foundProps = true;
@@ -141,7 +141,8 @@ var FieldNotesFeature = function (options) {
     html += '</dl>';
 
     if (foundProps) {
-      html = '<p><a href="#" class="toggle">Additional properties</a></p>' + html;
+      html = '<p class="properties hide">' +
+        '<a href="#" class="toggle">Additional properties</a></p>' + html;
     }
 
     return html;

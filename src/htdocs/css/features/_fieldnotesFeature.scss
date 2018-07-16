@@ -1,8 +1,6 @@
 .leaflet-popup .fieldnotes {
   dl {
-    &.hide {
-      display: none;
-    }
+    margin-top: .5em;
   }
   dt {
     width: 7.5em;
@@ -16,8 +14,9 @@
     margin-top: 4px;
   }
 
-  .custom {
-    margin-top: -1em;
+  /* Hide custom props by default */
+  .hide + .custom {
+    display: none;
   }
 
   .operator {
@@ -27,6 +26,39 @@
     }
 
     border-top: 1px solid $border-color-lighter;
-    margin-top: 1.4em;
+    margin-top: 1.5em;
+  }
+
+  .properties {
+    line-height: 1;
+    margin-bottom: 0;
+    position: relative;
+
+    a {
+      padding-left: 10px;
+      position: relative;
+
+      &:active {
+        color: $accent-color;
+      }
+    }
+
+    &:before {
+      border-bottom: 4px solid transparent;
+      border-left: 6px solid $accent-color;
+      border-top: 4px solid transparent;
+      content: '';
+      height: 0;
+      left: 0;
+      position: absolute;
+      top: .2em;
+      transition: all .25s;
+      width: 0;
+    }
+  }
+
+  /* Rotate triangle down to point down when custom props are visible */
+  :not(.hide):before {
+    transform: rotate(90deg);
   }
 }
