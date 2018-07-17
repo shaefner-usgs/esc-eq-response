@@ -40,7 +40,8 @@ var FieldNotesFeature = function (options) {
       _getCustomProps,
       _getName,
       _onEachFeature,
-      _pointToLayer;
+      _pointToLayer,
+      _updatePopup;
 
 
   _this = {};
@@ -70,14 +71,19 @@ var FieldNotesFeature = function (options) {
     _this.name = _getName();
   };
 
+  /**
+   * Add listener to popups for expanding additional (custom) props
+   */
   _addEventListener = function () {
     var el;
 
-    el = document.querySelector('.leaflet-popup-content .toggle');
-    el.addEventListener('click', function(e) {
-      e.preventDefault();
-      this.closest('.fieldnotes').querySelector('.properties').classList.toggle('hide');
-    });
+    el = document.querySelector('.leaflet-popup .toggle');
+    if (el) {
+      el.addEventListener('click', function(e) {
+        e.preventDefault();
+        this.closest('.fieldnotes').querySelector('.properties').classList.toggle('hide');
+      });
+    }
   };
 
   /**
@@ -186,7 +192,7 @@ var FieldNotesFeature = function (options) {
         maxWidth: 400
       })
       .bindTooltip(props.title)
-      .on('popupopen', _addEventListener);
+      .on('popupopen', _updatePopup);
 
     _count ++;
   };
@@ -201,6 +207,33 @@ var FieldNotesFeature = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     return L.marker(latlng, _markerOptions);
+  };
+
+  /**
+   * Update popup position after image loads; call method to add listeners
+   *
+   * @param e {Event}
+   */
+  _updatePopup = function (e) {
+    var image,
+        popup,
+        regex,
+        url;
+
+    image = new Image();
+    popup = e.popup;
+    regex = /http:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
+    url = regex.exec(popup.getContent());
+
+    _addEventListener();
+
+    if (url) { // popup has a photo
+      image.onload = function() {
+        popup.update(); // pan map to contain popup after image loads
+        _addEventListener();
+      };
+      image.src = url[0];
+    }
   };
 
   // ----------------------------------------------------------
