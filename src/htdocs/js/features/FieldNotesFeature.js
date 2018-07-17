@@ -99,7 +99,10 @@ var FieldNotesFeature = function (options) {
 
     img = '';
     if (props.attachment) {
-      img = '<a href="{attachment}"><img src="{attachment}" alt="photo" /></a>';
+      img = '<a class="photo" href="{attachment}">' +
+          '<div class="spinner"></div>' +
+          '<img src="{attachment}" alt="photo" />' +
+        '</a>';
     }
 
     html = L.Util.template('<div class="fieldnotes">' +
