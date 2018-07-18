@@ -149,5 +149,28 @@ AppUtil.setParam = function (name, value) {
   window.history.replaceState({}, '', queryString + hash);
 };
 
+/**
+ * Strip backslashes from escaped strings
+ *   taken from http://locutus.io/php/stripslashes/
+ *
+ * @param str {String}
+ *
+ * @return {String}
+ */
+AppUtil.stripslashes = function (str) {
+  return (str + '').replace(/\\(.?)/g, function (s, n1) {
+    switch (n1) {
+      case '\\':
+        return '\\';
+      case '0':
+        return '\u0000';
+      case '':
+        return '';
+      default:
+        return n1;
+    }
+  });
+};
+
 
 module.exports = AppUtil;

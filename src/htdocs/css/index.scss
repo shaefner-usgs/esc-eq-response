@@ -141,17 +141,6 @@ tr {
 
   h4 {
     margin: 0;
-
-    > a {
-      color: $link-color;
-
-      &:visited {
-        color: $link-color-visited;
-      }
-      &:active {
-        color: $link-color-active;
-      }
-    }
   }
 
   time {

@@ -1,0 +1,101 @@
+.leaflet-popup .fieldnotes {
+  dl {
+    margin-top: .5em;
+  }
+  dt {
+    width: 7.5em;
+  }
+  img {
+    display: block;
+    margin: 0 auto;
+    max-height: 300px;
+    max-width: 100%;
+  }
+  time {
+    color: $text-color-lighter;
+    font-size: .9em;
+    margin-top: 4px;
+  }
+
+  /* Hide custom props by default */
+  .hide + .custom {
+    display: none;
+  }
+
+  .operator {
+    a {
+      display: inline-block;
+      padding-top: 3px;
+    }
+
+    border-top: 1px solid $border-color-lighter;
+    margin-top: 1.5em;
+  }
+
+  .photo {
+    display: block;
+    min-height: 200px;
+    position: relative;
+
+    img {
+      position: relative;
+      z-index: 1001;
+    }
+  }
+
+  .properties {
+    line-height: 1;
+    margin-bottom: 0;
+    position: relative;
+
+    a {
+      padding-left: 10px;
+      position: relative;
+
+      &:active {
+        color: $accent-color;
+      }
+    }
+
+    &:before {
+      border-bottom: 4px solid transparent;
+      border-left: 6px solid $accent-color;
+      border-top: 4px solid transparent;
+      content: '';
+      height: 0;
+      left: 0;
+      position: absolute;
+      top: .2em;
+      transition: all .25s;
+      width: 0;
+    }
+  }
+
+  .spinner {
+    animation: rotate 0.75s infinite linear;
+    border: 5px solid $text-color-lighter;
+    border-radius: 50%;
+    border-right-color: transparent;
+    display: block;
+    height: 20px;
+    left: 47%;
+    position: absolute;
+    top: 47%;
+    width: 20px;
+    z-index: 1000;
+  }
+
+  /* Rotate triangle down to point down when custom props are visible */
+  :not(.hide):before {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

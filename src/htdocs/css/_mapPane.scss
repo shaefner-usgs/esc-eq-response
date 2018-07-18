@@ -1,4 +1,5 @@
 @import 'mappane/_mousePosition.scss';
+@import 'features/_fieldnotesFeature.scss';
 @import 'features/_stationsFeature.scss';
 
 #mapPane,
@@ -39,16 +40,23 @@
 .leaflet-stations-pane {
   z-index: 419;
 }
-.leaflet-faults-pane {
+.leaflet-fieldnotes-pane {
   z-index: 418;
 }
+.leaflet-faults-pane {
+  z-index: 417;
+}
 
-/* Match popup font-size to rest of app */
+/* Match popup font-size, link colors to rest of app */
 .leaflet-container {
   font-size: $font-size;
 
-  a:hover {
-    color: $link-color-hover;
+  a {
+    color: $link-color;
+    
+    &:hover {
+      color: $link-color-hover;
+    }
   }
 }
 
