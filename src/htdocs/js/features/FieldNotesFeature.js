@@ -73,15 +73,17 @@ var FieldNotesFeature = function (options) {
 
   /**
    * Add listener to popups for expanding additional (custom) props
+   *
+   * @param div {Element}
    */
-  _addEventListener = function () {
-    var el;
+  _addEventListener = function (div) {
+    var toggle;
 
-    el = document.querySelector('.leaflet-popup .toggle');
-    if (el) {
-      el.addEventListener('click', function(e) {
+    toggle = div.querySelector('.toggle');
+    if (toggle) {
+      toggle.addEventListener('click', function(e) {
         e.preventDefault();
-        this.closest('.fieldnotes').querySelector('.properties').classList.toggle('hide');
+        this.closest('.properties').classList.toggle('hide');
       });
     }
   };
@@ -91,11 +93,12 @@ var FieldNotesFeature = function (options) {
    *
    * @param props {Object}
    *
-   * @return html {Html}
+   * @return div {Element}
    */
   _genPopupContent = function (props) {
-    var html,
-        img;
+    var div,
+        img,
+        innerHTML;
 
     img = '';
     if (props.attachment) {
@@ -105,18 +108,20 @@ var FieldNotesFeature = function (options) {
         '</a>';
     }
 
-    html = L.Util.template('<div class="fieldnotes">' +
-        '<h4>{title}</h4>' +
-        '<time>{timestamp} {timezone}</time>' +
-        '<p class="description">{description}</p>' +
-        '<p class="notes">{notes}</p>' +
-        img + _getCustomProps(props) +
-        '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>' +
-      '</div>',
+    innerHTML = L.Util.template('<h4>{title}</h4>' +
+      '<time>{timestamp} {timezone}</time>' +
+      '<p class="description">{description}</p>' +
+      '<p class="notes">{notes}</p>' +
+      img + _getCustomProps(props) +
+      '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>',
       props
     );
 
-    return html;
+    div = L.DomUtil.create('div', 'fieldnotes');
+    div.innerHTML = innerHTML;
+    _addEventListener(div);
+
+    return div;
   };
 
   /**
@@ -213,7 +218,7 @@ var FieldNotesFeature = function (options) {
   };
 
   /**
-   * Update popup position after image loads; call method to add listeners
+   * Update popup position after image loads
    *
    * @param e {Event}
    */
@@ -228,12 +233,9 @@ var FieldNotesFeature = function (options) {
     regex = /http:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
     url = regex.exec(popup.getContent());
 
-    _addEventListener();
-
     if (url) { // popup has a photo
       image.onload = function() {
         popup.update(); // pan map to contain popup after image loads
-        _addEventListener();
       };
       image.src = url[0];
     }
