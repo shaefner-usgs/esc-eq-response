@@ -53,7 +53,7 @@
 
   a {
     color: $link-color;
-    
+
     &:hover {
       color: $link-color-hover;
     }
@@ -97,9 +97,15 @@
   background-image: url(../img/layers@2x.png) !important;
 }
 
-/* Hide zoom controls on mobile device (which has pinch-to-zoom gestures) */
-.leaflet-control-zoom.hide {
-  display: none;
+.leaflet-control-zoom {
+  a {
+    line-height: 27px !important;
+  }
+
+  /* Hide zoom controls on mobile device (which has pinch-to-zoom gestures) */
+  &.hide {
+    display: none;
+  }
 }
 
 /* Push top controls down to accommodate toolbar */
