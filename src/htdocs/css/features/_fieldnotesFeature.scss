@@ -1,4 +1,8 @@
-.leaflet-popup .fieldnotes {
+.leaflet-popup.fieldnotes {
+  dl, h4, p, time {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
   dl {
     margin-top: .5em;
   }
@@ -20,6 +24,15 @@
   /* Hide custom props by default */
   .hide + .custom {
     display: none;
+  }
+
+  .leaflet-popup-content {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .leaflet-popup-content-wrapper {
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .operator {

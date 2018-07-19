@@ -131,7 +131,7 @@ var FieldNotesFeature = function (options) {
       props
     );
 
-    div = L.DomUtil.create('div', 'fieldnotes');
+    div = L.DomUtil.create('div');
     div.innerHTML = innerHTML;
     _addEventListeners(div);
 
@@ -210,8 +210,9 @@ var FieldNotesFeature = function (options) {
     layer
       .bindPopup(_genPopupContent(props), {
         autoPanPadding: L.point(50, 50),
-        minWidth: 300,
-        maxWidth: 400
+        className: 'fieldnotes',
+        maxWidth: 398, /* fits 4X3 images 'flush' in popup (max-height is 300px) */
+        minWidth: 320
       })
       .bindTooltip(props.title)
       .on('popupopen', _updatePopup);
