@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('AppUtil'),
+    Lightbox = require('Lightbox'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -35,7 +36,9 @@ var FieldNotesFeature = function (options) {
       _mapLayer,
       _markerOptions,
 
-      _addEventListener,
+      _Lightbox,
+
+      _addEventListeners,
       _genPopupContent,
       _getCustomProps,
       _getName,
@@ -69,15 +72,26 @@ var FieldNotesFeature = function (options) {
     _mapLayer.id = _this.id; // attach id to L.Layer
 
     _this.name = _getName();
+
+    _Lightbox = Lightbox();
   };
 
   /**
-   * Add listener to popups for expanding additional (custom) props
+   * Add listeners to popups for expanding custom props and lightboxing photos
    *
    * @param div {Element}
    */
-  _addEventListener = function (div) {
-    var toggle;
+  _addEventListeners = function (div) {
+    var photo,
+        toggle;
+
+    photo = div.querySelector('.photo');
+    if (photo) {
+      photo.addEventListener('click', function(e) {
+        e.preventDefault();
+        _Lightbox.show();
+      });
+    }
 
     toggle = div.querySelector('.toggle');
     if (toggle) {
@@ -119,7 +133,7 @@ var FieldNotesFeature = function (options) {
 
     div = L.DomUtil.create('div', 'fieldnotes');
     div.innerHTML = innerHTML;
-    _addEventListener(div);
+    _addEventListeners(div);
 
     return div;
   };
@@ -238,6 +252,7 @@ var FieldNotesFeature = function (options) {
         popup.update(); // pan map to contain popup after image loads
       };
       image.src = url[0];
+      _Lightbox.add('<img src="' + image.src + '" alt="enlarged photo" />');
     }
   };
 

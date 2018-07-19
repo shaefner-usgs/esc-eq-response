@@ -1,0 +1,44 @@
+.lightbox {
+  background: rgba(0, 0, 0, 0.9);
+  bottom: 0;
+  cursor: pointer;
+  display: flex;
+  left: 0;
+  opacity: 1;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transition: opacity .25s ease-out;
+  visibility: visible;
+  z-index: 10000;
+
+  img {
+    margin: auto;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  &.hide {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &:after {
+    background: #ddd;
+    border-radius: 50%;
+    color: #000;
+    content: '\d7';
+    font-size: 20px;
+    height: 25px;
+    line-height: 1.05;
+    position: absolute;
+    right: 10px;
+    text-align: center;
+    top: 10px;
+    width: 25px;
+  }
+}
+
+.lightbox:hover:after {
+  background: #fff;
+}
