@@ -172,5 +172,16 @@ AppUtil.stripslashes = function (str) {
   });
 };
 
+/**
+ * Uppercase first letter in a string
+ *
+ * @param str {String}
+ *
+ * @return {String}
+ */
+AppUtil.ucfirst = function (str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 
 module.exports = AppUtil;
