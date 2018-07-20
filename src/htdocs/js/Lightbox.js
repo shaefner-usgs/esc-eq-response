@@ -10,7 +10,8 @@ var Lightbox = function (options) {
   var _this,
       _initialize,
 
-      _addEventListener;
+      _addEventListener,
+      _handleEscapeKey;
 
 
   _this = {};
@@ -29,6 +30,17 @@ var Lightbox = function (options) {
       e.preventDefault();
       _this.hide();
     });
+  };
+
+  /**
+   * Hide lightbox when user hits escape key
+   *
+   * @param e {Event}
+   */
+  _handleEscapeKey = function (e) {
+    if (e.key === 'Escape') {
+      _this.hide();
+    }
   };
 
   // ----------------------------------------------------------
@@ -66,6 +78,9 @@ var Lightbox = function (options) {
     if (div) {
       div.classList.add('hide');
     }
+
+    // Remove escape key listener
+    document.removeEventListener('keydown', _handleEscapeKey);
   };
 
   /**
@@ -90,6 +105,9 @@ var Lightbox = function (options) {
     if (div) {
       div.classList.remove('hide');
     }
+
+    // Add escape key listener
+    document.addEventListener('keydown', _handleEscapeKey);
   };
 
 
