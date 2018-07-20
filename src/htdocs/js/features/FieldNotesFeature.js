@@ -245,7 +245,7 @@ var FieldNotesFeature = function (options) {
 
     image = new Image();
     popup = e.popup;
-    regex = /http:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
+    regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
     url = regex.exec(popup.getContent().outerHTML);
 
     if (url) { // popup has a photo
