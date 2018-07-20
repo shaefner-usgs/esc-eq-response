@@ -4,8 +4,9 @@ esc-eq-response Changelog
 ## master
 
 * Add FieldNotes feature layer
+* Various fixes for map being panned past int'l dateline
 * Display domain name in error message during timeout
-* CSS code cleanup
+* CSS code cleanup / consistency
 * Add aftershock probabilities on summary pane
 
 An in-progress version being developed on the `master` branch.
