@@ -13,9 +13,9 @@ var _DEFAULTS,
 
 _ICON_DEFAULTS = {
   iconAnchor: L.point(10, 25),
-  iconRetinaUrl: '../img/pin-s-star+c0f@2x.png',
+  iconRetinaUrl: 'img/pin-s-star+c0f@2x.png',
   iconSize: L.point(20, 50),
-  iconUrl: '../img/pin-s-star+c0f.png',
+  iconUrl: 'img/pin-s-star+c0f.png',
   popupAnchor: L.point(0, -25),
   tooltipAnchor: L.point(0, -15)
 };
