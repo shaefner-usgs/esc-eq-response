@@ -130,6 +130,9 @@ tr {
     color: $text-color;
     margin-left: 5em;
   }
+  dl {
+    margin-bottom: 0;
+  }
   dt {
     clear: left;
     color: $text-color-lighter;
