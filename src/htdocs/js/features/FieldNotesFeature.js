@@ -35,6 +35,7 @@ var FieldNotesFeature = function (options) {
       _count,
       _mapLayer,
       _markerOptions,
+      _popup,
 
       _Lightbox,
 
@@ -98,6 +99,7 @@ var FieldNotesFeature = function (options) {
       toggle.addEventListener('click', function(e) {
         e.preventDefault();
         this.closest('.properties').classList.toggle('hide');
+        _popup.update();
       });
     }
   };
@@ -233,24 +235,24 @@ var FieldNotesFeature = function (options) {
   };
 
   /**
-   * Update popup position after image loads
+   * Update popup position and add Lightbox after image loads
    *
    * @param e {Event}
    */
   _updatePopup = function (e) {
     var image,
-        popup,
         regex,
         url;
 
+    _popup = e.popup; // store in closure for access in other methods
+
     image = new Image();
-    popup = e.popup;
     regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
-    url = regex.exec(popup.getContent().outerHTML);
+    url = regex.exec(_popup.getContent().outerHTML);
 
     if (url) { // popup has a photo
       image.onload = function() {
-        popup.update(); // pan map to contain popup after image loads
+        _popup.update(); // pan map to contain popup after image loads
       };
       image.src = url[0];
       _Lightbox.add('<img src="' + image.src + '" alt="enlarged photo" />');
