@@ -288,7 +288,7 @@ var Stations = function (options) {
     layer.bindPopup(_generatePopupContent(feature), {
       autoPanPadding: L.point(50, 50),
       minWidth: 300,
-      maxWidth: 400
+      maxWidth: 425
     }).bindTooltip(tooltip);
 
     _count ++;

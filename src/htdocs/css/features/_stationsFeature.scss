@@ -24,8 +24,91 @@
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+.station-channels-map {
+  margin-top: 1em;
+
+  td, th {
+    padding-left: .5em;
+    padding-right: .5em;
+  }
+  tr {
+    white-space: nowrap;
+  }
+
+  .station-channel-name {
+    border-color: $border-color-lighter;
+  }
+}
+
+.station-layer-icon {
+  opacity: 0.85;
+  position: absolute;
+
+  &:before {
+    border: 10px solid transparent;
+    border-left-width: 6px;
+    border-right-width: 6px;
+    content: ' ';
+    display: block;
+    left: 1px;
+    position: absolute;
+    top: -10px;
+    z-index: 2;
+  }
+
+  &:after {
+    border: 12px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.6);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    content: ' ';
+    display: block;
+    left: -1px;
+    position: absolute;
+    top: -13px;
+    z-index: 1;
+  }
+}
+
 .station-metadata {
   margin: 1.5em 0;
+}
+
+.station-mmiI:before {
+  border-bottom-color: $mmiI-color;
+}
+.station-mmiII:before {
+  border-bottom-color: $mmiII-color;
+}
+.station-mmiIII:before {
+  border-bottom-color: $mmiIII-color;
+}
+.station-mmiIV:before {
+  border-bottom-color: $mmiIV-color;
+}
+.station-mmiV:before {
+  border-bottom-color: $mmiV-color;
+}
+.station-mmiVI:before {
+  border-bottom-color: $mmiVI-color;
+}
+.station-mmiVII:before {
+  border-bottom-color: $mmiVII-color;
+}
+.station-mmiVIII:before {
+  border-bottom-color: $mmiVIII-color;
+}
+.station-mmiIX:before {
+  border-bottom-color: $mmiIX-color;
+}
+.station-mmiX:before {
+  border-bottom-color: $mmiX-color;
+}
+.station-mmiXI:before {
+  border-bottom-color: $mmiXI-color;
+}
+.station-mmiXII:before {
+  border-bottom-color: $mmiXII-color;
 }
 
 .station-summary {
@@ -176,85 +259,4 @@
     color: #999;
     font-size: .6875em;
   }
-}
-
-.station-channels-map {
-  td, th {
-    padding-left: .5em;
-    padding-right: .5em;
-  }
-  tr {
-    white-space: nowrap;
-  }
-
-  .station-channel-name {
-    border-color: $border-color-lighter;
-  }
-}
-
-.station-layer-icon {
-  opacity: 0.85;
-  position: absolute;
-
-  &:before {
-    border: 10px solid transparent;
-    border-left-width: 6px;
-    border-right-width: 6px;
-    content: ' ';
-    display: block;
-    left: 1px;
-    position: absolute;
-    top: -10px;
-    z-index: 2;
-  }
-
-  &:after {
-    border: 12px solid transparent;
-    border-bottom-color: rgba(0, 0, 0, 0.6);
-    border-left-width: 8px;
-    border-right-width: 8px;
-    content: ' ';
-    display: block;
-    left: -1px;
-    position: absolute;
-    top: -13px;
-    z-index: 1;
-  }
-}
-
-.station-mmiI:before {
-  border-bottom-color: $mmiI-color;
-}
-.station-mmiII:before {
-  border-bottom-color: $mmiII-color;
-}
-.station-mmiIII:before {
-  border-bottom-color: $mmiIII-color;
-}
-.station-mmiIV:before {
-  border-bottom-color: $mmiIV-color;
-}
-.station-mmiV:before {
-  border-bottom-color: $mmiV-color;
-}
-.station-mmiVI:before {
-  border-bottom-color: $mmiVI-color;
-}
-.station-mmiVII:before {
-  border-bottom-color: $mmiVII-color;
-}
-.station-mmiVIII:before {
-  border-bottom-color: $mmiVIII-color;
-}
-.station-mmiIX:before {
-  border-bottom-color: $mmiIX-color;
-}
-.station-mmiX:before {
-  border-bottom-color: $mmiX-color;
-}
-.station-mmiXI:before {
-  border-bottom-color: $mmiXI-color;
-}
-.station-mmiXII:before {
-  border-bottom-color: $mmiXII-color;
 }
