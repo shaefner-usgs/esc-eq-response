@@ -120,38 +120,6 @@ tr {
   background: $bg-color;
 }
 
-/* Earthquake details: mainshock on edit, summary panes (also Leaflet popups) */
-.earthquake, .leaflet-popup-content {
-  dd,
-  dt {
-    line-height: 1.7;
-  }
-  dd {
-    color: $text-color;
-    margin-left: 5em;
-  }
-  dl {
-    margin-bottom: 0;
-  }
-  dt {
-    clear: left;
-    color: $text-color-lighter;
-    display: inline-block;
-    float: left;
-    font-weight: 300;
-    letter-spacing: .015em;
-    width: 5em;
-  }
-
-  h4 {
-    margin: 0;
-  }
-
-  time {
-    display: block;
-  }
-}
-
 .pane {
   left: 0;
   opacity: 1;
