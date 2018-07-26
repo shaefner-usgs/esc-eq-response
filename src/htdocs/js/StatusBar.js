@@ -34,8 +34,14 @@ var StatusBar = function (options) {
    * @param el {Element}
    */
   _doRemove = function (el) {
-    if (el.parentNode) {
-      el.parentNode.removeChild(el);
+    var parent;
+
+    parent = el.parentNode;
+    if (parent) {
+      if (parent.children.length === 1) {
+        _hideStatusBar(); // should already be removed, but just in case...
+      }
+      parent.removeChild(el);
     }
   };
 
