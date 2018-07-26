@@ -103,6 +103,7 @@ var Features = function (options) {
       // Create feature (and store it in _features for access later)
       feature = opts.jsClass({
         json: opts.json,
+        layerOn: opts.layerOn,
         mainshockJson: opts.mainshockJson,
         name: name
       });
@@ -216,7 +217,7 @@ var Features = function (options) {
     return baseUri + queryString;
   };
 
-  _getFieldNotes = function () {
+  _getFieldNotes = function (layerOn) {
     var after,
         before,
         pairs,
@@ -241,6 +242,7 @@ var Features = function (options) {
 
     _loadFeed({
       jsClass: FieldNotesFeature,
+      layerOn: layerOn,
       name: 'Fieldnotes',
       url: url
     });
@@ -418,6 +420,7 @@ var Features = function (options) {
         _addFeature({
           jsClass: opts.jsClass,
           json: json,
+          layerOn: opts.layerOn,
           mainshockJson: _mainshockJson,
           name: name
         });
@@ -549,6 +552,8 @@ var Features = function (options) {
    * @param id {String}
    */
   _this.refresh = function (id) {
+    var fieldnotesLayerOn = false;
+
     _this.isRefreshing = true;
     _removeFeature(id);
 
@@ -556,8 +561,11 @@ var Features = function (options) {
       _getAftershocks();
 
       // Also refresh Fieldnotes
+      if (_MapPane.map.hasLayer(_features.fieldnotes.getMapLayer())) {
+        fieldnotesLayerOn = true;
+      }
       _removeFeature('fieldnotes');
-      _getFieldNotes();
+      _getFieldNotes(fieldnotesLayerOn);
     } else if (id === 'foreshocks') {
       _getForeshocks();
     } else if (id === 'historical') {

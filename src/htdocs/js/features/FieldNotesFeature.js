@@ -56,7 +56,7 @@ var FieldNotesFeature = function (options) {
     options = options || {};
     iconOptions = Util.extend({}, _ICON_DEFAULTS, options.iconOptions);
 
-    _this.displayLayer = false;
+    _this.displayLayer = options.layerOn || false;
     _this.id = 'fieldnotes'; // unique id; value is "baked into" app's js/css
     _this.zoomToLayer = false;
 
