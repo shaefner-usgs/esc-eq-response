@@ -3,6 +3,8 @@ esc-eq-response Changelog
 
 ## master
 
+An in-progress version being developed on the `master` branch.
+
 * Bug fix: include eqs whose mags are above threshold, but only after rounding to nearest tenth
 * Don't show 'Most Recent Aftershock' on summary if there's only 1 aftershock total
 * Bug fix: be sure status bar gets removed when empty
@@ -11,8 +13,6 @@ esc-eq-response Changelog
 * Display domain name in error message during timeout
 * CSS code cleanup / consistency
 * Add aftershock probabilities on summary pane
-
-An in-progress version being developed on the `master` branch.
 
 ## 0.5.0 (2018-06-12)
 
