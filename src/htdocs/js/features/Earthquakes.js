@@ -191,7 +191,7 @@ var Earthquakes = function (options) {
 
     mag = AppUtil.round(feature.properties.mag, 1);
     threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
-    if (mag >= threshold) {
+    if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
     }
   };
