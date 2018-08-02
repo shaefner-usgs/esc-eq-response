@@ -439,7 +439,7 @@ var SummaryPane = function (options) {
           summary += _getBinnedTable(data.bins, 'past');
           summary += '</div>';
           summary += data.probabilities;
-          if (data.lastId) {
+          if (data.lastId && count > 1) {
             summary += '<h3>Most Recent Aftershock</h3>';
             summary += _getListTable({
               lastAftershock: data.list[data.lastId]
