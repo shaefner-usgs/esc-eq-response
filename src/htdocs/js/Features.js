@@ -182,7 +182,7 @@ var Features = function (options) {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
       maxradiuskm: AppUtil.getParam('as-dist'),
-      minmagnitude: AppUtil.getParam('as-mag'),
+      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
@@ -280,7 +280,7 @@ var Features = function (options) {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
       maxradiuskm: AppUtil.getParam('fs-dist'),
-      minmagnitude: AppUtil.getParam('fs-mag'),
+      minmagnitude: Number(AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(days, 'days').toISOString().slice(0, -5)
     };
@@ -307,7 +307,7 @@ var Features = function (options) {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
       maxradiuskm: AppUtil.getParam('hs-dist'),
-      minmagnitude: AppUtil.getParam('hs-mag'),
+      minmagnitude: Number(AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };

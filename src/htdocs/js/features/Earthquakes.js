@@ -68,6 +68,7 @@ var Earthquakes = function (options) {
       _tooltipTemplate,
 
       _addEqToBin,
+      _filter,
       _getAge,
       _getBubbles,
       _getDescription,
@@ -122,6 +123,7 @@ var Earthquakes = function (options) {
     }
 
     _mapLayer = L.geoJson(options.json, {
+      filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
@@ -171,6 +173,26 @@ var Earthquakes = function (options) {
           }
         }
       }
+    }
+  };
+
+  /**
+   * Filter out eq mags below threshold - there might be some below threshold
+   * b/c query thresholds are decreased by 0.05 to account for rounding mags to
+   * nearest tenth
+   *
+   * @param feature {Object}
+   *
+   * @return {Boolean}
+   */
+  _filter = function (feature) {
+    var mag,
+        threshold;
+
+    mag = AppUtil.round(feature.properties.mag, 1);
+    threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    if (mag >= threshold) {
+      return true;
     }
   };
 
