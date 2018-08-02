@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 * Bug fix: include eqs whose mags are above threshold, but only after rounding to nearest tenth
 * Don't show 'Most Recent Aftershock' on summary if there's only 1 aftershock total
+* Bug fix: be sure status bar gets removed when empty
 * Add FieldNotes feature layer
 * Various fixes for map being panned past int'l dateline
 * Display domain name in error message during timeout
