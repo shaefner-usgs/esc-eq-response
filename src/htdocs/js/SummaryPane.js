@@ -331,7 +331,7 @@ var SummaryPane = function (options) {
     if (!singleMagBin) {
       mags = Object.keys(cumulativeEqs);
       max = Math.max.apply(null, mags);
-      min = AppUtil.getParam(AppUtil.lookup(id) + '-mag');
+      min = Math.floor(AppUtil.getParam(AppUtil.lookup(id) + '-mag'));
 
       html += '<div class="filter">';
       html += '<h4>Filter earthquakes by magnitude</h4>';
