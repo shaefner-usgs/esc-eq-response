@@ -28,7 +28,6 @@ var EditPane = function (options) {
       _eqidPrevValue,
       _fields,
       _throttleRefresh,
-      _throttleUpdate,
 
       _Features,
       _MapPane,
@@ -390,30 +389,16 @@ var EditPane = function (options) {
    * @param e {Event}
    */
   _updateParam = function (e) {
-    var doUpdate,
-        el,
+    var el,
         id,
         value;
 
-    doUpdate = function () {
-      id = e.target.id;
-      el = document.getElementById(id);
-      value = el.value.replace(/\s+/g, ''); // strip whitespace
-      el.value = value;
+    id = e.target.id;
+    el = document.getElementById(id);
+    value = el.value.replace(/\s+/g, ''); // strip whitespace
+    el.value = value;
 
-      AppUtil.setParam(id, value);
-    };
-
-    if (e.target.id === 'eqid') {
-      // Update immediately (only need to throttle number type inputs)
-      doUpdate();
-    } else {
-      // Throttle updates so they don't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttleUpdate);
-      _throttleUpdate = window.setTimeout(function() {
-        doUpdate();
-      }, 100);
-    }
+    AppUtil.setParam(id, value);
   };
 
   /**
