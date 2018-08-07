@@ -209,7 +209,7 @@ var EditPane = function (options) {
     viewmap = _el.querySelector('.viewmap');
 
     // Update querystring param when form field is changed
-    _addListener(_fields, 'input', _updateParam);
+    _addListener(_fields, 'change', _updateParam);
 
     // Get new set of feature layers when eqid is changed
     _addListener([_eqid], 'input', _getFeatures);
