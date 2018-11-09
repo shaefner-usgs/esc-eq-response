@@ -243,18 +243,18 @@ var Earthquakes = function (options) {
 
     bubblesTemplate = '';
     if (data.cdi) { // DYFI
-      bubblesTemplate += '<a href="{url}#dyfi" class="mmi{cdi}"' +
+      bubblesTemplate += '<a href="{url}/dyfi" class="mmi{cdi}"' +
         ' title="Did You Feel It? maximum reported intensity ({felt}' +
         ' responses)"><strong class="roman">{cdi}</strong><br>' +
         '<abbr title="Did You Feel It?">DYFI?</abbr></a>';
     }
     if (data.mmi) { // ShakeMap
-      bubblesTemplate += '<a href="{url}#shakemap" class="mmi{mmi}"' +
+      bubblesTemplate += '<a href="{url}/shakemap" class="mmi{mmi}"' +
         ' title="ShakeMap maximum estimated intensity"><strong class="roman">' +
         '{mmi}</strong><br><abbr title="ShakeMap">ShakeMap</abbr></a>';
     }
     if (data.alert) { // PAGER
-      bubblesTemplate += '<a href="{url}#pager" class="pager-alertlevel-' +
+      bubblesTemplate += '<a href="{url}/pager" class="pager-alertlevel-' +
       '{alert}" title="PAGER estimated impact alert level"><strong' +
       ' class="roman">{alert}</strong><br><abbr title="Prompt Assessment of' +
       ' Global Earthquakes for Response">PAGER</abbr></a>';
