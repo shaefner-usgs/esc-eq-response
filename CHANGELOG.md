@@ -5,6 +5,7 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Bug fix: use change event for updating urlparams, which allows decimal values to be entered
 * Bug fix: always set minimum value on sliders to integer (Math.floor)
 * Bug fix: include eqs with mag above threshold after rounding to nearest tenth
 * Don't show 'Most Recent Aftershock' on summary if there's only 1 aftershock total
