@@ -472,14 +472,14 @@ var Earthquakes = function (options) {
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
-      days = Math.floor(Moment.duration(eqMoment - _mainshockMoment).asDays());
+      days = Math.ceil(Moment.duration(eqMoment - _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'first');
 
-      days = Math.floor(Moment.duration(_nowMoment - eqMoment).asDays());
+      days = Math.ceil(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
-      days = Math.floor(Moment.duration(_mainshockMoment - eqMoment).asDays());
+      days = Math.ceil(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
     // Bin eq totals by magnitude, inclusive (used internally)
