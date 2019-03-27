@@ -79,7 +79,8 @@ var Mainshock = function (options) {
     var code,
         dyfi,
         products,
-        shakemap;
+        shakemap,
+        shakemapUrl;
 
     products = _mainshockJson.properties.products;
 
@@ -91,9 +92,14 @@ var Mainshock = function (options) {
       };
     }
     if (products.shakemap) {
+      if (products.shakemap[0].contents['download/tvmap.jpg']) {
+        shakemapUrl = products.shakemap[0].contents['download/tvmap.jpg'].url;
+      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
+        shakemapUrl = products.shakemap[0].contents['download/intensity.jpg'].url;
+      }
       shakemap = {
         mmi: AppUtil.romanize(_mainshockJson.properties.mmi),
-        url: products.shakemap[0].contents['download/tvmap.jpg'].url
+        url: shakemapUrl
       };
     }
 
