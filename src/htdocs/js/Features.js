@@ -20,9 +20,9 @@ var AftershocksFeature = require('features/AftershocksFeature'),
  * Features are event-specific layers added dynamically, based on the mainshock
  * Event ID entered by user
  *
- * Feature data comes from GeoJson web services on earthquake.usgs.gov
+ * Feature data comes from GeoJson web services (mostly via earthquake.usgs.gov)
  *
- * The stacking order of features is set via css (baseLayers are rendered as defined)
+ * The stacking order of feature layers on the map is defined in css
  *
  * @param options {Object}
  *   {
