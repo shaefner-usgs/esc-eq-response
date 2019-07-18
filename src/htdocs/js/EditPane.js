@@ -112,19 +112,21 @@ var EditPane = function (options) {
   _addSignificantEqs = function () {
     var div,
         refNode,
-        select,
+        selectMenu,
         significant;
 
     refNode = _el.querySelector('label[for=eqid]');
-    select = _SignificantEqs.getHtml();
+    selectMenu = _SignificantEqs.getHtml();
 
-    div = document.createElement('div');
-    div.innerHTML = select;
-    refNode.parentNode.insertBefore(div, refNode);
+    if (selectMenu) {
+      div = document.createElement('div');
+      div.innerHTML = selectMenu;
+      refNode.parentNode.insertBefore(div, refNode);
 
-    // Add listener here b/c we have to wait til it exists
-    significant = _el.querySelector('.significant');
-    _addListener([significant], 'change', _selSignificantEq);
+      // Add listener here b/c we have to wait til it exists
+      significant = _el.querySelector('.significant');
+      _addListener([significant], 'change', _selSignificantEq);
+    }
   };
 
   /*
