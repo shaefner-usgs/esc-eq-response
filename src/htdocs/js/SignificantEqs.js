@@ -60,8 +60,17 @@ var SignificantEqs = function (options) {
         _StatusBar.removeItem('significant');
       },
       error: function (status, xhr) {
+        // Show response in console and add additional info to error message
         if (xhr.responseText) {
           console.error(xhr.responseText);
+        }
+        if (status) {
+          if (status.message) {
+            errorMsg += '<strong>' + status.message + '</strong>';
+          }
+          else {
+            errorMsg += '<strong>http status code: ' + status + '</strong>';
+          }
         }
 
         _StatusBar.addError('significant', errorMsg);
@@ -69,7 +78,9 @@ var SignificantEqs = function (options) {
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        errorMsg += '<strong>Request timed out</strong>';
+        errorMsg += '<strong>Request timed out (can&rsquo;t connect to ' +
+          'earthquake.usgs.gov)</strong>';
+
         _StatusBar.addError('significant', errorMsg);
       },
       timeout: 8000
@@ -114,7 +125,8 @@ var SignificantEqs = function (options) {
       });
 
       html = '<select class="significant" tabindex="1">';
-      html += '<option value="" disabled="disabled"' + sel + '>Significant Earthquakes in the Past Month (UTC)</option>';
+      html += '<option value="" disabled="disabled"' + sel + '>Significant ' +
+        'Earthquakes in the Past Month (UTC)</option>';
       html += list;
       html += '</select>';
     }

@@ -426,20 +426,29 @@ var Features = function (options) {
         });
       },
       error: function (status, xhr) {
+        // Show response in console and add additional info to error message
         if (xhr.responseText) {
           console.error(xhr.responseText);
-        }
 
-        // Add additional info to error message
-        if (status === 404 && name === 'Mainshock') {
-          errorMsg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
+          if (xhr.responseText.match('limit of 20000')) { // status code 400
+            errorMsg += ' <strong>Modify the parameters to match fewer ' +
+              'earthquakes (max 20,000)</strong>';
+          }
+          else if (xhr.responseText.match('parameter combination')){ // status code 400
+            errorMsg += ' <strong>Missing required parameters (all fields ' +
+              'are required)</strong>';
+          }
         }
-        else if (xhr.responseText.match('limit of 20000')) {
-          errorMsg += ' <strong>Modify the parameters to match fewer earthquakes' +
-            ' (max 20,000)</strong>';
-        }
-        else if (xhr.responseText.match('parameter combination')){
-          errorMsg += ' <strong>Missing required parameters</strong>';
+        if (status) {
+          if (status === 404 && name === 'Mainshock') {
+            errorMsg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
+          }
+          else if (status.message) {
+            errorMsg += '<strong>' + status.message + '</strong>';
+          }
+          else {
+            errorMsg += '<strong>http status code: ' + status + '</strong>';
+          }
         }
 
         _StatusBar.addError(statusBarId, errorMsg);
