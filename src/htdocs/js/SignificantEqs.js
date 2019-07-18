@@ -83,7 +83,7 @@ var SignificantEqs = function (options) {
 
         _StatusBar.addError('significant', errorMsg);
       },
-      timeout: 8000
+      timeout: 20000
     });
   };
 
