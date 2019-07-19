@@ -59,7 +59,6 @@ var Features = function (options) {
       _getMainshock,
       _getMomentTensor,
       _getStations,
-      _getStatusBarId,
       _loadFeed,
       _removeCanvasEls,
       _removeFeature;
@@ -93,11 +92,9 @@ var Features = function (options) {
   _addFeature = function (opts) {
     var id,
         feature,
-        name,
-        statusBarId;
+        name;
 
     name = opts.name;
-    statusBarId = _getStatusBarId(name);
 
     try {
       // Create feature (and store it in _features for access later)
@@ -133,12 +130,12 @@ var Features = function (options) {
       }
 
       // Feature finished loading; remove alert / set isRefreshing to false
-      _StatusBar.removeItem(statusBarId);
+      _StatusBar.removeItem(name);
       _this.isRefreshing = false;
     }
     catch (error) {
       console.error(error);
-      _StatusBar.addError(statusBarId, 'Error Creating ' + name +
+      _StatusBar.addError(name, 'Error Creating ' + name +
         '<strong>' + error + '</strong>');
       _this.isRefreshing = false;
     }
@@ -372,18 +369,6 @@ var Features = function (options) {
   };
 
   /**
-   * Get id for status bar item (first word in name, lowercase)
-   *
-   * @param name {String}
-   *   name of feature
-   *
-   * @return {String}
-   */
-  _getStatusBarId = function (name) {
-    return /[^\s]+/.exec(name)[0].toLowerCase();
-  };
-
-  /**
    * Load json feed and then call _addFeature() when it's finished loading
    *
    * @param opts {Object}
@@ -397,15 +382,13 @@ var Features = function (options) {
     var domain,
         errorMsg,
         matches,
-        name,
-        statusBarId;
+        name;
 
     name = opts.name;
     errorMsg = 'Error Loading ' + name;
-    statusBarId = _getStatusBarId(name);
 
     // Alert user that feature is loading
-    _StatusBar.addItem(statusBarId, name);
+    _StatusBar.addItem(name);
 
     Xhr.ajax({
       url: opts.url,
@@ -451,7 +434,7 @@ var Features = function (options) {
           }
         }
 
-        _StatusBar.addError(statusBarId, errorMsg);
+        _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
       ontimeout: function (xhr) {
@@ -462,7 +445,7 @@ var Features = function (options) {
         errorMsg += '<strong>Request timed out (can&rsquo;t connect to ' +
           domain + ')</strong>';
 
-        _StatusBar.addError(statusBarId, errorMsg);
+        _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
       timeout: 20000

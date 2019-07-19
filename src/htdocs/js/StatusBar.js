@@ -16,6 +16,7 @@ var StatusBar = function (options) {
       _el,
 
       _doRemove,
+      _getClassName,
       _hideStatusBar,
       _showStatusBar;
 
@@ -39,21 +40,32 @@ var StatusBar = function (options) {
     parent = el.parentNode;
     if (parent) {
       if (parent.children.length === 1) {
-        _hideStatusBar(); // should already be removed, but just in case...
+        _hideStatusBar(); // should already be hidden, but just in case...
       }
       parent.removeChild(el);
     }
   };
 
   /**
-   * Hide status bar
+   * Get className for status bar item (first word in featureName, lowercased)
+   *
+   * @param featureName {String}
+   *
+   * @return {String}
+   */
+  _getClassName = function (featureName) {
+    return /[^\s]+/.exec(featureName)[0].toLowerCase();
+  };
+
+  /**
+   * Hide status bar (css uses this class for slide-down animation)
    */
   _hideStatusBar = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Show status bar
+   * Show status bar (css uses this class for slide-up animation)
    */
   _showStatusBar = function () {
     _el.classList.remove('hide');
@@ -66,62 +78,68 @@ var StatusBar = function (options) {
   /**
    * Add error to status bar
    *
-   * @param className {String}
-   * @param error {String}
+   * @param featureName {String}
+   * @param errorMsg {String}
    */
-  _this.addError = function (className, errorMsg) {
+  _this.addError = function (featureName, errorMsg) {
     var error;
 
-    _this.removeItem(className); // remove any leftover items for this feature
-    _showStatusBar();
-
     error = document.createElement('p');
-    error.classList.add(className, 'error');
+    error.classList.add(_getClassName(featureName), 'error');
     error.innerHTML = errorMsg;
 
+    // Remove any leftover items for this feature
+    _this.removeItem(featureName);
+
     _el.appendChild(error);
+    _showStatusBar();
   };
 
   /**
    * Add item to status bar
    *
-   * @param className {String}
-   * @param name {String}
+   * @param featureName {String}
+   *     pass in 'rendering' to display generic loading message
    */
-  _this.addItem = function (className, name) {
+  _this.addItem = function (featureName) {
     var animEllipsis,
+        className,
         item,
         refNode;
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
+    className = _getClassName(featureName);
     item = document.createElement('p');
     item.classList.add(className);
 
-    _this.removeError(className); // remove any leftover errors for this feature
-    _showStatusBar();
+    // Remove any leftover errors for this feature
+    _this.removeError(featureName);
 
     // Insert loading feature msgs 'above' rendering msgs
-    if (name) { // loading named feature
-      item.innerHTML = 'Loading ' + name + animEllipsis;
-      refNode = _el.querySelector('.rendering');
-      _el.insertBefore(item, refNode);
-    } else { // assume rendering since no name present
+    if (className === 'rendering') { // rendering app panes
       item.innerHTML = 'Loading' + animEllipsis;
       _el.appendChild(item);
     }
+    else { // loading feature
+      item.innerHTML = 'Loading ' + featureName + animEllipsis;
+      refNode = _el.querySelector('.rendering');
+      _el.insertBefore(item, refNode);
+    }
+
+    _showStatusBar();
   };
 
   /**
    * Check if error(s) exist(s)
    *
-   * @param className {String}
+   * @param featureName {String}
    *
    * @return {Boolean}
    */
-  _this.hasError = function (className) {
+  _this.hasError = function (featureName) {
     var error;
 
-    error = _el.querySelector('.' + className + '.error');
+    error = _el.querySelector('.' + _getClassName(featureName) + '.error');
     if (error) {
       return true;
     }
@@ -130,12 +148,12 @@ var StatusBar = function (options) {
   /**
    * Remove error from status bar (and hide if empty)
    *
-   * @param className {String}
+   * @param featureName {String}
    */
-  _this.removeError = function (className) {
+  _this.removeError = function (featureName) {
     var error;
 
-    error = _el.querySelector('.error.' + className);
+    error = _el.querySelector('.error.' + _getClassName(featureName));
     if (error) {
       error.parentNode.removeChild(error);
     }
@@ -148,13 +166,13 @@ var StatusBar = function (options) {
   /**
    * Remove item from status bar (and hide if empty)
    *
-   * @param className {String}
+   * @param featureName {String}
    */
-  _this.removeItem = function (className) {
+  _this.removeItem = function (featureName) {
     var i,
         items;
 
-    items = _el.querySelectorAll('.' + className);
+    items = _el.querySelectorAll('.' + _getClassName(featureName));
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
         _hideStatusBar();

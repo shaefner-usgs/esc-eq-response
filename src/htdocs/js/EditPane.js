@@ -253,11 +253,11 @@ var EditPane = function (options) {
     var regex;
 
     // Check if eqid exists (returns 404 error if not)
-    if (_StatusBar.hasError('mainshock')) {
+    if (_StatusBar.hasError('Mainshock')) {
       return false;
     }
 
-    // Check eqid format (2 letters followed by 5-8 characters)
+    // Check if eqid is correct format (2 letters followed by 5-8 characters)
     regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/;
     if (regex.test(_eqid.value)) {
       return true;

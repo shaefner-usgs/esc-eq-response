@@ -46,7 +46,7 @@ var SignificantEqs = function (options) {
         url;
 
     // Alert user that feed is loading
-    _StatusBar.addItem('significant', 'Significant Earthquakes');
+    _StatusBar.addItem('Significant Earthquakes');
 
     errorMsg = 'Error Loading Significant Earthquakes';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
@@ -57,7 +57,7 @@ var SignificantEqs = function (options) {
         _json = json;
         _callback();
 
-        _StatusBar.removeItem('significant');
+        _StatusBar.removeItem('Significant Earthquakes');
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message
@@ -73,7 +73,7 @@ var SignificantEqs = function (options) {
           }
         }
 
-        _StatusBar.addError('significant', errorMsg);
+        _StatusBar.addError('Significant Earthquakes', errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -81,7 +81,7 @@ var SignificantEqs = function (options) {
         errorMsg += '<strong>Request timed out (can&rsquo;t connect to ' +
           'earthquake.usgs.gov)</strong>';
 
-        _StatusBar.addError('significant', errorMsg);
+        _StatusBar.addError('Significant Earthquakes', errorMsg);
       },
       timeout: 20000
     });

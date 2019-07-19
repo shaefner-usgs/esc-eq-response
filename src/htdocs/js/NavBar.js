@@ -85,7 +85,7 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
-    _StatusBar.addItem('rendering', '');
+    _StatusBar.addItem('rendering');
 
     // Add a slight delay; otherwise loading (rendering) message does not display
     window.setTimeout(function() {
