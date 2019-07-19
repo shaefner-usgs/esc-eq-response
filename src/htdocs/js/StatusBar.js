@@ -84,7 +84,7 @@ var StatusBar = function (options) {
   _this.addError = function (featureName, errorMsg) {
     var error;
 
-    error = document.createElement('p');
+    error = document.createElement('div');
     error.classList.add(_getClassName(featureName), 'error');
     error.innerHTML = errorMsg;
 
@@ -109,20 +109,20 @@ var StatusBar = function (options) {
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
     className = _getClassName(featureName);
-    item = document.createElement('p');
+    item = document.createElement('div');
     item.classList.add(className);
 
     // Remove any leftover errors for this feature
     _this.removeError(featureName);
 
-    // Insert loading feature msgs 'above' rendering msgs
     if (className === 'rendering') { // rendering app panes
-      item.innerHTML = 'Loading' + animEllipsis;
+      item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
       _el.appendChild(item);
     }
     else { // loading feature
-      item.innerHTML = 'Loading ' + featureName + animEllipsis;
+      item.innerHTML = '<h4>Loading ' + featureName + animEllipsis + '</h4>';
       refNode = _el.querySelector('.rendering');
+      // Insert loading feature msgs 'above' rendering msgs
       _el.insertBefore(item, refNode);
     }
 

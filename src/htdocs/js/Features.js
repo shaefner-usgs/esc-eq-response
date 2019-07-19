@@ -135,8 +135,8 @@ var Features = function (options) {
     }
     catch (error) {
       console.error(error);
-      _StatusBar.addError(name, 'Error Creating ' + name +
-        '<strong>' + error + '</strong>');
+      _StatusBar.addError(name, '<h4>Error Creating ' + name + '</h4><ul><li>' +
+        error + '</li></ul>');
       _this.isRefreshing = false;
     }
   };
@@ -385,7 +385,7 @@ var Features = function (options) {
         name;
 
     name = opts.name;
-    errorMsg = 'Error Loading ' + name;
+    errorMsg = '<h4>Error Loading ' + name + '</h4><ul>';
 
     // Alert user that feature is loading
     _StatusBar.addItem(name);
@@ -414,26 +414,27 @@ var Features = function (options) {
           console.error(xhr.responseText);
 
           if (xhr.responseText.match('limit of 20000')) { // status code 400
-            errorMsg += ' <strong>Modify the parameters to match fewer ' +
-              'earthquakes (max 20,000)</strong>';
+            errorMsg += '<li>Modify the parameters to match fewer ' +
+              'earthquakes (max 20,000)</li>';
           }
           else if (xhr.responseText.match('parameter combination')){ // status code 400
-            errorMsg += ' <strong>Missing required parameters (all fields ' +
-              'are required)</strong>';
+            errorMsg += ' <li>Missing required parameters (all fields are ' +
+              'required)</li>';
           }
         }
         if (status) {
           if (status === 404 && name === 'Mainshock') {
-            errorMsg += ' <strong>Event ID ' + _eqid + ' not found</strong>';
+            errorMsg += ' <li>Event ID ' + _eqid + ' not found</li>';
           }
           else if (status.message) {
-            errorMsg += '<strong>' + status.message + '</strong>';
+            errorMsg += '<li>' + status.message + '</li>';
           }
           else {
-            errorMsg += '<strong>http status code: ' + status + '</strong>';
+            errorMsg += '<li>http status code: ' + status + '</li>';
           }
         }
 
+        errorMsg += '</ul>';
         _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
@@ -442,8 +443,8 @@ var Features = function (options) {
 
         matches = opts.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
         domain = matches && matches[1];
-        errorMsg += '<strong>Request timed out (can&rsquo;t connect to ' +
-          domain + ')</strong>';
+        errorMsg += '<li>Request timed out (can&rsquo;t connect to ' + domain +
+          ')</li></ul>';
 
         _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;

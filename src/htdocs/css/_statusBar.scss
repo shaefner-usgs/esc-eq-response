@@ -1,26 +1,43 @@
 #statusBar {
   bottom: 0;
   box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, 0.06);
-  height: 40px;
+  height: 44px;
   left: 0;
   position: fixed;
   width: 100%;
   z-index: 10000;
 
-  p {
+  div {
     background-color: rgba(255, 255, 120, 0.95);
     border-top: 2px solid rgba(255, 255, 0, 1);
-    color: $text-color;
     display: none;
-    font-size: 20px;
-    line-height: 1;
-    margin: 0;
-    min-height: 40px;
-    padding: 8px 0 10px;
-    text-align: center;
-    text-shadow: 1px 1px 3px #fffec6;
+    min-height: 44px;
+    padding: 10px 0;
     position: absolute;
+    text-shadow: 1px 1px 3px #fffec6;
     width: 100%;
+
+    h4 {
+      color: $text-color;
+      font-size: 20px;
+      line-height: 1;
+      margin: 0;
+      text-align: center;
+    }
+
+    li {
+      display: inline;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      &:after {
+        content: ', ';
+      }
+      &:last-child:after {
+        content: '';
+      }
+    }
 
     /* Loading animation */
     span {
@@ -40,23 +57,27 @@
       }
     }
 
-    strong {
-      display: block;
+    ul {
+      color: #fff;
       font-size: 14px;
-      font-weight: normal;
-      margin-top: 2px;
-    }
-
-    &:first-child {
-      display: block;
+      margin: 3px 0 0;
+      padding: 0;
+      text-align: center;
     }
 
     &.error {
       background-color: rgba(223, 62, 62, 0.92);
       border-color: rgb(195, 0, 0);
-      color: #fff;
       padding: 1px 0;
       text-shadow: 1px 1px 3px #922c2c;
+
+      h4 {
+        color: #fff;
+      }
+    }
+
+    &:first-child {
+      display: block; /* only display one item (first) at a time */
     }
   }
 
