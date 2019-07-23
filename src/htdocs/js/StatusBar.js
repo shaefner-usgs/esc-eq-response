@@ -82,11 +82,18 @@ var StatusBar = function (options) {
    * @param errorMsg {String}
    */
   _this.addError = function (featureName, errorMsg) {
-    var error;
+    var closeButton,
+        error;
 
     error = document.createElement('div');
     error.classList.add(_getClassName(featureName), 'error');
-    error.innerHTML = errorMsg;
+    error.innerHTML = errorMsg + '<a href="#" class="close"></a>';
+
+    closeButton = error.querySelector('.close');
+    closeButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      _this.removeItem(featureName);
+    });
 
     // Remove any leftover items for this feature
     _this.removeItem(featureName);

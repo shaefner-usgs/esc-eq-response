@@ -17,54 +17,6 @@
     text-shadow: 1px 1px 3px #fffec6;
     width: 100%;
 
-    h4 {
-      color: $text-color;
-      font-size: 20px;
-      line-height: 1;
-      margin: 0;
-      text-align: center;
-    }
-
-    li {
-      display: inline;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-
-      &:after {
-        content: ', ';
-      }
-      &:last-child:after {
-        content: '';
-      }
-    }
-
-    /* Loading animation */
-    span {
-      animation: loading 1s infinite;
-      display: inline-block;
-      font: 1.2em georgia;
-      line-height: .25;
-
-      &:nth-child(1) {
-        padding-left: 3px;
-      }
-      &:nth-child(2) {
-        animation-delay: .15s;
-      }
-      &:nth-child(3) {
-        animation-delay: .3s;
-      }
-    }
-
-    ul {
-      color: #fff;
-      font-size: 14px;
-      margin: 3px 0 0;
-      padding: 0;
-      text-align: center;
-    }
-
     &.error {
       background-color: rgba(223, 62, 62, 0.92);
       border-color: rgb(195, 0, 0);
@@ -78,6 +30,85 @@
 
     &:first-child {
       display: block; /* only display one item (first) at a time */
+    }
+  }
+
+  h4 {
+    color: $text-color;
+    font-size: 20px;
+    line-height: 1;
+    margin: 0;
+    text-align: center;
+  }
+
+  li {
+    color: #fff;
+    display: inline;
+    font-size: 14px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    &:after {
+      content: ', ';
+    }
+    &:last-child:after {
+      content: '';
+    }
+  }
+
+  /* Loading animation */
+  span {
+    animation: loading 1s infinite;
+    display: inline-block;
+    font: 1.2em georgia;
+    line-height: .25;
+
+    &:nth-child(1) {
+      padding-left: 3px;
+    }
+    &:nth-child(2) {
+      animation-delay: .15s;
+    }
+    &:nth-child(3) {
+      animation-delay: .3s;
+    }
+  }
+
+  ul {
+    margin: 3px 0 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .close {
+    background-color: rgb(195, 0, 0);
+    border-radius: 50%;
+    height: 32px;
+    opacity: 0.75;
+    position: absolute;
+    right: 6px;
+    top: 5px;
+    transition: opacity .25s ease-out;
+    width: 32px;
+
+    &:hover {
+      opacity: 1;
+    }
+    &:before, &:after {
+      background-color: #fff;
+      content: ' ';
+      height: 20px;
+      left: 15px;
+      position: absolute;
+      top: 6px;
+      width: 2px;
+    }
+    &:before {
+      transform: rotate(45deg);
+    }
+    &:after {
+      transform: rotate(-45deg);
     }
   }
 
