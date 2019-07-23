@@ -451,7 +451,7 @@ var Features = function (options) {
         _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
-      timeout: 2000
+      timeout: 20000
     });
   };
 
