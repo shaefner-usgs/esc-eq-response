@@ -385,7 +385,7 @@ var Features = function (options) {
         name;
 
     name = opts.name;
-    errorMsg = '<h4>Error Loading ' + name + '</h4><ul>';
+    errorMsg = '<h4>Error Loading ' + name + '</h4>';
 
     // Alert user that feature is loading
     _StatusBar.addItem(name);
@@ -409,6 +409,8 @@ var Features = function (options) {
         });
       },
       error: function (status, xhr) {
+        errorMsg += '<ul>';
+
         // Show response in console and add additional info to error message
         if (xhr.responseText) {
           console.error(xhr.responseText);
@@ -443,13 +445,13 @@ var Features = function (options) {
 
         matches = opts.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
         domain = matches && matches[1];
-        errorMsg += '<li>Request timed out (can&rsquo;t connect to ' + domain +
+        errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
 
         _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
-      timeout: 20000
+      timeout: 2000
     });
   };
 
