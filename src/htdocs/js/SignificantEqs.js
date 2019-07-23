@@ -48,7 +48,7 @@ var SignificantEqs = function (options) {
     // Alert user that feed is loading
     _StatusBar.addItem('Significant Earthquakes');
 
-    errorMsg = '<h4>Error Loading Significant Earthquakes</h4>';
+    errorMsg = '<h4>Error Loading Significant Earthquakes</h4><ul>';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 
     Xhr.ajax({
