@@ -15,9 +15,9 @@ var StatusBar = function (options) {
 
       _el,
 
-      _doRemove,
       _getClassName,
       _hideStatusBar,
+      _removeFromDom,
       _showStatusBar;
 
 
@@ -27,23 +27,6 @@ var StatusBar = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-  };
-
-  /**
-   * Remove status bar entry from DOM
-   *
-   * @param el {Element}
-   */
-  _doRemove = function (el) {
-    var parent;
-
-    parent = el.parentNode;
-    if (parent) {
-      if (parent.children.length === 1) {
-        _hideStatusBar(); // should already be hidden, but just in case...
-      }
-      parent.removeChild(el);
-    }
   };
 
   /**
@@ -58,14 +41,31 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Hide status bar (css uses this class for slide-down animation)
+   * Hide status bar (using css slide-down animation)
    */
   _hideStatusBar = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Show status bar (css uses this class for slide-up animation)
+   * Remove status bar entry from DOM
+   *
+   * @param el {Element}
+   */
+  _removeFromDom = function (el) {
+    var parent;
+
+    parent = el.parentNode;
+    if (parent) {
+      if (parent.children.length === 1) {
+        _hideStatusBar(); // should already be hidden, but just in case...
+      }
+      parent.removeChild(el);
+    }
+  };
+
+  /**
+   * Show status bar (using css slide-up animation)
    */
   _showStatusBar = function () {
     _el.classList.remove('hide');
@@ -112,8 +112,8 @@ var StatusBar = function (options) {
     item = document.createElement('div');
     item.classList.add(className);
 
-    // Remove any leftover errors for this feature
-    _this.removeError(featureName);
+    // Remove any leftover items for this feature
+    _this.removeItem(featureName);
 
     if (className === 'rendering') { // rendering app panes
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
@@ -146,25 +146,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove error from status bar (and hide if empty)
-   *
-   * @param featureName {String}
-   */
-  _this.removeError = function (featureName) {
-    var error;
-
-    error = _el.querySelector('.error.' + _getClassName(featureName));
-    if (error) {
-      error.parentNode.removeChild(error);
-    }
-
-    if (_el.children.length === 0) {
-      _hideStatusBar();
-    }
-  };
-
-  /**
-   * Remove item from status bar (and hide if empty)
+   * Remove item from status bar (and hide/remove status bar if empty)
    *
    * @param featureName {String}
    */
@@ -177,9 +159,9 @@ var StatusBar = function (options) {
       if (_el.children.length === 1) {
         _hideStatusBar();
         // Don't remove last item until after css transition to hide is complete
-        window.setTimeout(_doRemove, 500, items[i]);
+        window.setTimeout(_removeFromDom, 500, items[i]);
       } else {
-        _doRemove(items[i]);
+        _removeFromDom(items[i]);
       }
     }
   };
