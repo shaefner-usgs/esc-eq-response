@@ -81,13 +81,12 @@
     text-align: center;
   }
 
-  .close {
+  .close, .reload {
     background-color: rgb(195, 0, 0);
     border-radius: 50%;
     height: 32px;
     opacity: 0.75;
     position: absolute;
-    right: 6px;
     top: 5px;
     transition: opacity .25s ease-out;
     width: 32px;
@@ -95,6 +94,10 @@
     &:hover {
       opacity: 1;
     }
+  }
+  .close {
+    right: 3px;
+
     &:before, &:after {
       background-color: #fff;
       content: ' ';
@@ -109,6 +112,34 @@
     }
     &:after {
       transform: rotate(-45deg);
+    }
+  }
+  .reload {
+    padding: 7px;
+    right: 40px;
+
+    &:before, &:after {
+      content: '';
+      display: block;
+    }
+    &:before {
+      border-color: transparent white white white;
+      border-radius: 50%;
+      border-style: solid;
+      border-width: 2px;
+      height: 18px;
+      width: 18px;
+      transform: rotate(45deg);
+    }
+    &:after {
+      border-color: transparent transparent transparent white;
+      border-style: solid;
+      border-width: 4px 0 4px 6px;
+      height: 0;
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      width: 0;
     }
   }
 

@@ -447,6 +447,7 @@ var Features = function (options) {
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
+        //errorMsg += '<a href="#" class="reload"></a>';
 
         _StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
