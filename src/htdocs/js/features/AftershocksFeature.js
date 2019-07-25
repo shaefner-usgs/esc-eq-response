@@ -2,7 +2,6 @@
 
 
 var AppUtil = require('AppUtil'),
-    AftershocksProb = require('features/AftershocksProb'),
     Earthquakes = require('features/Earthquakes');
 
 
@@ -20,10 +19,11 @@ var Aftershocks = function (options) {
   var _this,
       _initialize,
 
+      _eqid,
       _mag,
       _magThreshold,
+      _oaf,
 
-      _AftershocksProb,
       _Earthquakes,
 
       _getName,
@@ -38,15 +38,16 @@ var Aftershocks = function (options) {
 
     options = options || {};
 
-    _AftershocksProb = AftershocksProb();
     _Earthquakes = Earthquakes({
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson
     });
 
+    _eqid = options.mainshockJson.id;
     _mag = options.mainshockJson.properties.mag;
     _magThreshold = Math.floor(_mag - 2.5);
+    _oaf = options.mainshockJson.properties.products.oaf;
 
     _this.displayLayer = true;
     _this.id = id;
@@ -63,57 +64,53 @@ var Aftershocks = function (options) {
     return options.name + ' (' + options.json.metadata.count + ')';
   };
 
+  /**
+   * Get aftershock probabilities HTML
+   */
   _getProbabilities = function () {
-    var expected,
+    var data,
         html,
-        i,
+        probability,
         range,
-        results,
-        start,
         url;
 
     html = '';
-    start = parseFloat(_Earthquakes.getDuration());
+    url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast';
 
-    for (i = Math.floor(_mag); i >= 4; i --) {
-      results = _AftershocksProb.calculate({
-        aftershock: i,
-        mainshock: AppUtil.round(_mag, 1),
-        start: start
-      });
-
-      expected = Math.round(10 * results.number) / 10;
-      range = '';
-      if (results.min === results.max) {
-        if (results.min !== 0) {
-          range = ' (' + results.min + ')';
+    if (_oaf) {
+      data = JSON.parse(_oaf[0].contents[''].bytes);
+      data.forecast.forEach(function(period) {
+        if (period.label === data.advisoryTimeFrame) { // show 'primary emphasis' period
+          period.bins.forEach(function(bin) {
+            if (bin.probability < 0.01) {
+              probability = '&lt; 1%';
+            } else if (bin.probability > 0.99) {
+              probability = '&gt; 99%';
+            } else {
+              probability = AppUtil.round(100 * bin.probability, 0) + '%';
+            }
+            if (bin.p95minimum === 0 && bin.p95maximum === 0) {
+              range = 0;
+            } else {
+              range = bin.p95minimum  + '&ndash;' + bin.p95maximum;
+            }
+            html += '<a href="' + url + '"><h4>M ' + bin.magnitude + '+</h4>' +
+              '<ul>' +
+                '<li class="probability">' + probability + '</li>' +
+                '<li class="expected"><abbr title="Expected number of ' +
+                  'aftershocks">' + range + '</abbr></li>' +
+              '</ul></a>';
+          });
         }
-      } else {
-        range = ' (' + results.min + '&ndash;' + results.max + ')';
-      }
-      expected += range;
-
-      url = 'http://escint.wr.usgs.gov/science/software/aftershocks/?';
-      url += 'msMag=' + results.mainshock + '&asMag=' + results.aftershock +
-        '&start=' + results.start;
-
-      html += '<a href="' + url + '">' +
-          '<h4>M ' + i + '+</h4>' +
-          '<ul>' +
-            '<li class="probability">' + AppUtil.round(100 * results.probability, 1) + '%</li>' +
-            '<li class="expected"><abbr title="Expected number (and range) ' +
-              'of aftershocks">' + expected + '</abbr></li>' +
-          '</ul>' +
-        '</a>';
+      });
     }
 
     if (html) {
       html = '<h3>Aftershock Probabilities</h3>' +
-        '<p>The probability of one or more aftershocks in the specified ' +
-          'magnitude range during the <strong>next 7 days</strong>, based on ' +
-          'the aftershock model in Reasenberg and Jones (1989, 1994). The ' +
-          'expected number of aftershocks and the range (' + results.conf * 100 +
-          '% confidence interval) is also included.</p>' +
+        '<p>Probability of one or more aftershocks in the specified ' +
+          'magnitude range during the <strong>next ' + data.advisoryTimeFrame.toLowerCase() +
+          '</strong>, based on ' + data.model.name + '. The expected number ' +
+          'of aftershocks (95% confidence range) is also included.</p>' +
         '<div class="probabilities">' + html + '</div>';
     }
 
