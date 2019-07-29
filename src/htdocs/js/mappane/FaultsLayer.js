@@ -37,7 +37,7 @@ L.FaultsLayer = function () {
 
   _layer = L.layerGroup([_plates, _faults]);
   _layer.id = 'faults';
-  
+
   return _layer;
 };
 
