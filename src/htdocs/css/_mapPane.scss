@@ -1,3 +1,4 @@
+@import 'mappane/_control-bottomcenter.scss';
 @import 'mappane/_mousePosition.scss';
 @import 'features/_fieldnotesFeature.scss';
 @import 'features/_stationsFeature.scss';
@@ -97,6 +98,9 @@
   }
   .leaflet-control-layers-expanded {
     background: #fff;
+  }
+  .leaflet-control-layers-separator {
+    border-top-color: #cabede;
   }
 }
 

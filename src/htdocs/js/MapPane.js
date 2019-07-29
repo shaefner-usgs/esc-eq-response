@@ -3,6 +3,7 @@
 
 
 // Leaflet plugins
+require('mappane/Control-bottomcenter');
 require('mappane/MousePosition');
 //require('mappane/RestoreMap');
 
@@ -192,7 +193,7 @@ var MapPane = function (options) {
 
     // Add / remove controls
     _this.layerControl = _addLayerControl();
-    L.control.mousePosition().addTo(_this.map);
+    L.control.mousePosition({position: 'bottomcenter'}).addTo(_this.map);
     L.control.scale().addTo(_this.map);
     _hideZoomControl();
 
