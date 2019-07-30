@@ -5,6 +5,11 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Move lat/lon control to center of map; tweak css for consistency among controls
+* Use OAF product for aftershock probs. instead of calculating them
+* Add close button to error bar so user can dismiss
+* Change timeout period for loading feeds from 8 to 20 secs
+* Display more informative error msgs when feeds fail to load
 * Update event page links to new schema
 * Bug fix: use change event for updating urlparams, which allows decimal values to be entered
 * Bug fix: always set minimum value on sliders to integer (Math.floor)
