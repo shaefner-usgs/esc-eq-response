@@ -1,7 +1,8 @@
 .leaflet-container .leaflet-control-mouseposition {
   background-color: rgba(255, 255, 255, .5);
-  color: #333;
+  color: $text-color;
   font: 11px/1.5 $font-family;
   margin: 0 0 5px 0;
   padding: 0 3px;
+  user-select: none;
 }
