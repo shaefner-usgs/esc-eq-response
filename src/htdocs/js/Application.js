@@ -16,8 +16,8 @@ var EditPane = require('EditPane'),
  *
  * @param options {Object}
  *   {
- *     editPane: {ELement},
- *     helpPane: {ELement},
+ *     editPane: {Element},
+ *     helpPane: {Element},
  *     mapPane: {Element},
  *     navBar: {Element},
  *     plotsPane: {Element},
@@ -29,15 +29,7 @@ var Application = function (options) {
   var _this,
       _initialize,
 
-      _EditPane,
-      _Features,
-      _HelpPane,
-      _MapPane,
-      _NavBar,
-      _PlotsPane,
-      _StatusBar,
-      _SummaryPane,
-
+      _loadDependencies,
       _redirect;
 
 
@@ -45,52 +37,44 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _redirect();
-
-    // Instantiate help / map / plots / summary panes & status / navigation bars
-    _HelpPane = HelpPane({
-      el: options.helpPane
-    });
-    _MapPane = MapPane({
-      el: options.mapPane
-    });
-    _PlotsPane = PlotsPane({
-      el: options.plotsPane,
-      mapPane: _MapPane
-    });
-    _SummaryPane = SummaryPane({
-      el: options.summaryPane,
-      mapPane: _MapPane
-    });
-    _StatusBar = StatusBar({
-      el: options.statusBar
-    });
-    _NavBar = NavBar({
-      el: options.navBar,
-      mapPane: _MapPane,
-      plotsPane: _PlotsPane,
-      statusBar: _StatusBar
-    });
-
-    // Instantiate features (event-specific layers) for map, plots and summary panes
-    _Features = Features({
-      mapPane: _MapPane,
-      plotsPane: _PlotsPane,
-      statusBar: _StatusBar,
-      summaryPane: _SummaryPane
-    });
-
-    // Instantiate edit pane
-    _EditPane = EditPane({
-      el: options.editPane,
-      features: _Features,
-      mapPane: _MapPane,
-      navBar: _NavBar,
-      statusBar: _StatusBar,
-      summaryPane: _SummaryPane
-    });
+    _loadComponents(options);
 
     // Remove initial loading message
-    _StatusBar.removeItem('initial');
+    _this.StatusBar.removeItem('initial');
+  };
+
+  /**
+   * Load app
+   */
+  _loadComponents = function (options) {
+    _this.HelpPane = HelpPane({
+      el: options.helpPane
+    });
+    _this.MapPane = MapPane({
+      el: options.mapPane
+    });
+    _this.StatusBar = StatusBar({
+      el: options.statusBar
+    });
+    _this.PlotsPane = PlotsPane({  // mapPane
+      app: _this,
+      el: options.plotsPane
+    });
+    _this.SummaryPane = SummaryPane({ // mapPane
+      app: _this,
+      el: options.summaryPane
+    });
+    _this.NavBar = NavBar({ // mapPane, plotsPane, statusBar
+      app: _this,
+      el: options.navBar
+    });
+    _this.Features = Features({ // mapPane, plotsPane, statusBar, summaryPane
+      app: _this
+    });
+    _this.EditPane = EditPane({ // features, mapPane, navBar, statusBar, summaryPane
+      app: _this,
+      el: options.editPane
+    });
   };
 
   /**
@@ -111,6 +95,7 @@ var Application = function (options) {
 
   _initialize(options);
   options = null;
+  console.log(_this);
   return _this;
 };
 

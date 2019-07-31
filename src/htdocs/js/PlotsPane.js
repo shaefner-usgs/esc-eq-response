@@ -17,11 +17,10 @@ var PlotsPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
       _features,
       _plotData,
-
-      _MapPane,
 
       _addListeners,
       _addPlotContainer,
@@ -39,11 +38,10 @@ var PlotsPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
     _plotData = {};
-
-    _MapPane = options.mapPane;
 
     // Make plots responsive
     window.onresize = function() {
@@ -75,7 +73,7 @@ var PlotsPane = function (options) {
         feature = 'mainshock';
       }
 
-      _MapPane.openPopup(feature, eqids[index]);
+      _app.MapPane.openPopup(feature, eqids[index]);
     });
   };
 

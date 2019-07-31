@@ -36,16 +36,12 @@ var Features = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _editPane,
       _eqid,
       _features,
       _mainshockJson,
       _plotdata,
-
-      _MapPane,
-      _PlotsPane,
-      _StatusBar,
-      _SummaryPane,
 
       _addFeature,
       _addPlots,
@@ -69,10 +65,7 @@ var Features = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _MapPane = options.mapPane;
-    _PlotsPane = options.plotsPane;
-    _StatusBar = options.statusBar;
-    _SummaryPane = options.summaryPane;
+    _app = options.app;
 
     // Flag to block mult. instances of feature from refreshing at the same time
     _this.isRefreshing = false;
@@ -108,8 +101,8 @@ var Features = function (options) {
       _features[id] = feature;
 
       // Create a new map pane and add feature to map, summary panes
-      _MapPane.createMapPane(id, 'overlayPane');
-      _MapPane.addFeatureLayer(feature);
+      _app.MapPane.createMapPane(id, 'overlayPane');
+      _app.MapPane.addFeatureLayer(feature);
       _addSummary(feature);
 
       if (id === 'mainshock') {
@@ -130,12 +123,12 @@ var Features = function (options) {
       }
 
       // Feature finished loading; remove alert / set isRefreshing to false
-      _StatusBar.removeItem(name);
+      _app.StatusBar.removeItem(name);
       _this.isRefreshing = false;
     }
     catch (error) {
       console.error(error);
-      _StatusBar.addError(name, '<h4>Error Creating ' + name + '</h4><ul><li>' +
+      _app.StatusBar.addError(name, '<h4>Error Creating ' + name + '</h4><ul><li>' +
         error + '</li></ul>');
       _this.isRefreshing = false;
     }
@@ -147,7 +140,7 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addPlots = function (feature) {
-    _PlotsPane.addPlots({
+    _app.PlotsPane.addPlots({
       id: feature.id,
       name: feature.name,
       data: _plotdata
@@ -161,7 +154,7 @@ var Features = function (options) {
    */
   _addSummary = function (feature) {
     if (feature.getSummaryData) { // check 1st if feature has summary to add
-      _SummaryPane.addSummary({
+      _app.SummaryPane.addSummary({
         id: feature.id,
         name: feature.name,
         data: feature.getSummaryData()
@@ -388,7 +381,7 @@ var Features = function (options) {
     errorMsg = '<h4>Error Loading ' + name + '</h4>';
 
     // Alert user that feature is loading
-    _StatusBar.addItem(name);
+    _app.StatusBar.addItem(name);
 
     Xhr.ajax({
       url: opts.url,
@@ -437,7 +430,7 @@ var Features = function (options) {
         }
 
         errorMsg += '</ul>';
-        _StatusBar.addError(name, errorMsg);
+        _app.StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
       ontimeout: function (xhr) {
@@ -449,7 +442,7 @@ var Features = function (options) {
           ')</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _StatusBar.addError(name, errorMsg);
+        _app.StatusBar.addError(name, errorMsg);
         _this.isRefreshing = false;
       },
       timeout: 20000
@@ -493,16 +486,16 @@ var Features = function (options) {
     }
 
     if (mapLayer) {
-      _MapPane.map.removeLayer(mapLayer);
-      _MapPane.layerControl.removeLayer(mapLayer);
+      _app.MapPane.map.removeLayer(mapLayer);
+      _app.MapPane.layerControl.removeLayer(mapLayer);
     }
 
     if (plotsEl) {
-      _PlotsPane.removePlots(plotsEl);
+      _app.PlotsPane.removePlots(plotsEl);
     }
 
     if (summaryEl) {
-      _SummaryPane.removeSummary(summaryEl);
+      _app.SummaryPane.removeSummary(summaryEl);
     }
   };
 
@@ -557,7 +550,7 @@ var Features = function (options) {
       _getAftershocks();
 
       // Also refresh Fieldnotes
-      if (_MapPane.map.hasLayer(_features.fieldnotes.getMapLayer())) {
+      if (_app.MapPane.map.hasLayer(_features.fieldnotes.getMapLayer())) {
         fieldnotesLayerOn = true;
       }
       _removeFeature('fieldnotes');

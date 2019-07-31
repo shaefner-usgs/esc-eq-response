@@ -15,14 +15,11 @@ var NavBar = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
       _navButtons,
       _panes,
       _throttle,
-
-      _MapPane,
-      _PlotsPane,
-      _StatusBar,
 
       _addListeners,
       _changePane,
@@ -41,13 +38,10 @@ var NavBar = function (options) {
 
     options = options || {};
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _navButtons = _el.querySelectorAll('.panes a');
     _panes = document.querySelectorAll('section.pane');
-
-    _MapPane = options.mapPane;
-    _PlotsPane = options.plotsPane;
-    _StatusBar = options.statusBar;
 
     id = _getPaneId();
     _changePane(id);
@@ -85,13 +79,13 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
-    _StatusBar.addItem('rendering');
+    _app.StatusBar.addItem('rendering');
 
     // Add a slight delay; otherwise loading (rendering) message does not display
     window.setTimeout(function() {
       _hidePanes();
       _showPane(id);
-      _StatusBar.removeItem('rendering');
+      _app.StatusBar.removeItem('rendering');
     }, 20);
   };
 
@@ -199,15 +193,15 @@ var NavBar = function (options) {
 
     // Update map container / render plots so they display correctly when unhidden
     if (id === 'mapPane') {
-      _MapPane.map.invalidateSize();
+      _app.MapPane.map.invalidateSize();
       // Fire an event so L.popup.update() can be called after map is visible,
       // which seems to be necessary for Leaflet to display popups correctly
       // when they're added to the map from another pane
-      _MapPane.map.fire('visible');
-      _MapPane.setView();
+      _app.MapPane.map.fire('visible');
+      _app.MapPane.setView();
     } else if (id === 'plotsPane') {
-      _PlotsPane.renderPlots();
-      _PlotsPane.resizePlots();
+      _app.PlotsPane.renderPlots();
+      _app.PlotsPane.resizePlots();
     }
   };
 

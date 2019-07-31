@@ -23,18 +23,14 @@ var EditPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
       _eqid,
       _eqidPrevValue,
       _fields,
       _throttleRefresh,
 
-      _Features,
-      _MapPane,
-      _NavBar,
       _SignificantEqs,
-      _StatusBar,
-      _SummaryPane,
 
       _addListener,
       _addSignificantEqs,
@@ -60,12 +56,7 @@ var EditPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _Features = options.features;
-    _MapPane = options.mapPane;
-    _NavBar = options.navBar;
-    _StatusBar = options.statusBar;
-    _SummaryPane = options.summaryPane;
-
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _eqid = document.getElementById('eqid');
     _eqid.focus();
@@ -76,7 +67,7 @@ var EditPane = function (options) {
 
     _SignificantEqs = SignificantEqs({
       callback: _addSignificantEqs,
-      statusBar: _StatusBar
+      statusBar: _app.StatusBar
     });
 
     _initListeners();
@@ -179,7 +170,7 @@ var EditPane = function (options) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
       // Pass editPane instance to expose its public methods to xhr callback in Features
-      _Features.getFeatures({
+      _app.Features.getFeatures({
         editPane: _this
       });
     }
@@ -253,7 +244,7 @@ var EditPane = function (options) {
     var regex;
 
     // Check if eqid exists (returns 404 error if not)
-    if (_StatusBar.hasError('Mainshock')) {
+    if (_app.StatusBar.hasError('Mainshock')) {
       return false;
     }
 
@@ -280,12 +271,12 @@ var EditPane = function (options) {
       _throttleRefresh = window.setTimeout(function() {
         // Even with throttle in place, ajax requests could 'stack' up
         // Wait until previous request is finished before starting another
-        if (_Features.isRefreshing) {
+        if (_app.Features.isRefreshing) {
           window.setTimeout(function() {
             _refreshEqs.call(formField);
           }, 100);
         } else {
-          _Features.refresh(id);
+          _app.Features.refresh(id);
         }
       }, 250);
     }
@@ -299,11 +290,11 @@ var EditPane = function (options) {
 
     _hideMainshock();
     _resetTitle();
-    _StatusBar.reset();
-    _Features.removeFeatures();
-    _MapPane.reset();
-    _SummaryPane.reset();
-    _NavBar.reset();
+    _app.StatusBar.reset();
+    _app.Features.removeFeatures();
+    _app.MapPane.reset();
+    _app.SummaryPane.reset();
+    _app.NavBar.reset();
   };
 
   /**

@@ -18,12 +18,11 @@ var SummaryPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
       _features,
       _style,
       _tz,
-
-      _MapPane,
 
       _addListeners,
       _addTimestamp,
@@ -45,12 +44,11 @@ var SummaryPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _features = _el.querySelector('.features');
     _style = document.createElement('style');
     _tz = _getTimeZone();
-
-    _MapPane = options.mapPane;
 
     // Dynamic range input styles are set inside this <style> tag
     document.body.appendChild(_style);
@@ -172,7 +170,7 @@ var SummaryPane = function (options) {
       selection.toString().length > 0;
 
     if(!isTextSelected) { // suppress event if user is trying to select text
-      _MapPane.openPopup(feature, eqid);
+      _app.MapPane.openPopup(feature, eqid);
     }
   };
 
