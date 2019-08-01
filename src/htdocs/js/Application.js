@@ -1,13 +1,15 @@
 'use strict';
 
 
-var EditPane = require('EditPane'),
+var AppUtil = require('AppUtil'),
+    EditPane = require('EditPane'),
     Features = require('Features'),
     HelpPane = require('HelpPane'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
     StatusBar = require('StatusBar'),
+    SignificantEqs = require('SignificantEqs'),
     SummaryPane = require('SummaryPane');
 
 
@@ -29,7 +31,7 @@ var Application = function (options) {
   var _this,
       _initialize,
 
-      _loadDependencies,
+      _loadComponents,
       _redirect;
 
 
@@ -44,9 +46,11 @@ var Application = function (options) {
   };
 
   /**
-   * Load app
+   * Load app components and store them in a global 'app' object that is shared
+   *   between classes
    */
   _loadComponents = function (options) {
+    _this.AppUtil = AppUtil;
     _this.HelpPane = HelpPane({
       el: options.helpPane
     });
@@ -56,24 +60,33 @@ var Application = function (options) {
     _this.StatusBar = StatusBar({
       el: options.statusBar
     });
-    _this.PlotsPane = PlotsPane({  // mapPane
+    // PlotsPane depends on: MapPane
+    _this.PlotsPane = PlotsPane({
       app: _this,
       el: options.plotsPane
     });
-    _this.SummaryPane = SummaryPane({ // mapPane
+    // SummaryPane depends on: MapPane
+    _this.SummaryPane = SummaryPane({
       app: _this,
       el: options.summaryPane
     });
-    _this.NavBar = NavBar({ // mapPane, plotsPane, statusBar
+    // Features depends on: MapPane, PlotsPane, StatusBar, SummaryPane
+    _this.Features = Features({
+      app: _this
+    });
+    // NavBar depends on: MapPane, PlotsPane, StatusBar
+    _this.NavBar = NavBar({
       app: _this,
       el: options.navBar
     });
-    _this.Features = Features({ // mapPane, plotsPane, statusBar, summaryPane
-      app: _this
-    });
-    _this.EditPane = EditPane({ // features, mapPane, navBar, statusBar, summaryPane
+    // EditPane depends on: Features, MapPane, NavBar, StatusBar, SummaryPane
+    _this.EditPane = EditPane({
       app: _this,
       el: options.editPane
+    });
+    // SignificantEqs depends on: EditPane, StatusBar
+    _this.SignificantEqs = SignificantEqs({
+      app: _this
     });
   };
 

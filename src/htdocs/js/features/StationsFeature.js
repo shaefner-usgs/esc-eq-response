@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Util = require('hazdev-webutils/src/util/Util');
+var Util = require('hazdev-webutils/src/util/Util');
 
 
 var _DEFAULTS,
@@ -42,6 +41,7 @@ var Stations = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _count,
       _mapLayer,
       _markerOptions,
@@ -67,6 +67,7 @@ var Stations = function (options) {
 
     options = options || {};
 
+    _app = options.app;
     _count = 0;
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
@@ -222,7 +223,7 @@ var Stations = function (options) {
 
   _generatePopupContent = function (feature) {
     var p = feature.properties,
-        romanIntensity = AppUtil.romanize(p.intensity) || 'I';
+        romanIntensity = _app.AppUtil.romanize(p.intensity) || 'I';
 
     var markup = ['<div class="station-popup">',
       '<h4 class="station-title">', _formatTitle(feature), '</h4>',
@@ -232,15 +233,15 @@ var Stations = function (options) {
           '<br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
         '</li>',
         '<li class="station-summary-pga">',
-          AppUtil.round(p.pga, 3, '&ndash;'),
+          _app.AppUtil.round(p.pga, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
         '</li>',
         '<li class="station-summary-pgv">',
-          AppUtil.round(p.pgv, 3, '&ndash;'),
+          _app.AppUtil.round(p.pgv, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
         '</li>',
         '<li class="station-summary-distance">',
-          AppUtil.round(p.distance, 1, '&ndash;'),' km',
+          _app.AppUtil.round(p.distance, 1, '&ndash;'),' km',
           '<br><abbr title="Distance (km)">Dist</abbr></br>',
         '</li>',
       '</ul>',
@@ -257,7 +258,7 @@ var Stations = function (options) {
           '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
         '<dt class="station-metadata-intensity">Intensity</dt>',
           '<dd class="station-metadata-intensity">',
-            AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
+            _app.AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
           '</dd>',
       '</dl>',
       _createChannelTable(p.channels),
@@ -307,7 +308,7 @@ var Stations = function (options) {
         romanIntensity;
 
     props = feature.properties;
-    romanIntensity = AppUtil.romanize(props.intensity) || 'I';
+    romanIntensity = _app.AppUtil.romanize(props.intensity) || 'I';
 
     _markerOptions.className = 'station-layer-icon station-mmi' + romanIntensity;
 

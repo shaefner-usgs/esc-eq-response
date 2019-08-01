@@ -1,10 +1,6 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    SignificantEqs = require('SignificantEqs');
-
-
 /**
  * Handles form fields and sets address bar to match application state.
  * Also kicks off fetching of data feeds and displays mainshock details.
@@ -30,10 +26,7 @@ var EditPane = function (options) {
       _fields,
       _throttleRefresh,
 
-      _SignificantEqs,
-
       _addListener,
-      _addSignificantEqs,
       _getDefaults,
       _getFeatures,
       _hideMainshock,
@@ -44,7 +37,6 @@ var EditPane = function (options) {
       _resetApp,
       _resetForm,
       _resetTitle,
-      _selSignificantEq,
       _setFormFields,
       _setQueryString,
       _updateParam,
@@ -64,11 +56,6 @@ var EditPane = function (options) {
 
     // All form fields
     _fields = _el.querySelectorAll('input');
-
-    _SignificantEqs = SignificantEqs({
-      callback: _addSignificantEqs,
-      statusBar: _app.StatusBar
-    });
 
     _initListeners();
     _setFormFields();
@@ -94,29 +81,6 @@ var EditPane = function (options) {
 
     for (i = 0; i < els.length; i ++) {
       els[i].addEventListener(type, listener);
-    }
-  };
-
-  /**
-   * Add list of significant earthquakes pulldown menu
-   */
-  _addSignificantEqs = function () {
-    var div,
-        refNode,
-        selectMenu,
-        significant;
-
-    refNode = _el.querySelector('label[for=eqid]');
-    selectMenu = _SignificantEqs.getHtml();
-
-    if (selectMenu) {
-      div = document.createElement('div');
-      div.innerHTML = selectMenu;
-      refNode.parentNode.insertBefore(div, refNode);
-
-      // Add listener here b/c we have to wait til it exists
-      significant = _el.querySelector('.significant');
-      _addListener([significant], 'change', _selSignificantEq);
     }
   };
 
@@ -316,7 +280,7 @@ var EditPane = function (options) {
       if (select) {
         div = select.parentNode;
         div.parentNode.removeChild(div);
-        _addSignificantEqs();
+        _app.SignificantEqs.addSignificantEqs();
       }
     }, 10);
   };
@@ -336,27 +300,10 @@ var EditPane = function (options) {
   };
 
   /**
-   * Set user selected significant eq as mainshock
-   */
-  _selSignificantEq = function () {
-    var index,
-        significant;
-
-    significant = _el.querySelector('.significant');
-    index = significant.selectedIndex;
-
-    _eqid.value = significant.options[index].value;
-
-    // Call manually: eqid input event not triggered when value changed programmatically
-    _setQueryString();
-    _getFeatures();
-  };
-
-  /**
    * Set all form field values to match values in querystring
    */
   _setFormFields = function () {
-    var params = AppUtil.getParams();
+    var params = _app.AppUtil.getParams();
 
     Object.keys(params).forEach(function(key) {
       if (document.getElementById(key)) {
@@ -372,7 +319,7 @@ var EditPane = function (options) {
     var i;
 
     for (i = 0; i < _fields.length; i ++) {
-      AppUtil.setParam(_fields[i].id, _fields[i].value);
+      _app.AppUtil.setParam(_fields[i].id, _fields[i].value);
     }
   };
 
@@ -391,7 +338,7 @@ var EditPane = function (options) {
     value = el.value.replace(/\s+/g, ''); // strip whitespace
     el.value = value;
 
-    AppUtil.setParam(id, value);
+    _app.AppUtil.setParam(id, value);
   };
 
   /**
@@ -406,6 +353,23 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Set user selected significant eq as mainshock
+   */
+  _this.selSignificantEq = function () {
+    var index,
+        significant;
+
+    significant = _el.querySelector('.significant');
+    index = significant.selectedIndex;
+
+    _eqid.value = significant.options[index].value;
+
+    // Call manually: eqid input event not triggered when value changed programmatically
+    _setQueryString();
+    _getFeatures();
+  };
 
   /**
    * Display mainshock's details on edit pane and also update <title>
@@ -423,8 +387,8 @@ var EditPane = function (options) {
     details.innerHTML = html;
     details.classList.remove('hide');
 
-    document.title = props.magType + ' ' + AppUtil.round(props.mag, 1) + ' - ' +
-      props.place + ' | ' + appTitle;
+    document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
+      ' - ' + props.place + ' | ' + appTitle;
   };
 
   /**
@@ -443,8 +407,8 @@ var EditPane = function (options) {
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (AppUtil.getParam(key) === '' || isNewEvent) {
-        AppUtil.setParam(key, defaults[key]);
+      if (_app.AppUtil.getParam(key) === '' || isNewEvent) {
+        _app.AppUtil.setParam(key, defaults[key]);
       }
     });
 

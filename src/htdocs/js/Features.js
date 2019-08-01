@@ -2,7 +2,6 @@
 
 
 var AftershocksFeature = require('features/AftershocksFeature'),
-    AppUtil = require('AppUtil'),
     FieldNotesFeature = require('features/FieldNotesFeature'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
     ForeshocksFeature = require('features/ForeshocksFeature'),
@@ -92,6 +91,7 @@ var Features = function (options) {
     try {
       // Create feature (and store it in _features for access later)
       feature = opts.jsClass({
+        app: _app,
         json: opts.json,
         layerOn: opts.layerOn,
         mainshockJson: opts.mainshockJson,
@@ -171,8 +171,8 @@ var Features = function (options) {
     params = {
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('as-dist'),
-      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      maxradiuskm: _app.AppUtil.getParam('as-dist'),
+      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time + 1000).utc().toISOString()
         .slice(0, -5)
     };
@@ -220,7 +220,7 @@ var Features = function (options) {
       between: after + ',' + before,
       lat: _mainshockJson.geometry.coordinates[1],
       lon: _mainshockJson.geometry.coordinates[0],
-      radius: AppUtil.getParam('as-dist') // use aftershocks radius
+      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
     };
 
     pairs = [];
@@ -262,15 +262,15 @@ var Features = function (options) {
     var days,
         params;
 
-    days = AppUtil.getParam('fs-days');
+    days = _app.AppUtil.getParam('fs-days');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('fs-dist'),
-      minmagnitude: Number(AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
+      maxradiuskm: _app.AppUtil.getParam('fs-dist'),
+      minmagnitude: Number(_app.AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(days, 'days').toISOString().slice(0, -5)
     };
@@ -289,15 +289,15 @@ var Features = function (options) {
     var params,
         years;
 
-    years = AppUtil.getParam('hs-years');
+    years = _app.AppUtil.getParam('hs-years');
 
     params = {
       endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
         .slice(0, -5),
       latitude: _mainshockJson.geometry.coordinates[1],
       longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('hs-dist'),
-      minmagnitude: Number(AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
+      maxradiuskm: _app.AppUtil.getParam('hs-dist'),
+      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
       starttime: Moment(_mainshockJson.properties.time).utc()
         .subtract(years, 'years').toISOString().slice(0, -5)
     };
@@ -517,7 +517,7 @@ var Features = function (options) {
     if (opts && opts.hasOwnProperty('editPane')) { // new mainshock
       // 1. Initialize environment
       _editPane = opts.editPane;
-      _eqid = AppUtil.getParam('eqid');
+      _eqid = _app.AppUtil.getParam('eqid');
       _features = {};
       _plotdata = {};
 

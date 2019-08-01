@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    LatLon = require('LatLon'),
+var LatLon = require('LatLon'),
     Moment = require('moment'),
     Util = require('hazdev-webutils/src/util/Util');
 
@@ -48,6 +47,7 @@ var Earthquakes = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _bins,
       _details,
       _duration,
@@ -86,6 +86,7 @@ var Earthquakes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
     coords = options.mainshockJson.geometry.coordinates;
 
+    _app = options.app;
     _bins = {};
     _eqList = {};
     _plotdata = {
@@ -189,8 +190,8 @@ var Earthquakes = function (options) {
     var mag,
         threshold;
 
-    mag = AppUtil.round(feature.properties.mag, 1);
-    threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    mag = _app.AppUtil.round(feature.properties.mag, 1);
+    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
     if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
     }
@@ -278,23 +279,23 @@ var Earthquakes = function (options) {
     var description;
 
     description = '<p class="description"><strong>M ' +
-      AppUtil.getParam(AppUtil.lookup(_id) + '-mag') + '+ </strong> earthquakes within ' +
-      '<strong>' + AppUtil.getParam(AppUtil.lookup(_id) + '-dist') + ' km</strong> of the ' +
-      'mainshock&rsquo;s epicenter';
+      _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag') + '+ </strong> ' +
+      'earthquakes within <strong>' + _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist') +
+      ' km</strong> of the mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      _duration = AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
+      _duration = _app.AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
         .asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
         _duration + '</strong>';
     }
     else if (_id === 'foreshocks') {
-      _duration = AppUtil.getParam('fs-days') + ' days';
+      _duration = _app.AppUtil.getParam('fs-days') + ' days';
       description += ' in the prior <strong>' + _duration + '</strong> ' +
         'before the mainshock';
     }
     else if (_id === 'historical') {
-      _duration = AppUtil.getParam('hs-years') + ' years';
+      _duration = _app.AppUtil.getParam('hs-years') + ' years';
       description += ' in the prior <strong>' + _duration + '</strong> ' +
       'before the mainshock';
     }
@@ -403,7 +404,7 @@ var Earthquakes = function (options) {
     bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
     eqMoment = Moment.utc(props.time, 'x');
-    mag = AppUtil.round(props.mag, 1);
+    mag = _app.AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
 
     // Time field for leaflet popup, etc.
@@ -417,19 +418,19 @@ var Earthquakes = function (options) {
 
     data = {
       alert: props.alert, // PAGER
-      cdi: AppUtil.romanize(props.cdi), // DYFI
-      depth: AppUtil.round(coords[2], 1),
-      distance: AppUtil.round(distance, 1),
+      cdi: _app.AppUtil.romanize(props.cdi), // DYFI
+      depth: _app.AppUtil.round(coords[2], 1),
+      distance: _app.AppUtil.round(distance, 1),
       distanceDir: bearingString,
       eqid: eqid,
       felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
-      latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
+      latlng: _app.AppUtil.round(coords[1], 3) + ', ' + _app.AppUtil.round(coords[0], 3),
       localTime: localTime,
       mag: mag,
       magInt: magInt,
       magType: props.magType || 'M',
-      mmi: AppUtil.romanize(props.mmi), // ShakeMap
+      mmi: _app.AppUtil.romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
       tsunami: props.tsunami,
@@ -504,7 +505,7 @@ var Earthquakes = function (options) {
 
     age = _getAge(props.time);
     fillColor = _COLORS[age];
-    radius = AppUtil.getRadius(props.mag);
+    radius = _app.AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
     _markerOptions.pane = _id;

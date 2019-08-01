@@ -1,8 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -19,6 +18,7 @@ var Mainshock = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _mainshockJson,
 
       _Earthquakes;
@@ -32,9 +32,11 @@ var Mainshock = function (options) {
 
     options = options || {};
 
+    _app = options.app;
     _mainshockJson = options.mainshockJson;
 
     _Earthquakes = Earthquakes({
+      app: _app,
       id: id,
       json: options.json,
       mainshockJson: _mainshockJson
@@ -87,7 +89,7 @@ var Mainshock = function (options) {
     if (products.dyfi) {
       code = products.dyfi[0].code;
       dyfi = {
-        cdi: AppUtil.romanize(_mainshockJson.properties.cdi),
+        cdi: _app.AppUtil.romanize(_mainshockJson.properties.cdi),
         url: products.dyfi[0].contents[code + '_ciim_geo.jpg'].url
       };
     }
@@ -98,7 +100,7 @@ var Mainshock = function (options) {
         shakemapUrl = products.shakemap[0].contents['download/intensity.jpg'].url;
       }
       shakemap = {
-        mmi: AppUtil.romanize(_mainshockJson.properties.mmi),
+        mmi: _app.AppUtil.romanize(_mainshockJson.properties.mmi),
         url: shakemapUrl
       };
     }

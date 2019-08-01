@@ -1,8 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/Earthquakes');
 
 
 /**
@@ -19,6 +18,7 @@ var Aftershocks = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _eqid,
       _mag,
       _magThreshold,
@@ -38,17 +38,19 @@ var Aftershocks = function (options) {
 
     options = options || {};
 
-    _Earthquakes = Earthquakes({
-      id: id,
-      json: options.json,
-      mainshockJson: options.mainshockJson
-    });
-
+    _app = options.app;
     _eqid = options.mainshockJson.id;
     _mag = options.mainshockJson.properties.mag;
     _magThreshold = Math.floor(_mag - 2.5);
     _oaf = options.mainshockJson.properties.products.oaf;
 
+    _Earthquakes = Earthquakes({
+      app: _app,
+      id: id,
+      json: options.json,
+      mainshockJson: options.mainshockJson
+    });
+    
     _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();
@@ -87,7 +89,7 @@ var Aftershocks = function (options) {
             } else if (bin.probability > 0.99) {
               probability = '&gt; 99%';
             } else {
-              probability = AppUtil.round(100 * bin.probability, 0) + '%';
+              probability = _app.AppUtil.round(100 * bin.probability, 0) + '%';
             }
             if (bin.p95minimum === 0 && bin.p95maximum === 0) {
               range = 0;

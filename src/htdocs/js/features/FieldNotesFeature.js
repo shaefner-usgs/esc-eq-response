@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Lightbox = require('Lightbox'),
+var Lightbox = require('Lightbox'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -32,6 +31,7 @@ var FieldNotesFeature = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _count,
       _mapLayer,
       _markerOptions,
@@ -60,6 +60,7 @@ var FieldNotesFeature = function (options) {
     _this.id = 'fieldnotes'; // unique id; value is "baked into" app's js/css
     _this.zoomToLayer = false;
 
+    _app = options.app;
     _count = 0;
     _markerOptions = Util.extend({
       icon: L.icon(iconOptions),
@@ -165,7 +166,7 @@ var FieldNotesFeature = function (options) {
       if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
         foundProps = true;
         value = props[key] || '&ndash;';
-        html += '<dt>' + AppUtil.ucfirst(key) + '</dt><dd>' + value + '</dd>';
+        html += '<dt>' + _app.AppUtil.ucfirst(key) + '</dt><dd>' + value + '</dd>';
       }
     });
     html += '</dl>';
@@ -200,7 +201,7 @@ var FieldNotesFeature = function (options) {
 
     // Strip slashes from json encoded values
     Object.keys(props).forEach(function(key) {
-      props[key] = AppUtil.stripslashes(props[key]);
+      props[key] = _app.AppUtil.stripslashes(props[key]);
     });
 
     // Create title prop

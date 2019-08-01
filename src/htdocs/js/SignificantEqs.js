@@ -1,9 +1,9 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Moment = require('moment'),
+var Moment = require('moment'),
     Xhr = require('util/Xhr');
+
 
 /**
  * Factory for getting significant earthquakes and creating html pulldown menu
@@ -18,10 +18,8 @@ var SignificantEqs = function (options) {
   var _this,
       _initialize,
 
-      _callback,
+      _app,
       _json,
-
-      _StatusBar,
 
       _loadFeed;
 
@@ -31,22 +29,20 @@ var SignificantEqs = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _StatusBar = options.statusBar;
-
-    _callback = options.callback;
+    _app = options.app;
 
     _loadFeed();
   };
 
   /**
-   * Load GeoJson feed for significant eqs and return via _callback()
+   * Load GeoJson feed for significant eqs
    */
   _loadFeed = function () {
     var errorMsg,
         url;
 
     // Alert user that feed is loading
-    _StatusBar.addItem('Significant Earthquakes');
+    _app.StatusBar.addItem('Significant Earthquakes');
 
     errorMsg = '<h4>Error Loading Significant Earthquakes</h4><ul>';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
@@ -55,9 +51,9 @@ var SignificantEqs = function (options) {
       url: url,
       success: function (json) {
         _json = json;
-        _callback();
+        _this.addSignificantEqs();
 
-        _StatusBar.removeItem('Significant Earthquakes');
+        _app.StatusBar.removeItem('Significant Earthquakes');
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message
@@ -74,7 +70,7 @@ var SignificantEqs = function (options) {
         }
 
         errorMsg += '</ul>';
-        _StatusBar.addError('Significant Earthquakes', errorMsg);
+        _app.StatusBar.addError('Significant Earthquakes', errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -83,7 +79,7 @@ var SignificantEqs = function (options) {
           'earthquake.usgs.gov)</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _StatusBar.addError('Significant Earthquakes', errorMsg);
+        _app.StatusBar.addError('Significant Earthquakes', errorMsg);
       },
       timeout: 20000
     });
@@ -92,6 +88,29 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Add list of significant earthquakes pulldown menu
+   */
+  _this.addSignificantEqs = function () {
+    var div,
+        refNode,
+        selectMenu,
+        significant;
+
+    refNode = document.querySelector('label[for=eqid]');
+    selectMenu = _this.getHtml();
+
+    if (selectMenu) {
+      div = document.createElement('div');
+      div.innerHTML = selectMenu;
+      refNode.parentNode.insertBefore(div, refNode);
+
+      // Add listener here b/c we have to wait til it exists
+      significant = document.querySelector('.significant');
+      significant.addEventListener('change', _app.EditPane.selSignificantEq);
+    }
+  };
 
   /**
    * Get html for pulldown menu of significant eqs
@@ -113,10 +132,10 @@ var SignificantEqs = function (options) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
         date = Moment.utc(props.time).format('MMM D HH:mm:ss');
-        mag = AppUtil.round(props.mag, 1);
+        mag = _app.AppUtil.round(props.mag, 1);
 
         selCurrent = '';
-        if (feature.id === AppUtil.getParam('eqid')) {
+        if (feature.id === _app.AppUtil.getParam('eqid')) {
           selCurrent = sel;
           sel = '';
         }

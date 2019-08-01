@@ -1,8 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Moment = require('moment'),
+var Moment = require('moment'),
     Tablesort = require('tablesort');
 
 
@@ -329,7 +328,7 @@ var SummaryPane = function (options) {
     if (!singleMagBin) {
       mags = Object.keys(cumulativeEqs);
       max = Math.max.apply(null, mags);
-      min = Math.floor(AppUtil.getParam(AppUtil.lookup(id) + '-mag'));
+      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(id) + '-mag'));
 
       html += '<div class="filter">';
       html += '<h4>Filter earthquakes by magnitude</h4>';
@@ -392,7 +391,7 @@ var SummaryPane = function (options) {
 
     if (id === 'mainshock') {
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
-        AppUtil.getParam('eqid');
+        _app.AppUtil.getParam('eqid');
 
       summary += '<div class="products">';
       summary += data.detailsHtml;
@@ -424,7 +423,7 @@ var SummaryPane = function (options) {
       count = Object.keys(opts.data.list).length;
       if (count > 0) {
         mag = Math.floor(Math.max(data.magThreshold,
-          AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
+          _app.AppUtil.getParam(_app.AppUtil.lookup(id) + '-mag')));
 
         // Check if there's eq data for mag threshold; if not, decr mag by 1
         while (!data.bins.magInclusive[mag]) {

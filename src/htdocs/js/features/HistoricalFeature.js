@@ -34,6 +34,7 @@ var Historical = function (options) {
     options = options || {};
 
     _Earthquakes = Earthquakes({
+      app: options.app,
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson

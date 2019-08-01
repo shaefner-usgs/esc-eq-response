@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil');
-
-
 /**
  * Creates, adds, and removes plot from plots pane
  *
@@ -394,7 +391,7 @@ var PlotsPane = function (options) {
 
       // Add origin point to beginning of aftershocks trace
       if (opts.id === 'aftershocks') {
-        mainshockId = AppUtil.getParam('eqid');
+        mainshockId = _app.AppUtil.getParam('eqid');
         date.unshift(opts.mainshockDate);
         eqid.unshift(mainshockId);
         x.unshift(opts.mainshockTime);
@@ -564,7 +561,7 @@ var PlotsPane = function (options) {
       displaylogo: false,
       modeBarButtonsToAdd: [{
         click: function(gd) {
-          eqid = AppUtil.getParam('eqid');
+          eqid = _app.AppUtil.getParam('eqid');
           feature = gd.parentNode.classList.item(2);
           type = gd.classList.item(0);
           opts = {
