@@ -57,27 +57,27 @@ var Application = function (options) {
     _this.MapPane = MapPane({
       el: options.mapPane
     });
-    _this.StatusBar = StatusBar({
-      el: options.statusBar
-    });
     // PlotsPane depends on: MapPane
     _this.PlotsPane = PlotsPane({
       app: _this,
       el: options.plotsPane
+    });
+    _this.StatusBar = StatusBar({
+      el: options.statusBar
+    });
+    // NavBar depends on: MapPane, PlotsPane, StatusBar
+    _this.NavBar = NavBar({
+      app: _this,
+      el: options.navBar
     });
     // SummaryPane depends on: MapPane
     _this.SummaryPane = SummaryPane({
       app: _this,
       el: options.summaryPane
     });
-    // Features depends on: MapPane, PlotsPane, StatusBar, SummaryPane
+    // Features depends on: (EditPane), MapPane, PlotsPane, StatusBar, SummaryPane
     _this.Features = Features({
       app: _this
-    });
-    // NavBar depends on: MapPane, PlotsPane, StatusBar
-    _this.NavBar = NavBar({
-      app: _this,
-      el: options.navBar
     });
     // EditPane depends on: Features, MapPane, NavBar, StatusBar, SummaryPane
     _this.EditPane = EditPane({
