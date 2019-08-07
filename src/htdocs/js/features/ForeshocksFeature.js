@@ -20,7 +20,6 @@ var Foreshocks = function (options) {
 
       _app,
       _magThreshold,
-
       _Earthquakes,
 
       _getName;

@@ -20,7 +20,6 @@ var Mainshock = function (options) {
 
       _app,
       _mainshockJson,
-
       _Earthquakes;
 
 

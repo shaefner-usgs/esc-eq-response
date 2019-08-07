@@ -23,7 +23,6 @@ var Aftershocks = function (options) {
       _mag,
       _magThreshold,
       _oaf,
-
       _Earthquakes,
 
       _getName,
@@ -50,7 +49,7 @@ var Aftershocks = function (options) {
       json: options.json,
       mainshockJson: options.mainshockJson
     });
-    
+
     _this.displayLayer = true;
     _this.id = id;
     _this.name = _getName();

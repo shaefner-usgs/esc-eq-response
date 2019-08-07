@@ -10,7 +10,6 @@ var HelpPane = function (options) {
 
       _el,
       _legend,
-
       _Svg,
 
       _addSvgElements;

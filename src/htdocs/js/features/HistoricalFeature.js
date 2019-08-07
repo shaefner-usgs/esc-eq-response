@@ -19,7 +19,6 @@ var Historical = function (options) {
       _initialize,
 
       _magThreshold,
-
       _Earthquakes,
 
       _getName;

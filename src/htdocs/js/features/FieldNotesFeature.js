@@ -36,7 +36,6 @@ var FieldNotesFeature = function (options) {
       _mapLayer,
       _markerOptions,
       _popup,
-
       _Lightbox,
 
       _addEventListeners,
