@@ -1,8 +1,7 @@
 'use strict';
 
 
-var Moment = require('moment'),
-    Xhr = require('util/Xhr');
+var Xhr = require('util/Xhr');
 
 
 /**
@@ -131,7 +130,7 @@ var SignificantEqs = function (options) {
     if (_json.features) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
-        date = Moment.utc(props.time).format('MMM D HH:mm:ss');
+        date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
         mag = _app.AppUtil.round(props.mag, 1);
 
         selCurrent = '';

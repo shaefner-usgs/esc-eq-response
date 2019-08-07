@@ -1,8 +1,15 @@
 'use strict';
 
-// static object with utility methods
+
+var Moment = require('moment');
+
+
+// Static object with utility methods
 var AppUtil = function () {
 };
+
+// Attach (expose) Moment library
+AppUtil.Moment = Moment;
 
 
 /**

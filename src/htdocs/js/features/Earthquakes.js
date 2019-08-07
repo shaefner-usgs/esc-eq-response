@@ -3,7 +3,6 @@
 
 
 var LatLon = require('LatLon'),
-    Moment = require('moment'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -107,11 +106,11 @@ var Earthquakes = function (options) {
 
     _mainshockLatlon = LatLon(coords[1], coords[0]);
 
-    _mainshockMoment = Moment.utc(options.mainshockJson.properties.time, 'x');
-    _nowMoment = Moment.utc();
-    _pastDayMoment = Moment.utc().subtract(1, 'days');
-    _pastHourMoment = Moment.utc().subtract(1, 'hours');
-    _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
+    _mainshockMoment = _app.AppUtil.Moment.utc(options.mainshockJson.properties.time, 'x');
+    _nowMoment = _app.AppUtil.Moment.utc();
+    _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
+    _pastHourMoment = _app.AppUtil.Moment.utc().subtract(1, 'hours');
+    _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
 
     // Templates for L.Util.template
     _tooltipTemplate = _getTemplate('tooltip');
@@ -209,7 +208,7 @@ var Earthquakes = function (options) {
     var age,
         eqMoment;
 
-    eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
+    eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
     if (eqMoment.isBefore(_mainshockMoment)) {
       if (_id === 'foreshocks') {
         age = 'foreshock';
@@ -284,7 +283,7 @@ var Earthquakes = function (options) {
       ' km</strong> of the mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      _duration = _app.AppUtil.round(Moment.duration(_nowMoment - _mainshockMoment)
+      _duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment - _mainshockMoment)
         .asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
         _duration + '</strong>';
@@ -403,7 +402,7 @@ var Earthquakes = function (options) {
     compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
     bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
 
-    eqMoment = Moment.utc(props.time, 'x');
+    eqMoment = _app.AppUtil.Moment.utc(props.time, 'x');
     mag = _app.AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
 
@@ -473,14 +472,17 @@ var Earthquakes = function (options) {
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
-      days = Math.ceil(Moment.duration(eqMoment - _mainshockMoment).asDays());
+      days = Math.ceil(_app.AppUtil.Moment.duration(eqMoment -
+        _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'first');
 
-      days = Math.ceil(Moment.duration(_nowMoment - eqMoment).asDays());
+      days = Math.ceil(_app.AppUtil.Moment.duration(_nowMoment -
+        eqMoment).asDays());
       _addEqToBin(days, magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
-      days = Math.ceil(Moment.duration(_mainshockMoment - eqMoment).asDays());
+      days = Math.ceil(_app.AppUtil.Moment.duration(_mainshockMoment -
+        eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
     // Bin eq totals by magnitude, inclusive (used internally)

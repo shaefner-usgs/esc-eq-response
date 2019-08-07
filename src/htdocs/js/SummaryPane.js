@@ -1,8 +1,7 @@
 'use strict';
 
 
-var Moment = require('moment'),
-    Tablesort = require('tablesort');
+var Tablesort = require('tablesort');
 
 
 /**
@@ -603,7 +602,7 @@ var SummaryPane = function (options) {
         timestamp;
 
     time = _el.querySelector('time');
-    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
+    timestamp = _app.AppUtil.Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
       ' (' + _tz + ')';
 
     time.innerHTML = timestamp;
