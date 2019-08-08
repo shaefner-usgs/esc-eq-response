@@ -2,17 +2,13 @@
 
 
 /**
- * Handles form fields and sets address bar to match application state.
- * Also kicks off fetching of data feeds and displays mainshock details.
+ * Handle form fields on Edit pane and set address bar to match application state.
+ * Also kick off fetching of data feeds.
  *
  * @param options {Object}
  *   {
- *     el: {Element},
- *     features: {Object}, // Features instance
- *     mapPane: {Object}, // MapPane instance
- *     navBar: {Object}, // NavBar instance
- *     statusBar: {Object}, // StatusBar instance
- *     summaryPane: {Object} // SummaryPane instance
+ *     app: {Object}, // application props / methods
+ *     el: {Element}
  *   }
  */
 var EditPane = function (options) {
@@ -28,8 +24,8 @@ var EditPane = function (options) {
 
       _addListener,
       _getDefaults,
-      _getFeatures,
       _hideMainshock,
+      _initFeatures,
       _initListeners,
       _isNewEvent,
       _isValidEqId,
@@ -63,7 +59,7 @@ var EditPane = function (options) {
 
     // Get things rolling if eqid is already set when initialized
     if (_eqid.value !== '') {
-      _getFeatures();
+      _initFeatures();
     }
   };
 
@@ -124,27 +120,24 @@ var EditPane = function (options) {
     };
   };
 
-  /**
-   * Get features for map, plots, summary panes
-   */
-  _getFeatures = function () {
-    _resetForm(); // first reset form/app to default state
-
-    if (_isValidEqId()) {
-      _el.querySelector('.viewmap').removeAttribute('disabled');
-
-      // Pass editPane instance to expose its public methods to xhr callback in Features
-      _app.Features.getFeatures({
-        editPane: _this
-      });
-    }
-  };
-
   /*
    * Hide mainshock details on edit pane
    */
   _hideMainshock = function () {
     _el.querySelector('.details').classList.add('hide');
+  };
+
+  /**
+   * Add features to map, plots, summary panes
+   */
+  _initFeatures = function () {
+    _resetForm(); // first reset form/app to default state
+
+    if (_isValidEqId()) {
+      _el.querySelector('.viewmap').removeAttribute('disabled');
+
+      _app.Features.initFeatures();
+    }
   };
 
   /**
@@ -169,7 +162,7 @@ var EditPane = function (options) {
     _addListener(_fields, 'input', _updateParam);
 
     // Get new set of feature layers when eqid is changed
-    _addListener([_eqid], 'input', _getFeatures);
+    _addListener([_eqid], 'input', _initFeatures);
 
     // Update eq features when params changed
     _addListener(aftershocks, 'change', _refreshEqs);
@@ -368,7 +361,7 @@ var EditPane = function (options) {
 
     // Call manually: eqid input event not triggered when value changed programmatically
     _setQueryString();
-    _getFeatures();
+    _initFeatures();
   };
 
   /**

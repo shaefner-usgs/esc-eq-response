@@ -4,6 +4,14 @@
 var Svg = require('Svg');
 
 
+/**
+ * Add SVG elements to Help pane
+ *
+ * @param options {Object}
+ *   {
+ *     el: {Element}
+ *   }
+ */
 var HelpPane = function (options) {
   var _this,
       _initialize,

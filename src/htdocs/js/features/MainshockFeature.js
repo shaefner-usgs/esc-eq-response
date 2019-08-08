@@ -5,46 +5,47 @@ var Earthquakes = require('features/Earthquakes');
 
 
 /**
- * Creates Mainshock feature
+ * Create Mainshock feature
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
+
  */
-var Mainshock = function (options) {
+var MainshockFeature = function (options) {
   var _this,
       _initialize,
 
       _app,
-      _mainshockJson,
-      _Earthquakes;
 
+      _getSummary;
 
   _this = {};
 
   _initialize = function (options) {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'mainshock';
-
     options = options || {};
 
     _app = options.app;
-    _mainshockJson = options.mainshockJson;
-
-    _Earthquakes = Earthquakes({
-      app: _app,
-      id: id,
-      json: options.json,
-      mainshockJson: _mainshockJson
-    });
 
     _this.displayLayer = true;
-    _this.id = id;
-    _this.name = options.name;
+    _this.id = 'mainshock';
+    _this.name = 'Mainshock';
+    _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
+      options.eqid + '.geojson';
     _this.zoomToLayer = true;
+  };
+
+  /**
+   * Get summary html for feature
+   */
+  _getSummary = function (Earthquakes) {
+    var summary;
+
+    summary = Earthquakes.lastId;
+
+    return summary;
   };
 
   // ----------------------------------------------------------
@@ -52,63 +53,18 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get map layer of feature
-   *
-   * @return {L.FeatureGroup}
+   * Create feature (map layer, plot data, summary)
+   *   invoked via Ajax callback in Features.js
    */
-  _this.getMapLayer = function () {
-    return _Earthquakes.getMapLayer();
-  };
+  _this.createFeature = function () {
+    Earthquakes = Earthquakes({
+      app: _app,
+      feature: _this
+    });
 
-  /**
-   * Get feature's data for plots pane
-   *
-   * @return {Object}
-   */
-  _this.getPlotData = function () {
-    return {
-      plotdata: _Earthquakes.getPlotData()
-    };
-  };
-
-  /**
-   * Get feature's data for summary pane
-   *
-   * @return {Object}
-   */
-  _this.getSummaryData = function () {
-    var code,
-        dyfi,
-        products,
-        shakemap,
-        shakemapUrl;
-
-    products = _mainshockJson.properties.products;
-
-    if (products.dyfi) {
-      code = products.dyfi[0].code;
-      dyfi = {
-        cdi: _app.AppUtil.romanize(_mainshockJson.properties.cdi),
-        url: products.dyfi[0].contents[code + '_ciim_geo.jpg'].url
-      };
-    }
-    if (products.shakemap) {
-      if (products.shakemap[0].contents['download/tvmap.jpg']) {
-        shakemapUrl = products.shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
-        shakemapUrl = products.shakemap[0].contents['download/intensity.jpg'].url;
-      }
-      shakemap = {
-        mmi: _app.AppUtil.romanize(_mainshockJson.properties.mmi),
-        url: shakemapUrl
-      };
-    }
-
-    return {
-      detailsHtml: _Earthquakes.getDetails(),
-      dyfi: dyfi,
-      shakemap: shakemap
-    };
+    _this.mapLayer = Earthquakes.mapLayer;
+    _this.plotData = Earthquakes.plotData;
+    _this.summary = _getSummary(Earthquakes);
   };
 
 
@@ -117,5 +73,4 @@ var Mainshock = function (options) {
   return _this;
 };
 
-
-module.exports = Mainshock;
+module.exports = MainshockFeature;

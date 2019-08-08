@@ -2,7 +2,7 @@
 
 
 /**
- * Sets up a status bar to inform user of app's status
+ * Set up a status bar to inform user of app's status (loading state, errors)
  *
  * @param options {Object}
  *   {

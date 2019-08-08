@@ -7,6 +7,7 @@
  *
  * @param options {Object}
  *   {
+ *     app: {Object}, // application props / methods
  *     el: {Element}
  *   }
  */

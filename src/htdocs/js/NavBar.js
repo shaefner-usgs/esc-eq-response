@@ -6,9 +6,8 @@
  *
  * @param options {Object}
  *   {
- *     el: {Element},
- *     mapPane: {Object}, // MapPane instance
- *     plotsPane: {Object} // PlotsPane instance
+ *     app: {Object}, // application props / methods
+ *     el: {Element}
  *   }
  */
 var NavBar = function (options) {

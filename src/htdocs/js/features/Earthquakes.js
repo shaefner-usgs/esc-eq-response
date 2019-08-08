@@ -32,14 +32,13 @@ _DEFAULTS = {
 
 
 /**
- * Parses an earthquake feed to create a Leaflet map layer as well as the data
- *   used on the plot and summary panes
+ * Parse earthquake json feed and create a Leaflet map layer, plot data and
+ *   other properties for summary, etc.
  *
  * @param options {Object}
  *   {
- *     id: {String}, // 'mainshock', 'aftershocks', 'foreshocks', 'historical'
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
+ *     app: {Object},
+ *     feature: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -47,21 +46,14 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
-      _bins,
-      _details,
-      _duration,
-      _eqList,
       _id,
-      _lastId,
       _markerOptions,
       _mainshockLatlon,
       _mainshockMoment,
-      _mapLayer,
       _nowMoment,
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
-      _plotdata,
       _popupTemplate,
       _tablerowTemplate,
       _tooltipTemplate,
@@ -72,7 +64,7 @@ var Earthquakes = function (options) {
       _getBubbles,
       _getDescription,
       _getIntervals,
-      _getTemplate,
+      _getHtmlTemplate,
       _onEachFeature,
       _pointToLayer;
 
@@ -80,15 +72,18 @@ var Earthquakes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var coords;
+    var coords,
+        mainshock;
 
     options = Util.extend({}, _DEFAULTS, options);
-    coords = options.mainshockJson.geometry.coordinates;
+    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _app = options.app;
-    _bins = {};
-    _eqList = {};
-    _plotdata = {
+    _id = options.feature.id;
+
+    _this.bins = {};
+    _this.eqList = {};
+    _this.plotdata = {
       color: [],
       date: [],
       depth: [],
@@ -101,33 +96,32 @@ var Earthquakes = function (options) {
       time: []
     };
 
-    _id = options.id;
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
-
+    if (_id === 'mainshock') {
+      mainshock = options.feature;
+    } else {
+      mainshock = _app.Features.getFeature('mainshock');
+      _this.description = _getDescription();
+    }
+    coords = mainshock.json.geometry.coordinates;
     _mainshockLatlon = LatLon(coords[1], coords[0]);
 
-    _mainshockMoment = _app.AppUtil.Moment.utc(options.mainshockJson.properties.time, 'x');
+    _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
     _nowMoment = _app.AppUtil.Moment.utc();
     _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
     _pastHourMoment = _app.AppUtil.Moment.utc().subtract(1, 'hours');
     _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
 
-    // Templates for L.Util.template
-    _tooltipTemplate = _getTemplate('tooltip');
-    _popupTemplate = _getTemplate('popup');
-    _tablerowTemplate = _getTemplate('tablerow');
+    // Templates for creating HTML using L.Util.template utility
+    _tooltipTemplate = _getHtmlTemplate('tooltip');
+    _popupTemplate = _getHtmlTemplate('popup');
+    _tablerowTemplate = _getHtmlTemplate('tablerow');
 
-    // Store feed description for aftershocks, foreshocks, and historical
-    if (_id === 'aftershocks' || _id === 'foreshocks' || _id === 'historical') {
-      _details = _getDescription();
-    }
-
-    _mapLayer = L.geoJson(options.json, {
+    _this.mapLayer = L.geoJson(options.feature.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _mapLayer.id = _id; // Attach id to L.Layer
+    _this.mapLayer.id = _id; // Attach id to L.Layer
   };
 
   /**
@@ -141,34 +135,34 @@ var Earthquakes = function (options) {
     var i,
         intervals;
 
-    if (!_bins[type]) {
-      _bins[type] = [];
+    if (!_this.bins[type]) {
+      _this.bins[type] = [];
     }
 
-    if (type === 'magInclusive') { // all eqs by mag, inclusive
+    if (type === 'magInclusive') {
       for (i = magInt; i >= 0; i --) {
-        if (!_bins[type][i]) {
-          _bins[type][i] = 0;
+        if (!_this.bins[type][i]) {
+          _this.bins[type][i] = 0;
         }
-        _bins[type][i] ++;
+        _this.bins[type][i] ++;
       }
     } else {
-      if (!_bins[type][magInt]) {
+      if (!_this.bins[type][magInt]) {
         intervals = _getIntervals();
-        _bins[type][magInt] = intervals;
+        _this.bins[type][magInt] = intervals;
       }
 
-      _bins[type][magInt][0] ++; // total
+      _this.bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
         if (_id !== 'foreshocks') {
-          _bins[type][magInt][365] ++;
+          _this.bins[type][magInt][365] ++;
         }
         if (days <= 30) {
-          _bins[type][magInt][30] ++;
+          _this.bins[type][magInt][30] ++;
           if (days <= 7) {
-            _bins[type][magInt][7] ++;
+            _this.bins[type][magInt][7] ++;
             if (days <= 1) {
-              _bins[type][magInt][1] ++;
+              _this.bins[type][magInt][1] ++;
             }
           }
         }
@@ -270,33 +264,37 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (aftershocks / foreshocks / historical)
+   * Get feed description (summary of user-set parameters, etc.) for
+   *   aftershocks / foreshocks / historical
    *
    * @return description {Html}
    */
   _getDescription = function () {
-    var description;
+    var description,
+        distance,
+        duration,
+        mag;
 
-    description = '<p class="description"><strong>M ' +
-      _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag') + '+ </strong> ' +
-      'earthquakes within <strong>' + _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist') +
-      ' km</strong> of the mainshock&rsquo;s epicenter';
+    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+
+    description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
+      'earthquakes within <strong>' + distance + ' km</strong> of the ' +
+      'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      _duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment - _mainshockMoment)
-        .asDays(), 1) + ' days';
+      duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
+        _mainshockMoment).asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
-        _duration + '</strong>';
-    }
-    else if (_id === 'foreshocks') {
-      _duration = _app.AppUtil.getParam('fs-days') + ' days';
-      description += ' in the prior <strong>' + _duration + '</strong> ' +
+        duration + '</strong>';
+    } else {
+      if (_id === 'foreshocks') {
+        duration = _app.AppUtil.getParam('fs-days') + ' days';
+      } else if (_id === 'historical') {
+        duration = _app.AppUtil.getParam('hs-years') + ' years';
+      }
+      description += ' in the prior <strong>' + duration + '</strong> ' +
         'before the mainshock';
-    }
-    else if (_id === 'historical') {
-      _duration = _app.AppUtil.getParam('hs-years') + ' years';
-      description += ' in the prior <strong>' + _duration + '</strong> ' +
-      'before the mainshock';
     }
 
     description += '.</p>';
@@ -330,7 +328,7 @@ var Earthquakes = function (options) {
    *
    * @return template {Html}
    */
-  _getTemplate = function (type) {
+  _getHtmlTemplate = function (type) {
     var template;
 
     if (type === 'popup') {
@@ -449,26 +447,21 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    // Feed details (set via _getDescription() for other features besides mainshock)
-    if (_id === 'mainshock') {
-      _details = popup; // set to same text as map popup
-    }
+    // 'Last' (most recent) earthquake in feed; overwrite each time thru loop
+    _this.lastId = eqid;
 
-    // Last earthquake will be last in list; overwrite each time thru loop
-    _lastId = eqid;
-
-    // Add props to _plotdata (additional props are added in _pointToLayer)
-    _plotdata.date.push(utcTime);
-    _plotdata.depth.push(coords[2] * -1); // return a negative number for depth
-    _plotdata.eqid.push(data.eqid);
-    _plotdata.lat.push(coords[1]);
-    _plotdata.lon.push(coords[0]);
-    _plotdata.mag.push(data.mag);
-    _plotdata.text.push(props.title + '<br />' + utcTime);
-    _plotdata.time.push(eqMoment.format());
+    // Add props to plotdata (additional props are added in _pointToLayer)
+    _this.plotdata.date.push(utcTime);
+    _this.plotdata.depth.push(coords[2] * -1); // return a negative number for depth
+    _this.plotdata.eqid.push(data.eqid);
+    _this.plotdata.lat.push(coords[1]);
+    _this.plotdata.lon.push(coords[0]);
+    _this.plotdata.mag.push(data.mag);
+    _this.plotdata.text.push(props.title + '<br />' + utcTime);
+    _this.plotdata.time.push(eqMoment.format());
 
     // Add eq to list for summary
-    _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
+    _this.eqList[eqid] = L.Util.template(_tablerowTemplate, data);
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
@@ -485,7 +478,7 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
-    // Bin eq totals by magnitude, inclusive (used internally)
+    // Total number of eqs by mag, inclusive (used internally)
     _addEqToBin(null, magInt, 'magInclusive');
   };
 
@@ -513,78 +506,11 @@ var Earthquakes = function (options) {
     _markerOptions.pane = _id;
     _markerOptions.radius = radius;
 
-    // Add props to _plotdata (additional props are added in _onEachFeature)
-    _plotdata.color.push(fillColor);
-    _plotdata.size.push(radius * 2); // plotly.js uses diameter
+    // Add props to plotdata (additional props are added in _onEachFeature)
+    _this.plotdata.color.push(fillColor);
+    _this.plotdata.size.push(radius * 2); // plotly.js uses diameter
 
     return L.circleMarker(latlng, _markerOptions);
-  };
-
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
-  /**
-   * Get binned earthquake data
-   *
-   * @return _bins {Object}
-   */
-  _this.getBinnedData = function () {
-    return _bins;
-  };
-
-  /**
-   * Get feed details (mainshock) / description (others)
-   *
-   * @return _details {String}
-   */
-  _this.getDetails = function () {
-    return _details;
-  };
-
-  /**
-   * Get duration of earthquake sequence
-   *
-   * @return _duration {Number}
-   */
-  _this.getDuration = function () {
-    return _duration;
-  };
-
-  /**
-   * Get id of 'last' (most recent) earthquake in feed (ordered by time-asc)
-   *
-   * @return {String}
-   */
-  _this.getLastId = function () {
-    return _lastId;
-  };
-
-  /**
-   * Get a list of earthquakes in feed as html table rows
-   *
-   * @return _eqList {Object}
-   */
-  _this.getList = function () {
-    return _eqList;
-  };
-
-  /**
-   * Get Leaflet layer for feature
-   *
-   * @return {L.GeoJSON layer}
-   */
-  _this.getMapLayer = function () {
-    return _mapLayer;
-  };
-
-  /**
-   * Get data for 3d plot
-   *
-   * @return _plotdata {Object}
-   */
-  _this.getPlotData = function () {
-    return _plotdata;
   };
 
 

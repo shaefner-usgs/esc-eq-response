@@ -235,20 +235,17 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeatureLayer = function (feature) {
-    var id,
-        layer;
+    var id;
 
     id = feature.id;
-    layer = feature.getMapLayer();
-
     _features[id] = feature;
 
     // Add layer to controller
-    _this.layerControl.addOverlay(layer, feature.name);
+    _this.layerControl.addOverlay(feature.mapLayer, feature.name);
 
     // Turn layer "on" / zoom map if set to be displayed / zoomed by default
     if (feature.displayLayer) {
-      _this.map.addLayer(layer);
+      _this.map.addLayer(feature.mapLayer);
     }
     if (feature.zoomToLayer) {
       _this.setView(feature);
@@ -270,15 +267,16 @@ var MapPane = function (options) {
   /**
    * Open popup matching eqid in feature layer
    *
-   * @param feature {String}
+   * @param id {String}
+   *     id of feature
    * @param eqid {String}
    */
-  _this.openPopup = function (feature, eqid) {
+  _this.openPopup = function (id, eqid) {
     var layer,
         map,
         marker;
 
-    layer = _features[feature].getMapLayer();
+    layer = _features[id].mapLayer;
     map = _this.map;
 
     // Simulate clicking on 'Map' button on navbar
@@ -333,16 +331,16 @@ var MapPane = function (options) {
     setView = false;
 
     if (feature) { // set bounds to feature being added
-      layer = feature.getMapLayer();
+      layer = feature.mapLayer;
       _bounds.extend(layer.getBounds());
       setView = true;
     } else { // set bounds to all features (called via NavBar.js)
       if (_initialLoad) { // only need to set first time map is visible
         setView = true;
 
-        Object.keys(_features).forEach(function(feature) {
-          if (_features[feature].zoomToLayer) {
-            layer = _features[feature].getMapLayer();
+        Object.keys(_features).forEach(function(key) {
+          if (_features[key].zoomToLayer) {
+            layer = _features[key].mapLayer;
             _bounds.extend(layer.getBounds());
           }
         });
