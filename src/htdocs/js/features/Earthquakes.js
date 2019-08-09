@@ -2,8 +2,7 @@
 'use strict';
 
 
-var LatLon = require('LatLon'),
-    Util = require('hazdev-webutils/src/util/Util');
+var Util = require('hazdev-webutils/src/util/Util');
 
 
 var _COLORS,
@@ -103,7 +102,7 @@ var Earthquakes = function (options) {
       _this.description = _getDescription();
     }
     coords = mainshock.json.geometry.coordinates;
-    _mainshockLatlon = LatLon(coords[1], coords[0]);
+    _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
 
     _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
     _nowMoment = _app.AppUtil.Moment.utc();
@@ -394,7 +393,7 @@ var Earthquakes = function (options) {
     eqid = feature.id;
     props = feature.properties;
 
-    latlon = LatLon(coords[1], coords[0]);
+    latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
     distance = _mainshockLatlon.distanceTo(latlon) / 1000;
     bearing = _mainshockLatlon.bearing(latlon);
     compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];

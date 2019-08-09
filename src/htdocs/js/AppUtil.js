@@ -1,16 +1,17 @@
 'use strict';
 
 
-var Moment = require('moment');
+var LatLon = require('LatLon'),
+    Moment = require('moment');
 
 
 // Static object with utility methods
 var AppUtil = function () {
 };
 
-// Attach (expose) Moment library
+// Attach (expose) helper libraries
+AppUtil.LatLon = LatLon;
 AppUtil.Moment = Moment;
-
 
 /**
  * Get value of url param
