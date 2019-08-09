@@ -60,7 +60,8 @@ var Features = function (options) {
       // Create a new map pane and add feature to map, summary panes
       _app.MapPane.createMapPane(feature.id, 'overlayPane');
       _app.MapPane.addFeatureLayer(feature);
-      // TODO: add summary, plots using feature.summary, feature.plotData
+      _app.SummaryPane.addSummary(feature);
+      // TODO: add plots using feature.plotData
 
       if (feature.id === 'mainshock') {
         // TODO: Show mainshock details on editPane
