@@ -45,6 +45,8 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
+      _bins,
+      _eqlist,
       _id,
       _markerOptions,
       _mainshockLatlon,
@@ -80,9 +82,9 @@ var Earthquakes = function (options) {
     _app = options.app;
     _id = options.feature.id;
 
-    _this.bins = {};
-    _this.eqList = {};
-    _this.plotdata = {
+    _bins = {};
+    _eqlist = {};
+    _this.plotData = {
       color: [],
       date: [],
       depth: [],
@@ -101,6 +103,7 @@ var Earthquakes = function (options) {
       mainshock = _app.Features.getFeature('mainshock');
       _this.description = _getDescription();
     }
+
     coords = mainshock.json.geometry.coordinates;
     _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
 
@@ -134,34 +137,34 @@ var Earthquakes = function (options) {
     var i,
         intervals;
 
-    if (!_this.bins[type]) {
-      _this.bins[type] = [];
+    if (!_bins[type]) {
+      _bins[type] = [];
     }
 
     if (type === 'magInclusive') {
       for (i = magInt; i >= 0; i --) {
-        if (!_this.bins[type][i]) {
-          _this.bins[type][i] = 0;
+        if (!_bins[type][i]) {
+          _bins[type][i] = 0;
         }
-        _this.bins[type][i] ++;
+        _bins[type][i] ++;
       }
     } else {
-      if (!_this.bins[type][magInt]) {
+      if (!_bins[type][magInt]) {
         intervals = _getIntervals();
-        _this.bins[type][magInt] = intervals;
+        _bins[type][magInt] = intervals;
       }
 
-      _this.bins[type][magInt][0] ++; // total
+      _bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
         if (_id !== 'foreshocks') {
-          _this.bins[type][magInt][365] ++;
+          _bins[type][magInt][365] ++;
         }
         if (days <= 30) {
-          _this.bins[type][magInt][30] ++;
+          _bins[type][magInt][30] ++;
           if (days <= 7) {
-            _this.bins[type][magInt][7] ++;
+            _bins[type][magInt][7] ++;
             if (days <= 1) {
-              _this.bins[type][magInt][1] ++;
+              _bins[type][magInt][1] ++;
             }
           }
         }
@@ -433,6 +436,8 @@ var Earthquakes = function (options) {
       url: props.url,
       utcTime: utcTime
     };
+
+    // Set additional props that depend on other props already being set
     data.bubblesHtml = _getBubbles(data);
     data.timeHtml = L.Util.template(timeTemplate, data);
 
@@ -449,18 +454,18 @@ var Earthquakes = function (options) {
     // 'Last' (most recent) earthquake in feed; overwrite each time thru loop
     _this.lastId = eqid;
 
-    // Add props to plotdata (additional props are added in _pointToLayer)
-    _this.plotdata.date.push(utcTime);
-    _this.plotdata.depth.push(coords[2] * -1); // return a negative number for depth
-    _this.plotdata.eqid.push(data.eqid);
-    _this.plotdata.lat.push(coords[1]);
-    _this.plotdata.lon.push(coords[0]);
-    _this.plotdata.mag.push(data.mag);
-    _this.plotdata.text.push(props.title + '<br />' + utcTime);
-    _this.plotdata.time.push(eqMoment.format());
+    // Add props to plotData (additional props are added in _pointToLayer)
+    _this.plotData.date.push(utcTime);
+    _this.plotData.depth.push(coords[2] * -1); // return a negative number for depth
+    _this.plotData.eqid.push(data.eqid);
+    _this.plotData.lat.push(coords[1]);
+    _this.plotData.lon.push(coords[0]);
+    _this.plotData.mag.push(data.mag);
+    _this.plotData.text.push(props.title + '<br />' + utcTime);
+    _this.plotData.time.push(eqMoment.format());
 
     // Add eq to list for summary
-    _this.eqList[eqid] = L.Util.template(_tablerowTemplate, data);
+    _eqlist[eqid] = L.Util.template(_tablerowTemplate, data);
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
@@ -505,11 +510,183 @@ var Earthquakes = function (options) {
     _markerOptions.pane = _id;
     _markerOptions.radius = radius;
 
-    // Add props to plotdata (additional props are added in _onEachFeature)
-    _this.plotdata.color.push(fillColor);
-    _this.plotdata.size.push(radius * 2); // plotly.js uses diameter
+    // Add props to plotData (additional props are added in _onEachFeature)
+    _this.plotData.color.push(fillColor);
+    _this.plotData.size.push(radius * 2); // plotly.js uses diameter
 
     return L.circleMarker(latlng, _markerOptions);
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Get table containing binned earthquake data
+   *
+   * @param type {String <magInclusive | first | past | prior>}
+   *
+   * @return html {Html}
+   */
+  _this.getBinnedTable = function (type) {
+    var html,
+        irow,
+        row,
+        total,
+        totalAll;
+
+    html = '';
+    if (_bins[type] && _bins[type].length > 0) {
+      html = '<table class="bin">' +
+        '<tr>' +
+          '<th class="period">' + type + ':</th>' +
+          '<th>Day</th>' +
+          '<th>Week</th>' +
+          '<th>Month</th>' +
+          '<th class="year">Year</th>' +
+          '<th>Total</th>' +
+        '</tr>';
+      _bins[type].forEach(function(cols, mag) {
+        html += '<tr><th class="rowlabel">M ' + mag + '</th>';
+        cols.forEach(function(col, i) {
+          if (i === 0) { // store row total
+            total = '<td class="total">' + col + '</td>';
+          } else {
+            html += '<td>' + col + '</td>';
+          }
+        });
+        html += total + '</tr>'; // add row total to table as last column
+      });
+
+      // Add total for each column as last row
+      html += '<tr>' +
+        '<th class="rowlabel">Total</th>';
+
+      for (row = 0; row < _bins[type].length; ++row) { // get column indices
+        if (typeof _bins[type][row] !== 'undefined') {
+          break;
+        }
+      }
+      if (row < _bins[type].length) { // if found valid row
+        totalAll = 0;
+        _bins[type][row].forEach(function(cols, index) {
+          total = 0;
+          for (irow = 0; irow < _bins[type].length; ++irow) {
+            if (typeof _bins[type][irow] !== 'undefined') {
+              if (index === 0) { // row total (last column)
+                totalAll += _bins[type][irow][index];
+              } else {
+                total += _bins[type][irow][index];
+              }
+            }
+          }
+          if (index > 0) {
+            html += '<td class="total">' + total + '</td>';
+          }
+        });
+        html += '<td class="total">' + totalAll + '</td>';
+        html += '</tr>';
+      }
+      html += '</table>';
+    }
+
+    return html;
+  };
+
+  /**
+   * Get table containing a list of earthquakes above mag threshold
+   *
+   * @param magThreshold {Number}
+   *     TODO: explain what this parameter does
+   *
+   * @return html {String}
+   */
+  _this.getListTable = function (magThreshold) {
+    var cssClasses,
+        html,
+        length,
+        mag,
+        match,
+        row,
+        sortClass,
+        tableData;
+
+    cssClasses = ['eqlist'];
+    length = Object.keys(_eqlist).length;
+    sortClass = 'non-sortable';
+    tableData = '';
+
+    Object.keys(_eqlist).forEach(function(key) {
+      row = _eqlist[key];
+
+      match = /tr\s+class="m(\d+)"/.exec(row);
+      mag = parseInt(match[1], 10);
+      if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
+        cssClasses.push('m' + mag);
+      }
+
+      tableData += row;
+    });
+    if (length > 1) {
+      cssClasses.push('sortable');
+    }
+    html = '<table class="' + cssClasses.join(' ') + '">' +
+        '<tr class="no-sort">' +
+          '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
+          '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
+          '<th class="location">Location</th>' +
+          '<th data-sort-method="number">Depth</th>' +
+          '<th data-sort-method="number">' +
+            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+          '</th>' +
+          '<th class="eqid">Event ID</th>' +
+        '</tr>' +
+        tableData +
+      '</table>';
+
+    return html;
+  };
+
+  /**
+   * Get html for input range slider when there's at least two mag bins w/ eqs
+   *
+   * @param mag {Number}
+   * @param cumulativeEqs {Array}
+   *     Array of cumulative eqs by mag
+   *
+   * @return html {String}
+   */
+  _this.getSlider = function (mag, cumulativeEqs) {
+    var html,
+        mags,
+        max,
+        min,
+        singleMagBin;
+
+    html = '';
+    singleMagBin = cumulativeEqs.every(function(value, i, array) {
+      return array[0] === value;
+    });
+
+    if (!singleMagBin) {
+      mags = Object.keys(cumulativeEqs);
+      max = Math.max.apply(null, mags);
+      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
+
+      html += '<div class="filter">';
+      html += '<h4>Filter earthquakes by magnitude</h4>';
+      html += '<div class="min">' + min + '</div>';
+      html += '<div class="inverted slider" style="--min: ' + min +
+        '; --max: ' + max + '; --val: ' + mag + ';">';
+      html += '<input id="' + _id + '" type="range" min="' + min + '" max="' +
+        max + '" value="' + mag + '"/>';
+      html += '<output for="'+ _id + '">' + mag + '</output>';
+      html += '</div>';
+      html += '<div class="max">' + max + '</div>';
+      html += '</div>';
+    }
+
+    return html;
   };
 
 

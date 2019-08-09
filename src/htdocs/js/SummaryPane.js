@@ -26,10 +26,6 @@ var SummaryPane = function (options) {
       _addListeners,
       _addTimestamp,
       _clickRow,
-      _getBinnedTable,
-      _getListTable,
-      _getSlider,
-      _getSummary,
       _getTimeZone,
       _getValue,
       _hoverRow,
@@ -171,292 +167,6 @@ var SummaryPane = function (options) {
     if(!isTextSelected) { // suppress event if user is trying to select text
       _app.MapPane.openPopup(feature, eqid);
     }
-  };
-
-  /**
-   * Get table containing binned earthquake data
-   *
-   * @param bins {Object}
-   *     earthquake data binned by mag/time
-   * @param type {String <magInclusive | first | past | prior>}
-   *
-   * @return html {Html}
-   */
-  _getBinnedTable = function (bins, type) {
-    var html,
-        irow,
-        row,
-        total,
-        totalAll;
-
-    html = '';
-    if (bins[type] && bins[type].length > 0) {
-      html = '<table class="bin">' +
-        '<tr>' +
-          '<th class="period">' + type + ':</th>' +
-          '<th>Day</th>' +
-          '<th>Week</th>' +
-          '<th>Month</th>' +
-          '<th class="year">Year</th>' +
-          '<th>Total</th>' +
-        '</tr>';
-      bins[type].forEach(function(cols, mag) {
-        html += '<tr><th class="rowlabel">M ' + mag + '</th>';
-        cols.forEach(function(col, i) {
-          if (i === 0) { // store row total
-            total = '<td class="total">' + col + '</td>';
-          } else {
-            html += '<td>' + col + '</td>';
-          }
-        });
-        html += total + '</tr>'; // add row total to table as last column
-      });
-
-      // Add total for each column as last row
-      html += '<tr>' +
-        '<th class="rowlabel">Total</th>';
-
-      for (row = 0; row < bins[type].length; ++row) { // get column indices
-        if (typeof bins[type][row] !== 'undefined') {
-          break;
-        }
-      }
-      if (row < bins[type].length) { // if found valid row
-        totalAll = 0;
-        bins[type][row].forEach(function(cols, index) {
-          total = 0;
-          for (irow = 0; irow < bins[type].length; ++irow) {
-            if (typeof bins[type][irow] !== 'undefined') {
-              if (index === 0) { // row total (last column)
-                totalAll += bins[type][irow][index];
-              } else {
-                total += bins[type][irow][index];
-              }
-            }
-          }
-          if (index > 0) {
-            html += '<td class="total">' + total + '</td>';
-          }
-        });
-        html += '<td class="total">' + totalAll + '</td>';
-        html += '</tr>';
-      }
-      html += '</table>';
-    }
-
-    return html;
-  };
-
-  /**
-   * Get table containing a list of earthquakes above mag threshold
-   *
-   * @param rows {Object}
-   *     tr html for each earthquake in list keyed by eqid
-   * @param magThreshold {Number}
-   *
-   * @return html {String}
-   */
-  _getListTable = function (rows, magThreshold) {
-    var cssClasses,
-        html,
-        length,
-        mag,
-        match,
-        row,
-        sortClass,
-        tableData;
-
-    cssClasses = ['list'];
-    length = Object.keys(rows).length;
-    sortClass = 'non-sortable';
-    tableData = '';
-
-    Object.keys(rows).forEach(function(key) {
-      row = rows[key];
-
-      match = /tr\s+class="m(\d+)"/.exec(row);
-      mag = parseInt(match[1], 10);
-      if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
-        cssClasses.push('m' + mag);
-      }
-
-      tableData += row;
-    });
-    if (length > 1) {
-      cssClasses.push('sortable');
-    }
-    html = '<table class="' + cssClasses.join(' ') + '">' +
-        '<tr class="no-sort">' +
-          '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-          '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
-          '<th class="location">Location</th>' +
-          '<th data-sort-method="number">Depth</th>' +
-          '<th data-sort-method="number">' +
-            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-          '</th>' +
-          '<th class="eqid">Event ID</th>' +
-        '</tr>' +
-        tableData +
-      '</table>';
-
-    return html;
-  };
-
-  /**
-   * Get html for input range slider when there's at least two mag bins w/ eqs
-   *
-   * @param id {String}
-   *     feature id
-   * @param mag {Number}
-   * @param cumulativeEqs {Array}
-   *     Array of cumulative eqs by mag
-   *
-   * @return html {String}
-   */
-  _getSlider = function (id, mag, cumulativeEqs) {
-    var html,
-        mags,
-        max,
-        min,
-        singleMagBin;
-
-    html = '';
-    singleMagBin = cumulativeEqs.every(function(value, i, array) {
-      return array[0] === value;
-    });
-
-    if (!singleMagBin) {
-      mags = Object.keys(cumulativeEqs);
-      max = Math.max.apply(null, mags);
-      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(id) + '-mag'));
-
-      html += '<div class="filter">';
-      html += '<h4>Filter earthquakes by magnitude</h4>';
-      html += '<div class="min">' + min + '</div>';
-      html += '<div class="inverted slider" style="--min: ' + min +
-        '; --max: ' + max + '; --val: ' + mag + ';">';
-      html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
-        max + '" value="' + mag + '"/>';
-      html += '<output for="'+ id + '">' + mag + '</output>';
-      html += '</div>';
-      html += '<div class="max">' + max + '</div>';
-      html += '</div>';
-    }
-
-    return html;
-  };
-
-  /**
-   * Get summary html for feature
-   *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // summary data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
-   *
-   * @return summary {Html}
-   */
-  _getSummary = function (opts) {
-    var count,
-        data,
-        id,
-        mag,
-        subheader,
-        summary,
-        url;
-
-    data = opts.data;
-    id = opts.id;
-
-    if (id === 'focal-mechanism' || id === 'moment-tensor') {
-      var beachball,
-          className,
-          h4;
-
-      beachball = opts.data;
-      className = '.' + id;
-      h4 = _el.querySelector(className + ' h4');
-
-      // Display beachball
-      beachball.render(_el.querySelector(className + ' a'));
-      h4.innerHTML = opts.name;
-      _el.querySelector(className).classList.remove('hide');
-
-      return;
-    }
-
-    summary = '<h2>' + opts.name + '</h2>';
-
-    if (id === 'mainshock') {
-      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
-        _app.AppUtil.getParam('eqid');
-
-      summary += '<div class="products">';
-      summary += data.detailsHtml;
-
-      // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism hide scale">' +
-        '<a href="' + url + '/focal-mechanism"><h4></h4></a></div>';
-      summary += '<div class="moment-tensor hide scale">' +
-        '<a href="' + url + '/moment-tensor"><h4></h4></a></div>';
-
-      // Add dyfi/sm thumbnails
-      if (data.dyfi) {
-        summary += '<div class="dyfi scale"><a href="' + url + '/dyfi">' +
-          '<h4>Did You Feel It?</h4><img src="' + data.dyfi.url + '" class="mmi' +
-          data.dyfi.cdi + '" /></a></div>';
-      }
-      if (data.shakemap) {
-        summary += '<div class="shakemap scale"><a href="' + url + '/shakemap">' +
-          '<h4>ShakeMap</h4><img src="' + data.shakemap.url + '" class="mmi' +
-          data.shakemap.mmi + '" /></a></div>';
-      }
-
-      summary += '</div>';
-    } else {
-      summary += data.detailsHtml;
-    }
-
-    if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
-      count = Object.keys(opts.data.list).length;
-      if (count > 0) {
-        mag = Math.floor(Math.max(data.magThreshold,
-          _app.AppUtil.getParam(_app.AppUtil.lookup(id) + '-mag')));
-
-        // Check if there's eq data for mag threshold; if not, decr mag by 1
-        while (!data.bins.magInclusive[mag]) {
-          mag --;
-        }
-
-        if (id === 'aftershocks') {
-          summary += '<div class="bins">';
-          summary += _getBinnedTable(data.bins, 'first');
-          summary += _getBinnedTable(data.bins, 'past');
-          summary += '</div>';
-          summary += data.probabilities;
-          if (data.lastId && count > 1) {
-            summary += '<h3>Most Recent Aftershock</h3>';
-            summary += _getListTable({
-              lastAftershock: data.list[data.lastId]
-            }, false);
-          }
-        }
-        if (id === 'historical' || id === 'foreshocks') {
-          summary += _getBinnedTable(data.bins, 'prior');
-        }
-
-        subheader = 'M <span class="mag">' + mag + '</span>+ Earthquakes';
-        subheader += ' (<span class="num">' + data.bins.magInclusive[mag] +
-          '</span>)';
-        summary += '<h3>' + subheader + '</h3>';
-        summary += _getSlider(id, mag, data.bins.magInclusive);
-        summary += _getListTable(data.list, mag);
-      }
-    }
-
-    return summary;
   };
 
   /**
@@ -617,33 +327,25 @@ var SummaryPane = function (options) {
    * Add feature to summary pane (text plus <div> container)
    *   (called by Features.js)
    *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // summary data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
+   * @param feature {Object}
    */
-  _this.addSummary = function (opts) {
+  _this.addSummary = function (feature) {
     var className,
         data,
         div,
         input,
-        summary,
         table;
 
-    className = opts.id;
-    data = opts.data;
-    summary = _getSummary(opts);
+    className = feature.id;
 
     // Add feature to summary
-    if (summary) {
+    if (feature.summary) {
       div = document.createElement('div');
       div.classList.add('content', 'lighter', 'feature', className);
-      div.innerHTML = summary;
+      div.innerHTML = '<h2>' + feature.name + '</h2>' + feature.summary;
       _features.appendChild(div);
 
-      table = div.querySelector('table.list');
+      table = div.querySelector('table.eqlist');
       if (table) {
         input = div.querySelector('input');
         _addListeners(div, data.bins.magInclusive);
