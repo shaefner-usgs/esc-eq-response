@@ -24,56 +24,13 @@ _SVG_DEFAULTS = {
  */
 var Svg = function (options) {
   var _this,
-      _initialize,
-
-      _getCircle;
+      _initialize;
 
 
   _this = {};
 
   _initialize = function (options) {
     options = options || {};
-  };
-
-  /**
-   * Create an SVG circle
-   *
-   * @param opts {Object}
-   *
-   * @return svg {Element}
-   */
-  _getCircle = function (opts) {
-    var elemSize,
-        svg,
-        svgOpts;
-
-    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
-
-    elemSize = Math.ceil(svgOpts.radius * 2 + 2);
-
-    svg.innerHTML = [
-      '<circle cx="',
-      elemSize / 2,
-      '" cy="',
-      elemSize / 2,
-      '" r="',
-      svgOpts.radius,
-      '" stroke="',
-      svgOpts.color,
-      '" stroke-width="1" stroke-opacity="',
-      svgOpts.opacity,
-      '" fill="',
-      svgOpts.fillColor,
-      '" fill-opacity="',
-      svgOpts.fillOpacity,
-      '" />'
-    ].join('');
-
-    svg.setAttribute('height', elemSize);
-    svg.setAttribute('width', elemSize);
-
-    return svg;
   };
 
   // ----------------------------------------------------------
@@ -128,7 +85,37 @@ var Svg = function (options) {
    * @return svg {Element}
    */
   _this.getCircle = function (opts) {
-    return _getCircle(opts);
+    var elemSize,
+        svg,
+        svgOpts;
+
+    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
+
+    elemSize = Math.ceil(svgOpts.radius * 2 + 2);
+
+    svg.innerHTML = [
+      '<circle cx="',
+      elemSize / 2,
+      '" cy="',
+      elemSize / 2,
+      '" r="',
+      svgOpts.radius,
+      '" stroke="',
+      svgOpts.color,
+      '" stroke-width="1" stroke-opacity="',
+      svgOpts.opacity,
+      '" fill="',
+      svgOpts.fillColor,
+      '" fill-opacity="',
+      svgOpts.fillOpacity,
+      '" />'
+    ].join('');
+
+    svg.setAttribute('height', elemSize);
+    svg.setAttribute('width', elemSize);
+
+    return svg;
   };
 
   /**
@@ -154,7 +141,7 @@ var Svg = function (options) {
 
       for (i = min; i <= max; i ++) {
         li = document.createElement('li');
-        circle = _getCircle({
+        circle = _this.getCircle({
           radius: AppUtil.getRadius(i)
         });
         li.appendChild(circle);
