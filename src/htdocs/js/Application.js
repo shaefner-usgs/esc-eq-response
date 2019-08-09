@@ -46,15 +46,17 @@ var Application = function (options) {
   };
 
   /**
-   * Load app components and store them in a global 'app' object that is shared
-   *   between classes
+   * Load app components and store them in a superglobal 'app' object that is
+   *   shared between classes
    */
   _loadComponents = function (options) {
     _this.AppUtil = AppUtil;
     _this.HelpPane = HelpPane({
+      app: _this,
       el: options.helpPane
     });
     _this.MapPane = MapPane({
+      app: _this,
       el: options.mapPane
     });
     // PlotsPane depends on: MapPane
@@ -63,6 +65,7 @@ var Application = function (options) {
       el: options.plotsPane
     });
     _this.StatusBar = StatusBar({
+      app: _this,
       el: options.statusBar
     });
     // NavBar depends on: MapPane, PlotsPane, StatusBar
