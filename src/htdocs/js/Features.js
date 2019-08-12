@@ -1,18 +1,31 @@
 'use strict';
 
 
-/*var AftershocksFeature = require('features/AftershocksFeature'),
+var /*AftershocksFeature = require('features/AftershocksFeature'),
     FieldNotesFeature = require('features/FieldNotesFeature'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
     ForeshocksFeature = require('features/ForeshocksFeature'),
-    HistoricalFeature = require('features/HistoricalFeature'),
+    HistoricalFeature = require('features/HistoricalFeature'),*/
     MainshockFeature = require('features/MainshockFeature'),
-    MomentTensorFeature = require('features/MomentTensorFeature'),
-    StationsFeature = require('features/StationsFeature'),
-    Xhr = require('util/Xhr');*/
-
-var MainshockFeature = require('features/MainshockFeature'),
+    /* MomentTensorFeature = require('features/MomentTensorFeature'),
+    StationsFeature = require('features/StationsFeature'),*/
     Xhr = require('util/Xhr');
+
+
+var _FEATURECLASSES;
+
+// Set which features get added, and the order (ASC)
+_FEATURECLASSES = [
+  MainshockFeature
+  //AftershocksFeature,
+  //ForeshocksFeature,
+  //HistoricalFeature,
+  //StationsFeature,
+  //FocalMechanismFeature,
+  //MomentTensorFeature,
+  //FieldNotesFeature
+];
+
 
 /**
  * Add Features to map, plots and summary
@@ -29,7 +42,6 @@ var Features = function (options) {
 
       _app,
       _eqid,
-      _featureClasses,
       _features;
 
 
@@ -99,24 +111,16 @@ var Features = function (options) {
    * Initialize (execute) each feature class and store it in _features
    */
   _this.initFeatures = function () {
-    _featureClasses = [
-      MainshockFeature
-      //AftershocksFeature,
-      //ForeshocksFeature,
-      //HistoricalFeature,
-      //StationsFeature,
-      //FocalMechanismFeature,
-      //MomentTensorFeature,
-      //FieldNotesFeature
-    ];
+    _features = {};
 
-    _featureClasses.forEach(function(featureClass) {
-      var feature = featureClass({
+    _FEATURECLASSES.forEach(function(FeatureClass) {
+      var feature = FeatureClass({
         app: _app,
         eqid: _eqid
       });
 
       _features[feature.id] = feature;
+      _this.remove(feature); // remove any previous instances
       _this.load(feature);
     });
   };
