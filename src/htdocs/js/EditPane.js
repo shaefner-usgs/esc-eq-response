@@ -30,7 +30,6 @@ var EditPane = function (options) {
       _isNewEvent,
       _isValidEqId,
       _refreshEqs,
-      _resetApp,
       _resetForm,
       _resetTitle,
       _setFormFields,
@@ -59,7 +58,7 @@ var EditPane = function (options) {
 
     // Get things rolling if eqid is already set when initialized
     if (_eqid.value !== '') {
-      _initFeatures();
+      //_initFeatures();
     }
   };
 
@@ -80,23 +79,19 @@ var EditPane = function (options) {
     }
   };
 
-  /*
+  /**
    * Get default values for form fields that depend on user-selected mainshock
-   *
-   * @param mainshockJson {Object}
-   *     GeoJson data
    *
    * @return {Object}
    */
-  _getDefaults = function (mainshockJson) {
+  _getDefaults = function () {
     var mag,
         ruptureArea,
         ruptureLength;
 
-    mag = mainshockJson.properties.mag;
+    mag = _app.Features.getFeature('mainshock').json.properties.mag;
 
-    /*
-     * Default values for aftershock and historical seismicity differences are
+    /* Default values for aftershock and historical seismicity differences are
      * based on rupture length, which we estimate from the Hanks-Bakun (2014)
      * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
      *
@@ -120,7 +115,7 @@ var EditPane = function (options) {
     };
   };
 
-  /*
+  /**
    * Hide mainshock details on edit pane
    */
   _hideMainshock = function () {
@@ -131,7 +126,7 @@ var EditPane = function (options) {
    * Add features to map, plots, summary panes
    */
   _initFeatures = function () {
-    _resetForm(); // first reset form/app to default state
+    _app.resetApp(); // first reset app to default state
 
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
@@ -170,7 +165,7 @@ var EditPane = function (options) {
     _addListener(historical, 'change', _refreshEqs);
 
     // Clear features when reset button pressed
-    _addListener([reset], 'click', _resetForm);
+    _addListener([reset], 'click', _app.resetApp);
 
     // Switch to map pane when 'View Map' button is clicked
     _addListener([viewmap], 'click', _viewMap);
@@ -240,28 +235,11 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset app: clear mainshock details, features, status bar, etc.
-   */
-  _resetApp = function () {
-    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
-
-    _hideMainshock();
-    _resetTitle();
-    _app.StatusBar.reset();
-    _app.Features.removeFeatures();
-    _app.MapPane.reset();
-    _app.SummaryPane.reset();
-    _app.NavBar.reset();
-  };
-
-  /**
-   * Reset form: call _resetApp, reset querystring/pulldown after form cleared
+   * Reset querystring/significant eqs after form values cleared
    */
   _resetForm = function () {
     var div,
         select;
-
-    _resetApp();
 
     // Set a slight delay so reset button can clear form fields first
     setTimeout(function () {
@@ -335,7 +313,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Switch to map pane (triggered when 'View map' button clicked)
+   * Switch to map pane when 'View Map' button clicked
    */
   _viewMap = function () {
     if (!_el.querySelector('.viewmap').hasAttribute('disabled')) {
@@ -346,6 +324,17 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Reset pane to initial state
+   */
+  _this.reset = function () {
+    _hideMainshock();
+    _resetForm();
+    _resetTitle();
+
+    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
+  };
 
   /**
    * Set user selected significant eq as mainshock
@@ -366,18 +355,19 @@ var EditPane = function (options) {
 
   /**
    * Display mainshock's details on edit pane and also update <title>
-   *
-   * @param html {String}
-   * @param props {Object}
    */
-  _this.showMainshock = function (html, props) {
+  _this.showMainshock = function () {
     var appTitle,
-        details;
+        details,
+        mainshock,
+        props;
 
     appTitle = _resetTitle();
     details = _el.querySelector('.details');
+    mainshock = _app.Features.getFeature('mainshock');
+    props = mainshock.json.props;
 
-    details.innerHTML = html;
+    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
     details.classList.remove('hide');
 
     document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
@@ -386,15 +376,12 @@ var EditPane = function (options) {
 
   /**
    * Set default form field values / url params based on mainshock's details
-   *
-   * @param mainshockJson {Object}
-   *     GeoJson data
    */
-  _this.setDefaults = function (mainshockJson) {
+  _this.setDefaults = function () {
     var defaults,
         isNewEvent;
 
-    defaults = _getDefaults(mainshockJson);
+    defaults = _getDefaults();
     isNewEvent = _isNewEvent();
 
     // First, update url params with defaults

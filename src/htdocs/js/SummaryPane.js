@@ -235,7 +235,7 @@ var SummaryPane = function (options) {
     }
   };
 
-  /*
+  /**
    * Make table sortable
    *
    * @param className {String}
@@ -374,7 +374,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Reset timestamp, inline styles for range inputs
+   * Reset pane to initial state
    */
   _this.reset = function () {
     var time;
@@ -382,6 +382,7 @@ var SummaryPane = function (options) {
     time = _el.querySelector('time');
     time.innerHTML = '';
 
+    _features.innerHTML = '';
     _style.textContent = '';
   };
 

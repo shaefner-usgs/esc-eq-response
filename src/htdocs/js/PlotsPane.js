@@ -624,6 +624,13 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Reset pane to initial state
+   */
+  _this.reset = function () {
+    _features.innerHTML = '';
+  };
+
+  /**
    * Resize plots: adds responsive / fluid sizing
    */
   _this.resizePlots = function () {

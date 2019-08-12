@@ -34,7 +34,6 @@ _FEATURECLASSES = [
  *   {
  *     app: {Object}, // application props / methods
  *   }
-
  */
 var Features = function (options) {
   var _this,
@@ -51,7 +50,6 @@ var Features = function (options) {
     options = options || {};
 
     _app = options.app;
-    _eqid = _app.AppUtil.getParam('eqid');
     _features = {};
 
     // Flag to block mult. instances of feature from refreshing at the same time
@@ -76,8 +74,8 @@ var Features = function (options) {
       // TODO: add plots using feature.plotData
 
       if (feature.id === 'mainshock') {
-        // TODO: Show mainshock details on editPane
-        //_app.EditPane.showMainshock();
+        _app.EditPane.showMainshock();
+        //_app.EditPane.setDefaults();
       }
       // Feature finished loading; remove alert / set isRefreshing to false
       _app.StatusBar.removeItem(feature.id);
@@ -111,7 +109,7 @@ var Features = function (options) {
    * Initialize (execute) each feature class and store it in _features
    */
   _this.initFeatures = function () {
-    _features = {};
+    _eqid = _app.AppUtil.getParam('eqid');
 
     _FEATURECLASSES.forEach(function(FeatureClass) {
       var feature = FeatureClass({
@@ -141,13 +139,9 @@ var Features = function (options) {
         feature.json = json;
         feature.createFeature();
         _this.add(feature);
-
-        if (feature.id === 'mainshock') { // set default values on edit pane
-          _app.EditPane.setDefaults(json);
-        }
       },
       error: function (status, xhr) {
-        errorMsg += '<ul>';
+        errorMsg = '<ul>';
 
         // Show response in console and add additional info to error message
         if (xhr.responseText) {
@@ -244,6 +238,16 @@ var Features = function (options) {
         _this.remove(_features[key]);
       });
     }
+  };
+
+  /**
+   * Reset to initial state
+   */
+  _this.reset = function () {
+    this.removeFeatures();
+
+    _eqid = null;
+    _features = {};
   };
 
 
