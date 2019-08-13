@@ -176,7 +176,7 @@ var EditPane = function (options) {
   /**
    * Check if event id entered by user is 'new' (different from previous value)
    *
-   * @return newEvent {Boolean}
+   * @return isNew {Boolean}
    */
   _isNewEvent = function () {
     var isNew = false;
@@ -266,6 +266,7 @@ var EditPane = function (options) {
   _resetTitle = function () {
     var title;
 
+    // Only keep 'generic' portion of title after '|' char (app name)
     title = document.title.split('|')[1] || document.title.split('|')[0];
     document.title = title;
 

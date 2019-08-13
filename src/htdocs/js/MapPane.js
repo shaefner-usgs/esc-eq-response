@@ -79,6 +79,9 @@ var MapPane = function (options) {
   /**
    * Comparison function for sorting overlays in layer control
    *
+   * @param layerA {L.Layer}
+   * @param layerB {L.Layer}
+   *
    * @return {Integer}
    */
   _compareLayers = function (layerA, layerB) {
@@ -92,6 +95,7 @@ var MapPane = function (options) {
     if (sortValue[0] > sortValue[1]) {
       return -1;
     }
+
     return 0;
   };
 
@@ -99,10 +103,9 @@ var MapPane = function (options) {
    * Get sort value of Leaflet layer
    *
    * @param layer {L.Layer}
-   * @param name {String}
    *
    * @return sortValue {Integer}
-   *   z-index value or 1 if no z-index
+   *     z-index value or 1 if no z-index
    */
   _getSortValue = function (layer) {
     var className,
@@ -209,7 +212,7 @@ var MapPane = function (options) {
   /**
    * Determine if Leaflet layer is a baselayer or not
    *
-   * @param name {String}
+   * @param layer {L.Layer}
    *
    * @return r {Boolean}
    */
@@ -320,7 +323,7 @@ var MapPane = function (options) {
   /**
    * Zoom map extent to contain features with 'zoomToLayer' prop set to true
    *
-   * @param feature {String}
+   * @param feature {Object}
    *     optional feature layer to zoom to; zooms to all layers if not set
    */
   _this.setView = function (feature) {
