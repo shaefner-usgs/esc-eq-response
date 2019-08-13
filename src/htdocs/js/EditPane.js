@@ -58,7 +58,7 @@ var EditPane = function (options) {
 
     // Get things rolling if eqid is already set when initialized
     if (_eqid.value !== '') {
-      //_initFeatures();
+      _initFeatures();
     }
   };
 
@@ -126,7 +126,9 @@ var EditPane = function (options) {
    * Add features to map, plots, summary panes
    */
   _initFeatures = function () {
-    _app.resetApp(); // first reset app to default state
+    if (_eqidPrevValue) {
+      _app.resetApp(); // first reset app to default state
+    }
 
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
@@ -365,7 +367,7 @@ var EditPane = function (options) {
     appTitle = _resetTitle();
     details = _el.querySelector('.details');
     mainshock = _app.Features.getFeature('mainshock');
-    props = mainshock.json.props;
+    props = mainshock.json.properties;
 
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
     details.classList.remove('hide');
