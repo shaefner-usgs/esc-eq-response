@@ -66,6 +66,8 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _this.add = function (feature) {
+    _features[feature.id] = feature;
+
     try {
       // Create a new map pane and add feature to map, summary panes
       _app.MapPane.createMapPane(feature.id, 'overlayPane');
@@ -75,7 +77,7 @@ var Features = function (options) {
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
-        //_app.EditPane.setDefaults();
+        _app.EditPane.setDefaults();
       }
       // Feature finished loading; remove alert / set isRefreshing to false
       _app.StatusBar.removeItem(feature.id);
@@ -98,11 +100,15 @@ var Features = function (options) {
    * @return feature {Object}
    */
   _this.getFeature = function (id) {
+    var feature;
+
     Object.keys(_features).forEach(function(key) {
       if (id === key) {
-        return _features[key];
+        feature = _features[key];
       }
     });
+
+    return feature;
   };
 
   /**
@@ -116,9 +122,6 @@ var Features = function (options) {
         app: _app,
         eqid: _eqid
       });
-
-      _features[feature.id] = feature;
-      _this.remove(feature); // remove any previous instances
       _this.load(feature);
     });
   };
@@ -226,13 +229,15 @@ var Features = function (options) {
       if (summaryEl) {
         _app.SummaryPane.removeSummary(summaryEl);
       }
+
+      _features[feature.id] = {};
     }
   };
 
   /**
    * Remove all features from map, plots and summary panes
    */
-  _this.removeFeatures = function () {
+  _this.removeAll = function () {
     if (_features) {
       Object.keys(_features).forEach(function(key) {
         _this.remove(_features[key]);
@@ -244,7 +249,7 @@ var Features = function (options) {
    * Reset to initial state
    */
   _this.reset = function () {
-    this.removeFeatures();
+    _this.removeAll();
 
     _eqid = null;
     _features = {};
