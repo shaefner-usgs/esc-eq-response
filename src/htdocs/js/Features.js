@@ -283,8 +283,6 @@ var Features = function (options) {
     _this.initFeatures(options);
 
     // TODO: also refresh Fieldnotes if refreshing aftershocks
-
-    _this.isRefreshing = false;
   };
 
   /**
