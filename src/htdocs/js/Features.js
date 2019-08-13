@@ -41,7 +41,12 @@ var Features = function (options) {
 
       _app,
       _eqid,
-      _features;
+      _features,
+
+      _add,
+      _load,
+      _remove,
+      _removeAll;
 
 
   _this = {};
@@ -56,16 +61,12 @@ var Features = function (options) {
     _this.isRefreshing = false;
   };
 
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
   /**
    * Add a feature to map, plots and summary panes
    *
    * @param feature {Object}
    */
-  _this.add = function (feature) {
+  _add = function (feature) {
     _features[feature.id] = feature;
 
     try {
@@ -92,46 +93,11 @@ var Features = function (options) {
   };
 
   /**
-   * Get a feature
-   *
-   * @param id {String}
-   *     id of feature
-   *
-   * @return feature {Object}
-   */
-  _this.getFeature = function (id) {
-    var feature;
-
-    Object.keys(_features).forEach(function(key) {
-      if (id === key) {
-        feature = _features[key];
-      }
-    });
-
-    return feature;
-  };
-
-  /**
-   * Initialize (execute) each feature class and store it in _features
-   */
-  _this.initFeatures = function () {
-    _eqid = _app.AppUtil.getParam('eqid');
-
-    _FEATURECLASSES.forEach(function(FeatureClass) {
-      var feature = FeatureClass({
-        app: _app,
-        eqid: _eqid
-      });
-      _this.load(feature);
-    });
-  };
-
-  /**
    * Load a feature (via json feed) and then add it once it's loaded
    *
    * @param feature {Object}
    */
-  _this.load = function (feature) {
+  _load = function (feature) {
     var domain,
         errorMsg,
         matches;
@@ -141,7 +107,7 @@ var Features = function (options) {
       success: function (json) {
         feature.json = json;
         feature.createFeature();
-        _this.add(feature);
+        _add(feature);
       },
       error: function (status, xhr) {
         errorMsg = '<ul>';
@@ -192,24 +158,11 @@ var Features = function (options) {
   };
 
   /**
-   * Refresh a feature
-   *
-   * @param feature {Object}
-   */
-  _this.refresh = function (feature) {
-    _this.isRefreshing = true;
-    _this.remove(feature);
-    _this.load(feature);
-
-    // TODO: also refresh Fieldnotes if refreshing aftershocks
-  };
-
-  /**
    * Remove a feature from map, plots and summary panes
    *
    * @param feature {Object}
    */
-  _this.remove = function (feature) {
+  _remove = function (feature) {
     var mapLayer,
         plotsEl,
         summaryEl;
@@ -237,19 +190,71 @@ var Features = function (options) {
   /**
    * Remove all features from map, plots and summary panes
    */
-  _this.removeAll = function () {
+  _removeAll = function () {
     if (_features) {
       Object.keys(_features).forEach(function(key) {
-        _this.remove(_features[key]);
+        _remove(_features[key]);
       });
     }
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Get a feature
+   *
+   * @param id {String}
+   *     id of feature
+   *
+   * @return feature {Object}
+   */
+  _this.getFeature = function (id) {
+    var feature;
+
+    Object.keys(_features).forEach(function(key) {
+      if (id === key) {
+        feature = _features[key];
+      }
+    });
+
+    return feature;
+  };
+
+  /**
+   * Initialize (execute) each feature class and store it in _features
+   */
+  _this.initFeatures = function () {
+    _eqid = _app.AppUtil.getParam('eqid');
+
+    _FEATURECLASSES.forEach(function(FeatureClass) {
+      var feature = FeatureClass({
+        app: _app,
+        eqid: _eqid
+      });
+      _load(feature);
+    });
+  };
+
+  /**
+   * Refresh a feature
+   *
+   * @param feature {Object}
+   */
+  _this.refresh = function (feature) {
+    _this.isRefreshing = true;
+    _remove(feature);
+    _load(feature);
+
+    // TODO: also refresh Fieldnotes if refreshing aftershocks
   };
 
   /**
    * Reset to initial state
    */
   _this.reset = function () {
-    _this.removeAll();
+    _removeAll();
 
     _eqid = null;
     _features = {};
