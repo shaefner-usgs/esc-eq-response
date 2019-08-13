@@ -19,6 +19,7 @@ var MainshockFeature = function (options) {
       _initialize,
 
       _app,
+      _Earthquakes,
 
       _getSummary;
 
@@ -40,7 +41,7 @@ var MainshockFeature = function (options) {
   /**
    * Get summary html for feature
    */
-  _getSummary = function (Earthquakes) {
+  _getSummary = function () {
     var baseUrl,
         cdi,
         imgSrc,
@@ -52,7 +53,7 @@ var MainshockFeature = function (options) {
       _app.AppUtil.getParam('eqid');
     products = _this.json.properties.products;
     summary = '<div class="products">';
-    summary += Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
+    summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
 
     if (products.dyfi) {
       cdi = _app.AppUtil.romanize(_this.json.properties.cdi);
@@ -87,14 +88,14 @@ var MainshockFeature = function (options) {
    *   invoked via Ajax callback in Features.js
    */
   _this.createFeature = function () {
-    Earthquakes = Earthquakes({
+    _Earthquakes = Earthquakes({
       app: _app,
       feature: _this
     });
 
-    _this.mapLayer = Earthquakes.mapLayer;
-    _this.plotData = Earthquakes.plotData;
-    _this.summary = _getSummary(Earthquakes);
+    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.plotData = _Earthquakes.plotData;
+    _this.summary = _getSummary();
   };
 
 
@@ -102,5 +103,6 @@ var MainshockFeature = function (options) {
   options = null;
   return _this;
 };
+
 
 module.exports = MainshockFeature;
