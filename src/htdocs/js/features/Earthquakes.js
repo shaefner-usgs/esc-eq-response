@@ -46,7 +46,7 @@ var Earthquakes = function (options) {
 
       _app,
       _bins,
-      _eqlist,
+      _eqList,
       _id,
       _markerOptions,
       _mainshockLatlon,
@@ -63,7 +63,6 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
-      _getDescription,
       _getIntervals,
       _getHtmlTemplate,
       _onEachFeature,
@@ -83,7 +82,7 @@ var Earthquakes = function (options) {
     _id = options.feature.id;
 
     _bins = {};
-    _eqlist = {};
+    _eqList = {};
     _this.plotData = {
       color: [],
       date: [],
@@ -101,7 +100,6 @@ var Earthquakes = function (options) {
       mainshock = options.feature;
     } else {
       mainshock = _app.Features.getFeature('mainshock');
-      _this.description = _getDescription();
     }
 
     coords = mainshock.json.geometry.coordinates;
@@ -266,45 +264,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (summary of user-set parameters, etc.) for
-   *   aftershocks / foreshocks / historical
-   *
-   * @return description {Html}
-   */
-  _getDescription = function () {
-    var description,
-        distance,
-        duration,
-        mag;
-
-    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
-    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
-
-    description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
-      'earthquakes within <strong>' + distance + ' km</strong> of the ' +
-      'mainshock&rsquo;s epicenter';
-
-    if (_id === 'aftershocks') {
-      duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
-        _mainshockMoment).asDays(), 1) + ' days';
-      description += '. The duration of the aftershock sequence is <strong>' +
-        duration + '</strong>';
-    } else {
-      if (_id === 'foreshocks') {
-        duration = _app.AppUtil.getParam('fs-days') + ' days';
-      } else if (_id === 'historical') {
-        duration = _app.AppUtil.getParam('hs-years') + ' years';
-      }
-      description += ' in the prior <strong>' + duration + '</strong> ' +
-        'before the mainshock';
-    }
-
-    description += '.</p>';
-
-    return description;
-  };
-
-  /**
    * Get intervals to store binned data in
    *
    * @return intervals {Array}
@@ -464,8 +423,8 @@ var Earthquakes = function (options) {
     _this.plotData.text.push(props.title + '<br />' + utcTime);
     _this.plotData.time.push(eqMoment.format());
 
-    // Add eq to list for summary
-    _eqlist[eqid] = L.Util.template(_tablerowTemplate, data);
+    // Add eq to html list for summary
+    _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
@@ -594,10 +553,49 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get feed description (summary of user-set parameters, etc.) for
+   *   aftershocks / foreshocks / historical
+   *
+   * @return description {Html}
+   */
+  _this.getDescription = function () {
+    var description,
+        distance,
+        duration,
+        mag;
+
+    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+
+    description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
+      'earthquakes within <strong>' + distance + ' km</strong> of the ' +
+      'mainshock&rsquo;s epicenter';
+
+    if (_id === 'aftershocks') {
+      duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
+        _mainshockMoment).asDays(), 1) + ' days';
+      description += '. The duration of the aftershock sequence is <strong>' +
+        duration + '</strong>';
+    } else {
+      if (_id === 'foreshocks') {
+        duration = _app.AppUtil.getParam('fs-days') + ' days';
+      } else if (_id === 'historical') {
+        duration = _app.AppUtil.getParam('hs-years') + ' years';
+      }
+      description += ' in the prior <strong>' + duration + '</strong> ' +
+        'before the mainshock';
+    }
+
+    description += '.</p>';
+
+    return description;
+  };
+
+  /**
    * Get table containing a list of earthquakes above mag threshold
    *
    * @param magThreshold {Number}
-   *     TODO: explain what this parameter does
+   *     only display eqs larger than threshold by default (slider reveals more)
    *
    * @return html {String}
    */
@@ -612,12 +610,12 @@ var Earthquakes = function (options) {
         tableData;
 
     cssClasses = ['eqlist'];
-    length = Object.keys(_eqlist).length;
+    length = Object.keys(_eqList).length;
     sortClass = 'non-sortable';
     tableData = '';
 
-    Object.keys(_eqlist).forEach(function(key) {
-      row = _eqlist[key];
+    Object.keys(_eqList).forEach(function(key) {
+      row = _eqList[key];
 
       match = /tr\s+class="m(\d+)"/.exec(row);
       mag = parseInt(match[1], 10);
