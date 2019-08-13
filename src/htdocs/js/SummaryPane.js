@@ -324,12 +324,11 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to summary pane (text plus <div> container)
-   *   (called by Features.js)
+   * Add feature to summary pane
    *
    * @param feature {Object}
    */
-  _this.addSummary = function (feature) {
+  _this.add = function (feature) {
     var className,
         data,
         div,
@@ -361,13 +360,12 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove feature from summary pane (including container)
-   *   (called by Features.js)
+   * Remove feature from summary pane
    *
    * @param el {Element}
    *     Element to remove
    */
-  _this.removeSummary = function (el) {
+  _this.remove = function (el) {
     if (_el.contains(el)) {
       el.parentNode.removeChild(el);
     }

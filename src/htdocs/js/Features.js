@@ -73,7 +73,7 @@ var Features = function (options) {
       // Create a new map pane and add feature to map, summary panes
       _app.MapPane.createMapPane(feature.id, 'overlayPane');
       _app.MapPane.addFeatureLayer(feature);
-      _app.SummaryPane.addSummary(feature);
+      _app.SummaryPane.add(feature);
       // TODO: add plots using feature.plotData
 
       if (feature.id === 'mainshock') {
@@ -177,10 +177,10 @@ var Features = function (options) {
         _app.MapPane.layerControl.removeLayer(mapLayer);
       }
       if (plotsEl) {
-        _app.PlotsPane.removePlots(plotsEl);
+        _app.PlotsPane.remove(plotsEl);
       }
       if (summaryEl) {
-        _app.SummaryPane.removeSummary(summaryEl);
+        _app.SummaryPane.remove(summaryEl);
       }
 
       _features[feature.id] = {};
