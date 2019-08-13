@@ -14,21 +14,26 @@ var /*AftershocksFeature = require('features/AftershocksFeature'),
 
 var _FEATURECLASSES;
 
-// Set which features get added, and the order (ASC)
-_FEATURECLASSES = [
-  MainshockFeature
-  //AftershocksFeature,
-  //ForeshocksFeature,
-  //HistoricalFeature,
-  //StationsFeature,
-  //FocalMechanismFeature,
-  //MomentTensorFeature,
-  //FieldNotesFeature
-];
+/**
+ * Set which features get added, and the order (ASC)
+ *   IMPORTANT: the Object key must match the id value set in the Feature class
+ *
+ * To add a new feature, create a new Feature class and then add it here.
+ */
+_FEATURECLASSES = {
+  mainshock: MainshockFeature
+  //aftershocks: AftershocksFeature,
+  //foreshocks: ForeshocksFeature,
+  //historical: HistoricalFeature,
+  //stations: StationsFeature,
+  //'focal-mechanism': FocalMechanismFeature,
+  //'moment-tensor': MomentTensorFeature,
+  //fieldnotes: FieldNotesFeature
+};
 
 
 /**
- * Add Features to map, plots and summary
+ * Create and add Features to map, plots and summary panes
  *
  * @param options {Object}
  *   {
@@ -93,7 +98,7 @@ var Features = function (options) {
   };
 
   /**
-   * Load a feature (via json feed) and then add it once it's loaded
+   * Load a feature (via json feed) and then call _add it once it's loaded
    *
    * @param feature {Object}
    */
@@ -237,12 +242,19 @@ var Features = function (options) {
   };
 
   /**
-   * Initialize (execute) each feature class and store it in _features
+   * Initialize (execute) each Feature class and then load its feed data
+   *
+   * @param addMe {Object}
    */
-  _this.initFeatures = function () {
+  _this.initFeatures = function (featureClasses) {
+    var FeatureClass;
+
+    featureClasses = featureClasses || _FEATURECLASSES;
     _eqid = _app.AppUtil.getParam('eqid');
 
-    _FEATURECLASSES.forEach(function(FeatureClass) {
+    Object.keys(featureClasses).forEach(function(key) {
+      FeatureClass = featureClasses[key];
+
       var feature = FeatureClass({
         app: _app,
         eqid: _eqid
@@ -254,14 +266,25 @@ var Features = function (options) {
   /**
    * Refresh a feature
    *
-   * @param feature {Object}
+   * @param id {String}
    */
-  _this.refresh = function (feature) {
+  _this.refresh = function (id) {
+    var feature,
+        options;
+
+    feature = _this.getFeature(id);
+    options = {};
+    options[feature.id] = _FEATURECLASSES[feature.id]; // use variable value for key name
+
     _this.isRefreshing = true;
+
     _remove(feature);
-    _load(feature);
+
+    _this.initFeatures(options);
 
     // TODO: also refresh Fieldnotes if refreshing aftershocks
+
+    _this.isRefreshing = false;
   };
 
   /**
