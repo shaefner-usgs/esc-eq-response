@@ -209,6 +209,20 @@ var Features = function (options) {
    *     id of feature
    *
    * @return feature {Object}
+   *   {
+   *     displayLayer : {Boolean}, // Whether or not layer is "on" by default on map
+   *     id : {String}, // Unique id of feature (this id is sometimes used elsewhere in app's css/js)
+   *     name : {String}, // Display name of feature
+   *     url : {String}, // URL of json feed to fetch data from
+   *     zoomToLayer : {Boolean}, // Whether or not map zoooms to fit layer
+   *
+   *     Note: The following props are set after external feed data is loaded
+   *
+   *     json : {Object}, // JSON feed data
+   *     mapLayer : {}, // Leaflet map layer for MapPane
+   *     plotData : {}, // Plot data formatted for Plot.ly for PlotPane
+   *     summary : {}, // HTML for SummaryPane
+   *   }
    */
   _this.getFeature = function (id) {
     var feature;
