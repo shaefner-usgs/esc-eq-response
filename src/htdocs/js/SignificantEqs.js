@@ -40,7 +40,10 @@ var SignificantEqs = function (options) {
         url;
 
     // Alert user that feed is loading
-    _app.StatusBar.addItem('Significant Earthquakes');
+    _app.StatusBar.addItem({
+      id: 'significant',
+      name: 'Significant Earthquakes'
+    });
 
     errorMsg = '<h4>Error Loading Significant Earthquakes</h4><ul>';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
@@ -51,7 +54,7 @@ var SignificantEqs = function (options) {
         _json = json;
         _this.addSignificantEqs();
 
-        _app.StatusBar.removeItem('Significant Earthquakes');
+        _app.StatusBar.removeItem('significant');
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message
@@ -68,7 +71,7 @@ var SignificantEqs = function (options) {
         }
 
         errorMsg += '</ul>';
-        _app.StatusBar.addError('Significant Earthquakes', errorMsg);
+        _app.StatusBar.addError({id: 'significant'}, errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -77,7 +80,7 @@ var SignificantEqs = function (options) {
           'earthquake.usgs.gov)</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _app.StatusBar.addError('Significant Earthquakes', errorMsg);
+        _app.StatusBar.addError({id: 'significant'}, errorMsg);
       },
       timeout: 20000
     });

@@ -95,7 +95,7 @@ var Features = function (options) {
     }
     catch (error) {
       console.error(error);
-      _app.StatusBar.addError(feature.id, '<h4>Error Creating ' + feature.name +
+      _app.StatusBar.addError(feature, '<h4>Error Creating ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
     }
 
@@ -150,7 +150,7 @@ var Features = function (options) {
         }
 
         errorMsg += '</ul>';
-        _app.StatusBar.addError(feature.id, errorMsg);
+        _app.StatusBar.addError(feature, errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -161,7 +161,7 @@ var Features = function (options) {
           ')</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _app.StatusBar.addError(feature.id, errorMsg);
+        _app.StatusBar.addError(feature, errorMsg);
       },
       timeout: 20000
     });

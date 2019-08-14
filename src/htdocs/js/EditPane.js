@@ -197,8 +197,8 @@ var EditPane = function (options) {
   _isValidEqId = function () {
     var regex;
 
-    // Check if eqid exists (returns 404 error if not)
-    if (_app.StatusBar.hasError('Mainshock')) {
+    // Check if eqid exists (404 error is logged if not)
+    if (_app.StatusBar.hasError('mainshock')) {
       return false;
     }
 

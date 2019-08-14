@@ -15,7 +15,6 @@ var StatusBar = function (options) {
 
       _el,
 
-      _getClassName,
       _hideStatusBar,
       _removeFromDom,
       _showStatusBar;
@@ -30,18 +29,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Get className for status bar item (first word in featureName, lowercased)
-   *
-   * @param featureName {String}
-   *
-   * @return {String}
-   */
-  _getClassName = function (featureName) {
-    return /[^\s]+/.exec(featureName)[0].toLowerCase();
-  };
-
-  /**
-   * Hide status bar (using css slide-down animation)
+   * Hide status bar (uses css slide-down animation)
    */
   _hideStatusBar = function () {
     _el.classList.add('hide');
@@ -65,7 +53,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Show status bar (using css slide-up animation)
+   * Show status bar (uses css slide-up animation)
    */
   _showStatusBar = function () {
     _el.classList.remove('hide');
@@ -78,25 +66,25 @@ var StatusBar = function (options) {
   /**
    * Add error to status bar
    *
-   * @param featureName {String}
+   * @param feature {Object}
    * @param errorMsg {String}
    */
-  _this.addError = function (featureName, errorMsg) {
+  _this.addError = function (feature, errorMsg) {
     var closeButton,
         error;
 
     error = document.createElement('div');
-    error.classList.add(_getClassName(featureName), 'error');
+    error.classList.add(feature.id, 'error');
     error.innerHTML = errorMsg + '<a href="#" class="close"></a>';
 
     closeButton = error.querySelector('.close');
     closeButton.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.removeItem(featureName);
+      _this.removeItem(feature.id);
     });
 
     // Remove any leftover items for this feature
-    _this.removeItem(featureName);
+    _this.removeItem(feature.id);
 
     _el.appendChild(error);
     _showStatusBar();
@@ -105,48 +93,50 @@ var StatusBar = function (options) {
   /**
    * Add item to status bar
    *
-   * @param featureName {String}
-   *     pass in 'rendering' to display generic loading message
+   * @param feature {Object}
+   *     optional; displays generic loading message if no feature
    */
-  _this.addItem = function (featureName) {
+  _this.addItem = function (feature) {
     var animEllipsis,
-        className,
-        item,
-        refNode;
+        id,
+        item;
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
-    className = _getClassName(featureName);
+    id = 'rendering';
+    if (feature && feature.hasOwnProperty('id')) {
+      id = feature.id;
+    }
     item = document.createElement('div');
-    item.classList.add(className);
+    item.classList.add(id);
 
     // Remove any leftover items for this feature
-    _this.removeItem(featureName);
+    _this.removeItem(id);
 
-    if (className === 'rendering') { // rendering app panes
+    if (id === 'rendering') { // rendering app pane
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
       _el.appendChild(item);
     }
     else { // loading feature
-      item.innerHTML = '<h4>Loading ' + featureName + animEllipsis + '</h4>';
-      refNode = _el.querySelector('.rendering');
+      item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';
+
       // Insert loading feature msgs 'above' rendering msgs
-      _el.insertBefore(item, refNode);
+      _el.insertBefore(item, _el.querySelector('.rendering'));
     }
 
     _showStatusBar();
   };
 
   /**
-   * Check if error(s) exist(s)
+   * Check if error exists for feature
    *
-   * @param featureName {String}
+   * @param id {String}
    *
    * @return {Boolean}
    */
-  _this.hasError = function (featureName) {
+  _this.hasError = function (id) {
     var error;
 
-    error = _el.querySelector('.' + _getClassName(featureName) + '.error');
+    error = _el.querySelector('.' + id + '.error');
     if (error) {
       return true;
     }
@@ -155,16 +145,17 @@ var StatusBar = function (options) {
   /**
    * Remove item from status bar (and hide/remove status bar if empty)
    *
-   * @param featureName {String}
+   * @param id {String}
    */
-  _this.removeItem = function (featureName) {
+  _this.removeItem = function (id) {
     var i,
         items;
 
-    items = _el.querySelectorAll('.' + _getClassName(featureName));
+    items = _el.querySelectorAll('.' + id);
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
         _hideStatusBar();
+
         // Don't remove last item until after css transition to hide is complete
         window.setTimeout(_removeFromDom, 500, items[i]);
       } else {
