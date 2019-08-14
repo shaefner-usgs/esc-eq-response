@@ -15,8 +15,13 @@ var /*AftershocksFeature = require('features/AftershocksFeature'),
 var _FEATURECLASSES;
 
 /**
- * Set which features get added, and the order (ASC)
- *   IMPORTANT: the Object key must match the id value set in the Feature class
+ * Set which features get added, and the order they are loaded. Stacking order
+ *   is set in CSS.
+ *
+ *   Mainshock must be first
+ *
+ *   IMPORTANT: the Object key must match the id property set in the Feature class
+ *     This id value may be used in other .js and .css files; changing not recommended
  *
  * To add a new feature, create a new Feature class and then add it here.
  */
@@ -110,7 +115,9 @@ var Features = function (options) {
     Xhr.ajax({
       url: feature.url,
       success: function (json) {
-        feature.json = json;
+        if (feature.id === 'mainshock') {
+          feature.json = json;
+        }
         feature.createFeature();
         _add(feature);
       },
@@ -216,14 +223,14 @@ var Features = function (options) {
    * @return feature {Object}
    *   {
    *     displayLayer : {Boolean}, // Whether or not layer is "on" by default on map
-   *     id : {String}, // Unique id of feature (this id is sometimes used elsewhere in app's css/js)
+   *     id : {String}, // Unique id of feature
    *     name : {String}, // Display name of feature
    *     url : {String}, // URL of json feed to fetch data from
    *     zoomToLayer : {Boolean}, // Whether or not map zoooms to fit layer
    *
    *     Note: The following props are set after external feed data is loaded
    *
-   *     json : {Object}, // JSON feed data
+   *     json : {Object}, // JSON feed data (mainshock only)
    *     mapLayer : {}, // Leaflet map layer for MapPane
    *     plotData : {}, // Plot data formatted for Plot.ly for PlotPane
    *     summary : {}, // HTML for SummaryPane
