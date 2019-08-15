@@ -108,13 +108,15 @@ var Features = function (options) {
         errorMsg,
         matches;
 
+    _app.StatusBar.addLoadingMsg(feature);
+
     Xhr.ajax({
       url: feature.url,
       success: function (json) {
         if (feature.id === 'mainshock') {
-          feature.json = json;
+          feature.json = json; // store mainshock json (used by other features)
         }
-        feature.createFeature();
+        feature.createFeature(json);
         _add(feature);
       },
       error: function (status, xhr) {
