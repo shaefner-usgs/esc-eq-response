@@ -15,15 +15,11 @@ var /*AftershocksFeature = require('features/AftershocksFeature'),
 var _FEATURECLASSES;
 
 /**
- * Set which features get added, and the order they are loaded. Stacking order
- *   is set in CSS.
+ * Set which features get added, and the order they are loaded (Mainshock must
+ *   be first). Stacking order is set in CSS.
  *
- *   Mainshock must be first
- *
- *   IMPORTANT: the Object key must match the id property set in the Feature class
- *     This id value may be used in other .js and .css files; changing not recommended
- *
- * To add a new feature, create a new Feature class and then add it here.
+ * IMPORTANT: the Object key must match the id property set in the Feature class.
+ *   This id value is used in other .js and .css files for some features.
  */
 _FEATURECLASSES = {
   mainshock: MainshockFeature
@@ -91,7 +87,7 @@ var Features = function (options) {
         _app.EditPane.setDefaults();
       }
       // Feature finished loading; remove alert / set isRefreshing to false
-      _app.StatusBar.removeItem(feature.id);
+      _app.StatusBar.remove(feature.id);
     }
     catch (error) {
       console.error(error);

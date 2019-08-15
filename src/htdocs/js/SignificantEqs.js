@@ -40,7 +40,7 @@ var SignificantEqs = function (options) {
         url;
 
     // Alert user that feed is loading
-    _app.StatusBar.addItem({
+    _app.StatusBar.addLoadingMsg({
       id: 'significant',
       name: 'Significant Earthquakes'
     });
@@ -54,7 +54,7 @@ var SignificantEqs = function (options) {
         _json = json;
         _this.addSignificantEqs();
 
-        _app.StatusBar.removeItem('significant');
+        _app.StatusBar.remove('significant');
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message

@@ -78,13 +78,13 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
-    _app.StatusBar.addItem();
+    _app.StatusBar.addLoadingMsg();
 
     // Add a slight delay; otherwise loading (rendering) message does not display
     window.setTimeout(function() {
       _hidePanes();
       _showPane(id);
-      _app.StatusBar.removeItem('rendering');
+      _app.StatusBar.remove('rendering');
     }, 20);
   };
 

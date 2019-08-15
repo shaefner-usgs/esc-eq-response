@@ -15,9 +15,9 @@ var StatusBar = function (options) {
 
       _el,
 
-      _hideStatusBar,
+      _hide,
       _removeFromDom,
-      _showStatusBar;
+      _show;
 
 
   _this = {};
@@ -31,7 +31,7 @@ var StatusBar = function (options) {
   /**
    * Hide status bar (uses css slide-down animation)
    */
-  _hideStatusBar = function () {
+  _hide = function () {
     _el.classList.add('hide');
   };
 
@@ -46,7 +46,7 @@ var StatusBar = function (options) {
     parent = el.parentNode;
     if (parent) {
       if (parent.children.length === 1) {
-        _hideStatusBar(); // should already be hidden, but just in case...
+        _hide(); // should already be hidden, but just in case...
       }
       parent.removeChild(el);
     }
@@ -55,7 +55,7 @@ var StatusBar = function (options) {
   /**
    * Show status bar (uses css slide-up animation)
    */
-  _showStatusBar = function () {
+  _show = function () {
     _el.classList.remove('hide');
   };
 
@@ -80,23 +80,23 @@ var StatusBar = function (options) {
     closeButton = error.querySelector('.close');
     closeButton.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.removeItem(feature.id);
+      _this.remove(feature.id);
     });
 
     // Remove any leftover items for this feature
-    _this.removeItem(feature.id);
+    _this.remove(feature.id);
 
     _el.appendChild(error);
-    _showStatusBar();
+    _show();
   };
 
   /**
-   * Add item to status bar
+   * Add loading message to status bar
    *
    * @param feature {Object}
    *     optional; displays generic loading message if no feature
    */
-  _this.addItem = function (feature) {
+  _this.addLoadingMsg = function (feature) {
     var animEllipsis,
         id,
         item;
@@ -110,7 +110,7 @@ var StatusBar = function (options) {
     item.classList.add(id);
 
     // Remove any leftover items for this feature
-    _this.removeItem(id);
+    _this.remove(id);
 
     if (id === 'rendering') { // rendering app pane
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
@@ -123,7 +123,7 @@ var StatusBar = function (options) {
       _el.insertBefore(item, _el.querySelector('.rendering'));
     }
 
-    _showStatusBar();
+    _show();
   };
 
   /**
@@ -147,14 +147,14 @@ var StatusBar = function (options) {
    *
    * @param id {String}
    */
-  _this.removeItem = function (id) {
+  _this.remove = function (id) {
     var i,
         items;
 
     items = _el.querySelectorAll('.' + id);
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
-        _hideStatusBar();
+        _hide();
 
         // Don't remove last item until after css transition to hide is complete
         window.setTimeout(_removeFromDom, 500, items[i]);
@@ -169,7 +169,7 @@ var StatusBar = function (options) {
    */
   _this.reset = function () {
     _el.innerHTML = '';
-    _hideStatusBar();
+    _hide();
   };
 
 

@@ -42,7 +42,7 @@ var Application = function (options) {
     _loadComponents(options);
 
     // Remove initial loading message
-    _this.StatusBar.removeItem('initial');
+    _this.StatusBar.remove('initial');
   };
 
   /**
