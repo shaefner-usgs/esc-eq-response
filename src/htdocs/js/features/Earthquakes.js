@@ -37,7 +37,8 @@ _DEFAULTS = {
  * @param options {Object}
  *   {
  *     app: {Object},
- *     feature: {Object}
+ *     feature: {Object},
+ *     json: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -46,7 +47,6 @@ var Earthquakes = function (options) {
 
       _app,
       _bins,
-      _eqList,
       _id,
       _markerOptions,
       _mainshockLatlon,
@@ -82,7 +82,7 @@ var Earthquakes = function (options) {
     _id = options.feature.id;
 
     _bins = {};
-    _eqList = {};
+    _this.eqList = {};
     _this.plotData = {
       color: [],
       date: [],
@@ -116,12 +116,14 @@ var Earthquakes = function (options) {
     _popupTemplate = _getHtmlTemplate('popup');
     _tablerowTemplate = _getHtmlTemplate('tablerow');
 
-    _this.mapLayer = L.geoJson(options.feature.json, {
+    _this.mapLayer = L.geoJson(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
     _this.mapLayer.id = _id; // Attach id to L.Layer
+
+    _this.sliderData = _bins.sliderData;
   };
 
   /**
@@ -129,7 +131,7 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <magInclusive | first | past | prior>}
+   * @param type {String <sliderData | first | past | prior>}
    */
   _addEqToBin = function (days, magInt, type) {
     var i,
@@ -139,7 +141,7 @@ var Earthquakes = function (options) {
       _bins[type] = [];
     }
 
-    if (type === 'magInclusive') {
+    if (type === 'sliderData') {
       for (i = magInt; i >= 0; i --) {
         if (!_bins[type][i]) {
           _bins[type][i] = 0;
@@ -410,8 +412,8 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    // 'Last' (most recent) earthquake in feed; overwrite each time thru loop
-    _this.lastId = eqid;
+    _this.eqList[eqid] = data; // store eq for summary table
+    _this.mostRecentEqId = eqid; // most recent earthquake in feed
 
     // Add props to plotData (additional props are added in _pointToLayer)
     _this.plotData.date.push(utcTime);
@@ -422,9 +424,6 @@ var Earthquakes = function (options) {
     _this.plotData.mag.push(data.mag);
     _this.plotData.text.push(props.title + '<br />' + utcTime);
     _this.plotData.time.push(eqMoment.format());
-
-    // Add eq to html list for summary
-    _eqList[eqid] = L.Util.template(_tablerowTemplate, data);
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
@@ -441,8 +440,9 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
-    // Total number of eqs by mag, inclusive (used internally)
-    _addEqToBin(null, magInt, 'magInclusive');
+
+    // Total number of eqs by mag, inclusive for slider filter
+    _addEqToBin(null, magInt, 'sliderData');
   };
 
   /**
@@ -483,7 +483,7 @@ var Earthquakes = function (options) {
   /**
    * Get table containing binned earthquake data
    *
-   * @param type {String <magInclusive | first | past | prior>}
+   * @param type {String <first | past | prior>}
    *
    * @return html {Html}
    */
@@ -554,7 +554,7 @@ var Earthquakes = function (options) {
 
   /**
    * Get feed description (summary of user-set parameters, etc.) for
-   *   aftershocks / foreshocks / historical
+   *   aftershocks, foreshocks and historical
    *
    * @return description {Html}
    */
@@ -592,42 +592,45 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get table containing a list of earthquakes above mag threshold
+   * Get table containing a list of earthquakes
+   *   only displays eqs larger than threshold by default
    *
-   * @param magThreshold {Number}
-   *     only display eqs larger than threshold by default (slider reveals more)
+   * @param data {Object}
+   *     earthquake details keyed by eqid
+   * @param threshold {Number}
+   *     optional; magnitude threshold
    *
    * @return html {String}
    */
-  _this.getListTable = function (magThreshold) {
+  _this.getListTable = function (data, threshold) {
     var cssClasses,
         html,
-        length,
         mag,
+        magThreshold,
         match,
-        row,
-        sortClass,
-        tableData;
+        tableData,
+        tr;
 
     cssClasses = ['eqlist'];
-    length = Object.keys(_eqList).length;
-    sortClass = 'non-sortable';
+    magThreshold = threshold || 0;
     tableData = '';
 
-    Object.keys(_eqList).forEach(function(key) {
-      row = _eqList[key];
-
-      match = /tr\s+class="m(\d+)"/.exec(row);
+    Object.keys(data).forEach(function(key) {
+      tr = L.Util.template(_tablerowTemplate, data[key]);
+      match = /tr\s+class="m(\d+)"/.exec(tr);
       mag = parseInt(match[1], 10);
+
       if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
         cssClasses.push('m' + mag);
       }
 
-      tableData += row;
+      tableData += tr;
     });
-    if (length > 1) {
+
+    if (Object.keys(data).length > 1) {
       cssClasses.push('sortable');
     }
+
     html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr class="no-sort">' +
           '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
@@ -649,12 +652,10 @@ var Earthquakes = function (options) {
    * Get html for input range slider when there's at least two mag bins w/ eqs
    *
    * @param mag {Number}
-   * @param cumulativeEqs {Array}
-   *     Array of cumulative eqs by mag
    *
    * @return html {String}
    */
-  _this.getSlider = function (mag, cumulativeEqs) {
+  _this.getSlider = function (mag) {
     var html,
         mags,
         max,
@@ -662,12 +663,12 @@ var Earthquakes = function (options) {
         singleMagBin;
 
     html = '';
-    singleMagBin = cumulativeEqs.every(function(value, i, array) {
+    singleMagBin = _bins.sliderData.every(function(value, i, array) {
       return array[0] === value;
     });
 
     if (!singleMagBin) {
-      mags = Object.keys(cumulativeEqs);
+      mags = Object.keys(_bins.sliderData);
       max = Math.max.apply(null, mags);
       min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 
