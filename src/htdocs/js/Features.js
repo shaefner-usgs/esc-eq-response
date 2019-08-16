@@ -1,8 +1,8 @@
 'use strict';
 
 
-var /*AftershocksFeature = require('features/AftershocksFeature'),
-    FieldNotesFeature = require('features/FieldNotesFeature'),
+var AftershocksFeature = require('features/AftershocksFeature'),
+    /*FieldNotesFeature = require('features/FieldNotesFeature'),
     FocalMechanismFeature = require('features/FocalMechanismFeature'),
     ForeshocksFeature = require('features/ForeshocksFeature'),
     HistoricalFeature = require('features/HistoricalFeature'),*/
@@ -22,8 +22,8 @@ var _FEATURECLASSES;
  *   This id value is used in other .js and .css files for some features.
  */
 _FEATURECLASSES = {
-  mainshock: MainshockFeature
-  //aftershocks: AftershocksFeature,
+  mainshock: MainshockFeature,
+  aftershocks: AftershocksFeature
   //foreshocks: ForeshocksFeature,
   //historical: HistoricalFeature,
   //stations: StationsFeature,
@@ -50,6 +50,7 @@ var Features = function (options) {
       _features,
 
       _add,
+      _intiFeature,
       _load,
       _remove,
       _removeAll;
@@ -85,6 +86,9 @@ var Features = function (options) {
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
         _app.EditPane.setDefaults();
+
+        // Initialize other features now that mainshock ready
+        _this.initFeatures();
       }
       // Feature finished loading; remove alert / set isRefreshing to false
       _app.StatusBar.remove(feature.id);
@@ -96,6 +100,19 @@ var Features = function (options) {
     }
 
     _this.isRefreshing = false;
+  };
+
+  /**
+   * Initialize (execute) Feature class and then load its feed data
+   */
+  _intiFeature = function (FeatureClass) {
+    _eqid = _app.AppUtil.getParam('eqid');
+
+    var feature = FeatureClass({
+      app: _app,
+      eqid: _eqid
+    });
+    _load(feature);
   };
 
   /**
@@ -213,6 +230,29 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Get the feed url for aftershocks, foreshocks and historical features
+   *
+   * @param params {Object}
+   *
+   * @return {String}
+   */
+  _this.getEqFeedUrl = function (params) {
+    var baseUri,
+        pairs,
+        queryString;
+
+    baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
+
+    pairs = ['format=geojson', 'orderby=time-asc'];
+    Object.keys(params).forEach(function(key) {
+      pairs.push(key + '=' + params[key]);
+    });
+    queryString = '?' + pairs.join('&');
+
+    return baseUri + queryString;
+  };
+
+  /**
    * Get a feature
    *
    * @param id {String}
@@ -247,25 +287,35 @@ var Features = function (options) {
   };
 
   /**
-   * Initialize (execute) each Feature class and then load its feed data
+   * Wrapper method to loop through Feature classes and initialze them
    *
-   * @param addMe {Object}
+   * Skip mainshock which is added separately so it's already available
+   *   for other features that depend on it.
+   *
+   * @param featureClasses {Object}
+   *     optional; uses _FEATURECLASSES if no parameter is passed
    */
   _this.initFeatures = function (featureClasses) {
     var FeatureClass;
 
     featureClasses = featureClasses || _FEATURECLASSES;
-    _eqid = _app.AppUtil.getParam('eqid');
 
     Object.keys(featureClasses).forEach(function(key) {
-      FeatureClass = featureClasses[key];
-
-      var feature = FeatureClass({
-        app: _app,
-        eqid: _eqid
-      });
-      _load(feature);
+      if (key !== 'mainshock') {
+        FeatureClass = featureClasses[key];
+        _intiFeature(FeatureClass);
+      }
     });
+  };
+
+  /**
+   * Wrapper method to initialze mainshock Feature
+   */
+  _this.initMainshockFeature = function () {
+    var FeatureClass;
+
+    FeatureClass = _FEATURECLASSES.mainshock;
+    _intiFeature(FeatureClass);
   };
 
   /**
