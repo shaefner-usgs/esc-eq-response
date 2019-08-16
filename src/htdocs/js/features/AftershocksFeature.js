@@ -9,9 +9,8 @@ var Earthquakes = require('features/Earthquakes');
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
  */
 var Aftershocks = function (options) {
@@ -20,49 +19,38 @@ var Aftershocks = function (options) {
 
       _app,
       _eqid,
-      _mag,
-      _magThreshold,
-      _oaf,
+      _mainshock,
       _Earthquakes,
 
-      _getName,
-      _getProbabilities;
+      _getProbabilities,
+      _getSummary;
 
 
   _this = {};
 
   _initialize = function (options) {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'aftershocks';
+    var urlParams;
 
     options = options || {};
 
     _app = options.app;
-    _eqid = options.mainshockJson.id;
-    _mag = options.mainshockJson.properties.mag;
-    _magThreshold = Math.floor(_mag - 2.5);
-    _oaf = options.mainshockJson.properties.products.oaf;
+    _eqid = options.eqid;
+    _mainshock = _app.Features.getFeature('mainshock');
 
-    _Earthquakes = Earthquakes({
-      app: _app,
-      id: id,
-      json: options.json,
-      mainshockJson: options.mainshockJson
-    });
+    urlParams = {
+      latitude: _mainshock.json.geometry.coordinates[1],
+      longitude: _mainshock.json.geometry.coordinates[0],
+      maxradiuskm: _app.AppUtil.getParam('as-dist'),
+      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
+        .utc().toISOString().slice(0, -5)
+    };
 
     _this.displayLayer = true;
-    _this.id = id;
-    _this.name = _getName();
+    _this.id = 'aftershocks';
+    _this.name = 'Aftershocks';
+    _this.url = _app.Features.getEqFeedUrl(urlParams);
     _this.zoomToLayer = true;
-  };
-
-  /**
-   * Get layer name of feature (adds number of features to name)
-   *
-   * @return {String}
-   */
-  _getName = function () {
-    return options.name + ' (' + options.json.metadata.count + ')';
   };
 
   /**
@@ -71,15 +59,17 @@ var Aftershocks = function (options) {
   _getProbabilities = function () {
     var data,
         html,
+        oaf,
         probability,
         range,
         url;
 
     html = '';
+    oaf = _mainshock.json.properties.products.oaf;
     url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast';
 
-    if (_oaf) {
-      data = JSON.parse(_oaf[0].contents[''].bytes);
+    if (oaf) {
+      data = JSON.parse(oaf[0].contents[''].bytes);
       data.forecast.forEach(function(period) {
         if (period.label === data.advisoryTimeFrame) { // show 'primary emphasis' period
           period.bins.forEach(function(bin) {
@@ -118,45 +108,73 @@ var Aftershocks = function (options) {
     return html;
   };
 
+  /**
+   * Get summary html for feature
+   *
+   * @param json {Object}
+   */
+  _getSummary = function (json) {
+    var mag,
+        magThreshold,
+        mostRecentEq,
+        summary;
+
+    options = {};
+
+    if (json.metadata.count > 0) {
+      magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
+      mostRecentEq = _app.AppUtil.pick(_Earthquakes.eqList, [_Earthquakes.mostRecentEqId]);
+
+      mag = Math.floor(Math.max(
+        magThreshold,
+        _app.AppUtil.getParam('as-mag')
+      ));
+
+      // Check if there's eq data for mag threshold; if not, decr mag by 1
+      while (!_Earthquakes.sliderData[mag]) {
+        mag --;
+      }
+
+      summary = _Earthquakes.getDescription();
+      summary += '<div class="bins">';
+      summary += _Earthquakes.getBinnedTable('first');
+      summary += _Earthquakes.getBinnedTable('past');
+      summary += '</div>';
+      summary += _getProbabilities();
+      summary += '<h3>Most Recent Aftershock</h3>';
+      summary += _Earthquakes.getListTable(mostRecentEq);
+      summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
+         '(<span class="num">' + _Earthquakes.sliderData[mag]  + '</span>)</h3>';
+      summary += _Earthquakes.getSlider();
+      summary += _Earthquakes.getListTable(_Earthquakes.eqList);
+    }
+
+    return summary;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Get map layer of feature
+   * Create feature (map layer, plot data, summary)
+   *   invoked via Ajax callback in Features.js after json feed is loaded
    *
-   * @return {L.FeatureGroup}
+   * @param json {Object}
+   *     feed data
    */
-  _this.getMapLayer = function () {
-    return _Earthquakes.getMapLayer();
-  };
+  _this.createFeature = function (json) {
+    _Earthquakes = Earthquakes({
+      app: _app,
+      feature: _this,
+      json: json
+    });
 
-  /**
-   * Get feature's data for plots pane
-   *
-   * @return {Object}
-   */
-  _this.getPlotData = function () {
-    return {
-      detailsHtml: _Earthquakes.getDetails(),
-      plotdata: _Earthquakes.getPlotData()
-    };
-  };
-
-  /**
-   * Get feature's data for summary pane
-   *
-   * @return {Object}
-   */
-  _this.getSummaryData = function () {
-    return {
-      bins: _Earthquakes.getBinnedData(),
-      detailsHtml: _Earthquakes.getDetails(),
-      lastId: _Earthquakes.getLastId(),
-      list: _Earthquakes.getList(),
-      magThreshold: _magThreshold,
-      probabilities: _getProbabilities()
-    };
+    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.name += ' (' + json.metadata.count + ')';
+    _this.plotData = _Earthquakes.plotData;
+    _this.sliderData = _Earthquakes.sliderData;
+    _this.summary = _getSummary(json);
   };
 
 
