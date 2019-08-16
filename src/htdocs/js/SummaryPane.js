@@ -330,7 +330,6 @@ var SummaryPane = function (options) {
    */
   _this.add = function (feature) {
     var className,
-        data,
         div,
         input,
         table;
@@ -347,7 +346,7 @@ var SummaryPane = function (options) {
       table = div.querySelector('table.eqlist');
       if (table) {
         input = div.querySelector('input');
-        _addListeners(div, data.bins.magInclusive);
+        _addListeners(div, feature.sliderData);
         _initTableSort(className);
         // Set initial colored section of range slider
         if (input) {
