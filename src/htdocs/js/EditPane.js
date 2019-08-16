@@ -133,7 +133,8 @@ var EditPane = function (options) {
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
-      _app.Features.initFeatures();
+      // Start by initializing mainshock. Once it's loaded, other features will be added
+      _app.Features.initMainshockFeature();
     }
   };
 
