@@ -12,7 +12,6 @@ var Earthquakes = require('features/Earthquakes');
  *     app: {Object}, // application props / methods
  *     eqid: {String} // mainshock event id
  *   }
-
  */
 var MainshockFeature = function (options) {
   var _this,
@@ -22,6 +21,7 @@ var MainshockFeature = function (options) {
       _Earthquakes,
 
       _getSummary;
+
 
   _this = {};
 
@@ -74,6 +74,12 @@ var MainshockFeature = function (options) {
         mmi + '" /></a></div>';
     }
 
+    // Add placeholders for beachballs
+    summary += '<div class="focal-mechanism hide scale">' +
+      '<a href="' + baseUrl + '/focal-mechanism"><h4></h4></a></div>';
+    summary += '<div class="moment-tensor hide scale">' +
+      '<a href="' + baseUrl + '/moment-tensor"><h4></h4></a></div>';
+
     summary += '</div>';
 
     return summary;
@@ -85,12 +91,13 @@ var MainshockFeature = function (options) {
 
   /**
    * Create feature (map layer, plot data, summary)
-   *   invoked via Ajax callback in Features.js
+   *   invoked via Ajax callback in Features.js after json feed is loaded
    */
-  _this.createFeature = function () {
+  _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({
       app: _app,
-      feature: _this
+      feature: _this,
+      json: json
     });
 
     _this.mapLayer = _Earthquakes.mapLayer;
