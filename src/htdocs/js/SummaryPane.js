@@ -5,7 +5,7 @@ var Tablesort = require('tablesort');
 
 
 /**
- * Creates, adds, and removes summary info from summary pane
+ * Add and remove features from summary pane and set up javascript interactions
  *
  * @param options {Object}
  *   {
@@ -25,12 +25,12 @@ var SummaryPane = function (options) {
 
       _addListeners,
       _addTimestamp,
-      _clickRow,
       _getTimeZone,
-      _getValue,
-      _hoverRow,
+      _getSliderValue,
       _initTableSort,
-      _setStyleRules,
+      _onMouseClick,
+      _onMouseOver,
+      _setSliderStyles,
       _updateTimestamp;
 
 
@@ -45,7 +45,7 @@ var SummaryPane = function (options) {
     _style = document.createElement('style');
     _tz = _getTimeZone();
 
-    // Dynamic range input styles are set inside this <style> tag
+    // Add <style> tag for dynamic range input (slider) styles
     document.body.appendChild(_style);
 
     _addTimestamp();
@@ -56,10 +56,10 @@ var SummaryPane = function (options) {
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
-   * @param cumulativeEqs {Array}
+   * @param sliderData {Array}
    *     Array of cumulative eqs by mag
    */
-  _addListeners = function (el, cumulativeEqs) {
+  _addListeners = function (el, sliderData) {
     var feature,
         i,
         input,
@@ -88,7 +88,7 @@ var SummaryPane = function (options) {
         scrollY = window.pageYOffset;
 
         mag.innerHTML = magValue;
-        num.innerHTML = cumulativeEqs[magValue];
+        num.innerHTML = sliderData[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
         for (i = magValue; i <= input.getAttribute('max'); i ++) {
@@ -99,7 +99,7 @@ var SummaryPane = function (options) {
         }
 
         window.scroll(0, scrollY); // prevent page scrolling
-        _setStyleRules(this, feature); // update slider track
+        _setSliderStyles(this, feature); // update slider track
       }, false);
     }
 
@@ -108,8 +108,8 @@ var SummaryPane = function (options) {
       for (i = 0; i < tables.length; i ++) {
         rows = tables[i].rows;
         for (j = 1; j < rows.length; j ++) {
-          rows[j].addEventListener('click', _clickRow);
-          rows[j].addEventListener('mouseover', _hoverRow);
+          rows[j].addEventListener('click', _onMouseClick);
+          rows[j].addEventListener('mouseover', _onMouseOver);
         }
       }
     }
@@ -124,49 +124,6 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _features);
-  };
-
-  /**
-   * Click handler for lists of earthquakes
-   *
-   * @param e {Event}
-   */
-  _clickRow = function(e) {
-    var eqid,
-        feature,
-        features,
-        isTextSelected,
-        parent,
-        selection,
-        tr;
-
-    // Keep row highlighted after user clicks
-    this.classList.add('selected');
-
-    eqid = this.querySelector('.eqid').textContent;
-
-    // Determine which feature was clicked
-    features = [
-      'aftershocks',
-      'foreshocks',
-      'historical',
-      'mainshock'
-    ];
-    parent = this.closest('.feature');
-    features.forEach(function(f) {
-      if (parent.classList.contains(f)) {
-        feature = f;
-      }
-    });
-
-    selection = window.getSelection();
-    tr = e.target.parentNode;
-    isTextSelected = tr.contains(selection.anchorNode) &&
-      selection.toString().length > 0;
-
-    if(!isTextSelected) { // suppress event if user is trying to select text
-      _app.MapPane.openPopup(feature, eqid);
-    }
   };
 
   /**
@@ -204,42 +161,30 @@ var SummaryPane = function (options) {
    * Get CSS value (percentage) for colored section of input range slider
    *
    * @param el {Element}
-   * @param p {Number}
+   *     input (range slider) element
    *
    * @return value {String}
    */
-  _getValue = function (el, p) {
+  _getSliderValue = function (el) {
     var min,
-        perc,
+        percentage,
         value;
 
     min = el.min || 0;
-    perc = p;
+    percentage = el.value;
     if (el.max) {
-      perc = Math.floor(100 * (p - min) / (el.max - min));
+      percentage = Math.floor(100 * (el.value - min) / (el.max - min));
     }
-    value = perc + '% 100%';
+    value = percentage + '% 100%';
 
     return value;
   };
 
   /**
-   * Turn off selected row when user hovers over any row
-   */
-  _hoverRow = function () {
-    var selected;
-
-    selected = _el.querySelector('.selected');
-    if (selected) {
-      selected.classList.remove('selected');
-    }
-  };
-
-  /**
-   * Make table sortable
+   * Make table sortable by clicking header values
    *
    * @param className {String}
-   *     className value of container elem
+   *     className of container elem (feature id)
    */
   _initTableSort = function (className) {
     var table,
@@ -277,14 +222,69 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Click handler for lists of earthquakes
+   *
+   * @param e {Event}
+   */
+  _onMouseClick = function (e) {
+    var eqid,
+        feature,
+        features,
+        isTextSelected,
+        parent,
+        selection,
+        tr;
+
+    eqid = this.querySelector('.eqid').textContent;
+
+    // Keep row highlighted after user clicks
+    this.classList.add('selected');
+
+    // Determine which feature was clicked
+    features = [
+      'aftershocks',
+      'foreshocks',
+      'historical',
+      'mainshock'
+    ];
+    parent = this.closest('.feature');
+    features.forEach(function(f) {
+      if (parent.classList.contains(f)) {
+        feature = f;
+      }
+    });
+
+    // Suppress event if user is trying to select text
+    selection = window.getSelection();
+    tr = e.target.parentNode;
+    isTextSelected = tr.contains(selection.anchorNode) &&
+      selection.toString().length > 0;
+
+    if (!isTextSelected) {
+      _app.MapPane.openPopup(feature, eqid);
+    }
+  };
+
+  /**
+   * Turn off 'selected' row when user hovers over any row
+   */
+  _onMouseOver = function () {
+    var selected;
+
+    selected = _el.querySelector('.selected');
+    if (selected) {
+      selected.classList.remove('selected');
+    }
+  };
+
+  /**
    * Set dynamic styles (inline) for colored section of input range sliders
    *
    * @param el {Element}
-   *     input element
-   * @param feature {String}
-   *     feature id
+   *     input (range slider) element
+   * @param feature {Object}
    */
-  _setStyleRules = function (el, feature) {
+  _setSliderStyles = function (el, feature) {
     var newRules,
         oldRules,
         value,
@@ -292,7 +292,7 @@ var SummaryPane = function (options) {
 
     newRules = '';
     oldRules = new RegExp('#' + feature + '[^#]+', 'g');
-    value = _getValue(el, el.value);
+    value = _getSliderValue(el);
     vendorEls = ['webkit-slider-runnable', 'moz-range'];
 
     for (var i = 0; i < vendorEls.length; i ++) {
@@ -334,24 +334,23 @@ var SummaryPane = function (options) {
         input,
         table;
 
-    className = feature.id;
-
-    // Add feature to summary
     if (feature.summary) {
+      className = feature.id;
+
       div = document.createElement('div');
       div.classList.add('content', 'lighter', 'feature', className);
       div.innerHTML = '<h2>' + feature.name + '</h2>' + feature.summary;
+
       _features.appendChild(div);
 
+      input = div.querySelector('input');
       table = div.querySelector('table.eqlist');
+      if (input) {
+        _setSliderStyles(input, className); // set initial colored section of range slider
+      }
       if (table) {
-        input = div.querySelector('input');
         _addListeners(div, feature.sliderData);
         _initTableSort(className);
-        // Set initial colored section of range slider
-        if (input) {
-          _setStyleRules(input, className);
-        }
       }
 
       _updateTimestamp();
