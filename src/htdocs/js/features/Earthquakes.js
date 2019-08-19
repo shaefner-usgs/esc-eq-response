@@ -31,8 +31,8 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquake json feed and create a Leaflet map layer, plot data and
- *   other properties for summary, etc.
+ * Parse earthquake json feed and create Leaflet map layer, Plotly.js data and
+ *   summary data.
  *
  * @param options {Object}
  *   {
