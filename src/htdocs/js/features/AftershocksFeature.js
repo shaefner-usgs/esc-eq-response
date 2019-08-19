@@ -121,6 +121,8 @@ var Aftershocks = function (options) {
 
     options = {};
 
+    summary = _Earthquakes.getDescription();
+
     if (json.metadata.count > 0) {
       magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
       mostRecentEq = _app.AppUtil.pick(_Earthquakes.eqList, [_Earthquakes.mostRecentEqId]);
@@ -135,7 +137,6 @@ var Aftershocks = function (options) {
         mag --;
       }
 
-      summary = _Earthquakes.getDescription();
       summary += '<div class="bins">';
       summary += _Earthquakes.getBinnedTable('first');
       summary += _Earthquakes.getBinnedTable('past');
