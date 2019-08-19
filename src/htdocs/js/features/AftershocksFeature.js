@@ -174,6 +174,7 @@ var Aftershocks = function (options) {
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.name += ' (' + json.metadata.count + ')';
     _this.plotData = _Earthquakes.plotData;
+    _this.plotText = _Earthquakes.getDescription();
     _this.sliderData = _Earthquakes.sliderData;
     _this.summary = _getSummary(json);
   };
