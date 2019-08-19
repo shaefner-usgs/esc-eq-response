@@ -199,8 +199,8 @@ var NavBar = function (options) {
       _app.MapPane.map.fire('visible');
       _app.MapPane.setView();
     } else if (id === 'plotsPane') {
-      _app.PlotsPane.renderPlots();
-      _app.PlotsPane.resizePlots();
+      _app.PlotsPane.render();
+      _app.PlotsPane.resize();
     }
   };
 
