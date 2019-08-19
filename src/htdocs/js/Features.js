@@ -77,11 +77,11 @@ var Features = function (options) {
     _features[feature.id] = feature;
 
     try {
-      // Create a new map pane and add feature to map, summary panes
+      // Create a new map pane and add feature to map, summary and plot panes
       _app.MapPane.createMapPane(feature.id, 'overlayPane');
       _app.MapPane.addFeatureLayer(feature);
+      _app.PlotsPane.add(feature);
       _app.SummaryPane.add(feature);
-      // TODO: add plots using feature.plotData
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
@@ -90,7 +90,8 @@ var Features = function (options) {
         // Initialize other features now that mainshock ready
         _this.initFeatures();
       }
-      // Feature finished loading; remove alert / set isRefreshing to false
+
+      // Feature finished loading; remove alert
       _app.StatusBar.remove(feature.id);
     }
     catch (error) {
