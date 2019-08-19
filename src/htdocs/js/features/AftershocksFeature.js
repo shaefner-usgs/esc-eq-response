@@ -145,8 +145,8 @@ var Aftershocks = function (options) {
       summary += _Earthquakes.getListTable(mostRecentEq);
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
          '(<span class="num">' + _Earthquakes.sliderData[mag]  + '</span>)</h3>';
-      summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes.eqList);
+      summary += _Earthquakes.getSlider(mag);
+      summary += _Earthquakes.getListTable(_Earthquakes.eqList, magThreshold);
     }
 
     return summary;

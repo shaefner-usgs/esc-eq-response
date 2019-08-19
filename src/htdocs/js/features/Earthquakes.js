@@ -593,26 +593,26 @@ var Earthquakes = function (options) {
 
   /**
    * Get table containing a list of earthquakes
-   *   only displays eqs larger than threshold by default
+   *   only displays eqs larger than threshold (if supplied) by default
    *
    * @param data {Object}
    *     earthquake details keyed by eqid
-   * @param threshold {Number}
+   * @param magThreshold {Number}
    *     optional; magnitude threshold
    *
    * @return html {String}
    */
-  _this.getListTable = function (data, threshold) {
+  _this.getListTable = function (data, magThreshold) {
     var cssClasses,
         html,
         mag,
-        magThreshold,
         match,
         tableData,
+        threshold,
         tr;
 
     cssClasses = ['eqlist'];
-    magThreshold = threshold || 0;
+    threshold = magThreshold || 0;
     tableData = '';
 
     Object.keys(data).forEach(function(key) {
@@ -620,7 +620,7 @@ var Earthquakes = function (options) {
       match = /tr\s+class="m(\d+)"/.exec(tr);
       mag = parseInt(match[1], 10);
 
-      if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
+      if (mag >= threshold && cssClasses.indexOf('m' + mag) === -1) {
         cssClasses.push('m' + mag);
       }
 

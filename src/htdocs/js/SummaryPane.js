@@ -81,7 +81,7 @@ var SummaryPane = function (options) {
       num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
       slider = input.parentNode;
-      table = el.querySelector('div.filter + .list');
+      table = el.querySelector('div.filter + .eqlist');
 
       input.addEventListener('input', function() {
         magValue = Number(input.value);
@@ -103,7 +103,7 @@ var SummaryPane = function (options) {
       }, false);
     }
 
-    tables = el.querySelectorAll('table.list');
+    tables = el.querySelectorAll('table.eqlist');
     if (tables) {
       for (i = 0; i < tables.length; i ++) {
         rows = tables[i].rows;
