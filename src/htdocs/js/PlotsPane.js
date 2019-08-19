@@ -3,7 +3,7 @@
 
 
 /**
- * Creates, adds, and removes plot from plots pane
+ * Add and remove features from plots pane and set up javascript interactions
  *
  * @param options {Object}
  *   {
@@ -43,7 +43,7 @@ var PlotsPane = function (options) {
 
     // Make plots responsive
     window.onresize = function() {
-      _this.resizePlots();
+      _this.resize();
     };
   };
 
@@ -76,30 +76,26 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add plot container / title to DOM
+   * Add plot's container / title to DOM
    *
-   * @param containerClass {String}
-   * @param title {String}
-   * @param opts {Object}
+   * @param featureId {String}
+   * @param plotId {String}
+   * @param plotTitle {String}
    *
    * @return container {Element}
    */
-  _addPlotContainer = function (containerClass, title, opts) {
+  _addPlotContainer = function (featureId, plotId, plotTitle) {
     var container,
         h3,
-        parentClass,
         parent;
 
     container = document.createElement('div');
-    container.classList.add(containerClass);
+    container.classList.add(plotId);
 
     h3 = document.createElement('h3');
-    h3.innerHTML = title;
+    h3.innerHTML = plotTitle;
 
-    parentClass = opts.id;
-    parent = _features.querySelector('.' + parentClass);
-
-    // Add plot container, title
+    parent = _features.querySelector('.' + featureId);
     parent.appendChild(h3);
     parent.appendChild(container);
 
@@ -109,29 +105,24 @@ var PlotsPane = function (options) {
   /**
    * Get config params for cumulative plot
    *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // feature id
-   *     name: {String} // feature name
-   *   }
+   * @param feature {Object}
    *
    * @return {Object}
    */
-  _getCumulativePlot = function (opts) {
+  _getCumulativePlot = function (feature) {
     var container,
         layout,
         plotId,
         trace;
 
     plotId = 'cumulative';
-    container = _addPlotContainer(plotId, 'Cumulative Earthquakes', opts);
+    container = _addPlotContainer(feature.id, plotId, 'Cumulative Earthquakes');
 
     trace = _getTrace({
-      data: opts.data[opts.id].plotdata,
-      id: opts.id,
-      mainshockDate: opts.data.mainshock.plotdata.date[0],
-      mainshockTime: opts.data.mainshock.plotdata.time[0],
+      data: feature.plotData,
+      id: feature.id,
+      mainshockDate: _app.Features.getFeature('mainshock').plotData.date[0],
+      mainshockTime: _app.Features.getFeature('mainshock').plotData.time[0],
       plot: plotId,
       type: 'scatter'
     });
@@ -150,16 +141,11 @@ var PlotsPane = function (options) {
   /**
    * Get config params for hypocenters plot
    *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // feature id
-   *     name: {String} // feature name
-   *   }
+   * @param feature {Object}
    *
    * @return {Object}
    */
-  _getHypocentersPlot = function (opts) {
+  _getHypocentersPlot = function (feature) {
     var container,
         data,
         layout,
@@ -169,14 +155,14 @@ var PlotsPane = function (options) {
         zRatio;
 
     plotId = 'hypocenters';
-    container = _addPlotContainer(plotId, '3D Hypocenters', opts);
+    container = _addPlotContainer(feature.id, plotId, '3D Hypocenters');
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
-    traces = ['mainshock', opts.id];
+    traces = ['mainshock', feature.id];
     traces.forEach(function(id) {
       trace = _getTrace({
-        data: opts.data[id].plotdata,
+        data: _app.Features.getFeature(id).plotData,
         id: id,
         plot: plotId,
         type: 'scatter3d'
@@ -287,16 +273,11 @@ var PlotsPane = function (options) {
   /**
    * Get config params for mag-time plot
    *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // plot data
-   *     id: {String}, // feature id
-   *     name: {String} // feature name
-   *   }
+   * @param feature {Object}
    *
    * @return {Object}
    */
-  _getMagTimePlot = function (opts) {
+  _getMagTimePlot = function (feature) {
     var container,
         data,
         layout,
@@ -305,14 +286,14 @@ var PlotsPane = function (options) {
         traces;
 
     plotId = 'magtime';
-    container = _addPlotContainer(plotId, 'Magnitude vs. Time', opts);
+    container = _addPlotContainer(feature.id, plotId, 'Magnitude vs. Time');
 
     // Get traces for plot and store in data (mainshock is in a separate trace)
     data = [];
-    traces = ['mainshock', opts.id];
+    traces = ['mainshock', feature.id];
     traces.forEach(function(id) {
       trace = _getTrace({
-        data: opts.data[id].plotdata,
+        data: _app.Features.getFeature(id).plotData,
         id: id,
         plot: plotId,
         type: 'scatter'
@@ -484,49 +465,53 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to plots pane - creates plots, but doesn't render them
-   *   (called by Features.js)
+   * Add feature to plots pane - creates plots, but doesn't nec. render them
    *
-   * @param opts {Object}
+   * @param feature {Object}
    */
-  _this.addPlots = function (opts) {
-    var className,
-        count,
+  _this.add = function (feature) {
+    var count,
+        description,
         div;
 
-    className = opts.id;
-    count = opts.data[className].plotdata.date.length;
-    div = document.createElement('div');
+    if (feature.plotData && feature.id !== 'mainshock') { // no plot for mainshock
+      count = feature.plotData.date.length;
+      div = document.createElement('div');
 
-    div.classList.add('content', 'lighter', 'feature', className);
-    div.innerHTML = '<h2>' + opts.name + '</h2>' + opts.data[className].detailsHtml;
-    _features.appendChild(div);
+      if (feature.plotText) {
+        description = feature.plotText;
+      }
 
-    if (count > 0) {
-      _plotData[className] = {
-        count: count,
-        plots: {
-          magTime: _getMagTimePlot(opts),
-          cumulative: _getCumulativePlot(opts),
-          hypocenters: _getHypocentersPlot(opts)
-        },
-        rendered: false
-      };
-    }
+      div.classList.add('content', 'lighter', 'feature', feature.id);
+      div.innerHTML = '<h2>' + feature.name + '</h2>' + description;
 
-    if (_isPlotPaneActive()) {
-      _this.renderPlots();
+      _features.appendChild(div);
+
+      if (count > 0) {
+        _plotData[feature.id] = {
+          count: count,
+          plots: {
+            magTime: _getMagTimePlot(feature),
+            cumulative: _getCumulativePlot(feature),
+            hypocenters: _getHypocentersPlot(feature)
+          },
+          rendered: false
+        };
+      }
+
+      if (_isPlotPaneActive()) {
+        _this.render();
+      }
     }
   };
 
   /**
-   * Remove feature from plots pane (including container)
-   *   (called by Features.js)
+   * Remove feature from plots pane
    *
    * @param el {Element}
    *     Element to remove
    */
-  _this.removePlots = function (el) {
+  _this.remove = function (el) {
     var i,
         plots;
 
@@ -540,12 +525,12 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Render plots (only call when plots pane is active)
+   * Render plots - only call when plots pane is active
    *
    * Plotly.js has issues if plots are rendered when plotsPane is not active
    *   (called by NavBar.js when user selects plot tab)
    */
-  _this.renderPlots = function () {
+  _this.render = function () {
     var config,
         count,
         el,
@@ -633,7 +618,7 @@ var PlotsPane = function (options) {
   /**
    * Resize plots: adds responsive / fluid sizing
    */
-  _this.resizePlots = function () {
+  _this.resize = function () {
     var i,
         plots;
 
