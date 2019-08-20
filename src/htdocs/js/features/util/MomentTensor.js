@@ -1,7 +1,7 @@
 'use strict';
 
-var BeachBallView = require('beachballs/BeachBallView'),
-    Tensor = require('beachballs/Tensor'),
+var BeachBallView = require('features/util/BeachBallView'),
+    Tensor = require('features/util/Tensor'),
     Util = require('hazdev-webutils/src/util/Util');
 
 

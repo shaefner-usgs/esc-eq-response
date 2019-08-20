@@ -2,10 +2,10 @@
 'use strict';
 
 
-var FocalMechanism = require('beachballs/FocalMechanism'),
+var FocalMechanism = require('features/util/FocalMechanism'),
     Util = require('hazdev-webutils/src/util/Util');
 
-require('beachballs/CanvasMarker');
+require('features/util/CanvasMarker');
 
 
 /**

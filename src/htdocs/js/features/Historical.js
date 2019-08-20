@@ -1,11 +1,11 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Creates Foreshocks feature
+ * Creates Historical Seismicity feature
  *
  * @param options {Object}
  *   {
@@ -14,11 +14,10 @@ var Earthquakes = require('features/Earthquakes');
  *     name: {String} // layer name
  *   }
  */
-var Foreshocks = function (options) {
+var Historical = function (options) {
   var _this,
       _initialize,
 
-      _app,
       _magThreshold,
       _Earthquakes,
 
@@ -29,19 +28,17 @@ var Foreshocks = function (options) {
 
   _initialize = function (options) {
     // Unique id; note that value is "baked into" app's js/css
-    var id = 'foreshocks';
+    var id = 'historical';
 
     options = options || {};
 
-    _app = options.app;
-    _magThreshold = Math.floor(_app.AppUtil.getParam('fs-mag'));
-
     _Earthquakes = Earthquakes({
-      app: _app,
+      app: options.app,
       id: id,
       json: options.json,
       mainshockJson: options.mainshockJson
     });
+    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
 
     _this.displayLayer = true;
     _this.id = id;
@@ -72,6 +69,18 @@ var Foreshocks = function (options) {
   };
 
   /**
+   * Get feature's data for plots pane
+   *
+   * @return {Object}
+   */
+  _this.getPlotData = function () {
+    return {
+      detailsHtml: _Earthquakes.getDetails(),
+      plotdata: _Earthquakes.getPlotData()
+    };
+  };
+
+  /**
    * Get feature's data for summary pane
    *
    * @return {Object}}
@@ -92,4 +101,4 @@ var Foreshocks = function (options) {
 };
 
 
-module.exports = Foreshocks;
+module.exports = Historical;

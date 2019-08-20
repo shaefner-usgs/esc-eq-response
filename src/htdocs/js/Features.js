@@ -1,14 +1,14 @@
 'use strict';
 
 
-var AftershocksFeature = require('features/AftershocksFeature'),
-    /*FieldNotesFeature = require('features/FieldNotesFeature'),
-    FocalMechanismFeature = require('features/FocalMechanismFeature'),
-    ForeshocksFeature = require('features/ForeshocksFeature'),
-    HistoricalFeature = require('features/HistoricalFeature'),*/
-    MainshockFeature = require('features/MainshockFeature'),
-    /* MomentTensorFeature = require('features/MomentTensorFeature'),
-    StationsFeature = require('features/StationsFeature'),*/
+var Aftershocks = require('features/Aftershocks'),
+    /*FieldNotes = require('features/FieldNotes'),
+    FocalMechanism = require('features/FocalMechanism'),
+    Foreshocks = require('features/Foreshocks'),
+    Historical = require('features/Historical'),*/
+    Mainshock = require('features/Mainshock'),
+    /* MomentTensor = require('features/MomentTensor'),
+    ShakeMapStations = require('features/ShakeMapStations'),*/
     Xhr = require('util/Xhr');
 
 
@@ -22,14 +22,14 @@ var _FEATURECLASSES;
  *   This id value is used in other .js and .css files for some features.
  */
 _FEATURECLASSES = {
-  mainshock: MainshockFeature,
-  aftershocks: AftershocksFeature
-  //foreshocks: ForeshocksFeature,
-  //historical: HistoricalFeature,
-  //stations: StationsFeature,
-  //'focal-mechanism': FocalMechanismFeature,
-  //'moment-tensor': MomentTensorFeature,
-  //fieldnotes: FieldNotesFeature
+  mainshock: Mainshock,
+  aftershocks: Aftershocks
+  //foreshocks: Foreshocks,
+  //historical: Historical,
+  //'shakemap-stations': ShakeMapStations,
+  //'focal-mechanism': FocalMechanism,
+  //'moment-tensor': MomentTensor,
+  //fieldnotes: FieldNotes
 };
 
 

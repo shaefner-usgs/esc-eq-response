@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Earthquakes = require('features/Earthquakes');
+var Earthquakes = require('features/util/Earthquakes');
 
 
 /**

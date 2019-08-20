@@ -2,10 +2,10 @@
 'use strict';
 
 
-var MomentTensor = require('beachballs/MomentTensor'),
+var MomentTensor = require('features/util/MomentTensor'),
     Util = require('hazdev-webutils/src/util/Util');
 
-require('beachballs/CanvasMarker');
+require('features/util/CanvasMarker');
 
 
 /**
