@@ -121,7 +121,6 @@ var Earthquakes = function (options) {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _this.mapLayer.id = _id; // Attach id to L.Layer
 
     _this.sliderData = _bins.sliderData;
   };

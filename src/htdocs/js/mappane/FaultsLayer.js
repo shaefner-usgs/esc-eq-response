@@ -36,6 +36,8 @@ L.FaultsLayer = function () {
   });
 
   _layer = L.layerGroup([_plates, _faults]);
+
+  // Set id value used by CSS for stacking order of overlays on Leaflet map
   _layer.id = 'faults';
 
   return _layer;

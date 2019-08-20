@@ -70,7 +70,6 @@ var FieldNotesFeature = function (options) {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _mapLayer.id = _this.id; // attach id to L.Layer
 
     _this.name = _getName();
 

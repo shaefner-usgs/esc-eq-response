@@ -78,7 +78,6 @@ var Stations = function (options) {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _mapLayer.id = id; // Attach id to L.Layer
 
     _this.displayLayer = false;
     _this.name = _getName();

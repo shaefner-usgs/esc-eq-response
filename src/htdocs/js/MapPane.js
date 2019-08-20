@@ -38,6 +38,7 @@ var MapPane = function (options) {
 
       _addLayerControl,
       _compareLayers,
+      _getLayerId,
       _getSortValue,
       _getStaticLayers,
       _hideZoomControl,
@@ -100,6 +101,27 @@ var MapPane = function (options) {
   };
 
   /**
+   * Get id value for a given layer, which is typically the Feature id, except
+   *   in cases where the map layer is not a Feature layer, but more like a
+   *   baseLayer (i.e. faults)
+   *
+   * @param layer {L.layer}
+   *
+   * @return id {String}
+   */
+  _getLayerId = function (layer) {
+    var id;
+
+    Object.keys(_features).forEach(function(key) {
+      if (layer === _features[key].mapLayer) {
+        id = key;
+      }
+    });
+
+    return id || layer.id;
+  };
+
+  /**
    * Get sort value of Leaflet layer
    *
    * @param layer {L.Layer}
@@ -116,7 +138,7 @@ var MapPane = function (options) {
     if (_isBaseLayer(layer)) {
       sortValue = 1; // base layers don't have a z-index
     } else {
-      className = 'leaflet-' + layer.id + '-pane';
+      className = 'leaflet-' + _getLayerId(layer) + '-pane';
       leafletPane = document.querySelector('.' + className);
       styles = window.getComputedStyle(leafletPane);
       sortValue = parseInt(styles.getPropertyValue('z-index'), 10);
