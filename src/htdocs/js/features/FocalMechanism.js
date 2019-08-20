@@ -76,7 +76,7 @@ var FocalMechanismFeature = function (options) {
         className: _this.id,
         iconSize: L.point(size, size)
       }),
-      pane: _this.id
+      pane: _this.id // // put marker in custom Leaflet map pane
     });
   };
 

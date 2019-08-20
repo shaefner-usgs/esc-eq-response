@@ -313,7 +313,7 @@ var Stations = function (options) {
 
     return L.marker(latlng, {
       icon: L.divIcon(_markerOptions),
-      pane: _this.id
+      pane: _this.id // put markers in custom Leaflet map pane
     });
   };
 

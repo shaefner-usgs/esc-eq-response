@@ -63,7 +63,7 @@ var FieldNotesFeature = function (options) {
     _count = 0;
     _markerOptions = Util.extend({
       icon: L.icon(iconOptions),
-      pane: _this.id
+      pane: _this.id // put markers in custom Leaflet map pane
     }, _MARKER_DEFAULTS, options.markerOptions);
 
     _mapLayer = L.geoJson(options.json, {

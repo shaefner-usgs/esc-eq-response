@@ -76,7 +76,7 @@ var MomentTensorFeature = function (options) {
         className: _this.id,
         iconSize: L.point(size, size)
       }),
-      pane: _this.id
+      pane: _this.id // put markers in custom Leaflet map pane
     });
   };
 

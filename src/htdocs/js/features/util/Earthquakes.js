@@ -465,7 +465,7 @@ var Earthquakes = function (options) {
     radius = _app.AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _id;
+    _markerOptions.pane = _id; // put markers in custom Leaflet map pane
     _markerOptions.radius = radius;
 
     // Add props to plotData (additional props are added in _onEachFeature)

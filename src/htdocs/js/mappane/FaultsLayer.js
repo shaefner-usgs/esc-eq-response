@@ -24,7 +24,7 @@ L.FaultsLayer = function () {
     tileOpts: {
       minZoom: 6,
       maxZoom: 17,
-      pane: 'faults'
+      pane: 'faults' // put map tiles in custom Leaflet map pane
     },
     tileUrl: _urlPrefix + 'faults/{z}/{x}/{y}.png',
     tiptext: '{NAME}'
