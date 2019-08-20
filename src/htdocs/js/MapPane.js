@@ -22,6 +22,7 @@ require('mappane/TerrainLayer');
  *
  * @param options {Object}
  *   {
+ *     app: {Object}
  *     el: {Element}
  *   }
  */
@@ -29,9 +30,9 @@ var MapPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _bounds,
       _el,
-      _features,
       _initialLoad,
       _mapNavButton,
       _staticLayers,
@@ -53,6 +54,7 @@ var MapPane = function (options) {
 
     _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _staticLayers = _getStaticLayers();
 
@@ -101,24 +103,29 @@ var MapPane = function (options) {
   };
 
   /**
-   * Get id value for a given layer, which is typically the Feature id, except
-   *   in cases where the map layer is not a Feature layer, but more like a
-   *   baseLayer (i.e. faults)
+   * Get the id value for a given layer, which is typically the Feature's id,
+   *   except in cases where the map layer is not a Feature layer (i.e. faults)
    *
    * @param layer {L.layer}
    *
    * @return id {String}
    */
   _getLayerId = function (layer) {
-    var id;
+    var features,
+        id;
 
-    Object.keys(_features).forEach(function(key) {
-      if (layer === _features[key].mapLayer) {
-        id = key;
-      }
-    });
+    if (layer.hasOwnProperty('id')) {
+      id = layer.id;
+    } else {
+      features = _app.Features.getFeatures();
+      Object.keys(features).forEach(function(key) {
+        if (layer === features[key].mapLayer) {
+          id = key;
+        }
+      });
+    }
 
-    return id || layer.id;
+    return id;
   };
 
   /**
@@ -260,11 +267,6 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeatureLayer = function (feature) {
-    var id;
-
-    id = feature.id;
-    _features[id] = feature;
-
     // Add layer to controller
     _this.layerControl.addOverlay(feature.mapLayer, feature.name);
 
@@ -301,7 +303,7 @@ var MapPane = function (options) {
         map,
         marker;
 
-    layer = _features[id].mapLayer;
+    layer = _app.Features.getFeature(id).mapLayer;
     map = _this.map;
 
     // Simulate clicking on 'Map' button on navbar
@@ -336,7 +338,6 @@ var MapPane = function (options) {
    */
   _this.reset = function () {
     _bounds = L.latLngBounds();
-    _features = {};
     _initialLoad = true;
 
     _this.map.setView([40, -96], 4); // United States
@@ -349,7 +350,8 @@ var MapPane = function (options) {
    *     optional feature layer to zoom to; zooms to all layers if not set
    */
   _this.setView = function (feature) {
-    var layer,
+    var features,
+        layer,
         setView;
 
     // Flag to determine if map extent will be set
@@ -363,9 +365,10 @@ var MapPane = function (options) {
       if (_initialLoad) { // only need to set first time map is visible
         setView = true;
 
-        Object.keys(_features).forEach(function(key) {
-          if (_features[key].zoomToLayer) {
-            layer = _features[key].mapLayer;
+        features = _app.Features.getFeatures();
+        Object.keys(features).forEach(function(key) {
+          if (features[key].zoomToLayer) {
+            layer = features[key].mapLayer;
             _bounds.extend(layer.getBounds());
           }
         });

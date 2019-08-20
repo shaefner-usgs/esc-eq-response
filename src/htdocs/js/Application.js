@@ -55,6 +55,11 @@ var Application = function (options) {
       app: _this,
       el: options.helpPane
     });
+    _this.StatusBar = StatusBar({
+      app: _this,
+      el: options.statusBar
+    });
+    // MapPane depends on: (Features)
     _this.MapPane = MapPane({
       app: _this,
       el: options.mapPane
@@ -63,10 +68,6 @@ var Application = function (options) {
     _this.PlotsPane = PlotsPane({
       app: _this,
       el: options.plotsPane
-    });
-    _this.StatusBar = StatusBar({
-      app: _this,
-      el: options.statusBar
     });
     // NavBar depends on: MapPane, PlotsPane, StatusBar
     _this.NavBar = NavBar({

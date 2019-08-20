@@ -288,6 +288,15 @@ var Features = function (options) {
   };
 
   /**
+   * Get all features
+   *
+   * @return _features {Object}
+   */
+  _this.getFeatures = function () {
+    return _features;
+  };
+
+  /**
    * Wrapper method to loop through Feature classes and initialze them
    *
    * Skip mainshock which is added separately so it's already available
