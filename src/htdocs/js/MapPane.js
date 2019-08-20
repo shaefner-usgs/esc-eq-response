@@ -3,7 +3,7 @@
 
 
 // Leaflet plugins
-require('mappane/Control-bottomcenter');
+require('mappane/Control-bottom-Center');
 require('mappane/MousePosition');
 //require('mappane/RestoreMap');
 
