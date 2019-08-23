@@ -187,6 +187,7 @@ var Features = function (options) {
 
   /**
    * Remove a feature from map, plots and summary panes
+   * TODO: pass in feature.id to all remove methods
    *
    * @param feature {Object}
    */
@@ -261,18 +262,20 @@ var Features = function (options) {
    *
    * @return feature {Object}
    *   {
-   *     displayLayer : {Boolean}, // Whether or not layer is "on" by default on map
-   *     id : {String}, // Unique id of feature
-   *     name : {String}, // Display name of feature
-   *     url : {String}, // URL of json feed to fetch data from
-   *     zoomToLayer : {Boolean}, // Whether or not map zoooms to fit layer
+   *     displayLayer: {Boolean}, // whether or not layer is "on" by default on map
+   *     id: {String}, // unique id of feature
+   *     name: {String}, // display name of feature
+   *     url: {String}, // URL of json feed to fetch data from
+   *     zoomToLayer: {Boolean}, // Whether or not map zoooms to fit layer
    *
-   *     Note: The following props are set after external feed data is loaded
+   *   The following props are optional and set after external feed data is loaded
    *
-   *     json : {Object}, // JSON feed data (mainshock only)
-   *     mapLayer : {}, // Leaflet map layer for MapPane
-   *     plotData : {}, // Plot data formatted for Plot.ly for PlotPane
-   *     summary : {}, // HTML for SummaryPane
+   *     count: {Number}, // number of features in layer
+   *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
+   *     plotDescription: {String}, // text description to accompany plots
+   *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
+   *     sliderData: {Object}, // data for eq mag filters on SummaryPane
+   *     summary: {String} // HTML for SummaryPane
    *   }
    */
   _this.getFeature = function (id) {
