@@ -329,28 +329,31 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.add = function (feature) {
-    var className,
-        div,
+    var div,
         input,
+        name,
         table;
 
     if (feature.summary) {
-      className = feature.id;
+      name = feature.name;
+      if (feature.count) {
+        name += ' (' + feature.count + ')';
+      }
 
       div = document.createElement('div');
-      div.classList.add('content', 'lighter', 'feature', className);
-      div.innerHTML = '<h2>' + feature.name + '</h2>' + feature.summary;
+      div.classList.add('content', 'lighter', 'feature', feature.id);
+      div.innerHTML = '<h2>' + name + '</h2>' + feature.summary;
 
       _features.appendChild(div);
 
       input = div.querySelector('input');
       table = div.querySelector('table.eqlist');
       if (input) {
-        _setSliderStyles(input, className); // set initial colored section of range slider
+        _setSliderStyles(input, feature.id); // set initial colored section of range slider
       }
       if (table) {
         _addListeners(div, feature.sliderData);
-        _initTableSort(className);
+        _initTableSort(feature.id);
       }
 
       _updateTimestamp();

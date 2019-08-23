@@ -300,8 +300,15 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeatureLayer = function (feature) {
+    var name;
+
+    name = feature.name;
+    if (feature.count) {
+      name += ' (' + feature.count + ')';
+    }
+
     // Add layer to controller
-    _this.layerControl.addOverlay(feature.mapLayer, feature.name);
+    _this.layerControl.addOverlay(feature.mapLayer, name);
 
     // Turn layer "on" / zoom map if set to be displayed / zoomed by default
     if (feature.displayLayer) {
