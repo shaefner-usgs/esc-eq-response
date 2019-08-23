@@ -47,7 +47,7 @@ var Earthquakes = function (options) {
 
       _app,
       _bins,
-      _id,
+      _featureId,
       _markerOptions,
       _mainshockLatlon,
       _mainshockMoment,
@@ -55,6 +55,7 @@ var Earthquakes = function (options) {
       _pastDayMoment,
       _pastHourMoment,
       _pastWeekMoment,
+      _plotData,
       _popupTemplate,
       _tablerowTemplate,
       _tooltipTemplate,
@@ -65,6 +66,7 @@ var Earthquakes = function (options) {
       _getBubbles,
       _getIntervals,
       _getHtmlTemplate,
+      _getPlotlyTrace,
       _onEachFeature,
       _pointToLayer;
 
@@ -79,11 +81,10 @@ var Earthquakes = function (options) {
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _app = options.app;
-    _id = options.feature.id;
+    _featureId = options.feature.id;
 
     _bins = {};
-    _this.eqList = {};
-    _this.plotData = {
+    _plotData = {
       color: [],
       date: [],
       depth: [],
@@ -96,15 +97,15 @@ var Earthquakes = function (options) {
       time: []
     };
 
-    if (_id === 'mainshock') {
+    if (_featureId === 'mainshock') {
       mainshock = options.feature;
     } else {
       mainshock = _app.Features.getFeature('mainshock');
     }
 
+    // Parameters used to calculate age and distance/direction from mainshock
     coords = mainshock.json.geometry.coordinates;
     _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
-
     _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
     _nowMoment = _app.AppUtil.Moment.utc();
     _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
@@ -116,11 +117,19 @@ var Earthquakes = function (options) {
     _popupTemplate = _getHtmlTemplate('popup');
     _tablerowTemplate = _getHtmlTemplate('tablerow');
 
+    _this.eqList = {};
+
     _this.mapLayer = L.geoJson(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
+
+    _this.plotTraces = {
+      magtime: _getPlotlyTrace('magtime', 'scatter'),
+      cumulative: _getPlotlyTrace('cumulative', 'scatter'),
+      hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
+    };
 
     _this.sliderData = _bins.sliderData;
   };
@@ -155,7 +164,7 @@ var Earthquakes = function (options) {
 
       _bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
-        if (_id !== 'foreshocks') {
+        if (_featureId !== 'foreshocks') {
           _bins[type][magInt][365] ++;
         }
         if (days <= 30) {
@@ -185,8 +194,8 @@ var Earthquakes = function (options) {
         threshold;
 
     mag = _app.AppUtil.round(feature.properties.mag, 1);
-    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
-    if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
+    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag');
+    if (mag >= threshold || _featureId === 'mainshock') { // don't filter out mainshock
       return true;
     }
   };
@@ -205,7 +214,7 @@ var Earthquakes = function (options) {
 
     eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
     if (eqMoment.isBefore(_mainshockMoment)) {
-      if (_id === 'foreshocks') {
+      if (_featureId === 'foreshocks') {
         age = 'foreshock';
       } else {
         age = 'historical';
@@ -276,7 +285,7 @@ var Earthquakes = function (options) {
     intervals[1] = 0;
     intervals[7] = 0;
     intervals[30] = 0;
-    if (_id !== 'foreshocks') {
+    if (_featureId !== 'foreshocks') {
       intervals[365] = 0;
     }
 
@@ -324,6 +333,120 @@ var Earthquakes = function (options) {
     }
 
     return template;
+  };
+
+  /**
+   * Get plot's trace option for plotly.js
+   *
+   * @param plotId {String <cumulative || hypocenters || magtime>}
+   * @param type {String <scatter || scatter3d>}
+   *
+   * @return trace {Object} || null
+   */
+  _getPlotlyTrace = function (plotId, type) {
+    var date,
+        eqid,
+        mainshockId,
+        mode,
+        sizeref,
+        text,
+        trace,
+        x,
+        y,
+        z;
+
+    if (_plotData.date.length === 0) {
+      return;
+    }
+
+    if (plotId === 'cumulative') {
+      mode = 'lines+markers';
+
+      // Copy data arrays so they can be modified w/o affecting orig. data
+      date = _plotData.date.slice();
+      eqid = _plotData.eqid.slice();
+      x = _plotData.time.slice();
+
+      // Fill y with values from 1 to length of x
+      y = Array.from(new Array(x.length), function (val, i) {
+        return i + 1;
+      });
+
+      // Add origin point (mainshock) to beginning of aftershocks trace
+      if (_featureId === 'aftershocks') {
+        mainshockId = _app.AppUtil.getParam('eqid');
+        date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
+        eqid.unshift(mainshockId);
+        x.unshift(_mainshockMoment.format());
+        y.unshift(0);
+      }
+
+      // Add date field to hover text
+      text = y.map(function(val, i) {
+        return val + '<br />' + date[i];
+      });
+    } else {
+      eqid = _plotData.eqid;
+      text = _plotData.text;
+    }
+    if (plotId === 'hypocenters') {
+      mode = 'markers';
+      sizeref = 0.79; // Plotly doesn't honor size value on 3d plots; adjust it.
+      x = _plotData.lon;
+      y = _plotData.lat;
+      z = _plotData.depth;
+    } else if (plotId === 'magtime') {
+      mode = 'markers';
+      sizeref = 1;
+      x = _plotData.time;
+      y = _plotData.mag;
+    }
+
+    trace = {
+      eqid: eqid,
+      feature: _featureId,
+      hoverinfo: 'text',
+      hoverlabel: {
+        font: {
+          size: 15
+        }
+      },
+      mode: mode,
+      plotid: plotId,
+      text: text,
+      type: type,
+      x: x,
+      y: y,
+      z: z
+    };
+
+    if (mode === 'markers') {
+      trace.marker = {
+        color: _plotData.color, // fill
+        line: { // stroke
+          color: 'rgb(65, 65, 65)',
+          width: 1
+        },
+        opacity: 0.85,
+        size: _plotData.size,
+        sizeref: sizeref
+      };
+    } else { // mode = lines+markers (cumulative plots)
+      trace.line = {
+        color: 'rgb(120, 186, 232)',
+        width: 2
+      };
+      trace.marker = {
+        color: 'rgb(120, 186, 232)', // fill
+        line: { // stroke
+          color: 'rgb(31, 119, 180)',
+          width: 1
+        },
+        size: 3
+      };
+    }
+
+    return trace;
   };
 
   /**
@@ -415,17 +538,17 @@ var Earthquakes = function (options) {
     _this.mostRecentEqId = eqid; // most recent earthquake in feed
 
     // Add props to plotData (additional props are added in _pointToLayer)
-    _this.plotData.date.push(utcTime);
-    _this.plotData.depth.push(coords[2] * -1); // return a negative number for depth
-    _this.plotData.eqid.push(data.eqid);
-    _this.plotData.lat.push(coords[1]);
-    _this.plotData.lon.push(coords[0]);
-    _this.plotData.mag.push(data.mag);
-    _this.plotData.text.push(props.title + '<br />' + utcTime);
-    _this.plotData.time.push(eqMoment.format());
+    _plotData.date.push(utcTime);
+    _plotData.depth.push(coords[2] * -1); // return a negative number for depth
+    _plotData.eqid.push(data.eqid);
+    _plotData.lat.push(coords[1]);
+    _plotData.lon.push(coords[0]);
+    _plotData.mag.push(data.mag);
+    _plotData.text.push(props.title + '<br />' + utcTime);
+    _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       days = Math.ceil(_app.AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'first');
@@ -434,7 +557,7 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'past');
     }
-    else if (_id === 'historical' || _id === 'foreshocks') {
+    else if (_featureId === 'historical' || _featureId === 'foreshocks') {
       days = Math.ceil(_app.AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
@@ -465,12 +588,12 @@ var Earthquakes = function (options) {
     radius = _app.AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _id; // put markers in custom Leaflet map pane
+    _markerOptions.pane = _featureId; // put markers in custom Leaflet map pane
     _markerOptions.radius = radius;
 
     // Add props to plotData (additional props are added in _onEachFeature)
-    _this.plotData.color.push(fillColor);
-    _this.plotData.size.push(radius * 2); // plotly.js uses diameter
+    _plotData.color.push(fillColor);
+    _plotData.size.push(radius * 2); // plotly.js uses diameter
 
     return L.circleMarker(latlng, _markerOptions);
   };
@@ -563,22 +686,22 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
-    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-dist');
+    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
       'earthquakes within <strong>' + distance + ' km</strong> of the ' +
       'mainshock&rsquo;s epicenter';
 
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
         _mainshockMoment).asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
         duration + '</strong>';
     } else {
-      if (_id === 'foreshocks') {
+      if (_featureId === 'foreshocks') {
         duration = _app.AppUtil.getParam('fs-days') + ' days';
-      } else if (_id === 'historical') {
+      } else if (_featureId === 'historical') {
         duration = _app.AppUtil.getParam('hs-years') + ' years';
       }
       description += ' in the prior <strong>' + duration + '</strong> ' +
@@ -669,16 +792,16 @@ var Earthquakes = function (options) {
     if (!singleMagBin) {
       mags = Object.keys(_bins.sliderData);
       max = Math.max.apply(null, mags);
-      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
+      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag'));
 
       html += '<div class="filter">';
       html += '<h4>Filter earthquakes by magnitude</h4>';
       html += '<div class="min">' + min + '</div>';
       html += '<div class="inverted slider" style="--min: ' + min +
         '; --max: ' + max + '; --val: ' + mag + ';">';
-      html += '<input id="' + _id + '" type="range" min="' + min + '" max="' +
-        max + '" value="' + mag + '"/>';
-      html += '<output for="'+ _id + '">' + mag + '</output>';
+      html += '<input id="' + _featureId + '" type="range" min="' + min +
+        '" max="' + max + '" value="' + mag + '"/>';
+      html += '<output for="'+ _featureId + '">' + mag + '</output>';
       html += '</div>';
       html += '<div class="max">' + max + '</div>';
       html += '</div>';

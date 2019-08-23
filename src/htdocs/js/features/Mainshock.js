@@ -101,7 +101,7 @@ var MainshockFeature = function (options) {
     });
 
     _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotData = _Earthquakes.plotData;
+    _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
   };
 
