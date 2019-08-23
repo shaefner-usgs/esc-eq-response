@@ -53,10 +53,9 @@ var MapPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
-
     _app = options.app;
     _el = options.el || document.createElement('div');
+    _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
     _staticLayers = _getStaticLayers();
 
     _this.initialLoad = true;
@@ -247,18 +246,16 @@ var MapPane = function (options) {
    *
    * @param layer {L.Layer}
    *
-   * @return r {Boolean}
+   * @return {Boolean}
    */
   _isBaseLayer = function (layer) {
-    var r = false;
-
     Object.keys(_staticLayers.baseLayers).forEach(function(key) {
       if (_staticLayers.baseLayers[key] === layer) {
-        r = true;
+        return true;
       }
     });
 
-    return r;
+    return false;
   };
 
   /**
@@ -287,7 +284,7 @@ var MapPane = function (options) {
   _setBounds = function (feature) {
     _bounds.extend(feature.mapLayer.getBounds());
 
-    _fitBounds(); // call in case Map pane is visible
+    _fitBounds(); // call in case MapPane is visible while features are being added
   };
 
   // ----------------------------------------------------------
@@ -320,7 +317,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Create a separate map pane for each Feature - used to control stacking order
+   * Create a separate MapPane for each Feature - used to control stacking order
    *
    * @param id {String}
    * @param parent {String <overlayPane | tilePane>}
@@ -332,7 +329,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set initial map extent when user views Map pane for the first time
+   * Set initial map extent when user views MapPane for the first time
    *   necessary to do this because Leaflet can't manipulate map when not visible
    */
   _this.initView = function () {
