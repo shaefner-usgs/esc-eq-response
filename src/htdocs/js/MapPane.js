@@ -246,16 +246,18 @@ var MapPane = function (options) {
    *
    * @param layer {L.Layer}
    *
-   * @return {Boolean}
+   * @return r {Boolean}
    */
   _isBaseLayer = function (layer) {
+    var r = false;
+
     Object.keys(_staticLayers.baseLayers).forEach(function(key) {
       if (_staticLayers.baseLayers[key] === layer) {
-        return true;
+        r = true;
       }
     });
 
-    return false;
+    return r;
   };
 
   /**
