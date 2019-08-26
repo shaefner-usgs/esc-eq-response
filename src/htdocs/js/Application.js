@@ -117,13 +117,13 @@ var Application = function (options) {
    * Set app to default state: remove features, clear status bar, etc.
    */
   _this.resetApp = function () {
-    _this.Features.reset();
     _this.EditPane.reset();
+    _this.Features.reset();
     _this.MapPane.reset();
-    _this.PlotsPane.reset();
-    _this.SummaryPane.reset();
     _this.NavBar.reset();
+    _this.PlotsPane.reset();
     _this.StatusBar.reset();
+    _this.SummaryPane.reset();
   };
 
 
