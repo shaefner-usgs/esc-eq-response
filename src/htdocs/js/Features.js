@@ -19,7 +19,7 @@ var _FEATURECLASSES;
  *   be first). Stacking order is set in CSS.
  *
  * IMPORTANT: the Object key must match the id property set in the Feature class.
- *   This id value is used in other .js and .css files for some features.
+ *   This id value is sometimes used as a reference in other .js/.css files.
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
@@ -325,10 +325,10 @@ var Features = function (options) {
    * Wrapper method to initialze mainshock Feature
    */
   _this.initMainshockFeature = function () {
-    var FeatureClass;
+    var MainshockClass;
 
-    FeatureClass = _FEATURECLASSES.mainshock;
-    _intiFeature(FeatureClass);
+    MainshockClass = _FEATURECLASSES.mainshock;
+    _intiFeature(MainshockClass);
   };
 
   /**

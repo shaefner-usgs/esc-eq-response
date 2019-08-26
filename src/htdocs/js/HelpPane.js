@@ -28,10 +28,9 @@ var HelpPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _Svg = Svg();
-
     _el = options.el || document.createElement('div');
     _legend = _el.querySelector('.legend');
+    _Svg = Svg();
 
     _addSvgElements();
   };
