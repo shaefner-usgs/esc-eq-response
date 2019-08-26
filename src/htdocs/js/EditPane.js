@@ -25,7 +25,6 @@ var EditPane = function (options) {
       _addListener,
       _getDefaults,
       _hideMainshock,
-      _initFeatures,
       _initListeners,
       _isNewEvent,
       _isValidEqId,
@@ -55,11 +54,6 @@ var EditPane = function (options) {
     _initListeners();
     _setFormFields();
     _setQueryString();
-
-    // Get things rolling if eqid is already set when initialized
-    if (_eqid.value !== '') {
-      _initFeatures();
-    }
   };
 
   /**
@@ -123,22 +117,6 @@ var EditPane = function (options) {
   };
 
   /**
-   * Add features to map, plots, summary panes
-   */
-  _initFeatures = function () {
-    if (_eqidPrevValue) {
-      _app.resetApp(); // first reset app to default state
-    }
-
-    if (_isValidEqId()) {
-      _el.querySelector('.viewmap').removeAttribute('disabled');
-
-      // Initialize mainshock (other features added after mainshock finished)
-      _app.Features.initMainshockFeature();
-    }
-  };
-
-  /**
    * Initialize event listeners
    *
    * Note that _addListener() expects a NodeList (or an array) as the first arg
@@ -160,7 +138,7 @@ var EditPane = function (options) {
     _addListener(_fields, 'input', _updateParam);
 
     // Get new set of feature layers when eqid is changed
-    _addListener([_eqid], 'input', _initFeatures);
+    _addListener([_eqid], 'input', _this.initFeatures);
 
     // Update eq features when params changed
     _addListener(aftershocks, 'change', _refreshEqs);
@@ -330,6 +308,22 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Add features to map, plots, summary panes
+   */
+  _this.initFeatures = function () {
+    //if (_eqidPrevValue) {
+      _app.resetApp(); // first reset app to default state
+    //}
+
+    if (_isValidEqId()) {
+      _el.querySelector('.viewmap').removeAttribute('disabled');
+
+      // Initialize mainshock (other features added after mainshock finished)
+      _app.Features.initMainshockFeature();
+    }
+  };
+
+  /**
    * Reset pane to initial state
    */
   _this.reset = function () {
@@ -354,28 +348,7 @@ var EditPane = function (options) {
 
     // Call manually: eqid input event not triggered when value changed programmatically
     _setQueryString();
-    _initFeatures();
-  };
-
-  /**
-   * Display mainshock's details on edit pane and also update <title>
-   */
-  _this.showMainshock = function () {
-    var appTitle,
-        details,
-        mainshock,
-        props;
-
-    appTitle = _resetTitle();
-    details = _el.querySelector('.details');
-    mainshock = _app.Features.getFeature('mainshock');
-    props = mainshock.json.properties;
-
-    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
-    details.classList.remove('hide');
-
-    document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
-      ' - ' + props.place + ' | ' + appTitle;
+    _this.initFeatures();
   };
 
   /**
@@ -398,6 +371,27 @@ var EditPane = function (options) {
 
     // Next, update all form fields to match url params
     _setFormFields();
+  };
+
+  /**
+   * Display mainshock's details on edit pane and also update <title>
+   */
+  _this.showMainshock = function () {
+    var appTitle,
+        details,
+        mainshock,
+        props;
+
+    appTitle = _resetTitle();
+    details = _el.querySelector('.details');
+    mainshock = _app.Features.getFeature('mainshock');
+    props = mainshock.json.properties;
+
+    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
+    details.classList.remove('hide');
+
+    document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
+      ' - ' + props.place + ' | ' + appTitle;
   };
 
 

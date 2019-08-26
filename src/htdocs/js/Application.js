@@ -31,7 +31,7 @@ var Application = function (options) {
   var _this,
       _initialize,
 
-      _loadComponents,
+      _initComponents,
       _redirect;
 
 
@@ -39,58 +39,58 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _redirect();
-    _loadComponents(options);
+    _initComponents(options);
 
     // Remove initial loading message
     _this.StatusBar.remove('initial');
+
+    // Get things rolling if eqid is already set
+    if (_this.AppUtil.getParam('eqid') !== '') {
+      _this.EditPane.initFeatures();
+    }
   };
 
   /**
-   * Load app components and store them in a superglobal 'app' object that is
-   *   shared between classes
+   * Instantiate app components and store them in a superglobal 'app' object
+   *   that is shared between Classes
    */
-  _loadComponents = function (options) {
-    _this.AppUtil = AppUtil;
-    _this.HelpPane = HelpPane({
-      app: _this,
-      el: options.helpPane
-    });
+  _initComponents = function (options) {
+    // Instantiate StatusBar first so it's available to show status while loading
     _this.StatusBar = StatusBar({
       app: _this,
       el: options.statusBar
     });
-    // MapPane depends on: (Features)
-    _this.MapPane = MapPane({
-      app: _this,
-      el: options.mapPane
-    });
-    // PlotsPane depends on: MapPane
-    _this.PlotsPane = PlotsPane({
-      app: _this,
-      el: options.plotsPane
-    });
-    // NavBar depends on: MapPane, PlotsPane, StatusBar
-    _this.NavBar = NavBar({
-      app: _this,
-      el: options.navBar
-    });
-    // SummaryPane depends on: MapPane
-    _this.SummaryPane = SummaryPane({
-      app: _this,
-      el: options.summaryPane
-    });
-    // Features depends on: (EditPane), MapPane, PlotsPane, StatusBar, SummaryPane
-    _this.Features = Features({
-      app: _this
-    });
-    // EditPane depends on: Features, MapPane, NavBar, StatusBar, SummaryPane
+
+    _this.AppUtil = AppUtil;
     _this.EditPane = EditPane({
       app: _this,
       el: options.editPane
     });
-    // SignificantEqs depends on: EditPane, StatusBar
+    _this.Features = Features({
+      app: _this
+    });
+    _this.HelpPane = HelpPane({
+      app: _this,
+      el: options.helpPane
+    });
+    _this.MapPane = MapPane({
+      app: _this,
+      el: options.mapPane
+    });
+    _this.NavBar = NavBar({
+      app: _this,
+      el: options.navBar
+    });
+    _this.PlotsPane = PlotsPane({
+      app: _this,
+      el: options.plotsPane
+    });
     _this.SignificantEqs = SignificantEqs({
       app: _this
+    });
+    _this.SummaryPane = SummaryPane({
+      app: _this,
+      el: options.summaryPane
     });
   };
 
@@ -129,7 +129,6 @@ var Application = function (options) {
 
   _initialize(options);
   options = null;
-  console.log(_this);
   return _this;
 };
 
