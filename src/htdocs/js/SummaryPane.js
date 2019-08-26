@@ -25,8 +25,8 @@ var SummaryPane = function (options) {
 
       _addListeners,
       _addTimestamp,
-      _getTimeZone,
       _getSliderValue,
+      _getTimeZone,
       _initTableSort,
       _onMouseClick,
       _onMouseOver,
@@ -127,6 +127,29 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Get CSS value (percentage) for colored section of input range slider
+   *
+   * @param el {Element}
+   *     input (range slider) element
+   *
+   * @return value {String}
+   */
+  _getSliderValue = function (el) {
+    var min,
+        percentage,
+        value;
+
+    min = el.min || 0;
+    percentage = el.value;
+    if (el.max) {
+      percentage = Math.floor(100 * (el.value - min) / (el.max - min));
+    }
+    value = percentage + '% 100%';
+
+    return value;
+  };
+  
+  /**
    * Get timezone of user's device
    * http://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
    *  offset-amount-in-js/12496442#12496442
@@ -155,29 +178,6 @@ var SummaryPane = function (options) {
     }
 
     return tz;
-  };
-
-  /**
-   * Get CSS value (percentage) for colored section of input range slider
-   *
-   * @param el {Element}
-   *     input (range slider) element
-   *
-   * @return value {String}
-   */
-  _getSliderValue = function (el) {
-    var min,
-        percentage,
-        value;
-
-    min = el.min || 0;
-    percentage = el.value;
-    if (el.max) {
-      percentage = Math.floor(100 * (el.value - min) / (el.max - min));
-    }
-    value = percentage + '% 100%';
-
-    return value;
   };
 
   /**

@@ -31,8 +31,8 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquake json feed and create Leaflet map layer, Plotly.js data and
- *   summary data.
+ * Parse earthquake json feed and create Leaflet map layer, Plotly.js trace, and
+ *   content for summary/plot panes.
  *
  * @param options {Object}
  *   {
@@ -48,9 +48,9 @@ var Earthquakes = function (options) {
       _app,
       _bins,
       _featureId,
-      _markerOptions,
       _mainshockLatlon,
       _mainshockMoment,
+      _markerOptions,
       _nowMoment,
       _pastDayMoment,
       _pastHourMoment,

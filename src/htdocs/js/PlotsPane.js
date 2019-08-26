@@ -25,8 +25,8 @@ var PlotsPane = function (options) {
       _getPlotlyConfig,
       _getPlotlyLayout,
       _getPlotlyParams,
-      _getRatio,
       _getPlotlyTraces,
+      _getRatio,
       _isPlotPaneActive;
 
 
@@ -281,6 +281,27 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Get plot traces
+   *
+   * @param feature {Object}
+   * @param plotId {String}
+   *
+   * @return traces {Array}
+   */
+  _getPlotlyTraces = function (feature, plotId) {
+    var traces;
+
+    traces = [
+      feature.plotTraces[plotId]
+    ];
+    if (plotId === 'hypocenters' || plotId === 'magtime') {
+      traces.push(_app.Features.getFeature('mainshock').plotTraces[plotId]);
+    }
+
+    return traces;
+  };
+
+  /**
    * Get ratio of depth values to latitude values to scale 3d plot correctly
    *
    * @param trace {Object}
@@ -302,27 +323,6 @@ var PlotsPane = function (options) {
     ratio = depthRange / latRange;
 
     return ratio;
-  };
-
-  /**
-   * Get plot traces
-   *
-   * @param feature {Object}
-   * @param plotId {String}
-   *
-   * @return traces {Array}
-   */
-  _getPlotlyTraces = function (feature, plotId) {
-    var traces;
-
-    traces = [
-      feature.plotTraces[plotId]
-    ];
-    if (plotId === 'hypocenters' || plotId === 'magtime') {
-      traces.push(_app.Features.getFeature('mainshock').plotTraces[plotId]);
-    }
-
-    return traces;
   };
 
   /**

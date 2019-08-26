@@ -105,6 +105,23 @@ var MapPane = function (options) {
   };
 
   /**
+   * Set map extent to contain all features (bounds)
+   */
+  _fitBounds = function () {
+    if (_bounds.isValid()) {
+      _this.map.fitBounds(_bounds, {
+        paddingTopLeft: L.point(0, 80), // accommodate navbar
+        reset: true
+      });
+    }
+
+    // Zoom out if map is zoomed in too close for context (e.g. just mainshock)
+    if (_this.map.getZoom() > 17) {
+      _this.map.setZoom(12);
+    }
+  };
+
+  /**
    * Get the id value for a given layer, which is typically the Feature's id,
    *   except in cases where the map layer is not a Feature layer (i.e. faults)
    *
@@ -258,23 +275,6 @@ var MapPane = function (options) {
     });
 
     return r;
-  };
-
-  /**
-   * Set map extent to contain all features (bounds)
-   */
-  _fitBounds = function () {
-    if (_bounds.isValid()) {
-      _this.map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 80), // accommodate navbar
-        reset: true
-      });
-    }
-
-    // Zoom out if map is zoomed in too close for context (e.g. just mainshock)
-    if (_this.map.getZoom() > 17) {
-      _this.map.setZoom(12);
-    }
   };
 
   /**
