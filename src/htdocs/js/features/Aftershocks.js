@@ -177,6 +177,7 @@ var Aftershocks = function (options) {
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
+    _this.title = _this.name + ' (' + _this.count + ')';
   };
 
 

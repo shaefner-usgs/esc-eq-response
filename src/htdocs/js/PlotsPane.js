@@ -352,21 +352,18 @@ var PlotsPane = function (options) {
     var description,
         div,
         plotlyParams,
-        name;
+        title;
 
     // Don't plot mainshock on its own (it is included in other features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       if (feature.plotDescription) {
         description = feature.plotDescription;
       }
-      name = feature.name;
-      if (feature.count) {
-        name += ' (' + feature.count + ')';
-      }
+      title = feature.title || feature.name;
 
       div = document.createElement('div');
       div.classList.add('content', 'lighter', 'feature', feature.id);
-      div.innerHTML = '<h2>' + name + '</h2>' + description;
+      div.innerHTML = '<h2>' + title + '</h2>' + description;
 
       _featuresEl.appendChild(div);
 
