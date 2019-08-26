@@ -10,7 +10,7 @@ var Lightbox = function (options) {
   var _this,
       _initialize,
 
-      _addEventListener,
+      _addListener,
       _handleEscapeKey;
 
 
@@ -25,7 +25,7 @@ var Lightbox = function (options) {
    *
    * @param div {Element}
    */
-  _addEventListener = function (div) {
+  _addListener = function (div) {
     div.addEventListener('click', function(e) {
       e.preventDefault();
       _this.hide();
@@ -65,7 +65,7 @@ var Lightbox = function (options) {
 
     document.body.appendChild(div);
 
-    _addEventListener(div);
+    _addListener(div);
   };
 
   /**
