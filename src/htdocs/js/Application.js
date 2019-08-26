@@ -118,12 +118,14 @@ var Application = function (options) {
    */
   _this.resetApp = function () {
     _this.EditPane.reset();
-    _this.Features.reset();
     _this.MapPane.reset();
     _this.NavBar.reset();
     _this.PlotsPane.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
+
+    // Reset Features last so other Classes can use Features during reset()
+    _this.Features.reset();
   };
 
 

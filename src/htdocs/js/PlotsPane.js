@@ -458,6 +458,17 @@ var PlotsPane = function (options) {
    * Reset pane to initial state
    */
   _this.reset = function () {
+    var features,
+        plotsEl;
+
+    features = _app.Features.getFeatures();
+    Object.keys(features).forEach(function(feature) {
+      plotsEl = document.querySelector('#plotsPane .' + feature);
+      if (plotsEl) {
+        _this.remove(plotsEl);
+      }
+    });
+
     _featuresEl.innerHTML = '';
   };
 
