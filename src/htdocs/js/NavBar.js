@@ -193,11 +193,11 @@ var NavBar = function (options) {
     // Update map container / render plots so they display correctly when unhidden
     if (id === 'mapPane') {
       _app.MapPane.map.invalidateSize();
-      // Fire an event so L.popup.update() can be called after map is visible,
-      // which seems to be necessary for Leaflet to display popups correctly
-      // when they're added to the map from another pane
-      _app.MapPane.map.fire('visible');
       _app.MapPane.initView();
+      // Fire an event so L.popup.update() can be called after map is visible,
+      //   which seems to be necessary for Leaflet to display popups correctly
+      //   when they're added to the map from another pane
+      _app.MapPane.map.fire('visible');
     } else if (id === 'plotsPane') {
       _app.PlotsPane.render();
       _app.PlotsPane.resize();

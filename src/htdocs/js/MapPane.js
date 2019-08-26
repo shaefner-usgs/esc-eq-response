@@ -133,7 +133,7 @@ var MapPane = function (options) {
     var features,
         id;
 
-    if (layer.hasOwnProperty('id')) {
+    if (layer.hasOwnProperty('id')) { // faults
       id = layer.id;
     } else {
       features = _app.Features.getFeatures();
@@ -162,7 +162,7 @@ var MapPane = function (options) {
         styles;
 
     if (_isBaseLayer(layer)) {
-      sortValue = 1; // base layers don't have a z-index
+      sortValue = 1; // base layers don't have a z-index/don't need to be sorted
     } else {
       className = 'leaflet-' + _getLayerId(layer) + '-pane';
       leafletPane = document.querySelector('.' + className);
@@ -338,7 +338,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Open popup matching eqid in Feature layer
+   * Open popup matching eqid in Feature layer - used for displaying map popups
+   *   from user interaction on other panes
    *
    * @param id {String}
    *     id of feature
@@ -362,11 +363,10 @@ var MapPane = function (options) {
       }
     });
 
-    // Center on marker so user can easily zoom into feature
-    map.setView(marker.getLatLng(), map.getZoom());
-
-    // Call L.popup.update() after map is visible so popup displays correctly
     map.on('visible', function() {
+      // Center map on marker
+      map.setView(marker.getLatLng(), map.getZoom());
+      // Call L.popup.update() after map is visible so popup displays correctly
       marker.getPopup().update();
       // Remove listener so it doesn't trigger again for following events
       map.off('visible');
