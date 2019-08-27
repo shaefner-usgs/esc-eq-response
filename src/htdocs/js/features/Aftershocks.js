@@ -40,7 +40,7 @@ var Aftershocks = function (options) {
     urlParams = {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: _app.AppUtil.getParam('as-dist'),
+      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
       minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
       starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
         .utc().toISOString().slice(0, -5)
@@ -118,8 +118,6 @@ var Aftershocks = function (options) {
         magThreshold,
         mostRecentEq,
         summary;
-
-    options = {};
 
     summary = _Earthquakes.getDescription();
 
