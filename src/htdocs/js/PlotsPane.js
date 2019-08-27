@@ -438,18 +438,20 @@ var PlotsPane = function (options) {
         _plotConfigs[featureId].rendered = true;
 
         // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
-        resetButton = plotlyParams.hypocenters.graphDiv.querySelector(
-          '[data-attr="resetLastSave"]'
-        );
-        resetButton.setAttribute('data-title', 'Autoscale');
-        path = resetButton.querySelector('path');
-        path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 ' +
-          '187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
-          'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
-          '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
-          '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
-          '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 ' +
-          '0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
+        if (plotlyParams.hypocenters) {
+          resetButton = plotlyParams.hypocenters.graphDiv.querySelector(
+            '[data-attr="resetLastSave"]'
+          );
+          resetButton.setAttribute('data-title', 'Autoscale');
+          path = resetButton.querySelector('path');
+          path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 ' +
+            '187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 ' +
+            '0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
+            '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
+            '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
+            '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 ' +
+            '0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
+        }
       }
     });
   };
