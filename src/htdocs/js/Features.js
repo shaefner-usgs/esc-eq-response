@@ -126,6 +126,7 @@ var Features = function (options) {
         errorMsg,
         matches;
 
+    errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
     _app.StatusBar.addLoadingMsg(feature);
 
     Xhr.ajax({
@@ -138,7 +139,7 @@ var Features = function (options) {
         _add(feature);
       },
       error: function (status, xhr) {
-        errorMsg = '<ul>';
+        errorMsg += '<ul>';
 
         // Show response in console and add additional info to error message
         if (xhr.responseText) {
