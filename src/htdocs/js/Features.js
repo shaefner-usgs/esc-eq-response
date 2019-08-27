@@ -341,16 +341,17 @@ var Features = function (options) {
     var feature,
         options;
 
-    feature = _this.getFeature(id);
-    options = {};
-    options[feature.id] = _FEATURECLASSES[feature.id]; // use variable value for key name
-
     _this.isRefreshing = true;
 
-    _remove(feature);
+    feature = _this.getFeature(id);
+    options = {};
 
+    if (feature) {
+      _remove(feature);
+    }
+
+    options[id] = _FEATURECLASSES[id];
     _this.initFeatures(options);
-
     // TODO: also refresh Fieldnotes if refreshing aftershocks
   };
 
