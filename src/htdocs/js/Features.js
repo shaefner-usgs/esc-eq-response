@@ -2,13 +2,13 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
-    /*FieldNotes = require('features/FieldNotes'),
-    FocalMechanism = require('features/FocalMechanism'),
+    //FieldNotes = require('features/FieldNotes'),
+    //FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
-    Historical = require('features/Historical'),*/
+    Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
-    /* MomentTensor = require('features/MomentTensor'),
-    ShakeMapStations = require('features/ShakeMapStations'),*/
+    //MomentTensor = require('features/MomentTensor'),
+    //ShakeMapStations = require('features/ShakeMapStations'),
     Xhr = require('util/Xhr');
 
 
@@ -23,9 +23,9 @@ var _FEATURECLASSES;
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
-  aftershocks: Aftershocks
-  //foreshocks: Foreshocks,
-  //historical: Historical,
+  aftershocks: Aftershocks,
+  foreshocks: Foreshocks,
+  historical: Historical,
   //'shakemap-stations': ShakeMapStations,
   //'focal-mechanism': FocalMechanism,
   //'moment-tensor': MomentTensor,
@@ -301,7 +301,7 @@ var Features = function (options) {
   };
 
   /**
-   * Wrapper method to loop through Feature classes and initialze them
+   * Wrapper method to loop through Feature classes and initialize them
    *
    * Skip mainshock which is added separately so it's already available
    *   for other features that depend on it.

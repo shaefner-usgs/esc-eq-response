@@ -5,54 +5,85 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Creates Historical Seismicity feature
+ * Creates Historical feature
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
  */
 var Historical = function (options) {
   var _this,
       _initialize,
 
-      _magThreshold,
+      _app,
+      _eqid,
+      _mainshock,
       _Earthquakes,
 
-      _getName;
+      _getSummary;
 
 
   _this = {};
 
   _initialize = function (options) {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'historical';
+    var urlParams,
+        years;
 
     options = options || {};
 
-    _Earthquakes = Earthquakes({
-      app: options.app,
-      id: id,
-      json: options.json,
-      mainshockJson: options.mainshockJson
-    });
-    _magThreshold = Math.floor(options.mainshockJson.properties.mag - 1);
+    _app = options.app;
+    _eqid = options.eqid;
+    _mainshock = _app.Features.getFeature('mainshock');
+
+    years = _app.AppUtil.getParam('hs-years');
+    urlParams = {
+      endtime: _app.AppUtil.Moment(_mainshock.json.properties.time - 1000).utc()
+        .toISOString().slice(0, -5),
+      latitude: _mainshock.json.geometry.coordinates[1],
+      longitude: _mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(_app.AppUtil.getParam('hs-dist')),
+      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time).utc()
+        .subtract(years, 'years').toISOString().slice(0, -5)
+    };
 
     _this.displayLayer = true;
-    _this.id = id;
-    _this.name = _getName();
+    _this.id = 'historical';
+    _this.name = 'Historical Seismicity';
+    _this.url = _app.Features.getEqFeedUrl(urlParams);
     _this.zoomToLayer = true;
   };
 
   /**
-   * Get layer name of feature (adds number of features to name)
+   * Get summary html for feature
    *
-   * @return {String}
+   * @param json {Object}
    */
-  _getName = function () {
-    return options.name + ' (' + options.json.metadata.count + ')';
+  _getSummary = function (json) {
+    var magThreshold,
+        summary;
+
+    summary = _Earthquakes.getDescription();
+
+    if (json.metadata.count > 0) {
+      magThreshold = Math.floor(_app.AppUtil.getParam('hs-mag'));
+
+      // Check if there's eq data for mag threshold; if not, decr mag by 1
+      while (!_Earthquakes.sliderData[magThreshold]) {
+        magThreshold --;
+      }
+
+      summary += _Earthquakes.getBinnedTable('prior');
+      summary += '<h3>M <span class="mag">' + magThreshold + '</span>+ ' +
+        'Earthquakes (<span class="num">' + _Earthquakes.sliderData[magThreshold] +
+        '</span>)</h3>';
+      summary += _Earthquakes.getSlider(magThreshold);
+      summary += _Earthquakes.getListTable(_Earthquakes.eqList, magThreshold);
+    }
+
+    return summary;
   };
 
   // ----------------------------------------------------------
@@ -60,38 +91,26 @@ var Historical = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get map layer of feature
+   * Create feature (map layer, plot data, summary)
+   *   invoked via Ajax callback in Features.js after json feed is loaded
    *
-   * @return {L.FeatureGroup}
+   * @param json {Object}
+   *     feed data
    */
-  _this.getMapLayer = function () {
-    return _Earthquakes.getMapLayer();
-  };
+  _this.createFeature = function (json) {
+    _Earthquakes = Earthquakes({
+      app: _app,
+      feature: _this,
+      json: json
+    });
 
-  /**
-   * Get feature's data for plots pane
-   *
-   * @return {Object}
-   */
-  _this.getPlotData = function () {
-    return {
-      detailsHtml: _Earthquakes.getDetails(),
-      plotdata: _Earthquakes.getPlotData()
-    };
-  };
-
-  /**
-   * Get feature's data for summary pane
-   *
-   * @return {Object}}
-   */
-  _this.getSummaryData = function () {
-    return {
-      bins: _Earthquakes.getBinnedData(),
-      detailsHtml: _Earthquakes.getDetails(),
-      list: _Earthquakes.getList(),
-      magThreshold: _magThreshold
-    };
+    _this.count = json.metadata.count;
+    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.plotDescription = _Earthquakes.getDescription();
+    _this.plotTraces = _Earthquakes.plotTraces;
+    _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
+    _this.summary = _getSummary(json);
+    _this.title = _this.name + ' (' + _this.count + ')';
   };
 
 
