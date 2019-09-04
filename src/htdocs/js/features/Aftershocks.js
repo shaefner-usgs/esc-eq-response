@@ -55,6 +55,8 @@ var Aftershocks = function (options) {
 
   /**
    * Get aftershock probabilities HTML
+   *
+   * @return html {String}
    */
   _getProbabilities = function () {
     var data,
@@ -112,6 +114,8 @@ var Aftershocks = function (options) {
    * Get summary html for feature
    *
    * @param json {Object}
+   *
+   * @return summary {String}
    */
   _getSummary = function (json) {
     var mag,
