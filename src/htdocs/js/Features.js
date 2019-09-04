@@ -263,11 +263,12 @@ var Features = function (options) {
    *
    * @return feature {Object}
    *   {
-   *     displayLayer: {Boolean}, // whether or not layer is "on" by default on map
+   *     displayLayer: {Boolean}, // whether or not map layer is "on" by default
    *     id: {String}, // unique id of feature
+   *     json: {String}, // json feed data (mainshock only)
    *     name: {String}, // display name of feature
-   *     url: {String}, // URL of json feed to fetch data from
-   *     zoomToLayer: {Boolean}, // Whether or not map zoooms to fit layer
+   *     url: {String}, // URL of json data feed
+   *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *
    *   The following props are optional and set after external feed data is loaded
    *
