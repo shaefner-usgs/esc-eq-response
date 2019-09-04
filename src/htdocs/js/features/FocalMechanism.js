@@ -2,8 +2,7 @@
 'use strict';
 
 
-var FocalMechanism = require('features/util/FocalMechanism'),
-    Util = require('hazdev-webutils/src/util/Util');
+var FocalMechanismUtil = require('features/util/FocalMechanism');
 
 require('features/util/CanvasMarker');
 
@@ -13,88 +12,99 @@ require('features/util/CanvasMarker');
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
  */
-var FocalMechanismFeature = function (options) {
+var FocalMechanism = function (options) {
   var _this,
       _initialize,
 
-      _json,
-      _mainshockJson,
-      _mapLayer,
+      _app,
+      _mainshock,
 
-      _createLayer,
-      _getBeachBall;
+      _getBeachBall,
+      _getMapLayer,
+      _getSummary;
 
 
   _this = {};
 
   _initialize = function (options) {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'focal-mechanism';
-
     options = options || {};
 
-    _mainshockJson = options.mainshockJson;
-    _json = options.json;
+    _app = options.app;
+    _mainshock = _app.Features.getFeature('mainshock');
 
     _this.displayLayer = false;
-    _this.id = id;
-    _this.name = options.name;
+    _this.id = 'focal-mechanism';
+    _this.name = 'Focal Mechanism';
     _this.zoomToLayer = false;
-
-    _createLayer();
   };
 
   /**
-   * Create Leaflet Layer
+   * Get focal mechanism beachball for summary pane
+   *
+   * @param size {Number}
+   *
+   * @return beachball {Object}
    */
-  _createLayer = function () {
+  _getBeachBall = function (size) {
+    var beachball,
+        focalMechanism;
+
+    focalMechanism = _mainshock.json.properties.products['focal-mechanism'][0];
+
+    if (focalMechanism) {
+      beachball = FocalMechanismUtil({
+        className: _this.id,
+        data: focalMechanism.properties,
+        size: size
+      });
+    }
+
+    return beachball;
+  };
+
+  /**
+   * Create Leaflet map layer
+   *
+   * @return mapLayer {L.layer}
+   */
+  _getMapLayer = function () {
     var beachball,
         coords,
+        mapLayer,
         size;
 
     size = 40;
 
-    // Render beachball under map for now (hidden by css)
+    // Render beachball under map (hidden by css)
     beachball = _getBeachBall({
-      size: size,
-      className: _this.id
+      size: size
     });
     beachball.render(document.querySelector('#mapPane'));
 
     coords = [
-      _mainshockJson.geometry.coordinates[1],
-      _mainshockJson.geometry.coordinates[0]
+      _mainshock.json.geometry.coordinates[1],
+      _mainshock.json.geometry.coordinates[0]
     ];
 
-    _mapLayer = L.canvasMarker(coords, {
+    mapLayer = L.canvasMarker(coords, {
       icon: L.divIcon({
         className: _this.id,
         iconSize: L.point(size, size)
       }),
       pane: _this.id // // put marker in custom Leaflet map pane
     });
+
+    return mapLayer;
   };
 
-  /**
-   * Get focal mechanism beachball for summary pane
-   *
-   * @return beachball {Object}
-   */
-  _getBeachBall = function (opts) {
-    var beachball;
-
-    opts = Util.extend({}, {
-      data: _json,
+  _getSummary = function () {
+    return _getBeachBall({
       size: 180
-    }, opts);
-    beachball = FocalMechanism(opts);
-
-    return beachball;
+    });
   };
 
   // ----------------------------------------------------------
@@ -102,22 +112,14 @@ var FocalMechanismFeature = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get map layer of feature
-   *
-   * @return {L.FeatureGroup}
+   * Create feature (map layer, plot data, summary)
+   *   invoked via Ajax callback in Features.js after json feed is loaded
    */
-  _this.getMapLayer = function () {
-    return _mapLayer;
+  _this.createFeature = function () {
+    _this.mapLayer = _getMapLayer();
+    _this.summary = _getSummary();
   };
 
-  /**
-   * Get feature's data for summary pane
-   *
-   * @return {Object}
-   */
-  _this.getSummaryData = function () {
-    return _getBeachBall();
-  };
 
   _initialize(options);
   options = null;
@@ -125,4 +127,4 @@ var FocalMechanismFeature = function (options) {
 };
 
 
-module.exports = FocalMechanismFeature;
+module.exports = FocalMechanism;
