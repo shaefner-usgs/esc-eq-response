@@ -43,7 +43,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get focal mechanism beachball for summary pane
+   * Get focal mechanism beachball
    *
    * @param size {Number}
    *
@@ -80,9 +80,7 @@ var FocalMechanism = function (options) {
     size = 40;
 
     // Render beachball under map (hidden by css)
-    beachball = _getBeachBall({
-      size: size
-    });
+    beachball = _getBeachBall(size);
     beachball.render(document.querySelector('#mapPane'));
 
     coords = [
@@ -102,9 +100,7 @@ var FocalMechanism = function (options) {
   };
 
   _getSummary = function () {
-    return _getBeachBall({
-      size: 180
-    });
+    return _getBeachBall(180);
   };
 
   // ----------------------------------------------------------
