@@ -62,6 +62,7 @@ var Application = function (options) {
     });
 
     _this.AppUtil = AppUtil;
+
     _this.EditPane = EditPane({
       app: _this,
       el: options.editPane

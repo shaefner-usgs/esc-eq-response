@@ -190,7 +190,7 @@ var NavBar = function (options) {
     // Scroll to user's former position
     _setScrollPosition(id);
 
-    // Update map container / render plots so they display correctly when unhidden
+    // Update map container / render plots when unhidden so they display correctly
     if (id === 'mapPane') {
       _app.MapPane.map.invalidateSize();
       _app.MapPane.initView();

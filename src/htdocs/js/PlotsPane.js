@@ -281,7 +281,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot traces
+   * Get plot traces (and add mainshock trace to hypocenters and magtime plots)
    *
    * @param feature {Object}
    * @param plotId {String}
