@@ -3,7 +3,7 @@
 
 var Aftershocks = require('features/Aftershocks'),
     //FieldNotes = require('features/FieldNotes'),
-    //FocalMechanism = require('features/FocalMechanism'),
+    FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
@@ -27,7 +27,7 @@ _FEATURECLASSES = {
   foreshocks: Foreshocks,
   historical: Historical,
   //'shakemap-stations': ShakeMapStations,
-  //'focal-mechanism': FocalMechanism,
+  'focal-mechanism': FocalMechanism,
   //'moment-tensor': MomentTensor,
   //fieldnotes: FieldNotes
 };
@@ -113,7 +113,13 @@ var Features = function (options) {
       app: _app,
       eqid: _eqid
     });
-    _load(feature);
+
+    if (feature.url) { // load external feed data
+      _load(feature);
+    } else { // no external feed data; just create and add feature
+      feature.createFeature();
+      _add(feature);
+    }
   };
 
   /**
@@ -265,14 +271,14 @@ var Features = function (options) {
    *   {
    *     displayLayer: {Boolean}, // whether or not map layer is "on" by default
    *     id: {String}, // unique id of feature
-   *     json: {String}, // json feed data (mainshock only)
    *     name: {String}, // display name of feature
-   *     url: {String}, // URL of json data feed
+   *     url: {String}, // URL of json data feed (optional)
    *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *
-   *   The following props are optional and set after external feed data is loaded
+   *   The following props are set after external feed data is loaded (optional)
    *
    *     count: {Number}, // number of features in layer
+   *     json: {String}, // json feed data (mainshock only)
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
    *     plotDescription: {String}, // text description to accompany plots
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
