@@ -21,6 +21,7 @@ var FocalMechanism = function (options) {
       _initialize,
 
       _app,
+      _eqid,
       _mainshock,
 
       _getBeachBall,
@@ -34,6 +35,7 @@ var FocalMechanism = function (options) {
     options = options || {};
 
     _app = options.app;
+    _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.displayLayer = false;
@@ -43,7 +45,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get focal mechanism beachball
+   * Create focal mechanism beachball
    *
    * @param size {Number}
    *
@@ -53,12 +55,12 @@ var FocalMechanism = function (options) {
     var beachball,
         focalMechanism;
 
-    focalMechanism = _mainshock.json.properties.products['focal-mechanism'][0];
+    focalMechanism = _mainshock.json.properties.products['focal-mechanism'];
 
     if (focalMechanism) {
       beachball = FocalMechanismUtil({
         className: _this.id,
-        data: focalMechanism.properties,
+        data: focalMechanism[0].properties,
         size: size
       });
     }
@@ -79,9 +81,11 @@ var FocalMechanism = function (options) {
 
     size = 40;
 
-    // Render beachball under map (hidden by css)
+    // Render hidden (via css) beachball (moved to map when layer is turned on)
     beachball = _getBeachBall(size);
-    beachball.render(document.querySelector('#mapPane'));
+    if (beachball) {
+      beachball.render(document.querySelector('#mapPane'));
+    }
 
     coords = [
       _mainshock.json.geometry.coordinates[1],
@@ -93,14 +97,33 @@ var FocalMechanism = function (options) {
         className: _this.id,
         iconSize: L.point(size, size)
       }),
-      pane: _this.id // // put marker in custom Leaflet map pane
+      pane: _this.id // put marker in custom Leaflet map pane
     });
 
     return mapLayer;
   };
 
+  /**
+   * Create summary
+   *
+   * @return summary {String}
+   */
   _getSummary = function () {
-    return _getBeachBall(180);
+    var beachball,
+        summary,
+        url;
+
+    beachball = _getBeachBall(180);
+    if (beachball) {
+      // Render hidden (via css) beachball (moved into place after summary added)
+      beachball.render(document.querySelector('#summaryPane'));
+
+      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
+        '/focal-mechanism';
+      summary = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
+    }
+
+    return summary;
   };
 
   // ----------------------------------------------------------
@@ -108,8 +131,7 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer, plot data, summary)
-   *   invoked via Ajax callback in Features.js after json feed is loaded
+   * Create feature (map layer, summary) - invoked via Features.js
    */
   _this.createFeature = function () {
     _this.mapLayer = _getMapLayer();

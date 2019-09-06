@@ -383,10 +383,18 @@ var MapPane = function (options) {
    * Reset state and set default map extent
    */
   _this.reset = function () {
+    var canvasEls,
+        i;
+
     _bounds = L.latLngBounds();
 
     _this.initialLoad = true;
     _this.map.setView([40, -96], 4); // United States
+
+    canvasEls = _el.querySelectorAll('canvas');
+    for (i = 0; i < canvasEls.length; i ++) {
+      _el.removeChild(canvasEls[i]);
+    }
   };
 
 

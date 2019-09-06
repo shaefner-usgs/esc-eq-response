@@ -148,7 +148,7 @@ var SummaryPane = function (options) {
 
     return value;
   };
-  
+
   /**
    * Get timezone of user's device
    * http://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
@@ -329,28 +329,42 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.add = function (feature) {
-    var div,
-        input,
-        title,
-        table;
+    var canvas,
+        div,
+        placeholder,
+        slider,
+        table,
+        title;
 
     if (feature.summary) {
-      title = feature.title || feature.name;
+      canvas = _el.querySelector('canvas.' + feature.id);
+      placeholder = _el.querySelector('div.' + feature.id);
 
-      div = document.createElement('div');
-      div.classList.add('content', 'lighter', 'feature', feature.id);
-      div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
+      if (placeholder) { // add summary to placeholder
+        placeholder.innerHTML = feature.summary;
+        placeholder.classList.remove('hide');
+        if (canvas) { // move beachball into place
+          placeholder.querySelector('a').appendChild(canvas);
+        }
+      } else { // create parent element and add title / summary
+        title = feature.title || feature.name;
 
-      _features.appendChild(div);
+        div = document.createElement('div');
+        div.classList.add('content', 'lighter', 'feature', feature.id);
+        div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
 
-      input = div.querySelector('input');
-      table = div.querySelector('table.eqlist');
-      if (input) {
-        _setSliderStyles(input, feature.id); // set initial colored section of range slider
-      }
-      if (table) {
-        _addListeners(div, feature.sliderData);
-        _initTableSort(feature.id);
+        _features.appendChild(div);
+
+        // Configure dynamic elements (sliders, table sorting) if present
+        slider = div.querySelector('.slider input');
+        table = div.querySelector('table.eqlist');
+        if (slider) {
+          _setSliderStyles(slider, feature.id); // set initial colored section of range slider
+        }
+        if (table) {
+          _addListeners(div, feature.sliderData);
+          _initTableSort(feature.id);
+        }
       }
 
       _updateTimestamp();

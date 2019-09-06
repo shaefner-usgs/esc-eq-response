@@ -18,6 +18,7 @@ var MainshockFeature = function (options) {
       _initialize,
 
       _app,
+      _eqid,
       _Earthquakes,
 
       _getSummary;
@@ -29,12 +30,13 @@ var MainshockFeature = function (options) {
     options = options || {};
 
     _app = options.app;
+    _eqid = options.eqid;
 
     _this.displayLayer = true;
     _this.id = 'mainshock';
     _this.name = 'Mainshock';
     _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      options.eqid + '.geojson';
+      _eqid + '.geojson';
     _this.zoomToLayer = true;
   };
 
@@ -49,11 +51,14 @@ var MainshockFeature = function (options) {
         products,
         summary;
 
-    baseUrl = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
-      _app.AppUtil.getParam('eqid');
+    baseUrl = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid;
     products = _this.json.properties.products;
     summary = '<div class="products">';
     summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
+
+    // Add placeholders for beachballs
+    summary += '<div class="focal-mechanism hide scale"></div>';
+    summary += '<div class="moment-tensor hide scale"></div>';
 
     if (products.dyfi) {
       cdi = _app.AppUtil.romanize(_this.json.properties.cdi);
@@ -73,12 +78,6 @@ var MainshockFeature = function (options) {
         '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
         mmi + '" /></a></div>';
     }
-
-    // Add placeholders for beachballs
-    summary += '<div class="focal-mechanism hide scale">' +
-      '<a href="' + baseUrl + '/focal-mechanism"><h4></h4></a></div>';
-    summary += '<div class="moment-tensor hide scale">' +
-      '<a href="' + baseUrl + '/moment-tensor"><h4></h4></a></div>';
 
     summary += '</div>';
 
