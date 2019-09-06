@@ -2,7 +2,7 @@
 'use strict';
 
 
-var MomentTensor = require('features/util/MomentTensor'),
+var BeachBall = require('features/util/BeachBall'),
     Util = require('hazdev-webutils/src/util/Util');
 
 require('features/util/CanvasMarker');
@@ -18,7 +18,7 @@ require('features/util/CanvasMarker');
  *     name: {String} // layer name
  *   }
  */
-var MomentTensorFeature = function (options) {
+var MomentTensor = function (options) {
   var _this,
       _initialize,
 
@@ -92,7 +92,7 @@ var MomentTensorFeature = function (options) {
       data: _json,
       size: 180
     }, opts);
-    beachball = MomentTensor(opts);
+    beachball = BeachBall(opts);
 
     return beachball;
   };
@@ -125,4 +125,4 @@ var MomentTensorFeature = function (options) {
 };
 
 
-module.exports = MomentTensorFeature;
+module.exports = MomentTensor;

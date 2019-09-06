@@ -2,7 +2,7 @@
 'use strict';
 
 
-var FocalMechanismUtil = require('features/util/FocalMechanism');
+var BeachBall = require('features/util/BeachBall');
 
 require('features/util/CanvasMarker');
 
@@ -58,10 +58,12 @@ var FocalMechanism = function (options) {
     focalMechanism = _mainshock.json.properties.products['focal-mechanism'];
 
     if (focalMechanism) {
-      beachball = FocalMechanismUtil({
+      beachball = BeachBall({
         className: _this.id,
         data: focalMechanism[0].properties,
-        size: size
+        fillColor: '#ffaa69',
+        size: size,
+        type: _this.id
       });
     }
 
