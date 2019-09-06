@@ -350,7 +350,7 @@ var SummaryPane = function (options) {
         title = feature.title || feature.name;
 
         div = document.createElement('div');
-        div.classList.add('content', 'lighter', 'feature', feature.id);
+        div.classList.add('content', 'feature', feature.id);
         div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
 
         _features.appendChild(div);
