@@ -47,7 +47,7 @@ var Earthquakes = function (options) {
 
       _app,
       _bins,
-      _featureId,
+      _id,
       _mainshockLatlon,
       _mainshockMoment,
       _markerOptions,
@@ -81,7 +81,7 @@ var Earthquakes = function (options) {
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _app = options.app;
-    _featureId = options.feature.id;
+    _id = options.id;
 
     _bins = {};
     _plotData = {
@@ -97,20 +97,18 @@ var Earthquakes = function (options) {
       time: []
     };
 
-    if (_featureId === 'mainshock') {
-      mainshock = options.feature;
-    } else {
+    if (_id !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
-    }
 
-    // Parameters used to calculate age and distance/direction from mainshock
-    coords = mainshock.json.geometry.coordinates;
-    _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
-    _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
-    _nowMoment = _app.AppUtil.Moment.utc();
-    _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
-    _pastHourMoment = _app.AppUtil.Moment.utc().subtract(1, 'hours');
-    _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
+      // Parameters used to calculate age and distance/direction from mainshock
+      coords = mainshock.json.geometry.coordinates;
+      _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
+      _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
+      _nowMoment = _app.AppUtil.Moment.utc();
+      _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
+      _pastHourMoment = _app.AppUtil.Moment.utc().subtract(1, 'hours');
+      _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
+    }
 
     // Templates for creating HTML using L.Util.template utility
     _tooltipTemplate = _getHtmlTemplate('tooltip');
@@ -164,7 +162,7 @@ var Earthquakes = function (options) {
 
       _bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
-        if (_featureId !== 'foreshocks') {
+        if (_id !== 'foreshocks') {
           _bins[type][magInt][365] ++;
         }
         if (days <= 30) {
@@ -194,14 +192,14 @@ var Earthquakes = function (options) {
         threshold;
 
     mag = _app.AppUtil.round(feature.properties.mag, 1);
-    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag');
-    if (mag >= threshold || _featureId === 'mainshock') { // don't filter out mainshock
+    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+    if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
     }
   };
 
   /**
-   * Get 'age' of earthquake (pasthour, pastday, etc)
+   * Get 'age' of earthquake (mainshock, pasthour, pastday, historical, etc)
    *
    * @param timestamp {Int}
    *     milliseconds since 1970
@@ -213,14 +211,14 @@ var Earthquakes = function (options) {
         eqMoment;
 
     eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (eqMoment.isBefore(_mainshockMoment)) {
-      if (_featureId === 'foreshocks') {
+    if (_id === 'mainshock') {
+      age = 'mainshock';
+    } else if (eqMoment.isBefore(_mainshockMoment)) {
+      if (_id === 'foreshocks') {
         age = 'foreshock';
       } else {
         age = 'historical';
       }
-    } else if (eqMoment.isSame(_mainshockMoment)) {
-      age = 'mainshock';
     } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
       age = 'pasthour';
     } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
@@ -285,7 +283,7 @@ var Earthquakes = function (options) {
     intervals[1] = 0;
     intervals[7] = 0;
     intervals[30] = 0;
-    if (_featureId !== 'foreshocks') {
+    if (_id !== 'foreshocks') {
       intervals[365] = 0;
     }
 
@@ -373,7 +371,7 @@ var Earthquakes = function (options) {
       });
 
       // Add origin point (mainshock) to beginning of aftershocks trace
-      if (_featureId === 'aftershocks') {
+      if (_id === 'aftershocks') {
         mainshockId = _app.AppUtil.getParam('eqid');
         date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
         eqid.unshift(mainshockId);
@@ -404,7 +402,7 @@ var Earthquakes = function (options) {
 
     trace = {
       eqid: eqid,
-      feature: _featureId,
+      feature: _id,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
@@ -479,11 +477,13 @@ var Earthquakes = function (options) {
     eqid = feature.id;
     props = feature.properties;
 
-    latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
-    distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-    bearing = _mainshockLatlon.bearing(latlon);
-    compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
-    bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
+    if (_id !== 'mainshock') {
+      latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
+      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+      bearing = _mainshockLatlon.bearing(latlon);
+      compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
+      bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
+    }
 
     eqMoment = _app.AppUtil.Moment.utc(props.time, 'x');
     mag = _app.AppUtil.round(props.mag, 1);
@@ -548,7 +548,7 @@ var Earthquakes = function (options) {
     _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
-    if (_featureId === 'aftershocks') {
+    if (_id === 'aftershocks') {
       days = Math.ceil(_app.AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'first');
@@ -557,7 +557,7 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'past');
     }
-    else if (_featureId === 'historical' || _featureId === 'foreshocks') {
+    else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.ceil(_app.AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
@@ -588,7 +588,7 @@ var Earthquakes = function (options) {
     radius = _app.AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _featureId; // put markers in custom Leaflet map pane
+    _markerOptions.pane = _id; // put markers in custom Leaflet map pane
     _markerOptions.radius = radius;
 
     // Add props to plotData (additional props are added in _onEachFeature)
@@ -686,22 +686,22 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-dist');
-    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag');
+    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
       'earthquakes within <strong>' + distance + ' km</strong> of the ' +
       'mainshock&rsquo;s epicenter';
 
-    if (_featureId === 'aftershocks') {
+    if (_id === 'aftershocks') {
       duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
         _mainshockMoment).asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
         duration + '</strong>';
     } else {
-      if (_featureId === 'foreshocks') {
+      if (_id === 'foreshocks') {
         duration = _app.AppUtil.getParam('fs-days') + ' days';
-      } else if (_featureId === 'historical') {
+      } else if (_id === 'historical') {
         duration = _app.AppUtil.getParam('hs-years') + ' years';
       }
       description += ' in the prior <strong>' + duration + '</strong> ' +
@@ -792,16 +792,16 @@ var Earthquakes = function (options) {
     if (!singleMagBin) {
       mags = Object.keys(_bins.sliderData);
       max = Math.max.apply(null, mags);
-      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_featureId) + '-mag'));
+      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 
       html += '<div class="filter">';
       html += '<h4>Filter earthquakes by magnitude</h4>';
       html += '<div class="min">' + min + '</div>';
       html += '<div class="inverted slider" style="--min: ' + min +
         '; --max: ' + max + '; --val: ' + mag + ';">';
-      html += '<input id="' + _featureId + '" type="range" min="' + min +
+      html += '<input id="' + _id + '" type="range" min="' + min +
         '" max="' + max + '" value="' + mag + '"/>';
-      html += '<output for="'+ _featureId + '">' + mag + '</output>';
+      html += '<output for="'+ _id + '">' + mag + '</output>';
       html += '</div>';
       html += '<div class="max">' + max + '</div>';
       html += '</div>';

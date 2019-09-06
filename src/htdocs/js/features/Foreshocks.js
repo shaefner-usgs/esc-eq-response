@@ -100,7 +100,7 @@ var Foreshocks = function (options) {
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({
       app: _app,
-      feature: _this,
+      id: _this.id,
       json: json
     });
 
