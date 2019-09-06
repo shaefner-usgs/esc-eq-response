@@ -9,8 +9,11 @@
   .aftershocks {
     order: 0;
   }
-  .historical {
+  .foreshocks {
     order: 1;
+  }
+  .historical {
+    order: 2;
   }
 
   .cumulative {
