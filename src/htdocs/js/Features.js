@@ -77,9 +77,8 @@ var Features = function (options) {
     _features[feature.id] = feature;
 
     try {
-      // Create a new map pane and add feature to map, summary and plot panes
-      _app.MapPane.createMapPane(feature.id, 'overlayPane');
-      _app.MapPane.addFeatureLayer(feature);
+      // Add feature to map, summary and plot panes
+      _app.MapPane.add(feature);
       _app.PlotsPane.add(feature);
       _app.SummaryPane.add(feature);
 

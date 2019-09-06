@@ -39,6 +39,7 @@ var MapPane = function (options) {
 
       _addLayerControl,
       _compareLayers,
+      _createMapPane,
       _fitBounds,
       _getLayerId,
       _getSortValue,
@@ -103,6 +104,18 @@ var MapPane = function (options) {
     }
 
     return 0;
+  };
+
+  /**
+   * Create a separate MapPane for each feature (used to control stacking order)
+   *
+   * @param id {String}
+   * @param parent {String <overlayPane | tilePane>}
+   */
+  _createMapPane = function (id, parent) {
+    if (!_this.map.getPane(id)) {
+      _this.map.createPane(id, _this.map.getPane(parent));
+    }
   };
 
   /**
@@ -237,7 +250,7 @@ var MapPane = function (options) {
     _this.reset();
 
     // Create custom pane for Faults overlay within tilePane
-    _this.createMapPane('faults', 'tilePane'); // pane is applied in Faults factory
+    _createMapPane('faults', 'tilePane'); // pane is applied in Faults factory
 
     // Add default layers to map (i.e. toggle on in layer control)
     _staticLayers.defaults.forEach(function(layer) {
@@ -295,34 +308,25 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add 'dynamic' Feature layer to map
+   * Add feature to map pane
    *
    * @param feature {Object}
    */
-  _this.addFeatureLayer = function (feature) {
+  _this.add = function (feature) {
     var title = feature.title || feature.name;
+
+    _createMapPane(feature.id, 'overlayPane');
 
     // Add layer to controller
     _this.layerControl.addOverlay(feature.mapLayer, title);
 
-    // Turn layer "on" / zoom map if set to be displayed / zoomed by default
+    // Turn layer "on" and zoom map if set to be displayed / zoomed by default
     if (feature.displayLayer) {
       _this.map.addLayer(feature.mapLayer);
-    }
-    if (feature.zoomToLayer) {
-      _setBounds(feature);
-    }
-  };
 
-  /**
-   * Create a separate MapPane for each Feature - used to control stacking order
-   *
-   * @param id {String}
-   * @param parent {String <overlayPane | tilePane>}
-   */
-  _this.createMapPane = function (id, parent) {
-    if (!_this.map.getPane(id)) {
-      _this.map.createPane(id, _this.map.getPane(parent));
+      if (feature.zoomToLayer) {
+        _setBounds(feature);
+      }
     }
   };
 
