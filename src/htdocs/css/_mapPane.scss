@@ -12,7 +12,7 @@
   canvas {
     width: 40px;
   }
-  /* hide 'placeholder' moment tensor / focal mech. beachballs */
+  /* hide rendered beachballs not turned on in layer controller */
   > canvas {
     display: none;
   }
