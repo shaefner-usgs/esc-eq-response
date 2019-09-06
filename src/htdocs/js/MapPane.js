@@ -33,6 +33,7 @@ var MapPane = function (options) {
       _app,
       _bounds,
       _el,
+      _initialLoad,
       _mapNavButton,
       _staticLayers,
 
@@ -54,11 +55,11 @@ var MapPane = function (options) {
     options = options || {};
 
     _app = options.app;
+    _bounds = L.latLngBounds();
     _el = options.el || document.createElement('div');
+    _initialLoad = true;
     _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
     _staticLayers = _getStaticLayers();
-
-    _this.initialLoad = true;
 
     _initMap();
   };
@@ -330,11 +331,11 @@ var MapPane = function (options) {
    *   necessary to do this because Leaflet can't manipulate map when not visible
    */
   _this.initView = function () {
-    if (_this.initialLoad) {
+    if (_initialLoad) {
       _fitBounds();
     }
 
-    _this.initialLoad = false;
+    _initialLoad = false;
   };
 
   /**
@@ -387,8 +388,8 @@ var MapPane = function (options) {
         i;
 
     _bounds = L.latLngBounds();
+    _initialLoad = true;
 
-    _this.initialLoad = true;
     _this.map.setView([40, -96], 4); // United States
 
     canvasEls = _el.querySelectorAll('canvas');
