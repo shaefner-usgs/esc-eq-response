@@ -2,99 +2,130 @@
 'use strict';
 
 
-var BeachBall = require('features/util/BeachBall'),
-    Util = require('hazdev-webutils/src/util/Util');
+var BeachBall = require('features/util/BeachBall');
 
 require('features/util/CanvasMarker');
 
 
 /**
- * Creates Moment Tensor feature
+ * Create Moment Tensor feature
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
  */
 var MomentTensor = function (options) {
   var _this,
       _initialize,
 
-      _json,
-      _mainshockJson,
-      _mapLayer,
+      _app,
+      _eqid,
+      _mainshock,
 
-      _createLayer,
-      _getBeachBall;
+      _getBeachBall,
+      _getMapLayer,
+      _getSummary;
 
 
   _this = {};
 
   _initialize = function (options) {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'moment-tensor';
-
     options = options || {};
 
-    _mainshockJson = options.mainshockJson;
-    _json = options.json;
+    _app = options.app;
+    _eqid = options.eqid;
+    _mainshock = _app.Features.getFeature('mainshock');
 
     _this.displayLayer = false;
-    _this.id = id;
-    _this.name = options.name;
+    _this.id = 'moment-tensor';
+    _this.name = 'Moment Tensor';
     _this.zoomToLayer = false;
-
-    _createLayer();
   };
 
   /**
-   * Create Leaflet Layer
+   * Create moment tensor beachball
+   *
+   * @param size {Number}
+   *
+   * @return beachball {Object}
    */
-  _createLayer = function () {
+  _getBeachBall = function (size) {
+    var beachball,
+        momentTensor;
+
+    momentTensor = _mainshock.json.properties.products['moment-tensor'];
+
+    if (momentTensor) {
+      beachball = BeachBall({
+        className: _this.id,
+        data: momentTensor[0].properties,
+        fillColor: '#6ea8ff',
+        size: size,
+        type: _this.id
+      });
+    }
+
+    return beachball;
+  };
+
+  /**
+   * Create Leaflet map layer
+   *
+   * @return mapLayer {L.layer}
+   */
+  _getMapLayer = function () {
     var beachball,
         coords,
+        mapLayer,
         size;
 
     size = 40;
 
-    // Render beachball under map for now (hidden by css)
-    beachball = _getBeachBall({
-      size: size,
-      className: _this.id
-    });
-    beachball.render(document.querySelector('#mapPane'));
+    // Render hidden (via css) beachball (moved to map when layer is turned on)
+    beachball = _getBeachBall(size);
+    if (beachball) {
+      beachball.render(document.querySelector('#mapPane'));
+    }
 
     coords = [
-      _mainshockJson.geometry.coordinates[1],
-      _mainshockJson.geometry.coordinates[0]
+      _mainshock.json.geometry.coordinates[1],
+      _mainshock.json.geometry.coordinates[0]
     ];
 
-    _mapLayer = L.canvasMarker(coords, {
+    mapLayer = L.canvasMarker(coords, {
       icon: L.divIcon({
         className: _this.id,
         iconSize: L.point(size, size)
       }),
-      pane: _this.id // put markers in custom Leaflet map pane
+      pane: _this.id // put marker in custom Leaflet map pane
     });
+
+    return mapLayer;
   };
 
   /**
-   * Get moment tensor beachball for summary pane
+   * Create summary
    *
-   * @return beachball {Object}
+   * @return summary {String}
    */
-  _getBeachBall = function (opts) {
-    var beachball;
+  _getSummary = function () {
+    var beachball,
+        summary,
+        url;
 
-    opts = Util.extend({}, {
-      data: _json,
-      size: 180
-    }, opts);
-    beachball = BeachBall(opts);
+    beachball = _getBeachBall(180);
+    if (beachball) {
+      // Render hidden (via css) beachball (moved into place after summary added)
+      beachball.render(document.querySelector('#summaryPane'));
 
-    return beachball;
+      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
+        '/moment-tensor';
+      summary = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
+    }
+
+    return summary;
   };
 
   // ----------------------------------------------------------
@@ -102,22 +133,13 @@ var MomentTensor = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get map layer of feature
-   *
-   * @return {L.FeatureGroup}
+   * Create feature (map layer, summary) - invoked via Features.js
    */
-  _this.getMapLayer = function () {
-    return _mapLayer;
+  _this.createFeature = function () {
+    _this.mapLayer = _getMapLayer();
+    _this.summary = _getSummary();
   };
 
-  /**
-   * Get feature's data for summary pane
-   *
-   * @return {Object}
-   */
-  _this.getSummaryData = function () {
-    return _getBeachBall();
-  };
 
   _initialize(options);
   options = null;
