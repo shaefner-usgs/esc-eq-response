@@ -276,13 +276,13 @@ var Features = function (options) {
    *
    *   The following props are set after external feed data is loaded (optional)
    *
-   *     count: {Number}, // number of features in layer
    *     json: {String}, // json feed data (mainshock only)
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
    *     plotDescription: {String}, // text description to accompany plots
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
    *     sliderData: {Object}, // data for eq mag filters on SummaryPane
-   *     summary: {String} // HTML for SummaryPane
+   *     summary: {String}, // HTML for SummaryPane
+   *     title: {Number} // typically the feature's name with count appended
    *   }
    */
   _this.getFeature = function (id) {
