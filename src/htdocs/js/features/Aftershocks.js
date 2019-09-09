@@ -5,7 +5,7 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Creates Aftershocks feature
+ * Create Aftershocks feature
  *
  * @param options {Object}
  *   {
@@ -111,7 +111,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get summary html for feature
+   * Get summary HTML
    *
    * @param json {Object}
    *
@@ -164,7 +164,7 @@ var Aftershocks = function (options) {
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}
-   *     feed data
+   *     feed data for feature
    */
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({

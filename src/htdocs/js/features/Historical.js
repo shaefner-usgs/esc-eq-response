@@ -5,7 +5,7 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Creates Historical feature
+ * Create Historical feature
  *
  * @param options {Object}
  *   {
@@ -57,9 +57,11 @@ var Historical = function (options) {
   };
 
   /**
-   * Get summary html for feature
+   * Get summary HTML
    *
    * @param json {Object}
+   *
+   * @return summary {String}
    */
   _getSummary = function (json) {
     var magThreshold,
@@ -95,7 +97,7 @@ var Historical = function (options) {
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}
-   *     feed data
+   *     feed data for feature
    */
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({

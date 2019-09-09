@@ -8,7 +8,7 @@ require('mappane/CanvasMarker');
 
 
 /**
- * Creates Focal Mechanism feature
+ * Create Focal Mechanism feature
  *
  * @param options {Object}
  *   {
@@ -45,7 +45,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Create focal mechanism beachball
+   * Get focal mechanism beachball
    *
    * @param size {Number}
    *
@@ -71,7 +71,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Create Leaflet map layer
+   * Get Leaflet map layer
    *
    * @return mapLayer {L.layer}
    */
@@ -106,7 +106,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Create summary
+   * Get summary HTML
    *
    * @return summary {String}
    */

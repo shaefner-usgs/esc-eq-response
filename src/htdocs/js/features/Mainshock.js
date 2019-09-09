@@ -41,7 +41,9 @@ var MainshockFeature = function (options) {
   };
 
   /**
-   * Get summary html for feature
+   * Get summary HTML
+   *
+   * @return summary {String}
    */
   _getSummary = function () {
     var baseUrl,
@@ -91,6 +93,9 @@ var MainshockFeature = function (options) {
   /**
    * Create feature (map layer, plot data, summary)
    *   invoked via Ajax callback in Features.js after json feed is loaded
+   *
+   * @param json {Object}
+   *     feed data for feature
    */
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({

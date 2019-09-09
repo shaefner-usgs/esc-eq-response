@@ -5,7 +5,7 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Creates Foreshocks feature
+ * Create Foreshocks feature
  *
  * @param options {Object}
  *   {
@@ -60,6 +60,8 @@ var Foreshocks = function (options) {
    * Get summary html for feature
    *
    * @param json {Object}
+   *
+   * @return summary {String}
    */
   _getSummary = function (json) {
     var magThreshold,
@@ -95,7 +97,7 @@ var Foreshocks = function (options) {
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}
-   *     feed data
+   *     feed data for feature
    */
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({
