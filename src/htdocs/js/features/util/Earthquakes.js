@@ -11,7 +11,7 @@ var _COLORS,
 
 _COLORS = {
   historical: '#dde',
-  foreshock: '#99a',
+  foreshocks: '#99a',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
@@ -37,8 +37,8 @@ _DEFAULTS = {
  * @param options {Object}
  *   {
  *     app: {Object},
- *     feature: {Object},
- *     json: {Object}
+ *     id: {String}, // Feature id
+ *     json: {Object} // Feature json data
  *   }
  */
 var Earthquakes = function (options) {
@@ -78,10 +78,10 @@ var Earthquakes = function (options) {
         mainshock;
 
     options = Util.extend({}, _DEFAULTS, options);
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _app = options.app;
     _id = options.id;
+    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     _bins = {};
     _plotData = {
@@ -96,12 +96,16 @@ var Earthquakes = function (options) {
       text: [],
       time: []
     };
+    // Templates for creating HTML using L.Util.template utility
+    _popupTemplate = _getHtmlTemplate('popup');
+    _tablerowTemplate = _getHtmlTemplate('tablerow');
+    _tooltipTemplate = _getHtmlTemplate('tooltip');
 
     if (_id !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
-
-      // Parameters used to calculate age and distance/direction from mainshock
       coords = mainshock.json.geometry.coordinates;
+
+      // Parameters used to calculate days and distance/direction from mainshock
       _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
       _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
       _nowMoment = _app.AppUtil.Moment.utc();
@@ -110,25 +114,17 @@ var Earthquakes = function (options) {
       _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
     }
 
-    // Templates for creating HTML using L.Util.template utility
-    _tooltipTemplate = _getHtmlTemplate('tooltip');
-    _popupTemplate = _getHtmlTemplate('popup');
-    _tablerowTemplate = _getHtmlTemplate('tablerow');
-
     _this.eqList = {};
-
     _this.mapLayer = L.geoJson(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-
     _this.plotTraces = {
       magtime: _getPlotlyTrace('magtime', 'scatter'),
       cumulative: _getPlotlyTrace('cumulative', 'scatter'),
       hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
     };
-
     _this.sliderData = _bins.sliderData;
   };
 
@@ -210,23 +206,19 @@ var Earthquakes = function (options) {
     var age,
         eqMoment;
 
-    eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
-    if (_id === 'mainshock') {
-      age = 'mainshock';
-    } else if (eqMoment.isBefore(_mainshockMoment)) {
-      if (_id === 'foreshocks') {
-        age = 'foreshock';
+    age = _id; // for everything except aftershocks
+
+    if (_id === 'aftershocks') {
+      eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
+      if (eqMoment.isSameOrAfter(_pastHourMoment)) {
+        age = 'pasthour';
+      } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
+        age = 'pastday';
+      } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
+        age = 'pastweek';
       } else {
-        age = 'historical';
+        age = 'older';
       }
-    } else if (eqMoment.isSameOrAfter(_pastHourMoment)) {
-      age = 'pasthour';
-    } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
-      age = 'pastday';
-    } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
-      age = 'pastweek';
-    } else {
-      age = 'older';
     }
 
     return age;
