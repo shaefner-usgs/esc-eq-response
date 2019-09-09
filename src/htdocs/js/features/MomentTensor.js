@@ -45,7 +45,7 @@ var MomentTensor = function (options) {
   };
 
   /**
-   * Create moment tensor beachball
+   * Get moment tensor beachball
    *
    * @param size {Number}
    *
@@ -71,7 +71,7 @@ var MomentTensor = function (options) {
   };
 
   /**
-   * Create Leaflet map layer
+   * Get Leaflet map layer
    *
    * @return mapLayer {L.layer}
    */
@@ -106,7 +106,7 @@ var MomentTensor = function (options) {
   };
 
   /**
-   * Create summary
+   * Get summary HTML
    *
    * @return summary {String}
    */
