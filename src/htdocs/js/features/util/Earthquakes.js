@@ -31,8 +31,8 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquake json feed and create Leaflet map layer, Plotly.js trace, and
- *   content for summary/plot panes.
+ * Parse earthquake json feed and create Leaflet map layer, Plotly.js traces,
+ *   and tabular content for summary pane.
  *
  * @param options {Object}
  *   {
@@ -129,7 +129,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Bin earthquakes by magnitude and time period (type)
+   * Bin earthquakes by magnitude and time period (type); also bin earthquake
+   *   totals for interactive sliders that filter earthquake tables by magnitude
    *
    * @param days {Integer}
    * @param magInt {Integer}
@@ -140,22 +141,23 @@ var Earthquakes = function (options) {
         intervals;
 
     if (!_bins[type]) {
-      _bins[type] = [];
+      _bins[type] = []; // initialize type array
     }
 
     if (type === 'sliderData') {
       for (i = magInt; i >= 0; i --) {
-        if (!_bins[type][i]) {
-          _bins[type][i] = 0;
+        if (!_bins.sliderData[i]) {
+          _bins.sliderData[i] = 0;
         }
-        _bins[type][i] ++;
+        _bins.sliderData[i] ++;
       }
-    } else {
+    } else { // first, past, or prior
       if (!_bins[type][magInt]) {
-        intervals = _getIntervals();
+        intervals = _getIntervals(); // initialize interval arrays
         _bins[type][magInt] = intervals;
       }
 
+      // Add eq to bins
       _bins[type][magInt][0] ++; // total
       if (days <= 365) { // bin eqs within one year of period
         if (_id !== 'foreshocks') {
@@ -189,6 +191,7 @@ var Earthquakes = function (options) {
 
     mag = _app.AppUtil.round(feature.properties.mag, 1);
     threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+
     if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
     }
@@ -229,7 +232,7 @@ var Earthquakes = function (options) {
    *
    * @param data {Object}
    *
-   * @return bubbles {Html}
+   * @return bubbles {String}
    */
   _getBubbles = function (data) {
     var bubbles,
@@ -237,26 +240,26 @@ var Earthquakes = function (options) {
 
     bubblesTemplate = '';
     if (data.cdi) { // DYFI
-      bubblesTemplate += '<a href="{url}/dyfi" class="mmi{cdi}"' +
-        ' title="Did You Feel It? maximum reported intensity ({felt}' +
-        ' responses)"><strong class="roman">{cdi}</strong><br>' +
+      bubblesTemplate += '<a href="{url}/dyfi" class="mmi{cdi}" ' +
+        'title="Did You Feel It? maximum reported intensity ({felt} ' +
+        'responses)"><strong class="roman">{cdi}</strong><br>' +
         '<abbr title="Did You Feel It?">DYFI?</abbr></a>';
     }
     if (data.mmi) { // ShakeMap
-      bubblesTemplate += '<a href="{url}/shakemap" class="mmi{mmi}"' +
-        ' title="ShakeMap maximum estimated intensity"><strong class="roman">' +
+      bubblesTemplate += '<a href="{url}/shakemap" class="mmi{mmi}" ' +
+        'title="ShakeMap maximum estimated intensity"><strong class="roman">' +
         '{mmi}</strong><br><abbr title="ShakeMap">ShakeMap</abbr></a>';
     }
     if (data.alert) { // PAGER
       bubblesTemplate += '<a href="{url}/pager" class="pager-alertlevel-' +
-      '{alert}" title="PAGER estimated impact alert level"><strong' +
-      ' class="roman">{alert}</strong><br><abbr title="Prompt Assessment of' +
-      ' Global Earthquakes for Response">PAGER</abbr></a>';
+        '{alert}" title="PAGER estimated impact alert level"><strong ' +
+        'class="roman">{alert}</strong><br><abbr title="Prompt Assessment of ' +
+        'Global Earthquakes for Response">PAGER</abbr></a>';
     }
     if (data.tsunami) {
-      bubblesTemplate += '<a href="http://www.tsunami.gov/" class="tsunami"' +
-      ' title="Tsunami Warning Center"><span class="hover"></span>' +
-      '<img src="img/tsunami.png" alt="Tsunami Warning Center"></a>';
+      bubblesTemplate += '<a href="http://www.tsunami.gov/" class="tsunami" ' +
+        'title="Tsunami Warning Center"><span class="hover"></span>' +
+        '<img src="img/tsunami.png" alt="Tsunami Warning Center"></a>';
     }
     bubbles = L.Util.template(bubblesTemplate, data);
 
@@ -264,7 +267,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get intervals to store binned data in
+   * Get intervals for storing binned eq data
    *
    * @return intervals {Array}
    */
@@ -283,11 +286,12 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get html template for displaying eq details
+   * Get HTML template (Leaflet's L.Util.template is used to populate values)
+   *   these are 'static' templates that don't change depending on context
    *
    * @param type {String <popup | tablerow | tooltip>}
    *
-   * @return template {Html}
+   * @return template {String}
    */
   _getHtmlTemplate = function (type) {
     var template;
@@ -307,8 +311,7 @@ var Earthquakes = function (options) {
           '<dd>{status}</dd>' +
         '</dl>' +
       '</div>';
-    }
-    else if (type === 'tablerow') {
+    } else if (type === 'tablerow') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
         '<td class="time" data-sort="{isoTime}">{utcTime}</td>' +
@@ -317,8 +320,7 @@ var Earthquakes = function (options) {
         '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="eqid">{eqid}</td>' +
       '</tr>';
-    }
-    else if (type === 'tooltip') {
+    } else if (type === 'tooltip') {
       template = 'M {mag} - {utcTime}';
     }
 
@@ -410,7 +412,7 @@ var Earthquakes = function (options) {
       z: z
     };
 
-    if (mode === 'markers') {
+    if (mode === 'markers') { // hypocenters or magtime plot
       trace.marker = {
         color: _plotData.color, // fill
         line: { // stroke
@@ -421,7 +423,7 @@ var Earthquakes = function (options) {
         size: _plotData.size,
         sizeref: sizeref
       };
-    } else { // mode = lines+markers (cumulative plots)
+    } else { // cumulative plot (mode = lines+markers)
       trace.line = {
         color: 'rgb(120, 186, 232)',
         width: 2
@@ -465,18 +467,10 @@ var Earthquakes = function (options) {
         tooltip,
         utcTime;
 
-    coords = feature.geometry.coordinates;
-    eqid = feature.id;
     props = feature.properties;
 
-    if (_id !== 'mainshock') {
-      latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
-      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-      bearing = _mainshockLatlon.bearing(latlon);
-      compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
-      bearingString = compassPoints[Math.floor((22.5 + (360.0+bearing)%360.0) / 45.0)];
-    }
-
+    coords = feature.geometry.coordinates;
+    eqid = feature.id;
     eqMoment = _app.AppUtil.Moment.utc(props.time, 'x');
     mag = _app.AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
@@ -488,6 +482,14 @@ var Earthquakes = function (options) {
       localTime = eqMoment.clone().utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at epicenter</span>';
       timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
+    }
+
+    if (_id !== 'mainshock') {
+      compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
+      latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
+      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+      bearing = _mainshockLatlon.bearing(latlon);
+      bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
     }
 
     data = {
@@ -526,8 +528,8 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    _this.eqList[eqid] = data; // store eq for summary table
-    _this.mostRecentEqId = eqid; // most recent earthquake in feed
+    _this.eqList[eqid] = data; // store eq details for summary table
+    _this.mostRecentEqId = eqid; // most recent (last) earthquake in feed
 
     // Add props to plotData (additional props are added in _pointToLayer)
     _plotData.date.push(utcTime);
@@ -555,7 +557,7 @@ var Earthquakes = function (options) {
       _addEqToBin(days, magInt, 'prior');
     }
 
-    // Total number of eqs by mag, inclusive for slider filter
+    // Total number of eqs by mag, inclusive for interactive slider filter
     _addEqToBin(null, magInt, 'sliderData');
   };
 
@@ -599,7 +601,7 @@ var Earthquakes = function (options) {
    *
    * @param type {String <first | past | prior>}
    *
-   * @return html {Html}
+   * @return html {String}
    */
   _this.getBinnedTable = function (type) {
     var html,
@@ -619,28 +621,26 @@ var Earthquakes = function (options) {
           '<th class="year">Year</th>' +
           '<th>Total</th>' +
         '</tr>';
-      _bins[type].forEach(function(cols, mag) {
+      _bins[type].forEach(function(columns, mag) {
         html += '<tr><th class="rowlabel">M ' + mag + '</th>';
-        cols.forEach(function(col, i) {
-          if (i === 0) { // store row total
-            total = '<td class="total">' + col + '</td>';
+        columns.forEach(function(column, i) {
+          if (i === 0) { // store row total (first column)
+            total = '<td class="total">' + column + '</td>';
           } else {
-            html += '<td>' + col + '</td>';
+            html += '<td>' + column + '</td>';
           }
         });
         html += total + '</tr>'; // add row total to table as last column
       });
 
       // Add total for each column as last row
-      html += '<tr>' +
-        '<th class="rowlabel">Total</th>';
-
+      html += '<tr><th class="rowlabel">Total</th>';
       for (row = 0; row < _bins[type].length; ++row) { // get column indices
         if (typeof _bins[type][row] !== 'undefined') {
           break;
         }
       }
-      if (row < _bins[type].length) { // if found valid row
+      if (row < _bins[type].length) { // found valid row
         totalAll = 0;
         _bins[type][row].forEach(function(cols, index) {
           total = 0;
@@ -667,10 +667,9 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (summary of user-set parameters, etc.) for
-   *   aftershocks, foreshocks and historical
+   * Get feed description (summary of user-set parameters, etc.) for feature
    *
-   * @return description {Html}
+   * @return description {String}
    */
   _this.getDescription = function () {
     var description,
@@ -678,7 +677,7 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance =  _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    distance = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
     mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
@@ -719,8 +718,7 @@ var Earthquakes = function (options) {
   _this.getListTable = function (data, magThreshold) {
     var cssClasses,
         html,
-        mag,
-        match,
+        magInt,
         tableData,
         threshold,
         tr;
@@ -730,12 +728,11 @@ var Earthquakes = function (options) {
     tableData = '';
 
     Object.keys(data).forEach(function(key) {
+      magInt = data.magInt;
       tr = L.Util.template(_tablerowTemplate, data[key]);
-      match = /tr\s+class="m(\d+)"/.exec(tr);
-      mag = parseInt(match[1], 10);
 
-      if (mag >= threshold && cssClasses.indexOf('m' + mag) === -1) {
-        cssClasses.push('m' + mag);
+      if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
+        cssClasses.push('m' + magInt);
       }
 
       tableData += tr;
@@ -786,17 +783,17 @@ var Earthquakes = function (options) {
       max = Math.max.apply(null, mags);
       min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 
-      html += '<div class="filter">';
-      html += '<h4>Filter earthquakes by magnitude</h4>';
-      html += '<div class="min">' + min + '</div>';
-      html += '<div class="inverted slider" style="--min: ' + min +
-        '; --max: ' + max + '; --val: ' + mag + ';">';
-      html += '<input id="' + _id + '" type="range" min="' + min +
-        '" max="' + max + '" value="' + mag + '"/>';
-      html += '<output for="'+ _id + '">' + mag + '</output>';
-      html += '</div>';
-      html += '<div class="max">' + max + '</div>';
-      html += '</div>';
+      html = '<div class="filter">' +
+          '<h4>Filter earthquakes by magnitude</h4>' +
+          '<div class="min">' + min + '</div>' +
+          '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
+            max + '; --val: ' + mag + ';">' +
+            '<input id="' + _id + '" type="range" min="' + min + '" max="' +
+            max + '" value="' + mag + '"/>' +
+            '<output for="'+ _id + '">' + mag + '</output>' +
+          '</div>' +
+          '<div class="max">' + max + '</div>' +
+        '</div>';
     }
 
     return html;
