@@ -4,7 +4,7 @@
 
 var BeachBall = require('features/util/BeachBall');
 
-require('features/util/CanvasMarker');
+require('mappane/CanvasMarker');
 
 
 /**
