@@ -13,7 +13,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     eqid: {String} // mainshock event id
  *   }
  */
-var MainshockFeature = function (options) {
+var Mainshock = function (options) {
   var _this,
       _initialize,
 
@@ -116,4 +116,4 @@ var MainshockFeature = function (options) {
 };
 
 
-module.exports = MainshockFeature;
+module.exports = Mainshock;
