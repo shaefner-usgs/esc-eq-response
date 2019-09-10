@@ -2,7 +2,7 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
-    //FieldNotes = require('features/FieldNotes'),
+    FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
     Historical = require('features/Historical'),
@@ -29,7 +29,7 @@ _FEATURECLASSES = {
   'shakemap-stations': ShakeMapStations,
   'focal-mechanism': FocalMechanism,
   'moment-tensor': MomentTensor,
-  //fieldnotes: FieldNotes
+  fieldnotes: FieldNotes
 };
 
 
@@ -344,20 +344,18 @@ var Features = function (options) {
    * @param id {String}
    */
   _this.refresh = function (id) {
-    var feature,
-        options;
+    var feature;
 
     _this.isRefreshing = true;
 
     feature = _this.getFeature(id);
-    options = {};
-
     if (feature) {
       _remove(feature);
     }
 
-    options[id] = _FEATURECLASSES[id];
-    _this.initFeatures(options);
+    _this.initFeatures({
+      id: _FEATURECLASSES[id]
+    });
     // TODO: also refresh Fieldnotes if refreshing aftershocks
   };
 

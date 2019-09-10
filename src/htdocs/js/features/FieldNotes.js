@@ -27,13 +27,21 @@ _DEFAULTS = {
   markerOptions: _MARKER_DEFAULTS
 };
 
-var FieldNotesFeature = function (options) {
+/**
+ * Create ShakeMap Stations feature
+ *
+ * @param options {Object}
+ *   {
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
+ *   }
+ */
+var FieldNotes = function (options) {
   var _this,
       _initialize,
 
       _app,
       _count,
-      _mapLayer,
       _markerOptions,
       _popup,
       _Lightbox,
@@ -41,7 +49,7 @@ var FieldNotesFeature = function (options) {
       _addEventListeners,
       _genPopupContent,
       _getCustomProps,
-      _getName,
+      _getUrl,
       _onEachFeature,
       _pointToLayer,
       _updatePopup;
@@ -55,25 +63,20 @@ var FieldNotesFeature = function (options) {
     options = options || {};
     iconOptions = Util.extend({}, _ICON_DEFAULTS, options.iconOptions);
 
-    _this.displayLayer = options.layerOn || false;
-    _this.id = 'fieldnotes'; // unique id; value is "baked into" app's js/css
-    _this.zoomToLayer = false;
-
     _app = options.app;
     _count = 0;
+    _Lightbox = Lightbox();
+
+    _this.displayLayer = false;
+    _this.id = 'fieldnotes';
+    _this.name = 'Fieldnotes';
+    _this.url = _getUrl();
+    _this.zoomToLayer = false;
+
     _markerOptions = Util.extend({
       icon: L.icon(iconOptions),
       pane: _this.id // put markers in custom Leaflet map pane
     }, _MARKER_DEFAULTS, options.markerOptions);
-
-    _mapLayer = L.geoJson(options.json, {
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
-    });
-
-    _this.name = _getName();
-
-    _Lightbox = Lightbox();
   };
 
   /**
@@ -144,7 +147,7 @@ var FieldNotesFeature = function (options) {
    *
    * @param props {Object}
    *
-   * @return html {Html}
+   * @return html {String}
    */
   _getCustomProps = function (props) {
     var foundProps,
@@ -178,12 +181,35 @@ var FieldNotesFeature = function (options) {
   };
 
   /**
-   * Get layer name of feature (adds number of features to name)
+   * Get url of data feed
    *
-   * @return {String}
+   * @return url {String}
    */
-  _getName = function () {
-    return options.name + ' (' + _count + ')';
+  _getUrl = function () {
+    var after,
+        before,
+        mainshock,
+        pairs,
+        params,
+        url;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc().format('X');
+    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
+    pairs = [];
+    params = {
+      between: after + ',' + before,
+      lat: mainshock.json.geometry.coordinates[1],
+      lon: mainshock.json.geometry.coordinates[0],
+      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
+    };
+    Object.keys(params).forEach(function(key) {
+      pairs.push(key + '=' + params[key]);
+    });
+
+    url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' + pairs.join('&');
+
+    return url;
   };
 
   /**
@@ -262,8 +288,19 @@ var FieldNotesFeature = function (options) {
   // Public methods
   // ----------------------------------------------------------
 
-  _this.getMapLayer = function () {
-    return _mapLayer;
+  /**
+   * Create feature (map layer)
+   *   invoked via Ajax callback in Features.js after json feed is loaded
+   *
+   * @param json {Object}
+   *     feed data for feature
+   */
+  _this.createFeature = function (json) {
+    _this.mapLayer = L.geoJson(json, {
+      onEachFeature: _onEachFeature,
+      pointToLayer: _pointToLayer
+    });
+    _this.title = _this.name + ' (' + _count + ')';
   };
 
 
@@ -273,4 +310,4 @@ var FieldNotesFeature = function (options) {
 };
 
 
-module.exports = FieldNotesFeature;
+module.exports = FieldNotes;
