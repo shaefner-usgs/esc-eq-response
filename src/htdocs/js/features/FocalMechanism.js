@@ -82,25 +82,25 @@ var FocalMechanism = function (options) {
         size;
 
     size = 40;
-
-    // Render hidden (via css) beachball (moved to map when layer is turned on)
     beachball = _getBeachBall(size);
+
     if (beachball) {
+      // Render beachball (hidden via css and shown when layer is turned on)
       beachball.render(document.querySelector('#mapPane'));
+
+      coords = [
+        _mainshock.json.geometry.coordinates[1],
+        _mainshock.json.geometry.coordinates[0]
+      ];
+
+      mapLayer = L.canvasMarker(coords, {
+        icon: L.divIcon({
+          className: _this.id,
+          iconSize: L.point(size, size)
+        }),
+        pane: _this.id // put marker in custom Leaflet map pane
+      });
     }
-
-    coords = [
-      _mainshock.json.geometry.coordinates[1],
-      _mainshock.json.geometry.coordinates[0]
-    ];
-
-    mapLayer = L.canvasMarker(coords, {
-      icon: L.divIcon({
-        className: _this.id,
-        iconSize: L.point(size, size)
-      }),
-      pane: _this.id // put marker in custom Leaflet map pane
-    });
 
     return mapLayer;
   };

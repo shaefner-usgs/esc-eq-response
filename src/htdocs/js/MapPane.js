@@ -315,17 +315,19 @@ var MapPane = function (options) {
   _this.add = function (feature) {
     var title = feature.title || feature.name;
 
-    _createMapPane(feature.id, 'overlayPane');
+    if (feature.mapLayer) {
+      _createMapPane(feature.id, 'overlayPane');
 
-    // Add layer to controller
-    _this.layerControl.addOverlay(feature.mapLayer, title);
+      // Add layer to controller
+      _this.layerControl.addOverlay(feature.mapLayer, title);
 
-    // Turn layer "on" and zoom map if set to be displayed / zoomed by default
-    if (feature.displayLayer) {
-      _this.map.addLayer(feature.mapLayer);
+      // Turn layer "on" and zoom map if set to be displayed / zoomed by default
+      if (feature.displayLayer) {
+        _this.map.addLayer(feature.mapLayer);
 
-      if (feature.zoomToLayer) {
-        _setBounds(feature);
+        if (feature.zoomToLayer) {
+          _setBounds(feature);
+        }
       }
     }
   };
