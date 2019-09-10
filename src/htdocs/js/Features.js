@@ -8,7 +8,7 @@ var Aftershocks = require('features/Aftershocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
     MomentTensor = require('features/MomentTensor'),
-    //ShakeMapStations = require('features/ShakeMapStations'),
+    ShakeMapStations = require('features/ShakeMapStations'),
     Xhr = require('util/Xhr');
 
 
@@ -26,7 +26,7 @@ _FEATURECLASSES = {
   aftershocks: Aftershocks,
   foreshocks: Foreshocks,
   historical: Historical,
-  //'shakemap-stations': ShakeMapStations,
+  'shakemap-stations': ShakeMapStations,
   'focal-mechanism': FocalMechanism,
   'moment-tensor': MomentTensor,
   //fieldnotes: FieldNotes
@@ -115,7 +115,7 @@ var Features = function (options) {
 
     if (feature.url) { // load external feed data, then create and add feature
       _load(feature);
-    } else { // no external feed data; just create and add feature
+    } else { // no external feed data, attempt to create and add feature
       feature.createFeature();
       _add(feature);
     }

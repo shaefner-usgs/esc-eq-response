@@ -10,15 +10,15 @@ var _DEFAULTS,
     _MARKER_DEFAULTS;
 
 _FLAG_DESCRIPTIONS = {
-  'M': 'Manually flagged',
-  'T': 'Outlier',
   'G': 'Glitch (clipped or below noise)',
   'I': 'Incomplete time series',
-  'N': 'Not in list of known stations'
+  'M': 'Manually flagged',
+  'N': 'Not in list of known stations',
+  'T': 'Outlier'
 };
 _MARKER_DEFAULTS = {
-  iconSize: [14, 10],
   iconAnchor: [7, 5],
+  iconSize: [14, 10],
   popupAnchor: [0, -5]
 };
 _DEFAULTS = {
@@ -28,23 +28,22 @@ _DEFAULTS = {
 
 
 /**
- * Creates ShakeMap stations feature
+ * Create ShakeMap Stations feature
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // application props / methods
+ *     eqid: {String} // mainshock event id
  *   }
  */
-var Stations = function (options) {
+var ShakeMapStations = function (options) {
   var _this,
       _initialize,
 
       _app,
       _count,
-      _mapLayer,
       _markerOptions,
+      _shakemap,
 
       _filter,
       _createAmplitudesObject,
@@ -54,7 +53,7 @@ var Stations = function (options) {
       _formatLocation,
       _formatTitle,
       _generatePopupContent,
-      _getName,
+      _getMapLayer,
       _onEachFeature,
       _pointToLayer;
 
@@ -62,8 +61,7 @@ var Stations = function (options) {
   _this = {};
 
   _initialize = function () {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'stations';
+    var mainshock;
 
     options = options || {};
 
@@ -71,16 +69,16 @@ var Stations = function (options) {
     _count = 0;
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
-    _this.id = id;
+    mainshock = _app.Features.getFeature('mainshock');
 
-    _mapLayer = L.geoJson(options.json, {
-      filter: _filter,
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
-    });
+    _shakemap = mainshock.json.properties.products.shakemap;
+    if (_shakemap) {
+      _this.url = _shakemap[0].contents['download/stationlist.json'].url;
+    }
 
     _this.displayLayer = false;
-    _this.name = _getName();
+    _this.id = 'shakemap-stations';
+    _this.name = 'ShakeMap Stations';
     _this.zoomToLayer = false;
   };
 
@@ -267,12 +265,24 @@ var Stations = function (options) {
   };
 
   /**
-   * Get layer name of feature (adds number of features to name)
+   * Get Leaflet map layer
    *
-   * @return {String}
+   * @param json {Object}
+   *
+   * @return mapLayer {L.layer}
    */
-  _getName = function () {
-    return options.name + ' (' + _count + ')';
+  _getMapLayer = function (json) {
+    var mapLayer;
+
+    if (_shakemap) {
+      mapLayer = L.geoJson(json, {
+        filter: _filter,
+        onEachFeature: _onEachFeature,
+        pointToLayer: _pointToLayer
+      });
+    }
+
+    return mapLayer;
   };
 
   /**
@@ -321,8 +331,16 @@ var Stations = function (options) {
   // Public methods
   // ----------------------------------------------------------
 
-  _this.getMapLayer = function () {
-    return _mapLayer;
+  /**
+   * Create feature (map layer)
+   *   invoked via Ajax callback in Features.js after json feed is loaded
+   *
+   * @param json {Object}
+   *     feed data for feature
+   */
+  _this.createFeature = function (json) {
+    _this.mapLayer = _getMapLayer(json);
+    _this.title = _this.name + ' (' + _count + ')';
   };
 
 
@@ -332,4 +350,4 @@ var Stations = function (options) {
 };
 
 
-module.exports = Stations;
+module.exports = ShakeMapStations;
