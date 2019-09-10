@@ -107,8 +107,8 @@ var Foreshocks = function (options) {
     });
 
     _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotDescription = _Earthquakes.getDescription();
-    _this.plotTraces = _Earthquakes.plotTraces;
+    //_this.plotDescription = _Earthquakes.getDescription();
+    //_this.plotTraces = _Earthquakes.plotTraces;
     _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
