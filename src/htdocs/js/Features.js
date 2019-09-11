@@ -50,6 +50,7 @@ var Features = function (options) {
       _features,
 
       _add,
+      _create,
       _intiFeature,
       _load,
       _remove,
@@ -103,7 +104,22 @@ var Features = function (options) {
   };
 
   /**
-   * Initialize (execute) Feature class and then load its feed data
+   * Create and add a feature (also load feed data if url prop is set)
+   *   feature is created and added from _load method after data is retrieved
+   *
+   * @param feature {Object}
+   */
+  _create = function (feature) {
+    if (feature.url) {
+      _load(feature); // load external feed data first
+    } else {
+      feature.createFeature();
+      _add(feature);
+    }
+  };
+
+  /**
+   * Initialize (execute) a Feature class
    */
   _intiFeature = function (FeatureClass) {
     _eqid = _app.AppUtil.getParam('eqid');
@@ -113,12 +129,7 @@ var Features = function (options) {
       eqid: _eqid
     });
 
-    if (feature.url) { // load external feed data, then create and add feature
-      _load(feature);
-    } else { // no external feed data, attempt to create and add feature
-      feature.createFeature();
-      _add(feature);
-    }
+    _create(feature);
   };
 
   /**
@@ -217,8 +228,6 @@ var Features = function (options) {
       if (summaryEl) {
         _app.SummaryPane.remove(summaryEl);
       }
-
-      _features[feature.id] = {};
     }
   };
 
@@ -351,11 +360,8 @@ var Features = function (options) {
     feature = _this.getFeature(id);
     if (feature) {
       _remove(feature);
+      _create(feature);
     }
-
-    _this.initFeatures({
-      id: _FEATURECLASSES[id]
-    });
     // TODO: also refresh Fieldnotes if refreshing aftershocks
   };
 
