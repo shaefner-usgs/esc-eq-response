@@ -6,6 +6,7 @@
  *
  * @param options {Object}
  *   {
+ *     app: {Object}
  *     el: {Element}
  *   }
  */

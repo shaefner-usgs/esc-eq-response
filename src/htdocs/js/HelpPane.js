@@ -9,6 +9,7 @@ var Svg = require('Svg');
  *
  * @param options {Object}
  *   {
+ *     app: {Object}
  *     el: {Element}
  *   }
  */
