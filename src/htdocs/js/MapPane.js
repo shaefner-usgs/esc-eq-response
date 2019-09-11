@@ -266,9 +266,9 @@ var MapPane = function (options) {
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
     //   baseLayers: _staticLayers.baseLayers,
-    //   id: 'eqid', // TODO: insert actual eqid
+    //   id: _app.AppUtil.getParam('eqid'),
     //   overlays: _staticLayers.overlays,
-    //   scope: 'response'
+    //   scope: 'response-app'
     // });
   };
 
