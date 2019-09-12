@@ -70,11 +70,7 @@ var ShakeMapStations = function (options) {
     _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
 
     mainshock = _app.Features.getFeature('mainshock');
-
     _shakemap = mainshock.json.properties.products.shakemap;
-    if (_shakemap) {
-      _this.url = _shakemap[0].contents['download/stationlist.json'].url;
-    }
 
     _this.displayLayer = false;
     _this.id = 'shakemap-stations';
@@ -341,6 +337,17 @@ var ShakeMapStations = function (options) {
   _this.createFeature = function (json) {
     _this.mapLayer = _getMapLayer(json);
     _this.title = _this.name + ' (' + _count + ')';
+  };
+
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    if (_shakemap) {
+      return _shakemap[0].contents['download/stationlist.json'].url;
+    }
   };
 
 

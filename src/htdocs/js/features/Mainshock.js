@@ -35,8 +35,6 @@ var Mainshock = function (options) {
     _this.displayLayer = true;
     _this.id = 'mainshock';
     _this.name = 'Mainshock';
-    _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _eqid + '.geojson';
     _this.zoomToLayer = true;
   };
 
@@ -107,6 +105,16 @@ var Mainshock = function (options) {
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
+  };
+
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
+      _eqid + '.geojson';
   };
 
 

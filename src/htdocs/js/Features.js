@@ -104,13 +104,13 @@ var Features = function (options) {
   };
 
   /**
-   * Create and add a feature (also load feed data if url prop is set)
-   *   feature is created and added from _load method after data is retrieved
+   * Create and add a feature (also load feed data if getFeedUrl method is set)
+   *   feature is created and added in _load method after data is retrieved
    *
    * @param feature {Object}
    */
   _create = function (feature) {
-    if (feature.url) {
+    if (typeof feature.getFeedUrl === 'function') {
       _load(feature); // load external feed data first
     } else {
       feature.createFeature();
@@ -140,13 +140,16 @@ var Features = function (options) {
   _load = function (feature) {
     var domain,
         errorMsg,
-        matches;
+        matches,
+        url;
 
     errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
+    url = feature.getFeedUrl();
+
     _app.StatusBar.addLoadingMsg(feature);
 
     Xhr.ajax({
-      url: feature.url,
+      url: url,
       success: function (json) {
         if (feature.id === 'mainshock') {
           feature.json = json; // store mainshock json (used by other features)
@@ -188,7 +191,7 @@ var Features = function (options) {
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        matches = feature.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
@@ -362,7 +365,6 @@ var Features = function (options) {
       _remove(feature);
       _create(feature);
     }
-    // TODO: also refresh Fieldnotes if refreshing aftershocks
   };
 
   /**

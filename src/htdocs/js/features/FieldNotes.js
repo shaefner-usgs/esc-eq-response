@@ -49,7 +49,6 @@ var FieldNotes = function (options) {
       _addEventListeners,
       _genPopupContent,
       _getCustomProps,
-      _getUrl,
       _onEachFeature,
       _pointToLayer,
       _updatePopup;
@@ -64,13 +63,11 @@ var FieldNotes = function (options) {
     iconOptions = Util.extend({}, _ICON_DEFAULTS, options.iconOptions);
 
     _app = options.app;
-    _count = 0;
     _Lightbox = Lightbox();
 
     _this.displayLayer = false;
     _this.id = 'fieldnotes';
     _this.name = 'Fieldnotes';
-    _this.url = _getUrl();
     _this.zoomToLayer = false;
 
     _markerOptions = Util.extend({
@@ -181,38 +178,6 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Get url of data feed
-   *
-   * @return url {String}
-   */
-  _getUrl = function () {
-    var after,
-        before,
-        mainshock,
-        pairs,
-        params,
-        url;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc().format('X');
-    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
-    pairs = [];
-    params = {
-      between: after + ',' + before,
-      lat: mainshock.json.geometry.coordinates[1],
-      lon: mainshock.json.geometry.coordinates[0],
-      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
-    };
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-
-    url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' + pairs.join('&');
-
-    return url;
-  };
-
-  /**
    * Leaflet GeoJSON option: creates popups and tooltips
    *
    * @param feature {Object}
@@ -296,11 +261,45 @@ var FieldNotes = function (options) {
    *     feed data for feature
    */
   _this.createFeature = function (json) {
+    _count = 0;
+
     _this.mapLayer = L.geoJson(json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
     _this.title = _this.name + ' (' + _count + ')';
+  };
+
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    var after,
+        before,
+        mainshock,
+        pairs,
+        urlParams;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
+      .format('X');
+    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc()
+      .add(30, 'days').format('X');
+    pairs = [];
+    urlParams = {
+      between: after + ',' + before,
+      lat: mainshock.json.geometry.coordinates[1],
+      lon: mainshock.json.geometry.coordinates[0],
+      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
+    };
+    Object.keys(urlParams).forEach(function(key) {
+      pairs.push(key + '=' + urlParams[key]);
+    });
+
+    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
+      pairs.join('&');
   };
 
 

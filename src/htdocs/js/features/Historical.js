@@ -18,8 +18,6 @@ var Historical = function (options) {
       _initialize,
 
       _app,
-      _eqid,
-      _mainshock,
       _Earthquakes,
 
       _getSummary;
@@ -28,31 +26,13 @@ var Historical = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var urlParams,
-        years;
-
     options = options || {};
 
     _app = options.app;
-    _eqid = options.eqid;
-    _mainshock = _app.Features.getFeature('mainshock');
-
-    years = _app.AppUtil.getParam('hs-years');
-    urlParams = {
-      endtime: _app.AppUtil.Moment(_mainshock.json.properties.time - 1000).utc()
-        .toISOString().slice(0, -5),
-      latitude: _mainshock.json.geometry.coordinates[1],
-      longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('hs-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time).utc()
-        .subtract(years, 'years').toISOString().slice(0, -5)
-    };
 
     _this.displayLayer = true;
     _this.id = 'historical';
     _this.name = 'Historical Seismicity';
-    _this.url = _app.Features.getEqFeedUrl(urlParams);
     _this.zoomToLayer = true;
   };
 
@@ -112,6 +92,31 @@ var Historical = function (options) {
     _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
+  };
+
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    var mainshock,
+        urlParams;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    urlParams = {
+      endtime: _app.AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
+        .toISOString().slice(0, -5),
+      latitude: mainshock.json.geometry.coordinates[1],
+      longitude: mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(_app.AppUtil.getParam('hs-dist')),
+      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(mainshock.json.properties.time).utc()
+        .subtract(_app.AppUtil.getParam('hs-years'), 'years').toISOString()
+        .slice(0, -5)
+    };
+
+    return _app.Features.getEqFeedUrl(urlParams);
   };
 
 

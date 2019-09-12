@@ -29,27 +29,15 @@ var Aftershocks = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var urlParams;
-
     options = options || {};
 
     _app = options.app;
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    urlParams = {
-      latitude: _mainshock.json.geometry.coordinates[1],
-      longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
-        .utc().toISOString().slice(0, -5)
-    };
-
     _this.displayLayer = true;
     _this.id = 'aftershocks';
     _this.name = 'Aftershocks';
-    _this.url = _app.Features.getEqFeedUrl(urlParams);
     _this.zoomToLayer = true;
   };
 
@@ -179,6 +167,26 @@ var Aftershocks = function (options) {
     _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
+  };
+
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    var urlParams;
+
+    urlParams = {
+      latitude: _mainshock.json.geometry.coordinates[1],
+      longitude: _mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
+      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
+        .utc().toISOString().slice(0, -5)
+    };
+
+    return _app.Features.getEqFeedUrl(urlParams);
   };
 
 
