@@ -250,29 +250,6 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get the feed url for aftershocks, foreshocks and historical features
-   *
-   * @param params {Object}
-   *
-   * @return {String}
-   */
-  _this.getEqFeedUrl = function (params) {
-    var baseUri,
-        pairs,
-        queryString;
-
-    baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-
-    pairs = ['format=geojson', 'orderby=time-asc'];
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-    queryString = '?' + pairs.join('&');
-
-    return baseUri + queryString;
-  };
-
-  /**
    * Get a feature
    *
    * @param id {String}

@@ -116,7 +116,7 @@ var Foreshocks = function (options) {
         .slice(0, -5)
     };
 
-    return _app.Features.getEqFeedUrl(urlParams);
+    return Earthquakes.getEqFeedUrl(urlParams);
   };
 
 

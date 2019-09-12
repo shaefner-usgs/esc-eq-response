@@ -806,6 +806,30 @@ var Earthquakes = function (options) {
 };
 
 
+/**
+ * Static method: get the feed url for earthquakes features
+ *
+ * @param params {Object}
+ *
+ * @return {String}
+ */
+Earthquakes.getEqFeedUrl = function (params) {
+  var baseUri,
+      pairs,
+      queryString;
+
+  baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
+
+  pairs = ['format=geojson', 'orderby=time-asc'];
+  Object.keys(params).forEach(function(key) {
+    pairs.push(key + '=' + params[key]);
+  });
+  queryString = '?' + pairs.join('&');
+
+  return baseUri + queryString;
+};
+
+
 L.earthquakesLayer = Earthquakes;
 
 module.exports = Earthquakes;
