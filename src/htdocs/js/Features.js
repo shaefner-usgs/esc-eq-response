@@ -356,7 +356,8 @@ var Features = function (options) {
    * @param id {String}
    */
   _this.refresh = function (id) {
-    var feature;
+    var feature,
+        fieldnotes;
 
     _this.isRefreshing = true;
 
@@ -364,6 +365,17 @@ var Features = function (options) {
     if (feature) {
       _remove(feature);
       _create(feature);
+    }
+
+    // Also refresh FieldNotes when Aftershocks feature is refreshed
+    if (id === 'aftershocks') {
+      fieldnotes = _app.Features.getFeature('fieldnotes');
+      if (_app.MapPane.map.hasLayer(fieldnotes.mapLayer)) {
+        fieldnotes.displayLayer = true; // leave on if user turned layer on
+      } else {
+        fieldnotes.displayLayer = false;
+      }
+      _this.refresh('fieldnotes');
     }
   };
 
