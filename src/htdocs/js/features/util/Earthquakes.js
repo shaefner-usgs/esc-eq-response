@@ -728,7 +728,7 @@ var Earthquakes = function (options) {
     tableData = '';
 
     Object.keys(data).forEach(function(key) {
-      magInt = data.magInt;
+      magInt = data[key].magInt;
       tr = L.Util.template(_tablerowTemplate, data[key]);
 
       if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
