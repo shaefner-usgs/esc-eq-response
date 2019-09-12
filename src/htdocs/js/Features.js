@@ -104,8 +104,9 @@ var Features = function (options) {
   };
 
   /**
-   * Create and add a feature (also load feed data if getFeedUrl method is set)
-   *   feature is created and added in _load method after data is retrieved
+   * Create a feature
+   *   first load feed data if feature's getFeedUrl method is set (feature is
+   *   then created in _load method after feed data is retrieved)
    *
    * @param feature {Object}
    */
@@ -119,7 +120,7 @@ var Features = function (options) {
   };
 
   /**
-   * Initialize (execute) a Feature class
+   * Instantiate a Feature class
    */
   _intiFeature = function (FeatureClass) {
     _eqid = _app.AppUtil.getParam('eqid');
@@ -133,7 +134,7 @@ var Features = function (options) {
   };
 
   /**
-   * Load a feature (via json feed) and then call _add it once it's loaded
+   * Load a feature from a json feed
    *
    * @param feature {Object}
    */
@@ -296,7 +297,7 @@ var Features = function (options) {
   };
 
   /**
-   * Wrapper method to loop through Feature classes and initialize them
+   * Wrapper method to loop through Feature classes and instantiate them
    *
    * Skip mainshock which is added separately so it's already available
    *   for other features that depend on it.
@@ -318,7 +319,7 @@ var Features = function (options) {
   };
 
   /**
-   * Wrapper method to initialze mainshock Feature
+   * Wrapper method to instantiate mainshock Feature
    */
   _this.initMainshockFeature = function () {
     var MainshockClass;
