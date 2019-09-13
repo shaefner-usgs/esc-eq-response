@@ -39,7 +39,7 @@ var MapPane = function (options) {
 
       _addLayerControl,
       _compareLayers,
-      _createMapPane,
+      _createPane,
       _fitBounds,
       _getLayerId,
       _getSortValue,
@@ -107,12 +107,12 @@ var MapPane = function (options) {
   };
 
   /**
-   * Create a separate MapPane for each feature (used to control stacking order)
+   * Create a separate pane for each feature (used to control stacking order)
    *
    * @param id {String}
    * @param parent {String <overlayPane | tilePane>}
    */
-  _createMapPane = function (id, parent) {
+  _createPane = function (id, parent) {
     if (!_this.map.getPane(id)) {
       _this.map.createPane(id, _this.map.getPane(parent));
     }
@@ -250,7 +250,7 @@ var MapPane = function (options) {
     _this.reset();
 
     // Create custom pane for Faults overlay within tilePane
-    _createMapPane('faults', 'tilePane'); // pane is applied in Faults factory
+    _createPane('faults', 'tilePane'); // pane is applied in Faults factory
 
     // Add default layers to map (i.e. toggle on in layer control)
     _staticLayers.defaults.forEach(function(layer) {
@@ -308,7 +308,7 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to map pane
+   * Add feature to map
    *
    * @param feature {Object}
    */
@@ -316,7 +316,7 @@ var MapPane = function (options) {
     var title = feature.title || feature.name;
 
     if (feature.mapLayer) {
-      _createMapPane(feature.id, 'overlayPane');
+      _createPane(feature.id, 'overlayPane');
 
       // Add layer to controller
       _this.layerControl.addOverlay(feature.mapLayer, title);
@@ -387,7 +387,17 @@ var MapPane = function (options) {
   };
 
   /**
-   * Reset state and set default map extent
+   * Remove layer from map
+   *
+   * @param layer {L.layer}
+   */
+  _this.remove = function (layer) {
+    _this.map.removeLayer(layer);
+    _this.layerControl.removeLayer(layer);
+  };
+
+  /**
+   * Reset state: Set default map extent and purge canvas elements (FM, MT)
    */
   _this.reset = function () {
     var canvasEls,

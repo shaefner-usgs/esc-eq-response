@@ -223,8 +223,7 @@ var Features = function (options) {
       summaryEl = document.querySelector('#summaryPane .' + feature.id);
 
       if (mapLayer) {
-        _app.MapPane.map.removeLayer(mapLayer);
-        _app.MapPane.layerControl.removeLayer(mapLayer);
+        _app.MapPane.remove(mapLayer);
       }
       if (plotsEl) {
         _app.PlotsPane.remove(plotsEl);
