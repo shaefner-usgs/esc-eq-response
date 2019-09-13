@@ -186,7 +186,7 @@ var Aftershocks = function (options) {
         .utc().toISOString().slice(0, -5)
     };
 
-    return Earthquakes.getEqFeedUrl(urlParams);
+    return Earthquakes.getFeedUrl(urlParams);
   };
 
 

@@ -807,13 +807,14 @@ var Earthquakes = function (options) {
 
 
 /**
- * Static method: get the feed url for earthquakes features
+ * Static method: get the feed url for Eearthquakes features
  *
  * @param params {Object}
+ *     See: API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
  *
  * @return {String}
  */
-Earthquakes.getEqFeedUrl = function (params) {
+Earthquakes.getFeedUrl = function (params) {
   var baseUri,
       pairs,
       queryString;
