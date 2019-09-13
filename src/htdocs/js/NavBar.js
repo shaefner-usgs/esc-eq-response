@@ -49,7 +49,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Add event listener for changing panes
+   * Add event listeners for changing panes / saving scroll position
    */
   _addListeners = function () {
     var i,

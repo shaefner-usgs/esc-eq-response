@@ -3,7 +3,7 @@
 
 
 /**
- * Add and remove features from plots pane and set up javascript interactions
+ * Add and remove Features from plots pane and set up javascript interactions
  *
  * @param options {Object}
  *   {
@@ -251,10 +251,6 @@ var PlotsPane = function (options) {
         titles,
         zRatio;
 
-    // if (!feature.plotTraces.magtime) { // no trace data
-    //   return;
-    // }
-
     if (plotId === 'hypocenters') {
       zRatio = _getRatio(feature.plotTraces.hypocenters);
     }
@@ -343,7 +339,7 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to plots pane
+   * Add a Feature to plots pane
    *   creates plots, but only renders them once plots pane is visible
    *
    * @param feature {Object}
@@ -354,7 +350,7 @@ var PlotsPane = function (options) {
         plotlyParams,
         title;
 
-    // Don't plot mainshock on its own (it is included in other features' plots)
+    // Don't plot mainshock on its own (it is included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       if (feature.plotDescription) {
         description = feature.plotDescription;
@@ -386,7 +382,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Remove feature from plots pane
+   * Remove a Feature from plots pane
    *
    * @param feature {Object}
    */
@@ -421,13 +417,13 @@ var PlotsPane = function (options) {
         rendered,
         resetButton;
 
-    // Loop thru features
+    // Loop thru Features
     Object.keys(_plotConfigs).forEach(function(featureId) {
       plotlyParams = _plotConfigs[featureId].plotlyParams;
       rendered = _plotConfigs[featureId].rendered;
 
       if (!rendered) {
-        // Loop thru plot types for feature
+        // Loop thru plot types for Feature
         Object.keys(plotlyParams).forEach(function(plotId) {
           graphDiv = plotlyParams[plotId].graphDiv;
           options = plotlyParams[plotId].options;
@@ -460,7 +456,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Reset pane to initial state
+   * Reset plots pane to initial state
    */
   _this.reset = function () {
     var features;

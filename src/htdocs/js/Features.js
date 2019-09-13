@@ -15,7 +15,7 @@ var Aftershocks = require('features/Aftershocks'),
 var _FEATURECLASSES;
 
 /**
- * Set which features get added, and the order they are loaded (Mainshock must
+ * Set which Features get added, and the order they are loaded (Mainshock must
  *   be first). Stacking order is set in CSS.
  *
  * IMPORTANT: the Object key must match the id property set in the Feature class.
@@ -65,12 +65,12 @@ var Features = function (options) {
     _app = options.app;
     _features = {};
 
-    // Flag to block mult. instances of feature from refreshing at the same time
+    // Flag to block mult. instances of Feature from refreshing at the same time
     _this.isRefreshing = false;
   };
 
   /**
-   * Add a feature to map, plots and summary panes
+   * Add a Feature to map, plots and summary panes
    *
    * @param feature {Object}
    */
@@ -87,7 +87,7 @@ var Features = function (options) {
         _app.EditPane.showMainshock();
         _app.EditPane.setDefaults();
 
-        // Initialize other features now that mainshock ready
+        // Initialize other Features now that mainshock ready
         _this.initFeatures();
       }
 
@@ -104,8 +104,8 @@ var Features = function (options) {
   };
 
   /**
-   * Create a feature
-   *   first load feed data if feature's getFeedUrl method is set (feature is
+   * Create a Feature
+   *   first load feed data if Feature's getFeedUrl method is set (Feature is
    *   then created in _load method after feed data is retrieved)
    *
    * @param feature {Object}
@@ -134,7 +134,7 @@ var Features = function (options) {
   };
 
   /**
-   * Load a feature from a json feed
+   * Load a Feature from a json feed
    *
    * @param feature {Object}
    */
@@ -207,8 +207,8 @@ var Features = function (options) {
   };
 
   /**
-   * Remove a feature from map, plots and summary panes
-   * TODO: pass in feature.id to all remove methods
+   * Remove a Feature from map, plots and summary panes
+   * TODO: pass in Feature.id to all remove methods
    *
    * @param feature {Object}
    */
@@ -221,7 +221,7 @@ var Features = function (options) {
   };
 
   /**
-   * Remove all features from map, plots and summary panes
+   * Remove all Features from map, plots and summary panes
    */
   _removeAll = function () {
     if (_features) {
@@ -236,7 +236,7 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get a feature
+   * Get a Feature
    *
    * @param id {String}
    *     id of feature
@@ -273,7 +273,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get all features
+   * Get all Features
    *
    * @return _features {Object}
    */
@@ -282,14 +282,14 @@ var Features = function (options) {
   };
 
   /**
-   * Get Feature id from name/title
+   * Get a Feature's id from its name/title
    *
    * @param name {String}
    *     name (or title) property of Feature
    *
    * @return id {String}
    */
-  _this.getId = function (name) {
+  _this.getFeatureId = function (name) {
     var feature,
         id;
 
@@ -307,7 +307,7 @@ var Features = function (options) {
    * Wrapper method to loop through Feature classes and instantiate them
    *
    * Skip mainshock which is added separately so it's already available
-   *   for other features that depend on it.
+   *   for other Features that depend on it.
    *
    * @param featureClasses {Object}
    *     optional; uses _FEATURECLASSES if no parameter is passed
@@ -336,7 +336,7 @@ var Features = function (options) {
   };
 
   /**
-   * Refresh a feature
+   * Refresh a Feature
    *
    * @param id {String}
    */
@@ -351,7 +351,7 @@ var Features = function (options) {
       _create(feature);
     }
 
-    // Also refresh FieldNotes when Aftershocks feature is refreshed
+    // Also refresh FieldNotes when Aftershocks Feature is refreshed
     if (id === 'aftershocks') {
       _this.refresh('fieldnotes');
     }

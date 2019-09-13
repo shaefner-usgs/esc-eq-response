@@ -8,7 +8,7 @@ require('mappane/CanvasMarker');
 
 
 /**
- * Create Moment Tensor feature
+ * Create moment tensor Feature
  *
  * @param options {Object}
  *   {
@@ -83,7 +83,7 @@ var MomentTensor = function (options) {
 
     size = 40;
     beachball = _getBeachBall(size);
-    
+
     if (beachball) {
       // Render beachball (hidden via css and shown when layer is turned on)
       beachball.render(document.querySelector('#mapPane'));
@@ -133,7 +133,7 @@ var MomentTensor = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer, summary) - invoked via Features.js
+   * Create Feature (map layer, summary html) - invoked via Features.js
    */
   _this.createFeature = function () {
     _this.mapLayer = _getMapLayer();

@@ -8,7 +8,7 @@ require('mappane/CanvasMarker');
 
 
 /**
- * Create Focal Mechanism feature
+ * Create focal mechanism Feature
  *
  * @param options {Object}
  *   {
@@ -133,7 +133,7 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer, summary) - invoked via Features.js
+   * Create feature (map layer, summary html) - invoked via Features.js
    */
   _this.createFeature = function () {
     _this.mapLayer = _getMapLayer();

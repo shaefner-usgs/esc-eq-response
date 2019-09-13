@@ -5,7 +5,7 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Create Historical feature
+ * Create historical seismicity Feature
  *
  * @param options {Object}
  *   {
@@ -73,11 +73,11 @@ var Historical = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer, plot data, summary)
+   * Create Feature (map layer, plot data, summary html)
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}
-   *     feed data for feature
+   *     feed data for Feature
    */
   _this.createFeature = function (json) {
     _Earthquakes = Earthquakes({

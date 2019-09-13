@@ -28,7 +28,7 @@ _DEFAULTS = {
 
 
 /**
- * Create ShakeMap Stations feature
+ * Create shakeMap stations Feature
  *
  * @param options {Object}
  *   {
@@ -328,7 +328,7 @@ var ShakeMapStations = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer)
+   * Create Feature (map layer)
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}

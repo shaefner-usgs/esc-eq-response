@@ -14,7 +14,7 @@ AppUtil.LatLon = LatLon;
 AppUtil.Moment = Moment;
 
 /**
- * Get value of url param
+ * Get the value of a URL parameter
  *
  * @param name {String}
  *
@@ -27,7 +27,7 @@ AppUtil.getParam = function (name) {
 };
 
 /**
- * Get all url param name/value pairs
+ * Get all URL parameter name/value pairs
  *
  * @return params {Object}
  */
@@ -59,20 +59,20 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
- * Lookup table for url param from feature id
+ * Lookup table to get a URL parameter from a Feature id
  *
- * @param key {String}
+ * @param id {String}
  *
  * @return {String}
  */
-AppUtil.lookup = function (key) {
+AppUtil.lookup = function (id) {
   var lookup = {
     aftershocks: 'as',
     foreshocks: 'fs',
     historical: 'hs'
   };
 
-  return lookup[key];
+  return lookup[id];
 };
 
 /**
@@ -150,7 +150,7 @@ AppUtil.round = function (num, precision, empty) {
 };
 
 /**
- * Set the value of a url parameter
+ * Set the value of a URL parameter
  *
  * @param name {String}
  * @param value {Mixed}

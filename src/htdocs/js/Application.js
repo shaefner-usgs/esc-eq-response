@@ -115,7 +115,7 @@ var Application = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set app to default state: remove features, clear status bar, etc.
+   * Set app to default state: remove Features, clear status bar, etc.
    */
   _this.resetApp = function () {
     _this.EditPane.reset();

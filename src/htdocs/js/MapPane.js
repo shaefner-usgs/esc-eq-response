@@ -94,7 +94,7 @@ var MapPane = function (options) {
         id;
 
     _this.map.on('overlayadd overlayremove', function (e) {
-      id = _app.Features.getId(e.name);
+      id = _app.Features.getFeatureId(e.name);
 
       if (e.type === 'overlayadd') {
         bool = true;
@@ -130,7 +130,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Create a separate pane for each feature (used to control stacking order)
+   * Create a separate pane for each Feature (used to control stacking order)
    *
    * @param id {String}
    * @param parent {String <overlayPane | tilePane>}
@@ -142,7 +142,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set map extent to contain all features (bounds)
+   * Zoom map extent to contain bounds (all Features with 'zoomToLayer' prop set to true)
    */
   _fitBounds = function () {
     if (_bounds.isValid()) {
@@ -152,7 +152,7 @@ var MapPane = function (options) {
       });
     }
 
-    // Zoom out if map is zoomed in too close for context (e.g. just mainshock)
+    // Zoom out if map is zoomed too close for context (e.g. just mainshock)
     if (_this.map.getZoom() > 17) {
       _this.map.setZoom(12);
     }
@@ -315,15 +315,14 @@ var MapPane = function (options) {
   };
 
   /**
-   * Zoom map extent to contain Features with 'zoomToLayer' prop set to true
+   * Set map bounds to contain Feature
    *
    * @param feature {Object}
-   *     Feature layer to zoom map to
    */
   _setBounds = function (feature) {
     _bounds.extend(feature.mapLayer.getBounds());
 
-    _fitBounds(); // call in case MapPane is visible while features are being added
+    _fitBounds(); // call in case MapPane is visible while Features are being added
   };
 
   // ----------------------------------------------------------
@@ -331,7 +330,7 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to map
+   * Add a Feature layer to map
    *
    * @param feature {Object}
    */
@@ -410,7 +409,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Remove layer from map
+   * Remove a Feature layer from map
    *
    * @param feature {Object}
    */
@@ -430,7 +429,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Reset state: Set default map extent and purge canvas elements (FM, MT)
+   * Reset map pane to initial state
+   *   Set default map extent and purge canvas elements (FM, MT)
    */
   _this.reset = function () {
     var canvasEls,

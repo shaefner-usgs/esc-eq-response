@@ -17,7 +17,7 @@ var StatusBar = function (options) {
       _el,
 
       _hide,
-      _removeFromDom,
+      _remove,
       _show;
 
 
@@ -37,11 +37,11 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove status bar entry from DOM
+   * Remove a status bar entry from DOM
    *
    * @param el {Element}
    */
-  _removeFromDom = function (el) {
+  _remove = function (el) {
     var parent;
 
     parent = el.parentNode;
@@ -65,7 +65,7 @@ var StatusBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add error to status bar
+   * Add an error to status bar
    *
    * @param feature {Object}
    * @param errorMsg {String}
@@ -84,7 +84,7 @@ var StatusBar = function (options) {
       _this.remove(feature.id);
     });
 
-    // Remove any leftover items for this feature
+    // Remove any leftover items for this Feature
     _this.remove(feature.id);
 
     _el.appendChild(error);
@@ -95,7 +95,7 @@ var StatusBar = function (options) {
    * Add loading message to status bar
    *
    * @param feature {Object}
-   *     optional; displays generic loading message if no feature
+   *     optional; displays generic loading message if no Feature
    */
   _this.addLoadingMsg = function (feature) {
     var animEllipsis,
@@ -110,17 +110,17 @@ var StatusBar = function (options) {
     item = document.createElement('div');
     item.classList.add(id);
 
-    // Remove any leftover items for this feature
+    // Remove any leftover items for this Feature
     _this.remove(id);
 
     if (id === 'rendering') { // rendering app pane
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
       _el.appendChild(item);
     }
-    else { // loading feature
+    else { // loading Feature
       item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';
 
-      // Insert loading feature msgs 'above' rendering msgs
+      // Insert loading Feature msgs 'above' rendering msgs
       _el.insertBefore(item, _el.querySelector('.rendering'));
     }
 
@@ -128,7 +128,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Check if error exists for feature
+   * Check if error exists for Feature
    *
    * @param id {String}
    *
@@ -158,9 +158,9 @@ var StatusBar = function (options) {
         _hide();
 
         // Don't remove last item until after css transition to hide is complete
-        window.setTimeout(_removeFromDom, 500, items[i]);
+        window.setTimeout(_remove, 500, items[i]);
       } else {
-        _removeFromDom(items[i]);
+        _remove(items[i]);
       }
     }
   };

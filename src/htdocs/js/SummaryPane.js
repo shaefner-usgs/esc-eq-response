@@ -5,7 +5,7 @@ var Tablesort = require('tablesort');
 
 
 /**
- * Add and remove features from summary pane and set up javascript interactions
+ * Add and remove Features from summary pane and set up javascript interactions
  *
  * @param options {Object}
  *   {
@@ -184,7 +184,7 @@ var SummaryPane = function (options) {
    * Make table sortable by clicking header values
    *
    * @param className {String}
-   *     className of container elem (feature id)
+   *     className of container elem (Feature id)
    */
   _initTableSort = function (className) {
     var table,
@@ -240,7 +240,7 @@ var SummaryPane = function (options) {
     // Keep row highlighted after user clicks
     this.classList.add('selected');
 
-    // Determine which feature was clicked
+    // Determine which Feature was clicked
     features = [
       'aftershocks',
       'foreshocks',
@@ -324,7 +324,7 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to summary pane
+   * Add a Feature to summary pane
    *
    * @param feature {Object}
    */
@@ -372,7 +372,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove feature from summary pane
+   * Remove a Feature from summary pane
    *
    * @param feature {Object}
    */
@@ -387,7 +387,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Reset pane to initial state
+   * Reset summary pane to initial state
    */
   _this.reset = function () {
     var time;

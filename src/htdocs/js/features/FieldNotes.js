@@ -28,7 +28,7 @@ _DEFAULTS = {
 };
 
 /**
- * Create ShakeMap Stations feature
+ * Create Fieldnotes Feature
  *
  * @param options {Object}
  *   {
@@ -254,11 +254,11 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer)
+   * Create Feature (map layer)
    *   invoked via Ajax callback in Features.js after json feed is loaded
    *
    * @param json {Object}
-   *     feed data for feature
+   *     feed data for Feature
    */
   _this.createFeature = function (json) {
     _count = 0;
