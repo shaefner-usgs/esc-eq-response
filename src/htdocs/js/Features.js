@@ -208,7 +208,6 @@ var Features = function (options) {
 
   /**
    * Remove a Feature from map, plots and summary panes
-   * TODO: pass in Feature.id to all remove methods
    *
    * @param feature {Object}
    */
