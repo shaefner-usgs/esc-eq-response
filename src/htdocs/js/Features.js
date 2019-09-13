@@ -239,8 +239,8 @@ var Features = function (options) {
    */
   _removeAll = function () {
     if (_features) {
-      Object.keys(_features).forEach(function(key) {
-        _remove(_features[key]);
+      Object.keys(_features).forEach(function(id) {
+        _remove(_features[id]);
       });
     }
   };
@@ -279,7 +279,7 @@ var Features = function (options) {
 
     Object.keys(_features).forEach(function(key) {
       if (id === key) {
-        feature = _features[key];
+        feature = _features[id];
       }
     });
 
@@ -296,6 +296,28 @@ var Features = function (options) {
   };
 
   /**
+   * Get Feature id from name/title
+   *
+   * @param name {String}
+   *     name (or title) property of Feature
+   *
+   * @return id {String}
+   */
+  _this.getId = function (name) {
+    var feature,
+        id;
+
+    Object.keys(_features).forEach(function(key) {
+      feature = _features[key];
+      if (feature.name === name || feature.title === name) {
+        id = key;
+      }
+    });
+
+    return id;
+  };
+
+  /**
    * Wrapper method to loop through Feature classes and instantiate them
    *
    * Skip mainshock which is added separately so it's already available
@@ -309,9 +331,9 @@ var Features = function (options) {
 
     featureClasses = featureClasses || _FEATURECLASSES;
 
-    Object.keys(featureClasses).forEach(function(key) {
-      if (key !== 'mainshock') {
-        FeatureClass = featureClasses[key];
+    Object.keys(featureClasses).forEach(function(id) {
+      if (id !== 'mainshock') {
+        FeatureClass = featureClasses[id];
         _intiFeature(FeatureClass);
       }
     });
@@ -333,8 +355,7 @@ var Features = function (options) {
    * @param id {String}
    */
   _this.refresh = function (id) {
-    var feature,
-        fieldnotes;
+    var feature;
 
     _this.isRefreshing = true;
 
@@ -346,12 +367,6 @@ var Features = function (options) {
 
     // Also refresh FieldNotes when Aftershocks feature is refreshed
     if (id === 'aftershocks') {
-      fieldnotes = _app.Features.getFeature('fieldnotes');
-      if (_app.MapPane.map.hasLayer(fieldnotes.mapLayer)) {
-        fieldnotes.displayLayer = true; // leave on if user turned layer on
-      } else {
-        fieldnotes.displayLayer = false;
-      }
       _this.refresh('fieldnotes');
     }
   };

@@ -38,6 +38,7 @@ var MapPane = function (options) {
       _staticLayers,
 
       _addLayerControl,
+      _addListeners,
       _compareLayers,
       _createPane,
       _fitBounds,
@@ -63,6 +64,7 @@ var MapPane = function (options) {
     _staticLayers = _getStaticLayers();
 
     _initMap();
+    _addListeners();
   };
 
   /**
@@ -81,6 +83,27 @@ var MapPane = function (options) {
     ).addTo(_this.map);
 
     return control;
+  };
+
+  /**
+   * Add event listeners for setting Features's displayLayer property when user
+   *   toggles layers on/off
+   */
+  _addListeners = function () {
+    var bool,
+        id;
+
+    _this.map.on('overlayadd overlayremove', function (e) {
+      id = _app.Features.getId(e.name);
+
+      if (e.type === 'overlayadd') {
+        bool = true;
+      } else {
+        bool = false;
+      }
+
+      _app.Features.getFeature(id).displayLayer = bool;
+    });
   };
 
   /**
