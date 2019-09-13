@@ -388,18 +388,21 @@ var PlotsPane = function (options) {
   /**
    * Remove feature from plots pane
    *
-   * @param el {Element}
-   *     Element to remove
+   * @param feature {Object}
    */
-  _this.remove = function (el) {
-    var i,
+  _this.remove = function (feature) {
+    var el,
+        i,
         plots;
 
-    plots = el.querySelectorAll('.js-plotly-plot');
-    for (i = 0; i < plots.length; i ++) {
-      Plotly.purge(plots[i]);
-    }
-    if (_el.contains(el)) {
+    el = _el.querySelector('.' + feature.id);
+
+    if (el) {
+      plots = el.querySelectorAll('.js-plotly-plot');
+
+      for (i = 0; i < plots.length; i ++) {
+        Plotly.purge(plots[i]);
+      }
       el.parentNode.removeChild(el);
     }
   };
@@ -460,15 +463,11 @@ var PlotsPane = function (options) {
    * Reset pane to initial state
    */
   _this.reset = function () {
-    var features,
-        plotsEl;
+    var features;
 
     features = _app.Features.getFeatures();
     Object.keys(features).forEach(function(feature) {
-      plotsEl = document.querySelector('#plotsPane .' + feature);
-      if (plotsEl) {
-        _this.remove(plotsEl);
-      }
+      _this.remove(feature);
     });
 
     _featuresEl.innerHTML = '';
@@ -482,7 +481,7 @@ var PlotsPane = function (options) {
         plots;
 
     if(_isPlotPaneActive()) {
-      plots = document.querySelectorAll('.js-plotly-plot');
+      plots = _el.querySelectorAll('.js-plotly-plot');
       for (i = 0; i < plots.length; i ++) {
         Plotly.Plots.resize(plots[i]);
       }

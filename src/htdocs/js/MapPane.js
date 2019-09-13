@@ -202,7 +202,7 @@ var MapPane = function (options) {
       sortValue = 1; // base layers don't have a z-index/don't need to be sorted
     } else {
       className = 'leaflet-' + _getLayerId(layer) + '-pane';
-      leafletPane = document.querySelector('.' + className);
+      leafletPane = _el.querySelector('.' + className);
       styles = window.getComputedStyle(leafletPane);
       sortValue = Number(styles.getPropertyValue('z-index'));
     }
@@ -412,11 +412,16 @@ var MapPane = function (options) {
   /**
    * Remove layer from map
    *
-   * @param layer {L.layer}
+   * @param feature {Object}
    */
-  _this.remove = function (layer) {
-    _this.map.removeLayer(layer);
-    _this.layerControl.removeLayer(layer);
+  _this.remove = function (feature) {
+    var mapLayer;
+
+    mapLayer = feature.mapLayer;
+    if (mapLayer) {
+      _this.map.removeLayer(mapLayer);
+      _this.layerControl.removeLayer(mapLayer);
+    }
   };
 
   /**

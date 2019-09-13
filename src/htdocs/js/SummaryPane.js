@@ -374,11 +374,14 @@ var SummaryPane = function (options) {
   /**
    * Remove feature from summary pane
    *
-   * @param el {Element}
-   *     Element to remove
+   * @param feature {Object}
    */
-  _this.remove = function (el) {
-    if (_el.contains(el)) {
+  _this.remove = function (feature) {
+    var el;
+
+    el  = _el.querySelector('.' + feature.id);
+
+    if (el) {
       el.parentNode.removeChild(el);
     }
   };
@@ -393,7 +396,7 @@ var SummaryPane = function (options) {
     time.innerHTML = '';
 
     _features.innerHTML = '';
-    _style.textContent = '';
+    _style.textContent = ''; // inline style for sliders
   };
 
 

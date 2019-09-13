@@ -213,24 +213,10 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _remove = function (feature) {
-    var mapLayer,
-        plotsEl,
-        summaryEl;
-
     if (feature) {
-      mapLayer = feature.mapLayer;
-      plotsEl = document.querySelector('#plotsPane .' + feature.id);
-      summaryEl = document.querySelector('#summaryPane .' + feature.id);
-
-      if (mapLayer) {
-        _app.MapPane.remove(mapLayer);
-      }
-      if (plotsEl) {
-        _app.PlotsPane.remove(plotsEl);
-      }
-      if (summaryEl) {
-        _app.SummaryPane.remove(summaryEl);
-      }
+      _app.MapPane.remove(feature);
+      _app.PlotsPane.remove(feature);
+      _app.SummaryPane.remove(feature);
     }
   };
 
