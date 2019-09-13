@@ -415,13 +415,18 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.remove = function (feature) {
-    var mapLayer;
+    var displayLayer,
+        mapLayer;
 
+    displayLayer = feature.displayLayer; // cache value
     mapLayer = feature.mapLayer;
+
     if (mapLayer) {
-      _this.map.removeLayer(mapLayer);
+      _this.map.removeLayer(mapLayer); // always sets displayLayer to false
       _this.layerControl.removeLayer(mapLayer);
     }
+
+    feature.displayLayer = displayLayer;
   };
 
   /**
