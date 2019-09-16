@@ -2,7 +2,8 @@
 
 
 /**
- * Handle form fields on Edit pane and set address bar to match application state.
+ * Handle form fields and set URL to match application state.
+ *
  * Also kick off fetching of data feeds.
  *
  * @param options {Object}
@@ -31,8 +32,8 @@ var EditPane = function (options) {
       _refreshEqs,
       _resetForm,
       _resetTitle,
-      _setFormFields,
-      _setQueryString,
+      _setFormFieldValues,
+      _setQueryStringValues,
       _updateParam,
       _viewMap;
 
@@ -45,15 +46,14 @@ var EditPane = function (options) {
     _app = options.app;
     _el = options.el || document.createElement('div');
     _eqid = document.getElementById('eqid');
-    _eqid.focus();
     _eqidPrevValue = null;
+    _fields = _el.querySelectorAll('input'); // all form fields
 
-    // All form fields
-    _fields = _el.querySelectorAll('input');
+    _eqid.focus();
 
     _initListeners();
-    _setFormFields();
-    _setQueryString();
+    _setFormFieldValues();
+    _setQueryStringValues();
   };
 
   /**
@@ -171,21 +171,21 @@ var EditPane = function (options) {
   /**
    * Check if eqid is valid
    *
-   * @return {Boolean}
+   * @return bool {Boolean}
    */
   _isValidEqId = function () {
-    var regex;
+    var bool,
+        regex;
 
-    // Check if eqid exists (404 error is logged if not)
-    if (_app.StatusBar.hasError('mainshock')) {
-      return false;
+    bool = false;
+    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/; // 2 letters followed by 5-8 characters
+
+    // Check if eqid exists and is correct format (404 error is logged if not)
+    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
+      bool = true;
     }
 
-    // Check if eqid is correct format (2 letters followed by 5-8 characters)
-    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/;
-    if (regex.test(_eqid.value)) {
-      return true;
-    }
+    return bool;
   };
 
   /**
@@ -216,18 +216,18 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset querystring/significant eqs after form values cleared
+   * Reset querystring/significant eqs (form fields are already cleared)
    */
   _resetForm = function () {
     var div,
         select;
 
-    // Set a slight delay so reset button can clear form fields first
+    // Set a slight delay so Reset button can finish clearing form fields first
     setTimeout(function () {
       // Reset query string
-      _setQueryString();
+      _setQueryStringValues();
 
-      // Rebuild significant eqs pulldown (to set selected item)
+      // Rebuild significant eqs pulldown (to set selected item if necessary)
       select = _el.querySelector('.significant');
       if (select) {
         div = select.parentNode;
@@ -255,7 +255,7 @@ var EditPane = function (options) {
   /**
    * Set all form field values to match values in querystring
    */
-  _setFormFields = function () {
+  _setFormFieldValues = function () {
     var params = _app.AppUtil.getParams();
 
     Object.keys(params).forEach(function(key) {
@@ -268,7 +268,7 @@ var EditPane = function (options) {
   /**
    * Set all querystring values to match values in form fields
    */
-  _setQueryString = function () {
+  _setQueryStringValues = function () {
     var i;
 
     for (i = 0; i < _fields.length; i ++) {
@@ -316,7 +316,7 @@ var EditPane = function (options) {
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
-      // Initialize mainshock (other features added after mainshock finished)
+      // Initialize mainshock (and other features after mainshock is added)
       _app.Features.initMainshockFeature();
     }
   };
@@ -345,7 +345,7 @@ var EditPane = function (options) {
     _eqid.value = significant.options[index].value;
 
     // Call manually: eqid input event not triggered when value changed programmatically
-    _setQueryString();
+    _setQueryStringValues();
     _this.initFeatures();
   };
 
@@ -368,7 +368,7 @@ var EditPane = function (options) {
     });
 
     // Next, update all form fields to match url params
-    _setFormFields();
+    _setFormFieldValues();
   };
 
   /**
