@@ -105,15 +105,16 @@ var Features = function (options) {
 
   /**
    * Create a Feature
-   *   first load feed data if Feature's getFeedUrl method is set (Feature is
-   *   then created in _load method after feed data is retrieved)
+   *
+   * First, load feed data if Feature's getFeedUrl method is set, then create
+   *   and add feature
    *
    * @param feature {Object}
    */
   _create = function (feature) {
-    if (typeof feature.getFeedUrl === 'function') {
-      _load(feature); // load external feed data first
-    } else {
+    if (typeof feature.getFeedUrl === 'function') { // get feed data for feature
+      _load(feature);
+    } else { // no external feed data needed
       feature.createFeature();
       _add(feature);
     }
@@ -305,8 +306,8 @@ var Features = function (options) {
   /**
    * Wrapper method to loop through Feature classes and instantiate them
    *
-   * Skip mainshock which is added separately so it's already available
-   *   for other Features that depend on it.
+   * Skip mainshock which was already added separately so it's available for
+   *   other Features that depend on it.
    *
    * @param featureClasses {Object}
    *     optional; uses _FEATURECLASSES if no parameter is passed
