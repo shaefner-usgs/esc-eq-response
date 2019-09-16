@@ -51,7 +51,7 @@ var Features = function (options) {
 
       _add,
       _create,
-      _intiFeature,
+      _initFeature,
       _load,
       _remove,
       _removeAll;
@@ -123,7 +123,7 @@ var Features = function (options) {
   /**
    * Instantiate a Feature class
    */
-  _intiFeature = function (FeatureClass) {
+  _initFeature = function (FeatureClass) {
     _eqid = _app.AppUtil.getParam('eqid');
 
     var feature = FeatureClass({
@@ -320,7 +320,7 @@ var Features = function (options) {
     Object.keys(featureClasses).forEach(function(id) {
       if (id !== 'mainshock') {
         FeatureClass = featureClasses[id];
-        _intiFeature(FeatureClass);
+        _initFeature(FeatureClass);
       }
     });
   };
@@ -332,7 +332,7 @@ var Features = function (options) {
     var MainshockClass;
 
     MainshockClass = _FEATURECLASSES.mainshock;
-    _intiFeature(MainshockClass);
+    _initFeature(MainshockClass);
   };
 
   /**
