@@ -192,19 +192,21 @@ var EditPane = function (options) {
    * Refresh eqs feature layer (triggered when a form field is changed by user)
    */
   _refreshEqs = function () {
-    var formField,
+    var feature,
+        formField,
         id;
 
     if (_isValidEqId()) {
       formField = this;
       id = formField.className; // 'afershocks', 'foreshocks' or 'historical'
+      feature = _app.Features.getFeature(id);
 
       // Throttle requests so they don't fire off repeatedly in rapid succession
       window.clearTimeout(_throttleRefresh);
       _throttleRefresh = window.setTimeout(function() {
         // Even with throttle in place, ajax requests could 'stack' up
         // Wait until previous request is finished before starting another
-        if (_app.Features.isRefreshing) {
+        if (feature.isRefreshing) {
           window.setTimeout(function() {
             _refreshEqs.call(formField);
           }, 100);

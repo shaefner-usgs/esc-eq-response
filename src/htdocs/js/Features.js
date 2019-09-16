@@ -64,9 +64,6 @@ var Features = function (options) {
 
     _app = options.app;
     _features = {};
-
-    // Flag to block mult. instances of Feature from refreshing at the same time
-    _this.isRefreshing = false;
   };
 
   /**
@@ -99,8 +96,6 @@ var Features = function (options) {
       _app.StatusBar.addError(feature, '<h4>Error Creating ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
     }
-
-    _this.isRefreshing = false;
   };
 
   /**
@@ -131,6 +126,9 @@ var Features = function (options) {
       eqid: _eqid
     });
 
+    // Flag to block mult. instances from refreshing simultaneously
+    feature.isRefreshing = false;
+
     _create(feature);
   };
 
@@ -158,6 +156,8 @@ var Features = function (options) {
         }
         feature.createFeature(json);
         _add(feature);
+
+        feature.isRefreshing = false;
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
@@ -189,6 +189,8 @@ var Features = function (options) {
 
         errorMsg += '</ul>';
         _app.StatusBar.addError(feature, errorMsg);
+
+        feature.isRefreshing = false;
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -200,11 +202,11 @@ var Features = function (options) {
         //errorMsg += '<a href="#" class="reload"></a>';
 
         _app.StatusBar.addError(feature, errorMsg);
+
+        feature.isRefreshing = false;
       },
       timeout: 20000
     });
-
-    _this.isRefreshing = false;
   };
 
   /**
@@ -336,16 +338,16 @@ var Features = function (options) {
   };
 
   /**
-   * Refresh a Feature
+   * Refresh a Feature when user manipulates parameters on edit pane
    *
    * @param id {String}
    */
   _this.refresh = function (id) {
     var feature;
 
-    _this.isRefreshing = true;
-
     feature = _this.getFeature(id);
+    feature.isRefreshing = true;
+
     if (feature) {
       _remove(feature);
       _create(feature);
