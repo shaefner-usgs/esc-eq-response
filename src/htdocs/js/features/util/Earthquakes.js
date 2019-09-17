@@ -64,8 +64,8 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
-      _getIntervals,
       _getHtmlTemplate,
+      _getIntervals,
       _getPlotlyTrace,
       _onEachFeature,
       _pointToLayer;
@@ -134,7 +134,7 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <sliderData | first | past | prior>}
+   * @param type {String <first | past | prior | sliderData>}
    */
   _addEqToBin = function (days, magInt, type) {
     var i,
@@ -158,17 +158,17 @@ var Earthquakes = function (options) {
       }
 
       // Add eq to bins
-      _bins[type][magInt][0] ++; // total
-      if (days <= 365) { // bin eqs within one year of period
+      _bins[type][magInt].total ++;
+      if (days <= 365) {
         if (_id !== 'foreshocks') {
-          _bins[type][magInt][365] ++;
+          _bins[type][magInt].year ++;
         }
         if (days <= 30) {
-          _bins[type][magInt][30] ++;
+          _bins[type][magInt].month ++;
           if (days <= 7) {
-            _bins[type][magInt][7] ++;
+            _bins[type][magInt].week ++;
             if (days <= 1) {
-              _bins[type][magInt][1] ++;
+              _bins[type][magInt].day ++;
             }
           }
         }
@@ -267,25 +267,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get intervals for storing binned eq data
-   *
-   * @return intervals {Array}
-   */
-  _getIntervals = function () {
-    var intervals = [];
-
-    intervals[0] = 0;
-    intervals[1] = 0;
-    intervals[7] = 0;
-    intervals[30] = 0;
-    if (_id !== 'foreshocks') {
-      intervals[365] = 0;
-    }
-
-    return intervals;
-  };
-
-  /**
    * Get HTML template (Leaflet's L.Util.template is used to populate values)
    *   these are 'static' templates that don't change depending on context
    *
@@ -325,6 +306,23 @@ var Earthquakes = function (options) {
     }
 
     return template;
+  };
+
+  /**
+   * Get time intervals for storing binned eq data
+   *
+   * @return intervals {Object}
+   */
+  _getIntervals = function () {
+    var intervals = {};
+
+    intervals.day = 0;
+    intervals.week = 0;
+    intervals.month = 0;
+    intervals.year = 0;
+    intervals.total = 0;
+
+    return intervals;
   };
 
   /**
@@ -605,12 +603,13 @@ var Earthquakes = function (options) {
    */
   _this.getBinnedTable = function (type) {
     var html,
-        irow,
-        row,
-        total,
-        totalAll;
+        intervalTotals,
+        rowTotal,
+        value;
 
     html = '';
+    intervalTotals = _getIntervals();
+
     if (_bins[type] && _bins[type].length > 0) {
       html = '<table class="bin">' +
         '<tr>' +
@@ -621,45 +620,33 @@ var Earthquakes = function (options) {
           '<th class="year">Year</th>' +
           '<th>Total</th>' +
         '</tr>';
-      _bins[type].forEach(function(columns, mag) {
+
+      _bins[type].forEach(function(intervals, mag) {
         html += '<tr><th class="rowlabel">M ' + mag + '</th>';
-        columns.forEach(function(column, i) {
-          if (i === 0) { // store row total (first column)
-            total = '<td class="total">' + column + '</td>';
+
+        Object.keys(intervals).forEach(function(interval) {
+          value = intervals[interval];
+          intervalTotals[interval] += value;
+
+          if (interval === 'total') {
+            rowTotal = '<td class="total">' + value + '</td>';
           } else {
-            html += '<td>' + column + '</td>';
+            html += '<td>' + value + '</td>';
           }
         });
-        html += total + '</tr>'; // add row total to table as last column
+
+        html += rowTotal + '</tr>'; // add row total as last column
       });
 
-      // Add total for each column as last row
+      // Add column total as last row
       html += '<tr><th class="rowlabel">Total</th>';
-      for (row = 0; row < _bins[type].length; ++row) { // get column indices
-        if (typeof _bins[type][row] !== 'undefined') {
-          break;
-        }
-      }
-      if (row < _bins[type].length) { // found valid row
-        totalAll = 0;
-        _bins[type][row].forEach(function(cols, index) {
-          total = 0;
-          for (irow = 0; irow < _bins[type].length; ++irow) {
-            if (typeof _bins[type][irow] !== 'undefined') {
-              if (index === 0) { // row total (last column)
-                totalAll += _bins[type][irow][index];
-              } else {
-                total += _bins[type][irow][index];
-              }
-            }
-          }
-          if (index > 0) {
-            html += '<td class="total">' + total + '</td>';
-          }
-        });
-        html += '<td class="total">' + totalAll + '</td>';
-        html += '</tr>';
-      }
+
+      Object.keys(intervalTotals).forEach(function(interval) {
+        value = intervalTotals[interval];
+        html += '<td class="total">' + value + '</td>';
+      });
+
+      html += '</tr>';
       html += '</table>';
     }
 
