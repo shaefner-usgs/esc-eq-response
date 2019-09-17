@@ -310,7 +310,7 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add features to map, plots, summary panes
+   * Create (and subsequently add) features to map, plots, summary panes
    */
   _this.initFeatures = function () {
     _app.resetApp(); // first reset app to default state
@@ -318,8 +318,8 @@ var EditPane = function (options) {
     if (_isValidEqId()) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
-      // Initialize mainshock (and other features after mainshock is added)
-      _app.Features.initMainshockFeature();
+      // Instantiate mainshock (other features are created after mainshock is ready)
+      _app.Features.instantiateMainshock();
     }
   };
 

@@ -254,23 +254,6 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Feature (map layer)
-   *   invoked via Ajax callback in Features.js after json feed is loaded
-   *
-   * @param json {Object}
-   *     feed data for Feature
-   */
-  _this.createFeature = function (json) {
-    _count = 0;
-
-    _this.mapLayer = L.geoJson(json, {
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
-    });
-    _this.title = _this.name + ' (' + _count + ')';
-  };
-
-  /**
    * Get url of data feed
    *
    * @return {String}
@@ -300,6 +283,22 @@ var FieldNotes = function (options) {
 
     return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
       pairs.join('&');
+  };
+
+  /**
+   * Create Feature - set properties that depend on external feed data
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.initFeature = function (json) {
+    _count = 0;
+
+    _this.mapLayer = L.geoJson(json, {
+      onEachFeature: _onEachFeature,
+      pointToLayer: _pointToLayer
+    });
+    _this.title = _this.name + ' (' + _count + ')';
   };
 
 

@@ -148,28 +148,6 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Feature (map layer, plot data, summary html)
-   *   invoked via Ajax callback in Features.js after json feed is loaded
-   *
-   * @param json {Object}
-   *     feed data for Feature
-   */
-  _this.createFeature = function (json) {
-    _Earthquakes = Earthquakes({
-      app: _app,
-      id: _this.id,
-      json: json
-    });
-
-    _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotDescription = _Earthquakes.getDescription();
-    _this.plotTraces = _Earthquakes.plotTraces;
-    _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
-    _this.summary = _getSummary(json);
-    _this.title = _this.name + ' (' + json.metadata.count + ')';
-  };
-
-  /**
    * Get url of data feed
    *
    * @return {String}
@@ -187,6 +165,27 @@ var Aftershocks = function (options) {
     };
 
     return Earthquakes.getFeedUrl(urlParams);
+  };
+
+  /**
+   * Create Feature - set properties that depend on external feed data
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.initFeature = function (json) {
+    _Earthquakes = Earthquakes({
+      app: _app,
+      id: _this.id,
+      json: json
+    });
+
+    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.plotDescription = _Earthquakes.getDescription();
+    _this.plotTraces = _Earthquakes.plotTraces;
+    _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
+    _this.summary = _getSummary(json);
+    _this.title = _this.name + ' (' + json.metadata.count + ')';
   };
 
 

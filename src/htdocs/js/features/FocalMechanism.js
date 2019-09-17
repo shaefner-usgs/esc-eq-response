@@ -133,9 +133,9 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create feature (map layer, summary html) - invoked via Features.js
+   * Create Feature
    */
-  _this.createFeature = function () {
+  _this.initFeature = function () {
     _this.mapLayer = _getMapLayer();
     _this.summary = _getSummary();
   };

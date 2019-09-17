@@ -328,18 +328,6 @@ var ShakeMapStations = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Feature (map layer)
-   *   invoked via Ajax callback in Features.js after json feed is loaded
-   *
-   * @param json {Object}
-   *     feed data for feature
-   */
-  _this.createFeature = function (json) {
-    _this.mapLayer = _getMapLayer(json);
-    _this.title = _this.name + ' (' + _count + ')';
-  };
-
-  /**
    * Get url of data feed
    *
    * @return {String}
@@ -348,6 +336,17 @@ var ShakeMapStations = function (options) {
     if (_shakemap) {
       return _shakemap[0].contents['download/stationlist.json'].url;
     }
+  };
+
+  /**
+   * Create Feature - set properties that depend on external feed data
+   *
+   * @param json {Object}
+   *     feed data for feature
+   */
+  _this.initFeature = function (json) {
+    _this.mapLayer = _getMapLayer(json);
+    _this.title = _this.name + ' (' + _count + ')';
   };
 
 

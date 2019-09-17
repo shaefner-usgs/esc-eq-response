@@ -50,8 +50,8 @@ var Features = function (options) {
       _features,
 
       _add,
-      _create,
-      _initFeature,
+      _init,
+      _instantiate,
       _load,
       _remove,
       _removeAll;
@@ -84,8 +84,8 @@ var Features = function (options) {
         _app.EditPane.showMainshock();
         _app.EditPane.setDefaults();
 
-        // Initialize other Features now that mainshock ready
-        _this.initFeatures();
+        // Instantiate other Features now that Mainshock ready
+        _this.instantiateFeatures();
       }
 
       // Feature finished loading; remove alert
@@ -99,18 +99,18 @@ var Features = function (options) {
   };
 
   /**
-   * Create a Feature
+   * Initialize a Feature
    *
-   * First, load feed data if Feature's getFeedUrl method is set, then create
-   *   and add feature
+   * First, load feed data if Feature's getFeedUrl method is set, then
+   *   initialize (create) and add feature
    *
    * @param feature {Object}
    */
-  _create = function (feature) {
+  _init = function (feature) {
     if (typeof feature.getFeedUrl === 'function') { // get feed data for feature
       _load(feature);
     } else { // no external feed data needed
-      feature.createFeature();
+      feature.initFeature();
       _add(feature);
     }
   };
@@ -118,7 +118,7 @@ var Features = function (options) {
   /**
    * Instantiate a Feature class
    */
-  _initFeature = function (FeatureClass) {
+  _instantiate = function (FeatureClass) {
     _eqid = _app.AppUtil.getParam('eqid');
 
     var feature = FeatureClass({
@@ -129,7 +129,7 @@ var Features = function (options) {
     // Flag to block mult. instances from refreshing simultaneously
     feature.isRefreshing = false;
 
-    _create(feature);
+    _init(feature);
   };
 
   /**
@@ -154,7 +154,7 @@ var Features = function (options) {
         if (feature.id === 'mainshock') {
           feature.json = json; // store mainshock json (used by other features)
         }
-        feature.createFeature(json);
+        feature.initFeature(json);
         _add(feature);
 
         feature.isRefreshing = false;
@@ -314,15 +314,15 @@ var Features = function (options) {
    * @param featureClasses {Object}
    *     optional; uses _FEATURECLASSES if no parameter is passed
    */
-  _this.initFeatures = function (featureClasses) {
+  _this.instantiateFeatures = function (featureClasses) {
     var FeatureClass;
 
     featureClasses = featureClasses || _FEATURECLASSES;
 
     Object.keys(featureClasses).forEach(function(id) {
-      if (id !== 'mainshock') {
+      if (id !== 'mainshock') { // skip mainshock
         FeatureClass = featureClasses[id];
-        _initFeature(FeatureClass);
+        _instantiate(FeatureClass);
       }
     });
   };
@@ -330,11 +330,11 @@ var Features = function (options) {
   /**
    * Wrapper method to instantiate mainshock Feature
    */
-  _this.initMainshockFeature = function () {
+  _this.instantiateMainshock = function () {
     var MainshockClass;
 
     MainshockClass = _FEATURECLASSES.mainshock;
-    _initFeature(MainshockClass);
+    _instantiate(MainshockClass);
   };
 
   /**
@@ -350,7 +350,7 @@ var Features = function (options) {
 
     if (feature) {
       _remove(feature);
-      _create(feature);
+      _init(feature);
     }
 
     // Also refresh FieldNotes when Aftershocks Feature is refreshed

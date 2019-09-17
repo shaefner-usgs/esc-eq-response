@@ -89,13 +89,22 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Feature (map layer, plot data, summary html)
-   *   invoked via Ajax callback in Features.js after json feed is loaded
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
+      _eqid + '.geojson';
+  };
+
+  /**
+   * Create Feature - set properties that depend on external feed data
    *
    * @param json {Object}
    *     feed data for Feature
    */
-  _this.createFeature = function (json) {
+  _this.initFeature = function (json) {
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
@@ -105,16 +114,6 @@ var Mainshock = function (options) {
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
-  };
-
-  /**
-   * Get url of data feed
-   *
-   * @return {String}
-   */
-  _this.getFeedUrl = function () {
-    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _eqid + '.geojson';
   };
 
 
