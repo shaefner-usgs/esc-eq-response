@@ -206,7 +206,7 @@ var EditPane = function (options) {
       _throttleRefresh = window.setTimeout(function() {
         // Even with throttle in place, ajax requests could 'stack' up
         // Wait until previous request is finished before starting another
-        if (feature.isRefreshing) {
+        if (feature && feature.isRefreshing) {
           window.setTimeout(function() {
             _refreshEqs.call(formField);
           }, 100);

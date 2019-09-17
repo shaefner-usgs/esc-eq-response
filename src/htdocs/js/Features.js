@@ -346,11 +346,13 @@ var Features = function (options) {
     var feature;
 
     feature = _this.getFeature(id);
-    feature.isRefreshing = true;
 
     if (feature) {
+      feature.isRefreshing = true;
       _remove(feature);
       _init(feature);
+    } else { // Feature not instantiated yet
+      _instantiate(_FEATURECLASSES[id]);
     }
 
     // Also refresh FieldNotes when Aftershocks Feature is refreshed
