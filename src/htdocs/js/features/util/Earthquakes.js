@@ -81,7 +81,7 @@ var Earthquakes = function (options) {
 
     _app = options.app;
     _id = options.id;
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
+    _markerOptions = options.markerOptions;
 
     _bins = {};
     _plotData = {
@@ -807,7 +807,7 @@ var Earthquakes = function (options) {
 
 
 /**
- * Static method: get the feed url for Eearthquakes features
+ * Static method: get the feed url for Earthquakes features
  *
  * @param params {Object}
  *     See: API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/

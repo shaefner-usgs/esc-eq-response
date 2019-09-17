@@ -22,7 +22,6 @@ _MARKER_DEFAULTS = {
   popupAnchor: [0, -5]
 };
 _DEFAULTS = {
-  json: {},
   markerOptions: _MARKER_DEFAULTS
 };
 
@@ -60,16 +59,15 @@ var ShakeMapStations = function (options) {
 
   _this = {};
 
-  _initialize = function () {
+  _initialize = function (options) {
     var mainshock;
 
-    options = options || {};
+    options = Util.extend({}, _DEFAULTS, options);
+    mainshock = options.app.Features.getFeature('mainshock');
 
     _app = options.app;
     _count = 0;
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
-
-    mainshock = _app.Features.getFeature('mainshock');
+    _markerOptions = options.markerOptions;
     _shakemap = mainshock.json.properties.products.shakemap;
 
     _this.displayLayer = false;

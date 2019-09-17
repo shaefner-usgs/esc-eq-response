@@ -23,7 +23,6 @@ _MARKER_DEFAULTS = {
 };
 _DEFAULTS = {
   iconOptions: _ICON_DEFAULTS,
-  json: {},
   markerOptions: _MARKER_DEFAULTS
 };
 
@@ -57,10 +56,7 @@ var FieldNotes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var iconOptions;
-
-    options = options || {};
-    iconOptions = Util.extend({}, _ICON_DEFAULTS, options.iconOptions);
+    options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
     _Lightbox = Lightbox();
@@ -71,9 +67,9 @@ var FieldNotes = function (options) {
     _this.zoomToLayer = false;
 
     _markerOptions = Util.extend({
-      icon: L.icon(iconOptions),
+      icon: L.icon(options.iconOptions),
       pane: _this.id // put markers in custom Leaflet map pane
-    }, _MARKER_DEFAULTS, options.markerOptions);
+    }, options.markerOptions);
   };
 
   /**
