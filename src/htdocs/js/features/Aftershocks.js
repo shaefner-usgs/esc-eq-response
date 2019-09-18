@@ -106,14 +106,16 @@ var Aftershocks = function (options) {
    * @return summary {String}
    */
   _getSummary = function (json) {
-    var mag,
+    var count,
+        mag,
         magThreshold,
         mostRecentEq,
         summary;
 
+    count = json.metadata.count;
     summary = _Earthquakes.getDescription();
 
-    if (json.metadata.count > 0) {
+    if (count > 0) {
       magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
       mostRecentEq = _app.AppUtil.pick(_Earthquakes.eqList, [_Earthquakes.mostRecentEqId]);
 
@@ -132,12 +134,14 @@ var Aftershocks = function (options) {
       summary += _Earthquakes.getBinnedTable('past');
       summary += '</div>';
       summary += _getProbabilities();
-      summary += '<h3>Most Recent Aftershock</h3>';
-      summary += _Earthquakes.getListTable(mostRecentEq);
+      if (count > 1) {
+        summary += '<h3>Most Recent Aftershock</h3>';
+        summary += _Earthquakes.getListTable(mostRecentEq);
+      }
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
          '(<span class="num">' + _Earthquakes.sliderData[mag]  + '</span>)</h3>';
       summary += _Earthquakes.getSlider(mag);
-      summary += _Earthquakes.getListTable(_Earthquakes.eqList, magThreshold);
+      summary += _Earthquakes.getListTable(_Earthquakes.eqList, mag);
     }
 
     return summary;
