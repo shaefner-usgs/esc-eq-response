@@ -159,9 +159,7 @@ var Earthquakes = function (options) {
       // Add eq to bins
       _bins[type][magInt].total ++;
       if (days <= 365) {
-        if (_id !== 'foreshocks') {
-          _bins[type][magInt].year ++;
-        }
+        _bins[type][magInt].year ++;
         if (days <= 30) {
           _bins[type][magInt].month ++;
           if (days <= 7) {
