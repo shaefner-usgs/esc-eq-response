@@ -31,12 +31,12 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquake json feed and create Leaflet map layer, Plotly.js traces,
- *   and tabular content for summary pane.
+ * Parse earthquakes json feed and create Leaflet map layer, Plotly.js traces
+ *   and content (description, sliders and tables) for summary pane.
  *
  * @param options {Object}
  *   {
- *     app: {Object},
+ *     app: {Object}, // Application
  *     id: {String}, // Feature id
  *     json: {Object} // Feature json data
  *   }
@@ -80,10 +80,9 @@ var Earthquakes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
+    _bins = {};
     _id = options.id;
     _markerOptions = options.markerOptions;
-
-    _bins = {};
     _plotData = {
       color: [],
       date: [],
@@ -153,7 +152,7 @@ var Earthquakes = function (options) {
       }
     } else { // first, past, or prior
       if (!_bins[type][magInt]) {
-        intervals = _getIntervals(); // initialize interval arrays
+        intervals = _getIntervals(); // get intervals template
         _bins[type][magInt] = intervals;
       }
 
@@ -309,7 +308,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get time intervals for storing binned eq data
+   * Get time intervals template for storing binned eq data
    *
    * @return intervals {Object}
    */
@@ -604,38 +603,32 @@ var Earthquakes = function (options) {
   _this.getBinnedTable = function (type) {
     var html,
         intervalTotals,
-        rowTotal,
         value;
 
     html = '';
-    intervalTotals = _getIntervals();
+    intervalTotals = _getIntervals(); // get intervals template
 
     if (_bins[type] && _bins[type].length > 0) {
       html = '<table class="bin">' +
         '<tr>' +
           '<th class="period">' + type + ':</th>' +
-          '<th>Day</th>' +
-          '<th>Week</th>' +
-          '<th>Month</th>' +
+          '<th class="day">Day</th>' +
+          '<th class="week">Week</th>' +
+          '<th class="month">Month</th>' +
           '<th class="year">Year</th>' +
-          '<th>Total</th>' +
+          '<th class="total">Total</th>' +
         '</tr>';
 
-      _bins[type].forEach(function(intervals, mag) {
+      _bins[type].forEach(function(intervals, mag) { // loop thru magnitude groups
         html += '<tr><th class="rowlabel">M ' + mag + '</th>';
 
         Object.keys(intervals).forEach(function(interval) {
           value = intervals[interval];
           intervalTotals[interval] += value;
-
-          if (interval === 'total') {
-            rowTotal = '<td class="total">' + value + '</td>';
-          } else {
-            html += '<td>' + value + '</td>';
-          }
+          html += '<td class="' + interval + '">' + value + '</td>';
         });
 
-        html += rowTotal + '</tr>'; // add row total as last column
+        html += '</tr>'; // add row total as last column
       });
 
       // Add column total as last row
@@ -643,7 +636,7 @@ var Earthquakes = function (options) {
 
       Object.keys(intervalTotals).forEach(function(interval) {
         value = intervalTotals[interval];
-        html += '<td class="total">' + value + '</td>';
+        html += '<td class="' + interval + ' total">' + value + '</td>';
       });
 
       html += '</tr>';
@@ -797,7 +790,7 @@ var Earthquakes = function (options) {
  * Static method: get the feed url for Earthquakes features
  *
  * @param params {Object}
- *     See: API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
+ *     See API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
  *
  * @return {String}
  */
