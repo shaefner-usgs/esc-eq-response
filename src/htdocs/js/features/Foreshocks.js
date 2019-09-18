@@ -5,12 +5,12 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Create foreshocks Feature
+ * Create Foreshocks Feature
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var Foreshocks = function (options) {

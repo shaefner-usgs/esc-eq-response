@@ -7,11 +7,10 @@
 /**
  * Creates a LatLon point on the earth's surface at the specified latitude / longitude.
  *
- * @constructor
- * @param {number}
- *     lat - Latitude in degrees.
- * @param {number}
- *     lon - Longitude in degrees.
+ * @param lat {Number}
+ *     Latitude in degrees.
+ * @param lon {Number}
+ *     Longitude in degrees.
  *
  * @example
  *     var p1 = new LatLon(52.205, 0.119);
@@ -29,12 +28,12 @@ function LatLon(lat, lon) {
 /**
  * Returns the distance from ‘this’ point to destination point (using haversine formula).
  *
- * @param {LatLon}
- *     point - Latitude/longitude of destination point.
- * @param {number}
- *     [radius=6371e3] - (Mean) radius of earth (defaults to radius in metres).
- * @returns {number}
- *     Distance between this point and destination point, in same units as radius.
+ * @param point {LatLon}
+ *     Latitude/longitude of destination point.
+ * @param radius {Number}
+ *     (Mean) radius of earth (defaults to radius in metres).
+ * @return {Number}
+ *     Distance between this point and destination point (same units as radius).
  *
  * @example
  *     var p1 = new LatLon(52.205, 0.119);
@@ -65,9 +64,9 @@ LatLon.prototype.distanceTo = function(point, radius) {
 /**
  * Foward azimuth (takeoff bearing) from point to destination.
  *
- * @param {LatLon}
- *     point - Latitude/longitude of destination point.
- * @returns {number}
+ * @param point {LatLon}
+ *     Latitude/longitude of destination point.
+ * @return {Number}
  *     Foward azimuth (degrees) from point to destination (-180.0, 180.0).
  *
  * @example

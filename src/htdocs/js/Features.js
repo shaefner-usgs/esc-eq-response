@@ -38,7 +38,7 @@ _FEATURECLASSES = {
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
+ *     app: {Object} // Application
  *   }
  */
 var Features = function (options) {

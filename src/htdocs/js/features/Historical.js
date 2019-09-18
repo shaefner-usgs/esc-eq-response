@@ -5,12 +5,12 @@ var Earthquakes = require('features/util/Earthquakes');
 
 
 /**
- * Create historical seismicity Feature
+ * Create Historical Seismicity Feature
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var Historical = function (options) {

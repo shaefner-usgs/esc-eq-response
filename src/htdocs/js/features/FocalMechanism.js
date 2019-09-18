@@ -8,12 +8,12 @@ require('mappane/CanvasMarker');
 
 
 /**
- * Create focal mechanism Feature
+ * Create Focal Mechanism Feature
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var FocalMechanism = function (options) {

@@ -264,8 +264,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get HTML template (Leaflet's L.Util.template is used to populate values)
-   *   these are 'static' templates that don't change depending on context
+   * Get HTML template for content
+   *   Leaflet's L.Util.template is used to populate values
    *
    * @param type {String <popup | tablerow | tooltip>}
    *
@@ -306,7 +306,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get time intervals template for storing binned eq data
+   * Get time intervals object template for storing binned eq data
    *
    * @return intervals {Object}
    */
@@ -328,7 +328,7 @@ var Earthquakes = function (options) {
    * @param plotId {String <cumulative || hypocenters || magtime>}
    * @param type {String <scatter || scatter3d>}
    *
-   * @return trace {Object} || null
+   * @return trace {Object || null}
    */
   _getPlotlyTrace = function (plotId, type) {
     var date,
@@ -437,7 +437,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates popups, tooltips and data for summary/plots
+   * Create Leaflet popups, tooltips and data for summary, plots; add earthquake
+   *   to bins
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -557,7 +558,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates markers and plot data from GeoJSON points
+   * Create Leaflet markers and add additional properties to plot data
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -645,7 +646,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get feed description (summary of user-set parameters, etc.) for feature
+   * Get description (summary of user-set parameters, etc.) of feature
    *
    * @return description {String}
    */
@@ -738,7 +739,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get html for input range slider when there's at least two mag bins w/ eqs
+   * Get input range slider when there's at least two magnitude bins w/ eqs
    *
    * @param mag {Number}
    *
@@ -785,7 +786,7 @@ var Earthquakes = function (options) {
 
 
 /**
- * Static method: get the feed url for Earthquakes features
+ * Static method: get the feed url for Earthquakes Features
  *
  * @param params {Object}
  *     See API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/

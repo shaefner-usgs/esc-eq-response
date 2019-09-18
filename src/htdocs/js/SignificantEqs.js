@@ -9,7 +9,7 @@ var Xhr = require('util/Xhr');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
+ *     app: {Object} // Application
  *   }
  */
 var SignificantEqs = function (options) {

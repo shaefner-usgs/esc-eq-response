@@ -8,12 +8,12 @@ require('mappane/CanvasMarker');
 
 
 /**
- * Create moment tensor Feature
+ * Create Moment Tensor Feature
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var MomentTensor = function (options) {

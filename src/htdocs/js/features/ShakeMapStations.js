@@ -27,12 +27,12 @@ _DEFAULTS = {
 
 
 /**
- * Create shakeMap stations Feature
+ * Create ShakeMap Stations Feature
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var ShakeMapStations = function (options) {
@@ -141,7 +141,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: filters out DYFI stations
+   * Filter out DYFI stations
    *
    * @param feature {Object}
    */
@@ -280,7 +280,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates popups and tooltips
+   * Create Leaflet popups and tooltips
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -299,7 +299,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates markers from GeoJSON points
+   * Create Leaflet markers
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}

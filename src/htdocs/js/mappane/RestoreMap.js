@@ -11,26 +11,25 @@
  *     (compatible with https://github.com/ismyrnow/Leaflet.groupedlayercontrol)
  * - remembers fullscreen mode
  *     (compatible with https://github.com/Leaflet/Leaflet.fullscreen)
- * - option to share layer settings across site
+ * - option to share layer settings on different pages
  *
  * Usage: map.RestoreMap(options)
  *
  * @param options {Object}
- *        optional settings
- *        {
- *          baseLayers: {Object <Layer Config>},
- *              req'd for restoring basemap setting
- *          id: {String},
- *              save each page's settings separately
- *          layerStorageType {String <local | session>}
- *          overlays: {Object <Layer Config>},
- *              req'd for restoring overlay settings
- *          scope: {String <AppName>}
- *              group / isolate settings (e.g. by app)
- *          shareLayers: {Boolean}
- *              share layer settings amongst all pages
- *          viewStorageType {String <local | session>}
- *        }
+ *   {
+ *     baseLayers: {Object <Layer Config>},
+ *         req'd for restoring basemap setting
+ *     id: {String},
+ *         saves each page's settings separately
+ *     layerStorageType {String <local | session>}
+ *     overlays: {Object <Layer Config>},
+ *         req'd for restoring overlay settings
+ *     scope: {String <AppName>}
+ *         group / isolate settings (e.g. by app)
+ *     shareLayers: {Boolean}
+ *         share layer settings amongst all pages
+ *     viewStorageType {String <local | session>}
+ *   }
  *
  * <Layer Config> : http://leafletjs.com/reference.html#control-layers-config
  */

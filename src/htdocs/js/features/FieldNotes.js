@@ -31,8 +31,8 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
- *     eqid: {String} // mainshock event id
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
 var FieldNotes = function (options) {
@@ -174,7 +174,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates popups and tooltips
+   * Create Leaflet popups and tooltips
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -209,7 +209,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates markers from GeoJSON points
+   * Create Leaflet markers
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}

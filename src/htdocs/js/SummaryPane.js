@@ -9,7 +9,7 @@ var Tablesort = require('tablesort');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // application props / methods
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */

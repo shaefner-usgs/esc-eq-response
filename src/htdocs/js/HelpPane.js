@@ -9,7 +9,7 @@ var Svg = require('Svg');
  *
  * @param options {Object}
  *   {
- *     app: {Object}
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */

@@ -22,7 +22,7 @@ require('mappane/TerrainLayer');
  *
  * @param options {Object}
  *   {
- *     app: {Object}
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */
