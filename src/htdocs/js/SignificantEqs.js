@@ -19,6 +19,7 @@ var SignificantEqs = function (options) {
       _app,
       _json,
 
+      _getHtml,
       _loadFeed;
 
 
@@ -30,6 +31,49 @@ var SignificantEqs = function (options) {
     _app = options.app;
 
     _loadFeed();
+  };
+
+  /**
+   * Get html for pulldown menu of significant eqs
+   *
+   * @return html {String}
+   */
+  _getHtml = function () {
+    var date,
+        html,
+        list,
+        mag,
+        props,
+        sel,
+        selCurrent;
+
+    sel = ' selected="selected"';
+
+    if (_json.features) {
+      _json.features.forEach(function(feature) {
+        props = feature.properties;
+        date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
+        mag = _app.AppUtil.round(props.mag, 1);
+
+        selCurrent = '';
+        if (feature.id === _app.AppUtil.getParam('eqid')) {
+          selCurrent = sel;
+          sel = '';
+        }
+
+        list += '<option value="' + feature.id + '"' + selCurrent + '>' +
+            'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
+          '</option>';
+      });
+
+      html = '<select class="significant" tabindex="1">';
+      html += '<option value="" disabled="disabled"' + sel + '>Significant ' +
+        'Earthquakes in the Past Month (UTC)</option>';
+      html += list;
+      html += '</select>';
+    }
+
+    return html;
   };
 
   /**
@@ -100,7 +144,7 @@ var SignificantEqs = function (options) {
         significant;
 
     refNode = document.querySelector('label[for=eqid]');
-    selectMenu = _this.getHtml();
+    selectMenu = _getHtml();
 
     if (selectMenu) {
       div = document.createElement('div');
@@ -111,49 +155,6 @@ var SignificantEqs = function (options) {
       significant = document.querySelector('.significant');
       significant.addEventListener('change', _app.EditPane.selSignificantEq);
     }
-  };
-
-  /**
-   * Get html for pulldown menu of significant eqs
-   *
-   * @return html {String}
-   */
-  _this.getHtml = function () {
-    var date,
-        html,
-        list,
-        mag,
-        props,
-        sel,
-        selCurrent;
-
-    sel = ' selected="selected"';
-
-    if (_json.features) {
-      _json.features.forEach(function(feature) {
-        props = feature.properties;
-        date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
-        mag = _app.AppUtil.round(props.mag, 1);
-
-        selCurrent = '';
-        if (feature.id === _app.AppUtil.getParam('eqid')) {
-          selCurrent = sel;
-          sel = '';
-        }
-
-        list += '<option value="' + feature.id + '"' + selCurrent + '>' +
-            'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
-          '</option>';
-      });
-
-      html = '<select class="significant" tabindex="1">';
-      html += '<option value="" disabled="disabled"' + sel + '>Significant ' +
-        'Earthquakes in the Past Month (UTC)</option>';
-      html += list;
-      html += '</select>';
-    }
-
-    return html;
   };
 
 
