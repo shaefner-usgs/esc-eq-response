@@ -34,7 +34,7 @@ _FEATURECLASSES = {
 
 
 /**
- * Create and add Features to map, plots and summary panes
+ * Create, load and add/remove Features on map, plots and summary panes
  *
  * @param options {Object}
  *   {
@@ -119,15 +119,12 @@ var Features = function (options) {
    * Instantiate a Feature class
    */
   _instantiate = function (FeatureClass) {
-    _eqid = _app.AppUtil.getParam('eqid');
+    var feature;
 
-    var feature = FeatureClass({
+    feature = FeatureClass({
       app: _app,
       eqid: _eqid
     });
-
-    // Flag to block mult. instances from refreshing simultaneously
-    feature.isRefreshing = false;
 
     _init(feature);
   };
@@ -324,7 +321,7 @@ var Features = function (options) {
     featureClasses = featureClasses || _FEATURECLASSES;
 
     Object.keys(featureClasses).forEach(function(id) {
-      if (id !== 'mainshock') { // skip mainshock
+      if (id !== 'mainshock') { // skip mainshock (already done)
         FeatureClass = featureClasses[id];
         _instantiate(FeatureClass);
       }
@@ -335,10 +332,9 @@ var Features = function (options) {
    * Wrapper method to instantiate mainshock Feature
    */
   _this.instantiateMainshock = function () {
-    var MainshockClass;
+    _eqid = _app.AppUtil.getParam('eqid');
 
-    MainshockClass = _FEATURECLASSES.mainshock;
-    _instantiate(MainshockClass);
+    _instantiate(_FEATURECLASSES.mainshock);
   };
 
   /**
@@ -352,10 +348,10 @@ var Features = function (options) {
     feature = _this.getFeature(id);
 
     if (feature) {
-      feature.isRefreshing = true;
+      feature.isRefreshing = true; // flag to block multiple/simultaneous refreshes
       _remove(feature);
       _init(feature);
-    } else { // Feature not instantiated yet
+    } else { // Feature was not yet successfully instantiated
       _instantiate(_FEATURECLASSES[id]);
     }
 
