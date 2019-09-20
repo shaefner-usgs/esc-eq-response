@@ -16,8 +16,8 @@ var StatusBar = function (options) {
 
       _el,
 
+      _doRemove,
       _hide,
-      _remove,
       _show;
 
 
@@ -30,18 +30,11 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Hide status bar (uses css slide-down animation)
-   */
-  _hide = function () {
-    _el.classList.add('hide');
-  };
-
-  /**
    * Remove a status bar entry from DOM
    *
    * @param el {Element}
    */
-  _remove = function (el) {
+  _doRemove = function (el) {
     var parent;
 
     parent = el.parentNode;
@@ -54,7 +47,14 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Show status bar (uses css slide-up animation)
+   * Hide status bar container (uses css slide-down animation)
+   */
+  _hide = function () {
+    _el.classList.add('hide');
+  };
+
+  /**
+   * Show status bar container (uses css slide-up animation)
    */
   _show = function () {
     _el.classList.remove('hide');
@@ -84,7 +84,7 @@ var StatusBar = function (options) {
       _this.remove(feature.id);
     });
 
-    // Remove any leftover items for this Feature
+    // Remove any leftover items for this Feature before adding another
     _this.remove(feature.id);
 
     _el.appendChild(error);
@@ -95,7 +95,7 @@ var StatusBar = function (options) {
    * Add loading message to status bar
    *
    * @param feature {Object}
-   *     optional; displays generic loading message if no Feature
+   *     optional; displays generic loading message if no Feature provided
    */
   _this.addLoadingMsg = function (feature) {
     var animEllipsis,
@@ -103,10 +103,12 @@ var StatusBar = function (options) {
         item;
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
-    id = 'rendering';
+    id = 'rendering'; // generic id
+
     if (feature && feature.hasOwnProperty('id')) {
       id = feature.id;
     }
+
     item = document.createElement('div');
     item.classList.add(id);
 
@@ -116,8 +118,7 @@ var StatusBar = function (options) {
     if (id === 'rendering') { // rendering app pane
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
       _el.appendChild(item);
-    }
-    else { // loading Feature
+    } else { // loading Feature
       item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';
 
       // Insert loading Feature msgs 'above' rendering msgs
@@ -144,7 +145,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove item from status bar (and hide/remove status bar if empty)
+   * Wrapper method to remove item from status bar (and hide status bar if empty)
    *
    * @param id {String}
    */
@@ -157,10 +158,10 @@ var StatusBar = function (options) {
       if (_el.children.length === 1) {
         _hide();
 
-        // Don't remove last item until after css transition to hide is complete
-        window.setTimeout(_remove, 500, items[i]);
+        // Don't remove last item until after hide css transition is complete
+        window.setTimeout(_doRemove, 500, items[i]);
       } else {
-        _remove(items[i]);
+        _doRemove(items[i]);
       }
     }
   };

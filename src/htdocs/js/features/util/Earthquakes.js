@@ -325,8 +325,8 @@ var Earthquakes = function (options) {
   /**
    * Get plot's trace option for plotly.js
    *
-   * @param plotId {String <cumulative || hypocenters || magtime>}
-   * @param type {String <scatter || scatter3d>}
+   * @param plotId {String <cumulative | hypocenters | magtime>}
+   * @param type {String <scatter | scatter3d>}
    *
    * @return trace {Object || null}
    */
@@ -593,7 +593,7 @@ var Earthquakes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get table containing binned earthquake data
+   * Get a table containing binned earthquake data
    *
    * @param type {String <first | past | prior>}
    *
@@ -646,7 +646,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get description (summary of user-set parameters, etc.) of feature
+   * Get a description (summary of user-set parameters, etc.) of feature
    *
    * @return description {String}
    */
@@ -684,7 +684,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get table containing a list of earthquakes
+   * Get a table containing a list of earthquakes
    *   only displays eqs larger than threshold (if supplied) by default
    *
    * @param data {Object}
@@ -739,7 +739,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get input range slider when there's at least two magnitude bins w/ eqs
+   * Get a range slider (filter) when there's at least two magnitude bins w/ eqs
    *
    * @param mag {Number}
    *

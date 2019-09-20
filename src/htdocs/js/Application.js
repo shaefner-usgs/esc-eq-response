@@ -14,7 +14,7 @@ var AppUtil = require('AppUtil'),
 
 
 /**
- * Earthquake Response Application - sets up app and dependencies
+ * Earthquake Response Application - set up app and dependencies
  *
  * @param options {Object}
  *   {
@@ -96,7 +96,7 @@ var Application = function (options) {
   };
 
   /**
-   * URL params shortened to make URLs more succinct; redirect users using old params
+   * URL params were shortened to make URLs more succinct; redirect users using old params
    */
   _redirect = function () {
     var url;

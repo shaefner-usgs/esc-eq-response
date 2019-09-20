@@ -5,7 +5,7 @@ var Xhr = require('util/Xhr');
 
 
 /**
- * Factory for getting significant earthquakes and creating html pulldown menu
+ * Factory for loading significant earthquakes and creating a pulldown menu
  *
  * @param options {Object}
  *   {
@@ -19,8 +19,8 @@ var SignificantEqs = function (options) {
       _app,
       _json,
 
-      _getHtml,
-      _loadFeed;
+      _getSelectMenu,
+      _load;
 
 
   _this = {};
@@ -30,56 +30,59 @@ var SignificantEqs = function (options) {
 
     _app = options.app;
 
-    _loadFeed();
+    _load();
   };
 
   /**
-   * Get html for pulldown menu of significant eqs
+   * Get significant earthquakes pulldown menu
    *
-   * @return html {String}
+   * @return el {Element}
    */
-  _getHtml = function () {
+  _getSelectMenu = function () {
     var date,
-        html,
+        el,
         list,
         mag,
         props,
-        sel,
-        selCurrent;
+        selected,
+        selectedStatus;
 
-    sel = ' selected="selected"';
+    list = '';
+    selected = ' selected="selected"';
 
     if (_json.features) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
+
         date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
         mag = _app.AppUtil.round(props.mag, 1);
 
-        selCurrent = '';
+        selectedStatus = '';
         if (feature.id === _app.AppUtil.getParam('eqid')) {
-          selCurrent = sel;
-          sel = '';
+          selectedStatus = selected;
+          selected = ''; // used to set default option to unselected since match found
         }
 
-        list += '<option value="' + feature.id + '"' + selCurrent + '>' +
-            'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
-          '</option>';
+        list += '<option value="' + feature.id + '"' + selectedStatus + '>' +
+          'M ' + mag + ' - ' + props.place + ' (' + date + ')</option>';
       });
 
-      html = '<select class="significant" tabindex="1">';
-      html += '<option value="" disabled="disabled"' + sel + '>Significant ' +
-        'Earthquakes in the Past Month (UTC)</option>';
-      html += list;
-      html += '</select>';
+      list = '<option value="" disabled="disabled"' + selected + '>' +
+        'Significant Earthquakes in the Past Month (UTC)</option>' + list;
+
+      el = document.createElement('select');
+      el.classList.add('significant');
+      el.innerHTML = list;
+      el.tabIndex = 1;
     }
 
-    return html;
+    return el;
   };
 
   /**
-   * Load GeoJson feed for significant eqs
+   * Load significant earthquakes feed
    */
-  _loadFeed = function () {
+  _load = function () {
     var errorMsg,
         url;
 
@@ -97,8 +100,6 @@ var SignificantEqs = function (options) {
       success: function (json) {
         _json = json;
         _this.addSignificantEqs();
-
-        _app.StatusBar.remove('significant');
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message
@@ -113,8 +114,8 @@ var SignificantEqs = function (options) {
             errorMsg += '<li>http status code: ' + status + '</li>';
           }
         }
-
         errorMsg += '</ul>';
+
         _app.StatusBar.addError({id: 'significant'}, errorMsg);
       },
       ontimeout: function (xhr) {
@@ -135,25 +136,20 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add list of significant earthquakes pulldown menu
+   * Add significant earthquakes pulldown menu
    */
   _this.addSignificantEqs = function () {
-    var div,
-        refNode,
-        selectMenu,
-        significant;
+    var refNode,
+        selectMenu;
 
     refNode = document.querySelector('label[for=eqid]');
-    selectMenu = _getHtml();
+    selectMenu = _getSelectMenu(_json);
+
+    _app.StatusBar.remove('significant');
 
     if (selectMenu) {
-      div = document.createElement('div');
-      div.innerHTML = selectMenu;
-      refNode.parentNode.insertBefore(div, refNode);
-
-      // Add listener here b/c we have to wait til it exists
-      significant = document.querySelector('.significant');
-      significant.addEventListener('change', _app.EditPane.selSignificantEq);
+      refNode.parentNode.insertBefore(selectMenu, refNode);
+      selectMenu.addEventListener('change', _app.EditPane.selSignificantEq);
     }
   };
 

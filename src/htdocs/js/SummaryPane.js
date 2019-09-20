@@ -5,7 +5,7 @@ var Tablesort = require('tablesort');
 
 
 /**
- * Add and remove Features from summary pane and set up javascript interactions
+ * Set up and configure summary pane; also adds / removes summaries
  *
  * @param options {Object}
  *   {
@@ -19,7 +19,7 @@ var SummaryPane = function (options) {
 
       _app,
       _el,
-      _features,
+      _featuresEl,
       _style,
       _tz,
 
@@ -41,7 +41,7 @@ var SummaryPane = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('div');
-    _features = _el.querySelector('.features');
+    _featuresEl = _el.querySelector('.features');
     _style = document.createElement('style');
     _tz = _getTimeZone();
 
@@ -123,7 +123,7 @@ var SummaryPane = function (options) {
 
     time = document.createElement('time');
     time.classList.add('updated');
-    _el.insertBefore(time, _features);
+    _el.insertBefore(time, _featuresEl);
   };
 
   /**
@@ -151,7 +151,7 @@ var SummaryPane = function (options) {
 
   /**
    * Get timezone of user's device
-   * http://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
+   * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
    *  offset-amount-in-js/12496442#12496442
    *
    * @return tz {String}
@@ -272,6 +272,7 @@ var SummaryPane = function (options) {
     var selected;
 
     selected = _el.querySelector('.selected');
+
     if (selected) {
       selected.classList.remove('selected');
     }
@@ -353,7 +354,7 @@ var SummaryPane = function (options) {
         div.classList.add('content', 'feature', feature.id);
         div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
 
-        _features.appendChild(div);
+        _featuresEl.appendChild(div);
 
         // Configure dynamic elements (sliders, table sorting) if present
         slider = div.querySelector('.slider input');
@@ -395,7 +396,7 @@ var SummaryPane = function (options) {
     time = _el.querySelector('time');
     time.innerHTML = '';
 
-    _features.innerHTML = '';
+    _featuresEl.innerHTML = '';
     _style.textContent = ''; // inline style for sliders
   };
 

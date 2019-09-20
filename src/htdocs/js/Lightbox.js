@@ -6,11 +6,14 @@ var Util = require('hazdev-webutils/src/util/Util');
 
 var _DEFAULTS = {};
 
+/**
+ * Create a lightbox overlay
+ */
 var Lightbox = function (options) {
   var _this,
       _initialize,
 
-      _addListener,
+      _addCloseListener,
       _handleEscapeKey;
 
 
@@ -25,7 +28,7 @@ var Lightbox = function (options) {
    *
    * @param div {Element}
    */
-  _addListener = function (div) {
+  _addCloseListener = function (div) {
     div.addEventListener('click', function(e) {
       e.preventDefault();
       _this.hide();
@@ -48,10 +51,10 @@ var Lightbox = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add lightbox to document
+   * Add Lightbox to document
    *
-   * @param html {Html}
-   *     lightbox content (typically an img)
+   * @param html {String}
+   *     Lightbox content (typically an img tag)
    */
   _this.add = function (html) {
     var div;
@@ -65,7 +68,7 @@ var Lightbox = function (options) {
 
     document.body.appendChild(div);
 
-    _addListener(div);
+    _addCloseListener(div);
   };
 
   /**

@@ -2,9 +2,10 @@
 
 
 /**
- * Handle form fields and set URL to match application state.
+ * Handle form fields and set URL to match application state; display mainshock
+ *   details
  *
- * Also kick off fetching of data feeds.
+ * Also kicks off creation of Features
  *
  * @param options {Object}
  *   {
@@ -29,7 +30,7 @@ var EditPane = function (options) {
       _initListeners,
       _isNewEvent,
       _isValidEqId,
-      _refreshEqs,
+      _refreshFeature,
       _resetForm,
       _resetTitle,
       _setFormFieldValues,
@@ -76,6 +77,15 @@ var EditPane = function (options) {
   /**
    * Get default values for form fields that depend on user-selected mainshock
    *
+   * Default values for aftershock and historical seismicity differences are
+   * based on rupture length, which we estimate from the Hanks-Bakun (2014)
+   * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
+   *
+   * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
+   *
+   * Aftershock / Forshock distance = ruptureLength,
+   * Historical distance = 1.5 * ruptureLength
+   *
    * @return {Object}
    */
   _getDefaults = function () {
@@ -84,16 +94,6 @@ var EditPane = function (options) {
         ruptureLength;
 
     mag = _app.Features.getFeature('mainshock').json.properties.mag;
-
-    /* Default values for aftershock and historical seismicity differences are
-     * based on rupture length, which we estimate from the Hanks-Bakun (2014)
-     * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
-     *
-     * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
-     *
-     * Aftershock / Forshock distance = ruptureLength,
-     * Historical distance = 1.5 * ruptureLength
-     */
     ruptureArea = Math.pow(10, mag - 4);
     ruptureLength = Math.pow(ruptureArea, 0.7);
 
@@ -141,9 +141,9 @@ var EditPane = function (options) {
     _addListener([_eqid], 'input', _this.initFeatures);
 
     // Update eq features when params changed
-    _addListener(aftershocks, 'change', _refreshEqs);
-    _addListener(foreshocks, 'change', _refreshEqs);
-    _addListener(historical, 'change', _refreshEqs);
+    _addListener(aftershocks, 'change', _refreshFeature);
+    _addListener(foreshocks, 'change', _refreshFeature);
+    _addListener(historical, 'change', _refreshFeature);
 
     // Clear features when reset button pressed
     _addListener([reset], 'click', _app.resetApp);
@@ -171,44 +171,44 @@ var EditPane = function (options) {
   /**
    * Check if eqid is valid
    *
-   * @return bool {Boolean}
+   * @return isValid {Boolean}
    */
   _isValidEqId = function () {
-    var bool,
+    var isValid,
         regex;
 
-    bool = false;
+    isValid = false;
     regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/; // 2 letters followed by 5-8 characters
 
     // Check if eqid exists and is correct format (404 error is logged if not)
     if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
-      bool = true;
+      isValid = true;
     }
 
-    return bool;
+    return isValid;
   };
 
   /**
-   * Refresh eqs feature layer (triggered when a form field is changed by user)
+   * Refresh a Feature (triggered when a form field is changed by user)
    */
-  _refreshEqs = function () {
+  _refreshFeature = function () {
     var feature,
         formField,
         id;
 
     if (_isValidEqId()) {
       formField = this;
-      id = formField.className; // 'afershocks', 'foreshocks' or 'historical'
+      id = formField.className;
       feature = _app.Features.getFeature(id);
 
-      // Throttle requests so they don't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttleRefresh);
+      // Throttle requests so they can't fire off repeatedly in rapid succession
+      window.clearTimeout(_throttleRefresh); // first clear any queued refresh
       _throttleRefresh = window.setTimeout(function() {
-        // Even with throttle in place, ajax requests could 'stack' up
+        // Even with a throttle in place, Ajax requests can still 'stack up'
         // Wait until previous request is finished before starting another
         if (feature && feature.isRefreshing) {
           window.setTimeout(function() {
-            _refreshEqs.call(formField);
+            _refreshFeature.call(formField);
           }, 100);
         } else {
           _app.Features.refresh(id);
@@ -218,22 +218,19 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset querystring/significant eqs (form fields are already cleared)
+   * Reset querystring/significant eqs (input fields are already cleared)
    */
   _resetForm = function () {
-    var div,
-        select;
+    var select;
 
-    // Set a slight delay so Reset button can finish clearing form fields first
+    // Set a slight delay so 'Reset' button can finish clearing form fields first
     setTimeout(function () {
-      // Reset query string
-      _setQueryStringValues();
+      _setQueryStringValues(); // reset query string
 
       // Rebuild significant eqs pulldown (to set selected item if necessary)
       select = _el.querySelector('.significant');
       if (select) {
-        div = select.parentNode;
-        div.parentNode.removeChild(div);
+        select.parentNode.removeChild(select);
         _app.SignificantEqs.addSignificantEqs();
       }
     }, 10);
@@ -310,7 +307,7 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create (and subsequently add) features to map, plots, summary panes
+   * Create Features (and subsequently add them to map, plots and summary panes)
    */
   _this.initFeatures = function () {
     _app.resetApp(); // first reset app to default state
@@ -324,7 +321,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset pane to initial state
+   * Reset edit pane to initial state
    */
   _this.reset = function () {
     _hideMainshock();

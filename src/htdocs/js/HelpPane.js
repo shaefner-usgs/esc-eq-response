@@ -5,7 +5,7 @@ var Svg = require('Svg');
 
 
 /**
- * Add SVG elements to Help pane
+ * Add SVG elements to help pane
  *
  * @param options {Object}
  *   {
@@ -37,13 +37,13 @@ var HelpPane = function (options) {
   };
 
   /**
-   * Add SVG elements to legend html
+   * Add SVG elements to legend HTML
    */
   _addSvgElements = function () {
-    var circles,
+    var circle,
+        circles,
         line,
         range,
-        svg,
         triangle;
 
     circles = {
@@ -71,8 +71,8 @@ var HelpPane = function (options) {
     };
 
     Object.keys(circles).forEach(function(key) {
-      svg = _Svg.getCircle(circles[key]);
-      _legend.querySelector('.' + key).appendChild(svg);
+      circle = _Svg.getCircle(circles[key]);
+      _legend.querySelector('.' + key).appendChild(circle);
     });
 
     line = _Svg.getLine({

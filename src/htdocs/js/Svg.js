@@ -5,9 +5,9 @@ var AppUtil = require('AppUtil'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
-var _SVG_DEFAULTS;
+var _DEFAULTS;
 
-_SVG_DEFAULTS = {
+_DEFAULTS = {
   color: '#000',
   fillColor: '#fff',
   fillOpacity: 0.85,
@@ -49,7 +49,7 @@ var Svg = function (options) {
         svgOpts;
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
+    svgOpts = Util.extend({}, _DEFAULTS, opts);
 
     svg.innerHTML = '<path d="M3.4,7.8C3.6,8.4,3.7,9,3.9,9.7c0.2,0.6,0.5,1.2,' +
       '0.8,1.8C5,12,5.2,12.4,5.6,13c-1.5,1.7-2.5,3.3-3.3,5.4C2.1,18,2,17.9,' +
@@ -90,7 +90,7 @@ var Svg = function (options) {
         svgOpts;
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
+    svgOpts = Util.extend({}, _DEFAULTS, opts);
 
     elemSize = Math.ceil(svgOpts.radius * 2 + 2);
 
@@ -163,7 +163,7 @@ var Svg = function (options) {
         svgOpts;
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
+    svgOpts = Util.extend({}, _DEFAULTS, opts);
 
     svg.innerHTML = [
       '<path fill="#fff" stroke-width="2" stroke-linecap="round" stroke="',
@@ -192,7 +192,7 @@ var Svg = function (options) {
         svgOpts;
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOpts = Util.extend({}, _SVG_DEFAULTS, opts);
+    svgOpts = Util.extend({}, _DEFAULTS, opts);
 
     svg.innerHTML = [
       '<polygon points="10,3 19,18 1,18" stroke-width="1" stroke="',

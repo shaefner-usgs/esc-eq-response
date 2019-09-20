@@ -117,6 +117,8 @@ var Features = function (options) {
 
   /**
    * Instantiate a Feature class
+   *
+   * @param FeatureClass {Object}
    */
   _instantiate = function (FeatureClass) {
     var feature;
@@ -172,13 +174,13 @@ var Features = function (options) {
               'earthquakes (max 20,000)</li>';
           }
           else if (xhr.responseText.match('parameter combination')){ // status code 400
-            errorMsg += ' <li>Missing required parameters (all fields are ' +
+            errorMsg += '<li>Missing required parameters (all fields are ' +
               'required)</li>';
           }
         }
         if (status) {
           if (status === 404 && feature.id === 'mainshock') {
-            errorMsg += ' <li>Event ID ' + _eqid + ' not found</li>';
+            errorMsg += '<li>Event ID ' + _eqid + ' not found</li>';
           }
           else if (status.message) {
             errorMsg += '<li>' + status.message + '</li>';
@@ -249,7 +251,6 @@ var Features = function (options) {
    *     displayLayer: {Boolean}, // whether or not map layer is "on" by default
    *     id: {String}, // unique id of feature
    *     name: {String}, // display name of feature
-   *     url: {String}, // URL of json data feed (optional)
    *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *
    *   The following props are set after external feed data is loaded (optional)
@@ -298,7 +299,7 @@ var Features = function (options) {
 
     Object.keys(_features).forEach(function(key) {
       feature = _features[key];
-      if (feature.name === name || feature.title === name) {
+      if (name === feature.name || name === feature.title) {
         id = key;
       }
     });

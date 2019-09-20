@@ -93,7 +93,7 @@ AppUtil.pick = function (object, picked) {
 };
 
 /**
- * Convert number to roman numeral
+ * Convert a number to a roman numeral
  *
  * @param num {Number}
  *
@@ -129,7 +129,7 @@ AppUtil.romanize = function (num) {
  * @param num {Number}
  * @param precision {Number}
  * @param empty {String}
- *   optional string to return if num is null
+ *     optional string to return if num is null
  *
  * @return {String}
  *     Note that it does not return a Number b/c toFixed() returns a string

@@ -3,7 +3,7 @@
 
 
 /**
- * Add and remove Features from plots pane and set up javascript interactions
+ * Set up and create Plotly.js plots; also adds / removes plots
  *
  * @param options {Object}
  *   {
@@ -18,7 +18,7 @@ var PlotsPane = function (options) {
       _app,
       _el,
       _featuresEl,
-      _plotConfigs,
+      _plots,
 
       _addListeners,
       _addPlotContainer,
@@ -38,7 +38,7 @@ var PlotsPane = function (options) {
     _app = options.app;
     _el = options.el || document.createElement('div');
     _featuresEl = _el.querySelector('.features');
-    _plotConfigs = {};
+    _plots = {};
 
     // Make plots responsive
     window.onresize = function() {
@@ -60,6 +60,7 @@ var PlotsPane = function (options) {
 
     plot.on('plotly_click', function(data) {
       points = data.points[0];
+
       eqids = points.data.eqid;
       feature = points.data.feature;
       index = points.pointNumber;
@@ -102,7 +103,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot config option for plotly.js
+   * Get plot config option for Plotly.js
    *
    * @param featureId {String}
    * @param plotId {String}
@@ -146,11 +147,11 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot layout option for plotly.js
+   * Get plot layout option for Plotly.js
    *
    * @param plotId {String}
    * @param zRatio {Number}
-   *     optional; only used for hypocenters plot
+   *     optional; only needed for hypocenters plot
    *
    * @return layout {Object}
    */
@@ -158,11 +159,6 @@ var PlotsPane = function (options) {
     var layout,
         spikecolor,
         titlefont;
-
-    spikecolor = '#7234dc';
-    titlefont = {
-      color: '#555'
-    };
 
     layout = {
       font: {
@@ -176,6 +172,10 @@ var PlotsPane = function (options) {
         t: 0
       },
       showlegend: false
+    };
+    spikecolor = '#7234dc';
+    titlefont = {
+      color: '#555'
     };
 
     if (plotId === 'hypocenters') {
@@ -235,10 +235,10 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get config parameters used to instantiate plots
+   * Get Plotly.js parameters used to instantiate plots
    *
    * @param feature {Object}
-   * @param plotId {String <cumulative || hypocenters || magtime>}
+   * @param plotId {String <cumulative | hypocenters | magtime>}
    *
    * @return {Object}
    *     Plotly.newPlot signature
@@ -251,15 +251,15 @@ var PlotsPane = function (options) {
         titles,
         zRatio;
 
-    if (plotId === 'hypocenters') {
-      zRatio = _getRatio(feature.plotTraces.hypocenters);
-    }
-
     titles = {
       cumulative: 'Cumulative Earthquakes',
       hypocenters: '3D Hypocenters',
       magtime: 'Magnitude vs. Time'
     };
+
+    if (plotId === 'hypocenters') {
+      zRatio = _getRatio(feature.plotTraces.hypocenters);
+    }
 
     config = _getPlotlyConfig(feature.id, plotId);
     container = _addPlotContainer(feature.id, plotId, titles[plotId]);
@@ -277,7 +277,8 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot traces (and add mainshock trace to hypocenters and magtime plots)
+   * Get plot traces option for Plotly.js (mainshock trace is added to
+   *   hypocenters, magtime plots)
    *
    * @param feature {Object}
    * @param plotId {String}
@@ -339,15 +340,15 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add a Feature to plots pane
-   *   creates plots, but only renders them once plots pane is visible
+   * Add a Feature to plots pane - creates plots, but only renders them once
+   *   plots pane is visible
    *
    * @param feature {Object}
    */
   _this.add = function (feature) {
     var description,
         div,
-        plotlyParams,
+        params,
         title;
 
     // Don't plot mainshock on its own (it is included in other Features' plots)
@@ -363,15 +364,15 @@ var PlotsPane = function (options) {
 
       _featuresEl.appendChild(div);
 
-      plotlyParams = {};
+      params = {};
       Object.keys(feature.plotTraces).forEach(function(plotId) {
         if (feature.plotTraces[plotId]) { // null if no data
-          plotlyParams[plotId] = _getPlotlyParams(feature, plotId);
+          params[plotId] = _getPlotlyParams(feature, plotId);
         }
       });
 
-      _plotConfigs[feature.id] = {
-        plotlyParams: plotlyParams,
+      _plots[feature.id] = {
+        params: params,
         rendered: false
       };
 
@@ -413,20 +414,20 @@ var PlotsPane = function (options) {
     var graphDiv,
         options,
         path,
-        plotlyParams,
+        params,
         rendered,
         resetButton;
 
     // Loop thru Features
-    Object.keys(_plotConfigs).forEach(function(featureId) {
-      plotlyParams = _plotConfigs[featureId].plotlyParams;
-      rendered = _plotConfigs[featureId].rendered;
+    Object.keys(_plots).forEach(function(featureId) {
+      params = _plots[featureId].params;
+      rendered = _plots[featureId].rendered;
 
       if (!rendered) {
         // Loop thru plot types for Feature
-        Object.keys(plotlyParams).forEach(function(plotId) {
-          graphDiv = plotlyParams[plotId].graphDiv;
-          options = plotlyParams[plotId].options;
+        Object.keys(params).forEach(function(plotId) {
+          graphDiv = params[plotId].graphDiv;
+          options = params[plotId].options;
 
           Plotly.newPlot(graphDiv, options);
           if (plotId !== 'hypocenters') { // skip click events on 3d plots
@@ -434,11 +435,11 @@ var PlotsPane = function (options) {
           }
         });
 
-        _plotConfigs[featureId].rendered = true;
+        _plots[featureId].rendered = true;
 
         // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
-        if (plotlyParams.hypocenters) {
-          resetButton = plotlyParams.hypocenters.graphDiv.querySelector(
+        if (params.hypocenters) {
+          resetButton = params.hypocenters.graphDiv.querySelector(
             '[data-attr="resetLastSave"]'
           );
           resetButton.setAttribute('data-title', 'Autoscale');
