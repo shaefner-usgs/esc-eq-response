@@ -81,7 +81,7 @@ var SummaryPane = function (options) {
       slider = input.parentNode;
       table = el.querySelector('div.filter + .eqlist');
 
-      input.addEventListener('input', function() {
+      input.addEventListener('input', function () {
         magValue = Number(input.value);
         scrollY = window.pageYOffset;
 
@@ -277,21 +277,22 @@ var SummaryPane = function (options) {
    *
    * @param el {Element}
    *     input (range slider) element
-   * @param feature {Object}
+   * @param id {String}
+   *     Feature id
    */
-  _setSliderStyles = function (el, feature) {
+  _setSliderStyles = function (el, id) {
     var newRules,
         oldRules,
         value,
         vendorEls;
 
     newRules = '';
-    oldRules = new RegExp('#' + feature + '[^#]+', 'g');
+    oldRules = new RegExp('#' + id + '[^#]+', 'g');
     value = _getSliderValue(el);
     vendorEls = ['webkit-slider-runnable', 'moz-range'];
 
     for (var i = 0; i < vendorEls.length; i ++) {
-      newRules += '#' + feature + '::-' + vendorEls[i] +
+      newRules += '#' + id + '::-' + vendorEls[i] +
         '-track { background-size:' + value + ' !important}';
     }
 
