@@ -237,7 +237,7 @@ var FieldNotes = function (options) {
     url = regex.exec(_popup.getContent().outerHTML);
 
     if (url) { // popup has a photo
-      image.onload = function() {
+      image.onload = function () {
         _popup.update(); // pan map to contain popup after image loads
       };
       image.src = url[0];
