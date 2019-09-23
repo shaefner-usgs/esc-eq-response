@@ -1,29 +1,26 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Moment = require('moment'),
-    Xhr = require('util/Xhr');
+var Xhr = require('util/Xhr');
+
 
 /**
- * Factory for getting significant earthquakes and creating html pulldown menu
+ * Factory for loading significant earthquakes and creating a pulldown menu
  *
  * @param options {Object}
  *   {
- *     callback: {Function},
- *     statusBar: {Object} // StatusBar instance
+ *     app: {Object} // Application
  *   }
  */
 var SignificantEqs = function (options) {
   var _this,
       _initialize,
 
-      _callback,
+      _app,
       _json,
 
-      _StatusBar,
-
-      _loadFeed;
+      _getSelectMenu,
+      _load;
 
 
   _this = {};
@@ -31,22 +28,69 @@ var SignificantEqs = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _StatusBar = options.statusBar;
+    _app = options.app;
 
-    _callback = options.callback;
-
-    _loadFeed();
+    _load();
   };
 
   /**
-   * Load GeoJson feed for significant eqs and return via _callback()
+   * Get significant earthquakes pulldown menu
+   *
+   * @return el {Element}
    */
-  _loadFeed = function () {
+  _getSelectMenu = function () {
+    var date,
+        el,
+        list,
+        mag,
+        props,
+        selected,
+        selectedStatus;
+
+    list = '';
+    selected = ' selected="selected"';
+
+    if (_json.features) {
+      _json.features.forEach(function(feature) {
+        props = feature.properties;
+
+        date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
+        mag = _app.AppUtil.round(props.mag, 1);
+
+        selectedStatus = '';
+        if (feature.id === _app.AppUtil.getParam('eqid')) {
+          selectedStatus = selected;
+          selected = ''; // used to set default option to unselected since match found
+        }
+
+        list += '<option value="' + feature.id + '"' + selectedStatus + '>' +
+          'M ' + mag + ' - ' + props.place + ' (' + date + ')</option>';
+      });
+
+      list = '<option value="" disabled="disabled"' + selected + '>' +
+        'Significant Earthquakes in the Past Month (UTC)</option>' + list;
+
+      el = document.createElement('select');
+      el.classList.add('significant');
+      el.innerHTML = list;
+      el.tabIndex = 1;
+    }
+
+    return el;
+  };
+
+  /**
+   * Load significant earthquakes feed
+   */
+  _load = function () {
     var errorMsg,
         url;
 
     // Alert user that feed is loading
-    _StatusBar.addItem('Significant Earthquakes');
+    _app.StatusBar.addLoadingMsg({
+      id: 'significant',
+      name: 'Significant Earthquakes'
+    });
 
     errorMsg = '<h4>Error Loading Significant Earthquakes</h4><ul>';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
@@ -55,9 +99,7 @@ var SignificantEqs = function (options) {
       url: url,
       success: function (json) {
         _json = json;
-        _callback();
-
-        _StatusBar.removeItem('Significant Earthquakes');
+        _this.addSignificantEqs();
       },
       error: function (status, xhr) {
         // Show response in console and add additional info to error message
@@ -72,9 +114,9 @@ var SignificantEqs = function (options) {
             errorMsg += '<li>http status code: ' + status + '</li>';
           }
         }
-
         errorMsg += '</ul>';
-        _StatusBar.addError('Significant Earthquakes', errorMsg);
+
+        _app.StatusBar.addError({id: 'significant'}, errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -83,7 +125,7 @@ var SignificantEqs = function (options) {
           'earthquake.usgs.gov)</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _StatusBar.addError('Significant Earthquakes', errorMsg);
+        _app.StatusBar.addError({id: 'significant'}, errorMsg);
       },
       timeout: 20000
     });
@@ -94,46 +136,21 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get html for pulldown menu of significant eqs
-   *
-   * @return html {String}
+   * Add significant earthquakes pulldown menu
    */
-  _this.getHtml = function () {
-    var date,
-        html,
-        list,
-        mag,
-        props,
-        sel,
-        selCurrent;
+  _this.addSignificantEqs = function () {
+    var refNode,
+        selectMenu;
 
-    sel = ' selected="selected"';
+    refNode = document.querySelector('label[for=eqid]');
+    selectMenu = _getSelectMenu(_json);
 
-    if (_json.features) {
-      _json.features.forEach(function(feature) {
-        props = feature.properties;
-        date = Moment.utc(props.time).format('MMM D HH:mm:ss');
-        mag = AppUtil.round(props.mag, 1);
+    _app.StatusBar.remove('significant');
 
-        selCurrent = '';
-        if (feature.id === AppUtil.getParam('eqid')) {
-          selCurrent = sel;
-          sel = '';
-        }
-
-        list += '<option value="' + feature.id + '"' + selCurrent + '>' +
-            'M ' + mag + ' - ' + props.place + ' (' + date + ')' +
-          '</option>';
-      });
-
-      html = '<select class="significant" tabindex="1">';
-      html += '<option value="" disabled="disabled"' + sel + '>Significant ' +
-        'Earthquakes in the Past Month (UTC)</option>';
-      html += list;
-      html += '</select>';
+    if (selectMenu) {
+      refNode.parentNode.insertBefore(selectMenu, refNode);
+      selectMenu.addEventListener('change', _app.EditPane.selSignificantEq);
     }
-
-    return html;
   };
 
 

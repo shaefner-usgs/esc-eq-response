@@ -6,7 +6,7 @@ var Util = require('hazdev-webutils/src/util/Util');
 
 
 /**
- * Factory for ESRI Terrain base layer
+ * Factory for Terrain base layer
  *
  * @param options {Object}
  *     L.TileLayer options

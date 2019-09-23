@@ -4,6 +4,9 @@
 
 require('mappane/Utfgrid');
 
+/**
+ * This class enables mouseover labels on Leaflet Map using UtfGrid
+ */
 L.MouseOverLayer = L.LayerGroup.extend({
   /**
    * @param options {Object}

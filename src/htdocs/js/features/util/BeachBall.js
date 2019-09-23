@@ -1,7 +1,7 @@
 'use strict';
 
-var BeachBallView = require('beachballs/BeachBallView'),
-    Tensor = require('beachballs/Tensor'),
+var BeachBallView = require('features/util/BeachBallView'),
+    Tensor = require('features/util/Tensor'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -15,7 +15,7 @@ var _DEFAULTS = {
 };
 
 
-var MomentTensor = function (options) {
+var BeachBall = function (options) {
   var _this,
       _initialize,
 
@@ -34,8 +34,8 @@ var MomentTensor = function (options) {
   _initialize = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
-    _data = options.data;
     _className = options.className;
+    _data = options.data;
     _fillColor = options.fillColor;
     _labelAxes = options.labelAxes;
     _labelPlanes = options.labelPlanes;
@@ -84,4 +84,4 @@ var MomentTensor = function (options) {
 };
 
 
-module.exports = MomentTensor;
+module.exports = BeachBall;

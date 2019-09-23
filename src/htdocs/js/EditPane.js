@@ -1,56 +1,40 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    SignificantEqs = require('SignificantEqs');
-
-
 /**
- * Handles form fields and sets address bar to match application state.
- * Also kicks off fetching of data feeds and displays mainshock details.
+ * Handle form fields and set URL to match application state; display mainshock
+ *   details
+ *
+ * Also kicks off creation of Features
  *
  * @param options {Object}
  *   {
- *     el: {Element},
- *     features: {Object}, // Features instance
- *     mapPane: {Object}, // MapPane instance
- *     navBar: {Object}, // NavBar instance
- *     statusBar: {Object}, // StatusBar instance
- *     summaryPane: {Object} // SummaryPane instance
+ *     app: {Object}, // Application
+ *     el: {Element}
  *   }
  */
 var EditPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
       _eqid,
       _eqidPrevValue,
       _fields,
       _throttleRefresh,
 
-      _Features,
-      _MapPane,
-      _NavBar,
-      _SignificantEqs,
-      _StatusBar,
-      _SummaryPane,
-
       _addListener,
-      _addSignificantEqs,
       _getDefaults,
-      _getFeatures,
       _hideMainshock,
       _initListeners,
       _isNewEvent,
       _isValidEqId,
-      _refreshEqs,
-      _resetApp,
+      _refreshFeature,
       _resetForm,
       _resetTitle,
-      _selSignificantEq,
-      _setFormFields,
-      _setQueryString,
+      _setFormFieldValues,
+      _setQueryStringValues,
       _updateParam,
       _viewMap;
 
@@ -60,33 +44,17 @@ var EditPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _Features = options.features;
-    _MapPane = options.mapPane;
-    _NavBar = options.navBar;
-    _StatusBar = options.statusBar;
-    _SummaryPane = options.summaryPane;
-
+    _app = options.app;
     _el = options.el || document.createElement('div');
     _eqid = document.getElementById('eqid');
-    _eqid.focus();
     _eqidPrevValue = null;
+    _fields = _el.querySelectorAll('input'); // all form fields
 
-    // All form fields
-    _fields = _el.querySelectorAll('input');
-
-    _SignificantEqs = SignificantEqs({
-      callback: _addSignificantEqs,
-      statusBar: _StatusBar
-    });
+    _eqid.focus();
 
     _initListeners();
-    _setFormFields();
-    _setQueryString();
-
-    // Get things rolling if eqid is already set when initialized
-    if (_eqid.value !== '') {
-      _getFeatures();
-    }
+    _setFormFieldValues();
+    _setQueryStringValues();
   };
 
   /**
@@ -107,53 +75,25 @@ var EditPane = function (options) {
   };
 
   /**
-   * Add list of significant earthquakes pulldown menu
-   */
-  _addSignificantEqs = function () {
-    var div,
-        refNode,
-        selectMenu,
-        significant;
-
-    refNode = _el.querySelector('label[for=eqid]');
-    selectMenu = _SignificantEqs.getHtml();
-
-    if (selectMenu) {
-      div = document.createElement('div');
-      div.innerHTML = selectMenu;
-      refNode.parentNode.insertBefore(div, refNode);
-
-      // Add listener here b/c we have to wait til it exists
-      significant = _el.querySelector('.significant');
-      _addListener([significant], 'change', _selSignificantEq);
-    }
-  };
-
-  /*
    * Get default values for form fields that depend on user-selected mainshock
    *
-   * @param mainshockJson {Object}
-   *     GeoJson data
+   * Default values for aftershock and historical seismicity differences are
+   * based on rupture length, which we estimate from the Hanks-Bakun (2014)
+   * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
+   *
+   * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
+   *
+   * Aftershock / Forshock distance = ruptureLength,
+   * Historical distance = 1.5 * ruptureLength
    *
    * @return {Object}
    */
-  _getDefaults = function (mainshockJson) {
+  _getDefaults = function () {
     var mag,
         ruptureArea,
         ruptureLength;
 
-    mag = mainshockJson.properties.mag;
-
-    /*
-     * Default values for aftershock and historical seismicity differences are
-     * based on rupture length, which we estimate from the Hanks-Bakun (2014)
-     * magitude-area relation. We round to the nearest 10km via 10*round(0.1*value).
-     *
-     * ruptureArea = 10**(M-4), ruptureLength(approx) = A**0.7
-     *
-     * Aftershock / Forshock distance = ruptureLength,
-     * Historical distance = 1.5 * ruptureLength
-     */
+    mag = _app.Features.getFeature('mainshock').json.properties.mag;
     ruptureArea = Math.pow(10, mag - 4);
     ruptureLength = Math.pow(ruptureArea, 0.7);
 
@@ -170,22 +110,6 @@ var EditPane = function (options) {
   };
 
   /**
-   * Get features for map, plots, summary panes
-   */
-  _getFeatures = function () {
-    _resetForm(); // first reset form/app to default state
-
-    if (_isValidEqId()) {
-      _el.querySelector('.viewmap').removeAttribute('disabled');
-
-      // Pass editPane instance to expose its public methods to xhr callback in Features
-      _Features.getFeatures({
-        editPane: _this
-      });
-    }
-  };
-
-  /*
    * Hide mainshock details on edit pane
    */
   _hideMainshock = function () {
@@ -214,15 +138,15 @@ var EditPane = function (options) {
     _addListener(_fields, 'input', _updateParam);
 
     // Get new set of feature layers when eqid is changed
-    _addListener([_eqid], 'input', _getFeatures);
+    _addListener([_eqid], 'input', _this.initFeatures);
 
     // Update eq features when params changed
-    _addListener(aftershocks, 'change', _refreshEqs);
-    _addListener(foreshocks, 'change', _refreshEqs);
-    _addListener(historical, 'change', _refreshEqs);
+    _addListener(aftershocks, 'change', _refreshFeature);
+    _addListener(foreshocks, 'change', _refreshFeature);
+    _addListener(historical, 'change', _refreshFeature);
 
     // Clear features when reset button pressed
-    _addListener([reset], 'click', _resetForm);
+    _addListener([reset], 'click', _app.resetApp);
 
     // Switch to map pane when 'View Map' button is clicked
     _addListener([viewmap], 'click', _viewMap);
@@ -231,7 +155,7 @@ var EditPane = function (options) {
   /**
    * Check if event id entered by user is 'new' (different from previous value)
    *
-   * @return newEvent {Boolean}
+   * @return isNew {Boolean}
    */
   _isNewEvent = function () {
     var isNew = false;
@@ -247,85 +171,67 @@ var EditPane = function (options) {
   /**
    * Check if eqid is valid
    *
-   * @return {Boolean}
+   * @return isValid {Boolean}
    */
   _isValidEqId = function () {
-    var regex;
+    var isValid,
+        regex;
 
-    // Check if eqid exists (returns 404 error if not)
-    if (_StatusBar.hasError('Mainshock')) {
-      return false;
+    isValid = false;
+    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/; // 2 letters followed by 5-8 characters
+
+    // Check if eqid exists and is correct format (404 error is logged if not)
+    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
+      isValid = true;
     }
 
-    // Check if eqid is correct format (2 letters followed by 5-8 characters)
-    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/;
-    if (regex.test(_eqid.value)) {
-      return true;
-    }
+    return isValid;
   };
 
   /**
-   * Refresh eqs feature layer (triggered when a form field is changed by user)
+   * Refresh a Feature (triggered when a form field is changed by user)
    */
-  _refreshEqs = function () {
-    var formField,
+  _refreshFeature = function () {
+    var feature,
+        formField,
         id;
 
     if (_isValidEqId()) {
       formField = this;
-      id = formField.className; // 'afershocks', 'foreshocks' or 'historical'
+      id = formField.className;
+      feature = _app.Features.getFeature(id);
 
-      // Throttle requests so they don't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttleRefresh);
+      // Throttle requests so they can't fire off repeatedly in rapid succession
+      window.clearTimeout(_throttleRefresh); // first clear any queued refresh
       _throttleRefresh = window.setTimeout(function() {
-        // Even with throttle in place, ajax requests could 'stack' up
+        // Even with a throttle in place, Ajax requests can still 'stack up'
         // Wait until previous request is finished before starting another
-        if (_Features.isRefreshing) {
+        if (feature && feature.isRefreshing) {
           window.setTimeout(function() {
-            _refreshEqs.call(formField);
+            _refreshFeature.call(formField);
           }, 100);
         } else {
-          _Features.refresh(id);
+          _app.Features.refresh(id);
         }
       }, 250);
     }
   };
 
   /**
-   * Reset app: clear mainshock details, features, status bar, etc.
-   */
-  _resetApp = function () {
-    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
-
-    _hideMainshock();
-    _resetTitle();
-    _StatusBar.reset();
-    _Features.removeFeatures();
-    _MapPane.reset();
-    _SummaryPane.reset();
-    _NavBar.reset();
-  };
-
-  /**
-   * Reset form: call _resetApp, reset querystring/pulldown after form cleared
+   * Reset querystring/significant eqs (input fields are already cleared)
    */
   _resetForm = function () {
-    var div,
-        select;
+    var select;
 
-    _resetApp();
+    // Set a slight delay so 'Reset' button can finish clearing form fields first
+    setTimeout(function() {
+      _setQueryStringValues(); // reset query string
 
-    // Set a slight delay so reset button can clear form fields first
-    setTimeout(function () {
-      // Reset query string
-      _setQueryString();
-
-      // Rebuild significant eqs pulldown (to set selected item)
+      // Rebuild significant eqs pulldown (to set selected item if necessary)
       select = _el.querySelector('.significant');
       if (select) {
-        div = select.parentNode;
-        div.parentNode.removeChild(div);
-        _addSignificantEqs();
+        select.parentNode.removeChild(select);
+        _app.SignificantEqs.addSignificantEqs();
       }
     }, 10);
   };
@@ -338,6 +244,7 @@ var EditPane = function (options) {
   _resetTitle = function () {
     var title;
 
+    // Only keep 'generic' portion of title after '|' char (app name)
     title = document.title.split('|')[1] || document.title.split('|')[0];
     document.title = title;
 
@@ -345,27 +252,10 @@ var EditPane = function (options) {
   };
 
   /**
-   * Set user selected significant eq as mainshock
-   */
-  _selSignificantEq = function () {
-    var index,
-        significant;
-
-    significant = _el.querySelector('.significant');
-    index = significant.selectedIndex;
-
-    _eqid.value = significant.options[index].value;
-
-    // Call manually: eqid input event not triggered when value changed programmatically
-    _setQueryString();
-    _getFeatures();
-  };
-
-  /**
    * Set all form field values to match values in querystring
    */
-  _setFormFields = function () {
-    var params = AppUtil.getParams();
+  _setFormFieldValues = function () {
+    var params = _app.AppUtil.getParams();
 
     Object.keys(params).forEach(function(key) {
       if (document.getElementById(key)) {
@@ -377,11 +267,11 @@ var EditPane = function (options) {
   /**
    * Set all querystring values to match values in form fields
    */
-  _setQueryString = function () {
+  _setQueryStringValues = function () {
     var i;
 
     for (i = 0; i < _fields.length; i ++) {
-      AppUtil.setParam(_fields[i].id, _fields[i].value);
+      _app.AppUtil.setParam(_fields[i].id, _fields[i].value);
     }
   };
 
@@ -400,11 +290,11 @@ var EditPane = function (options) {
     value = el.value.replace(/\s+/g, ''); // strip whitespace
     el.value = value;
 
-    AppUtil.setParam(id, value);
+    _app.AppUtil.setParam(id, value);
   };
 
   /**
-   * Switch to map pane (triggered when 'View map' button clicked)
+   * Switch to map pane when 'View Map' button clicked
    */
   _viewMap = function () {
     if (!_el.querySelector('.viewmap').hasAttribute('disabled')) {
@@ -417,48 +307,88 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Display mainshock's details on edit pane and also update <title>
-   *
-   * @param html {String}
-   * @param props {Object}
+   * Create Features (and subsequently add them to map, plots and summary panes)
    */
-  _this.showMainshock = function (html, props) {
-    var appTitle,
-        details;
+  _this.initFeatures = function () {
+    _app.resetApp(); // first reset app to default state
 
-    appTitle = _resetTitle();
-    details = _el.querySelector('.details');
+    if (_isValidEqId()) {
+      _el.querySelector('.viewmap').removeAttribute('disabled');
 
-    details.innerHTML = html;
-    details.classList.remove('hide');
+      // Instantiate mainshock (other features are created after mainshock is ready)
+      _app.Features.instantiateMainshock();
+    }
+  };
 
-    document.title = props.magType + ' ' + AppUtil.round(props.mag, 1) + ' - ' +
-      props.place + ' | ' + appTitle;
+  /**
+   * Reset edit pane to initial state
+   */
+  _this.reset = function () {
+    _hideMainshock();
+    _resetForm();
+    _resetTitle();
+
+    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
+  };
+
+  /**
+   * Set user selected significant eq as mainshock
+   */
+  _this.selSignificantEq = function () {
+    var index,
+        significant;
+
+    significant = _el.querySelector('.significant');
+    index = significant.selectedIndex;
+
+    _eqid.value = significant.options[index].value;
+
+    // Call manually: eqid input event not triggered when value changed programmatically
+    _setQueryStringValues();
+    _this.initFeatures();
   };
 
   /**
    * Set default form field values / url params based on mainshock's details
-   *
-   * @param mainshockJson {Object}
-   *     GeoJson data
    */
-  _this.setDefaults = function (mainshockJson) {
+  _this.setDefaults = function () {
     var defaults,
         isNewEvent;
 
-    defaults = _getDefaults(mainshockJson);
+    defaults = _getDefaults();
     isNewEvent = _isNewEvent();
 
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (AppUtil.getParam(key) === '' || isNewEvent) {
-        AppUtil.setParam(key, defaults[key]);
+      if (_app.AppUtil.getParam(key) === '' || isNewEvent) {
+        _app.AppUtil.setParam(key, defaults[key]);
       }
     });
 
     // Next, update all form fields to match url params
-    _setFormFields();
+    _setFormFieldValues();
+  };
+
+  /**
+   * Display mainshock's details on edit pane and also update <title>
+   */
+  _this.showMainshock = function () {
+    var appTitle,
+        details,
+        mainshock,
+        props;
+
+    appTitle = _resetTitle();
+    details = _el.querySelector('.details');
+    mainshock = _app.Features.getFeature('mainshock');
+    props = mainshock.json.properties;
+
+    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
+    details.classList.remove('hide');
+
+    document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
+      ' - ' + props.place + ' | ' + appTitle;
   };
 
 

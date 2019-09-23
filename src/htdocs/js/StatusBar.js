@@ -2,10 +2,11 @@
 
 
 /**
- * Sets up a status bar to inform user of app's status
+ * Set up a status bar to inform user of app's status (loading state, errors)
  *
  * @param options {Object}
  *   {
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */
@@ -15,10 +16,9 @@ var StatusBar = function (options) {
 
       _el,
 
-      _getClassName,
-      _hideStatusBar,
-      _removeFromDom,
-      _showStatusBar;
+      _doRemove,
+      _hide,
+      _show;
 
 
   _this = {};
@@ -30,44 +30,33 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Get className for status bar item (first word in featureName, lowercased)
-   *
-   * @param featureName {String}
-   *
-   * @return {String}
-   */
-  _getClassName = function (featureName) {
-    return /[^\s]+/.exec(featureName)[0].toLowerCase();
-  };
-
-  /**
-   * Hide status bar (using css slide-down animation)
-   */
-  _hideStatusBar = function () {
-    _el.classList.add('hide');
-  };
-
-  /**
-   * Remove status bar entry from DOM
+   * Remove a status bar entry from DOM
    *
    * @param el {Element}
    */
-  _removeFromDom = function (el) {
+  _doRemove = function (el) {
     var parent;
 
     parent = el.parentNode;
     if (parent) {
       if (parent.children.length === 1) {
-        _hideStatusBar(); // should already be hidden, but just in case...
+        _hide(); // should already be hidden, but just in case...
       }
       parent.removeChild(el);
     }
   };
 
   /**
-   * Show status bar (using css slide-up animation)
+   * Hide status bar container (uses css slide-down animation)
    */
-  _showStatusBar = function () {
+  _hide = function () {
+    _el.classList.add('hide');
+  };
+
+  /**
+   * Show status bar container (uses css slide-up animation)
+   */
+  _show = function () {
     _el.classList.remove('hide');
   };
 
@@ -76,99 +65,103 @@ var StatusBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add error to status bar
+   * Add an error to status bar
    *
-   * @param featureName {String}
+   * @param feature {Object}
    * @param errorMsg {String}
    */
-  _this.addError = function (featureName, errorMsg) {
+  _this.addError = function (feature, errorMsg) {
     var closeButton,
         error;
 
     error = document.createElement('div');
-    error.classList.add(_getClassName(featureName), 'error');
+    error.classList.add(feature.id, 'error');
     error.innerHTML = errorMsg + '<a href="#" class="close"></a>';
 
     closeButton = error.querySelector('.close');
     closeButton.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.removeItem(featureName);
+      _this.remove(feature.id);
     });
 
-    // Remove any leftover items for this feature
-    _this.removeItem(featureName);
+    // Remove any leftover items for this Feature before adding another
+    _this.remove(feature.id);
 
     _el.appendChild(error);
-    _showStatusBar();
+    _show();
   };
 
   /**
-   * Add item to status bar
+   * Add loading message to status bar
    *
-   * @param featureName {String}
-   *     pass in 'rendering' to display generic loading message
+   * @param feature {Object}
+   *     optional; displays generic loading message if no Feature provided
    */
-  _this.addItem = function (featureName) {
+  _this.addLoadingMsg = function (feature) {
     var animEllipsis,
-        className,
-        item,
-        refNode;
+        id,
+        item;
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
-    className = _getClassName(featureName);
+    id = 'rendering'; // generic id
+
+    if (feature && feature.hasOwnProperty('id')) {
+      id = feature.id;
+    }
+
     item = document.createElement('div');
-    item.classList.add(className);
+    item.classList.add(id);
 
-    // Remove any leftover items for this feature
-    _this.removeItem(featureName);
+    // Remove any leftover items for this Feature
+    _this.remove(id);
 
-    if (className === 'rendering') { // rendering app panes
+    if (id === 'rendering') { // rendering app pane
       item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
       _el.appendChild(item);
-    }
-    else { // loading feature
-      item.innerHTML = '<h4>Loading ' + featureName + animEllipsis + '</h4>';
-      refNode = _el.querySelector('.rendering');
-      // Insert loading feature msgs 'above' rendering msgs
-      _el.insertBefore(item, refNode);
+    } else { // loading Feature
+      item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';
+
+      // Insert loading Feature msgs 'above' rendering msgs
+      _el.insertBefore(item, _el.querySelector('.rendering'));
     }
 
-    _showStatusBar();
+    _show();
   };
 
   /**
-   * Check if error(s) exist(s)
+   * Check if error exists for Feature
    *
-   * @param featureName {String}
+   * @param id {String}
    *
    * @return {Boolean}
    */
-  _this.hasError = function (featureName) {
+  _this.hasError = function (id) {
     var error;
 
-    error = _el.querySelector('.' + _getClassName(featureName) + '.error');
+    error = _el.querySelector('.' + id + '.error');
     if (error) {
       return true;
     }
   };
 
   /**
-   * Remove item from status bar (and hide/remove status bar if empty)
+   * Wrapper method to remove item from status bar (and hide status bar if empty)
    *
-   * @param featureName {String}
+   * @param id {String}
    */
-  _this.removeItem = function (featureName) {
+  _this.remove = function (id) {
     var i,
         items;
 
-    items = _el.querySelectorAll('.' + _getClassName(featureName));
+    items = _el.querySelectorAll('.' + id);
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
-        _hideStatusBar();
-        // Don't remove last item until after css transition to hide is complete
-        window.setTimeout(_removeFromDom, 500, items[i]);
+        _hide();
+
+        // Don't remove last item until after hide css transition is complete
+        window.setTimeout(_doRemove, 500, items[i]);
       } else {
-        _removeFromDom(items[i]);
+        _doRemove(items[i]);
       }
     }
   };
@@ -178,7 +171,7 @@ var StatusBar = function (options) {
    */
   _this.reset = function () {
     _el.innerHTML = '';
-    _hideStatusBar();
+    _hide();
   };
 
 

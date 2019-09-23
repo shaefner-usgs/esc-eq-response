@@ -3,12 +3,11 @@
 
 
 // Leaflet plugins
-require('mappane/Control-bottomcenter');
+require('mappane/Control-bottomCenter');
 require('mappane/MousePosition');
 //require('mappane/RestoreMap');
 
 // Factories for creating map layers
-//   layers are added to global Leaflet instance, e.g. "L.faultsLayer()"
 require('mappane/DarkLayer');
 require('mappane/FaultsLayer');
 require('mappane/GreyscaleLayer');
@@ -17,11 +16,14 @@ require('mappane/TerrainLayer');
 
 
 /**
- * Sets up leaflet map instance and adds (non-event-specific) 'static' layers
- *   (event-specific 'feature' layers are added by Features.js)
+ * Set up Leaflet map instance and immediately add non-event-specific map layers
+ *
+ * Also adds / removes event-specific 'Feature' layers that are created after
+ *   external feed data is loaded
  *
  * @param options {Object}
  *   {
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */
@@ -29,20 +31,26 @@ var MapPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _bounds,
       _el,
-      _features,
       _initialLoad,
+      _layerControl,
       _mapNavButton,
       _staticLayers,
 
       _addLayerControl,
+      _addListeners,
       _compareLayers,
+      _createPane,
+      _fitBounds,
+      _getLayerId,
       _getSortValue,
       _getStaticLayers,
       _hideZoomControl,
       _initMap,
-      _isBaseLayer;
+      _isBaseLayer,
+      _setBounds;
 
 
   _this = {};
@@ -50,16 +58,19 @@ var MapPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
-
+    _app = options.app;
+    _bounds = L.latLngBounds();
     _el = options.el || document.createElement('div');
+    _initialLoad = true;
+    _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
     _staticLayers = _getStaticLayers();
 
     _initMap();
+    _addListeners();
   };
 
   /**
-   * Add layer control
+   * Add layer control to map
    *
    * @return control {L.Control}
    */
@@ -77,32 +88,112 @@ var MapPane = function (options) {
   };
 
   /**
+   * Add event listeners for setting Features's showLayer property when user
+   *   toggles layers on/off
+   */
+  _addListeners = function () {
+    var id,
+        showLayer;
+
+    _this.map.on('overlayadd overlayremove', function (e) {
+      id = _app.Features.getFeatureId(e.name);
+      showLayer = false;
+
+      if (e.type === 'overlayadd') {
+        showLayer = true;
+      }
+
+      _app.Features.getFeature(id).showLayer = showLayer;
+    });
+  };
+
+  /**
    * Comparison function for sorting overlays in layer control
+   *
+   * @param layerA {L.Layer}
+   * @param layerB {L.Layer}
    *
    * @return {Integer}
    */
   _compareLayers = function (layerA, layerB) {
-    var sortValue = [];
+    var sortValues;
 
-    sortValue[0] = _getSortValue(layerA);
-    sortValue[1] = _getSortValue(layerB);
-    if (sortValue[0] < sortValue[1]) {
+    sortValues = [
+      _getSortValue(layerA),
+      _getSortValue(layerB)
+    ];
+
+    if (sortValues[0] < sortValues[1]) {
       return 1;
-    }
-    if (sortValue[0] > sortValue[1]) {
+    } else if (sortValues[0] > sortValues[1]) {
       return -1;
     }
+
     return 0;
   };
 
   /**
-   * Get sort value of Leaflet layer
+   * Create a separate pane for each Feature (used to control stacking order)
+   *
+   * @param id {String}
+   * @param parent {String <overlayPane | tilePane>}
+   */
+  _createPane = function (id, parent) {
+    if (!_this.map.getPane(id)) {
+      _this.map.createPane(id, _this.map.getPane(parent));
+    }
+  };
+
+  /**
+   * Zoom map extent to contain _bounds
+   *   _bounds includes all Features with 'zoomToLayer' prop set to true
+   */
+  _fitBounds = function () {
+    if (_bounds.isValid()) {
+      _this.map.fitBounds(_bounds, {
+        paddingTopLeft: L.point(0, 40) // accommodate navbar
+      });
+    }
+
+    // Zoom out if map is zoomed too close for context (i.e. mainshock only)
+    if (_this.map.getZoom() > 17) {
+      _this.map.setZoom(12);
+    }
+  };
+
+  /**
+   * Get the id value for a layer, which is typically the Feature's id prop,
+   *   except in cases where the map layer is not a Feature layer (i.e. faults)
+   *
+   * @param layer {L.layer}
+   *
+   * @return id {String}
+   */
+  _getLayerId = function (layer) {
+    var features,
+        id;
+
+    if (layer.hasOwnProperty('id')) { // faults
+      id = layer.id;
+    } else {
+      features = _app.Features.getFeatures();
+      Object.keys(features).forEach(function(key) {
+        if (layer === features[key].mapLayer) {
+          id = key;
+        }
+      });
+    }
+
+    return id;
+  };
+
+  /**
+   * Get the sort value of a Leaflet layer, which is its z-index value
    *
    * @param layer {L.Layer}
-   * @param name {String}
    *
    * @return sortValue {Integer}
-   *   z-index value or 1 if no z-index
+   *     z-index value or 1 if no z-index
    */
   _getSortValue = function (layer) {
     var className,
@@ -111,19 +202,20 @@ var MapPane = function (options) {
         styles;
 
     if (_isBaseLayer(layer)) {
-      sortValue = 1; // base layers don't have a z-index
+      sortValue = 1; // base layers don't have a z-index/don't need to be sorted
     } else {
-      className = 'leaflet-' + layer.id + '-pane';
-      leafletPane = document.querySelector('.' + className);
+      className = 'leaflet-' + _getLayerId(layer) + '-pane';
+      leafletPane = _el.querySelector('.' + className);
       styles = window.getComputedStyle(leafletPane);
-      sortValue = parseInt(styles.getPropertyValue('z-index'), 10);
+      sortValue = Number(styles.getPropertyValue('z-index'));
     }
 
     return sortValue;
   };
 
   /**
-   * Get all 'static' map layers (not directly related to mainshock)
+   * Get all 'static' map layers
+   *   excludes 'dynamic' Feature layers that depend on user-set parameters
    *
    * @return layers {Object}
    *    {
@@ -146,16 +238,20 @@ var MapPane = function (options) {
     satellite = L.satelliteLayer();
     terrain = L.terrainLayer();
 
-    layers = {};
-    layers.baseLayers = {
-      'Greyscale': greyscale,
-      'Terrain': terrain,
-      'Satellite': satellite,
-      'Dark': dark
-    };
-    layers.defaults = [greyscale, faults];
-    layers.overlays = {
-      'Faults': faults
+    layers = {
+      baseLayers: {
+        'Greyscale': greyscale,
+        'Terrain': terrain,
+        'Satellite': satellite,
+        'Dark': dark
+      },
+      defaults: [
+        faults,
+        greyscale
+      ],
+      overlays: {
+        'Faults': faults
+      }
     };
 
     return layers;
@@ -177,52 +273,64 @@ var MapPane = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
-    // Create map and set initial view / state
     _this.map = L.map(_el.querySelector('.map'), {
       worldCopyJump: true
     });
-    _this.reset();
+    _this.reset(); // set initial state of map
 
     // Create custom pane for Faults overlay within tilePane
-    _this.createMapPane('faults', 'tilePane');
+    _createPane('faults', 'tilePane'); // pane is applied in Faults factory
 
-    // Add default layers to map
+    // Add default layers to map (i.e. toggle on in layer control)
     _staticLayers.defaults.forEach(function(layer) {
       _this.map.addLayer(layer);
     });
 
-    // Add / remove controls
-    _this.layerControl = _addLayerControl();
-    L.control.mousePosition({position: 'bottomcenter'}).addTo(_this.map);
+    // Add / remove Leaflet controls
+    _layerControl = _addLayerControl();
+    L.control.mousePosition({
+      position: 'bottomcenter'
+    }).addTo(_this.map);
     L.control.scale().addTo(_this.map);
     _hideZoomControl();
 
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
     //   baseLayers: _staticLayers.baseLayers,
-    //   id: 'eqid', // TODO: insert actual eqid
+    //   id: _app.AppUtil.getParam('eqid'),
     //   overlays: _staticLayers.overlays,
-    //   scope: 'response'
+    //   scope: 'response-app'
     // });
   };
 
   /**
    * Determine if Leaflet layer is a baselayer or not
    *
-   * @param name {String}
+   * @param layer {L.Layer}
    *
-   * @return r {Boolean}
+   * @return isBaseLayer {Boolean}
    */
   _isBaseLayer = function (layer) {
-    var r = false;
+    var isBaseLayer = false;
 
     Object.keys(_staticLayers.baseLayers).forEach(function(key) {
       if (_staticLayers.baseLayers[key] === layer) {
-        r = true;
+        isBaseLayer = true;
       }
     });
 
-    return r;
+    return isBaseLayer;
+  };
+
+  /**
+   * Set map bounds to contain Feature
+   *
+   * @param feature {Object}
+   */
+  _setBounds = function (feature) {
+    _bounds.extend(feature.mapLayer.getBounds());
+
+    _fitBounds(); // call in case MapPane is visible while Features are being added
   };
 
   // ----------------------------------------------------------
@@ -230,78 +338,78 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature layer to map
+   * Add a Feature layer to map
    *
    * @param feature {Object}
    */
-  _this.addFeatureLayer = function (feature) {
-    var id,
-        layer;
+  _this.add = function (feature) {
+    var title;
 
-    id = feature.id;
-    layer = feature.getMapLayer();
+    title = feature.title || feature.name;
 
-    _features[id] = feature;
+    if (feature.mapLayer) {
+      _createPane(feature.id, 'overlayPane'); // applied in mapLayer's marker options
+      _layerControl.addOverlay(feature.mapLayer, title);
 
-    // Add layer to controller
-    _this.layerControl.addOverlay(layer, feature.name);
+      // Turn layer "on" and zoom map if set to be displayed / zoomed by default
+      if (feature.showLayer) {
+        _this.map.addLayer(feature.mapLayer);
 
-    // Turn layer "on" / zoom map if set to be displayed / zoomed by default
-    if (feature.displayLayer) {
-      _this.map.addLayer(layer);
-    }
-    if (feature.zoomToLayer) {
-      _this.setView(feature);
+        if (feature.zoomToLayer) {
+          _setBounds(feature);
+        }
+      }
     }
   };
 
   /**
-   * Create a separate map pane for each feature - used to control stacking order
+   * Set initial map extent when user views MapPane for the first time; need
+   *   to do this because Leaflet doesn't manipulate the map when not visible
+   */
+  _this.initView = function () {
+    if (_initialLoad) {
+      _fitBounds();
+    }
+
+    _initialLoad = false;
+  };
+
+  /**
+   * Open popup matching eqid in Feature layer - used for displaying map popups
+   *   from user interaction on other panes
    *
    * @param id {String}
-   * @param parent {String}
-   */
-  _this.createMapPane = function (id, parent) {
-    if (!_this.map.getPane(id)) {
-      _this.map.createPane(id, _this.map.getPane(parent));
-    }
-  };
-
-  /**
-   * Open popup matching eqid in feature layer
-   *
-   * @param feature {String}
+   *     id of feature
    * @param eqid {String}
    */
-  _this.openPopup = function (feature, eqid) {
+  _this.openPopup = function (id, eqid) {
     var layer,
         map,
         marker;
 
-    layer = _features[feature].getMapLayer();
+    layer = _app.Features.getFeature(id).mapLayer;
     map = _this.map;
 
-    // Simulate clicking on 'Map' button on navbar
+    // Simulate clicking on 'Map' button on navbar (be certain map pane is active)
     _mapNavButton.click();
 
-    // Get marker associated with given eqid within feature layer
+    // Get marker associated with given eqid within Feature layer
     layer.eachLayer(function(m) {
       if (m.feature.id === eqid) {
         marker = m;
       }
     });
 
-    // Center on marker so user can easily zoom into feature
-    map.setView(marker.getLatLng(), map.getZoom());
-
-    // Call L.popup.update() after map is visible so popup displays correctly
     map.on('visible', function() {
+      // Center map on marker
+      map.setView(marker.getLatLng(), map.getZoom());
+      // Call L.popup.update() after map is visible so popup displays correctly
       marker.getPopup().update();
-      // Remove listener so it doesn't trigger again for following events
+      // Remove listener so it doesn't trigger next time map is visible
       map.off('visible');
     });
 
-    // Turn on feature layer (if not already) so its popup can be displayed
+    // Turn on Feature layer so its popup can be displayed
     if (!map.hasLayer(layer)) {
       map.addLayer(layer);
     }
@@ -309,56 +417,41 @@ var MapPane = function (options) {
   };
 
   /**
-   * Reset state and set default map extent
+   * Remove a Feature layer from map
+   *
+   * @param feature {Object}
    */
-  _this.reset = function () {
-    _bounds = L.latLngBounds();
-    _features = {};
-    _initialLoad = true;
+  _this.remove = function (feature) {
+    var mapLayer,
+        showLayer;
 
-    _this.map.setView([40, -96], 4); // United States
+    mapLayer = feature.mapLayer;
+    showLayer = feature.showLayer; // cache value
+
+    if (mapLayer) {
+      _this.map.removeLayer(mapLayer); // sets showLayer prop to false
+      _layerControl.removeLayer(mapLayer);
+    }
+
+    feature.showLayer = showLayer; // set to cached value
   };
 
   /**
-   * Zoom map extent to contain features with 'zoomToLayer' prop set to true
-   *
-   * @param feature {String}
-   *     optional feature layer to zoom to; zooms to all layers if not set
+   * Reset map pane to initial state
+   *   Set default map extent and purge canvas elements (FM, MT)
    */
-  _this.setView = function (feature) {
-    var layer,
-        setView;
+  _this.reset = function () {
+    var canvasEls,
+        i;
 
-    // Flag to determine if map extent will be set
-    setView = false;
+    _bounds = L.latLngBounds();
+    _initialLoad = true;
 
-    if (feature) { // set bounds to feature being added
-      layer = feature.getMapLayer();
-      _bounds.extend(layer.getBounds());
-      setView = true;
-    } else { // set bounds to all features (called via NavBar.js)
-      if (_initialLoad) { // only need to set first time map is visible
-        setView = true;
+    _this.map.setView([40, -96], 4); // United States
 
-        Object.keys(_features).forEach(function(feature) {
-          if (_features[feature].zoomToLayer) {
-            layer = _features[feature].getMapLayer();
-            _bounds.extend(layer.getBounds());
-          }
-        });
-        _initialLoad = false;
-      }
-    }
-
-    if (setView && _bounds.isValid()) {
-      _this.map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 45), // accommodate navbar
-        reset: true
-      });
-      // Map gets set at max zoom when mainshock is only 'zoomto' layer; Manually zoom out
-      if (_this.map.getZoom() > 17) {
-        _this.map.setZoom(10);
-      }
+    canvasEls = _el.querySelectorAll('canvas');
+    for (i = 0; i < canvasEls.length; i ++) {
+      _el.removeChild(canvasEls[i]);
     }
   };
 

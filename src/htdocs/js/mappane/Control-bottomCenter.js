@@ -2,7 +2,10 @@
 'use strict';
 
 
-// Extend Map._initControlPos to create a bottom-center container
+/**
+ * This class extends Map._initControlPos to create a bottom-center control
+ *   container
+ */
 L.Map.prototype._initControlPos = (function (_initControlPos) {
   return function () {
     _initControlPos.apply(this, arguments); // original method

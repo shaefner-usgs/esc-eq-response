@@ -1,16 +1,15 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Moment = require('moment'),
-    Tablesort = require('tablesort');
+var Tablesort = require('tablesort');
 
 
 /**
- * Creates, adds, and removes summary info from summary pane
+ * Set up and configure summary pane; also adds / removes summaries
  *
  * @param options {Object}
  *   {
+ *     app: {Object}, // Application
  *     el: {Element}
  *   }
  */
@@ -18,25 +17,20 @@ var SummaryPane = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
-      _features,
+      _featuresEl,
       _style,
       _tz,
 
-      _MapPane,
-
       _addListeners,
       _addTimestamp,
-      _clickRow,
-      _getBinnedTable,
-      _getListTable,
-      _getSlider,
-      _getSummary,
+      _getSliderValue,
       _getTimeZone,
-      _getValue,
-      _hoverRow,
       _initTableSort,
-      _setStyleRules,
+      _onMouseClick,
+      _onMouseOver,
+      _setSliderStyles,
       _updateTimestamp;
 
 
@@ -45,30 +39,28 @@ var SummaryPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
-    _features = _el.querySelector('.features');
+    _featuresEl = _el.querySelector('.features');
     _style = document.createElement('style');
     _tz = _getTimeZone();
 
-    _MapPane = options.mapPane;
-
-    // Dynamic range input styles are set inside this <style> tag
+    // Add <style> tag for dynamic range input (slider) styles
     document.body.appendChild(_style);
 
     _addTimestamp();
   };
 
   /**
-   * Add event listeners to earthquake lists / input range sliders
+   * Add event listeners to input range sliders / earthquake lists
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
-   * @param cumulativeEqs {Array}
+   * @param sliderData {Array}
    *     Array of cumulative eqs by mag
    */
-  _addListeners = function (el, cumulativeEqs) {
-    var feature,
-        i,
+  _addListeners = function (el, sliderData) {
+    var i,
         input,
         j,
         mag,
@@ -83,40 +75,41 @@ var SummaryPane = function (options) {
 
     input = el.querySelector('.slider input');
     if (input) {
-      feature = input.id;
       mag = el.querySelector('h3 .mag');
       num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
       slider = input.parentNode;
-      table = el.querySelector('div.filter + .list');
+      table = el.querySelector('div.filter + .eqlist');
 
-      input.addEventListener('input', function() {
+      input.addEventListener('input', function () {
         magValue = Number(input.value);
         scrollY = window.pageYOffset;
 
+        // Show / hide eqs in list and display slider's numeric value
         mag.innerHTML = magValue;
-        num.innerHTML = cumulativeEqs[magValue];
+        num.innerHTML = sliderData[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
         for (i = magValue; i <= input.getAttribute('max'); i ++) {
-          table.classList.add('m' + i);
+          table.classList.add('m' + i); // show eqs of mag i
         }
         for (j = magValue; j >= input.getAttribute('min'); j --) {
-          table.classList.remove('m' + (j - 1));
+          table.classList.remove('m' + (j - 1)); // hide eqs of mag j-1
         }
 
-        window.scroll(0, scrollY); // prevent page scrolling
-        _setStyleRules(this, feature); // update slider track
+        // Prevent page scrolling and update slider track
+        window.scroll(0, scrollY);
+        _setSliderStyles(this, input.id);
       }, false);
     }
 
-    tables = el.querySelectorAll('table.list');
+    tables = el.querySelectorAll('table.eqlist');
     if (tables) {
       for (i = 0; i < tables.length; i ++) {
         rows = tables[i].rows;
         for (j = 1; j < rows.length; j ++) {
-          rows[j].addEventListener('click', _clickRow);
-          rows[j].addEventListener('mouseover', _hoverRow);
+          rows[j].addEventListener('click', _onMouseClick);
+          rows[j].addEventListener('mouseover', _onMouseOver);
         }
       }
     }
@@ -130,341 +123,35 @@ var SummaryPane = function (options) {
 
     time = document.createElement('time');
     time.classList.add('updated');
-    _el.insertBefore(time, _features);
+    _el.insertBefore(time, _featuresEl);
   };
 
   /**
-   * Click handler for lists of earthquakes
+   * Get CSS value (percentage) for colored section of input range slider
    *
-   * @param e {Event}
+   * @param el {Element}
+   *     input (range slider) element
+   *
+   * @return value {String}
    */
-  _clickRow = function(e) {
-    var eqid,
-        feature,
-        features,
-        isTextSelected,
-        parent,
-        selection,
-        tr;
+  _getSliderValue = function (el) {
+    var min,
+        percentage,
+        value;
 
-    // Keep row highlighted after user clicks
-    this.classList.add('selected');
-
-    eqid = this.querySelector('.eqid').textContent;
-
-    // Determine which feature was clicked
-    features = [
-      'aftershocks',
-      'foreshocks',
-      'historical',
-      'mainshock'
-    ];
-    parent = this.closest('.feature');
-    features.forEach(function(f) {
-      if (parent.classList.contains(f)) {
-        feature = f;
-      }
-    });
-
-    selection = window.getSelection();
-    tr = e.target.parentNode;
-    isTextSelected = tr.contains(selection.anchorNode) &&
-      selection.toString().length > 0;
-
-    if(!isTextSelected) { // suppress event if user is trying to select text
-      _MapPane.openPopup(feature, eqid);
+    min = el.min || 0;
+    percentage = el.value;
+    if (el.max) {
+      percentage = Math.floor(100 * (el.value - min) / (el.max - min));
     }
-  };
+    value = percentage + '% 100%';
 
-  /**
-   * Get table containing binned earthquake data
-   *
-   * @param bins {Object}
-   *     earthquake data binned by mag/time
-   * @param type {String <magInclusive | first | past | prior>}
-   *
-   * @return html {Html}
-   */
-  _getBinnedTable = function (bins, type) {
-    var html,
-        irow,
-        row,
-        total,
-        totalAll;
-
-    html = '';
-    if (bins[type] && bins[type].length > 0) {
-      html = '<table class="bin">' +
-        '<tr>' +
-          '<th class="period">' + type + ':</th>' +
-          '<th>Day</th>' +
-          '<th>Week</th>' +
-          '<th>Month</th>' +
-          '<th class="year">Year</th>' +
-          '<th>Total</th>' +
-        '</tr>';
-      bins[type].forEach(function(cols, mag) {
-        html += '<tr><th class="rowlabel">M ' + mag + '</th>';
-        cols.forEach(function(col, i) {
-          if (i === 0) { // store row total
-            total = '<td class="total">' + col + '</td>';
-          } else {
-            html += '<td>' + col + '</td>';
-          }
-        });
-        html += total + '</tr>'; // add row total to table as last column
-      });
-
-      // Add total for each column as last row
-      html += '<tr>' +
-        '<th class="rowlabel">Total</th>';
-
-      for (row = 0; row < bins[type].length; ++row) { // get column indices
-        if (typeof bins[type][row] !== 'undefined') {
-          break;
-        }
-      }
-      if (row < bins[type].length) { // if found valid row
-        totalAll = 0;
-        bins[type][row].forEach(function(cols, index) {
-          total = 0;
-          for (irow = 0; irow < bins[type].length; ++irow) {
-            if (typeof bins[type][irow] !== 'undefined') {
-              if (index === 0) { // row total (last column)
-                totalAll += bins[type][irow][index];
-              } else {
-                total += bins[type][irow][index];
-              }
-            }
-          }
-          if (index > 0) {
-            html += '<td class="total">' + total + '</td>';
-          }
-        });
-        html += '<td class="total">' + totalAll + '</td>';
-        html += '</tr>';
-      }
-      html += '</table>';
-    }
-
-    return html;
-  };
-
-  /**
-   * Get table containing a list of earthquakes above mag threshold
-   *
-   * @param rows {Object}
-   *     tr html for each earthquake in list keyed by eqid
-   * @param magThreshold {Number}
-   *
-   * @return html {String}
-   */
-  _getListTable = function (rows, magThreshold) {
-    var cssClasses,
-        html,
-        length,
-        mag,
-        match,
-        row,
-        sortClass,
-        tableData;
-
-    cssClasses = ['list'];
-    length = Object.keys(rows).length;
-    sortClass = 'non-sortable';
-    tableData = '';
-
-    Object.keys(rows).forEach(function(key) {
-      row = rows[key];
-
-      match = /tr\s+class="m(\d+)"/.exec(row);
-      mag = parseInt(match[1], 10);
-      if (mag >= magThreshold && cssClasses.indexOf('m' + mag) === -1) {
-        cssClasses.push('m' + mag);
-      }
-
-      tableData += row;
-    });
-    if (length > 1) {
-      cssClasses.push('sortable');
-    }
-    html = '<table class="' + cssClasses.join(' ') + '">' +
-        '<tr class="no-sort">' +
-          '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-          '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
-          '<th class="location">Location</th>' +
-          '<th data-sort-method="number">Depth</th>' +
-          '<th data-sort-method="number">' +
-            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-          '</th>' +
-          '<th class="eqid">Event ID</th>' +
-        '</tr>' +
-        tableData +
-      '</table>';
-
-    return html;
-  };
-
-  /**
-   * Get html for input range slider when there's at least two mag bins w/ eqs
-   *
-   * @param id {String}
-   *     feature id
-   * @param mag {Number}
-   * @param cumulativeEqs {Array}
-   *     Array of cumulative eqs by mag
-   *
-   * @return html {String}
-   */
-  _getSlider = function (id, mag, cumulativeEqs) {
-    var html,
-        mags,
-        max,
-        min,
-        singleMagBin;
-
-    html = '';
-    singleMagBin = cumulativeEqs.every(function(value, i, array) {
-      return array[0] === value;
-    });
-
-    if (!singleMagBin) {
-      mags = Object.keys(cumulativeEqs);
-      max = Math.max.apply(null, mags);
-      min = Math.floor(AppUtil.getParam(AppUtil.lookup(id) + '-mag'));
-
-      html += '<div class="filter">';
-      html += '<h4>Filter earthquakes by magnitude</h4>';
-      html += '<div class="min">' + min + '</div>';
-      html += '<div class="inverted slider" style="--min: ' + min +
-        '; --max: ' + max + '; --val: ' + mag + ';">';
-      html += '<input id="' + id + '" type="range" min="' + min + '" max="' +
-        max + '" value="' + mag + '"/>';
-      html += '<output for="'+ id + '">' + mag + '</output>';
-      html += '</div>';
-      html += '<div class="max">' + max + '</div>';
-      html += '</div>';
-    }
-
-    return html;
-  };
-
-  /**
-   * Get summary html for feature
-   *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // summary data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
-   *
-   * @return summary {Html}
-   */
-  _getSummary = function (opts) {
-    var count,
-        data,
-        id,
-        mag,
-        subheader,
-        summary,
-        url;
-
-    data = opts.data;
-    id = opts.id;
-
-    if (id === 'focal-mechanism' || id === 'moment-tensor') {
-      var beachball,
-          className,
-          h4;
-
-      beachball = opts.data;
-      className = '.' + id;
-      h4 = _el.querySelector(className + ' h4');
-
-      // Display beachball
-      beachball.render(_el.querySelector(className + ' a'));
-      h4.innerHTML = opts.name;
-      _el.querySelector(className).classList.remove('hide');
-
-      return;
-    }
-
-    summary = '<h2>' + opts.name + '</h2>';
-
-    if (id === 'mainshock') {
-      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' +
-        AppUtil.getParam('eqid');
-
-      summary += '<div class="products">';
-      summary += data.detailsHtml;
-
-      // Add placeholders for beachballs
-      summary += '<div class="focal-mechanism hide scale">' +
-        '<a href="' + url + '/focal-mechanism"><h4></h4></a></div>';
-      summary += '<div class="moment-tensor hide scale">' +
-        '<a href="' + url + '/moment-tensor"><h4></h4></a></div>';
-
-      // Add dyfi/sm thumbnails
-      if (data.dyfi) {
-        summary += '<div class="dyfi scale"><a href="' + url + '/dyfi">' +
-          '<h4>Did You Feel It?</h4><img src="' + data.dyfi.url + '" class="mmi' +
-          data.dyfi.cdi + '" /></a></div>';
-      }
-      if (data.shakemap) {
-        summary += '<div class="shakemap scale"><a href="' + url + '/shakemap">' +
-          '<h4>ShakeMap</h4><img src="' + data.shakemap.url + '" class="mmi' +
-          data.shakemap.mmi + '" /></a></div>';
-      }
-
-      summary += '</div>';
-    } else {
-      summary += data.detailsHtml;
-    }
-
-    if (id === 'aftershocks' || id === 'foreshocks' || id === 'historical') {
-      count = Object.keys(opts.data.list).length;
-      if (count > 0) {
-        mag = Math.floor(Math.max(data.magThreshold,
-          AppUtil.getParam(AppUtil.lookup(id) + '-mag')));
-
-        // Check if there's eq data for mag threshold; if not, decr mag by 1
-        while (!data.bins.magInclusive[mag]) {
-          mag --;
-        }
-
-        if (id === 'aftershocks') {
-          summary += '<div class="bins">';
-          summary += _getBinnedTable(data.bins, 'first');
-          summary += _getBinnedTable(data.bins, 'past');
-          summary += '</div>';
-          summary += data.probabilities;
-          if (data.lastId && count > 1) {
-            summary += '<h3>Most Recent Aftershock</h3>';
-            summary += _getListTable({
-              lastAftershock: data.list[data.lastId]
-            }, false);
-          }
-        }
-        if (id === 'historical' || id === 'foreshocks') {
-          summary += _getBinnedTable(data.bins, 'prior');
-        }
-
-        subheader = 'M <span class="mag">' + mag + '</span>+ Earthquakes';
-        subheader += ' (<span class="num">' + data.bins.magInclusive[mag] +
-          '</span>)';
-        summary += '<h3>' + subheader + '</h3>';
-        summary += _getSlider(id, mag, data.bins.magInclusive);
-        summary += _getListTable(data.list, mag);
-      }
-    }
-
-    return summary;
+    return value;
   };
 
   /**
    * Get timezone of user's device
-   * http://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
+   * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
    *  offset-amount-in-js/12496442#12496442
    *
    * @return tz {String}
@@ -494,47 +181,12 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get CSS value (percentage) for colored section of input range slider
+   * Make table sortable via clickable headers
    *
-   * @param el {Element}
-   * @param p {Number}
-   *
-   * @return value {String}
+   * @param id {String}
+   *     Feature id
    */
-  _getValue = function (el, p) {
-    var min,
-        perc,
-        value;
-
-    min = el.min || 0;
-    perc = p;
-    if (el.max) {
-      perc = Math.floor(100 * (p - min) / (el.max - min));
-    }
-    value = perc + '% 100%';
-
-    return value;
-  };
-
-  /**
-   * Turn off selected row when user hovers over any row
-   */
-  _hoverRow = function () {
-    var selected;
-
-    selected = _el.querySelector('.selected');
-    if (selected) {
-      selected.classList.remove('selected');
-    }
-  };
-
-  /*
-   * Make table sortable
-   *
-   * @param className {String}
-   *     className value of container elem
-   */
-  _initTableSort = function (className) {
+  _initTableSort = function (id) {
     var table,
         cleanNumber,
         compareNumber;
@@ -563,9 +215,60 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    table = _el.querySelector('.' + className + ' .sortable');
+    table = _el.querySelector('.' + id + ' .sortable');
     if (table) {
       new Tablesort(table);
+    }
+  };
+
+  /**
+   * Click handler for lists of earthquakes
+   *
+   * @param e {Event}
+   */
+  _onMouseClick = function (e) {
+    var eqid,
+        featureId,
+        features,
+        isTextSelected,
+        parent,
+        selection,
+        tr;
+
+    eqid = this.querySelector('.eqid').textContent;
+    features = _app.Features.getFeatures();
+    parent = this.closest('.feature');
+    selection = window.getSelection();
+    tr = e.target.parentNode;
+
+    // Keep row highlighted (via css) after user clicks
+    this.classList.add('selected');
+
+    // Determine which Feature was clicked
+    Object.keys(features).forEach(function(key) {
+      if (parent.classList.contains(key)) {
+        featureId = key;
+      }
+    });
+
+    // Suppress click event if user is trying to select text
+    isTextSelected = tr.contains(selection.anchorNode) &&
+      selection.toString().length > 0;
+    if (!isTextSelected) {
+      _app.MapPane.openPopup(featureId, eqid);
+    }
+  };
+
+  /**
+   * Turn off 'selected' (previously clicked) row when user hovers over table
+   */
+  _onMouseOver = function () {
+    var selected;
+
+    selected = _el.querySelector('.selected');
+
+    if (selected) {
+      selected.classList.remove('selected');
     }
   };
 
@@ -573,23 +276,23 @@ var SummaryPane = function (options) {
    * Set dynamic styles (inline) for colored section of input range sliders
    *
    * @param el {Element}
-   *     input element
-   * @param feature {String}
-   *     feature id
+   *     input (range slider) element
+   * @param id {String}
+   *     Feature id
    */
-  _setStyleRules = function (el, feature) {
+  _setSliderStyles = function (el, id) {
     var newRules,
         oldRules,
         value,
         vendorEls;
 
     newRules = '';
-    oldRules = new RegExp('#' + feature + '[^#]+', 'g');
-    value = _getValue(el, el.value);
+    oldRules = new RegExp('#' + id + '[^#]+', 'g');
+    value = _getSliderValue(el);
     vendorEls = ['webkit-slider-runnable', 'moz-range'];
 
     for (var i = 0; i < vendorEls.length; i ++) {
-      newRules += '#' + feature + '::-' + vendorEls[i] +
+      newRules += '#' + id + '::-' + vendorEls[i] +
         '-track { background-size:' + value + ' !important}';
     }
 
@@ -606,7 +309,7 @@ var SummaryPane = function (options) {
         timestamp;
 
     time = _el.querySelector('time');
-    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
+    timestamp = _app.AppUtil.Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
       ' (' + _tz + ')';
 
     time.innerHTML = timestamp;
@@ -617,43 +320,46 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add feature to summary pane (text plus <div> container)
-   *   (called by Features.js)
+   * Add a Feature to summary pane
    *
-   * @param opts {Object}
-   *   {
-   *     data: {Object}, // summary data
-   *     id: {String}, // used for css class on container elem
-   *     name: {String} // feature name
-   *   }
+   * @param feature {Object}
    */
-  _this.addSummary = function (opts) {
-    var className,
-        data,
+  _this.add = function (feature) {
+    var canvas,
         div,
-        input,
-        summary,
-        table;
+        placeholder,
+        slider,
+        table,
+        title;
 
-    className = opts.id;
-    data = opts.data;
-    summary = _getSummary(opts);
+    if (feature.summary) {
+      canvas = _el.querySelector('canvas.' + feature.id);
+      placeholder = _el.querySelector('div.' + feature.id);
 
-    // Add feature to summary
-    if (summary) {
-      div = document.createElement('div');
-      div.classList.add('content', 'lighter', 'feature', className);
-      div.innerHTML = summary;
-      _features.appendChild(div);
+      if (placeholder) { // add summary to existing placeholder
+        placeholder.innerHTML = feature.summary;
+        placeholder.classList.remove('hide');
+        if (canvas) { // move beachball into place (FM, MT features)
+          placeholder.querySelector('a').appendChild(canvas);
+        }
+      } else { // create new element and add title / summary
+        title = feature.title || feature.name;
 
-      table = div.querySelector('table.list');
-      if (table) {
-        input = div.querySelector('input');
-        _addListeners(div, data.bins.magInclusive);
-        _initTableSort(className);
-        // Set initial colored section of range slider
-        if (input) {
-          _setStyleRules(input, className);
+        div = document.createElement('div');
+        div.classList.add('content', 'feature', feature.id);
+        div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
+
+        _featuresEl.appendChild(div);
+
+        // Configure dynamic elements (sliders, table sorting) if present
+        slider = div.querySelector('.slider input');
+        table = div.querySelector('table.eqlist');
+        if (slider) {
+          _setSliderStyles(slider, feature.id); // set initial colored section of range slider
+        }
+        if (table) {
+          _addListeners(div, feature.sliderData);
+          _initTableSort(feature.id);
         }
       }
 
@@ -662,20 +368,22 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove feature from summary pane (including container)
-   *   (called by Features.js)
+   * Remove a Feature from summary pane
    *
-   * @param el {Element}
-   *     Element to remove
+   * @param feature {Object}
    */
-  _this.removeSummary = function (el) {
-    if (_el.contains(el)) {
+  _this.remove = function (feature) {
+    var el;
+
+    el  = _el.querySelector('.' + feature.id);
+
+    if (el) {
       el.parentNode.removeChild(el);
     }
   };
 
   /**
-   * Reset timestamp, inline styles for range inputs
+   * Reset summary pane to initial state
    */
   _this.reset = function () {
     var time;
@@ -683,7 +391,8 @@ var SummaryPane = function (options) {
     time = _el.querySelector('time');
     time.innerHTML = '';
 
-    _style.textContent = '';
+    _featuresEl.innerHTML = '';
+    _style.textContent = ''; // inline style for sliders
   };
 
 

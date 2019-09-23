@@ -4,13 +4,21 @@
 var Svg = require('Svg');
 
 
+/**
+ * Add SVG elements to help pane
+ *
+ * @param options {Object}
+ *   {
+ *     app: {Object}, // Application
+ *     el: {Element}
+ *   }
+ */
 var HelpPane = function (options) {
   var _this,
       _initialize,
 
       _el,
       _legend,
-
       _Svg,
 
       _addSvgElements;
@@ -21,22 +29,21 @@ var HelpPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _Svg = Svg();
-
     _el = options.el || document.createElement('div');
     _legend = _el.querySelector('.legend');
+    _Svg = Svg();
 
     _addSvgElements();
   };
 
   /**
-   * Add SVG elements to legend html
+   * Add SVG elements to legend HTML
    */
   _addSvgElements = function () {
-    var circles,
+    var circle,
+        circles,
         line,
         range,
-        svg,
         triangle;
 
     circles = {
@@ -64,8 +71,8 @@ var HelpPane = function (options) {
     };
 
     Object.keys(circles).forEach(function(key) {
-      svg = _Svg.getCircle(circles[key]);
-      _legend.querySelector('.' + key).appendChild(svg);
+      circle = _Svg.getCircle(circles[key]);
+      _legend.querySelector('.' + key).appendChild(circle);
     });
 
     line = _Svg.getLine({

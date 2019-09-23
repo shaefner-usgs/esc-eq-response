@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Util = require('hazdev-webutils/src/util/Util');
+var Util = require('hazdev-webutils/src/util/Util');
 
 
 var _DEFAULTS,
@@ -11,40 +10,39 @@ var _DEFAULTS,
     _MARKER_DEFAULTS;
 
 _FLAG_DESCRIPTIONS = {
-  'M': 'Manually flagged',
-  'T': 'Outlier',
   'G': 'Glitch (clipped or below noise)',
   'I': 'Incomplete time series',
-  'N': 'Not in list of known stations'
+  'M': 'Manually flagged',
+  'N': 'Not in list of known stations',
+  'T': 'Outlier'
 };
 _MARKER_DEFAULTS = {
-  iconSize: [14, 10],
   iconAnchor: [7, 5],
+  iconSize: [14, 10],
   popupAnchor: [0, -5]
 };
 _DEFAULTS = {
-  json: {},
   markerOptions: _MARKER_DEFAULTS
 };
 
 
 /**
- * Creates ShakeMap stations feature
+ * Create ShakeMap Stations Feature
  *
  * @param options {Object}
  *   {
- *     json: {Object}, // geojson data for feature
- *     mainshockJson: {Object}, // mainshock geojson: magnitude, time, etc.
- *     name: {String} // layer name
+ *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  */
-var Stations = function (options) {
+var ShakeMapStations = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _count,
-      _mapLayer,
       _markerOptions,
+      _shakemap,
 
       _filter,
       _createAmplitudesObject,
@@ -54,33 +52,27 @@ var Stations = function (options) {
       _formatLocation,
       _formatTitle,
       _generatePopupContent,
-      _getName,
+      _getMapLayer,
       _onEachFeature,
       _pointToLayer;
 
 
   _this = {};
 
-  _initialize = function () {
-    // Unique id; note that value is "baked into" app's js/css
-    var id = 'stations';
+  _initialize = function (options) {
+    var mainshock;
 
-    options = options || {};
+    options = Util.extend({}, _DEFAULTS, options);
+    mainshock = options.app.Features.getFeature('mainshock');
 
+    _app = options.app;
     _count = 0;
-    _markerOptions = Util.extend({}, _MARKER_DEFAULTS, options.markerOptions);
+    _markerOptions = options.markerOptions;
+    _shakemap = mainshock.json.properties.products.shakemap;
 
-    _this.id = id;
-
-    _mapLayer = L.geoJson(options.json, {
-      filter: _filter,
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
-    });
-    _mapLayer.id = id; // Attach id to L.Layer
-
-    _this.displayLayer = false;
-    _this.name = _getName();
+    _this.showLayer = false;
+    _this.id = 'shakemap-stations';
+    _this.name = 'ShakeMap Stations';
     _this.zoomToLayer = false;
   };
 
@@ -149,7 +141,7 @@ var Stations = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: filters out DYFI stations
+   * Filter out DYFI stations
    *
    * @param feature {Object}
    */
@@ -222,7 +214,7 @@ var Stations = function (options) {
 
   _generatePopupContent = function (feature) {
     var p = feature.properties,
-        romanIntensity = AppUtil.romanize(p.intensity) || 'I';
+        romanIntensity = _app.AppUtil.romanize(p.intensity) || 'I';
 
     var markup = ['<div class="station-popup">',
       '<h4 class="station-title">', _formatTitle(feature), '</h4>',
@@ -232,15 +224,15 @@ var Stations = function (options) {
           '<br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
         '</li>',
         '<li class="station-summary-pga">',
-          AppUtil.round(p.pga, 3, '&ndash;'),
+          _app.AppUtil.round(p.pga, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
         '</li>',
         '<li class="station-summary-pgv">',
-          AppUtil.round(p.pgv, 3, '&ndash;'),
+          _app.AppUtil.round(p.pgv, 3, '&ndash;'),
           '<br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
         '</li>',
         '<li class="station-summary-distance">',
-          AppUtil.round(p.distance, 1, '&ndash;'),' km',
+          _app.AppUtil.round(p.distance, 1, '&ndash;'),' km',
           '<br><abbr title="Distance (km)">Dist</abbr></br>',
         '</li>',
       '</ul>',
@@ -257,7 +249,7 @@ var Stations = function (options) {
           '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
         '<dt class="station-metadata-intensity">Intensity</dt>',
           '<dd class="station-metadata-intensity">',
-            AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
+            _app.AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
           '</dd>',
       '</dl>',
       _createChannelTable(p.channels),
@@ -267,16 +259,28 @@ var Stations = function (options) {
   };
 
   /**
-   * Get layer name of feature (adds number of features to name)
+   * Get Leaflet map layer
    *
-   * @return {String}
+   * @param json {Object}
+   *
+   * @return mapLayer {L.layer}
    */
-  _getName = function () {
-    return options.name + ' (' + _count + ')';
+  _getMapLayer = function (json) {
+    var mapLayer;
+
+    if (_shakemap) {
+      mapLayer = L.geoJson(json, {
+        filter: _filter,
+        onEachFeature: _onEachFeature,
+        pointToLayer: _pointToLayer
+      });
+    }
+
+    return mapLayer;
   };
 
   /**
-   * Leaflet GeoJSON option: creates popups and tooltips
+   * Create Leaflet popups and tooltips
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -295,7 +299,7 @@ var Stations = function (options) {
   };
 
   /**
-   * Leaflet GeoJSON option: creates markers from GeoJSON points
+   * Create Leaflet markers
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -307,13 +311,13 @@ var Stations = function (options) {
         romanIntensity;
 
     props = feature.properties;
-    romanIntensity = AppUtil.romanize(props.intensity) || 'I';
+    romanIntensity = _app.AppUtil.romanize(props.intensity) || 'I';
 
     _markerOptions.className = 'station-layer-icon station-mmi' + romanIntensity;
 
     return L.marker(latlng, {
       icon: L.divIcon(_markerOptions),
-      pane: _this.id
+      pane: _this.id // put markers in custom Leaflet map pane
     });
   };
 
@@ -321,8 +325,26 @@ var Stations = function (options) {
   // Public methods
   // ----------------------------------------------------------
 
-  _this.getMapLayer = function () {
-    return _mapLayer;
+  /**
+   * Get url of data feed
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    if (_shakemap) {
+      return _shakemap[0].contents['download/stationlist.json'].url;
+    }
+  };
+
+  /**
+   * Create Feature - set properties that depend on external feed data
+   *
+   * @param json {Object}
+   *     feed data for feature
+   */
+  _this.initFeature = function (json) {
+    _this.mapLayer = _getMapLayer(json);
+    _this.title = _this.name + ' (' + _count + ')';
   };
 
 
@@ -332,4 +354,4 @@ var Stations = function (options) {
 };
 
 
-module.exports = Stations;
+module.exports = ShakeMapStations;

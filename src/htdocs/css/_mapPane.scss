@@ -1,7 +1,7 @@
-@import 'mappane/_control-bottomcenter.scss';
+@import 'mappane/_control-bottomCenter.scss';
 @import 'mappane/_mousePosition.scss';
-@import 'features/_fieldnotesFeature.scss';
-@import 'features/_stationsFeature.scss';
+@import 'features/_fieldnotes.scss';
+@import 'features/_shakemap-stations.scss';
 
 #mapPane,
 .map {
@@ -12,7 +12,7 @@
   canvas {
     width: 40px;
   }
-  /* hide 'placeholder' moment tensor / focal mech. beachballs */
+  /* hide rendered beachballs not turned on in layer controller */
   > canvas {
     display: none;
   }
@@ -38,7 +38,7 @@
 .leaflet-historical-pane {
   z-index: 420;
 }
-.leaflet-stations-pane {
+.leaflet-shakemap-stations-pane {
   z-index: 419;
 }
 .leaflet-fieldnotes-pane {

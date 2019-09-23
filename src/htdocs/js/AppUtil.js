@@ -1,12 +1,20 @@
 'use strict';
 
-// static object with utility methods
+
+var LatLon = require('LatLon'),
+    Moment = require('moment');
+
+
+// Static object with utility methods
 var AppUtil = function () {
 };
 
+// Attach (expose) helper libraries
+AppUtil.LatLon = LatLon;
+AppUtil.Moment = Moment;
 
 /**
- * Get value of url param
+ * Get the value of a URL parameter
  *
  * @param name {String}
  *
@@ -19,7 +27,7 @@ AppUtil.getParam = function (name) {
 };
 
 /**
- * Get all url param name/value pairs
+ * Get all URL parameter name/value pairs
  *
  * @return params {Object}
  */
@@ -51,24 +59,41 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
- * Lookup table for url param from feature id
+ * Lookup table to get a URL parameter from a Feature id
  *
- * @param key {String}
+ * @param id {String}
  *
  * @return {String}
  */
-AppUtil.lookup = function (key) {
+AppUtil.lookup = function (id) {
   var lookup = {
     aftershocks: 'as',
     foreshocks: 'fs',
     historical: 'hs'
   };
 
-  return lookup[key];
+  return lookup[id];
 };
 
 /**
- * Convert number to roman numeral
+ * Create a new object composed of only the picked object properties
+ *
+ * @param object {Object}
+ * @param picked {Array}
+ *
+ * @return subset {Object}
+ */
+AppUtil.pick = function (object, picked) {
+  var subset = picked.reduce(function(obj, key) {
+    obj[key] = object[key];
+    return obj;
+  }, {});
+
+  return subset;
+};
+
+/**
+ * Convert a number to a roman numeral
  *
  * @param num {Number}
  *
@@ -104,7 +129,7 @@ AppUtil.romanize = function (num) {
  * @param num {Number}
  * @param precision {Number}
  * @param empty {String}
- *   optional string to return if num is null
+ *     optional string to return if num is null
  *
  * @return {String}
  *     Note that it does not return a Number b/c toFixed() returns a string
@@ -125,7 +150,7 @@ AppUtil.round = function (num, precision, empty) {
 };
 
 /**
- * Set the value of a url parameter
+ * Set the value of a URL parameter
  *
  * @param name {String}
  * @param value {Mixed}

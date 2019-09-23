@@ -1,67 +1,60 @@
 'use strict';
 
 
-var AftershocksFeature = require('features/AftershocksFeature'),
-    AppUtil = require('AppUtil'),
-    FieldNotesFeature = require('features/FieldNotesFeature'),
-    FocalMechanismFeature = require('features/FocalMechanismFeature'),
-    ForeshocksFeature = require('features/ForeshocksFeature'),
-    HistoricalFeature = require('features/HistoricalFeature'),
-    MainshockFeature = require('features/MainshockFeature'),
-    Moment = require('moment'),
-    MomentTensorFeature = require('features/MomentTensorFeature'),
-    StationsFeature = require('features/StationsFeature'),
+var Aftershocks = require('features/Aftershocks'),
+    FieldNotes = require('features/FieldNotes'),
+    FocalMechanism = require('features/FocalMechanism'),
+    Foreshocks = require('features/Foreshocks'),
+    Historical = require('features/Historical'),
+    Mainshock = require('features/Mainshock'),
+    MomentTensor = require('features/MomentTensor'),
+    ShakeMapStations = require('features/ShakeMapStations'),
     Xhr = require('util/Xhr');
 
 
+var _FEATURECLASSES;
+
 /**
- * Retrieves and adds 'features' to map, plot, and summary panes
+ * Set which Features get added, and the order they are loaded (Mainshock must
+ *   be first). Stacking order is set in CSS.
  *
- * Features are event-specific layers added dynamically, based on the mainshock
- * Event ID entered by user
- *
- * Feature data comes from GeoJson web services (mostly via earthquake.usgs.gov)
- *
- * The stacking order of feature layers on the map is defined in css
+ * IMPORTANT: the Object key must match the id property set in the Feature class.
+ *   This id value is sometimes used as a reference in other .js/.css files.
+ */
+_FEATURECLASSES = {
+  mainshock: Mainshock,
+  aftershocks: Aftershocks,
+  foreshocks: Foreshocks,
+  historical: Historical,
+  'shakemap-stations': ShakeMapStations,
+  'focal-mechanism': FocalMechanism,
+  'moment-tensor': MomentTensor,
+  fieldnotes: FieldNotes
+};
+
+
+/**
+ * Create, load and add/remove Features on map, plots and summary panes
  *
  * @param options {Object}
  *   {
- *     mapPane: {Object}, // MapPane instance
- *     plotsPane: {Object}, // PlotsPane instance
- *     statusBar: {Object}, // StatusBar instance
- *     summaryPane: {Object} // SummaryPane instance
+ *     app: {Object} // Application
  *   }
  */
 var Features = function (options) {
   var _this,
       _initialize,
 
-      _editPane,
+      _app,
       _eqid,
       _features,
-      _mainshockJson,
-      _plotdata,
 
-      _MapPane,
-      _PlotsPane,
-      _StatusBar,
-      _SummaryPane,
-
-      _addFeature,
-      _addPlots,
-      _addSummary,
-      _getAftershocks,
-      _getEqFeedUrl,
-      _getFieldNotes,
-      _getFocalMechanism,
-      _getForeshocks,
-      _getHistorical,
-      _getMainshock,
-      _getMomentTensor,
-      _getStations,
-      _loadFeed,
-      _removeCanvasEls,
-      _removeFeature;
+      _add,
+      _init,
+      _instantiate,
+      _load,
+      _remove,
+      _removeAll;
 
 
   _this = {};
@@ -69,344 +62,105 @@ var Features = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _MapPane = options.mapPane;
-    _PlotsPane = options.plotsPane;
-    _StatusBar = options.statusBar;
-    _SummaryPane = options.summaryPane;
-
-    // Flag to block mult. instances of feature from refreshing at the same time
-    _this.isRefreshing = false;
+    _app = options.app;
+    _features = {};
   };
 
   /**
-   * Create and add feature to map, plots, summary panes
+   * Add a Feature to map, plots and summary panes
    *
-   * @param opts {Object}
-   *   {
-   *     jsClass: {Function}, // class that creates Feature
-   *     json: {Object}, // geojson data
-   *     mainshockJson: {Object}, // geojson data
-   *     name: {String}
-   *   }
+   * @param feature {Object}
    */
-  _addFeature = function (opts) {
-    var id,
-        feature,
-        name;
-
-    name = opts.name;
+  _add = function (feature) {
+    _features[feature.id] = feature;
 
     try {
-      // Create feature (and store it in _features for access later)
-      feature = opts.jsClass({
-        json: opts.json,
-        layerOn: opts.layerOn,
-        mainshockJson: opts.mainshockJson,
-        name: name
-      });
-      id = feature.id;
-      _features[id] = feature;
+      // Add feature to map, summary and plot panes
+      _app.MapPane.add(feature);
+      _app.PlotsPane.add(feature);
+      _app.SummaryPane.add(feature);
 
-      // Create a new map pane and add feature to map, summary panes
-      _MapPane.createMapPane(id, 'overlayPane');
-      _MapPane.addFeatureLayer(feature);
-      _addSummary(feature);
+      if (feature.id === 'mainshock') {
+        _app.EditPane.showMainshock();
+        _app.EditPane.setDefaults();
 
-      if (id === 'mainshock') {
-        // Show mainshock details on editPane
-        _editPane.showMainshock(feature.getSummaryData().detailsHtml,
-          opts.mainshockJson.properties);
-
-        // Store mainshock's plotdata
-        _plotdata[id] = feature.getPlotData();
-
-        // Add other (non-mainshock) features
-        _this.getFeatures();
-      } else if (id === 'aftershocks' || id === 'historical') {
-        // Add plots to plots pane
-        _plotdata[id] = feature.getPlotData();
-
-        _addPlots(feature);
+        // Instantiate other Features now that Mainshock ready
+        _this.instantiateFeatures();
       }
 
-      // Feature finished loading; remove alert / set isRefreshing to false
-      _StatusBar.removeItem(name);
-      _this.isRefreshing = false;
+      // Feature finished loading; remove alert
+      _app.StatusBar.remove(feature.id);
     }
     catch (error) {
       console.error(error);
-      _StatusBar.addError(name, '<h4>Error Creating ' + name + '</h4><ul><li>' +
-        error + '</li></ul>');
-      _this.isRefreshing = false;
+      _app.StatusBar.addError(feature, '<h4>Error Creating ' + feature.name +
+        '</h4><ul><li>' + error + '</li></ul>');
     }
   };
 
   /**
-   * Add feature to plots pane
+   * Initialize a Feature
+   *
+   * First, load feed data if Feature's getFeedUrl method is set, then
+   *   initialize (create) and add feature
    *
    * @param feature {Object}
    */
-  _addPlots = function (feature) {
-    _PlotsPane.addPlots({
-      id: feature.id,
-      name: feature.name,
-      data: _plotdata
-    });
+  _init = function (feature) {
+    if (typeof feature.getFeedUrl === 'function') { // get feed data for feature
+      _load(feature);
+    } else { // no external feed data needed
+      feature.initFeature();
+      _add(feature);
+    }
   };
 
   /**
-   * Add feature to summary pane
+   * Instantiate a Feature class
+   *
+   * @param FeatureClass {Object}
+   */
+  _instantiate = function (FeatureClass) {
+    var feature;
+
+    feature = FeatureClass({
+      app: _app,
+      eqid: _eqid
+    });
+
+    _init(feature);
+  };
+
+  /**
+   * Load a Feature from a json feed
    *
    * @param feature {Object}
    */
-  _addSummary = function (feature) {
-    if (feature.getSummaryData) { // check 1st if feature has summary to add
-      _SummaryPane.addSummary({
-        id: feature.id,
-        name: feature.name,
-        data: feature.getSummaryData()
-      });
-    }
-  };
-
-  /**
-   * Get aftershocks feature
-   */
-  _getAftershocks = function () {
-    var params;
-
-    params = {
-      latitude: _mainshockJson.geometry.coordinates[1],
-      longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('as-dist'),
-      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(_mainshockJson.properties.time + 1000).utc().toISOString()
-        .slice(0, -5)
-    };
-
-    _loadFeed({
-      jsClass: AftershocksFeature,
-      name: 'Aftershocks',
-      url: _getEqFeedUrl(params)
-    });
-  };
-
-  /**
-   * Get the feed url for aftershock / historical seismicity features
-   *
-   * @param params {Object}
-   *
-   * @return {String}
-   */
-  _getEqFeedUrl = function (params) {
-    var baseUri,
-        pairs,
-        queryString;
-
-    baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-
-    pairs = ['format=geojson', 'orderby=time-asc'];
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-    queryString = '?' + pairs.join('&');
-
-    return baseUri + queryString;
-  };
-
-  _getFieldNotes = function (layerOn) {
-    var after,
-        before,
-        pairs,
-        params,
-        url;
-
-    after = Moment(_mainshockJson.properties.time + 1000).utc().format('X');
-    before = Moment(_mainshockJson.properties.time).utc().add(30, 'days').format('X');
-    params = {
-      between: after + ',' + before,
-      lat: _mainshockJson.geometry.coordinates[1],
-      lon: _mainshockJson.geometry.coordinates[0],
-      radius: AppUtil.getParam('as-dist') // use aftershocks radius
-    };
-
-    pairs = [];
-    Object.keys(params).forEach(function(key) {
-      pairs.push(key + '=' + params[key]);
-    });
-
-    url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' + pairs.join('&');
-
-    _loadFeed({
-      jsClass: FieldNotesFeature,
-      layerOn: layerOn,
-      name: 'Fieldnotes',
-      url: url
-    });
-  };
-
-  /**
-   * Get focal mechanism feature
-   */
-  _getFocalMechanism = function () {
-    var focalmechanism;
-
-    focalmechanism = _mainshockJson.properties.products['focal-mechanism'];
-    if (focalmechanism) {
-      _addFeature({
-        jsClass: FocalMechanismFeature,
-        json: focalmechanism[0].properties,
-        mainshockJson: _mainshockJson,
-        name: 'Focal Mechanism'
-      });
-    }
-  };
-
-  /**
-   * Get foreshocks feature
-   */
-  _getForeshocks = function () {
-    var days,
-        params;
-
-    days = AppUtil.getParam('fs-days');
-
-    params = {
-      endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
-        .slice(0, -5),
-      latitude: _mainshockJson.geometry.coordinates[1],
-      longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('fs-dist'),
-      minmagnitude: Number(AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(_mainshockJson.properties.time).utc()
-        .subtract(days, 'days').toISOString().slice(0, -5)
-    };
-
-    _loadFeed({
-      jsClass: ForeshocksFeature,
-      name: 'Foreshocks',
-      url: _getEqFeedUrl(params)
-    });
-  };
-
-  /**
-   * Get historical seismicity feature
-   */
-  _getHistorical = function () {
-    var params,
-        years;
-
-    years = AppUtil.getParam('hs-years');
-
-    params = {
-      endtime: Moment(_mainshockJson.properties.time - 1000).utc().toISOString()
-        .slice(0, -5),
-      latitude: _mainshockJson.geometry.coordinates[1],
-      longitude: _mainshockJson.geometry.coordinates[0],
-      maxradiuskm: AppUtil.getParam('hs-dist'),
-      minmagnitude: Number(AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(_mainshockJson.properties.time).utc()
-        .subtract(years, 'years').toISOString().slice(0, -5)
-    };
-
-    _loadFeed({
-      jsClass: HistoricalFeature,
-      name: 'Historical Seismicity',
-      url: _getEqFeedUrl(params)
-    });
-  };
-
-  /**
-   * Get mainshock feature
-   */
-  _getMainshock = function () {
-    var url;
-
-    url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _eqid + '.geojson';
-
-    _loadFeed({
-      jsClass: MainshockFeature,
-      name: 'Mainshock',
-      url: url
-    });
-  };
-
-  /**
-   * Get moment tensor feature
-   */
-  _getMomentTensor = function () {
-    var momentTensor;
-
-    momentTensor = _mainshockJson.properties.products['moment-tensor'];
-    if (momentTensor) {
-      _addFeature({
-        jsClass: MomentTensorFeature,
-        json: momentTensor[0].properties,
-        mainshockJson: _mainshockJson,
-        name: 'Moment Tensor'
-      });
-    }
-  };
-
-  /**
-   * Get ShakeMap stations feature
-   */
-  _getStations = function () {
-    var shakemap,
-        url;
-
-    shakemap = _mainshockJson.properties.products.shakemap;
-    if (shakemap) {
-      url = shakemap[0].contents['download/stationlist.json'].url;
-
-      _loadFeed({
-        jsClass: StationsFeature,
-        name: 'ShakeMap Stations',
-        url: url
-      });
-    }
-  };
-
-  /**
-   * Load json feed and then call _addFeature() when it's finished loading
-   *
-   * @param opts {Object}
-   *   {
-   *     name: {String}
-   *     jsClass: {Function},
-   *     url: {String}
-   *   }
-   */
-  _loadFeed = function (opts) {
+  _load = function (feature) {
     var domain,
         errorMsg,
         matches,
-        name;
+        url;
 
-    name = opts.name;
-    errorMsg = '<h4>Error Loading ' + name + '</h4>';
+    errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
+    url = feature.getFeedUrl();
 
-    // Alert user that feature is loading
-    _StatusBar.addItem(name);
+    if (!url) {
+      return;
+    }
+
+    _app.StatusBar.addLoadingMsg(feature);
 
     Xhr.ajax({
-      url: opts.url,
+      url: url,
       success: function (json) {
-        if (json.id === _eqid) { // mainshock
-          _mainshockJson = json; // store mainshock's json (other features depend on it)
-
-          // Set default param values on edit pane
-          _editPane.setDefaults(_mainshockJson);
+        if (feature.id === 'mainshock') {
+          feature.json = json; // store mainshock json (used by other features)
         }
+        feature.initFeature(json);
+        _add(feature);
 
-        _addFeature({
-          jsClass: opts.jsClass,
-          json: json,
-          layerOn: opts.layerOn,
-          mainshockJson: _mainshockJson,
-          name: name
-        });
+        feature.isRefreshing = false;
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
@@ -420,13 +174,13 @@ var Features = function (options) {
               'earthquakes (max 20,000)</li>';
           }
           else if (xhr.responseText.match('parameter combination')){ // status code 400
-            errorMsg += ' <li>Missing required parameters (all fields are ' +
+            errorMsg += '<li>Missing required parameters (all fields are ' +
               'required)</li>';
           }
         }
         if (status) {
-          if (status === 404 && name === 'Mainshock') {
-            errorMsg += ' <li>Event ID ' + _eqid + ' not found</li>';
+          if (status === 404 && feature.id === 'mainshock') {
+            errorMsg += '<li>Event ID ' + _eqid + ' not found</li>';
           }
           else if (status.message) {
             errorMsg += '<li>' + status.message + '</li>';
@@ -437,72 +191,48 @@ var Features = function (options) {
         }
 
         errorMsg += '</ul>';
-        _StatusBar.addError(name, errorMsg);
-        _this.isRefreshing = false;
+        _app.StatusBar.addError(feature, errorMsg);
+
+        feature.isRefreshing = false;
       },
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        matches = opts.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
         //errorMsg += '<a href="#" class="reload"></a>';
 
-        _StatusBar.addError(name, errorMsg);
-        _this.isRefreshing = false;
+        _app.StatusBar.addError(feature, errorMsg);
+
+        feature.isRefreshing = false;
       },
       timeout: 20000
     });
   };
 
   /**
-   * Remove all canvas beachballs from map pane
+   * Remove a Feature from map, plots and summary panes
+   *
+   * @param feature {Object}
    */
-  _removeCanvasEls = function () {
-    var els,
-        i,
-        mapPane;
-
-    mapPane = document.querySelector('#mapPane');
-    els = mapPane.querySelectorAll('canvas');
-
-    for (i = 0; i < els.length; i ++) {
-      mapPane.removeChild(els[i]);
+  _remove = function (feature) {
+    if (feature) {
+      _app.MapPane.remove(feature);
+      _app.PlotsPane.remove(feature);
+      _app.SummaryPane.remove(feature);
     }
   };
 
   /**
-   * Remove feature from map, plots, summary panes
-   *
-   * @param id {String}
-   *     id of feature to remove
+   * Remove all Features from map, plots and summary panes
    */
-  _removeFeature = function (id) {
-    var className,
-        mapLayer,
-        plotsEl,
-        summaryEl;
-
-    className = id;
-
-    if (_features[id]) {
-      mapLayer = _features[id].getMapLayer();
-      plotsEl = document.querySelector('#plotsPane .' + className);
-      summaryEl = document.querySelector('#summaryPane .' + className);
-    }
-
-    if (mapLayer) {
-      _MapPane.map.removeLayer(mapLayer);
-      _MapPane.layerControl.removeLayer(mapLayer);
-    }
-
-    if (plotsEl) {
-      _PlotsPane.removePlots(plotsEl);
-    }
-
-    if (summaryEl) {
-      _SummaryPane.removeSummary(summaryEl);
+  _removeAll = function () {
+    if (_features) {
+      Object.keys(_features).forEach(function(id) {
+        _remove(_features[id]);
+      });
     }
   };
 
@@ -511,75 +241,135 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Initialize and begin process of adding feature layers
+   * Get a Feature
    *
-   * Called each time a new Event ID is entered by user
+   * @param id {String}
+   *     id of feature
    *
-   * @param opts {Object}
+   * @return feature {Object}
    *   {
-   *     editPane: {Object} // EditPane instance
+   *     showLayer: {Boolean}, // whether or not map layer is "on" by default
+   *     id: {String}, // unique id of feature
+   *     name: {String}, // display name of feature
+   *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
+   *
+   *   The following props are set after external feed data is loaded (optional)
+   *
+   *     json: {String}, // json feed data (mainshock only)
+   *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
+   *     plotDescription: {String}, // text description to accompany plots
+   *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
+   *     sliderData: {Object}, // data for eq mag filters on SummaryPane
+   *     summary: {String}, // HTML for SummaryPane
+   *     title: {Number} // typically the feature's name with count appended
    *   }
    */
-  _this.getFeatures = function (opts) {
-    if (opts && opts.hasOwnProperty('editPane')) { // new mainshock
-      // 1. Initialize environment
-      _editPane = opts.editPane;
-      _eqid = AppUtil.getParam('eqid');
-      _features = {};
-      _plotdata = {};
+  _this.getFeature = function (id) {
+    var feature;
 
-      // 2. Create mainshock feature
-      _getMainshock();
-    } else {
-      // 3. Create other features (called via mainshock's callback)
-      _getAftershocks();
-      _getForeshocks();
-      _getHistorical();
-      _getMomentTensor();
-      _getFocalMechanism();
-      _getStations();
-      _getFieldNotes();
-    }
+    Object.keys(_features).forEach(function(key) {
+      if (id === key) {
+        feature = _features[id];
+      }
+    });
+
+    return feature;
   };
 
   /**
-   * Refresh earthquakes feature layer when user tweaks form fields on edit pane
+   * Get all Features
+   *
+   * @return _features {Object}
+   */
+  _this.getFeatures = function () {
+    return _features;
+  };
+
+  /**
+   * Get a Feature's id from its name/title
+   *
+   * @param name {String}
+   *     name (or title) property of Feature
+   *
+   * @return id {String}
+   */
+  _this.getFeatureId = function (name) {
+    var feature,
+        id;
+
+    Object.keys(_features).forEach(function(key) {
+      feature = _features[key];
+      if (name === feature.name || name === feature.title) {
+        id = key;
+      }
+    });
+
+    return id;
+  };
+
+  /**
+   * Wrapper method to loop through Feature classes and instantiate them
+   *
+   * Skip mainshock which was already added separately so it's available for
+   *   other Features that depend on it.
+   *
+   * @param featureClasses {Object}
+   *     optional; uses _FEATURECLASSES if no parameter is passed
+   */
+  _this.instantiateFeatures = function (featureClasses) {
+    var FeatureClass;
+
+    featureClasses = featureClasses || _FEATURECLASSES;
+
+    Object.keys(featureClasses).forEach(function(id) {
+      if (id !== 'mainshock') { // skip mainshock (already done)
+        FeatureClass = featureClasses[id];
+        _instantiate(FeatureClass);
+      }
+    });
+  };
+
+  /**
+   * Wrapper method to instantiate mainshock Feature
+   */
+  _this.instantiateMainshock = function () {
+    _eqid = _app.AppUtil.getParam('eqid');
+
+    _instantiate(_FEATURECLASSES.mainshock);
+  };
+
+  /**
+   * Refresh a Feature when user manipulates parameters on edit pane
    *
    * @param id {String}
    */
   _this.refresh = function (id) {
-    var fieldnotesLayerOn = false;
+    var feature;
 
-    _this.isRefreshing = true;
-    _removeFeature(id);
+    feature = _this.getFeature(id);
 
+    if (feature) {
+      feature.isRefreshing = true; // flag to block multiple/simultaneous refreshes
+      _remove(feature);
+      _init(feature);
+    } else { // Feature was not yet successfully instantiated
+      _instantiate(_FEATURECLASSES[id]);
+    }
+
+    // Also refresh FieldNotes when Aftershocks Feature is refreshed
     if (id === 'aftershocks') {
-      _getAftershocks();
-
-      // Also refresh Fieldnotes
-      if (_MapPane.map.hasLayer(_features.fieldnotes.getMapLayer())) {
-        fieldnotesLayerOn = true;
-      }
-      _removeFeature('fieldnotes');
-      _getFieldNotes(fieldnotesLayerOn);
-    } else if (id === 'foreshocks') {
-      _getForeshocks();
-    } else if (id === 'historical') {
-      _getHistorical();
+      _this.refresh('fieldnotes');
     }
   };
 
   /**
-   * Remove all features from map, plots, summary panes
+   * Reset to initial state
    */
-  _this.removeFeatures = function () {
-    if (_features) {
-      Object.keys(_features).forEach(function(id) {
-        _removeFeature(id);
-      });
-      // remove any leftover beachballs
-      _removeCanvasEls();
-    }
+  _this.reset = function () {
+    _removeAll();
+
+    _eqid = null;
+    _features = {};
   };
 
 

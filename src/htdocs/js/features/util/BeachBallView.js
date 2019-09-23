@@ -1,7 +1,7 @@
 /* This is based on code in GMT, utilmeca.c. */
 'use strict';
 
-var Canvas = require('beachballs/Canvas'),
+var Canvas = require('features/util/Canvas'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
