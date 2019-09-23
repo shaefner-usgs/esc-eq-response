@@ -5,6 +5,16 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Code cleanup and optimization
+  - create an app "Superglobal" for easy access to a Class's public props/methods from any Class
+  - refactor convoluted code
+  - improve style/consistency between Classes
+  - improve file hierarchy
+  - cleaner, more intuitive API
+  - better separation of concerns
+  - better documentation
+* Bug fix: block features from refreshing multiple times simultaneously when user manipulates parameters
+* Map remembers layer state (on/off) when refreshing a feature
 * Move lat/lon control to center of map; tweak css for consistency among controls
 * Use OAF product for aftershock probs. instead of calculating them
 * Add close button to error bar so user can dismiss
