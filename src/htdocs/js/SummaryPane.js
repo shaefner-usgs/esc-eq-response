@@ -52,7 +52,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Add event listeners to earthquake lists / input range sliders
+   * Add event listeners to input range sliders / earthquake lists
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
@@ -60,8 +60,7 @@ var SummaryPane = function (options) {
    *     Array of cumulative eqs by mag
    */
   _addListeners = function (el, sliderData) {
-    var feature,
-        i,
+    var i,
         input,
         j,
         mag,
@@ -76,7 +75,6 @@ var SummaryPane = function (options) {
 
     input = el.querySelector('.slider input');
     if (input) {
-      feature = input.id;
       mag = el.querySelector('h3 .mag');
       num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
@@ -87,19 +85,21 @@ var SummaryPane = function (options) {
         magValue = Number(input.value);
         scrollY = window.pageYOffset;
 
+        // Show / hide eqs in list and display slider's numeric value
         mag.innerHTML = magValue;
         num.innerHTML = sliderData[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
         for (i = magValue; i <= input.getAttribute('max'); i ++) {
-          table.classList.add('m' + i);
+          table.classList.add('m' + i); // show eqs of mag i
         }
         for (j = magValue; j >= input.getAttribute('min'); j --) {
-          table.classList.remove('m' + (j - 1));
+          table.classList.remove('m' + (j - 1)); // hide eqs of mag j-1
         }
 
-        window.scroll(0, scrollY); // prevent page scrolling
-        _setSliderStyles(this, feature); // update slider track
+        // Prevent page scrolling and update slider track
+        window.scroll(0, scrollY);
+        _setSliderStyles(this, input.id);
       }, false);
     }
 
@@ -181,12 +181,12 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Make table sortable by clicking header values
+   * Make table sortable via clickable headers
    *
-   * @param className {String}
-   *     className of container elem (Feature id)
+   * @param id {String}
+   *     Feature id
    */
-  _initTableSort = function (className) {
+  _initTableSort = function (id) {
     var table,
         cleanNumber,
         compareNumber;
@@ -215,7 +215,7 @@ var SummaryPane = function (options) {
         return compareNumber(b, a);
     });
 
-    table = _el.querySelector('.' + className + ' .sortable');
+    table = _el.querySelector('.' + id + ' .sortable');
     if (table) {
       new Tablesort(table);
     }
@@ -236,37 +236,31 @@ var SummaryPane = function (options) {
         tr;
 
     eqid = this.querySelector('.eqid').textContent;
+    features = _app.Features.getFeatures();
+    parent = this.closest('.feature');
+    selection = window.getSelection();
+    tr = e.target.parentNode;
 
-    // Keep row highlighted after user clicks
+    // Keep row highlighted (via css) after user clicks
     this.classList.add('selected');
 
     // Determine which Feature was clicked
-    features = [
-      'aftershocks',
-      'foreshocks',
-      'historical',
-      'mainshock'
-    ];
-    parent = this.closest('.feature');
-    features.forEach(function(f) {
-      if (parent.classList.contains(f)) {
-        feature = f;
+    Object.keys(features).forEach(function(key) {
+      if (parent.classList.contains(key)) {
+        feature = key;
       }
     });
 
-    // Suppress event if user is trying to select text
-    selection = window.getSelection();
-    tr = e.target.parentNode;
+    // Suppress click event if user is trying to select text
     isTextSelected = tr.contains(selection.anchorNode) &&
       selection.toString().length > 0;
-
     if (!isTextSelected) {
       _app.MapPane.openPopup(feature, eqid);
     }
   };
 
   /**
-   * Turn off 'selected' row when user hovers over any row
+   * Turn off 'selected' (previously clicked) row when user hovers over table
    */
   _onMouseOver = function () {
     var selected;
@@ -341,13 +335,13 @@ var SummaryPane = function (options) {
       canvas = _el.querySelector('canvas.' + feature.id);
       placeholder = _el.querySelector('div.' + feature.id);
 
-      if (placeholder) { // add summary to placeholder
+      if (placeholder) { // add summary to existing placeholder
         placeholder.innerHTML = feature.summary;
         placeholder.classList.remove('hide');
-        if (canvas) { // move beachball into place
+        if (canvas) { // move beachball into place (FM, MT features)
           placeholder.querySelector('a').appendChild(canvas);
         }
-      } else { // create parent element and add title / summary
+      } else { // create new element and add title / summary
         title = feature.title || feature.name;
 
         div = document.createElement('div');
