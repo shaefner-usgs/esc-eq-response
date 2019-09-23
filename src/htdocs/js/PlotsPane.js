@@ -41,7 +41,7 @@ var PlotsPane = function (options) {
     _plots = {};
 
     // Make plots responsive
-    window.onresize = function() {
+    window.onresize = function () {
       _this.resize();
     };
   };
@@ -53,25 +53,25 @@ var PlotsPane = function (options) {
    */
   _addListeners = function (plot) {
     var eqids,
-        feature,
+        featureId,
         index,
         plotId,
         points;
 
-    plot.on('plotly_click', function(data) {
+    plot.on('plotly_click', function (data) {
       points = data.points[0];
 
       eqids = points.data.eqid;
-      feature = points.data.feature;
+      featureId = points.data.feature;
       index = points.pointNumber;
       plotId = points.data.plotid;
 
       // First point (at index 0) on cumulative aftershocks curve is mainshock
-      if (index === 0 && plotId === 'cumulative' && feature === 'aftershocks') {
-        feature = 'mainshock';
+      if (index === 0 && plotId === 'cumulative' && featureId === 'aftershocks') {
+        featureId = 'mainshock';
       }
 
-      _app.MapPane.openPopup(feature, eqids[index]);
+      _app.MapPane.openPopup(featureId, eqids[index]);
     });
   };
 

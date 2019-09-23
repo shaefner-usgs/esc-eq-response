@@ -228,7 +228,7 @@ var SummaryPane = function (options) {
    */
   _onMouseClick = function (e) {
     var eqid,
-        feature,
+        featureId,
         features,
         isTextSelected,
         parent,
@@ -247,7 +247,7 @@ var SummaryPane = function (options) {
     // Determine which Feature was clicked
     Object.keys(features).forEach(function(key) {
       if (parent.classList.contains(key)) {
-        feature = key;
+        featureId = key;
       }
     });
 
@@ -255,7 +255,7 @@ var SummaryPane = function (options) {
     isTextSelected = tr.contains(selection.anchorNode) &&
       selection.toString().length > 0;
     if (!isTextSelected) {
-      _app.MapPane.openPopup(feature, eqid);
+      _app.MapPane.openPopup(featureId, eqid);
     }
   };
 
