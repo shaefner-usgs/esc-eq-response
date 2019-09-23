@@ -224,7 +224,7 @@ var EditPane = function (options) {
     var select;
 
     // Set a slight delay so 'Reset' button can finish clearing form fields first
-    setTimeout(function () {
+    setTimeout(function() {
       _setQueryStringValues(); // reset query string
 
       // Rebuild significant eqs pulldown (to set selected item if necessary)

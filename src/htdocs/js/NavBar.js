@@ -56,7 +56,7 @@ var NavBar = function (options) {
     var id;
 
     // Save current scroll postion when user scrolls page
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', function () {
       _saveScrollPosition();
     });
 
