@@ -30,7 +30,7 @@ var Historical = function (options) {
 
     _app = options.app;
 
-    _this.displayLayer = true;
+    _this.showLayer = true;
     _this.id = 'historical';
     _this.name = 'Historical Seismicity';
     _this.zoomToLayer = true;

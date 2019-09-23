@@ -38,7 +38,7 @@ var MomentTensor = function (options) {
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.displayLayer = false;
+    _this.showLayer = false;
     _this.id = 'moment-tensor';
     _this.name = 'Moment Tensor';
     _this.zoomToLayer = false;

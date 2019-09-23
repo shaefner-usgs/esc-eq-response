@@ -61,7 +61,7 @@ var FieldNotes = function (options) {
     _app = options.app;
     _Lightbox = Lightbox();
 
-    _this.displayLayer = false;
+    _this.showLayer = false;
     _this.id = 'fieldnotes';
     _this.name = 'Fieldnotes';
     _this.zoomToLayer = false;

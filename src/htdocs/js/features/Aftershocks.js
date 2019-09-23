@@ -35,7 +35,7 @@ var Aftershocks = function (options) {
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.displayLayer = true;
+    _this.showLayer = true;
     _this.id = 'aftershocks';
     _this.name = 'Aftershocks';
     _this.zoomToLayer = true;

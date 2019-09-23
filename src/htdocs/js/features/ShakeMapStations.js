@@ -70,7 +70,7 @@ var ShakeMapStations = function (options) {
     _markerOptions = options.markerOptions;
     _shakemap = mainshock.json.properties.products.shakemap;
 
-    _this.displayLayer = false;
+    _this.showLayer = false;
     _this.id = 'shakemap-stations';
     _this.name = 'ShakeMap Stations';
     _this.zoomToLayer = false;

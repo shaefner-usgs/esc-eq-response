@@ -38,7 +38,7 @@ var FocalMechanism = function (options) {
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.displayLayer = false;
+    _this.showLayer = false;
     _this.id = 'focal-mechanism';
     _this.name = 'Focal Mechanism';
     _this.zoomToLayer = false;

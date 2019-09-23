@@ -248,7 +248,7 @@ var Features = function (options) {
    *
    * @return feature {Object}
    *   {
-   *     displayLayer: {Boolean}, // whether or not map layer is "on" by default
+   *     showLayer: {Boolean}, // whether or not map layer is "on" by default
    *     id: {String}, // unique id of feature
    *     name: {String}, // display name of feature
    *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer

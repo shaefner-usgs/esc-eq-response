@@ -32,7 +32,7 @@ var Mainshock = function (options) {
     _app = options.app;
     _eqid = options.eqid;
 
-    _this.displayLayer = true;
+    _this.showLayer = true;
     _this.id = 'mainshock';
     _this.name = 'Mainshock';
     _this.zoomToLayer = true;

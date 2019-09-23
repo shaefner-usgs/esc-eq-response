@@ -88,22 +88,22 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add event listeners for setting Features's displayLayer property when user
+   * Add event listeners for setting Features's showLayer property when user
    *   toggles layers on/off
    */
   _addListeners = function () {
-    var displayLayer,
-        id;
+    var id,
+        showLayer;
 
     _this.map.on('overlayadd overlayremove', function (e) {
-      displayLayer = false;
       id = _app.Features.getFeatureId(e.name);
+      showLayer = false;
 
       if (e.type === 'overlayadd') {
-        displayLayer = true;
+        showLayer = true;
       }
 
-      _app.Features.getFeature(id).displayLayer = displayLayer;
+      _app.Features.getFeature(id).showLayer = showLayer;
     });
   };
 
@@ -352,7 +352,7 @@ var MapPane = function (options) {
       _layerControl.addOverlay(feature.mapLayer, title);
 
       // Turn layer "on" and zoom map if set to be displayed / zoomed by default
-      if (feature.displayLayer) {
+      if (feature.showLayer) {
         _this.map.addLayer(feature.mapLayer);
 
         if (feature.zoomToLayer) {
@@ -422,18 +422,18 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.remove = function (feature) {
-    var displayLayer,
-        mapLayer;
+    var mapLayer,
+        showLayer;
 
-    displayLayer = feature.displayLayer; // cache value
     mapLayer = feature.mapLayer;
+    showLayer = feature.showLayer; // cache value
 
     if (mapLayer) {
-      _this.map.removeLayer(mapLayer); // sets displayLayer prop to false
+      _this.map.removeLayer(mapLayer); // sets showLayer prop to false
       _layerControl.removeLayer(mapLayer);
     }
 
-    feature.displayLayer = displayLayer; // set to cached value
+    feature.showLayer = showLayer; // set to cached value
   };
 
   /**

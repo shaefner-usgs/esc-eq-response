@@ -30,7 +30,7 @@ var Foreshocks = function (options) {
 
     _app = options.app;
 
-    _this.displayLayer = true;
+    _this.showLayer = true;
     _this.id = 'foreshocks';
     _this.name = 'Foreshocks';
     _this.zoomToLayer = true;
