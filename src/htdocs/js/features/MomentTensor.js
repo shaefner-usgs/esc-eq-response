@@ -117,7 +117,8 @@ var MomentTensor = function (options) {
 
     beachball = _getBeachBall(180);
     if (beachball) {
-      // Render hidden (via css) beachball (moved into place after summary added)
+      // Immediately render beachball (which is initially hidden via css)
+      //   it will be moved into place (and unhidden) once summary is added
       beachball.render(document.querySelector('#summaryPane'));
 
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
