@@ -14,7 +14,7 @@ var AppUtil = require('AppUtil'),
 
 
 /**
- * Earthquake Response Application - set up and instantiate app's components
+ * Earthquake Response Application - set up and configure app's components
  *
  * @param options {Object}
  *   {
@@ -29,17 +29,17 @@ var AppUtil = require('AppUtil'),
  *
  * @return _this {Object}
  *   {
-       AppUtil: {Function},
-       EditPane: {Function},
-       Features: {Function},
-       HelpPane: {Function},
-       MapPane: {Function},
-       NavBar: {Function},
-       PlotsPane: {Function},
-       SignificantEqs: {Function},
-       resetApp: {Function},
-       StatusBar: {Function},
-       SummaryPane: {Function}
+ *     AppUtil: {Function},
+ *     EditPane: {Function},
+ *     Features: {Function},
+ *     HelpPane: {Function},
+ *     MapPane: {Function},
+ *     NavBar: {Function},
+ *     PlotsPane: {Function},
+ *     SignificantEqs: {Function},
+ *     resetApp: {Function},
+ *     StatusBar: {Function},
+ *     SummaryPane: {Function}
  *   }
  */
 var Application = function (options) {
@@ -140,7 +140,7 @@ var Application = function (options) {
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
 
-    // Reset Features last so other Classes can use Features during reset()
+    // Reset Features last so other Classes can use Features during reset
     _this.Features.reset();
   };
 

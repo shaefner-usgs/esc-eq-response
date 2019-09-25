@@ -12,6 +12,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ *
  * @return _this {Object}
  *   {
  *     getFeedUrl: {Function},

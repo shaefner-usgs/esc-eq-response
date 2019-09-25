@@ -15,6 +15,7 @@ require('mappane/CanvasMarker');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ *
  * @return _this {Object}
  *   {
  *     id: {String},

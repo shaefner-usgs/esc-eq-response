@@ -34,6 +34,7 @@ _DEFAULTS = {
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ *
  * @return _this {Object}
  *   {
  *     getFeedUrl: {Function},
