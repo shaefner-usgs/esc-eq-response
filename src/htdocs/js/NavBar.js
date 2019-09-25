@@ -11,6 +11,11 @@
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     reset: {Function}
+ *   }
  */
 var NavBar = function (options) {
   var _this,

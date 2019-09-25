@@ -12,6 +12,13 @@ var Tablesort = require('tablesort');
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     add: {Function},
+ *     remove: {Function},
+ *     reset: {Function}
+ *   }
  */
 var SummaryPane = function (options) {
   var _this,

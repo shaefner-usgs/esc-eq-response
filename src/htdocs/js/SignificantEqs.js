@@ -11,6 +11,11 @@ var Xhr = require('util/Xhr');
  *   {
  *     app: {Object} // Application
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     addSignificantEqs: {Function}
+ *   }
  */
 var SignificantEqs = function (options) {
   var _this,
@@ -136,7 +141,7 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add significant earthquakes pulldown menu
+   * Add significant earthquakes pulldown menu to edit pane
    */
   _this.addSignificantEqs = function () {
     var refNode,

@@ -21,6 +21,15 @@ _DEFAULTS = {
  * Creates <svg> elements
  *
  * @param options {Object}
+ *
+ * @return _this {Object}
+ *   {
+ *     getBeachBall: {Function},
+ *     getCircle: {Function},
+ *     getCircleRange: {Function},
+ *     getLine: {Function},
+ *     getTriangle: {Function}
+ *   }
  */
 var Svg = function (options) {
   var _this,

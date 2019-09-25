@@ -14,7 +14,7 @@ var AppUtil = require('AppUtil'),
 
 
 /**
- * Earthquake Response Application - set up app and dependencies
+ * Earthquake Response Application - set up and instantiate app's components
  *
  * @param options {Object}
  *   {
@@ -25,6 +25,21 @@ var AppUtil = require('AppUtil'),
  *     plotsPane: {Element},
  *     statusBar: {Element},
  *     summaryPane: {Element}
+ *   }
+ *
+ * @return _this {Object}
+ *   {
+       AppUtil: {Function},
+       EditPane: {Function},
+       Features: {Function},
+       HelpPane: {Function},
+       MapPane: {Function},
+       NavBar: {Function},
+       PlotsPane: {Function},
+       SignificantEqs: {Function},
+       resetApp: {Function},
+       StatusBar: {Function},
+       SummaryPane: {Function}
  *   }
  */
 var Application = function (options) {

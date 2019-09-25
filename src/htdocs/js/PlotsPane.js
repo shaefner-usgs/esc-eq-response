@@ -10,6 +10,15 @@
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     add: {Function},
+ *     remove: {Function},
+ *     render: {Function},
+ *     reset: {Function},
+ *     resize: {Function}
+ *   }
  */
 var PlotsPane = function (options) {
   var _this,

@@ -40,6 +40,17 @@ _FEATURECLASSES = {
  *   {
  *     app: {Object} // Application
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     getFeature: {Function},
+ *     getFeatureId: {Function},
+ *     getFeatures: {Function},
+ *     instantiateFeatures: {Function},
+ *     instantiateMainshock: {Function},
+ *     refresh: {Function},
+ *     reset: {Function}
+ *   }
  */
 var Features = function (options) {
   var _this,
@@ -277,15 +288,6 @@ var Features = function (options) {
   };
 
   /**
-   * Get all Features
-   *
-   * @return _features {Object}
-   */
-  _this.getFeatures = function () {
-    return _features;
-  };
-
-  /**
    * Get a Feature's id from its name/title
    *
    * @param name {String}
@@ -305,6 +307,15 @@ var Features = function (options) {
     });
 
     return id;
+  };
+
+  /**
+   * Get all Features
+   *
+   * @return _features {Object}
+   */
+  _this.getFeatures = function () {
+    return _features;
   };
 
   /**

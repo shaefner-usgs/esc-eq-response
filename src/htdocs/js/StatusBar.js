@@ -9,6 +9,15 @@
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     addError: {Function},
+ *     addLoadingMsg: {Function},
+ *     hasError: {Function},
+ *     remove: {Function},
+ *     reset: {Function}
+ *   }
  */
 var StatusBar = function (options) {
   var _this,

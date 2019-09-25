@@ -8,6 +8,16 @@ var _DEFAULTS = {};
 
 /**
  * Create a lightbox overlay
+ *
+ * @param options {Object}
+ *
+ * @return _this {Object}
+ *   {
+ *     add: {Function},
+ *     hide: {Function},
+ *     remove: {Function},
+ *     show: {Function}
+ *   }
  */
 var Lightbox = function (options) {
   var _this,

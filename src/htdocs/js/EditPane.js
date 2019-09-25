@@ -12,6 +12,15 @@
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     initFeatures: {Function},
+ *     reset: {Function},
+ *     selSignificantEq: {Function},
+ *     setDefaults: {Function},
+ *     showMainshock: {Function}
+ *   }
  */
 var EditPane = function (options) {
   var _this,

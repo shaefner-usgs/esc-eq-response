@@ -26,6 +26,16 @@ require('mappane/TerrainLayer');
  *     app: {Object}, // Application
  *     el: {Element}
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     add: {Function},
+ *     initView: {Function},
+ *     map: {Object},
+ *     openPopup: {Function},
+ *     remove: {Function},
+ *     reset: {Function}
+ *   }
  */
 var MapPane = function (options) {
   var _this,
