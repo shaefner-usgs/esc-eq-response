@@ -5,14 +5,17 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+## 0.6.0 (2019-09-25)
+
+* Update to latest Leaflet (1.5.1)
 * Code cleanup and optimization
-  - create an app "Superglobal" for easy access to a Class's public props/methods from any Class
+  - create an app "Superglobal" for easy access to all public props/methods from any Class
+  - cleaner, more intuitive API
   - refactor convoluted code
   - improve style/consistency between Classes
-  - improve file hierarchy
-  - cleaner, more intuitive API
-  - better separation of concerns
-  - better documentation
+  - reorganize file/directory hierarchy
+  - better separation of concerns between Classes
+  - improve documentation
 * Bug fix: block features from refreshing multiple times simultaneously when user manipulates parameters
 * Map remembers layer state (on/off) when refreshing a feature
 * Move lat/lon control to center of map; tweak css for consistency among controls
