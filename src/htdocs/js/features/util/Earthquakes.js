@@ -40,6 +40,19 @@ _DEFAULTS = {
  *     id: {String}, // Feature id
  *     json: {Object} // Feature json data
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     eqList: {Object},
+ *     getBinnedTable: {Function},
+ *     getDescription: {Function},
+ *     getListTable: {Function},
+ *     getSlider: {Function},
+ *     mapLayer: {L.layer},
+ *     mostRecentEqId: {String},
+ *     plotTraces: {Object},
+ *     sliderData: {Array}
+ *   }
  */
 var Earthquakes = function (options) {
   var _this,

@@ -34,6 +34,17 @@ _DEFAULTS = {
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     getFeedUrl: {Function},
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     showLayer: {Boolean},
+ *     title: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var FieldNotes = function (options) {
   var _this,
@@ -61,9 +72,9 @@ var FieldNotes = function (options) {
     _app = options.app;
     _Lightbox = Lightbox();
 
-    _this.showLayer = false;
     _this.id = 'fieldnotes';
     _this.name = 'Fieldnotes';
+    _this.showLayer = false;
     _this.zoomToLayer = false;
 
     _markerOptions = Util.extend({

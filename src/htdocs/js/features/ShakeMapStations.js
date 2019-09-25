@@ -34,6 +34,17 @@ _DEFAULTS = {
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     getFeedUrl: {Function},
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     showLayer: {Boolean},
+ *     title: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var ShakeMapStations = function (options) {
   var _this,
@@ -70,9 +81,9 @@ var ShakeMapStations = function (options) {
     _markerOptions = options.markerOptions;
     _shakemap = mainshock.json.properties.products.shakemap;
 
-    _this.showLayer = false;
     _this.id = 'shakemap-stations';
     _this.name = 'ShakeMap Stations';
+    _this.showLayer = false;
     _this.zoomToLayer = false;
   };
 

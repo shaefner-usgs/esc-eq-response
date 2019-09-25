@@ -12,6 +12,21 @@ var Earthquakes = require('features/util/Earthquakes');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     getFeedUrl: {Function},
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     plotDescription: {String},
+ *     plotTraces: {Object},
+ *     showLayer: {Boolean},
+ *     sliderData: {Array},
+ *     summary: {String},
+ *     title: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var Aftershocks = function (options) {
   var _this,
@@ -35,9 +50,9 @@ var Aftershocks = function (options) {
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.showLayer = true;
     _this.id = 'aftershocks';
     _this.name = 'Aftershocks';
+    _this.showLayer = true;
     _this.zoomToLayer = true;
   };
 

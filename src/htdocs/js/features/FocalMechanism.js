@@ -15,6 +15,16 @@ require('mappane/CanvasMarker');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     showLayer: {Boolean},
+ *     summary: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var FocalMechanism = function (options) {
   var _this,
@@ -38,9 +48,9 @@ var FocalMechanism = function (options) {
     _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.showLayer = false;
     _this.id = 'focal-mechanism';
     _this.name = 'Focal Mechanism';
+    _this.showLayer = false;
     _this.zoomToLayer = false;
   };
 

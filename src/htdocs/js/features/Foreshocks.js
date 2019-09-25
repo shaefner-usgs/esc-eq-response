@@ -12,6 +12,19 @@ var Earthquakes = require('features/util/Earthquakes');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     getFeedUrl: {Function},
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     showLayer: {Boolean},
+ *     sliderData: {Array},
+ *     summary: {String},
+ *     title: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var Foreshocks = function (options) {
   var _this,
@@ -30,9 +43,9 @@ var Foreshocks = function (options) {
 
     _app = options.app;
 
-    _this.showLayer = true;
     _this.id = 'foreshocks';
     _this.name = 'Foreshocks';
+    _this.showLayer = true;
     _this.zoomToLayer = true;
   };
 

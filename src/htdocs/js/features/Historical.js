@@ -12,6 +12,21 @@ var Earthquakes = require('features/util/Earthquakes');
  *     app: {Object}, // Application
  *     eqid: {String} // Mainshock event id
  *   }
+ * @return _this {Object}
+ *   {
+ *     getFeedUrl: {Function},
+ *     id: {String},
+ *     initFeature: {Function},
+ *     mapLayer: {L.layer},
+ *     name: {String},
+ *     plotDescription: {String},
+ *     plotTraces: {Object},
+ *     showLayer: {Boolean},
+ *     sliderData: {Array},
+ *     summary: {String},
+ *     title: {String},
+ *     zoomToLayer: {Boolean}
+ *   }
  */
 var Historical = function (options) {
   var _this,
@@ -30,9 +45,9 @@ var Historical = function (options) {
 
     _app = options.app;
 
-    _this.showLayer = true;
     _this.id = 'historical';
     _this.name = 'Historical Seismicity';
+    _this.showLayer = true;
     _this.zoomToLayer = true;
   };
 
