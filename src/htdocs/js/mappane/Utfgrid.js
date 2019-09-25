@@ -2,12 +2,11 @@
 'use strict';
 
 
-/*!
- * Copyright (c) 2012, Smartrak, David Leaver
- * Leaflet.utfgrid is an open-source JavaScript library that provides utfgrid interaction on leaflet powered maps.
- * https://github.com/danzel/Leaflet.utfgrid
+/*
+ * This class provides a UTFGrid interaction implementation (mouseover labels)
+ *   for Leaflet
  *
- * @license MIT
+ * Copyright 2012 Smartrak, David Leaver (https://github.com/danzel/Leaflet.utfgrid)
  */
 (function (window, undefined) {
 

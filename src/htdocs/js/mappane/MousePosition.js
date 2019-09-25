@@ -2,8 +2,11 @@
 'use strict';
 
 
-// Copyright 2013 Ardhi Lukianto
-// https://github.com/ardhi/Leaflet.MousePosition
+/**
+ * This class displays geographic coordinates of the mouse pointer as it moves
+ *
+ * Copyright 2013 Ardhi Lukianto (https://github.com/ardhi/Leaflet.MousePosition)
+ */
 L.Control.MousePosition = L.Control.extend({
   options: {
     position: 'bottomleft',

@@ -3,7 +3,7 @@
 
 
 /**
- * Leaflet.RestoreMap plugin
+ * This class restores Leaflet map state using Local/Session Storage
  *   (based on https://github.com/makinacorpus/Leaflet.RestoreView)
  *
  * Added functionality:
