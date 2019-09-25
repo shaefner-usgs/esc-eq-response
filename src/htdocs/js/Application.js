@@ -72,7 +72,6 @@ var Application = function (options) {
   _initComponents = function (options) {
     // Instantiate StatusBar first so it's available to show status while loading
     _this.StatusBar = StatusBar({
-      app: _this,
       el: options.statusBar
     });
 
@@ -86,7 +85,6 @@ var Application = function (options) {
       app: _this
     });
     _this.HelpPane = HelpPane({
-      app: _this,
       el: options.helpPane
     });
     _this.MapPane = MapPane({
