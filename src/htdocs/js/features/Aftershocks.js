@@ -123,9 +123,11 @@ var Aftershocks = function (options) {
    */
   _getSummary = function (json) {
     var count,
+        duration,
         mag,
         magThreshold,
         mostRecentEq,
+        mostRecentEqTime,
         summary;
 
     count = json.metadata.count;
@@ -134,6 +136,12 @@ var Aftershocks = function (options) {
     if (count > 0) {
       magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
       mostRecentEq = _app.AppUtil.pick(_Earthquakes.eqList, [_Earthquakes.mostRecentEqId]);
+      mostRecentEqTime = mostRecentEq[_Earthquakes.mostRecentEqId].isoTime;
+
+      duration = _app.AppUtil.round(
+        _app.AppUtil.Moment.duration(_app.AppUtil.Moment.utc() -
+        _app.AppUtil.Moment.utc(mostRecentEqTime)).asDays() , 1
+      ) + ' days';
 
       mag = Math.floor(Math.max(
         magThreshold,
@@ -152,6 +160,8 @@ var Aftershocks = function (options) {
       summary += _getProbabilities();
       if (count > 1) {
         summary += '<h3>Most Recent Aftershock</h3>';
+        summary += '<p>The most recent aftershock was <strong>' + duration +
+          '</strong> ago.';
         summary += _Earthquakes.getListTable(mostRecentEq);
       }
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
