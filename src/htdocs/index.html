@@ -39,10 +39,10 @@
             <div class="mainshock">
               <h3>Mainshock</h3>
               <label for="eqid">
-                <p>Event ID (2 letters followed by 5-8 characters)</p>
+                <p>Event ID (typically 2 letters followed by 8-10 characters)</p>
               </label>
               <input type="text" id="eqid" value="" required="required"
-                pattern="^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$" autofocus="autofocus"
+                pattern="^[^/\\:]+$" autofocus="autofocus"
                 tabindex="2" />
             </div>
             <div class="details hide"></div>

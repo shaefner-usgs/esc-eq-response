@@ -178,7 +178,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Check if eqid is valid
+   * Check if eqid is valid and exists
    *
    * @return isValid {Boolean}
    */
@@ -187,9 +187,9 @@ var EditPane = function (options) {
         regex;
 
     isValid = false;
-    regex = /^[a-zA-Z]{2}[a-zA-Z0-9]{5,8}$/; // 2 letters followed by 5-8 characters
+    regex = /^[^/\\:]+$/; // no slashes, colons
 
-    // Check if eqid exists and is correct format (404 error is logged if not)
+    // 404 error is logged if eqid not found
     if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
       isValid = true;
     }
