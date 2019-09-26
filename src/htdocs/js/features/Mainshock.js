@@ -69,10 +69,6 @@ var Mainshock = function (options) {
     summary = '<div class="products">';
     summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
 
-    // Add placeholders for beachballs
-    summary += '<div class="focal-mechanism hide scale"></div>';
-    summary += '<div class="moment-tensor hide scale"></div>';
-
     if (products.dyfi) {
       cdi = _app.AppUtil.romanize(_this.json.properties.cdi);
       imgSrc = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
@@ -91,6 +87,10 @@ var Mainshock = function (options) {
         '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
         mmi + '" /></a></div>';
     }
+
+    // Add placeholders for beachballs
+    summary += '<div class="focal-mechanism hide scale"></div>';
+    summary += '<div class="moment-tensor hide scale"></div>';
 
     summary += '</div>';
 
