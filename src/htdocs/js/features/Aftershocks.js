@@ -161,7 +161,7 @@ var Aftershocks = function (options) {
       if (count > 1) {
         summary += '<h3>Most Recent Aftershock</h3>';
         summary += '<p>The most recent aftershock was <strong>' + duration +
-          '</strong> ago.';
+          ' ago</strong>.';
         summary += _Earthquakes.getListTable(mostRecentEq);
       }
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
