@@ -77,16 +77,21 @@ var NavBar = function (options) {
    *
    * @param id {String}
    */
-  _changePane = function (id) {
-    _app.StatusBar.addLoadingMsg();
+   _changePane = function (id) {
+     if (id === 'plotsPane' && !_app.PlotsPane.rendered) {
+       _app.StatusBar.addLoadingMsg();
 
-    // Add a slight delay; otherwise loading (rendering) message does not display
-    window.setTimeout(function() {
-      _hidePanes();
-      _showPane(id);
-      _app.StatusBar.remove('rendering');
-    }, 20);
-  };
+       // Add a slight delay; otherwise loading (rendering) message does not display
+       window.setTimeout(function() {
+         _hidePanes();
+         _showPane(id);
+         _app.StatusBar.remove('rendering');
+       }, 20);
+     } else {
+       _hidePanes();
+       _showPane(id);
+     }
+   };
 
   /**
    * Get id of selected pane from url (defaults to 'editPane' if not set)

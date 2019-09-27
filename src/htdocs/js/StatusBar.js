@@ -103,7 +103,7 @@ var StatusBar = function (options) {
    * Add loading message to status bar
    *
    * @param feature {Object}
-   *     optional; displays generic loading message if no Feature provided
+   *     optional; displays generic rendering message if no Feature provided
    */
   _this.addLoadingMsg = function (feature) {
     var animEllipsis,
@@ -124,7 +124,7 @@ var StatusBar = function (options) {
     _this.remove(id);
 
     if (id === 'rendering') { // rendering app pane
-      item.innerHTML = '<h4>Loading' + animEllipsis + '</h4>';
+      item.innerHTML = '<h4>Rendering' + animEllipsis + '</h4>';
       _el.appendChild(item);
     } else { // loading Feature
       item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';

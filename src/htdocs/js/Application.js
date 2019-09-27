@@ -70,12 +70,16 @@ var Application = function (options) {
    *   that is shared between Classes
    */
   _initComponents = function (options) {
-    // Instantiate StatusBar first so it's available to show status while loading
+    _this.AppUtil = AppUtil;
+
+    // Instantiate PlotsPane, StatusBar first so they're available immediately
+    _this.PlotsPane = PlotsPane({
+      app: _this,
+      el: options.plotsPane
+    });
     _this.StatusBar = StatusBar({
       el: options.statusBar
     });
-
-    _this.AppUtil = AppUtil;
 
     _this.EditPane = EditPane({
       app: _this,
@@ -94,10 +98,6 @@ var Application = function (options) {
     _this.NavBar = NavBar({
       app: _this,
       el: options.navBar
-    });
-    _this.PlotsPane = PlotsPane({
-      app: _this,
-      el: options.plotsPane
     });
     _this.SignificantEqs = SignificantEqs({
       app: _this

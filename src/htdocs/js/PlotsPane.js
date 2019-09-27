@@ -16,6 +16,7 @@
  *     add: {Function},
  *     remove: {Function},
  *     render: {Function},
+ *     rendered: {Boolean},
  *     reset: {Function},
  *     resize: {Function}
  *   }
@@ -48,6 +49,8 @@ var PlotsPane = function (options) {
     _el = options.el || document.createElement('div');
     _featuresEl = _el.querySelector('.features');
     _plots = {};
+
+    _this.rendered = false;
 
     // Make plots responsive
     window.onresize = function () {
@@ -463,6 +466,8 @@ var PlotsPane = function (options) {
         }
       }
     });
+
+    _this.rendered = true;
   };
 
   /**
@@ -477,6 +482,7 @@ var PlotsPane = function (options) {
     });
 
     _featuresEl.innerHTML = '';
+    _this.rendered = false;
   };
 
   /**
