@@ -127,8 +127,8 @@
     flex-wrap: wrap;
   }
 
-  .foreshocks .year {
-    display: none; /* hide year header on foreshocks binned data table */
+  .hide-year .year {
+    display: none; /* hide year column when duration is 30 days or less */
   }
 
   .impact-bubbles {

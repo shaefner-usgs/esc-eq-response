@@ -77,6 +77,7 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
+      _getDuration,
       _getHtmlTemplate,
       _getIntervals,
       _getPlotlyTrace,
@@ -165,7 +166,7 @@ var Earthquakes = function (options) {
       }
     } else { // first, past, or prior
       if (!_bins[type][magInt]) {
-        intervals = _getIntervals(); // get intervals template
+        intervals = _getIntervals(); // get intervals Object template
         _bins[type][magInt] = intervals;
       }
 
@@ -192,6 +193,7 @@ var Earthquakes = function (options) {
    * nearest tenth
    *
    * @param feature {Object}
+   *     geojson feature
    *
    * @return {Boolean}
    */
@@ -274,6 +276,36 @@ var Earthquakes = function (options) {
     bubbles = L.Util.template(bubblesTemplate, data);
 
     return bubbles;
+  };
+
+  /**
+   * Get the duration of an earthquake sequence
+   *
+   * @return duration {Object}
+   */
+  _getDuration = function () {
+    var duration;
+
+    if (_id === 'aftershocks') {
+      duration = {
+        'length': Number(_app.AppUtil.round(
+          _app.AppUtil.Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
+        )),
+        'interval': 'days'
+      };
+    } else if (_id === 'foreshocks') {
+      duration = {
+        'length': Number(_app.AppUtil.getParam('fs-days')),
+        'interval': 'days'
+      };
+    } else if (_id === 'historical') {
+      duration = {
+        'length': Number(_app.AppUtil.getParam('hs-years')),
+        'interval': 'years'
+      };
+    }
+
+    return duration;
   };
 
   /**
@@ -454,6 +486,7 @@ var Earthquakes = function (options) {
    *   to bins
    *
    * @param feature {Object}
+   *     geojson feature
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
@@ -574,6 +607,7 @@ var Earthquakes = function (options) {
    * Create Leaflet markers and add additional properties to plot data
    *
    * @param feature {Object}
+   *     geojson feature
    * @param latlng {L.LatLng}
    *
    * @return {L.CircleMarker}
@@ -613,15 +647,25 @@ var Earthquakes = function (options) {
    * @return html {String}
    */
   _this.getBinnedTable = function (type) {
-    var html,
+    var cssClasses,
+        days,
+        duration,
+        html,
         intervalTotals,
         value;
 
+    cssClasses = ['bin'];
+    duration = _getDuration(_id);
     html = '';
-    intervalTotals = _getIntervals(); // get intervals template
+    intervalTotals = _getIntervals(); // get intervals Object template
+
+    days = _app.AppUtil.Moment.duration(duration.length, duration.interval).asDays();
+    if (days <= 30) {
+      cssClasses.push('hide-year');
+    }
 
     if (_bins[type] && _bins[type].length > 0) {
-      html = '<table class="bin">' +
+      html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr>' +
           '<th class="period">' + type + ':</th>' +
           '<th class="day">Day</th>' +
@@ -670,6 +714,7 @@ var Earthquakes = function (options) {
         mag;
 
     distance = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    duration = _getDuration(_id);
     mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
@@ -677,18 +722,11 @@ var Earthquakes = function (options) {
       'mainshock&rsquo;s epicenter';
 
     if (_id === 'aftershocks') {
-      duration = _app.AppUtil.round(_app.AppUtil.Moment.duration(_nowMoment -
-        _mainshockMoment).asDays(), 1) + ' days';
       description += '. The duration of the aftershock sequence is <strong>' +
-        duration + '</strong>';
+        duration.length + ' ' + duration.interval + '</strong>';
     } else {
-      if (_id === 'foreshocks') {
-        duration = _app.AppUtil.getParam('fs-days') + ' days';
-      } else if (_id === 'historical') {
-        duration = _app.AppUtil.getParam('hs-years') + ' years';
-      }
-      description += ' in the prior <strong>' + duration + '</strong> ' +
-        'before the mainshock';
+      description += ' in the prior <strong>' + duration.length + ' ' +
+        duration.interval +  '</strong> before the mainshock';
     }
 
     description += '.</p>';
