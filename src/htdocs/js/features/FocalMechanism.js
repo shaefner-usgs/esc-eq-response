@@ -89,8 +89,11 @@ var FocalMechanism = function (options) {
   _getMapLayer = function () {
     var beachball,
         coords,
+        mainshock,
         mapLayer,
-        size;
+        popup,
+        size,
+        tooltip;
 
     size = 40;
     beachball = _getBeachBall(size);
@@ -104,6 +107,13 @@ var FocalMechanism = function (options) {
         _mainshock.json.geometry.coordinates[0]
       ];
 
+      // Get popup, tooltip content from mainshock Feature
+      _app.Features.getFeature('mainshock').mapLayer.eachLayer(function(layer) {
+        mainshock = layer; // only 1 layer in FeatureGroup
+      });
+      popup = mainshock.getPopup().getContent();
+      tooltip = mainshock.getTooltip().getContent();
+
       mapLayer = L.canvasMarker(coords, {
         icon: L.divIcon({
           className: _this.id,
@@ -111,6 +121,12 @@ var FocalMechanism = function (options) {
         }),
         pane: _this.id // put marker in custom Leaflet map pane
       });
+      mapLayer.bindPopup(popup, {
+        autoPanPaddingTopLeft: L.point(50, 50),
+        autoPanPaddingBottomRight: L.point(60, 40),
+        maxWidth: 350,
+        minWidth: 250
+      }).bindTooltip(tooltip);
     }
 
     return mapLayer;
