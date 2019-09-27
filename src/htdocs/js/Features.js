@@ -23,12 +23,12 @@ var _FEATURECLASSES;
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
+  'focal-mechanism': FocalMechanism,
+  'moment-tensor': MomentTensor,
   aftershocks: Aftershocks,
   foreshocks: Foreshocks,
   historical: Historical,
   'shakemap-stations': ShakeMapStations,
-  'focal-mechanism': FocalMechanism,
-  'moment-tensor': MomentTensor,
   fieldnotes: FieldNotes
 };
 
