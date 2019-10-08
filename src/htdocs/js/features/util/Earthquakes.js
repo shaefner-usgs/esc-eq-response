@@ -48,10 +48,10 @@ _DEFAULTS = {
  *     getDescription: {Function},
  *     getListTable: {Function},
  *     getSlider: {Function},
+ *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     mostRecentEqId: {String},
- *     plotTraces: {Object},
- *     sliderData: {Array}
+ *     plotTraces: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -138,16 +138,16 @@ var Earthquakes = function (options) {
       cumulative: _getPlotlyTrace('cumulative', 'scatter'),
       hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
     };
-    _this.sliderData = _bins.sliderData;
+    _this.magInclusive = _bins.total;
   };
 
   /**
-   * Bin earthquakes by magnitude and time period (type); also bin earthquake
-   *   totals for interactive sliders that filter earthquake tables by magnitude
+   * Bin earthquakes by magnitude and time period (type)
+   *   also bin mag totals (inclusive)
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <first | past | prior | sliderData>}
+   * @param type {String <first | past | prior | total>}
    */
   _addEqToBin = function (days, magInt, type) {
     var i,
@@ -157,12 +157,12 @@ var Earthquakes = function (options) {
       _bins[type] = []; // initialize type array
     }
 
-    if (type === 'sliderData') {
+    if (type === 'total') { // all eqs binned by mag inclusive
       for (i = magInt; i >= 0; i --) {
-        if (!_bins.sliderData[i]) {
-          _bins.sliderData[i] = 0;
+        if (!_bins.total[i]) {
+          _bins.total[i] = 0;
         }
-        _bins.sliderData[i] ++;
+        _bins.total[i] ++;
       }
     } else { // first, past, or prior
       if (!_bins[type][magInt]) {
@@ -599,8 +599,8 @@ var Earthquakes = function (options) {
       _addEqToBin(days, magInt, 'prior');
     }
 
-    // Total number of eqs by mag, inclusive for interactive slider filter
-    _addEqToBin(null, magInt, 'sliderData');
+    // Total number of eqs by magnitude (inclusive)
+    _addEqToBin(null, magInt, 'total');
   };
 
   /**
@@ -804,12 +804,12 @@ var Earthquakes = function (options) {
         singleMagBin;
 
     html = '';
-    singleMagBin = _bins.sliderData.every(function(value, i, array) {
+    singleMagBin = _bins.total.every(function(value, i, array) {
       return array[0] === value;
     });
 
     if (!singleMagBin) {
-      mags = Object.keys(_bins.sliderData);
+      mags = Object.keys(_bins.total);
       max = Math.max.apply(null, mags);
       min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 

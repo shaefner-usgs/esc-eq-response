@@ -18,12 +18,12 @@ var Earthquakes = require('features/util/Earthquakes');
  *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
+ *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     plotDescription: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
- *     sliderData: {Array},
  *     summary: {String},
  *     title: {String},
  *     zoomToLayer: {Boolean}
@@ -149,7 +149,7 @@ var Aftershocks = function (options) {
       ));
 
       // Check if there's eq data for mag threshold; if not, decr mag by 1
-      while (!_Earthquakes.sliderData[mag]) {
+      while (!_Earthquakes.magInclusive[mag]) {
         mag --;
       }
 
@@ -165,7 +165,7 @@ var Aftershocks = function (options) {
         summary += _Earthquakes.getListTable(mostRecentEq);
       }
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
-         '(<span class="num">' + _Earthquakes.sliderData[mag]  + '</span>)</h3>';
+        '(<span class="num">' + _Earthquakes.magInclusive[mag]  + '</span>)</h3>';
       summary += _Earthquakes.getSlider(mag);
       summary += _Earthquakes.getListTable(_Earthquakes.eqList, mag);
     }
@@ -210,10 +210,10 @@ var Aftershocks = function (options) {
       json: json
     });
 
+    _this.magInclusive = _Earthquakes.magInclusive; // for eq mag filters on summary
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotDescription = _Earthquakes.getDescription();
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
   };

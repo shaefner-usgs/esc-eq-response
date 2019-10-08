@@ -18,12 +18,12 @@ var Earthquakes = require('features/util/Earthquakes');
  *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
+ *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     plotDescription: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
- *     sliderData: {Array},
  *     summary: {String},
  *     title: {String},
  *     zoomToLayer: {Boolean}
@@ -69,13 +69,13 @@ var Historical = function (options) {
       magThreshold = Math.floor(_app.AppUtil.getParam('hs-mag'));
 
       // Check if there's eq data for mag threshold; if not, decr mag by 1
-      while (!_Earthquakes.sliderData[magThreshold]) {
+      while (!_Earthquakes.magInclusive[magThreshold]) {
         magThreshold --;
       }
 
       summary += _Earthquakes.getBinnedTable('prior');
       summary += '<h3>M <span class="mag">' + magThreshold + '</span>+ ' +
-        'Earthquakes (<span class="num">' + _Earthquakes.sliderData[magThreshold] +
+        'Earthquakes (<span class="num">' + _Earthquakes.magInclusive[magThreshold] +
         '</span>)</h3>';
       summary += _Earthquakes.getSlider(magThreshold);
       summary += _Earthquakes.getListTable(_Earthquakes.eqList, magThreshold);
@@ -126,10 +126,10 @@ var Historical = function (options) {
       json: json
     });
 
+    _this.magInclusive = _Earthquakes.magInclusive; // for eq mag filters on summary
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotDescription = _Earthquakes.getDescription();
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.sliderData = _Earthquakes.sliderData; // for eq mag filters on summary
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
   };
