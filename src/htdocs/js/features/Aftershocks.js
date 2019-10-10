@@ -68,13 +68,14 @@ var Aftershocks = function (options) {
         oaf,
         probability,
         range,
+        timeFrame,
         url;
 
     html = '';
     oaf = _mainshock.json.properties.products.oaf;
     url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast';
 
-    if (oaf) {
+    if (oaf) { // add forecast to html output
       data = JSON.parse(oaf[0].contents[''].bytes);
       data.forecast.forEach(function(period) {
         if (period.label === data.advisoryTimeFrame) { // show 'primary emphasis' period
@@ -102,13 +103,15 @@ var Aftershocks = function (options) {
       });
     }
 
-    if (html) {
+    if (html) { // add explanatory text to html output
+      timeFrame = data.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
       html = '<h3>Aftershock Probabilities</h3>' +
         '<p>Probability of one or more aftershocks in the specified ' +
-          'magnitude range during the <strong>next ' + data.advisoryTimeFrame.toLowerCase() +
-          '</strong>, based on ' + data.model.name + '. The expected number ' +
-          'of aftershocks (95% confidence range) is also included.</p>' +
-        '<div class="probabilities">' + html + '</div>';
+          'magnitude range during the <strong>next ' + timeFrame +
+          '</strong>. The expected number of aftershocks (95% confidence ' +
+          'range) is also included.</p>' +
+        '<div class="probabilities">' + html + '</div>' +
+        '<p class="model"><strong>Model</strong>: ' + data.model.name + '</p>';
     }
 
     return html;
