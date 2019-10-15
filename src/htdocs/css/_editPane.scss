@@ -1,34 +1,4 @@
-$reset-button-color: #efefef;
-
 #editPane {
-  button {
-    &.reset {
-      background-color: $reset-button-color;
-      border-color: color($reset-button-color shade(15%));
-      color: $text-color-lighter;
-
-      &:active,
-      &:hover,
-      &:focus {
-        background-color: color($reset-button-color tint(30%));
-        border-color: color($reset-button-color shade(25%));
-      }
-    }
-    &.viewmap {
-      background-color: $accent-color;
-      border-color: color($accent-color shade(15%));
-      color: #fff;
-      text-shadow: 1px 1px 3px #444;
-
-      &:active,
-      &:hover,
-      &:focus {
-        background-color: color($accent-color tint(8%));
-        border-color: color($accent-color shade(50%));
-      }
-    }
-  }
-
   form {
     display: flex;
     flex-flow: row wrap;

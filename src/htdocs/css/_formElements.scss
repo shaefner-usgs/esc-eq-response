@@ -1,21 +1,33 @@
+$reset-button-color: #efefef;
+
 /* Buttons
 --------------------------------------------- */
 
 button {
   -webkit-appearance: button;
-  border: 1px solid transparent;
+  background-color: $accent-color;
+  border: 1px solid color($accent-color shade(15%));
   border-radius: 4px;
+  color: #fff;
   cursor: pointer;
   display: inline-block;
   font: 400 14px/1.4 $font-family-headers;
   margin-top: 2em;
   padding: 6px 12px;
   text-align: center;
+  text-shadow: 1px 1px 3px #444;
   text-transform: uppercase;
   transition: all .25s ease-out;
   user-select: none;
   vertical-align: middle;
   white-space: nowrap;
+
+  &:active,
+  &:hover,
+  &:focus {
+    background-color: color($accent-color tint(8%));
+    border-color: color($accent-color shade(50%));
+  }
 
   &:active {
     box-shadow: inset 0 3px 8px rgba(0, 0, 0, .175);
@@ -29,6 +41,20 @@ button {
     box-shadow: none;
     cursor: not-allowed;
     opacity: .3;
+  }
+
+  &.reset {
+    background-color: $reset-button-color;
+    border-color: color($reset-button-color shade(15%));
+    color: $text-color-lighter;
+    text-shadow: 1px 1px 3px #ddd;
+
+    &:active,
+    &:hover,
+    &:focus {
+      background-color: color($reset-button-color tint(30%));
+      border-color: color($reset-button-color shade(25%));
+    }
   }
 }
 
