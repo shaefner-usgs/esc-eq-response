@@ -340,16 +340,18 @@ var SummaryPane = function (options) {
         title;
 
     if (feature.summary) {
-      canvas = _el.querySelector('canvas.' + feature.id);
       placeholder = _el.querySelector('div.' + feature.id);
 
-      if (placeholder) { // add summary to existing placeholder
+      if (placeholder) { // add summary to existing placeholder if it exists
         placeholder.innerHTML = feature.summary;
         placeholder.classList.remove('hide');
+
+        // Canvas elements (beachballs) are rendered before summary is added
+        canvas = _el.querySelector('canvas.' + feature.id);
         if (canvas) { // move beachball into place (FM, MT features)
           placeholder.querySelector('a').appendChild(canvas);
         }
-      } else { // create new element and add title / summary
+      } else { // or create new element and add title / summary
         title = feature.title || feature.name;
 
         div = document.createElement('div');
