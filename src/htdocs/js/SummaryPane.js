@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Tablesort = require('tablesort');
+var Tablesort = require('tablesort'),
+    Xhr = require('util/Xhr');
 
 
 /**
@@ -31,7 +32,9 @@ var SummaryPane = function (options) {
       _tz,
 
       _addListeners,
+      _addSummaryButton,
       _addTimestamp,
+      _getPostData,
       _getSliderValue,
       _getTimeZone,
       _initTableSort,
@@ -123,6 +126,37 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Add button to download Event Summary .rtf file
+   *
+   * @param div {Element}
+   *     mainshock container
+   */
+  _addSummaryButton = function (div) {
+    var button;
+
+    button = document.createElement('button');
+    button.classList.add('event-summary');
+    button.innerText = 'Event Summary';
+    button.type = 'button';
+
+    button.addEventListener('click', function() {
+      Xhr.ajax({
+        data: _getPostData(),
+        error: function(e, xhr) {
+          console.error(xhr.statusText + xhr.responseText);
+        },
+        method: 'POST',
+        success: function(data) {
+          window.location = 'php/event-summary/download.php?file=' + data.file;
+        },
+        url: 'php/event-summary/rtf.php'
+      });
+    });
+
+    div.appendChild(button);
+  };
+
+  /**
    * Add timestamp to summary pane
    */
   _addTimestamp = function () {
@@ -131,6 +165,55 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _featuresEl);
+  };
+
+  /**
+   * Get POST data key-value pairs used to create Event Summary RTF file
+   *
+   * @return data {Object}
+   */
+  _getPostData = function () {
+    var data,
+        dyfi,
+        eqid,
+        mainshock,
+        products,
+        properties,
+        shakemap,
+        summary;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    eqid = mainshock.json.id;
+    products = mainshock.json.properties.products;
+    properties = mainshock.json.properties;
+
+    if (products['general-text']) {
+      summary = products['general-text'][0].contents[''].bytes;
+    }
+    if (products.dyfi) {
+      dyfi = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
+    }
+    if (products.shakemap) {
+      if (products.shakemap[0].contents['download/tvmap.jpg']) {
+        shakemap = products.shakemap[0].contents['download/tvmap.jpg'].url;
+      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
+        shakemap = products.shakemap[0].contents['download/intensity.jpg'].url;
+      }
+    }
+
+    data = { // send empty string rather than javascript 'undefined' property
+      dyfi: dyfi || '',
+      eqid: eqid,
+      mag: properties.mag,
+      magType: properties.magType,
+      place: properties.place,
+      shakemap: shakemap || '',
+      summary: summary || '',
+      time: properties.time,
+      title: properties.title
+    };
+
+    return data;
   };
 
   /**
@@ -373,6 +456,10 @@ var SummaryPane = function (options) {
       }
 
       _updateTimestamp();
+    }
+
+    if (feature.id === 'mainshock') {
+      _addSummaryButton(div);
     }
   };
 
