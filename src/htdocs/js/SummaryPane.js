@@ -175,20 +175,30 @@ var SummaryPane = function (options) {
   _getPostData = function () {
     var data,
         dyfi,
-        eqid,
+        economic,
+        fatalities,
         mainshock,
+        pager,
         products,
-        properties,
+        props,
         shakemap,
         summary;
 
     mainshock = _app.Features.getFeature('mainshock');
-    eqid = mainshock.json.id;
     products = mainshock.json.properties.products;
-    properties = mainshock.json.properties;
+    props = mainshock.json.properties;
 
     if (products['general-text']) {
       summary = products['general-text'][0].contents[''].bytes;
+    }
+    if (products.losspager) {
+      economic = products.losspager.contents['alertecon_smaller.png'].url;
+      fatalities = products.losspager.contents['alertfatal_smaller.png'].url;
+      pager = {
+        alert: products.losspager.properties.alertlevel,
+        economic: economic,
+        fatalities: fatalities
+      };
     }
     if (products.dyfi) {
       dyfi = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
@@ -201,16 +211,22 @@ var SummaryPane = function (options) {
       }
     }
 
-    data = { // send empty string rather than javascript 'undefined' property
+    // Must send empty string rather than javascript 'undefined' property
+    data = {
+      appUrl: window.location.href,
+      depth: mainshock.json.geometry.coordinates[2],
       dyfi: dyfi || '',
-      eqid: eqid,
-      mag: properties.mag,
-      magType: properties.magType,
-      place: properties.place,
+      eqid: mainshock.json.id,
+      eventPageUrl: mainshock.url,
+      localTime: mainshock.localTime,
+      mag: props.mag,
+      magType: props.magType,
+      pager: pager || '',
+      place: props.place,
       shakemap: shakemap || '',
       summary: summary || '',
-      time: properties.time,
-      title: properties.title
+      title: props.title,
+      utcTime: mainshock.utcTime
     };
 
     return data;
