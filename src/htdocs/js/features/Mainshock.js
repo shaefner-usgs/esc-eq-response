@@ -124,9 +124,11 @@ var Mainshock = function (options) {
       json: json
     });
 
+    _this.localTime = _Earthquakes.localTime;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
+    _this.utcTime = _Earthquakes.utcTime;
   };
 
 

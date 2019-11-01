@@ -499,6 +499,7 @@ var Earthquakes = function (options) {
         distance,
         eqid,
         eqMoment,
+        eqMomentLocal,
         latlon,
         localTime,
         mag,
@@ -514,6 +515,7 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     eqid = feature.id;
     eqMoment = _app.AppUtil.Moment.utc(props.time, 'x');
+    eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
     mag = _app.AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
 
@@ -521,12 +523,15 @@ var Earthquakes = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
-      localTime = eqMoment.clone().utcOffset(props.tz).format('MMM D, YYYY h:mm:ss A') +
+      localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at epicenter</span>';
       timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_id !== 'mainshock') {
+    if (_id === 'mainshock') { // add time props to mainshock
+      _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
+      _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
+    } else { // calculate distance/direction from mainshock
       compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
       latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
       distance = _mainshockLatlon.distanceTo(latlon) / 1000;
