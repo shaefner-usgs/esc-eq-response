@@ -105,8 +105,8 @@ var Aftershocks = function (options) {
 
     if (html) { // add explanatory text to html output
       timeFrame = data.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
-      html = '<h3>Aftershock Probabilities</h3>' +
-        '<p>Probability of one or more aftershocks in the specified ' +
+      html = '<h3>Aftershock Forecast</h3>' +
+        '<p>The probability of one or more aftershocks in the specified ' +
           'magnitude range during the <strong>next ' + timeFrame +
           '</strong>. The expected number of aftershocks (95% confidence ' +
           'range) is also included.</p>' +
