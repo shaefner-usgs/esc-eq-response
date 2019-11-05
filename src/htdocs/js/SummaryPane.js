@@ -154,6 +154,7 @@ var SummaryPane = function (options) {
     });
 
     div.appendChild(button);
+    console.log(_getPostData());
   };
 
   /**
@@ -173,60 +174,68 @@ var SummaryPane = function (options) {
    * @return data {Object}
    */
   _getPostData = function () {
-    var data,
+    var contents,
+        data,
         dyfi,
-        economic,
-        fatalities,
         mainshock,
         pager,
         products,
-        props,
         shakemap,
         summary;
 
     mainshock = _app.Features.getFeature('mainshock');
     products = mainshock.json.properties.products;
-    props = mainshock.json.properties;
 
+    if (products.dyfi) {
+      contents = products.dyfi[0].contents;
+      dyfi = {
+        map: contents[products.dyfi[0].code + '_ciim_geo.jpg'].url,
+        plot: contents[products.dyfi[0].code + '_plot_atten.jpg'].url,
+        maxmmi: Number(products.dyfi[0].properties.maxmmi),
+        responses: Number(products.dyfi[0].properties.numResp)
+      };
+    }
     if (products['general-text']) {
       summary = products['general-text'][0].contents[''].bytes;
     }
     if (products.losspager) {
-      economic = products.losspager.contents['alertecon_smaller.png'].url;
-      fatalities = products.losspager.contents['alertfatal_smaller.png'].url;
+      contents = products.losspager[0].contents;
       pager = {
-        alert: products.losspager.properties.alertlevel,
-        economic: economic,
-        fatalities: fatalities
+        alert: products.losspager[0].properties.alertlevel,
+        economic: contents['alertecon_smaller.png'].url,
+        exposure: contents['exposure.png'].url,
+        fatalities: contents['alertfatal_smaller.png'].url
       };
     }
-    if (products.dyfi) {
-      dyfi = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
-    }
     if (products.shakemap) {
-      if (products.shakemap[0].contents['download/tvmap.jpg']) {
-        shakemap = products.shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
-        shakemap = products.shakemap[0].contents['download/intensity.jpg'].url;
+      contents = products.shakemap[0].contents;
+      if (contents['download/tvmap.jpg']) {
+        shakemap = contents['download/tvmap.jpg'].url;
+      } else if (contents['download/intensity.jpg'].url) {
+        shakemap = contents['download/intensity.jpg'].url;
       }
     }
 
     // Must send empty string rather than javascript 'undefined' property
     data = {
-      appUrl: window.location.href,
       depth: mainshock.json.geometry.coordinates[2],
       dyfi: dyfi || '',
       eqid: mainshock.json.id,
-      eventPageUrl: mainshock.url,
-      localTime: mainshock.localTime,
-      mag: props.mag,
-      magType: props.magType,
+      mag: mainshock.json.properties.mag,
+      magType: mainshock.json.properties.magType,
       pager: pager || '',
-      place: props.place,
+      place: mainshock.json.properties.place,
       shakemap: shakemap || '',
       summary: summary || '',
-      title: props.title,
-      utcTime: mainshock.utcTime
+      time: {
+        local: mainshock.localTime,
+        utc: mainshock.utcTime
+      },
+      title: mainshock.json.properties.title,
+      url: {
+        app: window.location.href,
+        eventPage: mainshock.json.properties.url
+      }
     };
 
     return data;
