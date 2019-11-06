@@ -213,6 +213,7 @@ var Aftershocks = function (options) {
       json: json
     });
 
+    _this.bins = _Earthquakes.bins;
     _this.description = _Earthquakes.getDescription();
     _this.magInclusive = _Earthquakes.magInclusive; // for eq mag filters on summary
     _this.mapLayer = _Earthquakes.mapLayer;

@@ -59,7 +59,6 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
-      _bins,
       _id,
       _mainshockLatlon,
       _mainshockMoment,
@@ -94,7 +93,6 @@ var Earthquakes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
-    _bins = {};
     _id = options.id;
     _markerOptions = options.markerOptions;
     _plotData = {
@@ -127,6 +125,7 @@ var Earthquakes = function (options) {
       _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
     }
 
+    _this.bins = {};
     _this.list = {};
     _this.mapLayer = L.geoJson(options.json, {
       filter: _filter,
@@ -138,7 +137,7 @@ var Earthquakes = function (options) {
       cumulative: _getPlotlyTrace('cumulative', 'scatter'),
       hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
     };
-    _this.magInclusive = _bins.total;
+    _this.magInclusive = _this.bins.total;
   };
 
   /**
@@ -153,33 +152,33 @@ var Earthquakes = function (options) {
     var i,
         intervals;
 
-    if (!_bins[type]) {
-      _bins[type] = []; // initialize type array
+    if (!_this.bins[type]) {
+      _this.bins[type] = []; // initialize type array
     }
 
     if (type === 'total') { // all eqs binned by mag inclusive
       for (i = magInt; i >= 0; i --) {
-        if (!_bins.total[i]) {
-          _bins.total[i] = 0;
+        if (!_this.bins.total[i]) {
+          _this.bins.total[i] = 0;
         }
-        _bins.total[i] ++;
+        _this.bins.total[i] ++;
       }
     } else { // first, past, or prior
-      if (!_bins[type][magInt]) {
+      if (!_this.bins[type][magInt]) {
         intervals = _getIntervals(); // get intervals Object template
-        _bins[type][magInt] = intervals;
+        _this.bins[type][magInt] = intervals;
       }
 
       // Add eq to bins
-      _bins[type][magInt].total ++;
+      _this.bins[type][magInt].total ++;
       if (days <= 365) {
-        _bins[type][magInt].year ++;
+        _this.bins[type][magInt].year ++;
         if (days <= 30) {
-          _bins[type][magInt].month ++;
+          _this.bins[type][magInt].month ++;
           if (days <= 7) {
-            _bins[type][magInt].week ++;
+            _this.bins[type][magInt].week ++;
             if (days <= 1) {
-              _bins[type][magInt].day ++;
+              _this.bins[type][magInt].day ++;
             }
           }
         }
@@ -669,7 +668,7 @@ var Earthquakes = function (options) {
       cssClasses.push('hide-year');
     }
 
-    if (_bins[type] && _bins[type].length > 0) {
+    if (_this.bins[type] && _this.bins[type].length > 0) {
       html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr>' +
           '<th class="period">' + type + ':</th>' +
@@ -680,7 +679,7 @@ var Earthquakes = function (options) {
           '<th class="total">Total</th>' +
         '</tr>';
 
-      _bins[type].forEach(function(intervals, mag) { // loop thru magnitude groups
+      _this.bins[type].forEach(function(intervals, mag) { // loop thru magnitude groups
         html += '<tr><th class="rowlabel">M ' + mag + '</th>';
 
         Object.keys(intervals).forEach(function(interval) {
@@ -809,12 +808,12 @@ var Earthquakes = function (options) {
         singleMagBin;
 
     html = '';
-    singleMagBin = _bins.total.every(function(value, i, array) {
+    singleMagBin = _this.bins.total.every(function(value, i, array) {
       return array[0] === value;
     });
 
     if (!singleMagBin) {
-      mags = Object.keys(_bins.total);
+      mags = Object.keys(_this.bins.total);
       max = Math.max.apply(null, mags);
       min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 
