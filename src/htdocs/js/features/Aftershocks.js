@@ -213,9 +213,9 @@ var Aftershocks = function (options) {
       json: json
     });
 
+    _this.description = _Earthquakes.getDescription();
     _this.magInclusive = _Earthquakes.magInclusive; // for eq mag filters on summary
     _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotDescription = _Earthquakes.getDescription();
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';

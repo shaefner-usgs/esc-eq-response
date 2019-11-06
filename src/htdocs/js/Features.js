@@ -262,10 +262,10 @@ var Features = function (options) {
    *
    *   The following props are set after external feed data is loaded (optional)
    *
+   *     description: {String}, // text description of feature's parameters
    *     json: {String}, // json feed data (mainshock only)
    *     magInclusive: {Object}, // data for eq mag filters on SummaryPane
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
-   *     plotDescription: {String}, // text description to accompany plots
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
    *     summary: {String}, // HTML for SummaryPane
    *     title: {Number} // typically the feature's name with count appended

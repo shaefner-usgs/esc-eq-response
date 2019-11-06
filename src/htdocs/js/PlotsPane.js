@@ -365,8 +365,8 @@ var PlotsPane = function (options) {
 
     // Don't plot mainshock on its own (it is included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
-      if (feature.plotDescription) {
-        description = feature.plotDescription;
+      if (feature.description) {
+        description = feature.description;
       }
       title = feature.title || feature.name;
 
