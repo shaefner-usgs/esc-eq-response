@@ -156,10 +156,6 @@ var Features = function (options) {
     errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
     url = feature.getFeedUrl();
 
-    if (!url) {
-      return;
-    }
-
     _app.StatusBar.addLoadingMsg(feature);
 
     Xhr.ajax({
