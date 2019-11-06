@@ -76,7 +76,7 @@ var Foreshocks = function (options) {
         'Earthquakes (<span class="num">' + _Earthquakes.magInclusive[magThreshold] +
         '</span>)</h3>';
       summary += _Earthquakes.getSlider(magThreshold);
-      summary += _Earthquakes.getListTable(_Earthquakes.eqList, magThreshold);
+      summary += _Earthquakes.getListTable(_Earthquakes.list, magThreshold);
     }
 
     return summary;

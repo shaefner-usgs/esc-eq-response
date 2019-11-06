@@ -43,11 +43,11 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
- *     eqList: {Object},
  *     getBinnedTable: {Function},
  *     getDescription: {Function},
  *     getListTable: {Function},
  *     getSlider: {Function},
+ *     list: {Object},
  *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     mostRecentEqId: {String},
@@ -127,7 +127,7 @@ var Earthquakes = function (options) {
       _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
     }
 
-    _this.eqList = {};
+    _this.list = {};
     _this.mapLayer = L.geoJson(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
@@ -575,7 +575,7 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    _this.eqList[eqid] = data; // store eq details for summary table
+    _this.list[eqid] = data; // store eq details for summary table
     _this.mostRecentEqId = eqid; // most recent (last) earthquake in feed
 
     // Add props to plotData (additional props are added in _pointToLayer)

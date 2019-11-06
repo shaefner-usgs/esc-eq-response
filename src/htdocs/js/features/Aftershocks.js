@@ -138,7 +138,7 @@ var Aftershocks = function (options) {
 
     if (count > 0) {
       magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
-      mostRecentEq = _app.AppUtil.pick(_Earthquakes.eqList, [_Earthquakes.mostRecentEqId]);
+      mostRecentEq = _app.AppUtil.pick(_Earthquakes.list, [_Earthquakes.mostRecentEqId]);
       mostRecentEqTime = mostRecentEq[_Earthquakes.mostRecentEqId].isoTime;
 
       duration = _app.AppUtil.round(
@@ -170,7 +170,7 @@ var Aftershocks = function (options) {
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
         '(<span class="num">' + _Earthquakes.magInclusive[mag]  + '</span>)</h3>';
       summary += _Earthquakes.getSlider(mag);
-      summary += _Earthquakes.getListTable(_Earthquakes.eqList, mag);
+      summary += _Earthquakes.getListTable(_Earthquakes.list, mag);
     }
 
     return summary;
