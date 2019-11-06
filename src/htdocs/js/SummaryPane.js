@@ -154,7 +154,6 @@ var SummaryPane = function (options) {
     });
 
     div.appendChild(button);
-    console.log(_getPostData());
   };
 
   /**
@@ -232,7 +231,7 @@ var SummaryPane = function (options) {
         utc: mainshock.utcTime
       },
       title: mainshock.json.properties.title,
-      url: {
+      urls: {
         app: window.location.href,
         eventPage: mainshock.json.properties.url
       }
