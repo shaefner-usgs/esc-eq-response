@@ -31,12 +31,20 @@ html {
 
 a {
   color: $link-color;
+  text-decoration-color: color($link-color tint(75%));
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
 
-  &:visited {
-    color: $link-color-visited;
-  }
   &:active {
     color: $link-color-active;
+  }
+  &:hover {
+    text-decoration-color: color($link-color tint(25%));
+    transition: text-decoration-color .15s ease-in;
+  }
+  &:visited {
+    color: $link-color-visited;
   }
 }
 
