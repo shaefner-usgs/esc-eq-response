@@ -17,7 +17,7 @@ button {
   text-align: center;
   text-shadow: 1px 1px 3px #444;
   text-transform: uppercase;
-  transition: all .25s ease-out;
+  transition: all .25s ease-in;
   user-select: none;
   vertical-align: middle;
   white-space: nowrap;
@@ -112,7 +112,7 @@ input[type=text], input[type=number] {
   margin: 0 1px 3px 0;
   outline: none;
   padding: 6px 0 6px 6px;
-  transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in;
   width: 12rem;
 
   &:focus {

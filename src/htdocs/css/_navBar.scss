@@ -17,7 +17,7 @@
     padding: 12px 15px;
     text-decoration: none;
     text-transform: uppercase;
-    transition: all .25s ease-out;
+    transition: all .25s ease-in;
 
     &:hover {
       background-color: color($accent-color-lighter lightness(92%));
