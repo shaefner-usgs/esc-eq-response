@@ -15,13 +15,13 @@ var Earthquakes = require('features/util/Earthquakes');
  *
  * @return _this {Object}
  *   {
+ *     cumulativeEqs: {Array},
+ *     description: {String},
  *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
- *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     name: {String},
- *     plotDescription: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
  *     summary: {String},
@@ -152,7 +152,7 @@ var Aftershocks = function (options) {
       ));
 
       // Check if there's eq data for mag threshold; if not, decr mag by 1
-      while (!_Earthquakes.magInclusive[mag]) {
+      while (!_this.cumulativeEqs[mag]) {
         mag --;
       }
 
@@ -168,7 +168,7 @@ var Aftershocks = function (options) {
         summary += _Earthquakes.getListTable(mostRecentEq);
       }
       summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
-        '(<span class="num">' + _Earthquakes.magInclusive[mag]  + '</span>)</h3>';
+        '(<span class="num">' + _this.cumulativeEqs[mag]  + '</span>)</h3>';
       summary += _Earthquakes.getSlider(mag);
       summary += _Earthquakes.getListTable(_Earthquakes.list, mag);
     }
@@ -213,9 +213,8 @@ var Aftershocks = function (options) {
       json: json
     });
 
-    _this.bins = _Earthquakes.bins;
+    _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
-    _this.magInclusive = _Earthquakes.magInclusive; // for eq mag filters on summary
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary(json);

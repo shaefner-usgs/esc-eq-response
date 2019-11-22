@@ -260,11 +260,10 @@ var Features = function (options) {
    *     name: {String}, // display name of feature
    *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *
-   *   The following props are set after external feed data is loaded (optional)
+   *   The following (optional) props are set after external feed data is loaded
    *
    *     description: {String}, // text description of feature's parameters
    *     json: {String}, // json feed data (mainshock only)
-   *     magInclusive: {Object}, // data for eq mag filters on SummaryPane
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
    *     summary: {String}, // HTML for SummaryPane

@@ -43,12 +43,12 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
+ *     bins: {Object)}
  *     getBinnedTable: {Function},
  *     getDescription: {Function},
  *     getListTable: {Function},
  *     getSlider: {Function},
  *     list: {Object},
- *     magInclusive: {Array},
  *     mapLayer: {L.layer},
  *     mostRecentEqId: {String},
  *     plotTraces: {Object}
@@ -137,51 +137,58 @@ var Earthquakes = function (options) {
       cumulative: _getPlotlyTrace('cumulative', 'scatter'),
       hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
     };
-    _this.magInclusive = _this.bins.total;
   };
 
   /**
-   * Bin earthquakes by magnitude and time period (type)
-   *   also bin mag totals (inclusive)
+   * Bin earthquakes by magnitude / time period; set cumulative earthquakes
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <first | past | prior | total>}
+   * @param type {String <first | past | prior>}
    */
   _addEqToBin = function (days, magInt, type) {
-    var i,
-        intervals;
+    var i;
 
+    // Initialize template for storing binned data (if necessary)
+    if (!_this.bins.cumulative) {
+      _this.bins.cumulative = []; // slider data
+    }
     if (!_this.bins[type]) {
-      _this.bins[type] = []; // initialize type array
+      _this.bins[type] = {
+        total: _getIntervals() // total row
+      };
+    }
+    if (!_this.bins[type]['m ' + magInt]) {
+      _this.bins[type]['m ' + magInt] = _getIntervals(); // magInt row
     }
 
-    if (type === 'total') { // all eqs binned by mag inclusive
-      for (i = magInt; i >= 0; i --) {
-        if (!_this.bins.total[i]) {
-          _this.bins.total[i] = 0;
-        }
-        _this.bins.total[i] ++;
-      }
-    } else { // first, past, or prior
-      if (!_this.bins[type][magInt]) {
-        intervals = _getIntervals(); // get intervals Object template
-        _this.bins[type][magInt] = intervals;
-      }
-
-      // Add eq to bins
-      _this.bins[type][magInt].total ++;
-      if (days <= 365) {
-        _this.bins[type][magInt].year ++;
-        if (days <= 30) {
-          _this.bins[type][magInt].month ++;
-          if (days <= 7) {
-            _this.bins[type][magInt].week ++;
-            if (days <= 1) {
-              _this.bins[type][magInt].day ++;
-            }
+    // Add eq to appropriate bin(s)
+    _this.bins[type]['m ' + magInt].total ++;
+    _this.bins[type].total.total ++;
+    if (days <= 365) {
+      _this.bins[type]['m ' + magInt].year ++;
+      _this.bins[type].total.year ++;
+      if (days <= 30) {
+        _this.bins[type]['m ' + magInt].month ++;
+        _this.bins[type].total.month ++;
+        if (days <= 7) {
+          _this.bins[type]['m ' + magInt].week ++;
+          _this.bins[type].total.week ++;
+          if (days <= 1) {
+            _this.bins[type]['m ' + magInt].day ++;
+            _this.bins[type].total.day ++;
           }
         }
+      }
+    }
+
+    // Cumulative eqs by magnitude (inclusive) for sliders
+    if (type !== 'past') { // don't calculate totals 2x for aftershocks
+      for (i = magInt; i >= 0; i --) {
+        if (!_this.bins.cumulative[i]) {
+          _this.bins.cumulative[i] = 0;
+        }
+        _this.bins.cumulative[i] ++;
       }
     }
   };
@@ -287,20 +294,20 @@ var Earthquakes = function (options) {
 
     if (_id === 'aftershocks') {
       duration = {
-        'length': Number(_app.AppUtil.round(
+        length: Number(_app.AppUtil.round(
           _app.AppUtil.Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
         )),
-        'interval': 'days'
+        interval: 'days'
       };
     } else if (_id === 'foreshocks') {
       duration = {
-        'length': Number(_app.AppUtil.getParam('fs-days')),
-        'interval': 'days'
+        length: Number(_app.AppUtil.getParam('fs-days')),
+        interval: 'days'
       };
     } else if (_id === 'historical') {
       duration = {
-        'length': Number(_app.AppUtil.getParam('hs-years')),
-        'interval': 'years'
+        length: Number(_app.AppUtil.getParam('hs-years')),
+        interval: 'years'
       };
     }
 
@@ -355,13 +362,13 @@ var Earthquakes = function (options) {
    * @return intervals {Object}
    */
   _getIntervals = function () {
-    var intervals = {};
-
-    intervals.day = 0;
-    intervals.week = 0;
-    intervals.month = 0;
-    intervals.year = 0;
-    intervals.total = 0;
+    var intervals = {
+      day: 0,
+      week: 0,
+      month: 0,
+      year: 0,
+      total: 0
+    };
 
     return intervals;
   };
@@ -602,9 +609,6 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
-
-    // Total number of eqs by magnitude (inclusive)
-    _addEqToBin(null, magInt, 'total');
   };
 
   /**
@@ -655,20 +659,18 @@ var Earthquakes = function (options) {
         days,
         duration,
         html,
-        intervalTotals,
-        value;
+        td;
 
     cssClasses = ['bin'];
     duration = _getDuration(_id);
     html = '';
-    intervalTotals = _getIntervals(); // get intervals Object template
 
     days = _app.AppUtil.Moment.duration(duration.length, duration.interval).asDays();
     if (days <= 30) {
       cssClasses.push('hide-year');
     }
 
-    if (_this.bins[type] && _this.bins[type].length > 0) {
+    if (_this.bins[type]) {
       html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr>' +
           '<th class="period">' + type + ':</th>' +
@@ -679,27 +681,21 @@ var Earthquakes = function (options) {
           '<th class="total">Total</th>' +
         '</tr>';
 
-      _this.bins[type].forEach(function(intervals, mag) { // loop thru magnitude groups
-        html += '<tr><th class="rowlabel">M ' + mag + '</th>';
+      Object.keys(_this.bins[type]).sort().forEach(function(th) {
+        html += '<tr><th class="rowlabel">' + th + '</th>';
 
-        Object.keys(intervals).forEach(function(interval) {
-          value = intervals[interval];
-          intervalTotals[interval] += value;
-          html += '<td class="' + interval + '">' + value + '</td>';
+        Object.keys(_this.bins[type][th]).forEach(function(period) {
+          cssClasses = [period];
+          if (th === 'total') {
+            cssClasses.push('total');
+          }
+          td = _this.bins[type][th][period];
+          html += '<td class="' + cssClasses.join(' ') + '">' + td + '</td>';
         });
 
-        html += '</tr>'; // add row total as last column
+        html += '</tr>';
       });
 
-      // Add column total as last row
-      html += '<tr><th class="rowlabel">Total</th>';
-
-      Object.keys(intervalTotals).forEach(function(interval) {
-        value = intervalTotals[interval];
-        html += '<td class="' + interval + ' total">' + value + '</td>';
-      });
-
-      html += '</tr>';
       html += '</table>';
     }
 
@@ -808,17 +804,17 @@ var Earthquakes = function (options) {
         singleMagBin;
 
     html = '';
-    singleMagBin = _this.bins.total.every(function(value, i, array) {
+    singleMagBin = _this.bins.cumulative.every(function(value, i, array) {
       return array[0] === value;
     });
 
     if (!singleMagBin) {
-      mags = Object.keys(_this.bins.total);
+      mags = Object.keys(_this.bins.cumulative);
       max = Math.max.apply(null, mags);
       min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
 
       html = '<div class="filter">' +
-          '<h4>Filter earthquakes by magnitude</h4>' +
+          '<h4>Filter earthquake list by magnitude</h4>' +
           '<div class="min">' + min + '</div>' +
           '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
             max + '; --val: ' + mag + ';">' +

@@ -66,10 +66,10 @@ var SummaryPane = function (options) {
    *
    * @param el {Element}
    *     div el that contains list table(s), slider
-   * @param magInclusive {Array}
-   *     Array of eqs by magnitude (inclusive)
+   * @param cumulativeEqs {Array}
+   *     Array of cumulative eqs by magnitude
    */
-  _addListeners = function (el, magInclusive) {
+  _addListeners = function (el, cumulativeEqs) {
     var i,
         input,
         j,
@@ -97,7 +97,7 @@ var SummaryPane = function (options) {
 
         // Show / hide eqs in list and display slider's numeric value
         mag.innerHTML = magValue;
-        num.innerHTML = magInclusive[magValue];
+        num.innerHTML = cumulativeEqs[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
         for (i = magValue; i <= input.getAttribute('max'); i ++) {
@@ -474,7 +474,7 @@ var SummaryPane = function (options) {
           _setSliderStyles(slider, feature.id); // set initial colored section of range slider
         }
         if (table) {
-          _addListeners(div, feature.magInclusive);
+          _addListeners(div, feature.cumulativeEqs);
           _initTableSort(feature.id);
         }
       }
