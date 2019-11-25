@@ -46,7 +46,6 @@ _FEATURECLASSES = {
  *     getFeature: {Function},
  *     getFeatureId: {Function},
  *     getFeatures: {Function},
- *     instantiateFeatures: {Function},
  *     instantiateMainshock: {Function},
  *     refresh: {Function},
  *     reset: {Function}
@@ -63,6 +62,7 @@ var Features = function (options) {
       _add,
       _init,
       _instantiate,
+      _instantiateFeatures,
       _load,
       _remove,
       _removeAll;
@@ -96,7 +96,7 @@ var Features = function (options) {
         _app.EditPane.setDefaults();
 
         // Instantiate other Features now that Mainshock ready
-        _this.instantiateFeatures();
+        _instantiateFeatures();
       }
 
       // Feature finished loading; remove alert
@@ -140,6 +140,28 @@ var Features = function (options) {
     });
 
     _init(feature);
+  };
+
+  /**
+   * Wrapper method to loop through Feature classes and instantiate them
+   *
+   * Skip mainshock which was already added separately so it's available for
+   *   other Features that depend on it.
+   *
+   * @param featureClasses {Object}
+   *     optional; uses _FEATURECLASSES if no parameter is passed
+   */
+  _instantiateFeatures = function (featureClasses) {
+    var FeatureClass;
+
+    featureClasses = featureClasses || _FEATURECLASSES;
+
+    Object.keys(featureClasses).forEach(function(id) {
+      if (id !== 'mainshock') { // skip mainshock (already done)
+        FeatureClass = featureClasses[id];
+        _instantiate(FeatureClass);
+      }
+    });
   };
 
   /**
@@ -311,28 +333,6 @@ var Features = function (options) {
    */
   _this.getFeatures = function () {
     return _features;
-  };
-
-  /**
-   * Wrapper method to loop through Feature classes and instantiate them
-   *
-   * Skip mainshock which was already added separately so it's available for
-   *   other Features that depend on it.
-   *
-   * @param featureClasses {Object}
-   *     optional; uses _FEATURECLASSES if no parameter is passed
-   */
-  _this.instantiateFeatures = function (featureClasses) {
-    var FeatureClass;
-
-    featureClasses = featureClasses || _FEATURECLASSES;
-
-    Object.keys(featureClasses).forEach(function(id) {
-      if (id !== 'mainshock') { // skip mainshock (already done)
-        FeatureClass = featureClasses[id];
-        _instantiate(FeatureClass);
-      }
-    });
   };
 
   /**
