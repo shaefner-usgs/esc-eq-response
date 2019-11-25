@@ -173,15 +173,21 @@ var SummaryPane = function (options) {
    * @return data {Object}
    */
   _getPostData = function () {
-    var contents,
+    var aftershocks,
+        contents,
         data,
         dyfi,
+        foreshocks,
+        historical,
         mainshock,
         pager,
         products,
         shakemap,
         summary;
 
+    aftershocks = _app.Features.getFeature('aftershocks');
+    foreshocks = _app.Features.getFeature('foreshocks');
+    historical = _app.Features.getFeature('historical');
     mainshock = _app.Features.getFeature('mainshock');
     products = mainshock.json.properties.products;
 
@@ -215,11 +221,25 @@ var SummaryPane = function (options) {
       }
     }
 
-    // Must send empty string rather than javascript 'undefined' property
+    // Must send empty string values rather than javascript 'undefined' property
     data = {
+      aftershocks: {
+        bins: aftershocks.bins,
+        description: aftershocks.description,
+        forecast: JSON.parse(mainshock.json.properties.products.oaf[0].
+          contents[''].bytes)
+      },
       depth: mainshock.json.geometry.coordinates[2],
       dyfi: dyfi || '',
       eqid: mainshock.json.id,
+      foreshocks: {
+        bins: foreshocks.bins,
+        description: foreshocks.description
+      },
+      historical: {
+        bins: historical.bins,
+        description: historical.description
+      },
       mag: mainshock.json.properties.mag,
       magType: mainshock.json.properties.magType,
       pager: pager || '',

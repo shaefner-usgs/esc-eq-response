@@ -125,6 +125,9 @@ var Foreshocks = function (options) {
       json: json
     });
 
+    _this.bins = {
+      prior: _Earthquakes.bins.prior
+    };
     _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
     _this.mapLayer = _Earthquakes.mapLayer;
