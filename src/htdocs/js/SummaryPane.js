@@ -126,7 +126,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Add button to download Event Summary .rtf file
+   * Add button to download Event Summary document
    *
    * @param div {Element}
    *     mainshock container
@@ -140,17 +140,7 @@ var SummaryPane = function (options) {
     button.type = 'button';
 
     button.addEventListener('click', function() {
-      Xhr.ajax({
-        data: _getPostData(),
-        error: function(e, xhr) {
-          console.error(xhr.statusText + xhr.responseText);
-        },
-        method: 'POST',
-        success: function(data) {
-          window.location = 'php/event-summary/download.php?file=' + data.file;
-        },
-        url: 'php/event-summary/rtf.php'
-      });
+      _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
     });
 
     div.appendChild(button);
@@ -168,7 +158,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get POST data key-value pairs used to create Event Summary RTF file
+   * Get POST data key-value pairs used to create Event Summary document
    *
    * @return data {Object}
    */
@@ -177,6 +167,7 @@ var SummaryPane = function (options) {
         contents,
         data,
         dyfi,
+        feeds,
         foreshocks,
         historical,
         mainshock,
@@ -186,6 +177,7 @@ var SummaryPane = function (options) {
         summary;
 
     aftershocks = _app.Features.getFeature('aftershocks');
+    feeds = _app.Feeds.getFeeds();
     foreshocks = _app.Features.getFeature('foreshocks');
     historical = _app.Features.getFeature('historical');
     mainshock = _app.Features.getFeature('mainshock');
@@ -256,6 +248,11 @@ var SummaryPane = function (options) {
         eventPage: mainshock.json.properties.url
       }
     };
+
+    // Add feed data fetched for Event Summary document
+    Object.keys(feeds).forEach(function(id) {
+      data[id] = feeds[id];
+    });
 
     return data;
   };
@@ -505,6 +502,23 @@ var SummaryPane = function (options) {
     if (feature.id === 'mainshock') {
       _addSummaryButton(div);
     }
+  };
+
+  /**
+   * Create Event Summary document (RTF) and trigger download
+   */
+  _this.createSummaryDoc = function () {
+    Xhr.ajax({
+      data: _getPostData(),
+      error: function(e, xhr) {
+        console.error(xhr.statusText + xhr.responseText);
+      },
+      method: 'POST',
+      success: function(data) {
+        window.location = 'php/event-summary/download.php?file=' + data.file;
+      },
+      url: 'php/event-summary/rtf.php'
+    });
   };
 
   /**

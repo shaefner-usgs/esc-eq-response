@@ -4,6 +4,7 @@
 var AppUtil = require('AppUtil'),
     EditPane = require('EditPane'),
     Features = require('Features'),
+    Feeds = require('Feeds'),
     HelpPane = require('HelpPane'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
@@ -32,6 +33,7 @@ var AppUtil = require('AppUtil'),
  *     AppUtil: {Function},
  *     EditPane: {Function},
  *     Features: {Function},
+ *     Feeds: {Function},
  *     HelpPane: {Function},
  *     MapPane: {Function},
  *     NavBar: {Function},
@@ -86,6 +88,9 @@ var Application = function (options) {
       el: options.editPane
     });
     _this.Features = Features({
+      app: _this
+    });
+    _this.Feeds = Feeds({
       app: _this
     });
     _this.HelpPane = HelpPane({
