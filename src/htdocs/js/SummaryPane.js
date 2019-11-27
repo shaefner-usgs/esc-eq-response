@@ -137,6 +137,7 @@ var SummaryPane = function (options) {
     button = document.createElement('button');
     button.classList.add('event-summary');
     button.innerText = 'Event Summary';
+    button.setAttribute('disabled', 'disabled');
     button.type = 'button';
 
     button.addEventListener('click', function() {
@@ -456,10 +457,12 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.add = function (feature) {
-    var canvas,
+    var button,
+        canvas,
         div,
         placeholder,
         slider,
+        status,
         table,
         title;
 
@@ -501,6 +504,13 @@ var SummaryPane = function (options) {
 
     if (feature.id === 'mainshock') {
       _addSummaryButton(div);
+    }
+
+    // Enable Event Summary download button once all Features are loaded
+    status = _app.Features.getStatus();
+    if (status === 'finished') {
+      button = document.querySelector('.event-summary');
+      button.removeAttribute('disabled');
     }
   };
 

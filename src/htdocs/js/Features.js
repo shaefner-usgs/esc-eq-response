@@ -46,6 +46,7 @@ _FEATURECLASSES = {
  *     getFeature: {Function},
  *     getFeatureId: {Function},
  *     getFeatures: {Function},
+ *     getStatus: {Function},
  *     instantiateMainshock: {Function},
  *     refresh: {Function},
  *     reset: {Function}
@@ -158,6 +159,8 @@ var Features = function (options) {
 
     Object.keys(featureClasses).forEach(function(id) {
       if (id !== 'mainshock') { // skip mainshock (already done)
+        _features[id] = false; // flag as not yet loaded
+
         FeatureClass = featureClasses[id];
         _instantiate(FeatureClass);
       }
@@ -333,6 +336,24 @@ var Features = function (options) {
    */
   _this.getFeatures = function () {
     return _features;
+  };
+
+  /**
+   * Get status of loading Features
+   *
+   * @return status {String}
+   *     Returns 'finished' if all Features are loaded
+   */
+  _this.getStatus = function () {
+    var status = 'finished';
+
+    Object.keys(_features).forEach(function(id) {
+      if (!_features[id]) {
+        status = '';
+      }
+    });
+
+    return status;
   };
 
   /**
