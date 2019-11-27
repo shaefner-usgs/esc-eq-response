@@ -102,7 +102,7 @@ var Features = function (options) {
       }
 
       // Feature finished loading; remove alert
-      _app.StatusBar.remove(feature.id);
+      _app.StatusBar.removeItem(feature.id);
     }
     catch (error) {
       console.error(error);
@@ -183,7 +183,7 @@ var Features = function (options) {
     errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
     url = feature.getFeedUrl();
 
-    _app.StatusBar.addLoadingMsg(feature);
+    _app.StatusBar.addItem(feature);
 
     Xhr.ajax({
       url: url,

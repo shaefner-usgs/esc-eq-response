@@ -79,13 +79,17 @@ var NavBar = function (options) {
    */
    _changePane = function (id) {
      if (id === 'plotsPane' && !_app.PlotsPane.rendered) {
-       _app.StatusBar.addLoadingMsg();
+       _app.StatusBar.addItem({
+         id: 'rendering'
+       }, {
+         prepend: 'Rendering'
+       });
 
        // Add a slight delay; otherwise loading (rendering) message does not display
        window.setTimeout(function() {
          _hidePanes();
          _showPane(id);
-         _app.StatusBar.remove('rendering');
+         _app.StatusBar.removeItem('rendering');
        }, 20);
      } else {
        _hidePanes();

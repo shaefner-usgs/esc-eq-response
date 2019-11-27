@@ -59,7 +59,7 @@ var Application = function (options) {
     _initComponents(options);
 
     // Remove initial loading message
-    _this.StatusBar.remove('initial');
+    _this.StatusBar.removeItem('initial');
 
     // Get things rolling if eqid is already set
     if (_this.AppUtil.getParam('eqid') !== '') {

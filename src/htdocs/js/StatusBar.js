@@ -1,6 +1,9 @@
 'use strict';
 
 
+var Util = require('hazdev-webutils/src/util/Util');
+
+
 /**
  * Set up a status bar to inform user of app's status (loading state, errors)
  *
@@ -24,8 +27,8 @@ var StatusBar = function (options) {
 
       _el,
 
-      _doRemove,
       _hide,
+      _remove,
       _show;
 
 
@@ -42,7 +45,7 @@ var StatusBar = function (options) {
    *
    * @param el {Element}
    */
-  _doRemove = function (el) {
+  _remove = function (el) {
     var parent;
 
     parent = el.parentNode;
@@ -75,69 +78,79 @@ var StatusBar = function (options) {
   /**
    * Add an error to status bar
    *
-   * @param feature {Object}
+   * @param item {Object}
    * @param errorMsg {String}
    */
-  _this.addError = function (feature, errorMsg) {
+  _this.addError = function (item, errorMsg) {
     var closeButton,
         error;
 
     error = document.createElement('div');
-    error.classList.add(feature.id, 'error');
+    error.classList.add(item.id, 'error');
     error.innerHTML = errorMsg + '<a href="#" class="close"></a>';
 
     closeButton = error.querySelector('.close');
     closeButton.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.remove(feature.id);
+      _this.removeItem(item.id);
     });
 
-    // Remove any leftover items for this Feature before adding another
-    _this.remove(feature.id);
+    // Remove any leftover items for this item before adding another
+    _this.removeItem(item.id);
 
     _el.appendChild(error);
     _show();
   };
 
   /**
-   * Add loading message to status bar
+   * Add an item to status bar
    *
-   * @param feature {Object}
-   *     optional; displays generic rendering message if no Feature provided
+   * @param item {Object}
+   *   {
+   *     id: {String},
+   *     name: {String} (optional)
+   *   }
+   * @param options {Object}
+   *     optional
    */
-  _this.addLoadingMsg = function (feature) {
+  _this.addItem = function (item, options) {
     var animEllipsis,
-        id,
-        item;
+        defaults,
+        div,
+        msg;
 
     animEllipsis = '<span>.</span><span>.</span><span>.</span>';
-    id = 'rendering'; // generic id
+    defaults = {
+      append: '',
+      prepend: 'Loading'
+    };
+    div = document.createElement('div');
+    msg = '';
+    options = Util.extend({}, defaults, options);
 
-    if (feature && feature.hasOwnProperty('id')) {
-      id = feature.id;
+    if (item.name) {
+      msg = item.name;
     }
-
-    item = document.createElement('div');
-    item.classList.add(id);
-
-    // Remove any leftover items for this Feature
-    _this.remove(id);
-
-    if (id === 'rendering') { // rendering app pane
-      item.innerHTML = '<h4>Rendering' + animEllipsis + '</h4>';
-      _el.appendChild(item);
-    } else { // loading Feature
-      item.innerHTML = '<h4>Loading ' + feature.name + animEllipsis + '</h4>';
-
-      // Insert loading Feature msgs 'above' rendering msgs
-      _el.insertBefore(item, _el.querySelector('.rendering'));
+    if (options.append) {
+      msg += ' ' + options.append;
     }
+    if (options.prepend) {
+      msg = options.prepend + ' ' + msg;
+    }
+    msg += animEllipsis;
+
+    // Remove any leftover items with this id, then add item
+    _this.removeItem(item.id);
+
+    div.classList.add(item.id);
+    div.innerHTML = '<h4>' + msg + '</h4>';
+    _el.appendChild(div);
 
     _show();
   };
 
   /**
-   * Check if error exists for Feature
+   * Check if an error exists for item
    *
    * @param id {String}
    *
@@ -157,7 +170,7 @@ var StatusBar = function (options) {
    *
    * @param id {String}
    */
-  _this.remove = function (id) {
+  _this.removeItem = function (id) {
     var i,
         items;
 
@@ -167,15 +180,15 @@ var StatusBar = function (options) {
         _hide();
 
         // Don't remove last item until after hide css transition is complete
-        window.setTimeout(_doRemove, 500, items[i]);
+        window.setTimeout(_remove, 500, items[i]);
       } else {
-        _doRemove(items[i]);
+        _remove(items[i]);
       }
     }
   };
 
   /**
-   * Clear all messages from status bar
+   * Clear all items from status bar
    */
   _this.reset = function () {
     _el.innerHTML = '';

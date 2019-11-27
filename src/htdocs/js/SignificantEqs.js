@@ -92,7 +92,7 @@ var SignificantEqs = function (options) {
         url;
 
     // Alert user that feed is loading
-    _app.StatusBar.addLoadingMsg({
+    _app.StatusBar.addItem({
       id: 'significant',
       name: 'Significant Earthquakes'
     });
@@ -150,7 +150,7 @@ var SignificantEqs = function (options) {
     refNode = document.querySelector('label[for=eqid]');
     selectMenu = _getSelectMenu(_json);
 
-    _app.StatusBar.remove('significant');
+    _app.StatusBar.removeItem('significant');
 
     if (selectMenu) {
       refNode.parentNode.insertBefore(selectMenu, refNode);

@@ -82,14 +82,14 @@ var Feeds = function (options) {
 
     errorMsg = '<h4>Error Loading ' + feed.name + '</h4>';
 
-    _app.StatusBar.addLoadingMsg(feed);
+    _app.StatusBar.addItem(feed);
 
     Xhr.ajax({
       url: feed.url,
       success: function (json) {
         _feeds[feed.id] = json;
 
-        _app.StatusBar.remove(feed.id);
+        _app.StatusBar.removeItem(feed.id);
 
         status = _getStatus();
         if (status === 'finished') { // all feeds finished loading
