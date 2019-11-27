@@ -65,6 +65,7 @@ var Features = function (options) {
       _instantiate,
       _instantiateFeatures,
       _load,
+      _numFeatures,
       _remove,
       _removeAll;
 
@@ -146,8 +147,8 @@ var Features = function (options) {
   /**
    * Wrapper method to loop through Feature classes and instantiate them
    *
-   * Skip mainshock which was already added separately so it's available for
-   *   other Features that depend on it.
+   * Skip mainshock which was already added (via _this.instantiateMainshock)
+   *   so it's available for other Features that depend on it.
    *
    * @param featureClasses {Object}
    *     optional; uses _FEATURECLASSES if no parameter is passed
@@ -156,6 +157,7 @@ var Features = function (options) {
     var FeatureClass;
 
     featureClasses = featureClasses || _FEATURECLASSES;
+    _numFeatures = Object.keys(featureClasses).length;
 
     Object.keys(featureClasses).forEach(function(id) {
       if (id !== 'mainshock') { // skip mainshock (already done)
@@ -345,10 +347,17 @@ var Features = function (options) {
    *     Returns 'finished' if all Features are loaded
    */
   _this.getStatus = function () {
-    var status = 'finished';
+    var allFeatures,
+        status;
 
-    Object.keys(_features).forEach(function(id) {
-      if (!_features[id]) {
+    status = 'finished';
+
+    if (Object.keys(_features).length === _numFeatures) {
+      allFeatures = true; // all Features have been instantiated
+    }
+
+    Object.keys(_features).some(function(id) {
+      if (!allFeatures || !_features[id]) {
         status = '';
       }
     });

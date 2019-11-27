@@ -60,7 +60,7 @@ var Feeds = function (options) {
   _getStatus = function () {
     var status = 'finished';
 
-    Object.keys(_feeds).forEach(function(id) {
+    Object.keys(_feeds).some(function(id) {
       if (!_feeds[id]) {
         status = '';
       }
