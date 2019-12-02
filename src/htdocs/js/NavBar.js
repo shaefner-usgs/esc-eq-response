@@ -80,7 +80,8 @@ var NavBar = function (options) {
    _changePane = function (id) {
      if (id === 'plotsPane' && !_app.PlotsPane.rendered) {
        _app.StatusBar.addItem({
-         id: 'rendering'
+         id: 'rendering',
+         name: 'Plots'
        }, {
          prepend: 'Rendering'
        });
