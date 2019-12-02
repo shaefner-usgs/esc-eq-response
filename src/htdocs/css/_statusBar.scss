@@ -43,7 +43,7 @@
     text-align: center;
   }
 
-  li {
+  li { /* error details */
     color: #fff;
     display: inline;
     font-size: 14px;
@@ -59,8 +59,7 @@
     }
   }
 
-  /* Loading animation */
-  span {
+  span { /* Loading animation */
     animation: loading 1s infinite;
     display: inline-block;
     font: 1.2em georgia;
@@ -100,7 +99,7 @@
   .close {
     right: 3px;
 
-    &:before, &:after {
+    &:before, &:after { /* 'X' */
       background-color: #fff;
       content: ' ';
       height: 20px;
@@ -120,7 +119,7 @@
     padding: 7px;
     right: 40px;
 
-    &:before, &:after {
+    &:before, &:after { /* Partial circle w/ arrow */
       content: '';
       display: block;
     }
