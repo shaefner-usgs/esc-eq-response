@@ -2,6 +2,10 @@
 
 
 var NearbyCities = require('feeds/NearbyCities'),
+    PagerComments = require('feeds/PagerComments'),
+    PagerExposures = require('feeds/PagerExposures'),
+    ShakeMapInfo = require('feeds/ShakeMapInfo'),
+    SignificantEqs = require('feeds/SignificantEqs'),
     Xhr = require('util/Xhr');
 
 
@@ -13,7 +17,11 @@ var _FEEDCLASSES;
  * IMPORTANT: the Object key must match the id property set in the Feed class.
  */
 _FEEDCLASSES = {
-  'nearby-cities': NearbyCities
+  'nearby-cities': NearbyCities,
+  'pager-comments': PagerComments,
+  'pager-exposures': PagerExposures,
+  'shakemap-info': ShakeMapInfo,
+  'significant-eqs': SignificantEqs
 };
 
 
