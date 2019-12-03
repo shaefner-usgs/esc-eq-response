@@ -25,7 +25,7 @@ var SignificantEqs = function (options) {
       _json,
 
       _getSelectMenu,
-      _load;
+      _loadJson;
 
 
   _this = {};
@@ -35,7 +35,7 @@ var SignificantEqs = function (options) {
 
     _app = options.app;
 
-    _load();
+    _loadJson();
   };
 
   /**
@@ -87,7 +87,7 @@ var SignificantEqs = function (options) {
   /**
    * Load significant earthquakes feed
    */
-  _load = function () {
+  _loadJson = function () {
     var errorMsg,
         url;
 

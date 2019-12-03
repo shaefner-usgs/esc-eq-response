@@ -16,8 +16,8 @@ var Tablesort = require('tablesort'),
  *
  * @return _this {Object}
  *   {
- *     add: {Function},
- *     remove: {Function},
+ *     addFeature: {Function},
+ *     removeFeature: {Function},
  *     reset: {Function}
  *   }
  */
@@ -456,7 +456,7 @@ var SummaryPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.add = function (feature) {
+  _this.addFeature = function (feature) {
     var button,
         canvas,
         div,
@@ -536,7 +536,7 @@ var SummaryPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.remove = function (feature) {
+  _this.removeFeature = function (feature) {
     var el;
 
     el  = _el.querySelector('.' + feature.id);

@@ -31,14 +31,14 @@ var EditPane = function (options) {
       _eqid,
       _eqidPrevValue,
       _fields,
-      _throttleRefresh,
+      _throttle,
 
       _addListener,
+      _checkIfNew,
+      _checkIfValid,
       _getDefaults,
       _hideMainshock,
       _initListeners,
-      _isNewEvent,
-      _isValidEqId,
       _refreshFeature,
       _resetForm,
       _resetTitle,
@@ -81,6 +81,42 @@ var EditPane = function (options) {
     for (i = 0; i < els.length; i ++) {
       els[i].addEventListener(type, listener);
     }
+  };
+
+  /**
+   * Check if eqid entered by user is 'new' (different from previous value)
+   *
+   * @return isNew {Boolean}
+   */
+  _checkIfNew = function () {
+    var isNew = false;
+
+    if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
+      isNew = true;
+    }
+    _eqidPrevValue = _eqid.value;
+
+    return isNew;
+  };
+
+  /**
+   * Check if eqid is valid and exists
+   *
+   * @return isValid {Boolean}
+   */
+  _checkIfValid = function () {
+    var isValid,
+        regex;
+
+    isValid = false;
+    regex = /^[^/\\:]+$/; // no slashes, colons
+
+    // 404 error is logged if eqid not found
+    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
+      isValid = true;
+    }
+
+    return isValid;
   };
 
   /**
@@ -146,15 +182,15 @@ var EditPane = function (options) {
     // Update querystring param when form field is changed
     _addListener(_fields, 'input', _updateParam);
 
-    // Get new set of feature layers when eqid is changed
+    // Get a new set of feature layers when eqid is changed
     _addListener([_eqid], 'input', _this.initFeatures);
 
-    // Update eq features when params changed
+    // Update features when params are changed (fires when change is committed)
     _addListener(aftershocks, 'change', _refreshFeature);
     _addListener(foreshocks, 'change', _refreshFeature);
     _addListener(historical, 'change', _refreshFeature);
 
-    // Clear features when reset button pressed
+    // Clear features when reset button is pressed
     _addListener([reset], 'click', _app.resetApp);
 
     // Switch to map pane when 'View Map' button is clicked
@@ -162,65 +198,33 @@ var EditPane = function (options) {
   };
 
   /**
-   * Check if event id entered by user is 'new' (different from previous value)
-   *
-   * @return isNew {Boolean}
-   */
-  _isNewEvent = function () {
-    var isNew = false;
-
-    if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
-      isNew = true;
-    }
-    _eqidPrevValue = _eqid.value;
-
-    return isNew;
-  };
-
-  /**
-   * Check if eqid is valid and exists
-   *
-   * @return isValid {Boolean}
-   */
-  _isValidEqId = function () {
-    var isValid,
-        regex;
-
-    isValid = false;
-    regex = /^[^/\\:]+$/; // no slashes, colons
-
-    // 404 error is logged if eqid not found
-    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
-      isValid = true;
-    }
-
-    return isValid;
-  };
-
-  /**
-   * Refresh a Feature (triggered when a form field is changed by user)
+   * Refresh a Feature
+   *   triggered when a form field inside div is changed by user
    */
   _refreshFeature = function () {
-    var feature,
-        formField,
-        id;
+    var div,
+        eqidIsValid,
+        feature;
 
-    if (_isValidEqId()) {
-      formField = this;
-      id = formField.className;
-      feature = _app.Features.getFeature(id);
+    eqidIsValid = _checkIfValid();
+
+    if (eqidIsValid) {
+      div = this;
+      feature = _app.Features.getFeature(div.className);
 
       // Throttle requests so they can't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttleRefresh); // first clear any queued refresh
-      _throttleRefresh = window.setTimeout(function() {
+      window.clearTimeout(_throttle); // first clear any queued refresh
+      _throttle = window.setTimeout(function() {
         // Even with a throttle in place, Ajax requests can still 'stack up'
         // Wait until previous request is finished before starting another
-        if (feature && feature.isRefreshing) {
-          window.setTimeout(function() {
-            _refreshFeature.call(formField);
-          }, 100);
-        } else {
-          _app.Features.refresh(id);
+        if (feature) {
+          if (feature.isRefreshing) {
+            window.setTimeout(function() {
+              _refreshFeature.call(div);
+            }, 100);
+          } else {
+            _app.Features.refreshFeature(feature);
+          }
         }
       }, 250);
     }
@@ -319,9 +323,11 @@ var EditPane = function (options) {
    * Create Features (and subsequently add them to map, plots and summary panes)
    */
   _this.initFeatures = function () {
+    var eqidIsValid = _checkIfValid();
+
     _app.resetApp(); // first reset app to default state
 
-    if (_isValidEqId()) {
+    if (eqidIsValid) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
       // Instantiate mainshock (other features are created after mainshock is ready)
@@ -362,15 +368,15 @@ var EditPane = function (options) {
    */
   _this.setDefaults = function () {
     var defaults,
-        isNewEvent;
+        eqidIsNew;
 
     defaults = _getDefaults();
-    isNewEvent = _isNewEvent();
+    eqidIsNew = _checkIfNew();
 
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (_app.AppUtil.getParam(key) === '' || isNewEvent) {
+      if (_app.AppUtil.getParam(key) === '' || eqidIsNew) {
         _app.AppUtil.setParam(key, defaults[key]);
       }
     });

@@ -13,8 +13,8 @@
  *
  * @return _this {Object}
  *   {
- *     add: {Function},
- *     remove: {Function},
+ *     addFeature: {Function},
+ *     removeFeature: {Function},
  *     render: {Function},
  *     rendered: {Boolean},
  *     reset: {Function},
@@ -32,12 +32,12 @@ var PlotsPane = function (options) {
 
       _addListeners,
       _addPlotContainer,
+      _checkIfActive,
       _getPlotlyConfig,
       _getPlotlyLayout,
       _getPlotlyParams,
       _getPlotlyTraces,
-      _getRatio,
-      _isPlotPaneActive;
+      _getRatio;
 
 
   _this = {};
@@ -339,7 +339,7 @@ var PlotsPane = function (options) {
    *
    * @return {Boolean}
    */
-  _isPlotPaneActive = function () {
+  _checkIfActive = function () {
     if (location.hash === '#plotsPane') {
       return true;
     }
@@ -357,9 +357,10 @@ var PlotsPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.add = function (feature) {
+  _this.addFeature = function (feature) {
     var description,
         div,
+        isActive,
         params,
         title;
 
@@ -388,7 +389,8 @@ var PlotsPane = function (options) {
         rendered: false
       };
 
-      if (_isPlotPaneActive()) {
+      isActive = _checkIfActive();
+      if (isActive) {
         _this.render();
       }
     }
@@ -399,7 +401,7 @@ var PlotsPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.remove = function (feature) {
+  _this.removeFeature = function (feature) {
     var el,
         i,
         plots;
@@ -478,7 +480,7 @@ var PlotsPane = function (options) {
 
     features = _app.Features.getFeatures();
     Object.keys(features).forEach(function(feature) {
-      _this.remove(feature);
+      _this.removeFeature(feature);
     });
 
     _featuresEl.innerHTML = '';
@@ -490,9 +492,12 @@ var PlotsPane = function (options) {
    */
   _this.resize = function () {
     var i,
+        isActive,
         plots;
 
-    if(_isPlotPaneActive()) {
+    isActive = _checkIfActive();
+
+    if (isActive) {
       plots = _el.querySelectorAll('.js-plotly-plot');
       for (i = 0; i < plots.length; i ++) {
         Plotly.Plots.resize(plots[i]);

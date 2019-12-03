@@ -29,11 +29,11 @@ require('mappane/TerrainLayer');
  *
  * @return _this {Object}
  *   {
- *     add: {Function},
+ *     addFeature: {Function},
  *     initView: {Function},
  *     map: {Object},
  *     openPopup: {Function},
- *     remove: {Function},
+ *     removeFeature: {Function},
  *     reset: {Function}
  *   }
  */
@@ -352,7 +352,7 @@ var MapPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.add = function (feature) {
+  _this.addFeature = function (feature) {
     var title;
 
     title = feature.title || feature.name;
@@ -431,7 +431,7 @@ var MapPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.remove = function (feature) {
+  _this.removeFeature = function (feature) {
     var mapLayer,
         showLayer;
 

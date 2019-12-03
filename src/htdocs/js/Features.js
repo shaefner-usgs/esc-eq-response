@@ -48,7 +48,7 @@ _FEATURECLASSES = {
  *     getFeatures: {Function},
  *     getStatus: {Function},
  *     instantiateMainshock: {Function},
- *     refresh: {Function},
+ *     refreshFeature: {Function},
  *     reset: {Function}
  *   }
  */
@@ -59,15 +59,15 @@ var Features = function (options) {
       _app,
       _eqid,
       _features,
-
-      _add,
-      _init,
-      _instantiate,
-      _instantiateFeatures,
-      _load,
       _numFeatures,
-      _remove,
-      _removeAll;
+
+      _addFeature,
+      _initFeature,
+      _instantiateFeature,
+      _instantiateFeatures,
+      _loadJson,
+      _removeFeature,
+      _removeAllFeatures;
 
 
   _this = {};
@@ -84,14 +84,14 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _add = function (feature) {
+  _addFeature = function (feature) {
     _features[feature.id] = feature;
 
     try {
       // Add feature to map, summary and plot panes
-      _app.MapPane.add(feature);
-      _app.PlotsPane.add(feature);
-      _app.SummaryPane.add(feature);
+      _app.MapPane.addFeature(feature);
+      _app.PlotsPane.addFeature(feature);
+      _app.SummaryPane.addFeature(feature);
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
@@ -119,21 +119,21 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _init = function (feature) {
-    if (typeof feature.getFeedUrl === 'function') { // get feed data for feature
-      _load(feature);
+  _initFeature = function (feature) {
+    if (typeof feature.getFeedUrl === 'function') { // gets url of feed data
+      _loadJson(feature); // load feature's feed data
     } else { // no external feed data needed
       feature.initFeature();
-      _add(feature);
+      _addFeature(feature);
     }
   };
 
   /**
-   * Instantiate a Feature class
+   * Instantiate a Feature
    *
    * @param FeatureClass {Object}
    */
-  _instantiate = function (FeatureClass) {
+  _instantiateFeature = function (FeatureClass) {
     var feature;
 
     feature = FeatureClass({
@@ -141,7 +141,7 @@ var Features = function (options) {
       eqid: _eqid
     });
 
-    _init(feature);
+    _initFeature(feature);
   };
 
   /**
@@ -164,17 +164,17 @@ var Features = function (options) {
         _features[id] = false; // flag as not yet loaded
 
         FeatureClass = featureClasses[id];
-        _instantiate(FeatureClass);
+        _instantiateFeature(FeatureClass);
       }
     });
   };
 
   /**
-   * Load a Feature from a json feed
+   * Load a json feed
    *
    * @param feature {Object}
    */
-  _load = function (feature) {
+  _loadJson = function (feature) {
     var domain,
         errorMsg,
         matches,
@@ -192,7 +192,7 @@ var Features = function (options) {
           feature.json = json; // store mainshock json (used by other features)
         }
         feature.initFeature(json);
-        _add(feature);
+        _addFeature(feature);
 
         feature.isRefreshing = false;
       },
@@ -251,21 +251,21 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _remove = function (feature) {
+  _removeFeature = function (feature) {
     if (feature) {
-      _app.MapPane.remove(feature);
-      _app.PlotsPane.remove(feature);
-      _app.SummaryPane.remove(feature);
+      _app.MapPane.removeFeature(feature);
+      _app.PlotsPane.removeFeature(feature);
+      _app.SummaryPane.removeFeature(feature);
     }
   };
 
   /**
    * Remove all Features from map, plots and summary panes
    */
-  _removeAll = function () {
+  _removeAllFeatures = function () {
     if (_features) {
       Object.keys(_features).forEach(function(id) {
-        _remove(_features[id]);
+        _removeFeature(_features[id]);
       });
     }
   };
@@ -371,30 +371,25 @@ var Features = function (options) {
   _this.instantiateMainshock = function () {
     _eqid = _app.AppUtil.getParam('eqid');
 
-    _instantiate(_FEATURECLASSES.mainshock);
+    _instantiateFeature(_FEATURECLASSES.mainshock);
   };
 
   /**
    * Refresh a Feature when user manipulates parameters on edit pane
    *
-   * @param id {String}
+   * @param feature {Object}
    */
-  _this.refresh = function (id) {
-    var feature;
-
-    feature = _this.getFeature(id);
-
+  _this.refreshFeature = function (feature) {
     if (feature) {
       feature.isRefreshing = true; // flag to block multiple/simultaneous refreshes
-      _remove(feature);
-      _init(feature);
-    } else { // Feature was not yet successfully instantiated
-      _instantiate(_FEATURECLASSES[id]);
-    }
 
-    // Also refresh FieldNotes when Aftershocks Feature is refreshed
-    if (id === 'aftershocks') {
-      _this.refresh('fieldnotes');
+      _removeFeature(feature);
+      _initFeature(feature);
+
+      // Also refresh FieldNotes when Aftershocks Feature is refreshed
+      if (feature.id === 'aftershocks') {
+        _this.refreshFeature(_this.getFeature('fieldnotes'));
+      }
     }
   };
 
@@ -402,7 +397,7 @@ var Features = function (options) {
    * Reset to initial state
    */
   _this.reset = function () {
-    _removeAll();
+    _removeAllFeatures();
 
     _eqid = null;
     _features = {};

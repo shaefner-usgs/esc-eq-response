@@ -39,7 +39,7 @@ var Feeds = function (options) {
       _feeds,
 
       _getStatus,
-      _load;
+      _loadJson;
 
 
   _this = {};
@@ -74,7 +74,7 @@ var Feeds = function (options) {
    *
    * @param feed {Object}
    */
-  _load = function (feed) {
+  _loadJson = function (feed) {
     var domain,
         errorMsg,
         matches,
@@ -159,7 +159,7 @@ var Feeds = function (options) {
       });
 
       if (feed.url) {
-        _load(feed);
+        _loadJson(feed);
       }
     });
   };
