@@ -37,6 +37,7 @@ var Feeds = function (options) {
 
       _app,
       _feeds,
+      _numFeeds,
 
       _getStatus,
       _loadJson;
@@ -58,10 +59,17 @@ var Feeds = function (options) {
    *     Returns 'finished' if all feeds are loaded
    */
   _getStatus = function () {
-    var status = 'finished';
+    var allFeeds,
+        status;
+
+    status = 'finished';
+
+    if (Object.keys(_feeds).length === _numFeeds) {
+      allFeeds = true; // all Features have been instantiated
+    }
 
     Object.keys(_feeds).some(function(id) {
-      if (!_feeds[id]) {
+      if (!allFeeds || !_feeds[id]) {
         status = '';
       }
     });
@@ -149,6 +157,7 @@ var Feeds = function (options) {
         FeedClass;
 
     feedClasses = feedClasses || _FEEDCLASSES;
+    _numFeeds = Object.keys(feedClasses).length;
 
     Object.keys(feedClasses).forEach(function(id) {
       _feeds[id] = false; // flag as not yet loaded
