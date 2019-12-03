@@ -7,6 +7,12 @@ date_default_timezone_set('America/Los_Angeles');
 
 $eqid = $_POST['eqid'];
 
+/**
+ * ------------------------------------------------------------------
+ * Begin RTF file creation
+ * ------------------------------------------------------------------
+ */
+
 // Create RTF document instance
 $rtf = new PHPRtfLite();
 
@@ -48,12 +54,18 @@ if ($_POST['shakemap']) {
   $section1->addImage($localImgPath, $imageFormat, 16, 16);
 }
 
+/**
+ * ------------------------------------------------------------------
+ * End RTF file creation
+ * ------------------------------------------------------------------
+ */
+
 $file = saveFile();
 sendResponse(array(
   'file' => $file
 ));
 
-/*
+/**
  * Create a local (temporary) image from a remote image
  *
  * @param $url {String}
