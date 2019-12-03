@@ -8,6 +8,13 @@
  *   {
  *     app: {Object}, // Application
  *   }
+ *
+ * @return _this {Object}
+ *   {
+ *     id: {String},
+ *     name: {String),
+ *     url: {String}
+ *   }
  */
 var NearbyCities = function (options) {
   var _this,

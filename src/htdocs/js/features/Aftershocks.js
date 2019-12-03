@@ -181,7 +181,7 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get url of data feed
+   * Get URL of json feed
    *
    * @return {String}
    */
