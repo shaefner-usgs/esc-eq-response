@@ -15,9 +15,9 @@ var Util = require('hazdev-webutils/src/util/Util');
  * @return _this {Object}
  *   {
  *     addError: {Function},
- *     addLoadingMsg: {Function},
+ *     addItem: {Function},
  *     hasError: {Function},
- *     remove: {Function},
+ *     removeItem: {Function},
  *     reset: {Function}
  *   }
  */
@@ -41,6 +41,13 @@ var StatusBar = function (options) {
   };
 
   /**
+   * Hide status bar container (uses css slide-down animation)
+   */
+  _hide = function () {
+    _el.classList.add('hide');
+  };
+
+  /**
    * Remove a status bar entry from DOM
    *
    * @param el {Element}
@@ -55,13 +62,6 @@ var StatusBar = function (options) {
       }
       parent.removeChild(el);
     }
-  };
-
-  /**
-   * Hide status bar container (uses css slide-down animation)
-   */
-  _hide = function () {
-    _el.classList.add('hide');
   };
 
   /**
