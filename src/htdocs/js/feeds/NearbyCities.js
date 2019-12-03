@@ -9,7 +9,6 @@
  *     app: {Object}, // Application
  *   }
  */
-
 var NearbyCities = function (options) {
   var _this,
       _initialize,
