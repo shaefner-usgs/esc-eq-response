@@ -122,7 +122,22 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _initFeature = function (feature) {
+    var flag;
+
     if (typeof feature.getFeedUrl === 'function') { // gets url of feed data
+      if (feature.dependencies) { // finish loading dependencies first
+        feature.dependencies.forEach(function(dependency) {
+          if (!_this.getFeature(dependency)) { // dependency not ready
+            flag = 'waiting';
+            window.setTimeout(function() {
+              _initFeature(feature);
+            }, 250);
+          }
+        });
+        if (flag === 'waiting') {
+          return; // exit if dependencies are not ready
+        }
+      }
       _loadJson(feature); // load feature's feed data
     } else { // no external feed data needed
       feature.initFeature();
