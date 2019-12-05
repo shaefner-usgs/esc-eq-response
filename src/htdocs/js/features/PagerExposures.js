@@ -39,20 +39,20 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get aggregated population exposure indexed by MMI
+   * Get aggregated population exposure and associated MMI (in descending order)
    *
    * @return exposures {Object}
    */
   _getExposures = function (json) {
     var exposures;
 
-    exposures = {};
-    json.population_exposure.mmi.forEach(function(mmi, i) {
-      exposures[mmi] = json.population_exposure.aggregated_exposure[i];
-    });
+    exposures = {
+      mmi: json.population_exposure.mmi.reverse(),
+      population: json.population_exposure.aggregated_exposure.reverse()
+    };
 
     return exposures;
-   };
+  };
 
   // ----------------------------------------------------------
   // Public methods
