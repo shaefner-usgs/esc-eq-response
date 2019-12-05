@@ -59,6 +59,31 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
+ * Get Intensity/Shaking level for a given MMI
+ *
+ * @param mmi {Integer}
+ *
+ * @return shakingLevel {Object}
+ */
+AppUtil.getShakingLevel = function (mmi) {
+  var shakingLevel = [
+    {}, // no zero-level values
+    {intensity: 'I',    shaking: 'Not felt'},
+    {intensity: 'II',   shaking: 'Weak'},
+    {intensity: 'III',  shaking: 'Weak'},
+    {intensity: 'IV',   shaking: 'Light'},
+    {intensity: 'V',    shaking: 'Moderate'},
+    {intensity: 'VI',   shaking: 'Strong'},
+    {intensity: 'VII',  shaking: 'Very strong'},
+    {intensity: 'VIII', shaking: 'Severe'},
+    {intensity: 'IX',   shaking: 'Violent'},
+    {intensity: 'X+',   shaking: 'Extreme'}
+  ];
+
+  return shakingLevel[mmi];
+};
+
+/**
  * Lookup table to get a URL parameter from a Feature id
  *
  * @param id {String}
