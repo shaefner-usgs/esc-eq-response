@@ -8,6 +8,7 @@ var Aftershocks = require('features/Aftershocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
     MomentTensor = require('features/MomentTensor'),
+    PagerExposures = require('features/PagerExposures'),
     ShakeMapStations = require('features/ShakeMapStations'),
     Xhr = require('util/Xhr');
 
@@ -23,6 +24,7 @@ var _FEATURECLASSES;
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
+  'pager-exposures': PagerExposures,
   'focal-mechanism': FocalMechanism,
   'moment-tensor': MomentTensor,
   aftershocks: Aftershocks,
