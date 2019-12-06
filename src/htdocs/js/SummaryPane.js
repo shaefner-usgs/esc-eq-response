@@ -173,6 +173,8 @@ var SummaryPane = function (options) {
         historical,
         mainshock,
         pager,
+        pagerCities,
+        pagerExposures,
         products,
         shakemap,
         summary;
@@ -182,6 +184,8 @@ var SummaryPane = function (options) {
     foreshocks = _app.Features.getFeature('foreshocks');
     historical = _app.Features.getFeature('historical');
     mainshock = _app.Features.getFeature('mainshock');
+    pagerCities = _app.Features.getFeature('pager-cities');
+    pagerExposures = _app.Features.getFeature('pager-exposures');
     products = mainshock.json.properties.products;
 
     if (products.dyfi) {
@@ -236,6 +240,8 @@ var SummaryPane = function (options) {
       mag: mainshock.json.properties.mag,
       magType: mainshock.json.properties.magType,
       pager: pager || '',
+      'pager-cities': pagerCities.cities,
+      'pager-exposures': pagerExposures.exposures,
       place: mainshock.json.properties.place,
       shakemap: shakemap || '',
       summary: summary || '',
