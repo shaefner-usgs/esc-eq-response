@@ -8,6 +8,7 @@ var Aftershocks = require('features/Aftershocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
     MomentTensor = require('features/MomentTensor'),
+    PagerCities = require('features/PagerCities'),
     PagerExposures = require('features/PagerExposures'),
     ShakeMapStations = require('features/ShakeMapStations'),
     Xhr = require('util/Xhr');
@@ -24,12 +25,13 @@ var _FEATURECLASSES;
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
-  'pager-exposures': PagerExposures,
+  'pager-exposures': PagerExposures, // dependency for PagerCities
   'focal-mechanism': FocalMechanism,
   'moment-tensor': MomentTensor,
   aftershocks: Aftershocks,
   foreshocks: Foreshocks,
   historical: Historical,
+  'pager-cities': PagerCities,
   'shakemap-stations': ShakeMapStations,
   fieldnotes: FieldNotes
 };
