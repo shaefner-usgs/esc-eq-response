@@ -21,11 +21,11 @@ var _FEATURECLASSES;
  *   be first). Stacking order is set in CSS.
  *
  * IMPORTANT: the Object key must match the id property set in the Feature class.
- *   This id value is sometimes used as a reference in other .js/.css files.
+ *   This id value might also used as a reference in other .js/.css files.
  */
 _FEATURECLASSES = {
   mainshock: Mainshock,
-  'pager-exposures': PagerExposures, // dependency for PagerCities
+  'pager-exposures': PagerExposures, // load ASAP: dependency for PagerCities
   'focal-mechanism': FocalMechanism,
   'moment-tensor': MomentTensor,
   aftershocks: Aftershocks,
@@ -38,7 +38,7 @@ _FEATURECLASSES = {
 
 
 /**
- * Create, load and add/remove Features on map, plots and summary panes
+ * Create, load, refresh and add/remove Features on map, plots and summary panes
  *
  * @param options {Object}
  *   {
@@ -92,7 +92,7 @@ var Features = function (options) {
     _features[feature.id] = feature;
 
     try {
-      // Add feature to map, summary and plot panes
+      // Add feature to map, plots and summary panes
       _app.MapPane.addFeature(feature);
       _app.PlotsPane.addFeature(feature);
       _app.SummaryPane.addFeature(feature);
@@ -118,8 +118,8 @@ var Features = function (options) {
   /**
    * Initialize a Feature
    *
-   * First, load feed data if Feature's getFeedUrl method is set, then
-   *   initialize (create) and add feature
+   * First, load feed data if necessary (Feature's getFeedUrl method is set),
+   *   then call methods to create / add Feature (via _loadJson callback)
    *
    * @param feature {Object}
    */
@@ -301,19 +301,22 @@ var Features = function (options) {
    *
    * @return feature {Object}
    *   {
-   *     showLayer: {Boolean}, // whether or not map layer is "on" by default
+   *     Required props:
+   *
    *     id: {String}, // unique id of feature
    *     name: {String}, // display name of feature
-   *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *
-   *   The following (optional) props are set after external feed data is loaded
+   *     Example of optional props that might also be set:
    *
-   *     description: {String}, // text description of feature's parameters
+   *     dependencies: {Array}, // other features that need to be loaded first
+   *     description: {String}, // text description of feature
    *     json: {String}, // json feed data (mainshock only)
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
+   *     showLayer: {Boolean}, // whether or not map layer is "on" by default
    *     summary: {String}, // HTML for SummaryPane
    *     title: {Number} // typically the feature's name with count appended
+   *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
    *   }
    */
   _this.getFeature = function (id) {
@@ -405,7 +408,7 @@ var Features = function (options) {
       _removeFeature(feature);
       _initFeature(feature);
 
-      // Also refresh FieldNotes when Aftershocks Feature is refreshed
+      // Also refresh FieldNotes when Aftershocks is refreshed (uses same params)
       if (feature.id === 'aftershocks') {
         _this.refreshFeature(_this.getFeature('fieldnotes'));
       }

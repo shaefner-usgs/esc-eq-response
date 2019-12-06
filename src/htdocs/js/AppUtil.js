@@ -186,7 +186,7 @@ AppUtil.romanize = function (num) {
  *     optional string to return if num is null
  *
  * @return {String}
- *     Note that it does not return a Number b/c toFixed() returns a string
+ *     NOTE: does not return a Number (for explicit display of e.g. M 2.0 eqs)
  */
 AppUtil.round = function (num, precision, empty) {
   var multiplier,
