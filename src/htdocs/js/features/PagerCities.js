@@ -63,19 +63,26 @@ var PagerCities = function (options) {
     cities = json.onepager_cities;
     exposures = _app.Features.getFeature('pager-exposures').exposures;
     summary = '<table>' +
-      '<tr><th>MMI</th><th>Level / Selected Cities</th><th>Population</th><tr>';
+      '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
 
     exposures.mmi.forEach(function(mmi, i) {
       population = exposures.population[i];
       if (mmi >= 2 && population !== 0) { // skip values below 2 and when nobody affected
         level = _app.AppUtil.getShakingLevel(mmi);
-        summary += '<tr><td>' + level.intensity + '</td><td>' + level.shaking +
-          '</td><td>' + population + '</td></tr>';
+        summary += '<tr>' +
+            '<td class="impact-bubbles"><span class="mmi' + level.intensity + '">' +
+              '<strong class="roman">' + level.intensity + '</strong></span></td>' +
+            '<td>' + level.shaking + '</td>' +
+            '<td>' + _app.AppUtil.addCommas(population) + '</td>' +
+          '</tr>';
         cities.forEach(function(city) {
           cityMmi = Number(_app.AppUtil.round(city.mmi, 0));
           if (cityMmi === mmi) {
-            summary += '<tr class="city"><td></td><td>' + city.name + '</td>' +
-              '<td>' + city.pop + '</td></tr>';
+            summary += '<tr class="city">' +
+                '<td></td>' +
+                '<td>' + city.name + '</td>' +
+                '<td>' + _app.AppUtil.addCommas(city.pop) + '</td>' +
+              '</tr>';
           }
         });
       }

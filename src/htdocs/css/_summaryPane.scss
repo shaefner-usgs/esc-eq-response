@@ -134,10 +134,6 @@
     display: none; /* hide year column when duration is 30 days or less */
   }
 
-  .impact-bubbles {
-    margin-top: 0;
-  }
-
   .eqlist {
     td {
       .tz {
@@ -243,13 +239,41 @@
     border-color: $mmiXII-color !important;
   }
 
+  .pager-cities {
+    td, th {
+      padding: 0.25em .8em;
+    }
+    td:nth-child(3) {
+      text-align: right;
+    }
+    tr {
+      border: none; /* override general table border styles */
+      border-top: 1px solid $border-color-lighter;
+
+      &.city, &:first-child {
+        border: none;
+      }
+      &:last-child {
+        border-bottom: 1px solid $border-color-lighter;
+      }
+    }
+
+    .city td {
+      color: #999;
+      padding: 0 .8em .3em .8em;
+    }
+  }
+
   .products {
     display: flex;
     flex-wrap: wrap;
 
+    canvas, img {
+      margin-top: 1em;
+    }
+
     h4 {
       margin: 0;
-      padding-bottom: 1em;
       text-align: center;
     }
 
