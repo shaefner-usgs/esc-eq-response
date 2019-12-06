@@ -48,7 +48,6 @@ var Mainshock = function (options) {
     _this.id = 'mainshock';
     _this.name = 'Mainshock';
     _this.showLayer = true;
-    _this.url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid;
     _this.zoomToLayer = true;
   };
 
@@ -62,16 +61,19 @@ var Mainshock = function (options) {
         imgSrc,
         mmi,
         products,
-        summary;
+        summary,
+        url;
 
     products = _this.json.properties.products;
+    url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid;
+
     summary = '<div class="products">';
     summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
 
     if (products.dyfi) {
       cdi = _app.AppUtil.romanize(_this.json.properties.cdi);
       imgSrc = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
-      summary += '<div class="dyfi scale"><a href="' + _this.url + '/dyfi">' +
+      summary += '<div class="dyfi scale"><a href="' + url + '/dyfi">' +
         '<h4>Did You Feel It?</h4><img src="' + imgSrc + '" class="mmi' + cdi +
         '" /></a></div>';
     }
@@ -82,7 +84,7 @@ var Mainshock = function (options) {
         imgSrc = products.shakemap[0].contents['download/intensity.jpg'].url;
       }
       mmi = _app.AppUtil.romanize(_this.json.properties.mmi);
-      summary += '<div class="shakemap scale"><a href="' + _this.url +
+      summary += '<div class="shakemap scale"><a href="' + url +
         '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
         mmi + '" /></a></div>';
     }
