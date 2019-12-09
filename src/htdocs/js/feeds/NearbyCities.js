@@ -44,11 +44,15 @@ var NearbyCities = function (options) {
    */
   _getFeedUrl = function () {
     var mainshockJson,
+        products,
         url;
 
     mainshockJson = _app.Features.getFeature('mainshock').json;
-    url = mainshockJson.properties.products['nearby-cities'][0].
-      contents['nearby-cities.json'].url;
+    products = mainshockJson.properties.products;
+
+    if (products['nearby-cities']) {
+      url = products['nearby-cities'][0].contents['nearby-cities.json'].url;
+    }
 
     return url;
   };

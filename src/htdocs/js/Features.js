@@ -202,6 +202,10 @@ var Features = function (options) {
     errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
     url = feature.getFeedUrl();
 
+    if (!url) {
+      return; // no feed available for Feature
+    }
+
     _app.StatusBar.addItem(feature);
 
     Xhr.ajax({

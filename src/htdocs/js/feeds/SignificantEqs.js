@@ -44,11 +44,15 @@ var SignificantEqs = function (options) {
    */
   _getFeedUrl = function () {
     var mainshockJson,
+        products,
         url;
 
     mainshockJson = _app.Features.getFeature('mainshock').json;
-    url = mainshockJson.properties.products.losspager[0].
-      contents['json/historical_earthquakes.json'].url;
+    products = mainshockJson.properties.products;
+
+    if (products.losspager) {
+      url = products.losspager[0].contents['json/historical_earthquakes.json'].url;
+    }
 
     return url;
   };
