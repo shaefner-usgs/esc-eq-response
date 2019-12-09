@@ -268,13 +268,13 @@
     display: flex;
     flex-wrap: wrap;
 
-    canvas, img {
-      margin-top: 1em;
-    }
-
     h4 {
       margin: 0;
       text-align: center;
+
+      &+img, &+canvas {
+        margin-top: 1em;
+      }
     }
 
     .dyfi img, .shakemap img {

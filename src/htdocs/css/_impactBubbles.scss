@@ -3,24 +3,17 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
 .earthquake {
   .impact-bubbles {
     margin: 1em 0;
+
+    > a, > span {
+      width: 25%;
+    }
   }
 }
 
 .impact-bubbles {
   display: flex;
 
-  > a {
-    width: 25%;
-
-    &:hover {
-      background-image: $hover;
-    }
-  }
-  > span {
-    width: 3.5em;
-  }
-
-  > a, span {
+  > a, > span {
     background-color: #fff;
     border-radius: 3px;
     box-shadow: inset 0 0 1px rgba(0, 0, 0, .5);
@@ -34,6 +27,7 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
     text-decoration: none;
     text-overflow: ellipsis;
     text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .3);
+    width: 3.5em;
 
     > abbr {
       border-bottom: 1px dotted #222;
@@ -48,6 +42,10 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
     + a {
       margin-left: 5px;
     }
+  }
+
+  > a:hover {
+    background-image: $hover;
   }
 
   .mmiI {
@@ -125,7 +123,7 @@ $hover: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
     text-transform: uppercase;
   }
 
-  > .tsunami {
+  .tsunami {
     padding: 0;
     position: relative;
 
