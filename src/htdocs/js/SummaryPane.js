@@ -136,7 +136,8 @@ var SummaryPane = function (options) {
 
     button = document.createElement('button');
     button.classList.add('event-summary');
-    button.innerText = 'Event Summary';
+    button.innerHTML = '<img src="img/download.png" width="13" alt="download" />';
+    button.innerHTML += 'Event Summary';
     button.setAttribute('disabled', 'disabled');
     button.type = 'button';
 

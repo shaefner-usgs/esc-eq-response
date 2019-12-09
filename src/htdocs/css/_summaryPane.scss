@@ -117,6 +117,17 @@
     }
   }
 
+  .event-summary {
+    padding-left: 32px;
+    position: relative;
+
+    img {
+      left: 12px;
+      position: absolute;
+      top: 8px;
+    }
+  }
+
   .feature {
     width: 100%;
 
