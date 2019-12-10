@@ -224,8 +224,8 @@ var SummaryPane = function (options) {
       aftershocks: {
         bins: aftershocks.bins,
         description: aftershocks.description,
-        forecast: JSON.parse(mainshock.json.properties.products.oaf[0].
-          contents[''].bytes)
+        forecast: aftershocks.forecast,
+        model: aftershocks.model
       },
       depth: mainshock.json.geometry.coordinates[2],
       dyfi: dyfi || '',

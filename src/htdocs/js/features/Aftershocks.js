@@ -17,10 +17,12 @@ var Earthquakes = require('features/util/Earthquakes');
  *   {
  *     cumulativeEqs: {Array},
  *     description: {String},
+ *     forecast: {Array},
  *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
+ *     model: {Object},
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
@@ -35,7 +37,9 @@ var Aftershocks = function (options) {
 
       _app,
       _eqid,
+      _forecast,
       _mainshock,
+      _model,
       _Earthquakes,
 
       _getProbabilities,
@@ -77,6 +81,11 @@ var Aftershocks = function (options) {
 
     if (oaf) { // add forecast to html output
       data = JSON.parse(oaf[0].contents[''].bytes);
+
+      // Store forecast and model to attach as returned (public) props
+      _forecast = data.forecast;
+      _model = data.model;
+
       data.forecast.forEach(function(period) {
         if (period.label === data.advisoryTimeFrame) { // show 'primary emphasis' period
           period.bins.forEach(function(bin) {
@@ -223,6 +232,10 @@ var Aftershocks = function (options) {
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary(json);
     _this.title = _this.name + ' (' + json.metadata.count + ')';
+
+    // The following props depend on summary being set
+    _this.forecast = _forecast;
+    _this.model = _model;
   };
 
 
