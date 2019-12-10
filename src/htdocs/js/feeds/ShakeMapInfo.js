@@ -44,11 +44,15 @@ var ShakeMapInfo = function (options) {
    */
   _getFeedUrl = function () {
     var mainshockJson,
+        products,
         url;
 
     mainshockJson = _app.Features.getFeature('mainshock').json;
-    url = mainshockJson.properties.products.shakemap[0].
-      contents['download/info.json'].url;
+    products = mainshockJson.properties.products;
+
+    if (products.shakemap) {
+      url = products.shakemap[0].contents['download/info.json'].url;
+    }
 
     return url;
   };
