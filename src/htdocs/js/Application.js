@@ -137,6 +137,7 @@ var Application = function (options) {
    */
   _this.resetApp = function () {
     _this.EditPane.reset();
+    _this.Feeds.reset();
     _this.MapPane.reset();
     _this.NavBar.reset();
     _this.PlotsPane.reset();

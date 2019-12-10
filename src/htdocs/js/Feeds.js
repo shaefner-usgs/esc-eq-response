@@ -34,7 +34,8 @@ _FEEDCLASSES = {
  * @return _this {Object}
  *   {
  *     getFeeds: {Function},
- *     instantiateFeeds: {Function}
+ *     instantiateFeeds: {Function},
+ *     reset: {Function}
  *   }
  */
 var Feeds = function (options) {
@@ -173,6 +174,13 @@ var Feeds = function (options) {
         }
       }
     });
+  };
+
+  /**
+   * Reset to initial state
+   */
+  _this.reset = function () {
+    _feeds = {};
   };
 
 
