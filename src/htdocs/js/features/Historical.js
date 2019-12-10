@@ -15,6 +15,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *
  * @return _this {Object}
  *   {
+ *     bins: {Object},
  *     cumulativeEqs: {Array},
  *     description: {String},
  *     getFeedUrl: {Function},
