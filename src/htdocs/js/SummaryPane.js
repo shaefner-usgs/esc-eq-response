@@ -245,7 +245,7 @@ var SummaryPane = function (options) {
       'pager-exposures': pagerExposures.exposures,
       place: mainshock.json.properties.place,
       shakemap: shakemap || '',
-      summary: summary || '',
+      'tectonic-summary': summary || '',
       time: {
         local: mainshock.localTime,
         utc: mainshock.utcTime
