@@ -62,23 +62,13 @@ var Feeds = function (options) {
    * Get status of loading external feed data
    *
    * @return status {String}
-   *     Returns 'finished' if all feeds are loaded
    */
   _getStatus = function () {
-    var allFeeds,
-        status;
+    var status;
 
-    status = 'finished';
-
-    if (Object.keys(_feeds).length === _numFeeds) {
-      allFeeds = true; // all Features have been instantiated
+    if (Object.keys(_feeds).length === _numFeeds) { // all available Feeds loaded
+      status = 'finished';
     }
-
-    Object.keys(_feeds).some(function(id) {
-      if (!allFeeds || !_feeds[id]) {
-        status = '';
-      }
-    });
 
     return status;
   };
@@ -160,14 +150,13 @@ var Feeds = function (options) {
    */
   _this.instantiateFeeds = function (feedClasses) {
     var feed,
-        FeedClass;
+        FeedClass,
+        status;
 
     feedClasses = feedClasses || _FEEDCLASSES;
     _numFeeds = Object.keys(feedClasses).length;
 
     Object.keys(feedClasses).forEach(function(id) {
-      _feeds[id] = false; // flag as not yet loaded
-
       FeedClass = feedClasses[id];
       feed = FeedClass({
         app: _app
@@ -175,6 +164,13 @@ var Feeds = function (options) {
 
       if (feed.url) {
         _loadJson(feed);
+      } else { // feed does not exist
+        -- _numFeeds;
+
+        status = _getStatus();
+        if (status === 'finished') { // all feeds finished loading
+          _app.SummaryPane.createSummaryDoc(); // create Event Summary document
+        }
       }
     });
   };
