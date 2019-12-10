@@ -2,7 +2,7 @@
 
 
 /**
- * Previous Significant Earthquakes Feed
+ * Historical Earthquakes Feed
  *
  * @param options {Object}
  *   {
@@ -16,7 +16,7 @@
  *     url: {String}
  *   }
  */
-var SignificantEqs = function (options) {
+var HistoricalEqs = function (options) {
   var _this,
       _initialize,
 
@@ -32,8 +32,8 @@ var SignificantEqs = function (options) {
 
     _app = options.app;
 
-    _this.id = 'significant-eqs';
-    _this.name = 'Previous Significant Earthquakes';
+    _this.id = 'historical-events';
+    _this.name = 'Historical Events';
     _this.url = _getFeedUrl();
   };
 
@@ -64,4 +64,4 @@ var SignificantEqs = function (options) {
 };
 
 
-module.exports = SignificantEqs;
+module.exports = HistoricalEqs;
