@@ -86,7 +86,7 @@ var NavBar = function (options) {
          prepend: 'Rendering'
        });
 
-       // Add a slight delay; otherwise loading (rendering) message does not display
+       // Add a slight delay; otherwise rendering message does not display
        window.setTimeout(function() {
          _hidePanes();
          _showPane(id);

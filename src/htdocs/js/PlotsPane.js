@@ -115,6 +115,19 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Check if plots pane is currently active
+   *
+   * @return {Boolean}
+   */
+  _checkIfActive = function () {
+    if (location.hash === '#plotsPane') {
+      return true;
+    }
+
+    return false;
+  };
+
+  /**
    * Get plot config option for Plotly.js
    *
    * @param featureId {String}
@@ -334,19 +347,6 @@ var PlotsPane = function (options) {
     return ratio;
   };
 
-  /**
-   * Check if plots pane is currently active
-   *
-   * @return {Boolean}
-   */
-  _checkIfActive = function () {
-    if (location.hash === '#plotsPane') {
-      return true;
-    }
-
-    return false;
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -364,7 +364,7 @@ var PlotsPane = function (options) {
         params,
         title;
 
-    // Don't plot mainshock on its own (it is included in other Features' plots)
+    // Don't plot mainshock on its own (it's included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       if (feature.description) {
         description = feature.description;
