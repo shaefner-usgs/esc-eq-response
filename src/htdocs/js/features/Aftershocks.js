@@ -18,8 +18,8 @@ var Earthquakes = require('features/util/Earthquakes');
  *     bins: {Object},
  *     cumulativeEqs: {Array},
  *     description: {String},
+ *     destroy: {Function},
  *     forecast: {Array},
- *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
@@ -29,6 +29,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     showLayer: {Boolean},
  *     summary: {String},
  *     title: {String},
+ *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -43,6 +44,7 @@ var Aftershocks = function (options) {
       _model,
       _Earthquakes,
 
+      _getFeedUrl,
       _getProbabilities,
       _getSummary;
 
@@ -59,7 +61,28 @@ var Aftershocks = function (options) {
     _this.id = 'aftershocks';
     _this.name = 'Aftershocks';
     _this.showLayer = true;
+    _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
+  };
+
+  /**
+   * Get URL of json feed
+   *
+   * @return {String}
+   */
+  _getFeedUrl = function () {
+    var urlParams;
+
+    urlParams = {
+      latitude: _mainshock.json.geometry.coordinates[1],
+      longitude: _mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
+      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
+        .utc().toISOString().slice(0, -5)
+    };
+
+    return Earthquakes.getFeedUrl(urlParams);
   };
 
   /**
@@ -191,23 +214,23 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    var urlParams;
+  _this.destroy = function () {
+    _initialize = null;
 
-    urlParams = {
-      latitude: _mainshock.json.geometry.coordinates[1],
-      longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
-        .utc().toISOString().slice(0, -5)
-    };
+    _app = null;
+    _eqid = null;
+    _forecast = null;
+    _mainshock = null;
+    _model = null;
+    _Earthquakes = null;
 
-    return Earthquakes.getFeedUrl(urlParams);
+    _getFeedUrl = null;
+    _getProbabilities = null;
+    _getSummary = null;
+
+    _this = null;
   };
 
   /**

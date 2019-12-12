@@ -11,11 +11,12 @@
  *
  * @return _this {Object}
  *   {
+ *     destroy: {Function},
  *     exposures: {Object},
- *     getFeedUrl: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     name: {String),
+ *     url: {String}
  *   }
  */
 var PagerExposures = function (options) {
@@ -24,7 +25,8 @@ var PagerExposures = function (options) {
 
       _app,
 
-      _getExposures;
+      _getExposures,
+      _getFeedUrl;
 
 
   _this = {};
@@ -36,6 +38,7 @@ var PagerExposures = function (options) {
 
     _this.id = 'pager-exposures';
     _this.name = 'PAGER Exposures';
+    _this.url = _getFeedUrl();
   };
 
   /**
@@ -54,28 +57,43 @@ var PagerExposures = function (options) {
     return exposures;
   };
 
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
   /**
    * Get URL of json feed
    *
    * @return url {String}
    */
-  _this.getFeedUrl = function () {
-    var mainshockJson,
+  _getFeedUrl = function () {
+    var mainshock,
         products,
         url;
 
-    mainshockJson = _app.Features.getFeature('mainshock').json;
-    products = mainshockJson.properties.products;
+    mainshock = _app.Features.getFeature('mainshock');
+    products = mainshock.json.properties.products;
+    url = '';
 
     if (products.losspager) {
       url = products.losspager[0].contents['json/exposures.json'].url;
     }
 
     return url;
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Destroy this Class to aid in garbage collection
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+
+    _getExposures = null;
+    _getFeedUrl = null;
+
+    _this = null;
   };
 
   /**

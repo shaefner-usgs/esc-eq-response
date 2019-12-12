@@ -37,13 +37,14 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
- *     getFeedUrl: {Function},
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
  *     title: {String},
+ *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -64,6 +65,7 @@ var ShakeMapStations = function (options) {
       _formatLocation,
       _formatTitle,
       _generatePopupContent,
+      _getFeedUrl,
       _getMapLayer,
       _onEachFeature,
       _pointToLayer;
@@ -85,6 +87,7 @@ var ShakeMapStations = function (options) {
     _this.id = 'shakemap-stations';
     _this.name = 'ShakeMap Stations';
     _this.showLayer = false;
+    _this.url = _getFeedUrl();
     _this.zoomToLayer = false;
   };
 
@@ -271,6 +274,21 @@ var ShakeMapStations = function (options) {
   };
 
   /**
+   * Get URL of json feed
+   *
+   * @return url {String}
+   */
+  _getFeedUrl = function () {
+    var url = '';
+
+    if (_shakemap) {
+      url = _shakemap[0].contents['download/stationlist.json'].url;
+    }
+
+    return url;
+  };
+
+  /**
    * Get Leaflet map layer
    *
    * @param json {Object}
@@ -338,14 +356,30 @@ var ShakeMapStations = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    if (_shakemap) {
-      return _shakemap[0].contents['download/stationlist.json'].url;
-    }
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _count = null;
+    _markerOptions = null;
+    _shakemap = null;
+
+    _filter = null;
+    _createAmplitudesObject = null;
+    _createChannelRow = null;
+    _createChannelTable = null;
+    _formatComponent = null;
+    _formatLocation = null;
+    _formatTitle = null;
+    _generatePopupContent = null;
+    _getFeedUrl = null;
+    _getMapLayer = null;
+    _onEachFeature = null;
+    _pointToLayer = null;
+
+    _this = null;
   };
 
   /**

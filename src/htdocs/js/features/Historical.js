@@ -18,7 +18,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     bins: {Object},
  *     cumulativeEqs: {Array},
  *     description: {String},
- *     getFeedUrl: {Function},
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
@@ -27,6 +27,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     showLayer: {Boolean},
  *     summary: {String},
  *     title: {String},
+ *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -37,6 +38,7 @@ var Historical = function (options) {
       _app,
       _Earthquakes,
 
+      _getFeedUrl,
       _getSummary;
 
 
@@ -50,7 +52,33 @@ var Historical = function (options) {
     _this.id = 'historical';
     _this.name = 'Historical Seismicity';
     _this.showLayer = true;
+    _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
+  };
+
+  /**
+   * Get URL of json feed
+   *
+   * @return {String}
+   */
+  _getFeedUrl = function () {
+    var mainshock,
+        urlParams;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    urlParams = {
+      endtime: _app.AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
+        .toISOString().slice(0, -5),
+      latitude: mainshock.json.geometry.coordinates[1],
+      longitude: mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(_app.AppUtil.getParam('hs-dist')),
+      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
+      starttime: _app.AppUtil.Moment(mainshock.json.properties.time).utc()
+        .subtract(_app.AppUtil.getParam('hs-years'), 'years').toISOString()
+        .slice(0, -5)
+    };
+
+    return Earthquakes.getFeedUrl(urlParams);
   };
 
   /**
@@ -90,28 +118,18 @@ var Historical = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    var mainshock,
-        urlParams;
+  _this.destroy = function () {
+    _initialize = null;
 
-    mainshock = _app.Features.getFeature('mainshock');
-    urlParams = {
-      endtime: _app.AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
-        .toISOString().slice(0, -5),
-      latitude: mainshock.json.geometry.coordinates[1],
-      longitude: mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('hs-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(mainshock.json.properties.time).utc()
-        .subtract(_app.AppUtil.getParam('hs-years'), 'years').toISOString()
-        .slice(0, -5)
-    };
+    _app = null;
+    _Earthquakes = null;
 
-    return Earthquakes.getFeedUrl(urlParams);
+    _getFeedUrl = null;
+    _getSummary = null;
+
+    _this = null;
   };
 
   /**

@@ -18,6 +18,7 @@ require('mappane/CanvasMarker');
  *
  * @return _this {Object}
  *   {
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
@@ -159,6 +160,23 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Destroy this Class to aid in garbage collection
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _eqid = null;
+    _mainshock = null;
+
+    _getBeachBall = null;
+    _getMapLayer = null;
+    _getSummary = null;
+
+    _this = null;
+  };
 
   /**
    * Create Feature

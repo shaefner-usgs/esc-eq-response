@@ -37,13 +37,14 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
- *     getFeedUrl: {Function},
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
  *     title: {String},
+ *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -60,6 +61,7 @@ var FieldNotes = function (options) {
       _addEventListeners,
       _genPopupContent,
       _getCustomProps,
+      _getFeedUrl,
       _onEachFeature,
       _pointToLayer,
       _updatePopup;
@@ -76,6 +78,7 @@ var FieldNotes = function (options) {
     _this.id = 'fieldnotes';
     _this.name = 'Fieldnotes';
     _this.showLayer = false;
+    _this.url = _getFeedUrl();
     _this.zoomToLayer = false;
 
     _markerOptions = Util.extend({
@@ -186,6 +189,38 @@ var FieldNotes = function (options) {
   };
 
   /**
+   * Get URL of json feed
+   *
+   * @return {String}
+   */
+  _getFeedUrl = function () {
+    var after,
+        before,
+        mainshock,
+        pairs,
+        urlParams;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
+      .format('X');
+    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc()
+      .add(30, 'days').format('X');
+    pairs = [];
+    urlParams = {
+      between: after + ',' + before,
+      lat: mainshock.json.geometry.coordinates[1],
+      lon: mainshock.json.geometry.coordinates[0],
+      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
+    };
+    Object.keys(urlParams).forEach(function(key) {
+      pairs.push(key + '=' + urlParams[key]);
+    });
+
+    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
+      pairs.join('&');
+  };
+
+  /**
    * Create Leaflet popups and tooltips
    *
    * @param feature {Object}
@@ -262,35 +297,26 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    var after,
-        before,
-        mainshock,
-        pairs,
-        urlParams;
+  _this.destroy = function () {
+    _initialize = null;
 
-    mainshock = _app.Features.getFeature('mainshock');
-    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
-      .format('X');
-    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc()
-      .add(30, 'days').format('X');
-    pairs = [];
-    urlParams = {
-      between: after + ',' + before,
-      lat: mainshock.json.geometry.coordinates[1],
-      lon: mainshock.json.geometry.coordinates[0],
-      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
-    };
-    Object.keys(urlParams).forEach(function(key) {
-      pairs.push(key + '=' + urlParams[key]);
-    });
+    _app = null;
+    _count = null;
+    _markerOptions = null;
+    _popup = null;
+    _Lightbox = null;
 
-    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
-      pairs.join('&');
+    _addEventListeners = null;
+    _genPopupContent = null;
+    _getCustomProps = null;
+    _getFeedUrl = null;
+    _onEachFeature = null;
+    _pointToLayer = null;
+    _updatePopup = null;
+
+    _this = null;
   };
 
   /**

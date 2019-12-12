@@ -218,7 +218,7 @@ var EditPane = function (options) {
         // Even with a throttle in place, Ajax requests can still 'stack up'
         // Wait until previous request is finished before starting another
         if (feature) {
-          if (feature.isRefreshing) {
+          if (feature.isLoading) {
             window.setTimeout(function() {
               _refreshFeature.call(div);
             }, 100);

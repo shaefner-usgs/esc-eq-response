@@ -15,7 +15,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *
  * @return _this {Object}
  *   {
- *     getFeedUrl: {Function},
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
@@ -23,6 +23,7 @@ var Earthquakes = require('features/util/Earthquakes');
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
  *     summary: {String},
+ *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -34,6 +35,7 @@ var Mainshock = function (options) {
       _eqid,
       _Earthquakes,
 
+      _getFeedUrl,
       _getSummary;
 
 
@@ -48,7 +50,18 @@ var Mainshock = function (options) {
     _this.id = 'mainshock';
     _this.name = 'Mainshock';
     _this.showLayer = true;
+    _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
+  };
+
+  /**
+   * Get URL of json feed
+   *
+   * @return {String}
+   */
+  _getFeedUrl = function () {
+    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
+      _eqid + '.geojson';
   };
 
   /**
@@ -103,13 +116,19 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _eqid + '.geojson';
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _eqid = null;
+    _Earthquakes = null;
+
+    _getFeedUrl = null;
+    _getSummary = null;
+
+    _this = null;
   };
 
   /**

@@ -104,13 +104,10 @@ var Features = function (options) {
         // Instantiate other Features now that Mainshock ready
         _instantiateFeatures();
       }
-
-      // Feature finished loading; remove alert
-      _app.StatusBar.removeItem(feature.id);
     }
     catch (error) {
       console.error(error);
-      _app.StatusBar.addError(feature, '<h4>Error Creating ' + feature.name +
+      _app.StatusBar.addError(feature, '<h4>Error Adding ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
     }
   };
@@ -118,29 +115,30 @@ var Features = function (options) {
   /**
    * Initialize a Feature
    *
-   * First, load feed data if necessary (Feature's getFeedUrl method is set),
-   *   then call methods to create / add Feature (via _loadJson callback)
+   * First, load feed data (if Feature's url property is set); call methods to
+   *    create / add Feature (via _loadJson's callback if loading feed data)
    *
    * @param feature {Object}
    */
   _initFeature = function (feature) {
     var flag;
 
-    if (typeof feature.getFeedUrl === 'function') { // gets url of feed data
-      if (feature.dependencies) { // finish loading dependencies first
-        feature.dependencies.forEach(function(dependency) {
-          if (!_this.getFeature(dependency)) { // dependency not ready
-            flag = 'waiting';
-            window.setTimeout(function() {
-              _initFeature(feature);
-            }, 250);
-          }
-        });
-        if (flag === 'waiting') {
-          return; // exit if dependencies are not ready
+    if (feature.dependencies) { // finish loading dependencies first
+      feature.dependencies.forEach(function(dependency) {
+        if (!_this.getFeature(dependency)) { // dependency not ready
+          flag = 'waiting';
+          window.setTimeout(function() {
+            _initFeature(feature);
+          }, 250);
         }
+      });
+      if (flag === 'waiting') {
+        return; // exit if dependencies are not ready
       }
-      _loadJson(feature); // load feature's feed data
+    }
+
+    if (feature.url) {
+      _loadJson(feature); // load feed data
     } else { // no external feed data needed
       feature.initFeature();
       _addFeature(feature);
@@ -168,21 +166,15 @@ var Features = function (options) {
    *
    * Skip mainshock which was already added (via _this.instantiateMainshock)
    *   so it's available for other Features that depend on it.
-   *
-   * @param featureClasses {Object}
-   *     optional; uses _FEATURECLASSES if no parameter is passed
    */
-  _instantiateFeatures = function (featureClasses) {
+  _instantiateFeatures = function () {
     var FeatureClass;
 
-    featureClasses = featureClasses || _FEATURECLASSES;
-    _numFeatures = Object.keys(featureClasses).length;
+    _numFeatures = Object.keys(_FEATURECLASSES).length;
 
-    Object.keys(featureClasses).forEach(function(id) {
+    Object.keys(_FEATURECLASSES).forEach(function(id) {
       if (id !== 'mainshock') { // skip mainshock (already done)
-        _features[id] = false; // flag as not yet loaded
-
-        FeatureClass = featureClasses[id];
+        FeatureClass = _FEATURECLASSES[id];
         _instantiateFeature(FeatureClass);
       }
     });
@@ -196,20 +188,14 @@ var Features = function (options) {
   _loadJson = function (feature) {
     var domain,
         errorMsg,
-        matches,
-        url;
+        matches;
 
     errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
-    url = feature.getFeedUrl();
-
-    if (!url) {
-      return; // no feed available for Feature
-    }
 
     _app.StatusBar.addItem(feature);
 
     Xhr.ajax({
-      url: url,
+      url: feature.url,
       success: function (json) {
         if (feature.id === 'mainshock') {
           feature.json = json; // store mainshock json (used by other features)
@@ -217,7 +203,8 @@ var Features = function (options) {
         feature.initFeature(json);
         _addFeature(feature);
 
-        feature.isRefreshing = false;
+        _app.StatusBar.removeItem(feature.id);
+        feature.isLoading = false;
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
@@ -250,12 +237,12 @@ var Features = function (options) {
         errorMsg += '</ul>';
         _app.StatusBar.addError(feature, errorMsg);
 
-        feature.isRefreshing = false;
+        feature.isLoading = false;
       },
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        matches = feature.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
@@ -263,14 +250,14 @@ var Features = function (options) {
 
         _app.StatusBar.addError(feature, errorMsg);
 
-        feature.isRefreshing = false;
+        feature.isLoading = false;
       },
       timeout: 20000
     });
   };
 
   /**
-   * Remove a Feature from map, plots and summary panes
+   * Remove a Feature from map, plots and summary panes, and destroy it
    *
    * @param feature {Object}
    */
@@ -279,6 +266,8 @@ var Features = function (options) {
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
+
+      feature.destroy();
     }
   };
 
@@ -307,6 +296,7 @@ var Features = function (options) {
    *   {
    *     Required props:
    *
+   *     destroy: {Function}, // garbage collection
    *     id: {String}, // unique id of feature
    *     name: {String}, // display name of feature
    *
@@ -317,10 +307,10 @@ var Features = function (options) {
    *     json: {String}, // json feed data (mainshock only)
    *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
-   *     showLayer: {Boolean}, // whether or not map layer is "on" by default
+   *     showLayer: {Boolean}, // whether or not mapLayer is "on" by default
    *     summary: {String}, // HTML for SummaryPane
    *     title: {Number} // typically the feature's name with count appended
-   *     zoomToLayer: {Boolean}, // whether or not map zoooms to fit layer
+   *     zoomToLayer: {Boolean}, // whether or not map zooms to fit layer by default
    *   }
    */
   _this.getFeature = function (id) {
@@ -370,23 +360,13 @@ var Features = function (options) {
    * Get status of loading Features
    *
    * @return status {String}
-   *     Returns 'finished' if all Features are loaded
    */
   _this.getStatus = function () {
-    var allFeatures,
-        status;
-
-    status = 'finished';
+    var status;
 
     if (Object.keys(_features).length === _numFeatures) {
-      allFeatures = true; // all Features have been instantiated
+      status = 'finished';
     }
-
-    Object.keys(_features).some(function(id) {
-      if (!allFeatures || !_features[id]) {
-        status = '';
-      }
-    });
 
     return status;
   };
@@ -407,10 +387,10 @@ var Features = function (options) {
    */
   _this.refreshFeature = function (feature) {
     if (feature) {
-      feature.isRefreshing = true; // flag to block multiple/simultaneous refreshes
+      feature.isLoading = true; // flag to block multiple/simultaneous refreshes
 
       _removeFeature(feature);
-      _initFeature(feature);
+      _instantiateFeature(_FEATURECLASSES[feature.id]);
 
       // Also refresh FieldNotes when Aftershocks is refreshed (uses same params)
       if (feature.id === 'aftershocks') {

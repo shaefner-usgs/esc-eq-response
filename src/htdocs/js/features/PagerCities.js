@@ -13,12 +13,13 @@
  *   {
  *     cities: {Object},
  *     dependencies: {Array},
- *     getFeedUrl: {Function},
+ *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     name: {String),
  *     summary: {String},
- *     title: {String}
+ *     title: {String},
+ *     url: {String}
  *   }
  */
 var PagerCities = function (options) {
@@ -27,6 +28,7 @@ var PagerCities = function (options) {
 
       _app,
 
+      _getFeedUrl,
       _getSummary;
 
 
@@ -37,12 +39,34 @@ var PagerCities = function (options) {
 
     _app = options.app;
 
-    _this.id = 'pager-cities';
     _this.dependencies = [
       'pager-exposures'
     ];
+    _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
     _this.title = 'Population Exposure';
+    _this.url = _getFeedUrl();
+  };
+
+  /**
+   * Get URL of json feed
+   *
+   * @return url {String}
+   */
+  _getFeedUrl = function () {
+    var mainshock,
+        products,
+        url;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    products = mainshock.json.properties.products;
+    url = '';
+
+    if (products.losspager) {
+      url = products.losspager[0].contents['json/cities.json'].url;
+    }
+
+    return url;
   };
 
   /**
@@ -97,23 +121,17 @@ var PagerCities = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get URL of json feed
-   *
-   * @return url {String}
+   * Destroy this Class to aid in garbage collection
    */
-  _this.getFeedUrl = function () {
-    var mainshockJson,
-        products,
-        url;
+  _this.destroy = function () {
+    _initialize = null;
 
-    mainshockJson = _app.Features.getFeature('mainshock').json;
-    products = mainshockJson.properties.products;
+    _app = null;
 
-    if (products.losspager) {
-      url = products.losspager[0].contents['json/cities.json'].url;
-    }
+    _getFeedUrl = null;
+    _getSummary = null;
 
-    return url;
+    _this = null;
   };
 
   /**
