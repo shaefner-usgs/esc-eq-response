@@ -46,7 +46,7 @@ var Feeds = function (options) {
       _feeds,
       _numFeeds,
 
-      _getStatus,
+      _createRtf,
       _loadJson;
 
 
@@ -60,18 +60,12 @@ var Feeds = function (options) {
   };
 
   /**
-   * Get status of loading external feed data
-   *
-   * @return status {String}
+   * Wrapper method to create RTF document
    */
-  _getStatus = function () {
-    var status;
-
-    if (Object.keys(_feeds).length === _numFeeds) { // all available Feeds loaded
-      status = 'finished';
+  _createRtf = function () {
+    if (Object.keys(_feeds).length === _numFeeds) { // all Feeds are loaded
+      _app.Rtf.create(); // create Event Summary document
     }
-
-    return status;
   };
 
   /**
@@ -82,8 +76,7 @@ var Feeds = function (options) {
   _loadJson = function (feed) {
     var domain,
         errorMsg,
-        matches,
-        status;
+        matches;
 
     errorMsg = '<h4>Error Loading ' + feed.name + '</h4>';
 
@@ -95,11 +88,7 @@ var Feeds = function (options) {
         _feeds[feed.id] = json;
 
         _app.StatusBar.removeItem(feed.id);
-
-        status = _getStatus();
-        if (status === 'finished') { // all feeds finished loading
-          _app.SummaryPane.createSummaryDoc(); // create Event Summary document
-        }
+        _createRtf();
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
@@ -151,8 +140,7 @@ var Feeds = function (options) {
    */
   _this.instantiateFeeds = function () {
     var feed,
-        FeedClass,
-        status;
+        FeedClass;
 
     _numFeeds = Object.keys(_FEEDCLASSES).length;
 
@@ -167,10 +155,7 @@ var Feeds = function (options) {
       } else { // feed does not exist
         -- _numFeeds;
 
-        status = _getStatus();
-        if (status === 'finished') { // all feeds finished loading
-          _app.SummaryPane.createSummaryDoc(); // create Event Summary document
-        }
+        _createRtf();
       }
     });
   };

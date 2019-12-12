@@ -10,6 +10,7 @@ var AppUtil = require('AppUtil'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
     StatusBar = require('StatusBar'),
+    Rtf = require('Rtf'),
     SignificantEqs = require('SignificantEqs'),
     SummaryPane = require('SummaryPane');
 
@@ -103,6 +104,9 @@ var Application = function (options) {
     _this.NavBar = NavBar({
       app: _this,
       el: options.navBar
+    });
+    _this.Rtf = Rtf({
+      app: _this
     });
     _this.SignificantEqs = SignificantEqs({
       app: _this
