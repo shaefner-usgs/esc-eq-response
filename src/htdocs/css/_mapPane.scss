@@ -179,6 +179,17 @@
   }
 }
 
+/* Scroll wide tables in Leaflet popups elegantly */
+.scroll-wrapper {
+  overflow: auto;
+
+  th.freeze {
+    background: white;
+    left: 0;
+    position: sticky;
+  }
+}
+
 /* Hide attribution text on (small screen) mobile devices */
 @media only screen
   and (max-width: $breakpoint-tablet-width) {

@@ -110,7 +110,7 @@ var ShakeMapStations = function (options) {
 
     return [
       '<tr>',
-        '<th scope="row" class="station-channel-name">',
+        '<th scope="row" class="station-channel-name freeze">',
           channel.name,
         '</th>',
         '<td class="station-channel-pga">',
@@ -135,9 +135,10 @@ var ShakeMapStations = function (options) {
     var i = 0, numChannels = channels.length;
 
     var markup = [
-      '<table class="station-channels-map">',
+      '<div class="scroll-wrapper">',
+        '<table class="station-channels-map">',
           '<tr>',
-            '<th scope="col" class="station-channels-map-name">name</th>',
+            '<th scope="col" class="station-channels-map-name freeze">name</th>',
             '<th scope="col" class="station-channels-map-pga">pga</th>',
             '<th scope="col" class="station-channels-map-pgv">pgv</th>',
             '<th scope="col" class="station-channels-map-psa03">psa03</th>',
@@ -150,7 +151,7 @@ var ShakeMapStations = function (options) {
       markup.push(_createChannelRow(channels[i]));
     }
 
-    markup.push('</table>');
+    markup.push('</div></table>');
 
     return markup.join('');
   };
@@ -253,19 +254,19 @@ var ShakeMapStations = function (options) {
       '</ul>',
       '<dl class="station-metadata horizontal">',
         '<dt class="station-metadata-network">Network</dt>',
-          '<dd class="station-metadata-network">',
-            (p.network || '&ndash;'),
-          '</dd>',
+        '<dd class="station-metadata-network">',
+          (p.network || '&ndash;'),
+        '</dd>',
         '<dt class="station-metadata-location">Location</dt>',
-          '<dd class="station-metadata-location">',
-            _formatLocation(feature),
-          '</dd>',
+        '<dd class="station-metadata-location">',
+          _formatLocation(feature),
+        '</dd>',
         '<dt class="station-metadata-source">Source</dt>',
-          '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
+        '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
         '<dt class="station-metadata-intensity">Intensity</dt>',
-          '<dd class="station-metadata-intensity">',
-            _app.AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
-          '</dd>',
+        '<dd class="station-metadata-intensity">',
+          _app.AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
+        '</dd>',
       '</dl>',
       _createChannelTable(p.channels),
     '</div>'];
