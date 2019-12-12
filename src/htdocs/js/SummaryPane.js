@@ -142,6 +142,7 @@ var SummaryPane = function (options) {
     button.type = 'button';
 
     button.addEventListener('click', function() {
+      _app.Feeds.reset();
       _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
     });
 
