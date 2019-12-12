@@ -60,6 +60,7 @@ var Earthquakes = function (options) {
 
       _app,
       _id,
+      _listTemplate,
       _mainshockLatlon,
       _mainshockMoment,
       _markerOptions,
@@ -69,7 +70,6 @@ var Earthquakes = function (options) {
       _pastWeekMoment,
       _plotData,
       _popupTemplate,
-      _tablerowTemplate,
       _tooltipTemplate,
 
       _addEqToBin,
@@ -108,8 +108,8 @@ var Earthquakes = function (options) {
       time: []
     };
     // Templates for creating HTML using L.Util.template utility
+    _listTemplate = _getHtmlTemplate('list');
     _popupTemplate = _getHtmlTemplate('popup');
-    _tablerowTemplate = _getHtmlTemplate('tablerow');
     _tooltipTemplate = _getHtmlTemplate('tooltip');
 
     if (_id !== 'mainshock') {
@@ -254,32 +254,38 @@ var Earthquakes = function (options) {
    */
   _getBubbles = function (data) {
     var bubbles,
-        bubblesTemplate;
+        template;
 
-    bubblesTemplate = '';
+    bubbles = '';
+    template = '';
+
     if (data.cdi) { // DYFI
-      bubblesTemplate += '<a href="{url}/dyfi" class="mmi{cdi}" ' +
+      template += '<a href="{url}/dyfi" class="mmi{cdi}" ' +
         'title="Did You Feel It? maximum reported intensity ({felt} ' +
         'responses)"><strong class="roman">{cdi}</strong><br>' +
         '<abbr title="Did You Feel It?">DYFI?</abbr></a>';
     }
     if (data.mmi) { // ShakeMap
-      bubblesTemplate += '<a href="{url}/shakemap" class="mmi{mmi}" ' +
+      template += '<a href="{url}/shakemap" class="mmi{mmi}" ' +
         'title="ShakeMap maximum estimated intensity"><strong class="roman">' +
         '{mmi}</strong><br><abbr title="ShakeMap">ShakeMap</abbr></a>';
     }
     if (data.alert) { // PAGER
-      bubblesTemplate += '<a href="{url}/pager" class="pager-alertlevel-' +
+      template += '<a href="{url}/pager" class="pager-alertlevel-' +
         '{alert}" title="PAGER estimated impact alert level"><strong ' +
         'class="roman">{alert}</strong><br><abbr title="Prompt Assessment of ' +
         'Global Earthquakes for Response">PAGER</abbr></a>';
     }
-    if (data.tsunami) {
-      bubblesTemplate += '<a href="http://www.tsunami.gov/" class="tsunami" ' +
+    if (data.tsunami) { // Tsunami
+      template += '<a href="http://www.tsunami.gov/" class="tsunami" ' +
         'title="Tsunami Warning Center"><span class="hover"></span>' +
         '<img src="img/tsunami.png" alt="Tsunami Warning Center"></a>';
     }
-    bubbles = L.Util.template(bubblesTemplate, data);
+
+    if (template) {
+      template = '<div class="impact-bubbles">' + template + '</div>';
+      bubbles = L.Util.template(template, data);
+    }
 
     return bubbles;
   };
@@ -318,7 +324,7 @@ var Earthquakes = function (options) {
    * Get HTML template for content
    *   Leaflet's L.Util.template is used to populate values
    *
-   * @param type {String <popup | tablerow | tooltip>}
+   * @param type {String <list | popup | tooltip>}
    *
    * @return template {String}
    */
@@ -328,7 +334,7 @@ var Earthquakes = function (options) {
     if (type === 'popup') {
       template = '<div class="earthquake">' +
         '<h4><a href="{url}">{magType} {mag} - {place}</a></h4>' +
-        '<div class="impact-bubbles">{bubblesHtml}</div>' +
+        '{bubblesHtml}' +
         '<dl>' +
           '<dt>Time</dt>' +
           '<dd>{timeHtml}</dd>' +
@@ -340,7 +346,7 @@ var Earthquakes = function (options) {
           '<dd>{status}</dd>' +
         '</dl>' +
       '</div>';
-    } else if (type === 'tablerow') {
+    } else if (type === 'list') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
         '<td class="time" data-sort="{isoTime}">{utcTime}</td>' +
@@ -512,7 +518,7 @@ var Earthquakes = function (options) {
         magInt,
         popup,
         props,
-        timeTemplate,
+        template,
         tooltip,
         utcTime;
 
@@ -527,11 +533,11 @@ var Earthquakes = function (options) {
 
     // Time field for leaflet popup, etc.
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
-    timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
+    template = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
       localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at epicenter</span>';
-      timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
+      template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
     if (_id === 'mainshock') { // add time props to mainshock
@@ -569,7 +575,7 @@ var Earthquakes = function (options) {
 
     // Set additional props that depend on other props already being set
     data.bubblesHtml = _getBubbles(data);
-    data.timeHtml = L.Util.template(timeTemplate, data);
+    data.timeHtml = L.Util.template(template, data);
 
     // Create popup/tooltip and bind to marker
     popup = L.Util.template(_popupTemplate, data);
@@ -759,7 +765,7 @@ var Earthquakes = function (options) {
 
     Object.keys(data).forEach(function(key) {
       magInt = data[key].magInt;
-      tr = L.Util.template(_tablerowTemplate, data[key]);
+      tr = L.Util.template(_listTemplate, data[key]);
 
       if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
         cssClasses.push('m' + magInt);
