@@ -388,6 +388,9 @@ var Features = function (options) {
   _this.refreshFeature = function (feature) {
     if (feature) {
       feature.isLoading = true; // flag to block multiple/simultaneous refreshes
+      if (feature.plotTraces) {
+        _app.PlotsPane.rendered = false;
+      }
 
       _removeFeature(feature);
       _instantiateFeature(_FEATURECLASSES[feature.id]);
