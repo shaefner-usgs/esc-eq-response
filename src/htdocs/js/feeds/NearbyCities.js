@@ -43,12 +43,13 @@ var NearbyCities = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshockJson,
+    var mainshock,
         products,
         url;
 
-    mainshockJson = _app.Features.getFeature('mainshock').json;
-    products = mainshockJson.properties.products;
+    mainshock = _app.Features.getFeature('mainshock');
+    products = mainshock.json.properties.products;
+    url = '';
 
     if (products['nearby-cities']) {
       url = products['nearby-cities'][0].contents['nearby-cities.json'].url;

@@ -43,12 +43,13 @@ var HistoricalEqs = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshockJson,
+    var mainshock,
         products,
         url;
 
-    mainshockJson = _app.Features.getFeature('mainshock').json;
-    products = mainshockJson.properties.products;
+    mainshock = _app.Features.getFeature('mainshock');
+    products = mainshock.json.properties.products;
+    url = '';
 
     if (products.losspager) {
       url = products.losspager[0].contents['json/historical_earthquakes.json'].url;

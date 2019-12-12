@@ -149,16 +149,15 @@ var Feeds = function (options) {
   /**
    * Wrapper method to loop through Feed classes and instantiate them
    */
-  _this.instantiateFeeds = function (feedClasses) {
+  _this.instantiateFeeds = function () {
     var feed,
         FeedClass,
         status;
 
-    feedClasses = feedClasses || _FEEDCLASSES;
-    _numFeeds = Object.keys(feedClasses).length;
+    _numFeeds = Object.keys(_FEEDCLASSES).length;
 
-    Object.keys(feedClasses).forEach(function(id) {
-      FeedClass = feedClasses[id];
+    Object.keys(_FEEDCLASSES).forEach(function(id) {
+      FeedClass = _FEEDCLASSES[id];
       feed = FeedClass({
         app: _app
       });
