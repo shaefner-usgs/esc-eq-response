@@ -2,7 +2,8 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
+var AppUtil = require('AppUtil'),
+    Util = require('hazdev-webutils/src/util/Util');
 
 
 var _COLORS,
@@ -117,12 +118,12 @@ var Earthquakes = function (options) {
       coords = mainshock.json.geometry.coordinates;
 
       // Parameters used to calculate days and distance/direction from mainshock
-      _mainshockLatlon = _app.AppUtil.LatLon(coords[1], coords[0]);
-      _mainshockMoment = _app.AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
-      _nowMoment = _app.AppUtil.Moment.utc();
-      _pastDayMoment = _app.AppUtil.Moment.utc().subtract(1, 'days');
-      _pastHourMoment = _app.AppUtil.Moment.utc().subtract(1, 'hours');
-      _pastWeekMoment = _app.AppUtil.Moment.utc().subtract(1, 'weeks');
+      _mainshockLatlon = AppUtil.LatLon(coords[1], coords[0]);
+      _mainshockMoment = AppUtil.Moment.utc(mainshock.json.properties.time, 'x');
+      _nowMoment = AppUtil.Moment.utc();
+      _pastDayMoment = AppUtil.Moment.utc().subtract(1, 'days');
+      _pastHourMoment = AppUtil.Moment.utc().subtract(1, 'hours');
+      _pastWeekMoment = AppUtil.Moment.utc().subtract(1, 'weeks');
     }
 
     _this.bins = {};
@@ -207,8 +208,8 @@ var Earthquakes = function (options) {
     var mag,
         threshold;
 
-    mag = _app.AppUtil.round(feature.properties.mag, 1);
-    threshold = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+    mag = AppUtil.round(feature.properties.mag, 1);
+    threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
 
     if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
@@ -230,7 +231,7 @@ var Earthquakes = function (options) {
     age = _id; // for everything except aftershocks
 
     if (_id === 'aftershocks') {
-      eqMoment = _app.AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
+      eqMoment = AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
       if (eqMoment.isSameOrAfter(_pastHourMoment)) {
         age = 'pasthour';
       } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
@@ -300,19 +301,19 @@ var Earthquakes = function (options) {
 
     if (_id === 'aftershocks') {
       duration = {
-        length: Number(_app.AppUtil.round(
-          _app.AppUtil.Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
+        length: Number(AppUtil.round(
+          AppUtil.Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
         )),
         interval: 'days'
       };
     } else if (_id === 'foreshocks') {
       duration = {
-        length: Number(_app.AppUtil.getParam('fs-days')),
+        length: Number(AppUtil.getParam('fs-days')),
         interval: 'days'
       };
     } else if (_id === 'historical') {
       duration = {
-        length: Number(_app.AppUtil.getParam('hs-years')),
+        length: Number(AppUtil.getParam('hs-years')),
         interval: 'years'
       };
     }
@@ -418,7 +419,7 @@ var Earthquakes = function (options) {
 
       // Add origin point (mainshock) to beginning of aftershocks trace
       if (_id === 'aftershocks') {
-        mainshockId = _app.AppUtil.getParam('eqid');
+        mainshockId = AppUtil.getParam('eqid');
         date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
         eqid.unshift(mainshockId);
         x.unshift(_mainshockMoment.format());
@@ -526,9 +527,9 @@ var Earthquakes = function (options) {
 
     coords = feature.geometry.coordinates;
     eqid = feature.id;
-    eqMoment = _app.AppUtil.Moment.utc(props.time, 'x');
+    eqMoment = AppUtil.Moment.utc(props.time, 'x');
     eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
-    mag = _app.AppUtil.round(props.mag, 1);
+    mag = AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
 
     // Time field for leaflet popup, etc.
@@ -545,7 +546,7 @@ var Earthquakes = function (options) {
       _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
     } else { // calculate distance/direction from mainshock
       compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
-      latlon = _app.AppUtil.LatLon(coords[1], coords[0]);
+      latlon = AppUtil.LatLon(coords[1], coords[0]);
       distance = _mainshockLatlon.distanceTo(latlon) / 1000;
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
@@ -553,19 +554,19 @@ var Earthquakes = function (options) {
 
     data = {
       alert: props.alert, // PAGER
-      cdi: _app.AppUtil.romanize(props.cdi), // DYFI
-      depth: _app.AppUtil.round(coords[2], 1),
-      distance: _app.AppUtil.round(distance, 1),
+      cdi: AppUtil.romanize(props.cdi), // DYFI
+      depth: AppUtil.round(coords[2], 1),
+      distance: AppUtil.round(distance, 1),
       distanceDir: bearingString,
       eqid: eqid,
       felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
-      latlng: _app.AppUtil.round(coords[1], 3) + ', ' + _app.AppUtil.round(coords[0], 3),
+      latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
       localTime: localTime,
       mag: mag,
       magInt: magInt,
       magType: props.magType || 'M',
-      mmi: _app.AppUtil.romanize(props.mmi), // ShakeMap
+      mmi: AppUtil.romanize(props.mmi), // ShakeMap
       place: props.place,
       status: props.status,
       tsunami: props.tsunami,
@@ -602,16 +603,16 @@ var Earthquakes = function (options) {
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
-      days = Math.ceil(_app.AppUtil.Moment.duration(eqMoment -
+      days = Math.ceil(AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
       _addEqToBin(days, magInt, 'first');
 
-      days = Math.ceil(_app.AppUtil.Moment.duration(_nowMoment -
+      days = Math.ceil(AppUtil.Moment.duration(_nowMoment -
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
-      days = Math.ceil(_app.AppUtil.Moment.duration(_mainshockMoment -
+      days = Math.ceil(AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
       _addEqToBin(days, magInt, 'prior');
     }
@@ -636,7 +637,7 @@ var Earthquakes = function (options) {
 
     age = _getAge(props.time);
     fillColor = _COLORS[age];
-    radius = _app.AppUtil.getRadius(props.mag);
+    radius = AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
     _markerOptions.pane = _id; // put markers in custom Leaflet map pane
@@ -671,7 +672,7 @@ var Earthquakes = function (options) {
     duration = _getDuration(_id);
     html = '';
 
-    days = _app.AppUtil.Moment.duration(duration.length, duration.interval).asDays();
+    days = AppUtil.Moment.duration(duration.length, duration.interval).asDays();
     if (days <= 30) {
       cssClasses.push('hide-year');
     }
@@ -719,9 +720,9 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-dist');
+    distance = AppUtil.getParam(AppUtil.lookup(_id) + '-dist');
     duration = _getDuration(_id);
-    mag = _app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag');
+    mag = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
       'earthquakes within <strong>' + distance + ' km</strong> of the ' +
@@ -817,7 +818,7 @@ var Earthquakes = function (options) {
     if (!singleMagBin) {
       mags = Object.keys(_this.bins.cumulative);
       max = Math.max.apply(null, mags);
-      min = Math.floor(_app.AppUtil.getParam(_app.AppUtil.lookup(_id) + '-mag'));
+      min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
 
       html = '<div class="filter">' +
           '<h4>Filter earthquake list by magnitude</h4>' +

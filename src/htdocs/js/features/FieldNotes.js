@@ -2,7 +2,8 @@
 'use strict';
 
 
-var Lightbox = require('Lightbox'),
+var AppUtil = require('AppUtil'),
+    Lightbox = require('Lightbox'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -175,7 +176,7 @@ var FieldNotes = function (options) {
       if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
         foundProps = true;
         value = props[key] || '&ndash;';
-        html += '<dt>' + _app.AppUtil.ucfirst(key) + '</dt><dd>' + value + '</dd>';
+        html += '<dt>' + AppUtil.ucfirst(key) + '</dt><dd>' + value + '</dd>';
       }
     });
     html += '</dl>';
@@ -201,16 +202,16 @@ var FieldNotes = function (options) {
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
-    after = _app.AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
+    after = AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
       .format('X');
-    before = _app.AppUtil.Moment(mainshock.json.properties.time).utc()
+    before = AppUtil.Moment(mainshock.json.properties.time).utc()
       .add(30, 'days').format('X');
     pairs = [];
     urlParams = {
       between: after + ',' + before,
       lat: mainshock.json.geometry.coordinates[1],
       lon: mainshock.json.geometry.coordinates[0],
-      radius: _app.AppUtil.getParam('as-dist') // use aftershocks radius
+      radius: AppUtil.getParam('as-dist') // use aftershocks radius
     };
     Object.keys(urlParams).forEach(function(key) {
       pairs.push(key + '=' + urlParams[key]);
@@ -233,7 +234,7 @@ var FieldNotes = function (options) {
 
     // Strip slashes from json encoded values
     Object.keys(props).forEach(function(key) {
-      props[key] = _app.AppUtil.stripslashes(props[key]);
+      props[key] = AppUtil.stripslashes(props[key]);
     });
 
     // Create title prop

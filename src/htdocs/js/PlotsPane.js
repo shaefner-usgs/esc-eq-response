@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('AppUtil');
+
+
 /**
  * Set up and create Plotly.js plots; also adds / removes plots
  *
@@ -144,7 +147,7 @@ var PlotsPane = function (options) {
       displaylogo: false,
       modeBarButtonsToAdd: [{
         click: function(gd) {
-          eqid = _app.AppUtil.getParam('eqid');
+          eqid = AppUtil.getParam('eqid');
           opts = {
             filename: eqid + '-' + featureId + '-' + plotId,
             format: 'svg',

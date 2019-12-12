@@ -31,7 +31,6 @@ var AppUtil = require('AppUtil'),
  *
  * @return _this {Object}
  *   {
- *     AppUtil: {Function},
  *     EditPane: {Function},
  *     Features: {Function},
  *     Feeds: {Function},
@@ -39,6 +38,7 @@ var AppUtil = require('AppUtil'),
  *     MapPane: {Function},
  *     NavBar: {Function},
  *     PlotsPane: {Function},
+ *     Rtf: {Function},
  *     SignificantEqs: {Function},
  *     resetApp: {Function},
  *     StatusBar: {Function},
@@ -63,7 +63,7 @@ var Application = function (options) {
     _this.StatusBar.removeItem('initial');
 
     // Get things rolling if eqid is already set
-    if (_this.AppUtil.getParam('eqid') !== '') {
+    if (AppUtil.getParam('eqid') !== '') {
       _this.EditPane.initFeatures();
     }
   };
@@ -73,8 +73,6 @@ var Application = function (options) {
    *   that is shared between Classes
    */
   _initComponents = function (options) {
-    _this.AppUtil = AppUtil;
-
     // Instantiate PlotsPane, StatusBar first so they're available immediately
     _this.PlotsPane = PlotsPane({
       app: _this,

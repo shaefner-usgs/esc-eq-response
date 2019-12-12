@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/util/Earthquakes');
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/util/Earthquakes');
 
 
 /**
@@ -66,14 +67,14 @@ var Foreshocks = function (options) {
 
     mainshock = _app.Features.getFeature('mainshock');
     urlParams = {
-      endtime: _app.AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
+      endtime: AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
         .toISOString().slice(0, -5),
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('fs-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(mainshock.json.properties.time).utc()
-        .subtract(_app.AppUtil.getParam('fs-days'), 'days').toISOString()
+      maxradiuskm: Number(AppUtil.getParam('fs-dist')),
+      minmagnitude: Number(AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
+      starttime: AppUtil.Moment(mainshock.json.properties.time).utc()
+        .subtract(AppUtil.getParam('fs-days'), 'days').toISOString()
         .slice(0, -5)
     };
 
@@ -94,7 +95,7 @@ var Foreshocks = function (options) {
     summary = _Earthquakes.getDescription();
 
     if (json.metadata.count > 0) {
-      magThreshold = Math.floor(_app.AppUtil.getParam('fs-mag'));
+      magThreshold = Math.floor(AppUtil.getParam('fs-mag'));
 
       // Check if there's eq data for mag threshold; if not, decr mag by 1
       while (!_this.cumulativeEqs[magThreshold]) {

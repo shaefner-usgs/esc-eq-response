@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Tablesort = require('tablesort');
+var AppUtil = require('AppUtil'),
+    Tablesort = require('tablesort');
 
 
 /**
@@ -341,7 +342,7 @@ var SummaryPane = function (options) {
         timestamp;
 
     time = _el.querySelector('time');
-    timestamp = _app.AppUtil.Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
+    timestamp = AppUtil.Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
       ' (' + _tz + ')';
 
     time.innerHTML = timestamp;

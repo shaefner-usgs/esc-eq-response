@@ -2,15 +2,13 @@
 'use strict';
 
 
-// Leaflet plugins
+// Leaflet plugins and layer factories (attached to global L var)
 require('mappane/Control-bottomCenter');
-require('mappane/MousePosition');
-//require('mappane/RestoreMap');
-
-// Factories for creating map layers
 require('mappane/DarkLayer');
 require('mappane/FaultsLayer');
 require('mappane/GreyscaleLayer');
+require('mappane/MousePosition');
+//require('mappane/RestoreMap');
 require('mappane/SatelliteLayer');
 require('mappane/TerrainLayer');
 
@@ -307,7 +305,7 @@ var MapPane = function (options) {
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
     //   baseLayers: _staticLayers.baseLayers,
-    //   id: _app.AppUtil.getParam('eqid'),
+    //   id: AppUtil.getParam('eqid'),
     //   overlays: _staticLayers.overlays,
     //   scope: 'response-app'
     // });

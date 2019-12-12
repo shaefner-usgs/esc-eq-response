@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Xhr = require('util/Xhr');
+var AppUtil = require('AppUtil'),
+    Xhr = require('util/Xhr');
 
 
 /**
@@ -59,11 +60,11 @@ var SignificantEqs = function (options) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
 
-        date = _app.AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
-        mag = _app.AppUtil.round(props.mag, 1);
+        date = AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
+        mag = AppUtil.round(props.mag, 1);
 
         selectedStatus = '';
-        if (feature.id === _app.AppUtil.getParam('eqid')) {
+        if (feature.id === AppUtil.getParam('eqid')) {
           selectedStatus = selected;
           selected = ''; // used to set default option to unselected since match found
         }

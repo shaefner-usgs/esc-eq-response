@@ -1,6 +1,9 @@
 'use strict';
 
 
+var AppUtil = require('AppUtil');
+
+
 /**
  * Handle form fields and set URL to match application state; display mainshock
  *   details
@@ -268,7 +271,7 @@ var EditPane = function (options) {
    * Set all form field values to match values in querystring
    */
   _setFormFieldValues = function () {
-    var params = _app.AppUtil.getParams();
+    var params = AppUtil.getParams();
 
     Object.keys(params).forEach(function(key) {
       if (document.getElementById(key)) {
@@ -284,7 +287,7 @@ var EditPane = function (options) {
     var i;
 
     for (i = 0; i < _fields.length; i ++) {
-      _app.AppUtil.setParam(_fields[i].id, _fields[i].value);
+      AppUtil.setParam(_fields[i].id, _fields[i].value);
     }
   };
 
@@ -303,7 +306,7 @@ var EditPane = function (options) {
     value = el.value.replace(/\s+/g, ''); // strip whitespace
     el.value = value;
 
-    _app.AppUtil.setParam(id, value);
+    AppUtil.setParam(id, value);
   };
 
   /**
@@ -376,8 +379,8 @@ var EditPane = function (options) {
     // First, update url params with defaults
     Object.keys(defaults).forEach(function(key) {
       // Only set default value if empty or user entered a 'new' Event ID
-      if (_app.AppUtil.getParam(key) === '' || eqidIsNew) {
-        _app.AppUtil.setParam(key, defaults[key]);
+      if (AppUtil.getParam(key) === '' || eqidIsNew) {
+        AppUtil.setParam(key, defaults[key]);
       }
     });
 
@@ -402,7 +405,7 @@ var EditPane = function (options) {
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
     details.classList.remove('hide');
 
-    document.title = props.magType + ' ' + _app.AppUtil.round(props.mag, 1) +
+    document.title = props.magType + ' ' + AppUtil.round(props.mag, 1) +
       ' - ' + props.place + ' | ' + appTitle;
   };
 

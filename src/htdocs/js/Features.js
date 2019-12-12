@@ -2,6 +2,7 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
+    AppUtil = require('AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
@@ -375,7 +376,7 @@ var Features = function (options) {
    * Wrapper method to instantiate mainshock Feature
    */
   _this.instantiateMainshock = function () {
-    _eqid = _app.AppUtil.getParam('eqid');
+    _eqid = AppUtil.getParam('eqid');
 
     _instantiateFeature(_FEATURECLASSES.mainshock);
   };

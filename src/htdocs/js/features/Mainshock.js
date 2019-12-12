@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/util/Earthquakes');
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/util/Earthquakes');
 
 
 /**
@@ -84,7 +85,7 @@ var Mainshock = function (options) {
     summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
 
     if (products.dyfi) {
-      cdi = _app.AppUtil.romanize(_this.json.properties.cdi);
+      cdi = AppUtil.romanize(_this.json.properties.cdi);
       imgSrc = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
       summary += '<div class="dyfi scale"><a href="' + url + '/dyfi">' +
         '<h4>Did You Feel It?</h4><img src="' + imgSrc + '" class="mmi' + cdi +
@@ -96,7 +97,7 @@ var Mainshock = function (options) {
       } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
         imgSrc = products.shakemap[0].contents['download/intensity.jpg'].url;
       }
-      mmi = _app.AppUtil.romanize(_this.json.properties.mmi);
+      mmi = AppUtil.romanize(_this.json.properties.mmi);
       summary += '<div class="shakemap scale"><a href="' + url +
         '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
         mmi + '" /></a></div>';

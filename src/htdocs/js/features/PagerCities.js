@@ -1,6 +1,9 @@
 'use strict';
 
 
+var AppUtil = require('AppUtil');
+
+
 /**
  * Create PAGER Cities Feature
  *
@@ -92,20 +95,20 @@ var PagerCities = function (options) {
     exposures.mmi.forEach(function(mmi, i) {
       population = exposures.population[i];
       if (mmi >= 2 && population !== 0) { // skip values below 2 and when nobody affected
-        level = _app.AppUtil.getShakingLevel(mmi);
+        level = AppUtil.getShakingLevel(mmi);
         summary += '<tr>' +
             '<td class="impact-bubbles"><span class="mmi' + level.intensity + '">' +
               '<strong class="roman">' + level.intensity + '</strong></span></td>' +
             '<td>' + level.shaking + '</td>' +
-            '<td>' + _app.AppUtil.addCommas(population) + '</td>' +
+            '<td>' + AppUtil.addCommas(population) + '</td>' +
           '</tr>';
         cities.forEach(function(city) {
-          cityMmi = Number(_app.AppUtil.round(city.mmi, 0));
+          cityMmi = Number(AppUtil.round(city.mmi, 0));
           if (cityMmi === mmi) {
             summary += '<tr class="city">' +
                 '<td></td>' +
                 '<td>' + city.name + '</td>' +
-                '<td>' + _app.AppUtil.addCommas(city.pop) + '</td>' +
+                '<td>' + AppUtil.addCommas(city.pop) + '</td>' +
               '</tr>';
           }
         });

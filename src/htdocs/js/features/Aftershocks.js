@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/util/Earthquakes');
+var AppUtil = require('AppUtil'),
+    Earthquakes = require('features/util/Earthquakes');
 
 
 /**
@@ -76,9 +77,9 @@ var Aftershocks = function (options) {
     urlParams = {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(_app.AppUtil.getParam('as-dist')),
-      minmagnitude: Number(_app.AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: _app.AppUtil.Moment(_mainshock.json.properties.time + 1000)
+      maxradiuskm: Number(AppUtil.getParam('as-dist')),
+      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      starttime: AppUtil.Moment(_mainshock.json.properties.time + 1000)
         .utc().toISOString().slice(0, -5)
     };
 
@@ -118,7 +119,7 @@ var Aftershocks = function (options) {
             } else if (bin.probability > 0.99) {
               probability = '&gt; 99%';
             } else {
-              probability = _app.AppUtil.round(100 * bin.probability, 0) + '%';
+              probability = AppUtil.round(100 * bin.probability, 0) + '%';
             }
             if (bin.p95minimum === 0 && bin.p95maximum === 0) {
               range = 0;
@@ -171,17 +172,17 @@ var Aftershocks = function (options) {
 
     if (count > 0) {
       magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
-      mostRecentEq = _app.AppUtil.pick(_Earthquakes.list, [_Earthquakes.mostRecentEqId]);
+      mostRecentEq = AppUtil.pick(_Earthquakes.list, [_Earthquakes.mostRecentEqId]);
       mostRecentEqTime = mostRecentEq[_Earthquakes.mostRecentEqId].isoTime;
 
-      duration = _app.AppUtil.round(
-        _app.AppUtil.Moment.duration(_app.AppUtil.Moment.utc() -
-        _app.AppUtil.Moment.utc(mostRecentEqTime)).asDays() , 1
+      duration = AppUtil.round(
+        AppUtil.Moment.duration(AppUtil.Moment.utc() -
+        AppUtil.Moment.utc(mostRecentEqTime)).asDays() , 1
       ) + ' days';
 
       mag = Math.floor(Math.max(
         magThreshold,
-        _app.AppUtil.getParam('as-mag')
+        AppUtil.getParam('as-mag')
       ));
 
       // Check if there's eq data for mag threshold; if not, decr mag by 1
