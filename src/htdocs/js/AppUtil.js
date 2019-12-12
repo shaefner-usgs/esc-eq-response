@@ -113,6 +113,38 @@ AppUtil.getShakingLevel = function (mmi) {
 };
 
 /**
+ * Get timezone of user's device
+ *
+ * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
+ *  offset-amount-in-js/12496442#12496442
+ *
+ * @return tz {String}
+ *     PST, CST, etc
+ */
+AppUtil.getTimeZone = function () {
+  var now,
+      tz;
+
+  now = new Date().toString();
+  try {
+    if (now.indexOf('(') > -1) {
+      tz = now.match(/\([^\)]+\)/)[0].match(/[A-Z]/g).join('');
+    } else {
+      tz = now.match(/[A-Z]{3,4}/)[0];
+    }
+
+    if (tz === 'GMT' && /(GMT\W*\d{4})/.test(now)) {
+      tz = RegExp.$1;
+    }
+  }
+  catch (error) {
+    console.error(error);
+  }
+
+  return tz;
+};
+
+/**
  * Lookup table to get a URL parameter from a Feature id
  *
  * @param id {String}

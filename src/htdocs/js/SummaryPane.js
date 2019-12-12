@@ -35,7 +35,6 @@ var SummaryPane = function (options) {
       _addSummaryButton,
       _addTimestamp,
       _getSliderValue,
-      _getTimeZone,
       _initTableSort,
       _onMouseClick,
       _onMouseOver,
@@ -52,7 +51,7 @@ var SummaryPane = function (options) {
     _el = options.el || document.createElement('div');
     _featuresEl = _el.querySelector('.features');
     _style = document.createElement('style');
-    _tz = _getTimeZone();
+    _tz = AppUtil.getTimeZone();
 
     // Add <style> tag for dynamic range input (slider) styles
     document.body.appendChild(_style);
@@ -180,37 +179,6 @@ var SummaryPane = function (options) {
     value = percentage + '% 100%';
 
     return value;
-  };
-
-  /**
-   * Get timezone of user's device
-   * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
-   *  offset-amount-in-js/12496442#12496442
-   *
-   * @return tz {String}
-   *     PST, CST, etc
-   */
-  _getTimeZone = function () {
-    var now,
-        tz;
-
-    now = new Date().toString();
-    try {
-      if (now.indexOf('(') > -1) {
-        tz = now.match(/\([^\)]+\)/)[0].match(/[A-Z]/g).join('');
-      } else {
-        tz = now.match(/[A-Z]{3,4}/)[0];
-      }
-
-      if (tz === 'GMT' && /(GMT\W*\d{4})/.test(now)) {
-        tz = RegExp.$1;
-      }
-    }
-    catch (error) {
-      console.error(error);
-    }
-
-    return tz;
   };
 
   /**
