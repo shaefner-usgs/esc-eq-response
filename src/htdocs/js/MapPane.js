@@ -50,7 +50,7 @@ var MapPane = function (options) {
       _addLayerControl,
       _addListeners,
       _compareLayers,
-      _createPane,
+      _createMapPane,
       _fitBounds,
       _getLayerId,
       _getSortValue,
@@ -146,7 +146,7 @@ var MapPane = function (options) {
    * @param id {String}
    * @param parent {String <overlayPane | tilePane>}
    */
-  _createPane = function (id, parent) {
+  _createMapPane = function (id, parent) {
     if (!_this.map.getPane(id)) {
       _this.map.createPane(id, _this.map.getPane(parent));
     }
@@ -287,7 +287,7 @@ var MapPane = function (options) {
     _this.reset(); // set initial state of map
 
     // Create custom pane for Faults overlay within tilePane
-    _createPane('faults', 'tilePane'); // pane is applied in Faults factory
+    _createMapPane('faults', 'tilePane'); // pane is applied in Faults factory
 
     // Add default layers to map (i.e. toggle on in layer control)
     _staticLayers.defaults.forEach(function(layer) {
@@ -356,7 +356,7 @@ var MapPane = function (options) {
     title = feature.title || feature.name;
 
     if (feature.mapLayer) {
-      _createPane(feature.id, 'overlayPane'); // applied in mapLayer's marker options
+      _createMapPane(feature.id, 'overlayPane'); // applied in mapLayer's marker options
       _layerControl.addOverlay(feature.mapLayer, title);
 
       // Turn layer "on" and zoom map if set to be displayed / zoomed by default
