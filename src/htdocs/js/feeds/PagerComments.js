@@ -58,6 +58,17 @@ var PagerComments = function (options) {
     return url;
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  _this.destroy = function () {
+    _initialize = null;
+    _app = null;
+    _getFeedUrl = null;
+    _this = null;
+  };
+
 
   _initialize(options);
   options = null;

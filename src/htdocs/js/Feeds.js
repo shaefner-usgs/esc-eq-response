@@ -60,11 +60,11 @@ var Feeds = function (options) {
   };
 
   /**
-   * Wrapper method to create RTF document
+   * Wrapper method to create RTF document (checks if all Feeds are loaded)
    */
   _createRtf = function () {
-    if (Object.keys(_feeds).length === _numFeeds) { // all Feeds are loaded
-      _app.Rtf.create(); // create Event Summary document
+    if (Object.keys(_feeds).length === _numFeeds) {
+      _app.Rtf.create();
     }
   };
 
@@ -85,7 +85,8 @@ var Feeds = function (options) {
     Xhr.ajax({
       url: feed.url,
       success: function (json) {
-        _feeds[feed.id] = json;
+        feed.json = json;
+        _feeds[feed.id] = feed;
 
         _app.StatusBar.removeItem(feed.id);
         _createRtf();
@@ -164,6 +165,10 @@ var Feeds = function (options) {
    * Reset to initial state
    */
   _this.reset = function () {
+    Object.keys(_feeds).forEach(function(id) {
+      _feeds[id].destroy();
+    });
+
     _feeds = {};
   };
 

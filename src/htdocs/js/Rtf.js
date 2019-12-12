@@ -134,7 +134,7 @@ var Rtf = function (options) {
 
     // Add feed data fetched for Event Summary document
     Object.keys(feeds).forEach(function(id) {
-      data[id] = feeds[id];
+      data[id] = feeds[id].json;
     });
 
     return data;
