@@ -47,6 +47,7 @@ var Feeds = function (options) {
       _numFeeds,
 
       _createRtf,
+      _instantiateFeed,
       _loadJson;
 
 
@@ -65,6 +66,26 @@ var Feeds = function (options) {
   _createRtf = function () {
     if (Object.keys(_feeds).length === _numFeeds) {
       _app.Rtf.create();
+    }
+  };
+
+  /**
+   * Instantiate a Feed
+   *
+   * @param FeedClass {Object}
+   */
+  _instantiateFeed = function (FeedClass) {
+    var feed;
+
+    feed = FeedClass({
+      app: _app
+    });
+
+    if (feed.url) {
+      _loadJson(feed);
+    } else { // feed does not exist
+      -- _numFeeds;
+      _createRtf();
     }
   };
 
@@ -140,24 +161,13 @@ var Feeds = function (options) {
    * Wrapper method to loop through Feed classes and instantiate them
    */
   _this.instantiateFeeds = function () {
-    var feed,
-        FeedClass;
+    var FeedClass;
 
     _numFeeds = Object.keys(_FEEDCLASSES).length;
 
     Object.keys(_FEEDCLASSES).forEach(function(id) {
       FeedClass = _FEEDCLASSES[id];
-      feed = FeedClass({
-        app: _app
-      });
-
-      if (feed.url) {
-        _loadJson(feed);
-      } else { // feed does not exist
-        -- _numFeeds;
-
-        _createRtf();
-      }
+      _instantiateFeed(FeedClass);
     });
   };
 
