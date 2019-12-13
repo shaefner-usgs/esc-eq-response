@@ -150,12 +150,12 @@ var Rtf = function (options) {
   _this.create = function () {
     Xhr.ajax({
       data: _getPostData(),
-      error: function(e, xhr) {
+      error: function (e, xhr) {
         console.error(xhr.statusText + xhr.responseText);
       },
       method: 'POST',
-      success: function(data) {
-        window.location = 'php/event-summary/download.php?file=' + data.file;
+      success: function (json) {
+        window.location = 'php/event-summary/download.php?file=' + json.file;
       },
       url: 'php/event-summary/rtf.php'
     });
