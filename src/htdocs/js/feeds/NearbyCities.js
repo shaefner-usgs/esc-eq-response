@@ -62,6 +62,9 @@ var NearbyCities = function (options) {
   // Public methods
   // ----------------------------------------------------------
 
+  /**
+   * Destroy this Class to aid in garbage collection
+   */
   _this.destroy = function () {
     _initialize = null;
     _app = null;
