@@ -88,7 +88,7 @@ var Rtf = function (options) {
       'pager-exposures': pagerExposures.exposures,
       place: properties.place,
       shakemap: products.shakemap || '',
-      'tectonic-summary': products.summary || '',
+      'summary': products.summary || '',
       time: {
         local: mainshock.localTime,
         utc: mainshock.utcTime
@@ -174,6 +174,10 @@ var Rtf = function (options) {
     Xhr.ajax({
       error: function (e, xhr) {
         console.error(xhr.statusText + xhr.responseText);
+
+        _app.StatusBar.addError({
+          id: 'rtf'
+        }, 'Error Creating RTF Document');
       },
       headers: {
         'Content-Type': 'application/json'
@@ -184,6 +188,8 @@ var Rtf = function (options) {
         window.location = 'php/event-summary/download.php?file=' + json.file;
         // Testing environment:
         //window.location = 'http://localhost:8888/php/event-summary/download.php?file=' + json.file;
+
+        _app.StatusBar.removeItem('rtf');
       },
       url: 'php/event-summary/rtf.php'
       // Testing environment:

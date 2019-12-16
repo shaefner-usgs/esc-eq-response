@@ -65,6 +65,13 @@ var Feeds = function (options) {
    */
   _createRtf = function () {
     if (Object.keys(_feeds).length === _numFeeds) {
+      _app.StatusBar.addItem({
+        id: 'rtf',
+        name: 'RTF Document'
+      }, {
+        prepend: 'Creating'
+      });
+
       _app.Rtf.create();
     }
   };
