@@ -79,6 +79,9 @@ var StatusBar = function (options) {
    * Add an error to status bar
    *
    * @param item {Object}
+   *   {
+   *     id: {String}
+   *   }
    * @param errorMsg {String}
    */
   _this.addError = function (item, errorMsg) {
