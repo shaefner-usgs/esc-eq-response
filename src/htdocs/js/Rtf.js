@@ -148,16 +148,25 @@ var Rtf = function (options) {
    * Create Event Summary document (RTF) and trigger download
    */
   _this.create = function () {
+    var data = JSON.stringify(_getPostData());
+
     Xhr.ajax({
-      data: _getPostData(),
       error: function (e, xhr) {
         console.error(xhr.statusText + xhr.responseText);
       },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       method: 'POST',
+      rawdata: data,
       success: function (json) {
         window.location = 'php/event-summary/download.php?file=' + json.file;
+        // Testing environment:
+        //window.location = 'http://localhost:8888/php/event-summary/download.php?file=' + json.file;
       },
       url: 'php/event-summary/rtf.php'
+      // Testing environment:
+      //url: 'http://localhost:8888/php/event-summary/rtf.php'
     });
   };
 

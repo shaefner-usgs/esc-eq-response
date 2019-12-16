@@ -1,11 +1,18 @@
 <?php
 
+/**
+ * Create an RTF file using json data sent via Ajax in Rtf.js
+ *
+ * Sends back a json response with the full path to the local (temporary) RTF file
+ */
+
 include_once '../lib/PHPRtfLite.php';
 PHPRtfLite::registerAutoloader();
 
 date_default_timezone_set('America/Los_Angeles');
 
-$eqid = $_POST['eqid'];
+// Read in raw data from the Ajax request body and convert it to an object
+$data = json_decode(file_get_contents('php://input'));
 
 /**
  * ------------------------------------------------------------------
@@ -40,18 +47,15 @@ $headerFormat->setSpaceBetweenLines(2);
 // Create RTF document
 $section1 = $rtf->addSection();
 
-$section1->writeText($_POST['title'], $headerFont, $headerFormat);
+$section1->writeText($data->title, $headerFont, $headerFormat);
 
-if ($_POST['summary']) {
-  $section1->writeText($_POST['summary'], $bodyFont, $bodyFormat);
+if ($data->dyfi) {
+  $localImg = getRemoteImage($data->dyfi->map);
+  $section1->addImage($localImg, $imageFormat, 16, 16);
 }
-if ($_POST['dyfi']) {
-  $localImgPath = getRemoteImage($_POST['dyfi']);
-  $section1->addImage($localImgPath, $imageFormat, 16, 16);
-}
-if ($_POST['shakemap']) {
-  $localImgPath = getRemoteImage($_POST['shakemap']);
-  $section1->addImage($localImgPath, $imageFormat, 16, 16);
+if ($data->shakemap) {
+  $localImg = getRemoteImage($data->shakemap);
+  $section1->addImage($localImg, $imageFormat, 16, 16);
 }
 
 /**
@@ -66,22 +70,22 @@ sendResponse(array(
 ));
 
 /**
- * Create a local (temporary) image from a remote image
+ * Create a local (temporary) copy of an image from a remote image
  *
  * @param $url {String}
  *     URL of remote image
  *
- * @return $path {String}
+ * @return $img {String}
  *     path of local image
  */
 function getRemoteImage($url) {
-  global $eqid;
+  global $data;
   static $count = 0;
 
   $count ++;
-  $path = "/tmp/$eqid-$count.jpg";
+  $img = "/tmp/{$data->eqid}-$count.jpg";
   $remoteImg = fopen($url, 'rb') or die(http_response_code(500));
-  $tempImg = fopen($path, 'wb');
+  $tempImg = fopen($img, 'wb');
 
   while (!feof($remoteImg)) { // write contents of remote img to tmp img
     $contents = fread($remoteImg, 4096);
@@ -91,28 +95,28 @@ function getRemoteImage($url) {
   fclose($remoteImg);
   fclose($tempImg);
 
-  return $path;
+  return $img;
 }
 
 /**
- * Save a local (temporary) event summary RTF file
+ * Save a local (temporary) copy of the event summary RTF file
  *
- * @return $path {String}
+ * @return $file {String}
  *     path of rtf file
  */
 function saveFile() {
-  global $eqid, $rtf;
+  global $data, $rtf;
 
-  $timestamp = date('YmdHis'); // e.g. 20191024093156
-  $path = "/tmp/$eqid-$timestamp.rtf";
+  $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
+  $file = "/tmp/{$data->eqid}-$timestamp.rtf";
 
-  $rtf->save($path);
+  $rtf->save($file);
 
-  return $path;
+  return $file;
 }
 
 /**
- * Send json response data
+ * Send response json, which contains the path to the temporary RTF file
  *
  * @param $data {Array}
  */
