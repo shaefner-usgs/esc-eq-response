@@ -23,7 +23,8 @@ var Rtf = function (options) {
 
       _app,
 
-      _getPostData;
+      _getPostData,
+      _getProducts;
 
 
   _this = {};
@@ -41,19 +42,15 @@ var Rtf = function (options) {
    */
   _getPostData = function () {
     var aftershocks,
-        contents,
         data,
-        dyfi,
         feeds,
         foreshocks,
         historical,
         mainshock,
-        pager,
         pagerCities,
         pagerExposures,
         products,
-        shakemap,
-        summary;
+        properties;
 
     aftershocks = _app.Features.getFeature('aftershocks');
     feeds = _app.Feeds.getFeeds();
@@ -62,7 +59,69 @@ var Rtf = function (options) {
     mainshock = _app.Features.getFeature('mainshock');
     pagerCities = _app.Features.getFeature('pager-cities');
     pagerExposures = _app.Features.getFeature('pager-exposures');
-    products = mainshock.json.properties.products;
+    products = _getProducts(mainshock.json.properties.products);
+    properties = mainshock.json.properties;
+
+    // Must send appropriate type for 'empty' values (not js 'undefined' prop)
+    data = {
+      aftershocks: {
+        bins: aftershocks.bins,
+        description: aftershocks.description,
+        forecast: aftershocks.forecast || [],
+        model: aftershocks.model || {}
+      },
+      depth: mainshock.json.geometry.coordinates[2],
+      dyfi: products.dyfi || {},
+      eqid: mainshock.json.id,
+      foreshocks: {
+        bins: foreshocks.bins,
+        description: foreshocks.description
+      },
+      historical: {
+        bins: historical.bins,
+        description: historical.description
+      },
+      mag: properties.mag,
+      magType: properties.magType,
+      pager: products.pager || {},
+      'pager-cities': pagerCities.cities,
+      'pager-exposures': pagerExposures.exposures,
+      place: properties.place,
+      shakemap: products.shakemap || '',
+      'tectonic-summary': products.summary || '',
+      time: {
+        local: mainshock.localTime,
+        utc: mainshock.utcTime
+      },
+      title: properties.title,
+      urls: {
+        app: window.location.href,
+        eventPage: properties.url
+      }
+    };
+
+    // Add feed data fetched for Event Summary document
+    Object.keys(feeds).forEach(function(id) {
+      data[id] = feeds[id].json;
+    });
+
+    return data;
+  };
+
+  /**
+   * Check if DYFI, ShakeMap, PAGER, Summary products exist, and if they do,
+   *   return select properties for each
+   *
+   * @param products {Object}
+   *
+   * @return {Object}
+   */
+  _getProducts = function (products) {
+    var contents,
+        dyfi,
+        pager,
+        shakemap,
+        summary;
 
     if (products.dyfi) {
       contents = products.dyfi[0].contents;
@@ -72,9 +131,6 @@ var Rtf = function (options) {
         maxmmi: Number(products.dyfi[0].properties.maxmmi),
         responses: Number(products.dyfi[0].properties.numResp)
       };
-    }
-    if (products['general-text']) {
-      summary = products['general-text'][0].contents[''].bytes;
     }
     if (products.losspager) {
       contents = products.losspager[0].contents;
@@ -93,51 +149,16 @@ var Rtf = function (options) {
         shakemap = contents['download/intensity.jpg'].url;
       }
     }
+    if (products['general-text']) {
+      summary = products['general-text'][0].contents[''].bytes;
+    }
 
-    // Must send appropriate type for 'empty' values (not js 'undefined' prop)
-    data = {
-      aftershocks: {
-        bins: aftershocks.bins,
-        description: aftershocks.description,
-        forecast: aftershocks.forecast || [],
-        model: aftershocks.model || {}
-      },
-      depth: mainshock.json.geometry.coordinates[2],
-      dyfi: dyfi || {},
-      eqid: mainshock.json.id,
-      foreshocks: {
-        bins: foreshocks.bins,
-        description: foreshocks.description
-      },
-      historical: {
-        bins: historical.bins,
-        description: historical.description
-      },
-      mag: mainshock.json.properties.mag,
-      magType: mainshock.json.properties.magType,
-      pager: pager || {},
-      'pager-cities': pagerCities.cities,
-      'pager-exposures': pagerExposures.exposures,
-      place: mainshock.json.properties.place,
-      shakemap: shakemap || '',
-      'tectonic-summary': summary || '',
-      time: {
-        local: mainshock.localTime,
-        utc: mainshock.utcTime
-      },
-      title: mainshock.json.properties.title,
-      urls: {
-        app: window.location.href,
-        eventPage: mainshock.json.properties.url
-      }
+    return {
+      dyfi: dyfi,
+      pager: pager,
+      shakemap: shakemap,
+      summary: summary
     };
-
-    // Add feed data fetched for Event Summary document
-    Object.keys(feeds).forEach(function(id) {
-      data[id] = feeds[id].json;
-    });
-
-    return data;
   };
 
   // ----------------------------------------------------------
