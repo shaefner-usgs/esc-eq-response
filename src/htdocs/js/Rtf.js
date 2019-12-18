@@ -191,9 +191,9 @@ var Rtf = function (options) {
 
         _app.StatusBar.removeItem('rtf');
       },
-      url: 'php/event-summary/rtf.php'
+      url: 'php/event-summary/create.php'
       // Testing environment:
-      //url: 'http://localhost:8888/php/event-summary/rtf.php'
+      //url: 'http://localhost:8888/php/event-summary/create.php'
     });
   };
 
