@@ -1,0 +1,60 @@
+#summaryPane {
+  .probabilities {
+    display: flex;
+    line-height: 1;
+
+    a {
+      border: 1px solid $border-color;
+      border-radius: 3px;
+      color: $text-color;
+      display: block;
+      margin-right: 1em;
+      text-align: center;
+      text-decoration: none;
+      transition: all .35s ease-out;
+      width: 6em;
+
+      abbr {
+        color: $text-color-lightest;
+        font-size: .8em;
+        display: inline-block;
+        margin-top: 5px;
+        transition: color .35s ease-out;
+      }
+      h4 {
+        background: $bg-color-darker;
+        border-radius: 3px 3px 0 0;
+        margin: 0;
+        padding: 4px 0;
+        transition: background .35s ease-out;
+      }
+      ul {
+        list-style: none;
+        margin: .75em 0 1em;
+        padding: 0;
+      }
+
+      .probability {
+        font: 1.25em $mmi-font-family;
+      }
+
+      &:hover {
+        border-color: color($accent-color tint(50%));
+        color: $accent-color;
+        transition-duration: 0s;
+
+        abbr {
+          color: color($accent-color tint(40%));
+          border-color: color($accent-color tint(40%));
+          transition-duration: 0s;
+        }
+        h4 {
+          background: $accent-color-lightest;
+        }
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
