@@ -145,8 +145,8 @@ var FocalMechanism = function (options) {
 
     beachball = _getBeachBall(180);
     if (beachball) {
-      // Immediately render beachball (which is initially hidden via css)
-      //   it will be moved into place (and unhidden) once summary is added
+      // Immediately render (hidden) beachball before adding summary. It will
+      //   be moved into place/unhidden when summary is added by SummaryPane.js
       beachball.render(document.querySelector('#summaryPane'));
 
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
