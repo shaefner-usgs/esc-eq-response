@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('America/Los_Angeles');
+
 downloadFile($_GET['file']);
 
 /**
@@ -11,9 +13,11 @@ downloadFile($_GET['file']);
 function downloadFile($file) {
   $filename = preg_replace('/-\d+/', '', basename($file)); // strip path/timestamp
 
-  header('Content-Type: application/rtf');
+  header('Cache-control: no-cache, must-revalidate');
   header('Content-Disposition: attachment; filename="' . $filename . '"');
   header('Content-Length: ' . filesize($file));
+  header('Content-Type: application/rtf');
+  header('Expires: ' . date(DATE_RFC2822));
   header('Connection: close');
 
   readfile($file);
