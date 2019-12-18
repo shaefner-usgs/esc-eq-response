@@ -107,7 +107,7 @@ class Rtf {
    */
   private function _saveFile() {
     $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
-    $file = "/tmp/{$this->_data->eqid}-$timestamp.rtf";
+    $file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
 
     $this->_rtf->save($file);
 
