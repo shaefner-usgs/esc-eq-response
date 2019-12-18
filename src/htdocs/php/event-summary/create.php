@@ -11,7 +11,7 @@ $rtf = new Rtf($data);
 sendResponse($rtf->file);
 
 /**
- * Send response json, which contains the path to the temporary RTF file
+ * Return response json, which contains the path to the temporary RTF file
  *
  * @param $file {String}
  *    full path of RTF file

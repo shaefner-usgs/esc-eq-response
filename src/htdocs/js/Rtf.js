@@ -5,7 +5,8 @@ var Xhr = require('util/Xhr');
 
 
 /**
- * Load PHP script and pass in POST data to create RTF summary document
+ * Create Event Summary RTF document by sending a json string as raw POST data
+ *   to a PHP script
  *
  * @param options {Object}
  *   {
@@ -36,7 +37,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get POST data key-value pairs used to create Event Summary document
+   * Get POST data json object used to create Event Summary document
    *
    * @return data {Object}
    */
@@ -88,7 +89,7 @@ var Rtf = function (options) {
       'pager-exposures': pagerExposures.exposures,
       place: properties.place,
       shakemap: products.shakemap || '',
-      'summary': products.summary || '',
+      summary: products.summary || '',
       time: {
         local: mainshock.localTime,
         utc: mainshock.utcTime
@@ -166,7 +167,7 @@ var Rtf = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Event Summary document (RTF) and trigger download
+   * Create Event Summary RTF file and then trigger download of file
    */
   _this.create = function () {
     var data = JSON.stringify(_getPostData());
@@ -185,15 +186,15 @@ var Rtf = function (options) {
       method: 'POST',
       rawdata: data,
       success: function (json) {
-        window.location = 'php/event-summary/download.php?file=' + json.file;
+        //window.location.assign('php/event-summary/download.php?file=' + json.file);
         // Testing environment:
-        //window.location = 'http://localhost:8888/php/event-summary/download.php?file=' + json.file;
+        window.location.assign('http://localhost:8888/php/event-summary/download.php?file=' + json.file);
 
         _app.StatusBar.removeItem('rtf');
       },
-      url: 'php/event-summary/create.php'
+      //url: 'php/event-summary/create.php'
       // Testing environment:
-      //url: 'http://localhost:8888/php/event-summary/create.php'
+      url: 'http://localhost:8888/php/event-summary/create.php'
     });
   };
 

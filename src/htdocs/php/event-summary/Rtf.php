@@ -7,10 +7,16 @@ PHPRtfLite::registerAutoloader();
 date_default_timezone_set('America/Los_Angeles');
 
 /**
- * Create an Event Summary RTF file and save it to a local (temp) directory
+ * Using the PHPRtfLite library, create an Event Summary RTF file and save it
+ *   to a local (temp) directory
  *
- * @param $data {Array}
+ * @param $data {Object}
  *     key-value pairs for populating content of RTF document
+ *
+ * @return {Object}
+ *     {
+ *       file: {String} full path of generated RTF file
+ *     }
  */
 class Rtf {
   private $_bodyFont;
@@ -97,7 +103,7 @@ class Rtf {
    * Save a local (temporary) copy of the RTF file
    *
    * @return $file {String}
-   *     path of rtf file
+   *     path of file
    */
   private function _saveFile() {
     $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
