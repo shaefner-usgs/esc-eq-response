@@ -67,7 +67,7 @@ var Feeds = function (options) {
     if (Object.keys(_feeds).length === _numFeeds) {
       _app.StatusBar.addItem({
         id: 'rtf',
-        name: 'RTF Document'
+        name: 'Event Summary'
       }, {
         prepend: 'Creating'
       });

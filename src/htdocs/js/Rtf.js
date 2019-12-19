@@ -178,7 +178,7 @@ var Rtf = function (options) {
 
         _app.StatusBar.addError({
           id: 'rtf'
-        }, 'Error Creating RTF Document');
+        }, 'Error Creating Event Summary');
       },
       headers: {
         'Content-Type': 'application/json'
