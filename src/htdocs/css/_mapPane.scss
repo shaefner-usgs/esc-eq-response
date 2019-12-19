@@ -140,6 +140,13 @@
   display: none;
 }
 
+/* Prevent text from wrapping */
+.leaflet-popup-content {
+  [datetime] {
+    min-width: 20em;
+  }
+}
+
 /* Push top controls down to accommodate toolbar */
 .leaflet-top .leaflet-control {
   margin-top: 50px;
@@ -159,7 +166,7 @@
 /* Hide attribution text on (small screen) mobile devices */
 @media only screen
   and (max-width: $breakpoint-tablet-width) {
-  .leaflet-control-attribution {
-    display: none;
-  }
+    .leaflet-control-attribution {
+      display: none;
+    }
 }
