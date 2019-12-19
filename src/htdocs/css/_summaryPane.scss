@@ -50,7 +50,7 @@
   }
 
   .mmiI {
-    border-color: #efefef !important; /* add subtle grey border so it shows up */
+    border-color: $border-color-lighter !important; /* add subtle grey border so it shows up */
   }
   .mmiII {
     border-color: $mmiII-color !important;
