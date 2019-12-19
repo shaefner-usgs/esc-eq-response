@@ -10,6 +10,7 @@ var AppUtil = require('AppUtil');
  * @param options {Object}
  *   {
  *     app: {Object}, // Application
+ *     eqid: {String} // Mainshock event id
  *   }
  *
  * @return _this {Object}
@@ -30,6 +31,7 @@ var PagerCities = function (options) {
       _initialize,
 
       _app,
+      _eqid,
 
       _getFeedUrl,
       _getSummary;
@@ -41,6 +43,7 @@ var PagerCities = function (options) {
     options = options || {};
 
     _app = options.app;
+    _eqid = options.eqid;
 
     _this.dependencies = [
       'pager-exposures'
@@ -85,11 +88,16 @@ var PagerCities = function (options) {
         exposures,
         level,
         population,
-        summary;
+        summary,
+        url;
 
     cities = json.onepager_cities;
     exposures = _app.Features.getFeature('pager-exposures').exposures;
-    summary = '<table>' +
+    url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
+      '/pager';
+
+    summary = '<h4><a href="' + url + '">' + _this.title + '</a></h4>';
+    summary += '<table>' +
       '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
 
     exposures.mmi.forEach(function(mmi, i) {

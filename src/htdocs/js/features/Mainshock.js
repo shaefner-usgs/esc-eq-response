@@ -81,13 +81,15 @@ var Mainshock = function (options) {
     products = _this.json.properties.products;
     url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid;
 
-    summary = '<div class="products">';
+    summary = '<div>';
+    summary += '<div class="products">';
     summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
 
+    // Add DYFI, ShakeMap thumbs
     if (products.dyfi) {
       cdi = AppUtil.romanize(_this.json.properties.cdi);
       imgSrc = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
-      summary += '<div class="dyfi scale"><a href="' + url + '/dyfi">' +
+      summary += '<div class="dyfi two-up"><a href="' + url + '/dyfi">' +
         '<h4>Did You Feel It?</h4><img src="' + imgSrc + '" class="mmi' + cdi +
         '" /></a></div>';
     }
@@ -98,16 +100,19 @@ var Mainshock = function (options) {
         imgSrc = products.shakemap[0].contents['download/intensity.jpg'].url;
       }
       mmi = AppUtil.romanize(_this.json.properties.mmi);
-      summary += '<div class="shakemap scale"><a href="' + url +
+      summary += '<div class="shakemap two-up"><a href="' + url +
         '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
         mmi + '" /></a></div>';
     }
 
     // Add placeholders for beachballs
-    summary += '<div class="focal-mechanism hide scale"></div>';
-    summary += '<div class="moment-tensor hide scale"></div>';
+    summary += '<div class="focal-mechanism hide two-up"></div>';
+    summary += '<div class="moment-tensor hide two-up"></div>';
+    summary += '</div>'; // .products div
 
-    summary += '</div>';
+    // Add placeholder for Population Exposure table
+    summary += '<div class="pager-cities hide"></div>';
+    summary += '</div>'; // parent div
 
     return summary;
   };
