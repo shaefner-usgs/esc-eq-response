@@ -3,6 +3,7 @@ $breakpoint-tablet-width: 1023px;
 
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
+$font-family-mmi: Tahoma, Verdana, Segoe, sans-serif;
 $font-size: 15px;
 
 /* Colors */
@@ -16,11 +17,14 @@ $bg-color-darker: #f7f7f7;
 
 $border-color: #ddd;
 $border-color-lighter: #efefef;
+$border-color-lightest: #f6f6f6;
 
 $link-color: $accent-color;
 $link-color-active: #DC406D;
 $link-color-hover: $accent-color;
-$link-color-visited: $link-color;
+$link-color-visited: $accent-color;
+
+$reset-button-color: #efefef;
 
 $text-color: #333;
 $text-color-darker: #000;
@@ -28,8 +32,6 @@ $text-color-lighter: #555;
 $text-color-lightest: #999;
 
 /* MMI / PAGER (impact bubbles) */
-
-$mmi-font-family: Tahoma, Verdana, Segoe, sans-serif;
 
 $mmiI-color: #fff;
 $mmiI-text-color: $text-color-darker;

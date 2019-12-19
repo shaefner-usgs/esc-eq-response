@@ -11,6 +11,12 @@
 @import '_statusBar.scss';
 @import '_summaryPane.scss';
 
+@import 'features/_aftershocks.scss';
+@import 'features/_earthquakes.scss';
+@import 'features/_fieldnotes.scss';
+@import 'features/_mainshock.scss';
+@import 'features/_shakemap-stations.scss';
+
 abbr[title] {
   text-decoration: none; /* clean up default styling in Chrome */
 }

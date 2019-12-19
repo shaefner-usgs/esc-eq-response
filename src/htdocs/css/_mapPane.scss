@@ -1,7 +1,5 @@
 @import 'mappane/_control-bottomCenter.scss';
 @import 'mappane/_mousePosition.scss';
-@import 'features/_fieldnotes.scss';
-@import 'features/_shakemap-stations.scss';
 
 #mapPane,
 .map {
@@ -145,38 +143,6 @@
 /* Push top controls down to accommodate toolbar */
 .leaflet-top .leaflet-control {
   margin-top: 50px;
-}
-
-/* Earthquake details in Leaflet popups (also mainshock on edit, summary panes) */
-.leaflet-popup-content, .earthquake {
-  dd,
-  dt {
-    line-height: 1.7;
-  }
-  dd {
-    color: $text-color;
-    margin-left: 5em;
-  }
-  dl {
-    margin-bottom: 0;
-  }
-  dt {
-    clear: left;
-    color: $text-color-lighter;
-    display: inline-block;
-    float: left;
-    font-weight: 300;
-    letter-spacing: .015em;
-    width: 5em;
-  }
-
-  h4 {
-    margin: 0;
-  }
-
-  time {
-    display: block;
-  }
 }
 
 /* Scroll wide tables in Leaflet popups elegantly */
