@@ -137,6 +137,7 @@ var SummaryPane = function (options) {
     button.innerHTML = '<img src="img/download.png" width="13" alt="download" />';
     button.innerHTML += 'Event Summary';
     button.setAttribute('disabled', 'disabled');
+    button.setAttribute('title', 'Download RTF Document');
     button.type = 'button';
 
     button.addEventListener('click', function() {
