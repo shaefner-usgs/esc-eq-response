@@ -103,7 +103,9 @@ var PagerExposures = function (options) {
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
-    _this.exposures = _getExposures(json);
+    if (_this.url) { // url not set when feed is unavailable
+      _this.exposures = _getExposures(json);
+    }
   };
 
   _initialize(options);

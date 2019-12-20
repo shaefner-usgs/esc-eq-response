@@ -63,7 +63,7 @@ var Rtf = function (options) {
     products = _getProducts(mainshock.json.properties.products);
     properties = mainshock.json.properties;
 
-    // Must send appropriate type for 'empty' values (not js 'undefined' prop)
+    // IMPORTANT: Set appropriate types for 'empty' values (i.e. not js 'undefined')
     data = {
       aftershocks: {
         bins: aftershocks.bins,
@@ -85,8 +85,8 @@ var Rtf = function (options) {
       mag: properties.mag,
       magType: properties.magType,
       pager: products.pager || {},
-      'pager-cities': pagerCities.cities,
-      'pager-exposures': pagerExposures.exposures,
+      'pager-cities': pagerCities.cities || {},
+      'pager-exposures': pagerExposures.exposures || {},
       place: properties.place,
       shakemap: products.shakemap || '',
       summary: products.summary || '',

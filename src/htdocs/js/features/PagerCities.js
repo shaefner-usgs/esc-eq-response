@@ -152,8 +152,10 @@ var PagerCities = function (options) {
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
-    _this.cities = json.onepager_cities;
-    _this.summary = _getSummary(json);
+    if (_this.url) { // url not set when feed is unavailable
+      _this.cities = json.onepager_cities;
+      _this.summary = _getSummary(json);
+    }
   };
 
   _initialize(options);
