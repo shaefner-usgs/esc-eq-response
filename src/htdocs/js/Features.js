@@ -93,10 +93,10 @@ var Features = function (options) {
     _features[feature.id] = feature;
 
     try {
-      // Add feature to map, plots and summary panes
-      _app.MapPane.addFeature(feature);
-      _app.PlotsPane.addFeature(feature);
-      _app.SummaryPane.addFeature(feature);
+      // Add feature to map, plots and summary panes; does nothing if prop not set
+      _app.MapPane.addFeature(feature); // prop: mapLayer
+      _app.PlotsPane.addFeature(feature); // prop: plotTraces
+      _app.SummaryPane.addFeature(feature); // prop: summary
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
@@ -139,8 +139,8 @@ var Features = function (options) {
     }
 
     if (feature.url) {
-      _loadJson(feature); // load feed data
-    } else { // no external feed data needed
+      _loadJson(feature);
+    } else { // Feature does not require feed data, or it's not available
       feature.initFeature();
       _addFeature(feature);
     }

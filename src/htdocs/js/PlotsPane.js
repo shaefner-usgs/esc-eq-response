@@ -387,6 +387,7 @@ var PlotsPane = function (options) {
         }
       });
 
+      // Plot.ly params to create plot
       _plots[feature.id] = {
         params: params,
         rendered: false
