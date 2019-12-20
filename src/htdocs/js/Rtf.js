@@ -178,7 +178,7 @@ var Rtf = function (options) {
 
         _app.StatusBar.addError({
           id: 'rtf'
-        }, 'Error Creating Event Summary');
+        }, '<h4>Error Creating Event Summary</h4>');
       },
       headers: {
         'Content-Type': 'application/json'
