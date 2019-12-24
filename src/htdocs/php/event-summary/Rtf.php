@@ -19,12 +19,9 @@ date_default_timezone_set('America/Los_Angeles');
  *     }
  */
 class Rtf {
-  private $_bodyFont;
-  private $_bodyFormat;
   private $_data;
-  private $_headerFont;
-  private $_headerFormat;
-  private $_imageFormat;
+  private $_font;
+  private $_format;
   private $_rtf;
 
   public $file;
@@ -33,42 +30,155 @@ class Rtf {
     $this->_data = $data;
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
+    $this->_cleanData();
     $this->_createRtf();
+    $this->_saveFile();
   }
 
   /**
-   * Create the RTF document and store its path in public 'file' prop
+   * Sanitize data from external json feeds for known issues
+   */
+  private function _cleanData() {
+
+  }
+
+  /**
+   * Create the RTF document
    */
   private function _createRtf() {
     $this->_setMargins();
-    $this->_setFormatting();
+    $this->_setStyles();
 
+    $this->_createSection1();
+    $this->_createSection2();
+  }
+
+  /**
+   * RTF Section 1: basic earthquake details
+   */
+  private function _createSection1() {
     $section1 = $this->_rtf->addSection();
+
+    $now = date('Y-m-d g:ia \(T\)');
+    $nearbyCitiesList = '';
+    if ($this->_data->{'nearby-cities'}) {
+      foreach ($this->_data->{'nearby-cities'} as $city) {
+        $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
+          ' of ' . $city->name . '<br>';
+      }
+      $nearbyCitiesList = substr($nearbyCitiesList, 0, -4); // remove final <br>
+    }
 
     $section1->writeText(
       $this->_data->title,
-      $this->_headerFont,
-      $this->_headerFormat
+      $this->_font->h1,
+      $this->_format->h1
     );
+    $section1->writeText(
+      '<b>Version 1</b>, ' . $now,
+      $this->_font->body,
+      $this->_format->center
+    );
+
+    $section1->writeText(
+      'Date and Time',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section1->writeText(
+      $this->_data->time->utc . ' (UTC)<br>' . $this->_data->time->local .
+        ' (local time at epicenter)',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section1->writeText(
+      'Magnitude',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section1->writeText(
+      $this->_data->magType . ' ' . $this->_data->mag,
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section1->writeText(
+      'Depth',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section1->writeText(
+      $this->_data->depth . ' km',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    if ($nearbyCitiesList) {
+      $section1->writeText(
+        'Nearby Cities',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section1->writeText(
+        $nearbyCitiesList,
+        $this->_font->body,
+        $this->_format->body
+      );
+    }
+
+    $section1->writeText(
+      'ComCat Event ID',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section1->writeText(
+      $this->_data->eqid,
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section1->writeText(
+      'Resources',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section1->writeHyperLink(
+      $this->_data->urls->eventPage,
+      'Event Page',
+      $this->_font->link,
+      $this->_format->link
+    );
+    $section1->writeHyperLink(
+      $this->_data->urls->app,
+      'Earthquake Response App',
+      $this->_font->link,
+      $this->_format->link
+    );
+  }
+
+  /**
+   * RTF Section 2: test images
+   */
+  private function _createSection2() {
+    $section2 = $this->_rtf->addSection();
 
     if ($this->_data->dyfi) {
       $img = $this->_getRemoteImage($this->_data->dyfi->map);
-      $section1->addImage(
+      $section2->addImage(
         $img,
-        $this->_imageFormat,
+        $this->_format->image,
         16, 16
       );
     }
     if ($this->_data->shakemap) {
       $img = $this->_getRemoteImage($this->_data->shakemap);
-      $section1->addImage(
+      $section2->addImage(
         $img,
-        $this->_imageFormat,
+        $this->_format->image,
         16, 16
       );
     }
-
-    $this->file = $this->_saveFile();
   }
 
   /**
@@ -100,38 +210,13 @@ class Rtf {
   }
 
   /**
-   * Save a local (temporary) copy of the RTF file
-   *
-   * @return $file {String}
-   *     path of file
+   * Save a local (temporary) copy of the RTF file and store its path in $file
    */
   private function _saveFile() {
     $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
-    $file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
+    $this->file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
 
-    $this->_rtf->save($file);
-
-    return $file;
-  }
-
-  /**
-   * Set up formatting for images, typography, etc.
-   */
-  private function _setFormatting() {
-    $this->_bodyFont = new PHPRtfLite_Font(14, 'Arial', '#000000', '#FFFFFF');
-    $this->_headerFont = new PHPRtfLite_Font(18, 'Arial', '#000000', '#FFFFFF');
-
-    $this->_bodyFormat = new PHPRtfLite_ParFormat('left');
-    $this->_bodyFormat->setSpaceBefore(10);
-    $this->_bodyFormat->setSpaceAfter(10);
-    $this->_bodyFormat->setSpaceBetweenLines(1.75);
-
-    $this->_imageFormat = new PHPRtfLite_ParFormat('center');
-
-    $this->_headerFormat = new PHPRtfLite_ParFormat('center');
-    $this->_headerFormat->setSpaceBefore(10);
-    $this->_headerFormat->setSpaceAfter(10);
-    $this->_headerFormat->setSpaceBetweenLines(2);
+    $this->_rtf->save($this->file);
   }
 
   /**
@@ -142,5 +227,56 @@ class Rtf {
     $this->_rtf->setMarginLeft(2.5);
     $this->_rtf->setMarginRight(2.5);
     $this->_rtf->setMarginTop(2);
+  }
+
+  /**
+   * Set styles for text, images, etc.
+   */
+  private function _setStyles() {
+    $this->_font->body = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
+
+    $this->_font->h1 = new PHPRtfLite_Font(18, 'Calibri', '#000000', '#FFFFFF');
+    $this->_font->h1->setBold();
+
+    $this->_font->h2 = new PHPRtfLite_Font(16, 'Calibri', '#313131', '#FFFFFF');
+    $this->_font->h2->setBold();
+
+    $this->_font->h3 = new PHPRtfLite_Font(14, 'Calibri', '#474747', '#FFFFFF');
+    $this->_font->h3->setBold();
+
+    $this->_font->h4 = new PHPRtfLite_Font(12, 'Calibri', '#5281c9', '#FFFFFF');
+    $this->_font->h4->setBold();
+
+    $this->_font->link = new PHPRtfLite_Font(12, 'Helvetica', '#0000CC', '#FFFFFF');
+    $this->_font->link->setUnderline();
+
+    $this->_format->body = new PHPRtfLite_ParFormat('left');
+    $this->_format->body->setSpaceAfter(10);
+    $this->_format->body->setSpaceBefore(0);
+    $this->_format->body->setSpaceBetweenLines(1.5);
+
+    $this->_format->center = new PHPRtfLite_ParFormat('center');
+    $this->_format->center->setSpaceAfter(10);
+    $this->_format->center->setSpaceBefore(5);
+
+    $this->_format->h1 = new PHPRtfLite_ParFormat('center');
+    $this->_format->h1->setSpaceBetweenLines(1.5);
+
+    $this->_format->h2 = new PHPRtfLite_ParFormat('left');
+    $this->_format->h2->setSpaceAfter(16);
+    $this->_format->h2->setSpaceBefore(16);
+
+    $this->_format->h3 = new PHPRtfLite_ParFormat('left');
+    $this->_format->h3->setSpaceAfter(16);
+    $this->_format->h3->setSpaceBefore(16);
+
+    $this->_format->h4 = new PHPRtfLite_ParFormat('left');
+    $this->_format->h4->setSpaceAfter(0);
+    $this->_format->h4->setSpaceBefore(16);
+
+    $this->_format->link = $this->_format->body;
+    $this->_format->link->setSpaceAfter(0);
+
+    $this->_format->image = new PHPRtfLite_ParFormat('center');
   }
 }
