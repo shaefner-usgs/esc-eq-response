@@ -28,12 +28,31 @@ class Rtf {
 
   public function __construct ($data) {
     $this->_data = $data;
+    $this->_font = new stdClass;
+    $this->_format = new stdClass;
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
     $this->_cleanData();
     $this->_createRtf();
     $this->_saveFile();
   }
+
+  // if ($this->_data->dyfi) {
+  //   $img = $this->_getRemoteImage($this->_data->dyfi->map);
+  //   $section2->addImage(
+  //     $img,
+  //     $this->_format->image,
+  //     16, 16
+  //   );
+  // }
+  // if ($this->_data->shakemap) {
+  //   $img = $this->_getRemoteImage($this->_data->shakemap);
+  //   $section2->addImage(
+  //     $img,
+  //     $this->_format->image,
+  //     16, 16
+  //   );
+  // }
 
   /**
    * Sanitize data from external json feeds for known issues
@@ -54,7 +73,7 @@ class Rtf {
   }
 
   /**
-   * RTF Section 1: basic earthquake details
+   * RTF Document, Section 1: Basic earthquake details
    */
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
@@ -158,27 +177,104 @@ class Rtf {
   }
 
   /**
-   * RTF Section 2: test images
+   * RTF Document, Section 2: Talking Points
    */
   private function _createSection2() {
     $section2 = $this->_rtf->addSection();
 
-    if ($this->_data->dyfi) {
-      $img = $this->_getRemoteImage($this->_data->dyfi->map);
-      $section2->addImage(
-        $img,
-        $this->_format->image,
-        16, 16
-      );
-    }
-    if ($this->_data->shakemap) {
-      $img = $this->_getRemoteImage($this->_data->shakemap);
-      $section2->addImage(
-        $img,
-        $this->_format->image,
-        16, 16
-      );
-    }
+    $section2->writeText(
+      'Talking Points',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section2->writeText(
+      'Date, Time, Location',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'Fault',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'Historical Seismicity',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'Aftershock Forecast',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'ShakeMap/DYFI',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'Long-term Probabilities',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
+      'Earthquake Preparedness',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      'We should all prepare and be certain the buildings we occupy are safe (see ',
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section2->writeHyperLink(
+      'https://www.earthquakeauthority.com/California-Earthquake-Risk/Personal-Preparedness/Seven-Steps-to-Earthquake-Safety',
+      'The Seven Steps to Earthquake Safety',
+      $this->_font->link,
+      $this->_format->link
+    );
+    $section2->writeText(
+      ').',
+      $this->_font->body,
+      $this->_format->body
+    );
   }
 
   /**
@@ -257,7 +353,7 @@ class Rtf {
 
     $this->_format->center = new PHPRtfLite_ParFormat('center');
     $this->_format->center->setSpaceAfter(10);
-    $this->_format->center->setSpaceBefore(5);
+    $this->_format->center->setSpaceBefore(0);
 
     $this->_format->h1 = new PHPRtfLite_ParFormat('center');
     $this->_format->h1->setSpaceBetweenLines(1.5);
