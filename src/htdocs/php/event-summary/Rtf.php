@@ -32,9 +32,11 @@ class Rtf {
     $this->_format = new stdClass;
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
-    $this->_cleanData();
-    $this->_createRtf();
-    $this->_saveFile();
+    if ($this->_data) {
+      $this->_cleanData();
+      $this->_createRtf();
+      $this->_saveFile();
+    }
   }
 
   // if ($this->_data->dyfi) {
