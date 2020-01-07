@@ -168,13 +168,13 @@ class Rtf {
       $this->_data->urls->eventPage,
       'Event Page',
       $this->_font->link,
-      $this->_format->link
+      $this->_format->body
     );
     $section1->writeHyperLink(
       $this->_data->urls->app,
       'Earthquake Response App',
       $this->_font->link,
-      $this->_format->link
+      $this->_format->body
     );
   }
 
@@ -269,13 +269,11 @@ class Rtf {
     $section2->writeHyperLink(
       'https://www.earthquakeauthority.com/California-Earthquake-Risk/Personal-Preparedness/Seven-Steps-to-Earthquake-Safety',
       'The Seven Steps to Earthquake Safety',
-      $this->_font->link,
-      $this->_format->link
+      $this->_font->link
     );
     $section2->writeText(
       ').',
-      $this->_font->body,
-      $this->_format->body
+      $this->_font->body
     );
   }
 
@@ -349,7 +347,7 @@ class Rtf {
     $this->_font->link->setUnderline();
 
     $this->_format->body = new PHPRtfLite_ParFormat('left');
-    $this->_format->body->setSpaceAfter(10);
+    $this->_format->body->setSpaceAfter(0);
     $this->_format->body->setSpaceBefore(0);
     $this->_format->body->setSpaceBetweenLines(1.5);
 
@@ -361,20 +359,22 @@ class Rtf {
     $this->_format->h1->setSpaceBetweenLines(1.5);
 
     $this->_format->h2 = new PHPRtfLite_ParFormat('left');
-    $this->_format->h2->setSpaceAfter(16);
-    $this->_format->h2->setSpaceBefore(16);
+    $this->_format->h2->setSpaceAfter(6);
+    $this->_format->h2->setSpaceBefore(6);
 
     $this->_format->h3 = new PHPRtfLite_ParFormat('left');
-    $this->_format->h3->setSpaceAfter(16);
+    $this->_format->h3->setSpaceAfter(0);
     $this->_format->h3->setSpaceBefore(16);
 
     $this->_format->h4 = new PHPRtfLite_ParFormat('left');
     $this->_format->h4->setSpaceAfter(0);
     $this->_format->h4->setSpaceBefore(16);
 
-    $this->_format->link = $this->_format->body;
-    $this->_format->link->setSpaceAfter(0);
-
     $this->_format->image = new PHPRtfLite_ParFormat('center');
+
+    $this->_format->paragraph = new PHPRtfLite_ParFormat('left');
+    $this->_format->paragraph->setSpaceAfter(12);
+    $this->_format->paragraph->setSpaceBefore(0);
+    $this->_format->paragraph->setSpaceBetweenLines(1.5);
   }
 }
