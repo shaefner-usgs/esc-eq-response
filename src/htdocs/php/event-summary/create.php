@@ -6,8 +6,8 @@ include_once 'Rtf.php';
 $data = json_decode(file_get_contents('php://input'));
 
 $jsonParams = [
-  'error' => null,
-  'file' => null
+  'error' => '',
+  'file' => ''
 ];
 
 // $file = fopen('/tmp/error.txt', 'w');
@@ -32,7 +32,7 @@ try {
  * @param $params {Array}
  */
 function sendResponse($params) {
-  $json = json_encode($params);
+  $json = json_encode($params, JSON_UNESCAPED_SLASHES);
 
   print $json;
 }
