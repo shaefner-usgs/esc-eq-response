@@ -72,6 +72,7 @@ class Rtf {
 
     $this->_createSection1();
     $this->_createSection2();
+    $this->_createSection3();
   }
 
   /**
@@ -278,6 +279,36 @@ class Rtf {
   }
 
   /**
+   * RTF Document, Section 3: Impact
+   */
+  private function _createSection3() {
+    $section3 = $this->_rtf->addSection();
+
+    $section3->writeText(
+      'Impact',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section3->writeText(
+      'PAGER',
+      $this->_font->h3,
+      $this->_format->h3
+    );
+
+    $section3->writeText(
+      'Alert Level',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section3->writeText(
+      $this->_data->pager->alert,
+      $this->_font->body,
+      $this->_format->pagerAlert->setBackgroundColor('#00FF00')
+    );
+  }
+
+  /**
    * Create a local (temporary) copy of an image from a remote image
    *
    * @param $url {String}
@@ -371,6 +402,11 @@ class Rtf {
     $this->_format->h4->setSpaceBefore(16);
 
     $this->_format->image = new PHPRtfLite_ParFormat('center');
+
+    $this->_format->pagerAlert = new PHPRtfLite_ParFormat('left');
+    $this->_format->pagerAlert->setSpaceAfter(0);
+    $this->_format->pagerAlert->setSpaceBefore(0);
+    $this->_format->pagerAlert->setSpaceBetweenLines(1.5);
 
     $this->_format->paragraph = new PHPRtfLite_ParFormat('left');
     $this->_format->paragraph->setSpaceAfter(12);
