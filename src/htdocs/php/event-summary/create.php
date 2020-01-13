@@ -10,19 +10,15 @@ $jsonParams = [
   'file' => ''
 ];
 
-// $file = fopen('/tmp/error.txt', 'w');
-// $output = print_r($data, true);
-// fwrite($file, $output);
-// fclose($file);
-
 // Create RTF file
+setHeaders();
 try {
   $rtf = new Rtf($data);
   $jsonParams['file'] = $rtf->file;
 } catch (Exception $e) {
   $jsonParams['error'] = $e->getMessage();
+  setHeaders('HTTP/1.0 500 Internal Server Error');
 } finally {
-  setHeaders($jsonParams);
   sendResponse($jsonParams);
 }
 
@@ -40,15 +36,16 @@ function sendResponse($params) {
 /**
  * Set HTTP Headers for CORS-compatible json response
  *
- * @param $params {Array}
+ * @param $header {String}
+ *     optional specific header to set
  */
-function setHeaders($params) {
-  header('Content-Type: application/json');
-  header('Access-Control-Allow-Headers: Accept, Authorization, Content-Type, Origin');
-  header('Access-Control-Allow-Methods: *');
-  header('Access-Control-Allow-Origin: *');
-
-  if ($params['error']) {
-    header('HTTP/1.0 500 Internal Server Error');
+function setHeaders($header = '') {
+  if ($header) {
+    header($header);
+  } else { // set general headers for all responses
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Headers: Accept, Authorization, Content-Type, Origin');
+    header('Access-Control-Allow-Methods: *');
+    header('Access-Control-Allow-Origin: *');
   }
 }
