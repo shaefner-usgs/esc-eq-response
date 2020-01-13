@@ -137,9 +137,9 @@ var Rtf = function (options) {
       contents = products.losspager[0].contents;
       pager = {
         alert: products.losspager[0].properties.alertlevel,
-        economic: contents['alertecon_smaller.png'].url,
+        economic: contents['alertecon.png'].url,
         exposure: contents['exposure.png'].url,
-        fatalities: contents['alertfatal_smaller.png'].url
+        fatalities: contents['alertfatal.png'].url
       };
     }
     if (products.shakemap) {
