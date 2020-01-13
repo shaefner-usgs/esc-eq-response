@@ -19,6 +19,7 @@ date_default_timezone_set('America/Los_Angeles');
  *     }
  */
 class Rtf {
+  private $_border;
   private $_data;
   private $_font;
   private $_format;
@@ -27,6 +28,7 @@ class Rtf {
   public $file;
 
   public function __construct ($data) {
+    $this->_border = new stdClass;
     $this->_data = $data;
     $this->_font = new stdClass;
     $this->_format = new stdClass;
@@ -39,22 +41,32 @@ class Rtf {
     }
   }
 
-  // if ($this->_data->dyfi) {
-  //   $img = $this->_getRemoteImage($this->_data->dyfi->map);
-  //   $section2->addImage(
-  //     $img,
-  //     $this->_format->image,
-  //     16, 16
-  //   );
-  // }
-  // if ($this->_data->shakemap) {
-  //   $img = $this->_getRemoteImage($this->_data->shakemap);
-  //   $section2->addImage(
-  //     $img,
-  //     $this->_format->image,
-  //     16, 16
-  //   );
-  // }
+  /**
+  * Add commas to large numbers
+  *
+  * @param $num {Number}
+  *
+  * @return {String}
+   */
+  private function _addCommas($num) {
+    $dec = '';
+    $num .= ''; // convert to string
+    $parts = explode('.', $num);
+    $int = $parts[0];
+    $regex = '/(\d+)(\d{3})/';
+
+    if (count($parts) > 1) {
+      $dec = '.' . $parts[1];
+    }
+
+    //while (regex.test(int)) {
+    while (preg_match($regex, $int)) {
+      //int = int.replace(regex, '$1' + ',' + '$2');
+      $int = preg_replace($regex, "$1,$2", $int);
+    }
+
+    return $int . $dec;
+  }
 
   /**
    * Sanitize data from external json feeds for known issues
@@ -72,8 +84,53 @@ class Rtf {
 
     $this->_createSection1();
     $this->_createSection2();
-    $this->_createSection3();
+
+    if (!empty(get_object_vars($this->_data->pager))) {
+      $this->_createSection3();
+    }
   }
+
+  /**
+   * Create a local (temporary) copy of an image from a remote image
+   *
+   * @param $url {String}
+   *     URL of remote image
+   *
+   * @return $path {String}
+   *     path of local image
+   */
+  private function _getRemoteImage($url) {
+    static $count = 0;
+
+    $count ++;
+    $path = "/tmp/{$this->_data->eqid}-$count.jpg";
+    $remoteImg = fopen($url, 'rb') or die(http_response_code(500));
+    $tempImg = fopen($path, 'wb');
+
+    while (!feof($remoteImg)) { // write contents of remote img to local tmp img
+      $contents = fread($remoteImg, 4096);
+      fwrite($tempImg, $contents);
+    }
+
+    fclose($remoteImg);
+    fclose($tempImg);
+
+    return $path;
+  }
+
+  /**
+   * Save a local (temporary) copy of the RTF file and store its path in $file
+   */
+  private function _saveFile() {
+    $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
+    $this->file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
+
+    $this->_rtf->save($this->file);
+  }
+
+  // --------------------------------------------
+  // Utility methods for creating RTF file follow
+  // --------------------------------------------
 
   /**
    * RTF Document, Section 1: Basic earthquake details
@@ -302,48 +359,158 @@ class Rtf {
       $this->_format->h4
     );
     $section3->writeText(
-      $this->_data->pager->alert,
-      $this->_font->body,
-      $this->_format->pagerAlert->setBackgroundColor('#00FF00')
+      ucfirst($this->_data->pager->alert),
+      $this->_font->pagerAlert[$this->_data->pager->alert],
+      $this->_format->body
     );
-  }
 
-  /**
-   * Create a local (temporary) copy of an image from a remote image
-   *
-   * @param $url {String}
-   *     URL of remote image
-   *
-   * @return $path {String}
-   *     path of local image
-   */
-  private function _getRemoteImage($url) {
-    static $count = 0;
+    $section3->writeText(
+      'Summary',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section3->writeText(
+      $this->_data->{'pager-comments'}->impact1,
+      $this->_font->body,
+      $this->_format->paragraph // margin below
+    );
+    $section3->writeText(
+      $this->_data->{'pager-comments'}->struct_comment,
+      $this->_font->body,
+      $this->_format->body // no margin below (margins don't collapse)
+    );
 
-    $count ++;
-    $path = "/tmp/{$this->_data->eqid}-$count.jpg";
-    $remoteImg = fopen($url, 'rb') or die(http_response_code(500));
-    $tempImg = fopen($path, 'wb');
-
-    while (!feof($remoteImg)) { // write contents of remote img to local tmp img
-      $contents = fread($remoteImg, 4096);
-      fwrite($tempImg, $contents);
+    if ($this->_data->pager->economic) {
+      $section3->writeText(
+        'Estimated Economic Losses',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section3->addImage(
+        $this->_getRemoteImage($this->_data->pager->economic),
+        $this->_format->image,
+        12
+      );
     }
 
-    fclose($remoteImg);
-    fclose($tempImg);
+    if ($this->_data->pager->fatalities) {
+      $section3->writeText(
+        'Estimated Fatalities',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section3->addImage(
+        $this->_getRemoteImage($this->_data->pager->fatalities),
+        $this->_format->image,
+        12
+      );
+    }
 
-    return $path;
+    if ($this->_data->pager->exposure) { // has exposure image
+      $section3->insertPageBreak();
+      $section3->writeText(
+        'Population Exposure',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section3->writeText('<br>');
+      $section3->addImage(
+        $this->_getRemoteImage($this->_data->pager->exposure),
+        $this->_format->image,
+        10
+      );
+    }
+
+    $this->_createTableExposure($section3);
   }
 
   /**
-   * Save a local (temporary) copy of the RTF file and store its path in $file
+   * Create population exposure table
+   *
+   * @param $section {Object}
+   *     RTF Document section
    */
-  private function _saveFile() {
-    $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
-    $this->file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
+  private function _createTableExposure($section) {
+    $cities = $this->_data->{'pager-cities'};
+    $mmis = array_filter(
+      $this->_data->{'pager-exposures'}->mmi,
+      function($value) {
+        if ($value >= 2) {
+          return $value;
+        }
+      }
+    );
+    $population = array_filter(
+      $this->_data->{'pager-exposures'}->population,
+      function($value) {
+        if ($value > 0) {
+          return $value;
+        }
+      }
+    );
+    $shaking = $this->_data->{'pager-exposures'}->shaking;
+    $numRows = count($cities) + count($population);
 
-    $this->_rtf->save($this->file);
+    $section->writeText('<br>');
+    $table = $section->addTable();
+    $table->addRows($numRows);
+    $table->addColumnsList(array(2, 5, 3));
+
+    $headerCol1 = $table->getCell(1, 1);
+    $headerCol1->setTextAlignment('center');
+    $headerCol1->writeText('MMI');
+    $headerCol2 = $table->getCell(1, 2);
+    $headerCol2->setTextAlignment('center');
+    $headerCol2->writeText('Level / Selected Cities');
+    $headerCol3 = $table->getCell(1, 3);
+    $headerCol3->setTextAlignment('center');
+    $headerCol3->writeText('Population');
+
+    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
+    $table->setFontForCellRange($this->_font->th, 1, 1, 1, 3);
+    $table->setFontForCellRange($this->_font->body, 2, 1, $numRows, 3);
+
+    $currentRow = 1;
+    foreach ($mmis as $i => $mmi) {
+      if (array_key_exists($i, $population) && $mmi >= 2 && $population[$i] > 0)
+      { // skip mmi below 2 and when nobody affected
+        $currentRow ++;
+
+        $cellIntensity = $table->getCell($currentRow, 1);
+        $cellIntensity->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellIntensity->setTextAlignment('center');
+        $cellIntensity->writeText($shaking[$i]->intensity);
+        $cellLevel = $table->getCell($currentRow, 2);
+        $cellLevel->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellLevel->setTextAlignment('left');
+        $cellLevel->writeText($shaking[$i]->level);
+        $cellPop = $table->getCell($currentRow, 3);
+        $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellPop->setTextAlignment('right');
+        $cellPop->writeText($this->_addCommas($population[$i]));
+
+        foreach ($cities as $city) {
+          $cityMmi = intVal(round($city->mmi, 0));
+          if ($cityMmi === $mmi) {
+            $currentRow ++;
+            $table->getRow($currentRow)->setFont($this->_font->bodyLighter);
+
+            $cellCity = $table->getCell($currentRow, 2);
+            $cellCity->setCellPaddings(0, 0.05, 0, 0.05);
+            $cellCity->writeText($city->name);
+            $cellPop = $table->getCell($currentRow, 3);
+            $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
+            $cellPop->setTextAlignment('right');
+            $cellPop->writeText($this->_addCommas($city->pop));
+          }
+        }
+      }
+    }
+
+    $table->setBorderForCellRange(
+      $this->_border->tdLast,
+      $currentRow, 1, $currentRow, 3
+    );
   }
 
   /**
@@ -360,7 +527,16 @@ class Rtf {
    * Set styles for text, images, etc.
    */
   private function _setStyles() {
+    $this->_border->tdLast = new PHPRtfLite_Border(
+      $this->_rtf,
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(1, '#000000')
+    );
+
     $this->_font->body = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
+    $this->_font->bodyLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
 
     $this->_font->h1 = new PHPRtfLite_Font(18, 'Calibri', '#000000', '#FFFFFF');
     $this->_font->h1->setBold();
@@ -376,6 +552,15 @@ class Rtf {
 
     $this->_font->link = new PHPRtfLite_Font(12, 'Helvetica', '#0000CC', '#FFFFFF');
     $this->_font->link->setUnderline();
+
+    $this->_font->pagerAlert = [
+      'green' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#00b04f'),
+      'orange' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FF9900'),
+      'red' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FF0000'),
+      'yellow' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFF00')
+    ];
+
+    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
 
     $this->_format->body = new PHPRtfLite_ParFormat('left');
     $this->_format->body->setSpaceAfter(0);
@@ -401,12 +586,7 @@ class Rtf {
     $this->_format->h4->setSpaceAfter(0);
     $this->_format->h4->setSpaceBefore(16);
 
-    $this->_format->image = new PHPRtfLite_ParFormat('center');
-
-    $this->_format->pagerAlert = new PHPRtfLite_ParFormat('left');
-    $this->_format->pagerAlert->setSpaceAfter(0);
-    $this->_format->pagerAlert->setSpaceBefore(0);
-    $this->_format->pagerAlert->setSpaceBetweenLines(1.5);
+    $this->_format->image = new PHPRtfLite_ParFormat('left');
 
     $this->_format->paragraph = new PHPRtfLite_ParFormat('left');
     $this->_format->paragraph->setSpaceAfter(12);
