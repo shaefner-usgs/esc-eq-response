@@ -370,21 +370,23 @@ class Rtf {
       $this->_format->body
     );
 
-    $section3->writeText(
-      'Summary',
-      $this->_font->h4,
-      $this->_format->h4
-    );
-    $section3->writeText(
-      $this->_data->{'pager-comments'}->impact1,
-      $this->_font->body,
-      $this->_format->paragraph // margin below
-    );
-    $section3->writeText(
-      $this->_data->{'pager-comments'}->struct_comment,
-      $this->_font->body,
-      $this->_format->body // no margin below (margins don't collapse)
-    );
+    if ($this->_data->{'pager-comments'}) {
+      $section3->writeText(
+        'Summary',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section3->writeText(
+        $this->_data->{'pager-comments'}->impact1,
+        $this->_font->body,
+        $this->_format->paragraph // margin below
+      );
+      $section3->writeText(
+        $this->_data->{'pager-comments'}->struct_comment,
+        $this->_font->body,
+        $this->_format->body // no margin below (margins don't collapse)
+      );
+    }
 
     if ($this->_data->pager->economic) {
       $section3->writeText(
@@ -475,16 +477,18 @@ class Rtf {
       $this->_format->body
     );
 
-    $section4->writeText(
-      'Tectonic Summary',
-      $this->_font->h4,
-      $this->_format->h4
-    );
-    $section4->writeText(
-      $this->_data->summary,
-      $this->_font->body,
-      $this->_format->body
-    );
+    if ($this->_data->summary) {
+      $section4->writeText(
+        'Tectonic Summary',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section4->writeText(
+        $this->_data->summary,
+        $this->_font->body,
+        $this->_format->body
+      );
+    }
   }
 
   /**
