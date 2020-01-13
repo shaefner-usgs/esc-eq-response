@@ -18,28 +18,28 @@ AppUtil.Moment = Moment;
  *
  * @param num {Number}
  *
- * @return {Number}
+ * @return {String}
  */
 AppUtil.addCommas = function (num) {
-  var regex,
-      x,
-      x1,
-      x2;
+  var dec,
+      int,
+      parts,
+      regex;
 
+  dec = '';
   num += ''; // convert to string
+  parts = num.split('.');
+  int = parts[0];
   regex = /(\d+)(\d{3})/;
-  x = num.split('.');
-  x1 = x[0];
-  x2 = '';
 
-  if (x.length > 1) {
-    x2 = '.' + x[1];
+  if (parts.length > 1) {
+    dec = '.' + parts[1];
   }
-  while (regex.test(x1)) {
-    x1 = x1.replace(regex, '$1' + ',' + '$2');
+  while (regex.test(int)) {
+    int = int.replace(regex, '$1' + ',' + '$2');
   }
 
-  return x1 + x2;
+  return int + dec;
 };
 
 /**
@@ -88,28 +88,28 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
- * Get Intensity/Shaking level for a given MMI
+ * Get shaking level / intensity for a given MMI value
  *
  * @param mmi {Integer}
  *
- * @return shakingLevel {Object}
+ * @return shaking {Object}
  */
 AppUtil.getShakingLevel = function (mmi) {
-  var shakingLevel = [
+  var shaking = [
     {}, // no zero-level values
-    {intensity: 'I',    shaking: 'Not felt'},
-    {intensity: 'II',   shaking: 'Weak'},
-    {intensity: 'III',  shaking: 'Weak'},
-    {intensity: 'IV',   shaking: 'Light'},
-    {intensity: 'V',    shaking: 'Moderate'},
-    {intensity: 'VI',   shaking: 'Strong'},
-    {intensity: 'VII',  shaking: 'Very strong'},
-    {intensity: 'VIII', shaking: 'Severe'},
-    {intensity: 'IX',   shaking: 'Violent'},
-    {intensity: 'X+',   shaking: 'Extreme'}
+    {intensity: 'I',    level: 'Not felt'},
+    {intensity: 'II',   level: 'Weak'},
+    {intensity: 'III',  level: 'Weak'},
+    {intensity: 'IV',   level: 'Light'},
+    {intensity: 'V',    level: 'Moderate'},
+    {intensity: 'VI',   level: 'Strong'},
+    {intensity: 'VII',  level: 'Very strong'},
+    {intensity: 'VIII', level: 'Severe'},
+    {intensity: 'IX',   level: 'Violent'},
+    {intensity: 'X+',   level: 'Extreme'}
   ];
 
-  return shakingLevel[mmi];
+  return shaking[mmi];
 };
 
 /**
