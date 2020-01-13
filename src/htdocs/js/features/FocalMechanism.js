@@ -179,7 +179,7 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Create Feature
+   * Init Feature
    */
   _this.initFeature = function () {
     _this.mapLayer = _getMapLayer();

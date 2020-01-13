@@ -321,7 +321,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create Feature - set properties that depend on external feed data
+   * Init Feature (set properties that depend on external feed data)
    *
    * @param json {Object}
    *     feed data for Feature

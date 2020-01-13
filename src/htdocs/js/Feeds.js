@@ -98,6 +98,7 @@ var Feeds = function (options) {
 
   /**
    * Load a json feed
+   *   upon success, store feed's data to Feed instance in json prop
    *
    * @param feed {Object}
    */
