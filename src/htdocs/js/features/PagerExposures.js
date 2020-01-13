@@ -1,6 +1,9 @@
 'use strict';
 
 
+var AppUtil = require('AppUtil');
+
+
 /**
  * Create PAGER Exposures Feature
  *
@@ -26,7 +29,8 @@ var PagerExposures = function (options) {
       _app,
 
       _getExposures,
-      _getFeedUrl;
+      _getFeedUrl,
+      _getShakingLevels;
 
 
   _this = {};
@@ -47,11 +51,15 @@ var PagerExposures = function (options) {
    * @return exposures {Object}
    */
   _getExposures = function (json) {
-    var exposures;
+    var exposures,
+        mmi;
+
+    mmi = json.population_exposure.mmi;
 
     exposures = {
-      mmi: json.population_exposure.mmi.reverse(),
-      population: json.population_exposure.aggregated_exposure.reverse()
+      mmi: mmi,
+      population: json.population_exposure.aggregated_exposure,
+      shaking: _getShakingLevels(mmi)
     };
 
     return exposures;
@@ -76,6 +84,23 @@ var PagerExposures = function (options) {
     }
 
     return url;
+  };
+
+  /**
+   * Get Intensity/Shaking levels for an array of mmi values
+   *
+   * @param mmi {Array}
+   *
+   * @return levels {Array}
+   */
+  _getShakingLevels = function (mmi) {
+    var levels = [];
+
+    mmi.forEach(function (val) { // Integer
+      levels.push(AppUtil.getShakingLevel(val));
+    });
+
+    return levels;
   };
 
   // ----------------------------------------------------------

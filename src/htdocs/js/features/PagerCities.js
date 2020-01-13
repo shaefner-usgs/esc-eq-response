@@ -86,8 +86,9 @@ var PagerCities = function (options) {
     var cities,
         cityMmi,
         exposures,
-        level,
+        mmi,
         population,
+        shaking,
         summary,
         url;
 
@@ -100,15 +101,18 @@ var PagerCities = function (options) {
     summary += '<table>' +
       '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
 
-    exposures.mmi.forEach(function(mmi, i) {
-      population = exposures.population[i];
-      if (mmi >= 2 && population !== 0) { // skip values below 2 and when nobody affected
-        level = AppUtil.getShakingLevel(mmi);
+    // Sort values in descending order for display purposes
+    mmi = exposures.mmi.reverse();
+    population = exposures.population.reverse();
+    shaking = exposures.shaking.reverse();
+
+    mmi.forEach(function(mmi, i) {
+      if (mmi >= 2 && population[i] > 0) { // skip mmi below 2 and when nobody affected
         summary += '<tr>' +
-            '<td class="impact-bubbles"><span class="mmi' + level.intensity + '">' +
-              '<strong class="roman">' + level.intensity + '</strong></span></td>' +
-            '<td>' + level.shaking + '</td>' +
-            '<td>' + AppUtil.addCommas(population) + '</td>' +
+            '<td class="impact-bubbles"><span class="mmi' + shaking[i].intensity + '">' +
+              '<strong class="roman">' + shaking[i].intensity + '</strong></span></td>' +
+            '<td>' + shaking[i].level + '</td>' +
+            '<td>' + AppUtil.addCommas(population[i]) + '</td>' +
           '</tr>';
         cities.forEach(function(city) {
           cityMmi = Number(AppUtil.round(city.mmi, 0));
