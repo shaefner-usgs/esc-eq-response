@@ -72,7 +72,11 @@ class Rtf {
    * Sanitize data from external json feeds for known issues
    */
   private function _cleanData() {
-
+    // Strip HTML tags, extra whitespace from summary
+    $this->_data->summary = preg_replace('/\s+/', ' ',
+      strip_tags($this->_data->summary)
+    );
+    $this->_data->summary = preg_replace('/^ /', '', $this->_data->summary);
   }
 
   /**
@@ -88,6 +92,8 @@ class Rtf {
     if (!empty(get_object_vars($this->_data->pager))) {
       $this->_createSection3();
     }
+
+    $this->_createSection4();
   }
 
   /**
@@ -425,6 +431,63 @@ class Rtf {
   }
 
   /**
+   * RTF Document, Section 4: Mechanism and Fault
+   */
+  private function _createSection4() {
+    $section4 = $this->_rtf->addSection();
+
+    $section4->writeText(
+      'Mechanism and Fault',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section4->writeText(
+      'Focal Mechanism',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section4->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section4->writeText(
+      'Moment Tensor',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section4->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section4->writeText(
+      'Fault',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section4->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section4->writeText(
+      'Tectonic Summary',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section4->writeText(
+      $this->_data->summary,
+      $this->_font->body,
+      $this->_format->body
+    );
+  }
+
+  /**
    * Create population exposure table
    *
    * @param $section {Object}
@@ -514,7 +577,7 @@ class Rtf {
   }
 
   /**
-   * Set page margins (unit is centimeters)
+   * Set RTF Document page margins (unit is centimeters)
    */
   private function _setMargins() {
     $this->_rtf->setMarginBottom(2);
@@ -524,7 +587,7 @@ class Rtf {
   }
 
   /**
-   * Set styles for text, images, etc.
+   * Set styles for text, images, etc. in RTF Document
    */
   private function _setStyles() {
     $this->_border->tdLast = new PHPRtfLite_Border(
