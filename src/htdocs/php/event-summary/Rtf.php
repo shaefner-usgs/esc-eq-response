@@ -97,6 +97,7 @@ class Rtf {
 
     $this->_createSection4();
     $this->_createSection5();
+    $this->_createSection6();
   }
 
   /**
@@ -137,9 +138,9 @@ class Rtf {
     $this->_rtf->save($this->file);
   }
 
-  // --------------------------------------------
-  // Utility methods for creating RTF file follow
-  // --------------------------------------------
+  // ---------------------------------------------------------------------
+  // Utility methods for creating RTF file using PHPRtfLite library follow
+  // ---------------------------------------------------------------------
 
   /**
    * RTF Document, Section 1: Basic earthquake details
@@ -381,7 +382,7 @@ class Rtf {
       $section3->writeText(
         $this->_data->{'pager-comments'}->impact1,
         $this->_font->body,
-        $this->_format->paragraph // margin below
+        $this->_format->p // margin below
       );
       $section3->writeText(
         $this->_data->{'pager-comments'}->struct_comment,
@@ -605,6 +606,126 @@ class Rtf {
   }
 
   /**
+   * RTF Document, Section 5: Aftershocks
+   */
+  private function _createSection6() {
+    $section6 = $this->_rtf->addSection();
+
+    $section6->writeText(
+      'Aftershocks',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section6->writeText(
+      strip_tags($this->_data->aftershocks->description),
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    $this->_createTableBinnedData($section6, 'aftershocks', 'first');
+
+    $section6->writeText(
+      '[EQ LIST PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    $section6->writeText(
+      'Aftershock Forecast',
+      $this->_font->h3,
+      $this->_format->h3
+    );
+
+    $section6->writeText(
+      'The probability of one or more aftershocks of at least magnitude M within the given time frame:',
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    $section6->writeText(
+      'The likely number of aftershocks of at least magnitude M within the given time frame:',
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    $datetime = date('Y-m-d g:ia \(T\)', $this->_data->aftershocks->forecast[0]->timeStart / 1000);
+    $section6->writeText(
+      '<strong>Forecast starts</strong>: ' . $datetime,
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    $section6->writeText(
+      '<strong>Model</strong>: ' . $this->_data->aftershocks->model->name,
+      $this->_font->body,
+      $this->_format->p
+    );
+  }
+
+  /**
+   * Create binned data table
+   *
+   * @param $section {Object}
+   *     RTF Document section
+   * @param $id {String}
+   *     Feature id
+   * @param $type {String <first | past | prior>}
+   */
+  private function _createTableBinnedData($section, $id, $type) {
+    $data = $this->_data->{$id}->bins->{$type};
+
+    // Convert table rows to an array and sort by key
+    $rows = get_object_vars($data);
+    ksort($rows);
+
+    $numRows = count($rows) + 1; // data rows + 1 header row
+    $table = $section->addTable();
+    $table->addRows($numRows);
+    $table->addColumnsList(array(1.5, 1.5, 1.5, 1.5, 1.5, 1.5));
+
+    $headerCol1 = $table->getCell(1, 1);
+    $headerCol1->setTextAlignment('center');
+    $headerCol1->writeText(strtoupper($type));
+    $headerCol2 = $table->getCell(1, 2);
+    $headerCol2->setTextAlignment('center');
+    $headerCol2->writeText('DAY');
+    $headerCol3 = $table->getCell(1, 3);
+    $headerCol3->setTextAlignment('center');
+    $headerCol3->writeText('WEEK');
+    $headerCol4 = $table->getCell(1, 4);
+    $headerCol4->setTextAlignment('center');
+    $headerCol4->writeText('MONTH');
+    $headerCol5 = $table->getCell(1, 5);
+    $headerCol5->setTextAlignment('center');
+    $headerCol5->writeText('YEAR');
+    $headerCol6 = $table->getCell(1, 6);
+    $headerCol6->setTextAlignment('center');
+    $headerCol6->writeText('TOTAL');
+
+    //$table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
+    $table->setFontForCellRange($this->_font->th, 1, 2, 1, 6);
+    $table->setFontForCellRange($this->_font->th, 2, 1, $numRows, 1);
+    $table->setFontForCellRange($this->_font->body, 2, 1, $numRows, 6);
+
+    $row = 1;
+    foreach ($rows as $th => $tds) {
+      $row ++;
+      $cell = $table->getCell($row, 1);
+      $cell->writeText(strtoupper($th));
+      $cell->setTextAlignment('center');
+
+      $col = 1;
+      foreach ($tds as $key => $value) {
+        $col ++;
+        $cell = $table->getCell($row, $col);
+        $cell->writeText($value);
+        $cell->setTextAlignment('right');
+      }
+    }
+  }
+
+  /**
    * Create population exposure table
    *
    * @param $section {Object}
@@ -629,7 +750,7 @@ class Rtf {
       }
     );
     $shaking = $this->_data->{'pager-exposures'}->shaking;
-    $numRows = count($cities) + count($population);
+    $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
     $section->writeText('<br>');
     $table = $section->addTable();
@@ -650,21 +771,21 @@ class Rtf {
     $table->setFontForCellRange($this->_font->th, 1, 1, 1, 3);
     $table->setFontForCellRange($this->_font->body, 2, 1, $numRows, 3);
 
-    $currentRow = 1;
+    $row = 1;
     foreach ($mmis as $i => $mmi) {
       if (array_key_exists($i, $population) && $mmi >= 2 && $population[$i] > 0)
       { // skip mmi below 2 and when nobody affected
-        $currentRow ++;
+        $row ++;
 
-        $cellIntensity = $table->getCell($currentRow, 1);
+        $cellIntensity = $table->getCell($row, 1);
         $cellIntensity->setCellPaddings(0, 0.05, 0, 0.05);
         $cellIntensity->setTextAlignment('center');
         $cellIntensity->writeText($shaking[$i]->intensity);
-        $cellLevel = $table->getCell($currentRow, 2);
+        $cellLevel = $table->getCell($row, 2);
         $cellLevel->setCellPaddings(0, 0.05, 0, 0.05);
         $cellLevel->setTextAlignment('left');
         $cellLevel->writeText($shaking[$i]->level);
-        $cellPop = $table->getCell($currentRow, 3);
+        $cellPop = $table->getCell($row, 3);
         $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
         $cellPop->setTextAlignment('right');
         $cellPop->writeText($this->_addCommas($population[$i]));
@@ -672,13 +793,13 @@ class Rtf {
         foreach ($cities as $city) {
           $cityMmi = intVal(round($city->mmi, 0));
           if ($cityMmi === $mmi) {
-            $currentRow ++;
-            $table->getRow($currentRow)->setFont($this->_font->bodyLighter);
+            $row ++;
+            $table->getRow($row)->setFont($this->_font->bodyLighter);
 
-            $cellCity = $table->getCell($currentRow, 2);
+            $cellCity = $table->getCell($row, 2);
             $cellCity->setCellPaddings(0, 0.05, 0, 0.05);
             $cellCity->writeText($city->name);
-            $cellPop = $table->getCell($currentRow, 3);
+            $cellPop = $table->getCell($row, 3);
             $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
             $cellPop->setTextAlignment('right');
             $cellPop->writeText($this->_addCommas($city->pop));
@@ -689,7 +810,7 @@ class Rtf {
 
     $table->setBorderForCellRange(
       $this->_border->tdLast,
-      $currentRow, 1, $currentRow, 3
+      $row, 1, $row, 3
     );
   }
 
@@ -768,9 +889,9 @@ class Rtf {
 
     $this->_format->image = new PHPRtfLite_ParFormat('left');
 
-    $this->_format->paragraph = new PHPRtfLite_ParFormat('left');
-    $this->_format->paragraph->setSpaceAfter(12);
-    $this->_format->paragraph->setSpaceBefore(0);
-    $this->_format->paragraph->setSpaceBetweenLines(1.5);
+    $this->_format->p = new PHPRtfLite_ParFormat('left');
+    $this->_format->p->setSpaceAfter(12);
+    $this->_format->p->setSpaceBefore(0);
+    $this->_format->p->setSpaceBetweenLines(1.5);
   }
 }
