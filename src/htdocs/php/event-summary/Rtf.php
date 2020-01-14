@@ -23,6 +23,7 @@ class Rtf {
   private $_data;
   private $_font;
   private $_format;
+  private $_now;
   private $_rtf;
 
   public $file;
@@ -32,6 +33,7 @@ class Rtf {
     $this->_data = $data;
     $this->_font = new stdClass;
     $this->_format = new stdClass;
+    $this->_now = date('Y-m-d g:ia \(T\)');
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
     if ($this->_data) {
@@ -94,6 +96,7 @@ class Rtf {
     }
 
     $this->_createSection4();
+    $this->_createSection5();
   }
 
   /**
@@ -144,7 +147,6 @@ class Rtf {
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
 
-    $now = date('Y-m-d g:ia \(T\)');
     $nearbyCitiesList = '';
     if ($this->_data->{'nearby-cities'}) {
       foreach ($this->_data->{'nearby-cities'} as $city) {
@@ -160,7 +162,7 @@ class Rtf {
       $this->_format->h1
     );
     $section1->writeText(
-      '<b>Version 1</b>, ' . $now,
+      '<b>Version 1</b>, ' . $this->_now,
       $this->_font->body,
       $this->_format->center
     );
@@ -489,6 +491,117 @@ class Rtf {
         $this->_format->body
       );
     }
+  }
+
+  /**
+   * RTF Document, Section 5: Ground Shaking
+   */
+  private function _createSection5() {
+    $section5 = $this->_rtf->addSection();
+
+    $section5->writeText(
+      'Ground Shaking',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    if ($this->_data->shakemap) {
+      $section5->writeText(
+        'ShakeMap',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+    }
+
+    if ($this->_data->{'shakemap-info'}) {
+      $motions = $this->_data->{'shakemap-info'}->output->ground_motions;
+
+      $mmi = round($motions->intensity->max, 1) . ' (bias: ' .
+        round($motions->intensity->bias, 3) . ')';
+      $pga = round($motions->pga->max) . ' %g (bias: ' .
+        round($motions->pga->bias, 3) . ')';
+      $pgv = round($motions->pgv->max) . ' cm/s (bias: ' .
+        round($motions->pgv->bias, 3) . ')';
+
+      $section5->writeText(
+        'Max MMI: ' . $mmi,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max PGA: ' . $pga,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max PGV: ' . $pgv,
+        $this->_font->body,
+        $this->_format->body
+      );
+    }
+
+    if ($this->_data->shakemap) {
+      $section5->addImage(
+        $this->_getRemoteImage($this->_data->shakemap),
+        $this->_format->image,
+        12
+      );
+    }
+
+    $section5->writeText(
+      'Ground-Motion Analysis',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section5->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    if (!empty(get_object_vars($this->_data->dyfi))) {
+      $section5->writeText(
+        'Did You Feel It?',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section5->writeText(
+        $this->_data->dyfi->responses . ' responses as of ' . $this->_now,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max MMI: ' . $this->_data->dyfi->maxmmi,
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      if ($this->_data->dyfi->map) {
+        $section5->addImage(
+          $this->_getRemoteImage($this->_data->dyfi->map),
+          $this->_format->image,
+          12
+        );
+      }
+      if ($this->_data->dyfi->plot) {
+        $section5->addImage(
+          $this->_getRemoteImage($this->_data->dyfi->plot),
+          $this->_format->image,
+          12
+        );
+      }
+    }
+
+    $section5->writeText(
+      'Ground Failure',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section5->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
   }
 
   /**
