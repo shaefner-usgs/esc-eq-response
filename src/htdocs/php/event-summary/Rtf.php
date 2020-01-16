@@ -682,11 +682,12 @@ class Rtf {
     $numRows = count($rows) + 1; // data rows + 1 header row
     $table = $section->addTable();
     $table->addRows($numRows);
-    $table->addColumnsList(array(1.5, 1.5, 1.5, 1.5, 1.5, 1.5));
+    $table->addColumnsList(array(1.75, 1.75, 1.75, 1.75, 1.75, 1.75));
 
     $headerCol1 = $table->getCell(1, 1);
-    $headerCol1->setTextAlignment('center');
-    $headerCol1->writeText(strtoupper($type));
+    $headerCol1->setTextAlignment('right');
+    $headerCol1->writeText(strtoupper($type) . ':');
+    $headerCol1->setFont($this->_font->td);
     $headerCol2 = $table->getCell(1, 2);
     $headerCol2->setTextAlignment('center');
     $headerCol2->writeText('DAY');
@@ -703,10 +704,15 @@ class Rtf {
     $headerCol6->setTextAlignment('center');
     $headerCol6->writeText('TOTAL');
 
-    //$table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
+    $table->setBackgroundForCellRange('#F7F7F7', $numRows, 2, $numRows, 6);
+    $table->setBackgroundForCellRange('#F7F7F7', 2, 6, $numRows, 6);
+    $table->setBorderForCellRange($this->_border->thCol, 1, 2, 1, 6);
+    $table->setBorderForCellRange($this->_border->thRow, 2, 1, $numRows, 1);
     $table->setFontForCellRange($this->_font->th, 1, 2, 1, 6);
     $table->setFontForCellRange($this->_font->th, 2, 1, $numRows, 1);
-    $table->setFontForCellRange($this->_font->body, 2, 1, $numRows, 6);
+    $table->setFontForCellRange($this->_font->tdBg, $numRows, 2, $numRows, 6);
+    $table->setFontForCellRange($this->_font->tdBg, 2, 6, $numRows, 6);
+    $table->setFontForCellRange($this->_font->td, 2, 2, $numRows - 1, 5);
 
     $row = 1;
     foreach ($rows as $th => $tds) {
@@ -714,6 +720,7 @@ class Rtf {
       $cell = $table->getCell($row, 1);
       $cell->writeText(strtoupper($th));
       $cell->setTextAlignment('center');
+      $cell->setCellPaddings(0.075, 0.15, 0.075, 0.15);
 
       $col = 1;
       foreach ($tds as $key => $value) {
@@ -721,6 +728,7 @@ class Rtf {
         $cell = $table->getCell($row, $col);
         $cell->writeText($value);
         $cell->setTextAlignment('right');
+        $cell->setCellPaddings(0.075, 0.15, 0.075, 0.15);
       }
     }
   }
@@ -733,7 +741,7 @@ class Rtf {
    */
   private function _createTableExposure($section) {
     $cities = $this->_data->{'pager-cities'};
-    $mmis = array_filter(
+    $mmis = array_filter( // keep values where mmi >=2
       $this->_data->{'pager-exposures'}->mmi,
       function($value) {
         if ($value >= 2) {
@@ -741,13 +749,14 @@ class Rtf {
         }
       }
     );
-    $population = array_filter(
+    $population = array_filter( // keep values where population > 0 and mmi >=2
       $this->_data->{'pager-exposures'}->population,
-      function($value) {
-        if ($value > 0) {
+      function($value, $key) {
+        if ($value > 0 && $this->_data->{'pager-exposures'}->mmi[$key] >= 2) {
           return $value;
         }
-      }
+      },
+      ARRAY_FILTER_USE_BOTH
     );
     $shaking = $this->_data->{'pager-exposures'}->shaking;
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
@@ -768,8 +777,9 @@ class Rtf {
     $headerCol3->writeText('Population');
 
     $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
-    $table->setFontForCellRange($this->_font->th, 1, 1, 1, 3);
-    $table->setFontForCellRange($this->_font->body, 2, 1, $numRows, 3);
+    $table->setBorderForCellRange($this->_border->tdLast, $numRows, 1, $numRows, 3);
+    $table->setFontForCellRange($this->_font->thBg, 1, 1, 1, 3);
+    $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 3);
 
     $row = 1;
     foreach ($mmis as $i => $mmi) {
@@ -778,15 +788,15 @@ class Rtf {
         $row ++;
 
         $cellIntensity = $table->getCell($row, 1);
-        $cellIntensity->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellIntensity->setCellPaddings(0, 0.025, 0, 0.125);
         $cellIntensity->setTextAlignment('center');
         $cellIntensity->writeText($shaking[$i]->intensity);
         $cellLevel = $table->getCell($row, 2);
-        $cellLevel->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellLevel->setCellPaddings(0, 0.025, 0, 0.125);
         $cellLevel->setTextAlignment('left');
         $cellLevel->writeText($shaking[$i]->level);
         $cellPop = $table->getCell($row, 3);
-        $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
+        $cellPop->setCellPaddings(0, 0.025, 0, 0.125);
         $cellPop->setTextAlignment('right');
         $cellPop->writeText($this->_addCommas($population[$i]));
 
@@ -794,24 +804,19 @@ class Rtf {
           $cityMmi = intVal(round($city->mmi, 0));
           if ($cityMmi === $mmi) {
             $row ++;
-            $table->getRow($row)->setFont($this->_font->bodyLighter);
+            $table->getRow($row)->setFont($this->_font->tdLighter);
 
             $cellCity = $table->getCell($row, 2);
-            $cellCity->setCellPaddings(0, 0.05, 0, 0.05);
+            $cellCity->setCellPaddings(0, 0.025, 0, 0.125);
             $cellCity->writeText($city->name);
             $cellPop = $table->getCell($row, 3);
-            $cellPop->setCellPaddings(0, 0.05, 0, 0.05);
+            $cellPop->setCellPaddings(0, 0.025, 0, 0.125);
             $cellPop->setTextAlignment('right');
             $cellPop->writeText($this->_addCommas($city->pop));
           }
         }
       }
     }
-
-    $table->setBorderForCellRange(
-      $this->_border->tdLast,
-      $row, 1, $row, 3
-    );
   }
 
   /**
@@ -836,8 +841,22 @@ class Rtf {
       new PHPRtfLite_Border_Format(1, '#000000')
     );
 
+    $this->_border->thCol = new PHPRtfLite_Border(
+      $this->_rtf,
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(1, '#CCCCCC')
+    );
+    $this->_border->thRow = new PHPRtfLite_Border(
+      $this->_rtf,
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(),
+      new PHPRtfLite_Border_Format(1, '#CCCCCC'),
+      new PHPRtfLite_Border_Format()
+    );
+
     $this->_font->body = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
-    $this->_font->bodyLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
 
     $this->_font->h1 = new PHPRtfLite_Font(18, 'Calibri', '#000000', '#FFFFFF');
     $this->_font->h1->setBold();
@@ -861,7 +880,13 @@ class Rtf {
       'yellow' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFF00')
     ];
 
-    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
+    $this->_font->td = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
+    $this->_font->tdBg = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#F7F7F7');
+    $this->_font->tdLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
+
+    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
+    $this->_font->th->setBold();
+    $this->_font->thBg = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
 
     $this->_format->body = new PHPRtfLite_ParFormat('left');
     $this->_format->body->setSpaceAfter(0);
