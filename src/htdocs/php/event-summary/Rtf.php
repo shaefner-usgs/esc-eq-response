@@ -59,9 +59,7 @@ class Rtf {
       $dec = '.' . $parts[1];
     }
 
-    //while (regex.test(int)) {
     while (preg_match($regex, $int)) {
-      //int = int.replace(regex, '$1' + ',' + '$2');
       $int = preg_replace($regex, "$1,$2", $int);
     }
 
@@ -622,6 +620,7 @@ class Rtf {
     );
 
     $this->_createTableBinnedData($section6, 'aftershocks', 'first');
+    $this->_createTableBinnedData($section6, 'aftershocks', 'past');
 
     $section6->writeText(
       '[EQ LIST PLACEHOLDER]',
@@ -636,18 +635,31 @@ class Rtf {
     );
 
     $section6->writeText(
-      'The probability of one or more aftershocks of at least magnitude M within the given time frame:',
+      'The probability of one or more aftershocks of at least magnitude M ' .
+        'within the given time frame:',
       $this->_font->body,
-      $this->_format->p
+      $this->_format->body
     );
+    $this->_createTableForecast($section6, 'probability');
 
     $section6->writeText(
-      'The likely number of aftershocks of at least magnitude M within the given time frame:',
+      'The likely number of aftershocks of at least magnitude M within the ' .
+        'given time frame (95% confidence range):',
+      $this->_font->body,
+      $this->_format->body
+    );
+    $this->_createTableForecast($section6, 'number');
+
+    $section6->writeText(
+      '* = An earthquake is possible, but the probability is low.',
       $this->_font->body,
       $this->_format->p
     );
 
-    $datetime = date('Y-m-d g:ia \(T\)', $this->_data->aftershocks->forecast[0]->timeStart / 1000);
+    $datetime = date(
+      'Y-m-d g:ia \(T\)',
+      $this->_data->aftershocks->forecast[0]->timeStart / 1000
+    );
     $section6->writeText(
       '<strong>Forecast starts</strong>: ' . $datetime,
       $this->_font->body,
@@ -829,6 +841,77 @@ class Rtf {
               $cell->writeText($value);
             }
           }
+        }
+      }
+    }
+  }
+
+  /**
+   * Create Aftershocks forecast table
+   *
+   * @param $section {Object}
+   *     RTF Document section
+   * @param $type {String <number | probability>}
+   */
+  private function _createTableForecast($section, $type) {
+    $forecasts = $this->_data->aftershocks->forecast;
+    $numCols = count($forecasts) + 1; // data cols + 1 header col
+    $numRows = count($forecasts[0]->bins) + 1; // data rows + 1 header row
+
+    $section->writeText(
+      '<br>',
+      $this->_font->body,
+      $this->_format->table // sets paragraph formatting in table that follows
+    );
+
+    $table = $section->addTable();
+    $table->addRows($numRows);
+    $table->addColumnsList(array(2, 2, 2, 2, 2));
+    $table->setFontForCellRange($this->_font->td, 2, 2, $numRows, $numCols);
+    $table->setFontForCellRange($this->_font->th, 1, 2, 1, $numCols);
+    $table->setFontForCellRange($this->_font->th, 2, 1, $numRows, 1);
+    $table->setTextAlignmentForCellRange('right', 2, 2, $numRows, $numCols);
+    $table->setTextAlignmentForCellRange('center', 1, 2, 1, $numCols);
+    $table->setTextAlignmentForCellRange('center', 2, 1, $numRows, 1);
+
+    $col = 1;
+    foreach ($forecasts as $forecast) {
+      $col ++;
+
+      // Header row
+      $cell = $table->getCell(1, $col);
+      $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
+      $cell->writeText($forecast->label);
+
+      // Data rows
+      $row = 1;
+      foreach ($forecast->bins as $bin) {
+        $row ++;
+
+        if ($col === 2) { // first pass, render magnitude headers
+          $cell = $table->getCell($row, 1);
+          $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
+          $cell->writeText('M >= ' . $bin->magnitude);
+        }
+
+        $cell = $table->getCell($row, $col);
+        $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
+
+        if ($type === 'number') {
+          if ($bin->p95minimum === 0 && $bin->p95maximum === 0) {
+            $number = '*';
+          } else {
+            $number = $bin->p95minimum . ' to ' . $bin->p95maximum;
+          }
+          $cell->writeText($number);
+        } else {
+          $probability = round($bin->probability * 100, 0);
+          if ($probability < 1) {
+            $probability = ' < 1%';
+          } else {
+            $probability .= '%';
+          }
+          $cell->writeText($probability);
         }
       }
     }
