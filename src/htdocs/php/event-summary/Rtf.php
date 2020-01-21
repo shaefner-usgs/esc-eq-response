@@ -75,6 +75,10 @@ class Rtf {
       strip_tags($this->_data->summary)
     );
     $this->_data->summary = trim($this->_data->summary);
+    // Remove header from summary if it exists
+    $this->_data->summary = preg_replace('/^tectonic summary ?/i', '',
+      $this->_data->summary
+    );
   }
 
   /**
@@ -86,11 +90,7 @@ class Rtf {
 
     $this->_createSection1();
     $this->_createSection2();
-
-    if (!empty(get_object_vars($this->_data->pager))) {
-      $this->_createSection3();
-    }
-
+    $this->_createSection3();
     $this->_createSection4();
     $this->_createSection5();
     $this->_createSection6();
@@ -175,7 +175,7 @@ class Rtf {
     $section1 = $this->_rtf->addSection();
 
     $nearbyCitiesList = '';
-    if ($this->_data->{'nearby-cities'}) {
+    if (property_exists($this->_data, 'nearby-cities')) {
       foreach ($this->_data->{'nearby-cities'} as $city) {
         $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
           ' of ' . $city->name . '<br>';
@@ -374,91 +374,93 @@ class Rtf {
    * RTF Document, Section 3: Impact
    */
   private function _createSection3() {
-    $section3 = $this->_rtf->addSection();
+    if (!empty(get_object_vars($this->_data->pager))) {
+      $section3 = $this->_rtf->addSection();
 
-    $section3->writeText(
-      'Impact',
-      $this->_font->h2,
-      $this->_format->h2
-    );
-
-    $section3->writeText(
-      'PAGER',
-      $this->_font->h3,
-      $this->_format->h3
-    );
-
-    $section3->writeText(
-      'Alert Level',
-      $this->_font->h4,
-      $this->_format->h4
-    );
-    $section3->writeText(
-      ucfirst($this->_data->pager->alert),
-      $this->_font->pagerAlert[$this->_data->pager->alert],
-      $this->_format->body
-    );
-
-    if ($this->_data->{'pager-comments'}) {
       $section3->writeText(
-        'Summary',
+        'Impact',
+        $this->_font->h2,
+        $this->_format->h2
+      );
+
+      $section3->writeText(
+        'PAGER',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+
+      $section3->writeText(
+        'Alert Level',
         $this->_font->h4,
         $this->_format->h4
       );
       $section3->writeText(
-        $this->_data->{'pager-comments'}->impact1,
-        $this->_font->body,
-        $this->_format->p // margin below
+        ucfirst($this->_data->pager->alert),
+        $this->_font->pagerAlert[$this->_data->pager->alert],
+        $this->_format->body
       );
-      $section3->writeText(
-        $this->_data->{'pager-comments'}->struct_comment,
-        $this->_font->body,
-        $this->_format->body // no margin below (margins don't collapse)
-      );
-    }
 
-    if ($this->_data->pager->economic) {
-      $section3->writeText(
-        'Estimated Economic Losses',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-      $section3->addImage(
-        $this->_getRemoteImage($this->_data->pager->economic),
-        $this->_format->image,
-        12
-      );
-    }
+      if (property_exists($this->_data, 'pager-comments')) {
+        $section3->writeText(
+          'Summary',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->writeText(
+          $this->_data->{'pager-comments'}->impact1,
+          $this->_font->body,
+          $this->_format->p // margin below
+        );
+        $section3->writeText(
+          $this->_data->{'pager-comments'}->struct_comment,
+          $this->_font->body,
+          $this->_format->body // no margin below (margins don't collapse)
+        );
+      }
 
-    if ($this->_data->pager->fatalities) {
-      $section3->writeText(
-        'Estimated Fatalities',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-      $section3->addImage(
-        $this->_getRemoteImage($this->_data->pager->fatalities),
-        $this->_format->image,
-        12
-      );
-    }
+      if ($this->_data->pager->economic) {
+        $section3->writeText(
+          'Estimated Economic Losses',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->addImage(
+          $this->_getRemoteImage($this->_data->pager->economic),
+          $this->_format->image,
+          12
+        );
+      }
 
-    if ($this->_data->pager->exposure) { // has exposure image
-      $section3->insertPageBreak();
-      $section3->writeText(
-        'Population Exposure',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-      $section3->writeText('<br>');
-      $section3->addImage(
-        $this->_getRemoteImage($this->_data->pager->exposure),
-        $this->_format->image,
-        10
-      );
-    }
+      if ($this->_data->pager->fatalities) {
+        $section3->writeText(
+          'Estimated Fatalities',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->addImage(
+          $this->_getRemoteImage($this->_data->pager->fatalities),
+          $this->_format->image,
+          12
+        );
+      }
 
-    $this->_createTableExposure($section3);
+      if ($this->_data->pager->exposure) { // has exposure image
+        $section3->insertPageBreak();
+        $section3->writeText(
+          'Population Exposure',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->writeText('<br>');
+        $section3->addImage(
+          $this->_getRemoteImage($this->_data->pager->exposure),
+          $this->_format->image,
+          10
+        );
+      }
+
+      $this->_createTableExposure($section3);
+    }
   }
 
   /**
@@ -540,31 +542,36 @@ class Rtf {
       );
     }
 
-    if ($this->_data->{'shakemap-info'}) {
+    if (property_exists($this->_data, 'shakemap-info')) {
       $motions = $this->_data->{'shakemap-info'}->output->ground_motions;
 
-      $mmi = round($motions->intensity->max, 1) . ' (bias: ' .
-        round($motions->intensity->bias, 3) . ')';
-      $pga = round($motions->pga->max) . ' %g (bias: ' .
-        round($motions->pga->bias, 3) . ')';
-      $pgv = round($motions->pgv->max) . ' cm/s (bias: ' .
-        round($motions->pgv->bias, 3) . ')';
-
-      $section5->writeText(
-        'Max MMI: ' . $mmi,
-        $this->_font->body,
-        $this->_format->body
-      );
-      $section5->writeText(
-        'Max PGA: ' . $pga,
-        $this->_font->body,
-        $this->_format->body
-      );
-      $section5->writeText(
-        'Max PGV: ' . $pgv,
-        $this->_font->body,
-        $this->_format->body
-      );
+      if (property_exists($motions, 'intensity')) {
+        $mmi = round($motions->intensity->max, 1) . ' (bias: ' .
+          round($motions->intensity->bias, 3) . ')';
+        $section5->writeText(
+          'Max MMI: ' . $mmi,
+          $this->_font->body,
+          $this->_format->body
+        );
+      }
+      if (property_exists($motions, 'pga')) {
+        $pga = round($motions->pga->max) . ' %g (bias: ' .
+          round($motions->pga->bias, 3) . ')';
+        $section5->writeText(
+          'Max PGA: ' . $pga,
+          $this->_font->body,
+          $this->_format->body
+        );
+      }
+      if (property_exists($motions, 'pgv')) {
+        $pgv = round($motions->pgv->max) . ' cm/s (bias: ' .
+          round($motions->pgv->bias, 3) . ')';
+        $section5->writeText(
+          'Max PGV: ' . $pgv,
+          $this->_font->body,
+          $this->_format->body
+        );
+      }
     }
 
     if ($this->_data->shakemap) {
@@ -649,8 +656,10 @@ class Rtf {
       $this->_format->body
     );
 
-    $this->_createTableBinnedData($section6, 'aftershocks', 'first');
-    $this->_createTableBinnedData($section6, 'aftershocks', 'past');
+    if (!empty(get_object_vars($this->_data->aftershocks->bins))) {
+      $this->_createTableBinnedData($section6, 'aftershocks', 'first');
+      $this->_createTableBinnedData($section6, 'aftershocks', 'past');
+    }
 
     $section6->writeText(
       '[EQ LIST PLACEHOLDER]',
@@ -658,49 +667,51 @@ class Rtf {
       $this->_format->p
     );
 
-    $section6->writeText(
-      'Aftershock Forecast',
-      $this->_font->h3,
-      $this->_format->h3
-    );
+    if (!empty($this->_data->aftershocks->forecast)) {
+      $section6->writeText(
+        'Aftershock Forecast',
+        $this->_font->h3,
+        $this->_format->h3
+      );
 
-    $section6->writeText(
-      'The probability of one or more aftershocks of at least magnitude M ' .
-        'within the given time frame:',
-      $this->_font->body,
-      $this->_format->body
-    );
-    $this->_createTableForecast($section6, 'probability');
+      $section6->writeText(
+        'The probability of one or more aftershocks of at least magnitude M ' .
+          'within the given time frame:',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $this->_createTableForecast($section6, 'probability');
 
-    $section6->writeText(
-      'The likely number of aftershocks of at least magnitude M within the ' .
-        'given time frame (95% confidence range):',
-      $this->_font->body,
-      $this->_format->body
-    );
-    $this->_createTableForecast($section6, 'number');
+      $section6->writeText(
+        'The likely number of aftershocks of at least magnitude M within the ' .
+          'given time frame (95% confidence range):',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $this->_createTableForecast($section6, 'number');
 
-    $section6->writeText(
-      '* = An earthquake is possible, but the probability is low.',
-      $this->_font->body,
-      $this->_format->p
-    );
+      $section6->writeText(
+        '* = An earthquake is possible, but the probability is low.',
+        $this->_font->body,
+        $this->_format->p
+      );
 
-    $datetime = date(
-      'Y-m-d g:ia \(T\)',
-      $this->_data->aftershocks->forecast[0]->timeStart / 1000
-    );
-    $section6->writeText(
-      '<strong>Forecast starts</strong>: ' . $datetime,
-      $this->_font->body,
-      $this->_format->p
-    );
+      $datetime = date(
+        'Y-m-d g:ia \(T\)',
+        $this->_data->aftershocks->forecast[0]->timeStart / 1000
+      );
+      $section6->writeText(
+        '<strong>Forecast starts</strong>: ' . $datetime,
+        $this->_font->body,
+        $this->_format->p
+      );
 
-    $section6->writeText(
-      '<strong>Model</strong>: ' . $this->_data->aftershocks->model->name,
-      $this->_font->body,
-      $this->_format->p
-    );
+      $section6->writeText(
+        '<strong>Model</strong>: ' . $this->_data->aftershocks->model->name,
+        $this->_font->body,
+        $this->_format->p
+      );
+    }
   }
 
   /**
@@ -721,7 +732,9 @@ class Rtf {
       $this->_format->body
     );
 
-    $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
+    if (!empty(get_object_vars($this->_data->foreshocks->bins))) {
+      $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
+    }
 
     $section7->writeText(
       '[EQ LIST PLACEHOLDER]',
@@ -748,7 +761,9 @@ class Rtf {
       $this->_format->body
     );
 
-    $this->_createTableBinnedData($section8, 'historical', 'prior');
+    if (!empty(get_object_vars($this->_data->historical->bins))) {
+      $this->_createTableBinnedData($section8, 'historical', 'prior');
+    }
 
     $section8->writeText(
       '[EQ LIST PLACEHOLDER]',
