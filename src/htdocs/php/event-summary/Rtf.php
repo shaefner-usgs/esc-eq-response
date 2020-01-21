@@ -74,7 +74,7 @@ class Rtf {
     $this->_data->summary = preg_replace('/\s+/', ' ',
       strip_tags($this->_data->summary)
     );
-    $this->_data->summary = preg_replace('/^ /', '', $this->_data->summary);
+    $this->_data->summary = trim($this->_data->summary);
   }
 
   /**
@@ -94,6 +94,9 @@ class Rtf {
     $this->_createSection4();
     $this->_createSection5();
     $this->_createSection6();
+    $this->_createSection7();
+    $this->_createSection8();
+    $this->_createSection9();
   }
 
   /**
@@ -122,6 +125,33 @@ class Rtf {
     fclose($tempImg);
 
     return $path;
+  }
+
+  /**
+   * Get a roman numeral from number
+   *
+   * @param $number {Number}
+   *
+   * @return $r {String}
+   */
+  private function _numberToRoman($number) {
+    $num = intVal($number);
+    $lookup = array('M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400,
+      'C' => 100, 'XC' => 90, 'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9,
+      'V' => 5, 'IV' => 4, 'I' => 1);
+    $r = '';
+
+    while ($num > 0) {
+      foreach ($lookup as $roman => $int) {
+        if ($num >= $int) {
+          $num -= $int;
+          $r .= $roman;
+          break;
+        }
+      }
+    }
+
+    return $r;
   }
 
   /**
@@ -602,7 +632,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 5: Aftershocks
+   * RTF Document, Section 6: Aftershocks
    */
   private function _createSection6() {
     $section6 = $this->_rtf->addSection();
@@ -668,6 +698,128 @@ class Rtf {
 
     $section6->writeText(
       '<strong>Model</strong>: ' . $this->_data->aftershocks->model->name,
+      $this->_font->body,
+      $this->_format->p
+    );
+  }
+
+  /**
+   * RTF Document, Section 7: Foreshocks
+   */
+  private function _createSection7() {
+    $section7 = $this->_rtf->addSection();
+
+    $section7->writeText(
+      'Foreshocks',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section7->writeText(
+      strip_tags($this->_data->foreshocks->description),
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
+
+    $section7->writeText(
+      '[EQ LIST PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->p
+    );
+  }
+
+  /**
+   * RTF Document, Section 8: Historical Seismicity
+   */
+  private function _createSection8() {
+    $section8 = $this->_rtf->addSection();
+
+    $section8->writeText(
+      'Historical Seismicity',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+
+    $section8->writeText(
+      strip_tags($this->_data->historical->description),
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $this->_createTableBinnedData($section8, 'historical', 'prior');
+
+    $section8->writeText(
+      '[EQ LIST PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->p
+    );
+
+    if (property_exists($this->_data, 'historical-events')) {
+      $events = $this->_data->{'historical-events'};
+
+      // Get sort order based on event date/time
+      $dates = array();
+      foreach ($events as $key => $event) {
+        $dates[$key] = $event->Time;
+      }
+      arsort($dates);
+      $sortKeys = array_keys($dates);
+
+      $section8->writeText(
+        'Previous Significant Earthquakes',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+
+      foreach ($sortKeys as $key) {
+        $event = $events[$key];
+
+        $section8->writeText(
+          trim($event->Name, '"'),
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section8->writeText(
+          'M ' . $event->Magnitude . ', ' . $event->Time . ' (UTC)',
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section8->writeText(
+          round($event->Distance) . ' km away',
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section8->writeText(
+          $event->ShakingDeaths . ' shaking fatalities; ' . $event->Injured .
+            ' injured',
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section8->writeText(
+          'Max MMI: ' . $this->_numberToRoman($event->MaxMMI) . ' (pop ' .
+            $this->_addCommas($event->NumMaxMMI) . ')',
+          $this->_font->body,
+          $this->_format->body
+        );
+      }
+    }
+  }
+
+  /**
+   * RTF Document, Section 9: ShakeAlert
+   */
+  private function _createSection9() {
+    $section9 = $this->_rtf->addSection();
+
+    $section9->writeText(
+      'ShakeAlert',
+      $this->_font->h2,
+      $this->_format->h2
+    );
+    $section9->writeText(
+      '[PLACEHOLDER]',
       $this->_font->body,
       $this->_format->p
     );
@@ -830,7 +982,7 @@ class Rtf {
         }
 
         foreach ($cities as $city) {
-          $cityMmi = intVal(round($city->mmi, 0));
+          $cityMmi = intVal(round($city->mmi));
           if ($cityMmi === $mmi) {
             $row ++;
             $values = [
@@ -920,7 +1072,7 @@ class Rtf {
           } else if ($bin->probability > .99) {
             $probability = '> 99';
           } else {
-            $probability = round($bin->probability * 100, 0);
+            $probability = round($bin->probability * 100);
           }
           $cell->writeText($probability . '%');
         }
