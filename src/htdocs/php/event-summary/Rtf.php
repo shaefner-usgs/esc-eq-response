@@ -699,16 +699,21 @@ class Rtf {
 
     $table = $section->addTable();
     $table->addRows($numRows);
-    $table->addColumnsList(array(1.75, 1.75, 1.75, 1.75, 1.75, 1.75));
+    $table->addColumnsList(array(1.65, 1.65, 1.65, 1.65, 1.65, 1.65));
     $table->setBackgroundForCellRange('#F7F7F7', $numRows, 2, $numRows, 6);
     $table->setBackgroundForCellRange('#F7F7F7', 2, 6, $numRows, 6);
     $table->setBordersForCellRange(
-      $this->_format->borderLight,
+      $this->_format->borderLighter,
+      1, 1, $numRows, 6,
+      false, false, false, true
+    );
+    $table->setBordersForCellRange(
+      $this->_format->border,
       1, 2, 1, 6,
       false, false, false, true
     );
     $table->setBordersForCellRange(
-      $this->_format->borderLight,
+      $this->_format->border,
       2, 1, $numRows, 1,
       false, false, true, false
     );
@@ -724,12 +729,12 @@ class Rtf {
     // Header row
     $cell = $table->getCell(1, 1);
     $cell->setTextAlignment('right');
-    $cell->writeText(strtoupper($type) . ':');
+    $cell->writeText(ucfirst($type) . ':');
 
     $ths = array_keys(get_object_vars($rows['total']));
     foreach ($ths as $key => $value) {
       $cell = $table->getCell(1, $key + 2);
-      $cell->writeText(strtoupper($value));
+      $cell->writeText(ucfirst($value));
     }
 
     // Data rows
@@ -738,7 +743,7 @@ class Rtf {
       $row ++;
       $cell = $table->getCell($row, 1);
       $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
-      $cell->writeText(strtoupper($th)); // row header
+      $cell->writeText(ucfirst($th)); // row header
 
       $col = 1;
       foreach ($tds as $value) {
@@ -789,7 +794,7 @@ class Rtf {
     $table->addColumnsList(array(2, 5, 3));
     $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
     $table->setBordersForCellRange(
-      $this->_format->borderDark,
+      $this->_format->borderDarker,
       $numRows, 1, $numRows, 3,
       false, false, false, true
     );
@@ -867,6 +872,11 @@ class Rtf {
     $table = $section->addTable();
     $table->addRows($numRows);
     $table->addColumnsList(array(2, 2, 2, 2, 2));
+    $table->setBordersForCellRange(
+      $this->_format->borderLighter,
+      1, 1, $numRows, $numCols,
+      false, false, true, true
+    );
     $table->setFontForCellRange($this->_font->td, 2, 2, $numRows, $numCols);
     $table->setFontForCellRange($this->_font->th, 1, 2, 1, $numCols);
     $table->setFontForCellRange($this->_font->th, 2, 1, $numRows, 1);
@@ -891,7 +901,7 @@ class Rtf {
         if ($col === 2) { // first pass, render magnitude headers
           $cell = $table->getCell($row, 1);
           $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
-          $cell->writeText('M >= ' . $bin->magnitude);
+          $cell->writeText('M ' . $bin->magnitude . '+');
         }
 
         $cell = $table->getCell($row, $col);
@@ -905,13 +915,14 @@ class Rtf {
           }
           $cell->writeText($number);
         } else {
-          $probability = round($bin->probability * 100, 0);
-          if ($probability < 1) {
-            $probability = ' < 1%';
+          if ($bin->probability < .01) {
+            $probability = '< 1';
+          } else if ($bin->probability > .99) {
+            $probability = '> 99';
           } else {
-            $probability .= '%';
+            $probability = round($bin->probability * 100, 0);
           }
-          $cell->writeText($probability);
+          $cell->writeText($probability . '%');
         }
       }
     }
@@ -959,7 +970,7 @@ class Rtf {
     $this->_font->tdBg = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#F7F7F7');
     $this->_font->tdLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
 
-    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
+    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#666666', '#FFFFFF');
     $this->_font->th->setBold();
     $this->_font->thBg = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
 
@@ -968,8 +979,9 @@ class Rtf {
     $this->_format->body->setSpaceBefore(0);
     $this->_format->body->setSpaceBetweenLines(1.5);
 
-    $this->_format->borderDark = new PHPRtfLite_Border_Format(1, '#000000');
-    $this->_format->borderLight = new PHPRtfLite_Border_Format(1, '#CCCCCC');
+    $this->_format->border = new PHPRtfLite_Border_Format(1, '#DDDDDD');
+    $this->_format->borderDarker = new PHPRtfLite_Border_Format(1, '#000000');
+    $this->_format->borderLighter = new PHPRtfLite_Border_Format(1, '#EFEFEF');
 
     $this->_format->center = new PHPRtfLite_ParFormat('center');
     $this->_format->center->setSpaceAfter(10);
