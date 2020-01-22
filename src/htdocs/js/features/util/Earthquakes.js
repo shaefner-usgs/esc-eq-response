@@ -44,7 +44,7 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
- *     bins: {Object)}
+ *     bins: {Object}
  *     getBinnedTable: {Function},
  *     getDescription: {Function},
  *     getListTable: {Function},

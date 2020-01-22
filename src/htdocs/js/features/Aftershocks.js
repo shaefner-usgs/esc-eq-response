@@ -247,10 +247,11 @@ var Aftershocks = function (options) {
       json: json
     });
 
-    _this.bins = {
-      first: _Earthquakes.bins.first,
-      past: _Earthquakes.bins.past
-    };
+    _this.bins = {};
+    if (_Earthquakes.bins.first) {
+      _this.bins.first = _Earthquakes.bins.first;
+      _this.bins.past = _Earthquakes.bins.past;
+    }
     _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
     _this.mapLayer = _Earthquakes.mapLayer;
