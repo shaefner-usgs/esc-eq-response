@@ -186,15 +186,15 @@ var Rtf = function (options) {
       method: 'POST',
       rawdata: data,
       success: function (json) {
-        //window.location.assign('php/event-summary/download.php?file=' + json.file);
-        // Testing environment:
-        window.location.assign('http://localhost:8888/php/event-summary/download.php?file=' + json.file);
+        // Testing environment
+        // window.location.assign('http://localhost:8888/php/event-summary/download.php?file=' + json.file);
+        window.location.assign('php/event-summary/download.php?file=' + json.file);
 
         _app.StatusBar.removeItem('rtf');
       },
-      //url: 'php/event-summary/create.php'
-      // Testing environment:
-      url: 'http://localhost:8888/php/event-summary/create.php'
+      // Testing environment
+      // url: 'http://localhost:8888/php/event-summary/create.php'
+      url: 'php/event-summary/create.php'
     });
   };
 
