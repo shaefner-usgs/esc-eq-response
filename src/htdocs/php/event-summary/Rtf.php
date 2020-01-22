@@ -1137,7 +1137,7 @@ class Rtf {
     $this->_font->tdBg = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#F7F7F7');
     $this->_font->tdLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
 
-    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#666666', '#FFFFFF');
+    $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#444444', '#FFFFFF');
     $this->_font->th->setBold();
     $this->_font->thBg = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
 
