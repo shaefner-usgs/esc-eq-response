@@ -817,12 +817,25 @@ class Rtf {
           $this->_font->body,
           $this->_format->body
         );
-        $section8->writeText(
-          $event->ShakingDeaths . ' shaking fatalities; ' . $event->Injured .
-            ' injured',
-          $this->_font->body,
-          $this->_format->body
-        );
+
+        $effects = '';
+        if (!is_null($event->ShakingDeaths)) {
+          $effects = $event->ShakingDeaths . ' shaking fatalities';
+        }
+        if (!is_null($event->Injured)) {
+          if ($effects) {
+            $effects .= '; ';
+          }
+          $effects .= $event->Injured . ' injured';
+        }
+        if ($effects) {
+          $section8->writeText(
+            $effects,
+            $this->_font->body,
+            $this->_format->body
+          );
+        }
+
         $section8->writeText(
           'Max MMI: ' . $this->_numberToRoman($event->MaxMMI) . ' (pop ' .
             $this->_addCommas($event->NumMaxMMI) . ')',
