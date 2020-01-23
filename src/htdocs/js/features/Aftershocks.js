@@ -129,7 +129,7 @@ var Aftershocks = function (options) {
             html += '<a href="' + url + '"><h4>M ' + bin.magnitude + '+</h4>' +
               '<ul>' +
                 '<li class="probability">' + probability + '</li>' +
-                '<li class="expected"><abbr title="Expected number of ' +
+                '<li class="likely"><abbr title="Likely number of ' +
                   'aftershocks">' + range + '</abbr></li>' +
               '</ul></a>';
           });
@@ -142,7 +142,7 @@ var Aftershocks = function (options) {
       html = '<h3>Aftershock Forecast</h3>' +
         '<p>The probability of one or more aftershocks in the specified ' +
           'magnitude range during the <strong>next ' + timeFrame +
-          '</strong>. The expected number of aftershocks (95% confidence ' +
+          '</strong>. The likely number of aftershocks (95% confidence ' +
           'range) is also included.</p>' +
         '<div class="probabilities">' + html + '</div>' +
         '<p class="model"><strong>Model</strong>: ' + data.model.name + '</p>';
