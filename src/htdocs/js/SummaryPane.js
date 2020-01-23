@@ -31,8 +31,8 @@ var SummaryPane = function (options) {
       _style,
       _tz,
 
+      _addDownloadButton,
       _addListeners,
-      _addSummaryButton,
       _addTimestamp,
       _getSliderValue,
       _initTableSort,
@@ -129,7 +129,7 @@ var SummaryPane = function (options) {
    * @param div {Element}
    *     mainshock container
    */
-  _addSummaryButton = function (div) {
+  _addDownloadButton = function (div) {
     var button;
 
     button = document.createElement('button');
@@ -373,7 +373,7 @@ var SummaryPane = function (options) {
     }
 
     if (feature.id === 'mainshock') {
-      _addSummaryButton(div);
+      _addDownloadButton(div);
     }
 
     // Enable Event Summary download button once all Features are loaded
