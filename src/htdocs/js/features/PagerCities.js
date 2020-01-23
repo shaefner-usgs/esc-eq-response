@@ -88,18 +88,16 @@ var PagerCities = function (options) {
         exposures,
         mmi,
         population,
+        rows,
         shaking,
         summary,
         url;
 
     cities = json.onepager_cities;
     exposures = _app.Features.getFeature('pager-exposures').exposures;
+    rows = '';
     url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
       '/pager';
-
-    summary = '<h4><a href="' + url + '">' + _this.title + '</a></h4>';
-    summary += '<table>' +
-      '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
 
     // Sort values in descending order for display purposes
     mmi = exposures.mmi.reverse();
@@ -108,7 +106,7 @@ var PagerCities = function (options) {
 
     mmi.forEach(function(mmi, i) {
       if (mmi >= 2 && population[i] > 0) { // skip mmi below 2 and when nobody affected
-        summary += '<tr>' +
+        rows += '<tr>' +
             '<td class="impact-bubbles"><span class="mmi' + shaking[i].intensity + '">' +
               '<strong class="roman">' + shaking[i].intensity + '</strong></span></td>' +
             '<td>' + shaking[i].level + '</td>' +
@@ -117,7 +115,7 @@ var PagerCities = function (options) {
         cities.forEach(function(city) {
           cityMmi = Number(AppUtil.round(city.mmi, 0));
           if (cityMmi === mmi) {
-            summary += '<tr class="city">' +
+            rows += '<tr class="city">' +
                 '<td></td>' +
                 '<td>' + city.name + '</td>' +
                 '<td>' + AppUtil.addCommas(city.pop) + '</td>' +
@@ -126,7 +124,14 @@ var PagerCities = function (options) {
         });
       }
     });
-    summary += '</table>';
+
+    if (rows) {
+      summary = '<h4><a href="' + url + '">' + _this.title + '</a></h4>';
+      summary += '<table>' +
+        '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
+      summary += rows;
+      summary += '</table>';
+    }
 
     return summary;
   };

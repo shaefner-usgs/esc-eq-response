@@ -792,7 +792,7 @@ class Rtf {
         $event = $events[$key];
 
         $section8->writeText(
-          trim($event->Name, '"'),
+          trim(stripslashes($event->Name), '"'), // clean up slashes/extra quotes
           $this->_font->h4,
           $this->_format->h4
         );
@@ -950,67 +950,68 @@ class Rtf {
     $shaking = $this->_data->{'pager-exposures'}->shaking;
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
-    $section->writeText(
-      '<br>',
-      $this->_font->body,
-      $this->_format->table // sets paragraph formatting in table that follows
-    );
+    if ($numRows > 1) { // table contains more than just a header row
+      $section->writeText(
+        '<br>',
+        $this->_font->body,
+        $this->_format->table // sets paragraph formatting in table that follows
+      );
 
-    $table = $section->addTable();
-    $table->addRows($numRows);
-    $table->addColumnsList(array(2, 5, 3));
-    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
-    $table->setBordersForCellRange(
-      $this->_format->borderDarker,
-      $numRows, 1, $numRows, 3,
-      false, false, false, true
-    );
-    $table->setFontForCellRange($this->_font->thBg, 1, 1, 1, 3);
-    $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 3);
-    $table->setTextAlignmentForCellRange('center', 1, 1, 1, 3);
-    $table->setTextAlignmentForCellRange('center', 2, 1, $numRows, 1);
-    $table->setTextAlignmentForCellRange('left', 2, 2, $numRows, 2);
-    $table->setTextAlignmentForCellRange('right', 2, 3, $numRows, 3);
+      $table = $section->addTable();
+      $table->addRows($numRows);
+      $table->addColumnsList(array(2, 5, 3));
+      $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
+      $table->setBordersForCellRange(
+        $this->_format->borderDarker,
+        $numRows, 1, $numRows, 3,
+        false, false, false, true
+      );
+      $table->setFontForCellRange($this->_font->thBg, 1, 1, 1, 3);
+      $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 3);
+      $table->setTextAlignmentForCellRange('center', 1, 1, 1, 3);
+      $table->setTextAlignmentForCellRange('center', 2, 1, $numRows, 1);
+      $table->setTextAlignmentForCellRange('left', 2, 2, $numRows, 2);
+      $table->setTextAlignmentForCellRange('right', 2, 3, $numRows, 3);
 
-    // Header row
-    foreach (['MMI', 'Level / Selected Cities', 'Population'] as $key => $value) {
-      $cell = $table->getCell(1, $key + 1);
-      $cell->writeText($value);
-    }
+      // Header row
+      foreach (['MMI', 'Level / Selected Cities', 'Population'] as $key => $value) {
+        $cell = $table->getCell(1, $key + 1);
+        $cell->writeText($value);
+      }
 
-    // Data rows
-    $row = 1;
-    foreach ($mmis as $i => $mmi) {
-      // Skip mmi below 2 and when nobody affected
-      if (array_key_exists($i, $population) && $mmi >= 2 && $population[$i] > 0) {
-        $row ++;
-        $values = [
-          $shaking[$i]->intensity,
-          $shaking[$i]->level,
-          $this->_addCommas($population[$i])
-        ];
+      // Data rows
+      $row = 1;
+      foreach ($mmis as $i => $mmi) {
+        if (array_key_exists($i, $population)) { // value not filtered out above
+          $row ++;
+          $values = [
+            $shaking[$i]->intensity,
+            $shaking[$i]->level,
+            $this->_addCommas($population[$i])
+          ];
 
-        foreach ($values as $key => $value) {
-          $cell = $table->getCell($row, $key + 1);
-          $cell->setCellPaddings(0, 0.025, 0, 0.125);
-          $cell->writeText($value);
-        }
+          foreach ($values as $key => $value) {
+            $cell = $table->getCell($row, $key + 1);
+            $cell->setCellPaddings(0, 0.025, 0, 0.125);
+            $cell->writeText($value);
+          }
 
-        foreach ($cities as $city) {
-          $cityMmi = intVal(round($city->mmi));
-          if ($cityMmi === $mmi) {
-            $row ++;
-            $values = [
-              $city->name,
-              $this->_addCommas($city->pop)
-            ];
+          foreach ($cities as $city) {
+            $cityMmi = intVal(round($city->mmi));
+            if ($cityMmi === $mmi) {
+              $row ++;
+              $values = [
+                $city->name,
+                $this->_addCommas($city->pop)
+              ];
 
-            $table->getRow($row)->setFont($this->_font->tdLighter);
+              $table->getRow($row)->setFont($this->_font->tdLighter);
 
-            foreach ($values as $key => $value) {
-              $cell = $table->getCell($row, $key + 2);
-              $cell->setCellPaddings(0, 0.025, 0, 0.125);
-              $cell->writeText($value);
+              foreach ($values as $key => $value) {
+                $cell = $table->getCell($row, $key + 2);
+                $cell->setCellPaddings(0, 0.025, 0, 0.125);
+                $cell->writeText($value);
+              }
             }
           }
         }
