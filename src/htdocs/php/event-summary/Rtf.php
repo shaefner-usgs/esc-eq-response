@@ -1031,6 +1031,11 @@ class Rtf {
     $numCols = count($forecasts) + 1; // data cols + 1 header col
     $numRows = count($forecasts[0]->bins) + 1; // data rows + 1 header row
 
+    $columns = array(2, 2, 2, 2, 2);
+    if ($type === 'number') {
+      $columns = array(2.5, 2.5, 2.5, 2.5, 2.5);
+    }
+
     $section->writeText(
       '<br>',
       $this->_font->body,
@@ -1039,7 +1044,7 @@ class Rtf {
 
     $table = $section->addTable();
     $table->addRows($numRows);
-    $table->addColumnsList(array(2, 2, 2, 2, 2));
+    $table->addColumnsList($columns);
     $table->setBordersForCellRange(
       $this->_format->borderLighter,
       1, 1, $numRows, $numCols,
