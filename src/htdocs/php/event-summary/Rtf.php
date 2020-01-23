@@ -75,10 +75,21 @@ class Rtf {
       strip_tags($this->_data->summary)
     );
     $this->_data->summary = trim($this->_data->summary);
+
     // Remove header from summary if it exists
     $this->_data->summary = preg_replace('/^tectonic summary ?/i', '',
       $this->_data->summary
     );
+
+    // Remove null values from historical events list
+    foreach ($this->_data->{'historical-events'} as $key => $event) {
+      if (!$event) { // NULL
+        unset($this->_data->{'historical-events'}[$key]);
+      }
+    }
+    if (count($this->_data->{'historical-events'}) === 0) {
+      unset($this->_data->{'historical-events'});
+    }
   }
 
   /**
