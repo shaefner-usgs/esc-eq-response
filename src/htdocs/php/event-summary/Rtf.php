@@ -187,6 +187,11 @@ class Rtf {
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
 
+    $datetime = $this->_data->time->utc . ' (UTC)';
+    if (property_exists($this->_data->time, 'local')) {
+      $datetime .= '<br>' . $this->_data->time->local . ' (local time at epicenter)';
+    }
+
     $nearbyCitiesList = '';
     if (property_exists($this->_data, 'nearby-cities')) {
       foreach ($this->_data->{'nearby-cities'} as $city) {
@@ -213,8 +218,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->time->utc . ' (UTC)<br>' . $this->_data->time->local .
-        ' (local time at epicenter)',
+      $datetime,
       $this->_font->body,
       $this->_format->body
     );

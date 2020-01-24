@@ -528,7 +528,6 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     eqid = feature.id;
     eqMoment = AppUtil.Moment.utc(props.time, 'x');
-    eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
     mag = AppUtil.round(props.mag, 1);
     magInt = Math.floor(mag);
 
@@ -536,13 +535,16 @@ var Earthquakes = function (options) {
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
+      eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
       localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at the epicenter</span>';
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_id === 'mainshock') { // add time props to mainshock
-      _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
+    if (_id === 'mainshock') { // add verbose time props to mainshock
+      if (eqMomentLocal) {
+        _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
+      }
       _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
     } else { // calculate distance/direction from mainshock
       compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
