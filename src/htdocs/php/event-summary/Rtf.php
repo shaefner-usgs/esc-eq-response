@@ -82,13 +82,15 @@ class Rtf {
     );
 
     // Remove null values from historical events list
-    foreach ($this->_data->{'historical-events'} as $key => $event) {
-      if (!$event) { // NULL
-        unset($this->_data->{'historical-events'}[$key]);
+    if (property_exists($this->_data, 'historical-events')) {
+      foreach ($this->_data->{'historical-events'} as $key => $event) {
+        if (!$event) { // NULL
+          unset($this->_data->{'historical-events'}[$key]);
+        }
       }
-    }
-    if (count($this->_data->{'historical-events'}) === 0) {
-      unset($this->_data->{'historical-events'});
+      if (count($this->_data->{'historical-events'}) === 0) {
+        unset($this->_data->{'historical-events'});
+      }
     }
   }
 
