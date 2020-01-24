@@ -326,10 +326,11 @@ var EditPane = function (options) {
    * Create Features (and subsequently add them to map, plots and summary panes)
    */
   _this.initFeatures = function () {
-    var eqidIsValid = _checkIfValid();
+    var eqidIsValid;
 
     _app.resetApp(); // first reset app to default state
 
+    eqidIsValid = _checkIfValid();
     if (eqidIsValid) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
