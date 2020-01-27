@@ -4,7 +4,7 @@
 var NearbyCities = require('feeds/NearbyCities'),
     PagerComments = require('feeds/PagerComments'),
     ShakeMapInfo = require('feeds/ShakeMapInfo'),
-    HistoricalEqs = require('feeds/HistoricalEqs'),
+    HistoricalEvents = require('feeds/HistoricalEvents'),
     Xhr = require('util/Xhr');
 
 
@@ -19,7 +19,7 @@ _FEEDCLASSES = {
   'nearby-cities': NearbyCities,
   'pager-comments': PagerComments,
   'shakemap-info': ShakeMapInfo,
-  'historical-events': HistoricalEqs
+  'historical-events': HistoricalEvents
 };
 
 

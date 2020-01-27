@@ -2,11 +2,11 @@
 
 
 /**
- * Historical Earthquakes Feed
+ * Historical Events Feed
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} // Application
  *   }
  *
  * @return _this {Object}
@@ -16,7 +16,7 @@
  *     url: {String}
  *   }
  */
-var HistoricalEqs = function (options) {
+var HistoricalEvents = function (options) {
   var _this,
       _initialize,
 
@@ -84,4 +84,4 @@ var HistoricalEqs = function (options) {
 };
 
 
-module.exports = HistoricalEqs;
+module.exports = HistoricalEvents;
