@@ -85,7 +85,7 @@ var Rtf = function (options) {
       mag: properties.mag,
       magType: properties.magType,
       pager: products.pager || {},
-      'pager-cities': pagerCities.cities || {},
+      'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
       place: properties.place,
       shakemap: products.shakemap || '',
