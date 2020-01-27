@@ -43,7 +43,8 @@ var HistoricalEqs = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -52,7 +53,11 @@ var HistoricalEqs = function (options) {
     url = '';
 
     if (products.losspager) {
-      url = products.losspager[0].contents['json/historical_earthquakes.json'].url;
+      contents = products.losspager[0].contents;
+      if (contents['json/historical_earthquakes.json']) {
+        url = contents['json/historical_earthquakes.json'].url;
+      }
+
     }
 
     return url;

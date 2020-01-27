@@ -60,7 +60,8 @@ var PagerCities = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -69,7 +70,10 @@ var PagerCities = function (options) {
     url = '';
 
     if (products.losspager) {
-      url = products.losspager[0].contents['json/cities.json'].url;
+      contents = products.losspager[0].contents;
+      if (contents['json/cities.json']) {
+        url = contents['json/cities.json'].url;
+      }
     }
 
     return url;

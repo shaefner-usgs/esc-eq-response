@@ -43,7 +43,8 @@ var NearbyCities = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -52,7 +53,10 @@ var NearbyCities = function (options) {
     url = '';
 
     if (products['nearby-cities']) {
-      url = products['nearby-cities'][0].contents['nearby-cities.json'].url;
+      contents = products['nearby-cities'][0].contents;
+      if (contents['nearby-cities.json']) {
+        url = contents['nearby-cities.json'].url;
+      }
     }
 
     return url;

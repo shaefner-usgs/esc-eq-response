@@ -43,7 +43,8 @@ var PagerComments = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -52,7 +53,10 @@ var PagerComments = function (options) {
     url = '';
 
     if (products.losspager) {
-      url = products.losspager[0].contents['json/comments.json'].url;
+      contents = products.losspager[0].contents;
+      if (contents['json/comments.json']) {
+        url = contents['json/comments.json'].url;
+      }
     }
 
     return url;

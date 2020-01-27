@@ -281,10 +281,16 @@ var ShakeMapStations = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var url = '';
+    var contents,
+        url;
+
+    url = '';
 
     if (_shakemap) {
-      url = _shakemap[0].contents['download/stationlist.json'].url;
+      contents = _shakemap[0].contents;
+      if (contents['download/stationlist.json']) {
+        url = contents['download/stationlist.json'].url;
+      }
     }
 
     return url;

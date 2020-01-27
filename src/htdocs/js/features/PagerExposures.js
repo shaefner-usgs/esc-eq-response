@@ -71,7 +71,8 @@ var PagerExposures = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -80,7 +81,10 @@ var PagerExposures = function (options) {
     url = '';
 
     if (products.losspager) {
-      url = products.losspager[0].contents['json/exposures.json'].url;
+      contents = products.losspager[0].contents;
+      if (contents['json/exposures.json']) {
+        url = contents['json/exposures.json'].url;
+      }
     }
 
     return url;

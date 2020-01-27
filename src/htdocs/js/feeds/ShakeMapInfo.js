@@ -43,7 +43,8 @@ var ShakeMapInfo = function (options) {
    * @return url {String}
    */
   _getFeedUrl = function () {
-    var mainshock,
+    var contents,
+        mainshock,
         products,
         url;
 
@@ -52,7 +53,10 @@ var ShakeMapInfo = function (options) {
     url = '';
 
     if (products.shakemap) {
-      url = products.shakemap[0].contents['download/info.json'].url;
+      contents = products.shakemap[0].contents;
+      if (contents['download/info.json']) {
+        url = contents['download/info.json'].url;
+      }
     }
 
     return url;
