@@ -406,16 +406,18 @@ class Rtf {
         $this->_format->h3
       );
 
-      $section3->writeText(
-        'Alert Level',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-      $section3->writeText(
-        ucfirst($this->_data->pager->alert),
-        $this->_font->pagerAlert[$this->_data->pager->alert],
-        $this->_format->body
-      );
+      if (property_exists($this->_data->pager, 'alert')) {
+        $section3->writeText(
+          'Alert Level',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->writeText(
+          ucfirst($this->_data->pager->alert),
+          $this->_font->pagerAlert[$this->_data->pager->alert],
+          $this->_format->body
+        );
+      }
 
       if (property_exists($this->_data, 'pager-comments')) {
         $section3->writeText(
@@ -435,7 +437,7 @@ class Rtf {
         );
       }
 
-      if ($this->_data->pager->economic) {
+      if (property_exists($this->_data->pager, 'economic')) {
         $section3->writeText(
           'Estimated Economic Losses',
           $this->_font->h4,
@@ -448,7 +450,7 @@ class Rtf {
         );
       }
 
-      if ($this->_data->pager->fatalities) {
+      if (property_exists($this->_data->pager, 'fatalities')) {
         $section3->writeText(
           'Estimated Fatalities',
           $this->_font->h4,
@@ -461,7 +463,7 @@ class Rtf {
         );
       }
 
-      if ($this->_data->pager->exposure) { // has exposure image
+      if (property_exists($this->_data->pager, 'exposure')) {
         $section3->insertPageBreak();
         $section3->writeText(
           'Population Exposure',
@@ -476,7 +478,12 @@ class Rtf {
         );
       }
 
-      $this->_createTableExposure($section3);
+      if (
+        !empty($this->_data->{'pager-cities'}) &&
+        !empty(get_object_vars($this->_data->{'pager-exposures'}))
+      ) {
+        $this->_createTableExposure($section3);
+      }
     }
   }
 
@@ -627,14 +634,14 @@ class Rtf {
         $this->_format->body
       );
 
-      if ($this->_data->dyfi->map) {
+      if (property_exists($this->_data->dyfi, 'map')) {
         $section5->addImage(
           $this->_getRemoteImage($this->_data->dyfi->map),
           $this->_format->image,
           12
         );
       }
-      if ($this->_data->dyfi->plot) {
+      if (property_exists($this->_data->dyfi, 'plot')) {
         $section5->addImage(
           $this->_getRemoteImage($this->_data->dyfi->plot),
           $this->_format->image,
