@@ -680,7 +680,13 @@ class Rtf {
       $this->_format->body
     );
 
-    if (!empty(get_object_vars($this->_data->aftershocks->bins))) {
+    if (empty(get_object_vars($this->_data->aftershocks->bins))) {
+      $section6->writeText(
+        'None',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+    } else {
       $this->_createTableBinnedData($section6, 'aftershocks', 'first');
       $this->_createTableBinnedData($section6, 'aftershocks', 'past');
     }
@@ -756,7 +762,13 @@ class Rtf {
       $this->_format->body
     );
 
-    if (!empty(get_object_vars($this->_data->foreshocks->bins))) {
+    if (empty(get_object_vars($this->_data->foreshocks->bins))) {
+      $section7->writeText(
+        'None',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+    } else {
       $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
     }
 
@@ -785,7 +797,13 @@ class Rtf {
       $this->_format->body
     );
 
-    if (!empty(get_object_vars($this->_data->historical->bins))) {
+    if (empty(get_object_vars($this->_data->historical->bins))) {
+      $section8->writeText(
+        'None',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+    } else {
       $this->_createTableBinnedData($section8, 'historical', 'prior');
     }
 
