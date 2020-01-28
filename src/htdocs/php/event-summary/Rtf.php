@@ -954,9 +954,9 @@ class Rtf {
     $cell->writeText(ucfirst($type) . ':');
 
     $ths = array_keys(get_object_vars($rows['total']));
-    foreach ($ths as $key => $value) {
+    foreach ($ths as $key => $th) {
       $cell = $table->getCell(1, $key + 2);
-      $cell->writeText(ucfirst($value));
+      $cell->writeText(ucfirst($th));
     }
 
     // Data rows
@@ -968,11 +968,11 @@ class Rtf {
       $cell->writeText(ucfirst($th)); // row header
 
       $col = 1;
-      foreach ($tds as $value) {
+      foreach ($tds as $td) {
         $col ++;
         $cell = $table->getCell($row, $col);
         $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
-        $cell->writeText($value); // row data
+        $cell->writeText($td); // row data
       }
     }
   }
@@ -984,7 +984,14 @@ class Rtf {
    *     RTF Document section
    */
   private function _createTableExposure($section) {
-    $cities = $this->_data->{'pager-cities'};
+    $cities = array_filter( // keep values where mmi >=2
+      $this->_data->{'pager-cities'},
+      function($value) {
+        if (intVal(round($value->mmi)) >= 2) {
+          return $value;
+        }
+      }
+    );
     $mmis = array_filter( // keep values where mmi >=2
       $this->_data->{'pager-exposures'}->mmi,
       function($value) {
@@ -1005,11 +1012,11 @@ class Rtf {
     $shaking = $this->_data->{'pager-exposures'}->shaking;
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
-    if ($numRows > 1) { // table contains more than just a header row
+    if ($numRows > 1) { // table contains data (and not just a header row)
       $section->writeText(
         '<br>',
         $this->_font->body,
-        $this->_format->table // sets paragraph formatting in table that follows
+        $this->_format->table // sets formatting in table that follows
       );
 
       $table = $section->addTable();
@@ -1029,43 +1036,45 @@ class Rtf {
       $table->setTextAlignmentForCellRange('right', 2, 3, $numRows, 3);
 
       // Header row
-      foreach (['MMI', 'Level / Selected Cities', 'Population'] as $key => $value) {
+      foreach (['MMI', 'Level / Selected Cities', 'Population'] as $key => $th) {
         $cell = $table->getCell(1, $key + 1);
-        $cell->writeText($value);
+        $cell->writeText($th);
       }
 
       // Data rows
       $row = 1;
       foreach ($mmis as $i => $mmi) {
-        if (array_key_exists($i, $population)) { // value not filtered out above
+        if (array_key_exists($i, $population)) { // value was not filtered out
           $row ++;
-          $values = [
+          $tds = [
             $shaking[$i]->intensity,
             $shaking[$i]->level,
             $this->_addCommas($population[$i])
           ];
 
-          foreach ($values as $key => $value) {
-            $cell = $table->getCell($row, $key + 1);
+          foreach ($tds as $key => $td) {
+            $col = $key + 1;
+            $cell = $table->getCell($row, $col);
             $cell->setCellPaddings(0, 0.025, 0, 0.125);
-            $cell->writeText($value);
+            $cell->writeText($td);
           }
 
           foreach ($cities as $city) {
             $cityMmi = intVal(round($city->mmi));
             if ($cityMmi === $mmi) {
               $row ++;
-              $values = [
+              $tds = [
                 $city->name,
                 $this->_addCommas($city->pop)
               ];
 
               $table->getRow($row)->setFont($this->_font->tdLighter);
 
-              foreach ($values as $key => $value) {
-                $cell = $table->getCell($row, $key + 2);
+              foreach ($tds as $key => $td) {
+                $col = $key + 2;
+                $cell = $table->getCell($row, $col);
                 $cell->setCellPaddings(0, 0.025, 0, 0.125);
-                $cell->writeText($value);
+                $cell->writeText($td);
               }
             }
           }
