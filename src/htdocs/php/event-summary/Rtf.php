@@ -81,11 +81,20 @@ class Rtf {
       $this->_data->summary
     );
 
-    // Remove null values from historical events list
+    // Strip extra whitespace from PAGER summary
+    if (property_exists($this->_data, 'pager-comments')) {
+      $this->_data->{'pager-comments'}->struct_comment = preg_replace(
+        '/\s+/', ' ', $this->_data->{'pager-comments'}->struct_comment
+      );
+    }
+
+    // Clean up / remove null values from historical events list
     if (property_exists($this->_data, 'historical-events')) {
       foreach ($this->_data->{'historical-events'} as $key => $event) {
         if (!$event) { // NULL
           unset($this->_data->{'historical-events'}[$key]);
+        } else { // clean up slashes/extra quotes on name prop
+          $event->Name = trim(stripslashes($event->Name), '"');
         }
       }
       if (count($this->_data->{'historical-events'}) === 0) {
@@ -834,7 +843,7 @@ class Rtf {
         $event = $events[$key];
 
         $section8->writeText(
-          trim(stripslashes($event->Name), '"'), // clean up slashes/extra quotes
+          $event->Name,
           $this->_font->h4,
           $this->_format->h4
         );
