@@ -33,6 +33,7 @@ var PagerCities = function (options) {
       _app,
       _eqid,
 
+      _compare,
       _getFeedUrl,
       _getSummary;
 
@@ -52,6 +53,24 @@ var PagerCities = function (options) {
     _this.name = 'PAGER Cities';
     _this.title = 'Population Exposure';
     _this.url = _getFeedUrl();
+  };
+
+  /**
+   * Comparison function to sort an array of cities by population (DESC)
+   *
+   * @params a, b {Objects}
+   *     Objects to compare/sort
+   *
+   * @return {Integer}
+   */
+  _compare = function (a, b) {
+    if (a.pop > b.pop) {
+      return -1;
+    } else if (b.pop > a.pop) {
+      return 1;
+    }
+
+    return 0;
   };
 
   /**
@@ -82,13 +101,12 @@ var PagerCities = function (options) {
   /**
    * Get summary HTML for Feature
    *
-   * @param json {Object}
+   * @param cities {Array}
    *
    * @return summary {String}
    */
-  _getSummary = function (json) {
-    var cities,
-        cityMmi,
+  _getSummary = function (cities) {
+    var cityMmi,
         exposures,
         mmi,
         population,
@@ -97,7 +115,6 @@ var PagerCities = function (options) {
         summary,
         url;
 
-    cities = json.onepager_cities;
     exposures = _app.Features.getFeature('pager-exposures').exposures;
     rows = '';
     url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
@@ -166,8 +183,8 @@ var PagerCities = function (options) {
    */
   _this.initFeature = function (json) {
     if (_this.url) { // url not set when feed is unavailable
-      _this.cities = json.onepager_cities;
-      _this.summary = _getSummary(json);
+      _this.cities = json.onepager_cities.sort(_compare);
+      _this.summary = _getSummary(_this.cities);
     }
   };
 
