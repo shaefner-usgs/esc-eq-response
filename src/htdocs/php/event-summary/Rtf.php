@@ -575,27 +575,55 @@ class Rtf {
     if (property_exists($this->_data, 'shakemap-info')) {
       $motions = $this->_data->{'shakemap-info'}->output->ground_motions;
 
+      $mmiProp = ''; // property name is inconsistent
       if (property_exists($motions, 'intensity')) {
-        $mmi = round($motions->intensity->max, 1) . ' (bias: ' .
-          round($motions->intensity->bias, 3) . ')';
+        $mmiProp = 'intensity';
+      } else if (property_exists($motions, 'MMI')) {
+        $mmiProp = 'MMI';
+      }
+      if ($mmiProp) {
+        $mmi = round($motions->{$mmiProp}->max, 1);
+        if ($motions->{$mmiProp}->bias) {
+          $mmi .= ' (bias: ' . round($motions->{$mmiProp}->bias, 3) . ')';
+        }
         $section5->writeText(
           'Max MMI: ' . $mmi,
           $this->_font->body,
           $this->_format->body
         );
       }
+
+      $pgaProp = ''; // property name is inconsistent
       if (property_exists($motions, 'pga')) {
-        $pga = round($motions->pga->max) . ' %g (bias: ' .
-          round($motions->pga->bias, 3) . ')';
+        $pgaProp = 'pga';
+      } else if (property_exists($motions, 'PGA')) {
+        $pgaProp = 'PGA';
+      }
+      if ($pgaProp) {
+        $pga = round($motions->{$pgaProp}->max, 1) . ' ' .
+          $motions->{$pgaProp}->units;
+        if ($motions->{$pgaProp}->bias) {
+          $pga .= ' (bias: ' . round($motions->{$pgaProp}->bias, 3) . ')';
+        }
         $section5->writeText(
           'Max PGA: ' . $pga,
           $this->_font->body,
           $this->_format->body
         );
       }
+
+      $pgvProp = ''; // property name is inconsistent
       if (property_exists($motions, 'pgv')) {
-        $pgv = round($motions->pgv->max) . ' cm/s (bias: ' .
-          round($motions->pgv->bias, 3) . ')';
+        $pgvProp = 'pgv';
+      } else if (property_exists($motions, 'PGV')) {
+        $pgvProp = 'PGV';
+      }
+      if ($pgvProp) {
+        $pgv = round($motions->{$pgvProp}->max, 1) . ' ' .
+          $motions->{$pgvProp}->units;
+        if ($motions->{$pgvProp}->bias) {
+          $pgv .= ' (bias: ' . round($motions->{$pgvProp}->bias, 3) . ')';
+        }
         $section5->writeText(
           'Max PGV: ' . $pgv,
           $this->_font->body,
