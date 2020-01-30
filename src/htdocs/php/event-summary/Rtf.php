@@ -487,10 +487,7 @@ class Rtf {
         );
       }
 
-      if (
-        !empty($this->_data->{'pager-cities'}) &&
-        !empty(get_object_vars($this->_data->{'pager-exposures'}))
-      ) {
+      if (!empty(get_object_vars($this->_data->{'pager-exposures'}))) {
         $this->_createTableExposure($section3);
       }
     }
