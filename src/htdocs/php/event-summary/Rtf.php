@@ -760,12 +760,12 @@ class Rtf {
         $this->_format->p
       );
 
-      $datetime = date(
-        'Y-m-d g:ia \(T\)',
+      $datetime = gmdate(
+        'Y-m-d H:i:s',
         $this->_data->aftershocks->forecast[0]->timeStart / 1000
       );
       $section6->writeText(
-        '<strong>Forecast starts</strong>: ' . $datetime,
+        '<strong>Forecast starts</strong>: ' . $datetime . ' (UTC)',
         $this->_font->body,
         $this->_format->p
       );
