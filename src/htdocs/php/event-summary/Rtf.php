@@ -860,7 +860,11 @@ class Rtf {
 
         $effects = '';
         if (!is_null($event->ShakingDeaths)) {
-          $effects = $event->ShakingDeaths . ' shaking fatalities';
+          $fatalities = 'fatalities';
+          if ($event->ShakingDeaths === 1) {
+            $fatalities = 'fatality';
+          }
+          $effects = $event->ShakingDeaths . " shaking $fatalities";
         }
         if (!is_null($event->Injured)) {
           if ($effects) {
