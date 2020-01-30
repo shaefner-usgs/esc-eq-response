@@ -1074,7 +1074,7 @@ class Rtf {
       $table->setTextAlignmentForCellRange('right', 2, 3, $numRows, 3);
 
       // Header row
-      foreach (['MMI', 'Level / Selected Cities', 'Population'] as $key => $th) {
+      foreach (['MMI', 'Shaking / Selected Cities', 'Population'] as $key => $th) {
         $cell = $table->getCell(1, $key + 1);
         $cell->writeText($th);
       }
