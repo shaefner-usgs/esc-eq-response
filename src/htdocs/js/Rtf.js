@@ -24,6 +24,7 @@ var Rtf = function (options) {
 
       _app,
 
+      _filter,
       _getPostData,
       _getProducts;
 
@@ -34,6 +35,34 @@ var Rtf = function (options) {
     options = options || {};
 
     _app = options.app;
+  };
+
+  /**
+   * Filter out eqs below mag threshold set via summary pane's filter slider
+   *
+   * @param feature {Object}
+   *
+   * @return list {Array}
+   */
+  _filter = function (feature) {
+    var el,
+        list,
+        threshold;
+
+    el = document.querySelector('.' + feature.id + ' .filter output');
+    list = feature.list;
+
+    if (el) {
+      threshold = Number(el.value);
+    }
+
+    if (threshold) {
+      list = feature.list.filter(function (eq) {
+        return eq.mag >= threshold;
+      });
+    }
+
+    return list;
   };
 
   /**
@@ -68,6 +97,7 @@ var Rtf = function (options) {
       aftershocks: {
         bins: aftershocks.bins,
         description: aftershocks.description,
+        earthquakes: _filter(aftershocks),
         forecast: aftershocks.forecast || [],
         model: aftershocks.model || {}
       },
@@ -76,11 +106,13 @@ var Rtf = function (options) {
       eqid: mainshock.json.id,
       foreshocks: {
         bins: foreshocks.bins,
-        description: foreshocks.description
+        description: foreshocks.description,
+        earthquakes: _filter(foreshocks)
       },
       historical: {
         bins: historical.bins,
-        description: historical.description
+        description: historical.description,
+        earthquakes: _filter(historical)
       },
       mag: properties.mag,
       magType: properties.magType,

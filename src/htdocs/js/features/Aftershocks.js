@@ -242,6 +242,7 @@ var Aftershocks = function (options) {
     }
     _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
+    _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary(json);
