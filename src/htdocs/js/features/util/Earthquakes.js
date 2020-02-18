@@ -61,6 +61,7 @@ var Earthquakes = function (options) {
 
       _app,
       _id,
+      _json,
       _listTemplate,
       _mainshockLatlon,
       _mainshockMoment,
@@ -81,6 +82,7 @@ var Earthquakes = function (options) {
       _getHtmlTemplate,
       _getIntervals,
       _getPlotlyTrace,
+      _getRange,
       _onEachFeature,
       _pointToLayer;
 
@@ -95,6 +97,7 @@ var Earthquakes = function (options) {
 
     _app = options.app;
     _id = options.id;
+    _json = options.json;
     _markerOptions = options.markerOptions;
     _plotData = {
       color: [],
@@ -128,7 +131,7 @@ var Earthquakes = function (options) {
 
     _this.bins = {};
     _this.list = {};
-    _this.mapLayer = L.geoJson(options.json, {
+    _this.mapLayer = L.geoJson(_json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
@@ -138,6 +141,7 @@ var Earthquakes = function (options) {
       cumulative: _getPlotlyTrace('cumulative', 'scatter'),
       hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
     };
+    _this.range = _getRange();
   };
 
   /**
@@ -378,6 +382,54 @@ var Earthquakes = function (options) {
     };
 
     return intervals;
+  };
+
+  /**
+   * Get the magnitude range for the list of earthquakes, including the initial
+   *   'cutoff' magnitude for which smaller events are not displayed by default
+   *
+   * @return {Object}
+   *   {
+   *     initial: {Integer},
+   *     max: {Integer},
+   *     min: {Integer}
+   *   }
+   */
+  _getRange = function () {
+    var cumulativeEqs,
+        initial,
+        max,
+        maxNumberEqs,
+        min;
+
+    if (_id === 'mainshock' || _json.metadata.count === 0) { // not applicable
+      return;
+    }
+
+    cumulativeEqs = _this.bins.cumulative; // cumulative eqs indexed by mag
+    max = cumulativeEqs.length - 1;
+    initial = max; // default to highest mag eq in list
+    maxNumberEqs = 25; // max number of eqs to display by default
+    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
+
+    // Find the mag level where the number of eqs is less than maxNumberEqs
+    cumulativeEqs.some(function(number, magInt) {
+      if (number <= maxNumberEqs) {
+        initial = magInt;
+        return true; // stop looking
+      }
+    });
+
+    // Can get set to less than minimum value when there's no smaller mag events
+    if (initial < min) {
+      initial = min;
+    }
+
+    return {
+      initial: initial,
+      max: max,
+      min: min
+    };
   };
 
   /**
@@ -744,13 +796,13 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get a table containing a list of earthquakes
-   *   only displays eqs larger than threshold (if supplied) by default
+   * Get an html table containing a list of earthquakes
+   *   eqs smaller than magThreshold are not displayed by default
    *
    * @param data {Object}
    *     earthquake details keyed by eqid
    * @param magThreshold {Number}
-   *     optional; magnitude threshold
+   *     optional; magnitude threshold for default display
    *
    * @return html {String}
    */
@@ -763,15 +815,15 @@ var Earthquakes = function (options) {
         tr;
 
     cssClasses = ['eqlist'];
-    threshold = magThreshold || 0;
     tableData = '';
+    threshold = magThreshold || 0;
 
     Object.keys(data).forEach(function(key) {
       magInt = data[key].magInt;
       tr = L.Util.template(_listTemplate, data[key]);
 
       if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
-        cssClasses.push('m' + magInt);
+        cssClasses.push('m' + magInt); // flag to display mag level by default
       }
 
       tableData += tr;
@@ -801,41 +853,48 @@ var Earthquakes = function (options) {
   /**
    * Get a range slider (filter) when there's at least two magnitude bins w/ eqs
    *
-   * @param mag {Number}
-   *
    * @return html {String}
    */
-  _this.getSlider = function (mag) {
+  _this.getSlider = function () {
     var html,
-        mags,
-        max,
-        min,
         singleMagBin;
 
     html = '';
     singleMagBin = _this.bins.cumulative.every(function(value, i, array) {
-      return array[0] === value;
+      return array[0] === value; // all values are the same
     });
 
     if (!singleMagBin) {
-      mags = Object.keys(_this.bins.cumulative);
-      max = Math.max.apply(null, mags);
-      min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
-
       html = '<div class="filter">' +
           '<h4>Filter earthquake list by magnitude</h4>' +
-          '<div class="min">' + min + '</div>' +
-          '<div class="inverted slider" style="--min: ' + min + '; --max: ' +
-            max + '; --val: ' + mag + ';">' +
-            '<input id="' + _id + '" type="range" min="' + min + '" max="' +
-            max + '" value="' + mag + '"/>' +
-            '<output for="'+ _id + '">' + mag + '</output>' +
+          '<div class="min">' + _this.range.min + '</div>' +
+          '<div class="inverted slider" style="--min: ' + _this.range.min +
+            '; --max: ' + _this.range.max + '; --val: ' + _this.range.initial +
+            ';"><input id="' + _id + '" type="range" min="' + _this.range.min +
+            '" max="' + _this.range.max + '" value="' + _this.range.initial +
+            '"/><output for="'+ _id + '">' + _this.range.initial + '</output>' +
           '</div>' +
-          '<div class="max">' + max + '</div>' +
+          '<div class="max">' + _this.range.max + '</div>' +
         '</div>';
     }
 
     return html;
+  };
+
+  /**
+   * Get header for magnitude range slider (filter)
+   *
+   * @return {String}
+   */
+  _this.getSubHeader = function () {
+    var mag,
+        num;
+
+    mag = _this.range.initial;
+    num = _this.bins.cumulative[mag];
+
+    return '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
+      '(<span class="num">' + num + '</span>)</h3>';
   };
 
 

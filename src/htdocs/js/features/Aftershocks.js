@@ -161,8 +161,6 @@ var Aftershocks = function (options) {
   _getSummary = function (json) {
     var count,
         duration,
-        mag,
-        magThreshold,
         mostRecentEq,
         mostRecentEqTime,
         summary;
@@ -171,7 +169,6 @@ var Aftershocks = function (options) {
     summary = _Earthquakes.getDescription();
 
     if (count > 0) {
-      magThreshold = Math.floor(_mainshock.json.properties.mag - 2.5);
       mostRecentEq = AppUtil.pick(_Earthquakes.list, [_Earthquakes.mostRecentEqId]);
       mostRecentEqTime = mostRecentEq[_Earthquakes.mostRecentEqId].isoTime;
 
@@ -179,16 +176,6 @@ var Aftershocks = function (options) {
         AppUtil.Moment.duration(AppUtil.Moment.utc() -
         AppUtil.Moment.utc(mostRecentEqTime)).asDays() , 1
       ) + ' days';
-
-      mag = Math.floor(Math.max(
-        magThreshold,
-        AppUtil.getParam('as-mag')
-      ));
-
-      // Check if there's eq data for mag threshold; if not, decr mag by 1
-      while (!_this.cumulativeEqs[mag]) {
-        mag --;
-      }
 
       summary += '<div class="bins">';
       summary += _Earthquakes.getBinnedTable('first');
@@ -201,10 +188,9 @@ var Aftershocks = function (options) {
           ' ago</strong>.';
         summary += _Earthquakes.getListTable(mostRecentEq);
       }
-      summary += '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
-        '(<span class="num">' + _this.cumulativeEqs[mag]  + '</span>)</h3>';
-      summary += _Earthquakes.getSlider(mag);
-      summary += _Earthquakes.getListTable(_Earthquakes.list, mag);
+      summary += _Earthquakes.getSubHeader();
+      summary += _Earthquakes.getSlider();
+      summary += _Earthquakes.getListTable(_Earthquakes.list, _Earthquakes.range.initial);
     }
 
     return summary;

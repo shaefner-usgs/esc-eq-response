@@ -90,25 +90,15 @@ var Historical = function (options) {
    * @return summary {String}
    */
   _getSummary = function (json) {
-    var magThreshold,
-        summary;
+    var summary;
 
     summary = _Earthquakes.getDescription();
 
     if (json.metadata.count > 0) {
-      magThreshold = Math.floor(AppUtil.getParam('hs-mag'));
-
-      // Check if there's eq data for mag threshold; if not, decr mag by 1
-      while (!_this.cumulativeEqs[magThreshold]) {
-        magThreshold --;
-      }
-
       summary += _Earthquakes.getBinnedTable('prior');
-      summary += '<h3>M <span class="mag">' + magThreshold + '</span>+ ' +
-        'Earthquakes (<span class="num">' + _this.cumulativeEqs[magThreshold] +
-        '</span>)</h3>';
-      summary += _Earthquakes.getSlider(magThreshold);
-      summary += _Earthquakes.getListTable(_Earthquakes.list, magThreshold);
+      summary += _Earthquakes.getSubHeader();
+      summary += _Earthquakes.getSlider();
+      summary += _Earthquakes.getListTable(_Earthquakes.list, _Earthquakes.range.initial);
     }
 
     return summary;
