@@ -51,7 +51,6 @@ _DEFAULTS = {
  *     getSlider: {Function},
  *     list: {Object},
  *     mapLayer: {L.layer},
- *     mostRecentEqId: {String},
  *     plotTraces: {Object}
  *   }
  */
@@ -130,7 +129,7 @@ var Earthquakes = function (options) {
     }
 
     _this.bins = {};
-    _this.list = {};
+    _this.list = [];
     _this.mapLayer = L.geoJson(_json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
@@ -642,8 +641,7 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    _this.list[eqid] = data; // store eq details for summary table
-    _this.mostRecentEqId = eqid; // most recent (last) earthquake in feed
+    _this.list.push(data); // store eq details for summary table
 
     // Add props to plotData (additional props are added in _pointToLayer)
     _plotData.date.push(utcTime);
@@ -799,14 +797,14 @@ var Earthquakes = function (options) {
    * Get an html table containing a list of earthquakes
    *   eqs smaller than magThreshold are not displayed by default
    *
-   * @param data {Object}
-   *     earthquake details keyed by eqid
+   * @param eqs {Array}
+   *     list of earthquake objects
    * @param magThreshold {Number}
    *     optional; magnitude threshold for default display
    *
    * @return html {String}
    */
-  _this.getListTable = function (data, magThreshold) {
+  _this.getListTable = function (eqs, magThreshold) {
     var cssClasses,
         html,
         magInt,
@@ -818,9 +816,9 @@ var Earthquakes = function (options) {
     tableData = '';
     threshold = magThreshold || 0;
 
-    Object.keys(data).forEach(function(key) {
-      magInt = data[key].magInt;
-      tr = L.Util.template(_listTemplate, data[key]);
+    eqs.forEach(function(eq) {
+      magInt = eq.magInt;
+      tr = L.Util.template(_listTemplate, eq);
 
       if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
         cssClasses.push('m' + magInt); // flag to display mag level by default
@@ -829,7 +827,7 @@ var Earthquakes = function (options) {
       tableData += tr;
     });
 
-    if (Object.keys(data).length > 1) {
+    if (eqs.length > 1) {
       cssClasses.push('sortable');
     }
 

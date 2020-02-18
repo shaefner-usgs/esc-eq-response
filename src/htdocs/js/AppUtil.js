@@ -162,23 +162,6 @@ AppUtil.lookup = function (id) {
 };
 
 /**
- * Create a new object composed of only the picked object properties
- *
- * @param object {Object}
- * @param picked {Array}
- *
- * @return subset {Object}
- */
-AppUtil.pick = function (object, picked) {
-  var subset = picked.reduce(function(obj, key) {
-    obj[key] = object[key];
-    return obj;
-  }, {});
-
-  return subset;
-};
-
-/**
  * Convert a number to a roman numeral
  *
  * @param num {Number}

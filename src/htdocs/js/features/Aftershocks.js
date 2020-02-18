@@ -169,12 +169,14 @@ var Aftershocks = function (options) {
     summary = _Earthquakes.getDescription();
 
     if (count > 0) {
-      mostRecentEq = AppUtil.pick(_Earthquakes.list, [_Earthquakes.mostRecentEqId]);
-      mostRecentEqTime = mostRecentEq[_Earthquakes.mostRecentEqId].isoTime;
+      mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
+      mostRecentEqTime = mostRecentEq.isoTime;
 
       duration = AppUtil.round(
-        AppUtil.Moment.duration(AppUtil.Moment.utc() -
-        AppUtil.Moment.utc(mostRecentEqTime)).asDays() , 1
+        AppUtil.Moment.duration(
+          AppUtil.Moment.utc() -
+          AppUtil.Moment.utc(mostRecentEqTime)
+        ).asDays(), 1
       ) + ' days';
 
       summary += '<div class="bins">';
@@ -186,7 +188,7 @@ var Aftershocks = function (options) {
         summary += '<h3>Most Recent Aftershock</h3>';
         summary += '<p>The most recent aftershock was <strong>' + duration +
           ' ago</strong>.';
-        summary += _Earthquakes.getListTable(mostRecentEq);
+        summary += _Earthquakes.getListTable([mostRecentEq]); // expects array
       }
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
