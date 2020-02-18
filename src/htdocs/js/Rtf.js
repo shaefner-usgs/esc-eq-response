@@ -10,7 +10,7 @@ var Xhr = require('util/Xhr');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} // Application
  *   }
  *
  * @return _this {Object}
@@ -37,7 +37,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get POST data json object used to create Event Summary document
+   * Get POST data json object used to populate Event Summary RTF document
    *
    * @return data {Object}
    */
