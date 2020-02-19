@@ -23,10 +23,14 @@ var Rtf = function (options) {
       _initialize,
 
       _app,
+      _sortKey,
+      _sortOrder,
 
+      _compare,
       _filter,
       _getPostData,
-      _getProducts;
+      _getProducts,
+      _getSortValues;
 
 
   _this = {};
@@ -38,31 +42,120 @@ var Rtf = function (options) {
   };
 
   /**
-   * Filter out eqs below mag threshold set via summary pane's filter slider
+   * Sort an array of earthquake objects by key
+   *
+   * @params a, b {Objects}
+   *     Objects to compare/sort
+   *
+   * @return {Integer}
+   */
+  _compare = function (a, b) {
+    var aValue,
+        bValue,
+        comparison;
+
+    // Case insensitive sort
+    aValue = a[_sortKey];
+    if (typeof a[_sortKey] === 'string') {
+      aValue = a[_sortKey].toUpperCase();
+    }
+    bValue = b[_sortKey];
+    if (typeof b[_sortKey] === 'string') {
+      bValue = b[_sortKey].toUpperCase(); // case insensitive
+    }
+
+    // Sort by integer value for appropriate fields
+    if (_sortKey === 'mag' || _sortKey === 'depth' || _sortKey === 'distance') {
+      aValue = parseFloat(a[_sortKey], 10);
+      bValue = parseFloat(b[_sortKey], 10);
+    }
+
+    comparison = 0;
+    if (aValue > bValue) {
+      comparison = 1;
+    } else if (aValue < bValue) {
+      comparison = -1;
+    }
+
+    if (_sortOrder === 'up') { // order seems to be inverted by table sorting library
+      comparison *= -1;
+    }
+
+    return comparison;
+  };
+
+  /**
+   * Filter out eqs below mag threshold (set via summary pane's filter sliders)
    *
    * @param feature {Object}
    *
    * @return list {Array}
    */
   _filter = function (feature) {
-    var el,
-        list,
+    var list,
+        slider,
+        sortValues,
         threshold;
 
-    el = document.querySelector('.' + feature.id + ' .filter output');
     list = feature.list;
+    slider = document.querySelector('.' + feature.id + ' .filter output');
 
-    if (el) {
-      threshold = Number(el.value);
-    }
-
-    if (threshold) {
+    if (slider) { // eq list has a slider filter
+      threshold = Number(slider.value);
       list = feature.list.filter(function (eq) {
         return eq.mag >= threshold;
       });
     }
 
+    // Set sort key, order here (not in _compare) so it only gets set once/feature
+    if (list.length > 0) {
+      sortValues = _getSortValues(feature.id);
+      _sortKey = sortValues.key;
+      _sortOrder = sortValues.order;
+    }
+
     return list;
+  };
+
+  /**
+   * Get the sort key (set as a CSS class on a <th>) and order for an eq list
+   *
+   * @param featureId {String}
+   *     Feature ID
+   *
+   * @return {Object}
+   */
+  _getSortValues = function (featureId) {
+    var el,
+        key,
+        order,
+        regex1,
+        regex2,
+        result,
+        ths;
+
+    regex1 = /sort-(up|down)/; // finds current sorted-by th
+    regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
+    ths = document.querySelectorAll('.' + featureId + ' .eqlist th');
+
+    ths.forEach(function(th) {
+      th.classList.forEach(function(className) {
+        result = regex1.exec(className);
+        if (result) {
+          el = th; // elem table is sorted by
+          order = result[1]; // 'up' or 'down'
+        }
+      });
+    });
+
+    key = Array.from(el.classList).filter(function (cssClass) {
+      return !regex2.test(cssClass); // weeds out sorting algorithm CSS classes
+    });
+
+    return {
+      key: key[0],
+      order: order
+    };
   };
 
   /**
@@ -80,7 +173,7 @@ var Rtf = function (options) {
         pagerCities,
         pagerExposures,
         products,
-        properties;
+        props;
 
     aftershocks = _app.Features.getFeature('aftershocks');
     feeds = _app.Feeds.getFeeds();
@@ -90,14 +183,14 @@ var Rtf = function (options) {
     pagerCities = _app.Features.getFeature('pager-cities');
     pagerExposures = _app.Features.getFeature('pager-exposures');
     products = _getProducts(mainshock.json.properties.products);
-    properties = mainshock.json.properties;
+    props = mainshock.json.properties;
 
     // IMPORTANT: Set appropriate types for 'empty' values (i.e. not js 'undefined')
     data = {
       aftershocks: {
         bins: aftershocks.bins,
         description: aftershocks.description,
-        earthquakes: _filter(aftershocks),
+        earthquakes: _filter(aftershocks).sort(_compare),
         forecast: aftershocks.forecast || [],
         model: aftershocks.model || {}
       },
@@ -107,29 +200,29 @@ var Rtf = function (options) {
       foreshocks: {
         bins: foreshocks.bins,
         description: foreshocks.description,
-        earthquakes: _filter(foreshocks)
+        earthquakes: _filter(foreshocks).sort(_compare)
       },
       historical: {
         bins: historical.bins,
         description: historical.description,
-        earthquakes: _filter(historical)
+        earthquakes: _filter(historical).sort(_compare)
       },
-      mag: properties.mag,
-      magType: properties.magType,
+      mag: props.mag,
+      magType: props.magType,
       pager: products.pager || {},
       'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
-      place: properties.place,
+      place: props.place,
       shakemap: products.shakemap || '',
       summary: products.summary || '',
       time: {
         local: mainshock.localTime,
         utc: mainshock.utcTime
       },
-      title: properties.title,
+      title: props.title,
       urls: {
         app: window.location.href,
-        eventPage: properties.url
+        eventPage: props.url
       }
     };
 
