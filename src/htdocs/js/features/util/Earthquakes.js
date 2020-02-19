@@ -353,8 +353,8 @@ var Earthquakes = function (options) {
     } else if (type === 'list') {
       template = '<tr class="m{magInt}">' +
         '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
-        '<td class="time" data-sort="{isoTime}">{utcTime}</td>' +
-        '<td class="location">{latlng}</td>' +
+        '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
+        '<td class="latlng">{latlng}</td>' +
         '<td class="depth" data-sort="{depth}">{depth} km</td>' +
         '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
         '<td class="eqid">{eqid}</td>' +
@@ -833,11 +833,11 @@ var Earthquakes = function (options) {
 
     html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr class="no-sort">' +
-          '<th data-sort-method="number" data-sort-order="desc">Mag</th>' +
-          '<th data-sort-order="desc" class="sort-default">Time (UTC)</th>' +
-          '<th class="location">Location</th>' +
-          '<th data-sort-method="number">Depth</th>' +
-          '<th data-sort-method="number">' +
+          '<th class="mag" data-sort-method="number" data-sort-order="desc">Mag</th>' +
+          '<th class="utcTime sort-default" data-sort-order="desc">Time (UTC)</th>' +
+          '<th class="latlng">Location</th>' +
+          '<th class="depth" data-sort-method="number">Depth</th>' +
+          '<th class="distance" data-sort-method="number">' +
             '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
           '</th>' +
           '<th class="eqid">Event ID</th>' +
