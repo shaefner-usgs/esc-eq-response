@@ -71,7 +71,6 @@ var Earthquakes = function (options) {
       _pastWeekMoment,
       _plotData,
       _popupTemplate,
-      _tooltipTemplate,
 
       _addEqToBin,
       _filter,
@@ -113,7 +112,6 @@ var Earthquakes = function (options) {
     // Templates for creating HTML using L.Util.template utility
     _listTemplate = _getHtmlTemplate('list');
     _popupTemplate = _getHtmlTemplate('popup');
-    _tooltipTemplate = _getHtmlTemplate('tooltip');
 
     if (_id !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
@@ -328,16 +326,25 @@ var Earthquakes = function (options) {
    * Get HTML template for content
    *   Leaflet's L.Util.template is used to populate values
    *
-   * @param type {String <list | popup | tooltip>}
+   * @param type {String <list | popup>}
    *
    * @return template {String}
    */
   _getHtmlTemplate = function (type) {
     var template;
 
-    if (type === 'popup') {
+    if (type === 'list') { // lists on summary pane
+      template = '<tr class="m{magInt}">' +
+        '<td class="mag" data-sort="{mag}">{displayMag}</td>' +
+        '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
+        '<td class="latlng">{latlng}</td>' +
+        '<td class="depth" data-sort="{depth}">{displayDepth}</td>' +
+        '<td class="distance" data-sort="{distance}">{displayDistance}</td>' +
+        '<td class="eqid">{eqid}</td>' +
+      '</tr>';
+    } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
       template = '<div class="earthquake">' +
-        '<h4><a href="{url}">{magType} {mag} - {place}</a></h4>' +
+        '<h4><a href="{url}">{title}</a></h4>' +
         '{bubblesHtml}' +
         '<dl>' +
           '<dt>Time</dt>' +
@@ -345,22 +352,11 @@ var Earthquakes = function (options) {
           '<dt>Location</dt>' +
           '<dd>{latlng}</dd>' +
           '<dt>Depth</dt>' +
-          '<dd>{depth} km</dd>' +
+          '<dd>{displayDepth} km</dd>' +
           '<dt>Status</dt>' +
           '<dd>{status}</dd>' +
         '</dl>' +
       '</div>';
-    } else if (type === 'list') {
-      template = '<tr class="m{magInt}">' +
-        '<td class="mag" data-sort="{mag}">{magType} {mag}</td>' +
-        '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
-        '<td class="latlng">{latlng}</td>' +
-        '<td class="depth" data-sort="{depth}">{depth} km</td>' +
-        '<td class="distance" data-sort="{distance}">{distance} km <span>{distanceDir}</span></td>' +
-        '<td class="eqid">{eqid}</td>' +
-      '</tr>';
-    } else if (type === 'tooltip') {
-      template = 'M {mag} - {utcTime}';
     }
 
     return template;
@@ -381,54 +377,6 @@ var Earthquakes = function (options) {
     };
 
     return intervals;
-  };
-
-  /**
-   * Get the magnitude range for the list of earthquakes, including the initial
-   *   'cutoff' magnitude for which smaller events are not displayed by default
-   *
-   * @return {Object}
-   *   {
-   *     initial: {Integer},
-   *     max: {Integer},
-   *     min: {Integer}
-   *   }
-   */
-  _getRange = function () {
-    var cumulativeEqs,
-        initial,
-        max,
-        maxNumberEqs,
-        min;
-
-    if (_id === 'mainshock' || _json.metadata.count === 0) { // not applicable
-      return;
-    }
-
-    cumulativeEqs = _this.bins.cumulative; // cumulative eqs indexed by mag
-    max = cumulativeEqs.length - 1;
-    initial = max; // default to highest mag eq in list
-    maxNumberEqs = 25; // max number of eqs to display by default
-    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
-
-    // Find the mag level where the number of eqs is less than maxNumberEqs
-    cumulativeEqs.some(function(number, magInt) {
-      if (number <= maxNumberEqs) {
-        initial = magInt;
-        return true; // stop looking
-      }
-    });
-
-    // Can get set to less than minimum value when there's no smaller mag events
-    if (initial < min) {
-      initial = min;
-    }
-
-    return {
-      initial: initial,
-      max: max,
-      min: min
-    };
   };
 
   /**
@@ -546,6 +494,54 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the magnitude range for the list of earthquakes, including the initial
+   *   'cutoff' magnitude for which smaller events are not displayed by default
+   *
+   * @return {Object}
+   *   {
+   *     initial: {Integer},
+   *     max: {Integer},
+   *     min: {Integer}
+   *   }
+   */
+  _getRange = function () {
+    var cumulativeEqs,
+        initial,
+        max,
+        maxNumberEqs,
+        min;
+
+    if (_id === 'mainshock' || _json.metadata.count === 0) { // not applicable
+      return;
+    }
+
+    cumulativeEqs = _this.bins.cumulative; // cumulative eqs indexed by mag
+    max = cumulativeEqs.length - 1;
+    initial = max; // default to highest mag eq in list
+    maxNumberEqs = 25; // max number of eqs to display by default
+    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
+
+    // Find the mag level where the number of eqs is less than maxNumberEqs
+    cumulativeEqs.some(function(number, magInt) {
+      if (number <= maxNumberEqs) {
+        initial = magInt;
+        return true; // stop looking
+      }
+    });
+
+    // Can get set to less than minimum value when there's no smaller mag events
+    if (initial < min) {
+      initial = min;
+    }
+
+    return {
+      initial: initial,
+      max: max,
+      min: min
+    };
+  };
+
+  /**
    * Create Leaflet popups, tooltips and data for summary, plots; add earthquake
    *   to bins
    *
@@ -560,36 +556,33 @@ var Earthquakes = function (options) {
         coords,
         data,
         days,
+        displayMag,
         distance,
-        eqid,
         eqMoment,
         eqMomentLocal,
         latlon,
         localTime,
-        mag,
-        magInt,
+        magType,
         popup,
         props,
-        template,
+        timeTemplate,
         tooltip,
         utcTime;
 
     props = feature.properties;
-
+    magType = props.magType || 'M';
     coords = feature.geometry.coordinates;
-    eqid = feature.id;
+    displayMag = magType + ' ' + AppUtil.round(props.mag, 1);
     eqMoment = AppUtil.Moment.utc(props.time, 'x');
-    mag = AppUtil.round(props.mag, 1);
-    magInt = Math.floor(mag);
 
     // Time field for leaflet popup, etc.
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
-    template = '<time datetime="{isoTime}">{utcTime}</time>';
+    timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
       eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
       localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at the epicenter</span>';
-      template += '<time datetime="{isoTime}">{localTime}</time>';
+      timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
     if (_id === 'mainshock') { // add verbose time props to mainshock
@@ -598,7 +591,7 @@ var Earthquakes = function (options) {
       }
       _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
     } else { // calculate distance/direction from mainshock
-      compassPoints = [' N', 'NE', ' E', 'SE', ' S', 'SW', ' W', 'NW', ' N'];
+      compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
       latlon = AppUtil.LatLon(coords[1], coords[0]);
       distance = _mainshockLatlon.distanceTo(latlon) / 1000;
       bearing = _mainshockLatlon.bearing(latlon);
@@ -608,32 +601,34 @@ var Earthquakes = function (options) {
     data = {
       alert: props.alert, // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
-      depth: AppUtil.round(coords[2], 1),
-      distance: AppUtil.round(distance, 1),
-      distanceDir: bearingString,
-      eqid: eqid,
+      depth: coords[2],
+      displayDepth: AppUtil.round(coords[2], 1) + ' km',
+      displayDistance: AppUtil.round(distance, 1) + ' km <span>' +
+        bearingString + '</span>',
+      displayMag: displayMag,
+      distance: distance,
+      eqid: feature.id,
       felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
       latlng: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
       localTime: localTime,
-      mag: mag,
-      magInt: magInt,
-      magType: props.magType || 'M',
+      mag: parseFloat(AppUtil.round(props.mag, 1)),
+      magInt: Math.floor(AppUtil.round(props.mag, 1)),
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
-      place: props.place,
       status: props.status,
+      title: displayMag + ' - ' + props.place,
       tsunami: props.tsunami,
       url: props.url,
       utcTime: utcTime
     };
 
-    // Set additional props that depend on other props already being set
+    // Set additional props that depend on other data props already being set
     data.bubblesHtml = _getBubbles(data);
-    data.timeHtml = L.Util.template(template, data);
+    data.timeHtml = L.Util.template(timeTemplate, data);
 
     // Create popup/tooltip and bind to marker
     popup = L.Util.template(_popupTemplate, data);
-    tooltip = L.Util.template(_tooltipTemplate, data);
+    tooltip = data.displayMag + ' - ' + data.utcTime;
     layer.bindPopup(popup, {
       autoPanPaddingTopLeft: L.point(50, 50),
       autoPanPaddingBottomRight: L.point(60, 40),
@@ -650,23 +645,23 @@ var Earthquakes = function (options) {
     _plotData.lat.push(coords[1]);
     _plotData.lon.push(coords[0]);
     _plotData.mag.push(data.mag);
-    _plotData.text.push(props.title + '<br />' + utcTime);
+    _plotData.text.push(data.title + '<br />' + utcTime);
     _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
       days = Math.ceil(AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
-      _addEqToBin(days, magInt, 'first');
+      _addEqToBin(days, data.magInt, 'first');
 
       days = Math.ceil(AppUtil.Moment.duration(_nowMoment -
         eqMoment).asDays());
-      _addEqToBin(days, magInt, 'past');
+      _addEqToBin(days, data.magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.ceil(AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
-      _addEqToBin(days, magInt, 'prior');
+      _addEqToBin(days, data.magInt, 'prior');
     }
   };
 
