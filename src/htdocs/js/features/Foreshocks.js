@@ -97,7 +97,7 @@ var Foreshocks = function (options) {
       summary += _Earthquakes.getBinnedTable('prior');
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes.list, _Earthquakes.range.initial);
+      summary += _Earthquakes.getListTable(_Earthquakes);
     }
 
     return summary;

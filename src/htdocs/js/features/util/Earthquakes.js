@@ -49,9 +49,12 @@ _DEFAULTS = {
  *     getDescription: {Function},
  *     getListTable: {Function},
  *     getSlider: {Function},
+ *     getSubHeader: {Function},
+ *     id: {String},
  *     list: {Object},
  *     mapLayer: {L.layer},
- *     plotTraces: {Object}
+ *     plotTraces: {Object},
+ *     range: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -59,7 +62,6 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
-      _id,
       _json,
       _listTemplate,
       _mainshockLatlon,
@@ -92,9 +94,9 @@ var Earthquakes = function (options) {
         mainshock;
 
     options = Util.extend({}, _DEFAULTS, options);
+    _this.id = options.id;
 
     _app = options.app;
-    _id = options.id;
     _json = options.json;
     _markerOptions = options.markerOptions;
     _plotData = {
@@ -113,7 +115,7 @@ var Earthquakes = function (options) {
     _listTemplate = _getHtmlTemplate('list');
     _popupTemplate = _getHtmlTemplate('popup');
 
-    if (_id !== 'mainshock') {
+    if (_this.id !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
@@ -210,9 +212,9 @@ var Earthquakes = function (options) {
         threshold;
 
     mag = AppUtil.round(feature.properties.mag, 1);
-    threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    threshold = AppUtil.getParam(AppUtil.lookup(_this.id) + '-mag');
 
-    if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
+    if (mag >= threshold || _this.id === 'mainshock') { // don't filter out mainshock
       return true;
     }
   };
@@ -229,9 +231,9 @@ var Earthquakes = function (options) {
     var age,
         eqMoment;
 
-    age = _id; // for everything except aftershocks
+    age = _this.id; // for everything except aftershocks
 
-    if (_id === 'aftershocks') {
+    if (_this.id === 'aftershocks') {
       eqMoment = AppUtil.Moment.utc(timestamp, 'x'); // unix ms timestamp
       if (eqMoment.isSameOrAfter(_pastHourMoment)) {
         age = 'pasthour';
@@ -300,19 +302,19 @@ var Earthquakes = function (options) {
   _getDuration = function () {
     var duration;
 
-    if (_id === 'aftershocks') {
+    if (_this.id === 'aftershocks') {
       duration = {
         length: Number(AppUtil.round(
           AppUtil.Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
         )),
         interval: 'days'
       };
-    } else if (_id === 'foreshocks') {
+    } else if (_this.id === 'foreshocks') {
       duration = {
         length: Number(AppUtil.getParam('fs-days')),
         interval: 'days'
       };
-    } else if (_id === 'historical') {
+    } else if (_this.id === 'historical') {
       duration = {
         length: Number(AppUtil.getParam('hs-years')),
         interval: 'years'
@@ -417,7 +419,7 @@ var Earthquakes = function (options) {
       });
 
       // Add origin point (mainshock) to beginning of aftershocks trace
-      if (_id === 'aftershocks') {
+      if (_this.id === 'aftershocks') {
         mainshockId = AppUtil.getParam('eqid');
         date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
         eqid.unshift(mainshockId);
@@ -448,7 +450,7 @@ var Earthquakes = function (options) {
 
     trace = {
       eqid: eqid,
-      feature: _id,
+      feature: _this.id,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
@@ -511,7 +513,7 @@ var Earthquakes = function (options) {
         maxNumberEqs,
         min;
 
-    if (_id === 'mainshock' || _json.metadata.count === 0) { // not applicable
+    if (_this.id === 'mainshock' || _json.metadata.count === 0) { // not applicable
       return;
     }
 
@@ -519,7 +521,7 @@ var Earthquakes = function (options) {
     max = cumulativeEqs.length - 1;
     initial = max; // default to highest mag eq in list
     maxNumberEqs = 25; // max number of eqs to display by default
-    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
+    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_this.id) + '-mag'));
 
     // Find the mag level where the number of eqs is less than maxNumberEqs
     cumulativeEqs.some(function(number, magInt) {
@@ -585,7 +587,7 @@ var Earthquakes = function (options) {
       timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_id === 'mainshock') { // add verbose time props to mainshock
+    if (_this.id === 'mainshock') { // add verbose time props to mainshock
       if (eqMomentLocal) {
         _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
       }
@@ -649,7 +651,7 @@ var Earthquakes = function (options) {
     _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
-    if (_id === 'aftershocks') {
+    if (_this.id === 'aftershocks') {
       days = Math.ceil(AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
       _addEqToBin(days, data.magInt, 'first');
@@ -658,7 +660,7 @@ var Earthquakes = function (options) {
         eqMoment).asDays());
       _addEqToBin(days, data.magInt, 'past');
     }
-    else if (_id === 'historical' || _id === 'foreshocks') {
+    else if (_this.id === 'historical' || _this.id === 'foreshocks') {
       days = Math.ceil(AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
       _addEqToBin(days, data.magInt, 'prior');
@@ -687,7 +689,7 @@ var Earthquakes = function (options) {
     radius = AppUtil.getRadius(props.mag);
 
     _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _id; // put markers in custom Leaflet map pane
+    _markerOptions.pane = _this.id; // put markers in custom Leaflet map pane
     _markerOptions.radius = radius;
 
     // Add props to plotData (additional props are added in _onEachFeature)
@@ -716,7 +718,7 @@ var Earthquakes = function (options) {
         td;
 
     cssClasses = ['bin'];
-    duration = _getDuration(_id);
+    duration = _getDuration(_this.id);
     html = '';
 
     days = AppUtil.Moment.duration(duration.length, duration.interval).asDays();
@@ -767,15 +769,15 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance = AppUtil.getParam(AppUtil.lookup(_id) + '-dist');
-    duration = _getDuration(_id);
-    mag = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    distance = AppUtil.getParam(AppUtil.lookup(_this.id) + '-dist');
+    duration = _getDuration(_this.id);
+    mag = AppUtil.getParam(AppUtil.lookup(_this.id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
       'earthquakes within <strong>' + distance + ' km</strong> of the ' +
       'mainshock&rsquo;s epicenter';
 
-    if (_id === 'aftershocks') {
+    if (_this.id === 'aftershocks') {
       description += '. The duration of the aftershock sequence is <strong>' +
         duration.length + ' ' + duration.interval + '</strong>';
     } else {
@@ -792,44 +794,55 @@ var Earthquakes = function (options) {
    * Get an html table containing a list of earthquakes
    *   eqs smaller than magThreshold are not displayed by default
    *
-   * @param eqs {Array}
-   *     list of earthquake objects
-   * @param magThreshold {Number}
-   *     optional; magnitude threshold for default display
+   * @param self {object}
+   *     instance of this Class
    *
    * @return html {String}
    */
-  _this.getListTable = function (eqs, magThreshold) {
+  _this.getListTable = function (self) {
     var cssClasses,
         html,
         magInt,
+        magThreshold,
         tableData,
-        threshold,
+        td1CssClasses,
+        td2CssClasses,
         tr;
 
     cssClasses = ['eqlist'];
+    magThreshold = 0; // default
     tableData = '';
-    threshold = magThreshold || 0;
+    td1CssClasses = ['mag'];
+    td2CssClasses = ['utcTime'];
 
-    eqs.forEach(function(eq) {
+    if (self.hasOwnProperty('range')) {
+      magThreshold = self.range.initial;
+    }
+
+    self.list.forEach(function(eq) {
       magInt = eq.magInt;
       tr = L.Util.template(_listTemplate, eq);
 
-      if (magInt >= threshold && cssClasses.indexOf('m' + magInt) === -1) {
+      if (magInt >= magThreshold && cssClasses.indexOf('m' + magInt) === -1) {
         cssClasses.push('m' + magInt); // flag to display mag level by default
       }
 
       tableData += tr;
     });
 
-    if (eqs.length > 1) {
+    if (self.list.length > 1) {
       cssClasses.push('sortable');
+    }
+    if (_this.id === 'historical') {
+      td1CssClasses.push('sort-default'); // sort by mag, DESC
+    } else {
+      td2CssClasses.push('sort-default'); // sort by utcTime, DESC
     }
 
     html = '<table class="' + cssClasses.join(' ') + '">' +
         '<tr class="no-sort">' +
-          '<th class="mag" data-sort-method="number" data-sort-order="desc">Mag</th>' +
-          '<th class="utcTime sort-default" data-sort-order="desc">Time (UTC)</th>' +
+          '<th class="' + td1CssClasses.join(' ') + '" data-sort-method="number" data-sort-order="desc">Mag</th>' +
+          '<th class="' + td2CssClasses.join(' ') + '" data-sort-order="desc">Time (UTC)</th>' +
           '<th class="latlng">Location</th>' +
           '<th class="depth" data-sort-method="number">Depth</th>' +
           '<th class="distance" data-sort-method="number">' +
@@ -863,9 +876,9 @@ var Earthquakes = function (options) {
           '<div class="min">' + _this.range.min + '</div>' +
           '<div class="inverted slider" style="--min: ' + _this.range.min +
             '; --max: ' + _this.range.max + '; --val: ' + _this.range.initial +
-            ';"><input id="' + _id + '" type="range" min="' + _this.range.min +
+            ';"><input id="' + _this.id + '" type="range" min="' + _this.range.min +
             '" max="' + _this.range.max + '" value="' + _this.range.initial +
-            '"/><output for="'+ _id + '">' + _this.range.initial + '</output>' +
+            '"/><output for="'+ _this.id + '">' + _this.range.initial + '</output>' +
           '</div>' +
           '<div class="max">' + _this.range.max + '</div>' +
         '</div>';

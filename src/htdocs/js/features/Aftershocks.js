@@ -188,11 +188,14 @@ var Aftershocks = function (options) {
         summary += '<h3>Most Recent Aftershock</h3>';
         summary += '<p>The most recent aftershock was <strong>' + duration +
           ' ago</strong>.';
-        summary += _Earthquakes.getListTable([mostRecentEq]); // expects array
+        summary += _Earthquakes.getListTable({
+          id: _this.id,
+          list: [mostRecentEq]
+        });
       }
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes.list, _Earthquakes.range.initial);
+      summary += _Earthquakes.getListTable(_Earthquakes);
     }
 
     return summary;
