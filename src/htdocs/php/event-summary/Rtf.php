@@ -110,15 +110,15 @@ class Rtf {
     $this->_setMargins();
     $this->_setStyles();
 
-    $this->_createSection1();
-    $this->_createSection2();
-    $this->_createSection3();
-    $this->_createSection4();
-    $this->_createSection5();
-    $this->_createSection6();
-    $this->_createSection7();
-    $this->_createSection8();
-    $this->_createSection9();
+    $this->_createSection1(); // Basic earthquake details
+    $this->_createSection2(); // Talking Points
+    $this->_createSection3(); // Impact
+    $this->_createSection4(); // Mechanism and Fault
+    $this->_createSection5(); // Ground Shaking
+    $this->_createSection6(); // Aftershocks
+    $this->_createSection7(); // Foreshocks
+    $this->_createSection8(); // Historical Seismicity
+    $this->_createSection9(); // ShakeAlert
   }
 
   /**
@@ -700,38 +700,44 @@ class Rtf {
    * RTF Document, Section 6: Aftershocks
    */
   private function _createSection6() {
+    $aftershocks = $this->_data->aftershocks;
+    $count = $aftershocks->count;
     $section6 = $this->_rtf->addSection();
 
     $section6->writeText(
-      'Aftershocks',
+      "Aftershocks ($count)",
       $this->_font->h2,
       $this->_format->h2
     );
 
     $section6->writeText(
-      strip_tags($this->_data->aftershocks->description),
+      strip_tags($aftershocks->description),
       $this->_font->body,
       $this->_format->body
     );
 
-    if (empty(get_object_vars($this->_data->aftershocks->bins))) {
+    if ($count === 0) {
       $section6->writeText(
         'None',
         $this->_font->h3,
         $this->_format->h3
       );
     } else {
+      $listCount = count($aftershocks->earthquakes);
+      $magThreshold = $aftershocks->magThreshold;
+
       $this->_createTableBinnedData($section6, 'aftershocks', 'first');
       $this->_createTableBinnedData($section6, 'aftershocks', 'past');
+
+      $section6->writeText(
+        "M $magThreshold+ Earthquakes ($listCount)",
+        $this->_font->h3,
+        $this->_format->h3
+      );
+      $this->_createTableEqlist($section6, 'aftershocks');
     }
 
-    $section6->writeText(
-      '[EQ LIST PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->p
-    );
-
-    if (!empty($this->_data->aftershocks->forecast)) {
+    if (!empty($aftershocks->forecast)) {
       $section6->writeText(
         'Aftershock Forecast',
         $this->_font->h3,
@@ -762,7 +768,7 @@ class Rtf {
 
       $datetime = gmdate(
         'Y-m-d H:i:s',
-        $this->_data->aftershocks->forecast[0]->timeStart / 1000
+        $aftershocks->forecast[0]->timeStart / 1000
       );
       $section6->writeText(
         '<strong>Forecast starts</strong>: ' . $datetime . ' (UTC)',
@@ -771,7 +777,7 @@ class Rtf {
       );
 
       $section6->writeText(
-        '<strong>Model</strong>: ' . $this->_data->aftershocks->model->name,
+        '<strong>Model</strong>: ' . $aftershocks->model->name,
         $this->_font->body,
         $this->_format->p
       );
@@ -782,70 +788,82 @@ class Rtf {
    * RTF Document, Section 7: Foreshocks
    */
   private function _createSection7() {
+    $foreshocks = $this->_data->foreshocks;
+    $count = $foreshocks->count;
     $section7 = $this->_rtf->addSection();
 
     $section7->writeText(
-      'Foreshocks',
+      "Foreshocks ($count)",
       $this->_font->h2,
       $this->_format->h2
     );
 
     $section7->writeText(
-      strip_tags($this->_data->foreshocks->description),
+      strip_tags($foreshocks->description),
       $this->_font->body,
       $this->_format->body
     );
 
-    if (empty(get_object_vars($this->_data->foreshocks->bins))) {
+    if ($count === 0) {
       $section7->writeText(
         'None',
         $this->_font->h3,
         $this->_format->h3
       );
     } else {
-      $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
-    }
+      $listCount = count($foreshocks->earthquakes);
+      $magThreshold = $foreshocks->magThreshold;
 
-    $section7->writeText(
-      '[EQ LIST PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->p
-    );
+      $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
+
+      $section7->writeText(
+        "M $magThreshold+ Earthquakes ($listCount)",
+        $this->_font->h3,
+        $this->_format->h3
+      );
+      $this->_createTableEqlist($section7, 'foreshocks');
+    }
   }
 
   /**
    * RTF Document, Section 8: Historical Seismicity
    */
   private function _createSection8() {
+    $historical = $this->_data->historical;
+    $count = $historical->count;
     $section8 = $this->_rtf->addSection();
 
     $section8->writeText(
-      'Historical Seismicity',
+      "Historical Seismicity ($count)",
       $this->_font->h2,
       $this->_format->h2
     );
 
     $section8->writeText(
-      strip_tags($this->_data->historical->description),
+      strip_tags($historical->description),
       $this->_font->body,
       $this->_format->body
     );
 
-    if (empty(get_object_vars($this->_data->historical->bins))) {
+    if ($count === 0) {
       $section8->writeText(
         'None',
         $this->_font->h3,
         $this->_format->h3
       );
     } else {
-      $this->_createTableBinnedData($section8, 'historical', 'prior');
-    }
+      $listCount = count($historical->earthquakes);
+      $magThreshold = $historical->magThreshold;
 
-    $section8->writeText(
-      '[EQ LIST PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->p
-    );
+      $this->_createTableBinnedData($section8, 'historical', 'prior');
+
+      $section8->writeText(
+        "M $magThreshold+ Earthquakes ($listCount)",
+        $this->_font->h3,
+        $this->_format->h3
+      );
+      $this->_createTableEqlist($section8, 'historical');
+    }
 
     if (property_exists($this->_data, 'historical-events')) {
       $events = $this->_data->{'historical-events'};
@@ -945,7 +963,7 @@ class Rtf {
   private function _createTableBinnedData($section, $id, $type) {
     $data = $this->_data->{$id}->bins->{$type};
 
-    // Convert table rows to an array and sort by key
+    // Convert data rows to an array and sort by key (e.g. m 1, m 2, ..., total)
     $rows = get_object_vars($data);
     ksort($rows);
 
@@ -1011,6 +1029,80 @@ class Rtf {
         $cell = $table->getCell($row, $col);
         $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
         $cell->writeText($td); // row data
+      }
+    }
+  }
+
+  /**
+   * Create earthquake list table
+   *
+   * @param $section {Object}
+   *     RTF Document section
+   * @param $id {String}
+   *     Feature id
+   */
+  private function _createTableEqlist($section, $id) {
+    $eqs = $this->_data->{$id}->earthquakes;
+    $fields = [
+      'displayMag' => 'Mag',
+      'utcTime' => 'Time (UTC)',
+      'latlng' => 'Location',
+      'displayDepth' => 'Depth',
+      'displayDistance' => 'Distance',
+      'eqid' => 'Event ID'
+    ];
+    $numRows = count($eqs) + 1; // data rows + 1 header row
+
+    $section->writeText(
+      '<br>',
+      $this->_font->body,
+      $this->_format->table // sets formatting in table that follows
+    );
+
+    $table = $section->addTable();
+    $table->addRows($numRows);
+    $table->addColumnsList(array(1.9, 4.4, 3.2, 2, 2.4, 2.9));
+    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 6);
+    $table->setBordersForCellRange(
+      $this->_format->borderDarker,
+      $numRows, 1, $numRows, 6,
+      false, false, false, true
+    );
+    $table->setFontForCellRange($this->_font->thBg, 1, 1, 1, 6);
+    $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 6);
+    $table->setTextAlignmentForCellRange('center', 1, 1, 1, 6);
+    $table->setTextAlignmentForCellRange('right', 2, 1, $numRows, 1);
+    $table->setTextAlignmentForCellRange('right', 2, 4, $numRows, 4);
+
+    // Header row
+    $col = 0;
+    $row = 1;
+
+    foreach ($fields as $key => $value) {
+      $col ++;
+      $cell = $table->getCell($row, $col);
+      $cell->writeText($value);
+    }
+
+    // Data rows
+    foreach ($eqs as $eq) {
+      $col = 0;
+      $row ++;
+
+      foreach ($fields as $key => $value) {
+        $col ++;
+        $cell = $table->getCell($row, $col);
+
+        $cell->setCellPaddings(0, 0.1, 0, 0.1);
+        if ($col === 1 || $col === 4) { // text aligned right; add padding
+          $cell->setPaddingRight(.2);
+        }
+
+        $fieldValue = strip_tags($eq->{$key});
+        if ($key === 'utcTime') {
+          $fieldValue = substr($fieldValue, 0, -4); // strip ' UTC' off end
+        }
+        $cell->writeText($fieldValue);
       }
     }
   }
@@ -1155,9 +1247,9 @@ class Rtf {
     $table->setFontForCellRange($this->_font->td, 2, 2, $numRows, $numCols);
     $table->setFontForCellRange($this->_font->th, 1, 2, 1, $numCols);
     $table->setFontForCellRange($this->_font->th, 2, 1, $numRows, 1);
-    $table->setTextAlignmentForCellRange('right', 2, 2, $numRows, $numCols);
     $table->setTextAlignmentForCellRange('center', 1, 2, 1, $numCols);
     $table->setTextAlignmentForCellRange('center', 2, 1, $numRows, 1);
+    $table->setTextAlignmentForCellRange('right', 2, 2, $numRows, $numCols);
 
     $col = 1;
     foreach ($forecasts as $forecast) {
@@ -1208,8 +1300,8 @@ class Rtf {
    */
   private function _setMargins() {
     $this->_rtf->setMarginBottom(2);
-    $this->_rtf->setMarginLeft(2.5);
-    $this->_rtf->setMarginRight(2.5);
+    $this->_rtf->setMarginLeft(2);
+    $this->_rtf->setMarginRight(2);
     $this->_rtf->setMarginTop(2);
   }
 
