@@ -23,6 +23,7 @@ var Rtf = function (options) {
       _initialize,
 
       _app,
+      _magThreshold,
       _sortKey,
       _sortOrder,
 
@@ -94,16 +95,15 @@ var Rtf = function (options) {
   _filter = function (feature) {
     var list,
         slider,
-        sortValues,
-        threshold;
+        sortValues;
 
     list = feature.list;
     slider = document.querySelector('.' + feature.id + ' .filter output');
 
     if (slider) { // eq list has a slider filter
-      threshold = Number(slider.value);
+      _magThreshold = Number(slider.value);
       list = feature.list.filter(function (eq) {
-        return eq.mag >= threshold;
+        return eq.mag >= _magThreshold;
       });
     }
 
@@ -115,47 +115,6 @@ var Rtf = function (options) {
     }
 
     return list;
-  };
-
-  /**
-   * Get the sort key (set as a CSS class on a <th>) and order for an eq list
-   *
-   * @param featureId {String}
-   *     Feature ID
-   *
-   * @return {Object}
-   */
-  _getSortValues = function (featureId) {
-    var el,
-        key,
-        order,
-        regex1,
-        regex2,
-        result,
-        ths;
-
-    regex1 = /sort-(up|down)/; // finds current sorted-by th
-    regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
-    ths = document.querySelectorAll('.' + featureId + ' .eqlist th');
-
-    ths.forEach(function(th) {
-      th.classList.forEach(function(className) {
-        result = regex1.exec(className);
-        if (result) {
-          el = th; // elem table is sorted by
-          order = result[1]; // 'up' or 'down'
-        }
-      });
-    });
-
-    key = Array.from(el.classList).filter(function (cssClass) {
-      return !regex2.test(cssClass); // weeds out sorting algorithm CSS classes
-    });
-
-    return {
-      key: key[0],
-      order: order
-    };
   };
 
   /**
@@ -189,9 +148,11 @@ var Rtf = function (options) {
     data = {
       aftershocks: {
         bins: aftershocks.bins,
+        count: aftershocks.bins.first.total.total,
         description: aftershocks.description,
         earthquakes: _filter(aftershocks).sort(_compare),
         forecast: aftershocks.forecast || [],
+        magThreshold: _magThreshold,
         model: aftershocks.model || {}
       },
       depth: mainshock.json.geometry.coordinates[2],
@@ -199,13 +160,17 @@ var Rtf = function (options) {
       eqid: mainshock.json.id,
       foreshocks: {
         bins: foreshocks.bins,
+        count: foreshocks.bins.prior.total.total,
         description: foreshocks.description,
-        earthquakes: _filter(foreshocks).sort(_compare)
+        earthquakes: _filter(foreshocks).sort(_compare),
+        magThreshold: _magThreshold,
       },
       historical: {
         bins: historical.bins,
+        count: historical.bins.prior.total.total,
         description: historical.description,
-        earthquakes: _filter(historical).sort(_compare)
+        earthquakes: _filter(historical).sort(_compare),
+        magThreshold: _magThreshold,
       },
       mag: props.mag,
       magType: props.magType,
@@ -284,6 +249,47 @@ var Rtf = function (options) {
       pager: pager,
       shakemap: shakemap,
       summary: summary
+    };
+  };
+
+  /**
+   * Get the sort key (set as a CSS class on a <th>) and order for an eq list
+   *
+   * @param featureId {String}
+   *     Feature ID
+   *
+   * @return {Object}
+   */
+  _getSortValues = function (featureId) {
+    var el,
+        key,
+        order,
+        regex1,
+        regex2,
+        result,
+        ths;
+
+    regex1 = /sort-(up|down)/; // finds current sorted-by th
+    regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
+    ths = document.querySelectorAll('.' + featureId + ' .eqlist th');
+
+    ths.forEach(function(th) {
+      th.classList.forEach(function(className) {
+        result = regex1.exec(className);
+        if (result) {
+          el = th; // elem table is sorted by
+          order = result[1]; // 'up' or 'down'
+        }
+      });
+    });
+
+    key = Array.from(el.classList).filter(function (cssClass) {
+      return !regex2.test(cssClass); // weeds out sorting algorithm CSS classes
+    });
+
+    return {
+      key: key[0],
+      order: order
     };
   };
 
