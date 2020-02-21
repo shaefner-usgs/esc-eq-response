@@ -321,7 +321,7 @@ class Rtf {
     );
 
     $section2->writeText(
-      'Fault',
+      'Fault and Tectonic Setting',
       $this->_font->h4,
       $this->_format->h4
     );
