@@ -54,7 +54,7 @@ var Rtf = function (options) {
         bValue,
         comparison;
 
-    // Case insensitive sort
+    // Case insensitive sort for strings
     aValue = a[_sortKey];
     if (typeof a[_sortKey] === 'string') {
       aValue = a[_sortKey].toUpperCase();
@@ -64,10 +64,10 @@ var Rtf = function (options) {
       bValue = b[_sortKey].toUpperCase(); // case insensitive
     }
 
-    // Sort by integer value for appropriate fields
-    if (_sortKey === 'mag' || _sortKey === 'depth' || _sortKey === 'distance') {
-      aValue = parseFloat(a[_sortKey], 10);
-      bValue = parseFloat(b[_sortKey], 10);
+    // Use ISO time to properly sort date/time fields
+    if (_sortKey === 'utcTime') {
+      aValue = a.isoTime;
+      bValue = b.isoTime;
     }
 
     comparison = 0;
@@ -77,7 +77,7 @@ var Rtf = function (options) {
       comparison = -1;
     }
 
-    if (_sortOrder === 'up') { // order seems to be inverted by table sorting library
+    if (_sortOrder === 'up') { // order flag inverted?? by table sorting library
       comparison *= -1;
     }
 
