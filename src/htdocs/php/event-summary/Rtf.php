@@ -1188,7 +1188,7 @@ class Rtf {
 
     $table = $section->addTable();
     $table->addRows($numRows);
-    $table->addColumnsList(array(1.9, 4.4, 3.2, 2, 2.4, 2.9));
+    $table->addColumnsList(array(1.9, 4.4, 3.3, 2, 2.4, 2.9));
     $table->setBackgroundForCellRange('#000000', 1, 1, 1, 6);
     $table->setBordersForCellRange(
       $this->_format->borderDarker,
