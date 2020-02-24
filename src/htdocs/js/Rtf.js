@@ -148,7 +148,7 @@ var Rtf = function (options) {
     data = {
       aftershocks: {
         bins: aftershocks.bins,
-        count: aftershocks.bins.first.total.total,
+        count: aftershocks.count,
         description: aftershocks.description,
         earthquakes: _filter(aftershocks).sort(_compare),
         forecast: aftershocks.forecast || [],
@@ -160,14 +160,14 @@ var Rtf = function (options) {
       eqid: mainshock.json.id,
       foreshocks: {
         bins: foreshocks.bins,
-        count: foreshocks.bins.prior.total.total,
+        count: foreshocks.count,
         description: foreshocks.description,
         earthquakes: _filter(foreshocks).sort(_compare),
         magThreshold: _magThreshold,
       },
       historical: {
         bins: historical.bins,
-        count: historical.bins.prior.total.total,
+        count: historical.count,
         description: historical.description,
         earthquakes: _filter(historical).sort(_compare),
         magThreshold: _magThreshold,

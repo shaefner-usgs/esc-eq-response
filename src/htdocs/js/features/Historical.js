@@ -89,12 +89,12 @@ var Historical = function (options) {
    *
    * @return summary {String}
    */
-  _getSummary = function (json) {
+  _getSummary = function () {
     var summary;
 
     summary = _Earthquakes.getDescription();
 
-    if (json.metadata.count > 0) {
+    if (_this.count > 0) {
       summary += _Earthquakes.getBinnedTable('prior');
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
@@ -140,13 +140,14 @@ var Historical = function (options) {
     if (_Earthquakes.bins.prior) {
       _this.bins.prior = _Earthquakes.bins.prior;
     }
+    _this.count = json.metadata.count;
     _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
     _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _getSummary(json);
-    _this.title = _this.name + ' (' + json.metadata.count + ')';
+    _this.summary = _getSummary();
+    _this.title = _this.name + ' (' + _this.count + ')';
   };
 
 

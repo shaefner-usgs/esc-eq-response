@@ -158,17 +158,15 @@ var Aftershocks = function (options) {
    *
    * @return summary {String}
    */
-  _getSummary = function (json) {
-    var count,
-        duration,
+  _getSummary = function () {
+    var duration,
         mostRecentEq,
         mostRecentEqTime,
         summary;
 
-    count = json.metadata.count;
     summary = _Earthquakes.getDescription();
 
-    if (count > 0) {
+    if (_this.count > 0) {
       mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
       mostRecentEqTime = mostRecentEq.isoTime;
 
@@ -184,7 +182,7 @@ var Aftershocks = function (options) {
       summary += _Earthquakes.getBinnedTable('past');
       summary += '</div>';
       summary += _getProbabilities();
-      if (count > 1) {
+      if (_this.count > 1) {
         summary += '<h3>Most Recent Aftershock</h3>';
         summary += '<p>The most recent aftershock was <strong>' + duration +
           ' ago</strong>.';
@@ -243,13 +241,14 @@ var Aftershocks = function (options) {
       _this.bins.first = _Earthquakes.bins.first;
       _this.bins.past = _Earthquakes.bins.past;
     }
+    _this.count = json.metadata.count;
     _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
     _this.description = _Earthquakes.getDescription();
     _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _getSummary(json);
-    _this.title = _this.name + ' (' + json.metadata.count + ')';
+    _this.summary = _getSummary();
+    _this.title = _this.name + ' (' + _this.count + ')';
 
     // The following props depend on summary being set
     _this.forecast = _forecast;
