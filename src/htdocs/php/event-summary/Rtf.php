@@ -944,11 +944,138 @@ class Rtf {
       $this->_font->h2,
       $this->_format->h2
     );
-    $section9->writeText(
-      '[PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->p
-    );
+
+    if (property_exists($this->_data, 'shake-alert')) {
+      $shakeAlert = $this->_data->{'shake-alert'};
+
+      $section9->writeText(
+        'Status: ' . $shakeAlert->properties->announcement,
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      $section9->writeText(
+        'Summary',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+
+      $features = $shakeAlert->initial_alert->features;
+      foreach ($features as $feature) {
+        if ($feature->id === 'acircle_0.0') {
+          $speedRadius = $feature->properties->radius;
+          if ($feature->properties->radiusunits === 'm') {
+            $speedRadius = $speedRadius / 1000;
+          }
+        }
+      }
+      $speedInitial = $shakeAlert->initial_alert->properties->elapsed;
+      $speedFinal = $shakeAlert->final_alert->properties->elapsed;
+      $section9->writeText(
+        'Speed of Alert',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section9->writeText(
+        'Initial alert after origin time: ' . round($speedInitial, 1) . ' s',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'Final alert update after origin time: ' . round($speedFinal, 1) . ' s',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'Radius of late-alert zone: ' . round($speedRadius, 1) . ' km',
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      $magInitial = $shakeAlert->initial_alert->properties->magnitude;
+      $magFinal = $shakeAlert->final_alert->properties->magnitude;
+      $section9->writeText(
+        'Magnitude Accuracy',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section9->writeText(
+        'Initial ShakeAlert: M ' . round($magInitial, 1),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'Final ShakeAlert: M ' . round($magFinal, 1),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'ANSS report: M ' . round($this->_data->mag, 1),
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      $locationInitial = $this->_getLocation(
+        $shakeAlert->initial_alert->properties->location_azimuth_error,
+        $shakeAlert->initial_alert->properties->location_distance_error
+      );
+      $locationFinal = $this->_getLocation(
+        $shakeAlert->final_alert->properties->location_azimuth_error,
+        $shakeAlert->final_alert->properties->location_distance_error
+      );
+      $section9->writeText(
+        'Alert Location Relative to ANSS Location',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section9->writeText(
+        'Inital alert: ' . $locationInitial,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'Final alert: ' . $locationFinal,
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      $numStations = $shakeAlert->final_alert->properties->num_stations;
+      $numStations10 = $shakeAlert->properties->num_stations_10km;
+      $numStations100 = $shakeAlert->properties->num_stations_100km;
+      $section9->writeText(
+        'Number of Stations Reporting',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section9->writeText(
+        $numStations10 . ' within 10 km of epicenter',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        $numStations100 . ' within 100 km of epicenter',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        $numStations . ' used in final alert update',
+        $this->_font->body,
+        $this->_format->body
+      );
+
+      $section9->writeText(
+        'Cities',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+      $this->_createTableShakeAlert($section9);
+    } else {
+      $section9->writeText(
+        'No ShakeAlert Information',
+        $this->_font->h3,
+        $this->_format->h3
+      );
+    }
   }
 
   /**
@@ -1293,6 +1420,88 @@ class Rtf {
         }
       }
     }
+  }
+
+  /**
+   * Create ShakeAlert cities table
+   *
+   * @param $section {Object}
+   *     RTF Document section
+   */
+  function _createTableShakeAlert($section) {
+    $cities = $this->_data->{'shake-alert'}->cities->features;
+    $numRows = count($cities) + 1; // data rows + 1 header row
+
+    $section->writeText(
+      '<br>',
+      $this->_font->body,
+      $this->_format->table // sets paragraph formatting in table that follows
+    );
+
+    $table = $section->addTable();
+    $table->addRows($numRows);
+    $table->addColumnsList(array(4, 4, 3.5, 3.5));
+    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 4);
+    $table->setBordersForCellRange(
+      $this->_format->borderDarker,
+      $numRows, 1, $numRows, 4,
+      false, false, false, true
+    );
+    $table->setFontForCellRange($this->_font->thBg, 1, 1, 1, 4);
+    $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 4);
+    $table->setTextAlignmentForCellRange('center', 1, 1, 1, 4);
+    $table->setTextAlignmentForCellRange('left', 2, 1, $numRows, 4);
+
+    // Header row
+    $row = 1;
+    foreach (['City', 'Distance', 'Warning Time', 'Predicted MMI'] as $i => $th) {
+      $col = $i + 1;
+      $cell = $table->getCell($row, $col);
+      $cell->writeText($th);
+    }
+
+    // Data rows
+    foreach ($cities as $city) {
+      $row ++;
+
+      $cell = $table->getCell($row, 1);
+      $cell->setCellPaddings(0, 0.025, 0, 0.125);
+      $cell->writeText($city->properties->name);
+
+      $citydist = $city->properties->citydist;
+      $distance = round($citydist, 0) . ' km (' . round($citydist/1.60934, 0) . ' mi)';
+      $cell = $table->getCell($row, 2);
+      $cell->setCellPaddings(0, 0.025, 0, 0.125);
+      $cell->writeText($distance);
+
+      $time = '~' . round($city->properties->warning_time, 0) . ' s';
+      $cell = $table->getCell($row, 3);
+      $cell->setCellPaddings(0, 0.025, 0, 0.125);
+      $cell->writeText($time);
+
+      $cell = $table->getCell($row, 4);
+      $cell->setCellPaddings(0, 0.025, 0, 0.125);
+      $cell->writeText($city->properties->mmi);
+    }
+  }
+
+  /**
+   * Get alert location relative to ANSS location
+   *
+   * @param $azimuth {Number} degrees
+   * @param $distance {Number} km
+   *
+   * @return {String}
+   */
+  private function _getLocation($azimuth, $distance) {
+    $compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+    $index = floor((22.5 + (360.0 + $azimuth) % 360.0) / 45.0);
+
+    $direction = $compassPoints[$index];
+    $kms = round($distance, 1);
+    $miles = round($distance / 1.60934, 1);
+
+    return "$kms km ($miles mi) $direction";
   }
 
   /**

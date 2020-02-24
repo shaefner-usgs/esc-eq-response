@@ -1,10 +1,11 @@
 'use strict';
 
 
-var NearbyCities = require('feeds/NearbyCities'),
+var HistoricalEvents = require('feeds/HistoricalEvents'),
+    NearbyCities = require('feeds/NearbyCities'),
     PagerComments = require('feeds/PagerComments'),
     ShakeMapInfo = require('feeds/ShakeMapInfo'),
-    HistoricalEvents = require('feeds/HistoricalEvents'),
+    ShakeAlert = require('feeds/ShakeAlert'),
     Xhr = require('util/Xhr');
 
 
@@ -16,10 +17,11 @@ var _FEEDCLASSES;
  * IMPORTANT: the Object key must match the id property set in the Feed class.
  */
 _FEEDCLASSES = {
+  'historical-events': HistoricalEvents,
   'nearby-cities': NearbyCities,
   'pager-comments': PagerComments,
   'shakemap-info': ShakeMapInfo,
-  'historical-events': HistoricalEvents
+  'shake-alert': ShakeAlert
 };
 
 
@@ -61,7 +63,7 @@ var Feeds = function (options) {
   };
 
   /**
-   * Wrapper method to create RTF document (checks if all Feeds are loaded)
+   * Wrapper method to create RTF document (first checks if all Feeds are loaded)
    */
   _createRtf = function () {
     if (Object.keys(_feeds).length === _numFeeds) {
