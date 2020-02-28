@@ -55,34 +55,36 @@ var Rtf = function (options) {
         bValue,
         comparison;
 
-    // Case insensitive sort for strings
-    aValue = a[_sortKey];
-    if (typeof a[_sortKey] === 'string') {
-      aValue = a[_sortKey].toUpperCase();
-    }
-    bValue = b[_sortKey];
-    if (typeof b[_sortKey] === 'string') {
-      bValue = b[_sortKey].toUpperCase(); // case insensitive
-    }
+    if (_sortKey) {
+      // Case insensitive sort for strings
+      aValue = a[_sortKey];
+      if (typeof a[_sortKey] === 'string') {
+        aValue = a[_sortKey].toUpperCase();
+      }
+      bValue = b[_sortKey];
+      if (typeof b[_sortKey] === 'string') {
+        bValue = b[_sortKey].toUpperCase(); // case insensitive
+      }
 
-    // Use ISO time to properly sort date/time fields
-    if (_sortKey === 'utcTime') {
-      aValue = a.isoTime;
-      bValue = b.isoTime;
-    }
+      // Use ISO time to properly sort date/time fields
+      if (_sortKey === 'utcTime') {
+        aValue = a.isoTime;
+        bValue = b.isoTime;
+      }
 
-    comparison = 0;
-    if (aValue > bValue) {
-      comparison = 1;
-    } else if (aValue < bValue) {
-      comparison = -1;
-    }
+      comparison = 0;
+      if (aValue > bValue) {
+        comparison = 1;
+      } else if (aValue < bValue) {
+        comparison = -1;
+      }
 
-    if (_sortOrder === 'up') { // order flag inverted?? by table sorting library
-      comparison *= -1;
-    }
+      if (_sortOrder === 'up') { // order flag inverted?? by table sorting library
+        comparison *= -1;
+      }
 
-    return comparison;
+      return comparison;
+    }
   };
 
   /**
@@ -100,6 +102,7 @@ var Rtf = function (options) {
     list = feature.list;
     slider = document.querySelector('.' + feature.id + ' .filter output');
 
+    _magThreshold = 0;
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
       list = feature.list.filter(function (eq) {
@@ -110,8 +113,10 @@ var Rtf = function (options) {
     // Set sort key, order here (not in _compare) so it only gets set once/feature
     if (list.length > 0) {
       sortValues = _getSortValues(feature.id);
-      _sortKey = sortValues.key;
-      _sortOrder = sortValues.order;
+      if (sortValues) {
+        _sortKey = sortValues.key;
+        _sortOrder = sortValues.order;
+      }
     }
 
     return list;
@@ -271,13 +276,17 @@ var Rtf = function (options) {
 
     regex1 = /sort-(up|down)/; // finds current sorted-by th
     regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
-    ths = document.querySelectorAll('.' + featureId + ' .eqlist th');
+    ths = document.querySelectorAll('.' + featureId + ' .eqlist.sortable th');
+
+    if (ths.length === 0) { // unsorted table (happens when there is only 1 row)
+      return;
+    }
 
     ths.forEach(function(th) {
       th.classList.forEach(function(className) {
         result = regex1.exec(className);
         if (result) {
-          el = th; // elem table is sorted by
+          el = th; // field (element) table is sorted by
           order = result[1]; // 'up' or 'down'
         }
       });
