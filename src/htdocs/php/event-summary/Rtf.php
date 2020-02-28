@@ -122,6 +122,25 @@ class Rtf {
   }
 
   /**
+   * Get alert location relative to ANSS location
+   *
+   * @param $azimuth {Number} degrees
+   * @param $distance {Number} km
+   *
+   * @return {String}
+   */
+  private function _getLocation($azimuth, $distance) {
+    $compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+    $index = floor((22.5 + (360.0 + $azimuth) % 360.0) / 45.0);
+
+    $direction = $compassPoints[$index];
+    $kms = round($distance, 1);
+    $miles = round($distance / 1.60934, 1);
+
+    return "$kms km ($miles mi) $direction";
+  }
+
+  /**
    * Create a local (temporary) copy of an image from a remote image
    *
    * @param $url {String}
@@ -713,7 +732,7 @@ class Rtf {
     $section6->writeText(
       strip_tags($aftershocks->description),
       $this->_font->body,
-      $this->_format->body
+      $this->_format->p
     );
 
     if ($count === 0) {
@@ -723,6 +742,12 @@ class Rtf {
         $this->_format->h3
       );
     } else {
+      $section6->writeText(
+        'Earthquakes updated: ' . $this->_now,
+        $this->_font->body,
+        $this->_format->body
+      );
+
       $listCount = count($aftershocks->earthquakes);
       $magThreshold = $aftershocks->magThreshold;
 
@@ -801,7 +826,7 @@ class Rtf {
     $section7->writeText(
       strip_tags($foreshocks->description),
       $this->_font->body,
-      $this->_format->body
+      $this->_format->p
     );
 
     if ($count === 0) {
@@ -811,6 +836,12 @@ class Rtf {
         $this->_format->h3
       );
     } else {
+      $section7->writeText(
+        'Earthquakes updated: ' . $this->_now,
+        $this->_font->body,
+        $this->_format->body
+      );
+
       $listCount = count($foreshocks->earthquakes);
       $magThreshold = $foreshocks->magThreshold;
 
@@ -842,7 +873,7 @@ class Rtf {
     $section8->writeText(
       strip_tags($historical->description),
       $this->_font->body,
-      $this->_format->body
+      $this->_format->p
     );
 
     if ($count === 0) {
@@ -852,6 +883,12 @@ class Rtf {
         $this->_format->h3
       );
     } else {
+      $section8->writeText(
+        'Earthquakes updated: ' . $this->_now,
+        $this->_font->body,
+        $this->_format->body
+      );
+
       $listCount = count($historical->earthquakes);
       $magThreshold = $historical->magThreshold;
 
@@ -1483,25 +1520,6 @@ class Rtf {
       $cell->setCellPaddings(0, 0.025, 0, 0.125);
       $cell->writeText($city->properties->mmi);
     }
-  }
-
-  /**
-   * Get alert location relative to ANSS location
-   *
-   * @param $azimuth {Number} degrees
-   * @param $distance {Number} km
-   *
-   * @return {String}
-   */
-  private function _getLocation($azimuth, $distance) {
-    $compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-    $index = floor((22.5 + (360.0 + $azimuth) % 360.0) / 45.0);
-
-    $direction = $compassPoints[$index];
-    $kms = round($distance, 1);
-    $miles = round($distance / 1.60934, 1);
-
-    return "$kms km ($miles mi) $direction";
   }
 
   /**
