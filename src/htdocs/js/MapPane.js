@@ -457,7 +457,7 @@ var MapPane = function (options) {
 
     _this.map.setView([40, -96], 4); // United States
 
-    canvasEls = _el.querySelectorAll('canvas');
+    canvasEls = document.querySelectorAll('#mapPane > canvas');
     for (i = 0; i < canvasEls.length; i ++) {
       _el.removeChild(canvasEls[i]);
     }
