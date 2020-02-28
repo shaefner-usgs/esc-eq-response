@@ -25,6 +25,7 @@ var AppUtil = require('AppUtil'),
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
+ *     sortBy: {String},
  *     summary: {String},
  *     title: {String},
  *     url: {String},
@@ -52,6 +53,7 @@ var Foreshocks = function (options) {
     _this.id = 'foreshocks';
     _this.name = 'Foreshocks';
     _this.showLayer = true;
+    _this.sortBy = 'utcTime';
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -97,7 +99,7 @@ var Foreshocks = function (options) {
       summary += _Earthquakes.getBinnedTable('prior');
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes);
+      summary += _Earthquakes.getListTable('all');
     }
 
     return summary;
@@ -132,7 +134,8 @@ var Foreshocks = function (options) {
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
-      json: json
+      json: json,
+      sortBy: _this.sortBy
     });
 
     _this.bins = {};

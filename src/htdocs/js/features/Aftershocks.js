@@ -28,6 +28,7 @@ var AppUtil = require('AppUtil'),
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
+ *     sortBy: {String},
  *     summary: {String},
  *     title: {String},
  *     url: {String},
@@ -62,6 +63,7 @@ var Aftershocks = function (options) {
     _this.id = 'aftershocks';
     _this.name = 'Aftershocks';
     _this.showLayer = true;
+    _this.sortBy = 'utcTime';
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -186,14 +188,11 @@ var Aftershocks = function (options) {
         summary += '<h3>Most Recent Aftershock</h3>';
         summary += '<p>The most recent aftershock was <strong>' + duration +
           ' ago</strong>.';
-        summary += _Earthquakes.getListTable({
-          id: _this.id,
-          list: [mostRecentEq]
-        });
+        summary += _Earthquakes.getListTable('mostRecent');
       }
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes);
+      summary += _Earthquakes.getListTable('all');
     }
 
     return summary;
@@ -233,7 +232,8 @@ var Aftershocks = function (options) {
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
-      json: json
+      json: json,
+      sortBy: _this.sortBy
     });
 
     _this.bins = {};

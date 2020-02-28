@@ -1171,11 +1171,11 @@ class Rtf {
   private function _createTableEqlist($section, $id) {
     $eqs = $this->_data->{$id}->earthquakes;
     $fields = [
-      'displayMag' => 'Mag',
+      'magDisplay' => 'Mag',
       'utcTime' => 'Time (UTC)',
-      'latlng' => 'Location',
-      'displayDepth' => 'Depth',
-      'displayDistance' => 'Distance',
+      'location' => 'Location',
+      'depthDisplay' => 'Depth',
+      'distanceDisplay' => 'Distance',
       'eqid' => 'Event ID'
     ];
     $numRows = count($eqs) + 1; // data rows + 1 header row

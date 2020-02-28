@@ -26,6 +26,7 @@ var AppUtil = require('AppUtil'),
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
+ *     sortBy: {String},
  *     summary: {String},
  *     title: {String},
  *     url: {String},
@@ -53,6 +54,7 @@ var Historical = function (options) {
     _this.id = 'historical';
     _this.name = 'Historical Seismicity';
     _this.showLayer = true;
+    _this.sortBy = 'mag';
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -98,7 +100,7 @@ var Historical = function (options) {
       summary += _Earthquakes.getBinnedTable('prior');
       summary += _Earthquakes.getSubHeader();
       summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable(_Earthquakes);
+      summary += _Earthquakes.getListTable('all');
     }
 
     return summary;
@@ -133,7 +135,8 @@ var Historical = function (options) {
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
-      json: json
+      json: json,
+      sortBy: _this.sortBy
     });
 
     _this.bins = {};
