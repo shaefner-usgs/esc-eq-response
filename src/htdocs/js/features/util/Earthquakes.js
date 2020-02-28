@@ -62,7 +62,6 @@ var Earthquakes = function (options) {
       _app,
       _id,
       _json,
-      _listTemplate,
       _mainshockLatlon,
       _mainshockMoment,
       _markerOptions,
@@ -71,9 +70,9 @@ var Earthquakes = function (options) {
       _pastHourMoment,
       _pastWeekMoment,
       _plotData,
-      _popupTemplate,
       _range,
       _sortBy,
+      _templates,
 
       _addEqToBin,
       _filter,
@@ -99,9 +98,7 @@ var Earthquakes = function (options) {
     _app = options.app;
     _id = options.id;
     _json = options.json;
-    _listTemplate = _getHtmlTemplate('list');
     _markerOptions = options.markerOptions;
-    _popupTemplate = _getHtmlTemplate('popup');
     _plotData = {
       color: [],
       date: [],
@@ -115,6 +112,13 @@ var Earthquakes = function (options) {
       time: []
     };
     _sortBy = options.sortBy;
+    _templates = {
+      popup: _getHtmlTemplate('popup'),
+      row: _getHtmlTemplate('row'),
+      slider: _getHtmlTemplate('slider'),
+      subheader: _getHtmlTemplate('subheader'),
+      table: _getHtmlTemplate('table')
+    };
 
     if (_id !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
@@ -329,23 +333,14 @@ var Earthquakes = function (options) {
    * Get HTML template for earthquake content, which uses Leaflet's
    *   L.Util.template to populate values
    *
-   * @param type {String <list | popup>}
+   * @param type {String <popup | row | slider | subheader | table>}
    *
    * @return template {String}
    */
   _getHtmlTemplate = function (type) {
     var template;
 
-    if (type === 'list') { // lists on summary pane
-      template = '<tr class="m{magInt}">' +
-        '<td class="mag" data-sort="{mag}">{magDisplay}</td>' +
-        '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
-        '<td class="location">{location}</td>' +
-        '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
-        '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
-        '<td class="eqid">{eqid}</td>' +
-      '</tr>';
-    } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
+    if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
       template = '<div class="earthquake">' +
         '<h4><a href="{url}">{title}</a></h4>' +
         '{bubblesHtml}' +
@@ -360,6 +355,43 @@ var Earthquakes = function (options) {
           '<dd>{status}</dd>' +
         '</dl>' +
       '</div>';
+    } else if (type === 'row') { // lists on summary pane
+      template = '<tr class="m{magInt}">' +
+        '<td class="mag" data-sort="{mag}">{magDisplay}</td>' +
+        '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
+        '<td class="location">{location}</td>' +
+        '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
+        '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
+        '<td class="eventId">{eqid}</td>' +
+      '</tr>';
+    } else if (type === 'slider') {
+      template = '<div class="filter">' +
+        '<h4>Filter earthquake list by magnitude</h4>' +
+        '<div class="min">{min}</div>' +
+        '<div class="inverted slider" style="--min:{min}; --max:{max}; --val:{initial};">' +
+          '<input id="{id}" type="range" min="{min}" max="{max}" value="{initial}"/>' +
+          '<output for="{id}">{initial}</output>' +
+        '</div>' +
+        '<div class="max">{max}</div>' +
+      '</div>';
+    } else if (type === 'subheader') {
+      template = '<h3>' +
+        'M <span class="mag">{mag}</span>+ Earthquakes (<span class="num">{num}</span>)' +
+      '</h3>';
+    } else if (type === 'table') { // lists on summary pane
+      template = '<table class="{tableClasses}">' +
+        '<tr class="no-sort">' +
+          '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
+          '<th class="{utcTime}" data-sort-order="desc">Time (UTC)</th>' +
+          '<th class="{location}">Location</th>' +
+          '<th class="{depth}" data-sort-method="number">Depth</th>' +
+          '<th class="{distance}" data-sort-method="number">' +
+            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+          '</th>' +
+          '<th class="{eventId}">Event ID</th>' +
+        '</tr>' +
+        '{tableData}' +
+      '</table>';
     }
 
     return template;
@@ -557,9 +589,9 @@ var Earthquakes = function (options) {
         bearingString,
         compassPoints,
         coords,
-        data,
         days,
         distance,
+        eq,
         eqMoment,
         eqMomentLocal,
         latlon,
@@ -568,7 +600,6 @@ var Earthquakes = function (options) {
         magType,
         popup,
         props,
-        timeTemplate,
         tooltip,
         utcTime;
 
@@ -580,12 +611,12 @@ var Earthquakes = function (options) {
 
     // Time field for leaflet popup, etc.
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
-    timeTemplate = '<time datetime="{isoTime}">{utcTime}</time>';
+    _templates.time = '<time datetime="{isoTime}">{utcTime}</time>';
     if (props.tz) { // calculate local time if tz prop included in feed
       eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
       localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
         ' <span class="tz">at the epicenter</span>';
-      timeTemplate += '<time datetime="{isoTime}">{localTime}</time>';
+      _templates.time += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
     if (_id === 'mainshock') { // add verbose time props to mainshock
@@ -601,7 +632,7 @@ var Earthquakes = function (options) {
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
     }
 
-    data = {
+    eq = {
       alert: props.alert, // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
       depth: coords[2],
@@ -625,13 +656,13 @@ var Earthquakes = function (options) {
       utcTime: utcTime
     };
 
-    // Set additional props that depend on other data props already being set
-    data.bubblesHtml = _getBubbles(data);
-    data.timeHtml = L.Util.template(timeTemplate, data);
+    // Set additional props that depend on other eq props already being set
+    eq.bubblesHtml = _getBubbles(eq);
+    eq.timeHtml = L.Util.template(_templates.time, eq);
 
     // Create popup/tooltip and bind to marker
-    popup = L.Util.template(_popupTemplate, data);
-    tooltip = data.magDisplay + ' - ' + data.utcTime;
+    popup = L.Util.template(_templates.popup, eq);
+    tooltip = eq.magDisplay + ' - ' + eq.utcTime;
     layer.bindPopup(popup, {
       autoPanPaddingTopLeft: L.point(50, 50),
       autoPanPaddingBottomRight: L.point(60, 40),
@@ -639,32 +670,32 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    _this.list.push(data); // store eq details for summary table
+    _this.list.push(eq); // store eq details for summary table
 
     // Add props to plotData (additional props are added in _pointToLayer)
     _plotData.date.push(utcTime);
     _plotData.depth.push(coords[2] * -1); // return a negative number for depth
-    _plotData.eqid.push(data.eqid);
+    _plotData.eqid.push(eq.eqid);
     _plotData.lat.push(coords[1]);
     _plotData.lon.push(coords[0]);
-    _plotData.mag.push(data.mag);
-    _plotData.text.push(data.title + '<br />' + utcTime);
+    _plotData.mag.push(eq.mag);
+    _plotData.text.push(eq.title + '<br />' + utcTime);
     _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
     if (_id === 'aftershocks') {
       days = Math.ceil(AppUtil.Moment.duration(eqMoment -
         _mainshockMoment).asDays());
-      _addEqToBin(days, data.magInt, 'first');
+      _addEqToBin(days, eq.magInt, 'first');
 
       days = Math.ceil(AppUtil.Moment.duration(_nowMoment -
         eqMoment).asDays());
-      _addEqToBin(days, data.magInt, 'past');
+      _addEqToBin(days, eq.magInt, 'past');
     }
     else if (_id === 'historical' || _id === 'foreshocks') {
       days = Math.ceil(AppUtil.Moment.duration(_mainshockMoment -
         eqMoment).asDays());
-      _addEqToBin(days, data.magInt, 'prior');
+      _addEqToBin(days, eq.magInt, 'prior');
     }
   };
 
@@ -798,11 +829,12 @@ var Earthquakes = function (options) {
    * @param type {String}
    *     'all' or 'mostRecent'; default is 'all'
    *
-   * @return html {String}
+   * @return {String}
    */
   _this.getListTable = function (type) {
-    var eqs,
-        html,
+    var data,
+        eqs,
+        fields,
         magInt,
         magThreshold,
         tableClasses,
@@ -811,18 +843,16 @@ var Earthquakes = function (options) {
         tr;
 
     eqs = _this.list;
+    fields = ['depth', 'distance', 'eventId', 'location', 'mag', 'utcTime'];
     magThreshold = _range.initial;
     tableClasses = ['eqlist'];
     tableData = '';
-    thClasses = {
-      depth: ['depth'],
-      distance: ['distance'],
-      eqid: ['eqid'],
-      location: ['location'],
-      mag: ['mag'],
-      utcTime: ['utcTime']
-    };
+    thClasses = {};
     type = type || 'all';
+
+    fields.forEach(function(field) {
+      thClasses[field] = [field]; // set <th> classes to field value by default
+    });
 
     if (type === 'mostRecent') {
       eqs = [_this.list[_this.list.length - 1]];
@@ -831,17 +861,18 @@ var Earthquakes = function (options) {
     if (eqs.length > 1) {
       tableClasses.push('sortable');
 
-      // Set default sort field to value defined in Feature class
-      Object.keys(thClasses).forEach(function(key) {
-        if (_sortBy && key === _sortBy) {
-          thClasses[key].push('sort-default');
+      // Add class 'sort-default' to <th> classes
+      fields.forEach(function(field) {
+        if (_sortBy && field === _sortBy) {
+          thClasses[field].push('sort-default');
         }
       });
     }
 
+    // Add row (eq) to table data
     eqs.forEach(function(eq) {
       magInt = eq.magInt;
-      tr = L.Util.template(_listTemplate, eq);
+      tr = L.Util.template(_templates.row, eq);
 
       if (magInt >= magThreshold && tableClasses.indexOf('m' + magInt) === -1) {
         tableClasses.push('m' + magInt); // flag to display mag level by default
@@ -849,30 +880,25 @@ var Earthquakes = function (options) {
       tableData += tr;
     });
 
-    html = '<table class="' + tableClasses.join(' ') + '">' +
-        '<tr class="no-sort">' +
-          '<th class="' + thClasses.mag.join(' ') + '" data-sort-method="number" data-sort-order="desc">Mag</th>' +
-          '<th class="' + thClasses.utcTime.join(' ') + '" data-sort-order="desc">Time (UTC)</th>' +
-          '<th class="' + thClasses.location.join(' ') + '">Location</th>' +
-          '<th class="' + thClasses.depth.join(' ') + '" data-sort-method="number">Depth</th>' +
-          '<th class="' + thClasses.distance.join(' ') + '" data-sort-method="number">' +
-            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-          '</th>' +
-          '<th class="' + thClasses.eqid.join(' ') + '">Event ID</th>' +
-        '</tr>' +
-        tableData +
-      '</table>';
+    // Create template data
+    data = {};
+    fields.forEach(function(field) {
+      data[field] = thClasses[field].join(' ');
+    });
+    data.tableClasses = tableClasses.join(' ');
+    data.tableData = tableData;
 
-    return html;
+    return L.Util.template(_templates.table, data);
   };
 
   /**
-   * Get a range slider (filter) when there's at least two magnitude bins w/ eqs
+   * Get a range slider html when there's at least two magnitude bins w/ eqs
    *
    * @return html {String}
    */
   _this.getSlider = function () {
-    var html,
+    var data,
+        html,
         singleMagBin;
 
     html = '';
@@ -881,36 +907,26 @@ var Earthquakes = function (options) {
     });
 
     if (!singleMagBin) {
-      html = '<div class="filter">' +
-          '<h4>Filter earthquake list by magnitude</h4>' +
-          '<div class="min">' + _range.min + '</div>' +
-          '<div class="inverted slider" style="--min: ' + _range.min +
-            '; --max: ' + _range.max + '; --val: ' + _range.initial +
-            ';"><input id="' + _id + '" type="range" min="' + _range.min +
-            '" max="' + _range.max + '" value="' + _range.initial +
-            '"/><output for="'+ _id + '">' + _range.initial + '</output>' +
-          '</div>' +
-          '<div class="max">' + _range.max + '</div>' +
-        '</div>';
+      data = _range;
+      data.id = _id;
+      html = L.Util.template(_templates.slider, data);
     }
 
     return html;
   };
 
   /**
-   * Get header for magnitude range slider (filter)
+   * Get subheader html for magnitude range slider (filter)
    *
    * @return {String}
    */
   _this.getSubHeader = function () {
-    var mag,
-        num;
+    var data = {
+      mag: _range.initial,
+      num: _this.bins.cumulative[_range.initial]
+    };
 
-    mag = _range.initial;
-    num = _this.bins.cumulative[mag];
-
-    return '<h3>M <span class="mag">' + mag + '</span>+ Earthquakes ' +
-      '(<span class="num">' + num + '</span>)</h3>';
+    return L.Util.template(_templates.subheader, data);
   };
 
 

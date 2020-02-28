@@ -55,7 +55,7 @@ var Rtf = function (options) {
         bValue,
         comparison;
 
-    if (_sortKey) {
+    if (_sortKey) { // not set for unsorted (1 row) tables
       // Case insensitive sort for strings
       aValue = a[_sortKey];
       if (typeof a[_sortKey] === 'string') {
@@ -102,7 +102,6 @@ var Rtf = function (options) {
     list = feature.list;
     slider = document.querySelector('.' + feature.id + ' .filter output');
 
-    _magThreshold = 0;
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
       list = feature.list.filter(function (eq) {
@@ -157,7 +156,7 @@ var Rtf = function (options) {
         description: aftershocks.description,
         earthquakes: _filter(aftershocks).sort(_compare),
         forecast: aftershocks.forecast || [],
-        magThreshold: _magThreshold,
+        magThreshold: _magThreshold || 0,
         model: aftershocks.model || {}
       },
       depth: mainshock.json.geometry.coordinates[2],
@@ -168,14 +167,14 @@ var Rtf = function (options) {
         count: foreshocks.count,
         description: foreshocks.description,
         earthquakes: _filter(foreshocks).sort(_compare),
-        magThreshold: _magThreshold,
+        magThreshold: _magThreshold || 0,
       },
       historical: {
         bins: historical.bins,
         count: historical.count,
         description: historical.description,
         earthquakes: _filter(historical).sort(_compare),
-        magThreshold: _magThreshold,
+        magThreshold: _magThreshold || 0,
       },
       mag: props.mag,
       magType: props.magType,
