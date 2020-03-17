@@ -237,7 +237,7 @@ var SummaryPane = function (options) {
         selection,
         tr;
 
-    eqid = this.querySelector('.eqid').textContent;
+    eqid = this.querySelector('.eventId').textContent;
     features = _app.Features.getFeatures();
     parent = this.closest('.feature');
     selection = window.getSelection();
