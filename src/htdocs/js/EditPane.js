@@ -335,7 +335,7 @@ var EditPane = function (options) {
       _el.querySelector('.viewmap').removeAttribute('disabled');
 
       // Instantiate mainshock (other features are created after mainshock is ready)
-      _app.Features.instantiateMainshock();
+      _app.Features.instantiateFeature('mainshock');
     }
   };
 

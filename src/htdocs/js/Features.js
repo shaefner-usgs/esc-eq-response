@@ -52,7 +52,7 @@ _FEATURECLASSES = {
  *     getFeatureId: {Function},
  *     getFeatures: {Function},
  *     getStatus: {Function},
- *     instantiateMainshock: {Function},
+ *     instantiateFeature: {Function},
  *     refreshFeature: {Function},
  *     reset: {Function}
  *   }
@@ -68,7 +68,6 @@ var Features = function (options) {
 
       _addFeature,
       _initFeature,
-      _instantiateFeature,
       _instantiateFeatures,
       _loadJson,
       _removeFeature,
@@ -147,36 +146,17 @@ var Features = function (options) {
   };
 
   /**
-   * Instantiate a Feature
-   *
-   * @param FeatureClass {Object}
-   */
-  _instantiateFeature = function (FeatureClass) {
-    var feature;
-
-    feature = FeatureClass({
-      app: _app,
-      eqid: _eqid
-    });
-
-    _initFeature(feature);
-  };
-
-  /**
    * Wrapper method to loop through Feature classes and instantiate them
    *
-   * Skip mainshock which was already added (via _this.instantiateMainshock)
-   *   so it's available for other Features that depend on it.
+   * Skip mainshock which is added separately so it's available for other
+   *   Features that depend on it.
    */
   _instantiateFeatures = function () {
-    var FeatureClass;
-
     _numFeatures = Object.keys(_FEATURECLASSES).length;
 
     Object.keys(_FEATURECLASSES).forEach(function(id) {
       if (id !== 'mainshock') { // skip mainshock (already done)
-        FeatureClass = _FEATURECLASSES[id];
-        _instantiateFeature(FeatureClass);
+        _this.instantiateFeature(id);
       }
     });
   };
@@ -373,12 +353,26 @@ var Features = function (options) {
   };
 
   /**
-   * Wrapper method to instantiate mainshock Feature
+   * Instantiate a Feature
+   *
+   * @param id {String}
    */
-  _this.instantiateMainshock = function () {
-    _eqid = AppUtil.getParam('eqid');
+  _this.instantiateFeature = function (id) {
+    var feature,
+        FeatureClass;
 
-    _instantiateFeature(_FEATURECLASSES.mainshock);
+    FeatureClass = _FEATURECLASSES[id];
+
+    if (id === 'mainshock') {
+      _eqid = AppUtil.getParam('eqid');
+    }
+
+    feature = FeatureClass({
+      app: _app,
+      eqid: _eqid
+    });
+
+    _initFeature(feature);
   };
 
   /**
@@ -394,7 +388,7 @@ var Features = function (options) {
       }
 
       _removeFeature(feature);
-      _instantiateFeature(_FEATURECLASSES[feature.id]);
+      _this.instantiateFeature(feature.id);
 
       // Also refresh FieldNotes when Aftershocks is refreshed (uses same params)
       if (feature.id === 'aftershocks') {
