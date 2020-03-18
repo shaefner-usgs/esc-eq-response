@@ -122,6 +122,27 @@ class Rtf {
   }
 
   /**
+   * Create a local (temporary) image from a data URI
+   *
+   * @param $data {String}
+   *     image data URI base 64 encoded in .png format
+   *
+   * @return $path {String}
+   *     path of new local image
+   */
+  private function _getImage($data) {
+    $filtered = substr($data, strpos($data, ",") + 1); // remove encoding metadata
+    $contents = base64_decode($filtered); // decode base 64 data
+    $path = $this->_getPath('png');
+    $img = fopen($path, 'wb');
+
+    fwrite($img, $contents);
+    fclose($img);
+
+    return $path;
+  }
+
+  /**
    * Get alert location relative to ANSS location
    *
    * @param $azimuth {Number} degrees
@@ -141,19 +162,32 @@ class Rtf {
   }
 
   /**
+   * Create a unique filename (full path) based on the eqid
+   *
+   * @param $extension {String}
+   *
+   * @return {String}
+   */
+  private function _getPath($extension) {
+    static $count = 0;
+    $count ++;
+
+    return "/tmp/{$this->_data->eqid}-$count.$extension";
+  }
+
+  /**
    * Create a local (temporary) copy of an image from a remote image
    *
    * @param $url {String}
    *     URL of remote image
    *
    * @return $path {String}
-   *     path of local image
+   *     path of new local image
    */
   private function _getRemoteImage($url) {
-    static $count = 0;
-
-    $count ++;
-    $path = "/tmp/{$this->_data->eqid}-$count.jpg";
+    preg_match('/\.(\w+)$/', $url, $matches); // get image extension
+    $extension = $matches[1];
+    $path = $this->_getPath($extension);
     $remoteImg = fopen($url, 'rb') or die(http_response_code(500));
     $tempImg = fopen($path, 'wb');
 
@@ -518,33 +552,39 @@ class Rtf {
   private function _createSection4() {
     $section4 = $this->_rtf->addSection();
 
+    $beachballs = $this->_data->beachballs;
+
     $section4->writeText(
       'Mechanism and Fault',
       $this->_font->h2,
       $this->_format->h2
     );
 
-    $section4->writeText(
-      'Focal Mechanism',
-      $this->_font->h4,
-      $this->_format->h4
-    );
-    $section4->writeText(
-      '[PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->body
-    );
+    if (property_exists($beachballs, 'fm')) {
+      $section4->writeText(
+        'Focal Mechanism',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section4->addImage(
+        $this->_getImage($beachballs->fm),
+        $this->_format->image,
+        6
+      );
+    }
 
-    $section4->writeText(
-      'Moment Tensor',
-      $this->_font->h4,
-      $this->_format->h4
-    );
-    $section4->writeText(
-      '[PLACEHOLDER]',
-      $this->_font->body,
-      $this->_format->body
-    );
+    if (property_exists($beachballs, 'mt')) {
+      $section4->writeText(
+        'Moment Tensor',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section4->addImage(
+        $this->_getImage($beachballs->mt),
+        $this->_format->image,
+        6
+      );
+    }
 
     $section4->writeText(
       'Fault',

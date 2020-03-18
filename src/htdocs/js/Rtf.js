@@ -29,6 +29,7 @@ var Rtf = function (options) {
 
       _compare,
       _filter,
+      _getBeachBalls,
       _getPostData,
       _getProducts,
       _getSortValues;
@@ -122,12 +123,39 @@ var Rtf = function (options) {
   };
 
   /**
+   * Get focal mechanism, moment tensor beachballs as a data uri (base64 encoded)
+   *
+   * @return beachballs {Object}
+   */
+  _getBeachBalls = function () {
+    var beachball,
+        beachballs,
+        canvasEls;
+
+    beachballs = {};
+    canvasEls = {
+      fm: document.querySelector('#summaryPane .focal-mechanism canvas'),
+      mt: document.querySelector('#summaryPane .moment-tensor canvas')
+    };
+
+    Object.keys(canvasEls).forEach(function(key) {
+      beachball = canvasEls[key];
+      if (beachball) {
+        beachballs[key] = beachball.toDataURL('image/png');
+      }
+    });
+
+    return beachballs;
+  };
+
+  /**
    * Get POST data json object used to populate Event Summary RTF document
    *
    * @return data {Object}
    */
   _getPostData = function () {
     var aftershocks,
+        beachballs,
         data,
         feeds,
         foreshocks,
@@ -139,6 +167,7 @@ var Rtf = function (options) {
         props;
 
     aftershocks = _app.Features.getFeature('aftershocks');
+    beachballs = _getBeachBalls();
     feeds = _app.Feeds.getFeeds();
     foreshocks = _app.Features.getFeature('foreshocks');
     historical = _app.Features.getFeature('historical');
@@ -159,6 +188,7 @@ var Rtf = function (options) {
         magThreshold: _magThreshold || 0,
         model: aftershocks.model || {}
       },
+      beachballs: beachballs,
       depth: mainshock.json.geometry.coordinates[2],
       dyfi: products.dyfi || {},
       eqid: mainshock.json.id,
