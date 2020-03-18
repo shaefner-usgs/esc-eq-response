@@ -207,20 +207,22 @@ var EditPane = function (options) {
   _refreshFeature = function () {
     var div,
         eqidIsValid,
-        feature;
+        feature,
+        id;
 
     eqidIsValid = _checkIfValid();
 
     if (eqidIsValid) {
       div = this;
-      feature = _app.Features.getFeature(div.className);
+      id = div.className;
+      feature = _app.Features.getFeature(id);
 
-      // Throttle requests so they can't fire off repeatedly in rapid succession
-      window.clearTimeout(_throttle); // first clear any queued refresh
-      _throttle = window.setTimeout(function() {
-        // Even with a throttle in place, Ajax requests can still 'stack up'
-        // Wait until previous request is finished before starting another
-        if (feature) {
+      if (feature) {
+        // Throttle requests so they can't fire off repeatedly in rapid succession
+        window.clearTimeout(_throttle); // first clear any queued refresh
+        _throttle = window.setTimeout(function() {
+          // Even with a throttle in place, Ajax requests can still 'stack up'
+          // Wait until previous request is finished before starting another
           if (feature.isLoading) {
             window.setTimeout(function() {
               _refreshFeature.call(div);
@@ -228,8 +230,10 @@ var EditPane = function (options) {
           } else {
             _app.Features.refreshFeature(feature);
           }
-        }
-      }, 250);
+        }, 250);
+      } else { // feature never instantiated (likely due to a bad ajax request)
+        _app.Features.instantiateFeature(id);
+      }
     }
   };
 

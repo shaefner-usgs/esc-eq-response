@@ -217,6 +217,7 @@ var Features = function (options) {
 
         errorMsg += '</ul>';
         _app.StatusBar.addError(feature, errorMsg);
+        _removeFeature(feature);
 
         feature.isLoading = false;
       },
@@ -230,6 +231,7 @@ var Features = function (options) {
         //errorMsg += '<a href="#" class="reload"></a>';
 
         _app.StatusBar.addError(feature, errorMsg);
+        _removeFeature(feature);
 
         feature.isLoading = false;
       },
@@ -247,6 +249,8 @@ var Features = function (options) {
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
+
+      delete _features[feature.id];
 
       feature.destroy();
     }
