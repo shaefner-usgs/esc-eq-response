@@ -65,6 +65,7 @@ var Features = function (options) {
       _eqid,
       _features,
       _numFeatures,
+      _showLayer,
 
       _addFeature,
       _initFeature,
@@ -92,10 +93,10 @@ var Features = function (options) {
     _features[feature.id] = feature;
 
     try {
-      // Add feature to map, plots and summary panes; does nothing if prop not set
-      _app.MapPane.addFeature(feature); // prop: mapLayer
-      _app.PlotsPane.addFeature(feature); // prop: plotTraces
-      _app.SummaryPane.addFeature(feature); // prop: summary
+      // Add feature to map, plots and summary panes if prop is set
+      _app.MapPane.addFeature(feature); // relevant prop: mapLayer
+      _app.PlotsPane.addFeature(feature); // relevant prop: plotTraces
+      _app.SummaryPane.addFeature(feature); // relevant prop: summary
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
@@ -135,6 +136,10 @@ var Features = function (options) {
       if (flag === 'waiting') {
         return; // exit if dependencies are not ready
       }
+    }
+
+    if (typeof _showLayer === 'boolean') { // used cached value if set
+      feature.showLayer = _showLayer;
     }
 
     if (feature.url) {
@@ -249,6 +254,8 @@ var Features = function (options) {
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
+
+      _showLayer = feature.showLayer; // cache value
 
       feature.destroy();
     }
