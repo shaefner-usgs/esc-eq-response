@@ -219,7 +219,7 @@ var Features = function (options) {
         _app.StatusBar.addError(feature, errorMsg);
         _removeFeature(feature);
 
-        feature.isLoading = false;
+        delete _features[feature.id];
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -233,7 +233,7 @@ var Features = function (options) {
         _app.StatusBar.addError(feature, errorMsg);
         _removeFeature(feature);
 
-        feature.isLoading = false;
+        delete _features[feature.id];
       },
       timeout: 20000
     });
@@ -249,8 +249,6 @@ var Features = function (options) {
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
-
-      delete _features[feature.id];
 
       feature.destroy();
     }
