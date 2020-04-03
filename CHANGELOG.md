@@ -5,18 +5,21 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-## 0.7.0 (2020-01-30)
+## 0.7.0 (2020-04-03)
 
 * Add option to create / download an Event Summary RTF file
 * Add "Population Exposure" table and tweak the layout of Mainshock products
-* Only show rendering message on 1st load of plots pane
 * Add map popups to FM, MT beachball layers
-* Update eqid validation to be more lax
-* Elegantly scroll long tables in map popups
-* Display tweaks on edit, summary, help panes
 * Create new Feeds / Feed classes for fetching data shown only in RTF Summary
 * Add support for dependencies if other feature(s) need to be fetched first
 * Add destroy method to all Features/Feeds
+* Update eqid validation to be more lax
+* Only show rendering message on 1st load of plots pane
+* Sort historical eq list by mag, desc
+* Hide year column on binned data tables when eq sequence is 30 days or less
+* Add "x days ago" note since most recent aftershock
+* Elegantly scroll long tables in map popups
+* Display tweaks on edit, summary, help panes
 * Code cleanup/optimization
 * Bug fixes
 
