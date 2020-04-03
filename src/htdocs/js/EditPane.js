@@ -18,6 +18,7 @@ var AppUtil = require('AppUtil');
  *
  * @return _this {Object}
  *   {
+ *     focusedField: {String},
  *     initFeatures: {Function},
  *     reset: {Function},
  *     selSignificantEq: {Function},
@@ -47,6 +48,7 @@ var EditPane = function (options) {
       _resetTitle,
       _setFormFieldValues,
       _setQueryStringValues,
+      _storeFocus,
       _updateParam,
       _viewMap;
 
@@ -61,8 +63,6 @@ var EditPane = function (options) {
     _eqid = document.getElementById('eqid');
     _eqidPrevValue = null;
     _fields = _el.querySelectorAll('input'); // all form fields
-
-    _eqid.focus();
 
     _initListeners();
     _setFormFieldValues();
@@ -185,6 +185,9 @@ var EditPane = function (options) {
     // Update querystring param when form field is changed
     _addListener(_fields, 'input', _updateParam);
 
+    // Remember focused field
+    _addListener(_fields, 'focus', _storeFocus);
+
     // Get a new set of feature layers when eqid is changed
     _addListener([_eqid], 'input', _this.initFeatures);
 
@@ -293,6 +296,15 @@ var EditPane = function (options) {
     for (i = 0; i < _fields.length; i ++) {
       AppUtil.setParam(_fields[i].id, _fields[i].value);
     }
+  };
+
+  /**
+   * Store id of form field selected (focused) by user
+   *
+   * @param e {Event}
+   */
+  _storeFocus = function (e) {
+    _this.focusedField = e.target.id;
   };
 
   /**

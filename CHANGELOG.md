@@ -5,6 +5,8 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Remember focused field on edit pane when switching between panes
+
 ## 0.7.0 (2020-04-03)
 
 * Add option to create / download an Event Summary RTF file

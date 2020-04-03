@@ -60,24 +60,28 @@ var NavBar = function (options) {
   _addListeners = function () {
     var id;
 
-    // Save current scroll postion when user scrolls page
-    window.addEventListener('scroll', function () {
-      _saveScrollPosition();
-    });
-
     // Update UI when user switches pane
     window.addEventListener('hashchange', function () {
       id = _getPaneId();
       _changePane(id);
     });
+
+    // Save current scroll postion when user scrolls page
+    window.addEventListener('scroll', function () {
+      _saveScrollPosition();
+    });
   };
 
   /**
    * Switch between panes in UI
+   *   show rendering message for first load of plots
+   *   track focused field on EditPane
    *
    * @param id {String}
    */
    _changePane = function (id) {
+     var field;
+
      if (id === 'plotsPane' && !_app.PlotsPane.rendered) {
        _app.StatusBar.addItem({
          id: 'rendering',
@@ -93,6 +97,13 @@ var NavBar = function (options) {
          _app.StatusBar.removeItem('rendering');
        }, 20);
      } else {
+       if (id === 'editPane') { // focus appropriate field
+         field = 'eqid'; // default
+         if (_app.EditPane.focusedField) {
+           field = _app.EditPane.focusedField;
+         }
+        document.getElementById(field).focus();
+       }
        _hidePanes();
        _showPane(id);
      }
