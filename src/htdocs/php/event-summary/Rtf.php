@@ -23,6 +23,7 @@ class Rtf {
           $_font,
           $_format,
           $_now,
+          $_plotNames,
           $_rtf;
 
   public $file;
@@ -32,6 +33,10 @@ class Rtf {
     $this->_font = new stdClass;
     $this->_format = new stdClass;
     $this->_now = date('Y-m-d g:ia \(T\)');
+    $this->_plotNames = [
+      'cumulative' => 'Cumulative Earthquakes',
+      'magtime' => 'Magnitude vs. Time'
+    ];
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
     if ($this->_data) {
@@ -802,6 +807,22 @@ class Rtf {
       $this->_createTableEqlist($section6, 'aftershocks');
     }
 
+    if (!empty(get_object_vars($aftershocks->plots))) {
+      foreach ($aftershocks->plots as $type => $dataUrl) {
+        $section6->writeText(
+          $this->_plotNames[$type],
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section6->writeText('<br>');
+        $section6->addImage(
+          $this->_getImage($dataUrl),
+          $this->_format->image,
+          18
+        );
+      }
+    }
+
     if (!empty($aftershocks->forecast)) {
       $section6->writeText(
         'Aftershock Forecast',
@@ -940,6 +961,22 @@ class Rtf {
         $this->_format->h3
       );
       $this->_createTableEqlist($section8, 'historical');
+    }
+
+    if (!empty(get_object_vars($historical->plots))) {
+      foreach ($historical->plots as $type => $dataUrl) {
+        $section8->writeText(
+          $this->_plotNames[$type],
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section8->writeText('<br>');
+        $section8->addImage(
+          $this->_getImage($dataUrl),
+          $this->_format->image,
+          18
+        );
+      }
     }
 
     if (property_exists($this->_data, 'historical-events')) {
