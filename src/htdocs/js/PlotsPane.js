@@ -17,6 +17,7 @@ var AppUtil = require('AppUtil');
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
+ *     getPlots: {Function},
  *     removeFeature: {Function},
  *     render: {Function},
  *     rendered: {Boolean},
@@ -401,6 +402,15 @@ var PlotsPane = function (options) {
   };
 
   /**
+   * Get Plot.ly params for all Features that have plots
+   *
+   * @return {Object}
+   */
+  _this.getPlots = function () {
+    return _plots;
+  };
+
+  /**
    * Remove a Feature from plots pane
    *
    * @param feature {Object}
@@ -423,10 +433,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Render plots - only call when plots pane is active
-   *
-   * Plotly.js has issues if plots are rendered when plotsPane is not active
-   *   (called by NavBar.js when user selects plot tab)
+   * Render plots
    */
   _this.render = function () {
     var graphDiv,

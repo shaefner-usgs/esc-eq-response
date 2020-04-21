@@ -1,3 +1,4 @@
+/* global Plotly */
 'use strict';
 
 
@@ -24,15 +25,20 @@ var Rtf = function (options) {
 
       _app,
       _magThreshold,
+      _plots,
       _sortKey,
       _sortOrder,
 
       _compare,
       _filter,
       _getBeachBalls,
+      _getPlotDivs,
       _getPostData,
       _getProducts,
-      _getSortValues;
+      _getPromise,
+      _getPromises,
+      _getSortValues,
+      _initPlots;
 
 
   _this = {};
@@ -123,7 +129,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get focal mechanism, moment tensor beachballs as a data uri (base64 encoded)
+   * Get focal mechanism, moment tensor beachballs as a dataUrl (base64 encoded)
    *
    * @return beachballs {Object}
    */
@@ -146,6 +152,37 @@ var Rtf = function (options) {
     });
 
     return beachballs;
+  };
+
+  /**
+   * Get an array of div containers for all (2d) plots, grouped by Feature
+   *
+   * @return divs {Object}
+   *   {
+   *     featureId: [div1, ...],
+   *     ...
+   *   }
+   */
+  _getPlotDivs = function () {
+    var divs,
+        params,
+        plots;
+
+    divs = {};
+    plots = _app.PlotsPane.getPlots();
+
+    Object.keys(plots).forEach(function(featureId) {
+      divs[featureId] = [];
+      params = plots[featureId].params;
+
+      Object.keys(params).forEach(function(plotId) {
+        if (plotId !== 'hypocenters') { // skip 3d plots
+          divs[featureId].push(params[plotId].graphDiv);
+        }
+      });
+    });
+
+    return divs;
   };
 
   /**
@@ -186,7 +223,8 @@ var Rtf = function (options) {
         earthquakes: _filter(aftershocks).sort(_compare),
         forecast: aftershocks.forecast || [],
         magThreshold: _magThreshold || 0,
-        model: aftershocks.model || {}
+        model: aftershocks.model || {},
+        plots: _plots.aftershocks
       },
       beachballs: beachballs,
       depth: mainshock.json.geometry.coordinates[2],
@@ -197,7 +235,7 @@ var Rtf = function (options) {
         count: foreshocks.count,
         description: foreshocks.description,
         earthquakes: _filter(foreshocks).sort(_compare),
-        magThreshold: _magThreshold || 0,
+        magThreshold: _magThreshold || 0
       },
       historical: {
         bins: historical.bins,
@@ -205,6 +243,7 @@ var Rtf = function (options) {
         description: historical.description,
         earthquakes: _filter(historical).sort(_compare),
         magThreshold: _magThreshold || 0,
+        plots: _plots.historical
       },
       mag: props.mag,
       magType: props.magType,
@@ -287,6 +326,53 @@ var Rtf = function (options) {
   };
 
   /**
+   * Get a promise to (2d) plot image as a dataUrl (base64 encoded)
+   *
+   * @param div {Element}
+   * @param featureId {String}
+   *
+   * @return promise {Object}
+   */
+  _getPromise = function (div, featureId) {
+    var promise,
+        type;
+
+    type = div.classList.item(0); // plot type key
+    promise = Plotly.toImage(div, {
+      format: 'png',
+      height: 300,
+      width: 800
+    }).then(function(dataUrl) {
+      _plots[featureId][type] = dataUrl;
+    });
+
+    return promise;
+  };
+
+  /**
+   * Wrapper method to get a promise to each (2d) plot image
+   *
+   * @return promises {Array}
+   */
+  _getPromises = function () {
+    var plotDivs,
+        promises;
+
+    plotDivs = _getPlotDivs();
+    promises = [];
+
+    Object.keys(plotDivs).forEach(function(featureId) {
+      _plots[featureId] = {}; // initialize object that stores a Feature's plots
+
+      plotDivs[featureId].forEach(function(div) {
+        promises.push(_getPromise(div, featureId));
+      });
+    });
+
+    return promises;
+  };
+
+  /**
    * Get the sort key (set as a CSS class on a <th>) and order for an eq list
    *
    * @param featureId {String}
@@ -331,6 +417,20 @@ var Rtf = function (options) {
     };
   };
 
+  /**
+   * Store plot image .pngs, which are returned as a Promise from Plot.ly
+   *
+   * @return promises {Array}
+   */
+  _initPlots = function () {
+    var promises;
+
+    _plots = {};
+    promises = _getPromises(); // promises that populate _plots
+
+    return promises;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -339,27 +439,39 @@ var Rtf = function (options) {
    * Create Event Summary RTF file and then trigger download of file
    */
   _this.create = function () {
-    var data = JSON.stringify(_getPostData());
+    var data,
+        plots;
 
-    Xhr.ajax({
-      error: function (e, xhr) {
-        console.error(xhr.statusText + xhr.responseText);
+    // Render plots so that their images can be captured
+    if (!_app.PlotsPane.rendered) {
+      _app.PlotsPane.render();
+    }
 
-        _app.StatusBar.addError({
-          id: 'rtf'
-        }, '<h4>Error Creating Event Summary</h4>');
-      },
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST',
-      rawdata: data,
-      success: function (json) {
-        window.location.assign('php/event-summary/download.php?file=' + json.file);
+    plots = _initPlots();
 
-        _app.StatusBar.removeItem('rtf');
-      },
-      url: 'php/event-summary/create.php'
+    Promise.all(plots).then(function() {
+      data = JSON.stringify(_getPostData());
+
+      Xhr.ajax({
+        error: function (e, xhr) {
+          console.error(xhr.statusText + xhr.responseText);
+
+          _app.StatusBar.addError({
+            id: 'rtf'
+          }, '<h4>Error Creating Event Summary</h4>');
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        rawdata: data,
+        success: function (json) {
+          window.location.assign('php/event-summary/download.php?file=' + json.file);
+
+          _app.StatusBar.removeItem('rtf');
+        },
+        url: 'php/event-summary/create.php'
+      });
     });
   };
 
