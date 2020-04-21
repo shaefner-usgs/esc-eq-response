@@ -326,7 +326,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get a promise to (2d) plot image as a dataUrl (base64 encoded)
+   * Get a Promise to (2d) plot image as a dataUrl (base64 encoded)
    *
    * @param div {Element}
    * @param featureId {String}
@@ -350,7 +350,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Wrapper method to get a promise to each (2d) plot image
+   * Wrapper method to get a Promise to each (2d) plot image
    *
    * @return promises {Array}
    */
@@ -418,7 +418,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Store plot image .pngs, which are returned as a Promise from Plot.ly
+   * Store plot image .pngs, which are each returned as a Promise from Plot.ly
    *
    * @return promises {Array}
    */
