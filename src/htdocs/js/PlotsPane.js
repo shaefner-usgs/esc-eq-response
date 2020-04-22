@@ -384,7 +384,9 @@ var PlotsPane = function (options) {
       params = {};
       Object.keys(feature.plotTraces).forEach(function(plotId) {
         if (feature.plotTraces[plotId]) { // null if no data
-          params[plotId] = _getPlotlyParams(feature, plotId);
+          if (plotId !== 'cumulative' || feature.count > 1) { // skip cumul. plot w/ 1eq
+            params[plotId] = _getPlotlyParams(feature, plotId);
+          }
         }
       });
 
