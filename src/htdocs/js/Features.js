@@ -257,6 +257,8 @@ var Features = function (options) {
 
       _showLayer = feature.showLayer; // cache value
 
+      delete _features[feature.id];
+
       feature.destroy();
     }
   };

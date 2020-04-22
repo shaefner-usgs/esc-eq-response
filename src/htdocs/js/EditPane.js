@@ -208,7 +208,8 @@ var EditPane = function (options) {
    *   triggered when a form field inside div is changed by user
    */
   _refreshFeature = function () {
-    var div,
+    var button,
+        div,
         eqidIsValid,
         feature,
         id;
@@ -221,6 +222,10 @@ var EditPane = function (options) {
       feature = _app.Features.getFeature(id);
 
       if (feature) {
+        // Disable download button while feature is refreshing
+        button = document.querySelector('.event-summary');
+        button.setAttribute('disabled', 'disabled');
+
         // Throttle requests so they can't fire off repeatedly in rapid succession
         window.clearTimeout(_throttle); // first clear any queued refresh
         _throttle = window.setTimeout(function() {
