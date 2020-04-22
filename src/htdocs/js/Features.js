@@ -90,7 +90,7 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addFeature = function (feature) {
-    _features[feature.id] = feature;
+    _features[feature.id] = feature; // store added feature
 
     try {
       // Add feature to map, plots and summary panes if prop is set
@@ -352,7 +352,7 @@ var Features = function (options) {
    * @return status {String}
    */
   _this.getStatus = function () {
-    var status;
+    var status = '';
 
     if (Object.keys(_features).length === _numFeatures) {
       status = 'finished';
