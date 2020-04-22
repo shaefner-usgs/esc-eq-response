@@ -1187,9 +1187,9 @@ class Rtf {
       $this->_createTableShakeAlert($section9);
     } else {
       $section9->writeText(
-        'No ShakeAlert Information',
-        $this->_font->h3,
-        $this->_format->h3
+        'ShakeAlert information is not available for this event.',
+        $this->_font->body,
+        $this->_format->p
       );
     }
   }
