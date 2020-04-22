@@ -167,7 +167,7 @@ class Rtf {
   }
 
   /**
-   * Create a unique filename (full path) based on the eqid
+   * Create a unique filename (full path) for attachments based on the eqid
    *
    * @param $extension {String}
    *
@@ -571,6 +571,7 @@ class Rtf {
         $this->_font->h4,
         $this->_format->h4
       );
+      $section4->writeText('<br>');
       $section4->addImage(
         $this->_getImage($beachballs->fm),
         $this->_format->image,
@@ -584,6 +585,7 @@ class Rtf {
         $this->_font->h4,
         $this->_format->h4
       );
+      $section4->writeText('<br>');
       $section4->addImage(
         $this->_getImage($beachballs->mt),
         $this->_format->image,
@@ -788,7 +790,7 @@ class Rtf {
       );
     } else {
       $section6->writeText(
-        'Earthquakes updated: ' . $this->_now,
+        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
@@ -801,8 +803,8 @@ class Rtf {
 
       $section6->writeText(
         "M $magThreshold+ Earthquakes ($listCount)",
-        $this->_font->h3,
-        $this->_format->h3
+        $this->_font->h4,
+        $this->_format->h4
       );
       $this->_createTableEqlist($section6, 'aftershocks');
     }
@@ -826,8 +828,8 @@ class Rtf {
     if (!empty($aftershocks->forecast)) {
       $section6->writeText(
         'Aftershock Forecast',
-        $this->_font->h3,
-        $this->_format->h3
+        $this->_font->h4,
+        $this->_format->h4
       );
 
       $section6->writeText(
@@ -898,7 +900,7 @@ class Rtf {
       );
     } else {
       $section7->writeText(
-        'Earthquakes updated: ' . $this->_now,
+        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
@@ -910,8 +912,8 @@ class Rtf {
 
       $section7->writeText(
         "M $magThreshold+ Earthquakes ($listCount)",
-        $this->_font->h3,
-        $this->_format->h3
+        $this->_font->h4,
+        $this->_format->h4
       );
       $this->_createTableEqlist($section7, 'foreshocks');
     }
@@ -945,7 +947,7 @@ class Rtf {
       );
     } else {
       $section8->writeText(
-        'Earthquakes updated: ' . $this->_now,
+        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
@@ -957,8 +959,8 @@ class Rtf {
 
       $section8->writeText(
         "M $magThreshold+ Earthquakes ($listCount)",
-        $this->_font->h3,
-        $this->_format->h3
+        $this->_font->h4,
+        $this->_format->h4
       );
       $this->_createTableEqlist($section8, 'historical');
     }
@@ -1063,7 +1065,7 @@ class Rtf {
       $shakeAlert = $this->_data->{'shake-alert'};
 
       $section9->writeText(
-        'Status: ' . $shakeAlert->properties->announcement,
+        '<strong>Status</strong>: ' . $shakeAlert->properties->announcement,
         $this->_font->body,
         $this->_format->body
       );
@@ -1295,7 +1297,7 @@ class Rtf {
     $numRows = count($eqs) + 1; // data rows + 1 header row
 
     $section->writeText(
-      '<br>',
+      '',
       $this->_font->body,
       $this->_format->table // sets formatting in table that follows
     );
@@ -1303,7 +1305,7 @@ class Rtf {
     $table = $section->addTable();
     $table->addRows($numRows);
     $table->addColumnsList(array(1.9, 4.4, 3.3, 2, 2.4, 2.9));
-    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 6);
+    $table->setBackgroundForCellRange('#666666', 1, 1, 1, 6);
     $table->setBordersForCellRange(
       $this->_format->borderDarker,
       $numRows, 1, $numRows, 6,
@@ -1393,7 +1395,7 @@ class Rtf {
       $table = $section->addTable();
       $table->addRows($numRows);
       $table->addColumnsList(array(2, 5, 3));
-      $table->setBackgroundForCellRange('#000000', 1, 1, 1, 3);
+      $table->setBackgroundForCellRange('#666666', 1, 1, 1, 3);
       $table->setBordersForCellRange(
         $this->_format->borderDarker,
         $numRows, 1, $numRows, 3,
@@ -1472,7 +1474,7 @@ class Rtf {
     }
 
     $section->writeText(
-      '<br>',
+      '',
       $this->_font->body,
       $this->_format->table // sets paragraph formatting in table that follows
     );
@@ -1547,7 +1549,7 @@ class Rtf {
     $numRows = count($cities) + 1; // data rows + 1 header row
 
     $section->writeText(
-      '<br>',
+      '',
       $this->_font->body,
       $this->_format->table // sets paragraph formatting in table that follows
     );
@@ -1555,7 +1557,7 @@ class Rtf {
     $table = $section->addTable();
     $table->addRows($numRows);
     $table->addColumnsList(array(4, 4, 3.5, 3.5));
-    $table->setBackgroundForCellRange('#000000', 1, 1, 1, 4);
+    $table->setBackgroundForCellRange('#666666', 1, 1, 1, 4);
     $table->setBordersForCellRange(
       $this->_format->borderDarker,
       $numRows, 1, $numRows, 4,
@@ -1615,25 +1617,25 @@ class Rtf {
   private function _setStyles() {
     $this->_font->body = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
 
-    $this->_font->h1 = new PHPRtfLite_Font(18, 'Calibri', '#000000', '#FFFFFF');
+    $this->_font->h1 = new PHPRtfLite_Font(20, 'Calibri', '#000000', '#FFFFFF');
     $this->_font->h1->setBold();
 
-    $this->_font->h2 = new PHPRtfLite_Font(16, 'Calibri', '#313131', '#FFFFFF');
+    $this->_font->h2 = new PHPRtfLite_Font(18, 'Calibri', '#313131', '#FFFFFF');
     $this->_font->h2->setBold();
 
-    $this->_font->h3 = new PHPRtfLite_Font(14, 'Calibri', '#474747', '#FFFFFF');
+    $this->_font->h3 = new PHPRtfLite_Font(16, 'Calibri', '#474747', '#FFFFFF');
     $this->_font->h3->setBold();
 
-    $this->_font->h4 = new PHPRtfLite_Font(12, 'Calibri', '#5281c9', '#FFFFFF');
+    $this->_font->h4 = new PHPRtfLite_Font(14, 'Calibri', '#5281c9', '#FFFFFF');
     $this->_font->h4->setBold();
 
     $this->_font->link = new PHPRtfLite_Font(12, 'Helvetica', '#0000CC', '#FFFFFF');
     $this->_font->link->setUnderline();
 
     $this->_font->pagerAlert = [
-      'green' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#00b04f'),
-      'orange' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FF9900'),
-      'red' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FF0000'),
+      'green' => new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#00b04f'),
+      'orange' => new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#FF9900'),
+      'red' => new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#FF0000'),
       'yellow' => new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFF00')
     ];
 
@@ -1643,7 +1645,7 @@ class Rtf {
 
     $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#444444', '#FFFFFF');
     $this->_font->th->setBold();
-    $this->_font->thBg = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#000000');
+    $this->_font->thBg = new PHPRtfLite_Font(12, 'Helvetica', '#FFFFFF', '#666666');
 
     $this->_format->body = new PHPRtfLite_ParFormat('left');
     $this->_format->body->setSpaceAfter(0);
@@ -1661,7 +1663,7 @@ class Rtf {
     $this->_format->h1 = new PHPRtfLite_ParFormat('center');
     $this->_format->h1->setSpaceBetweenLines(1.5);
 
-    $this->_format->h2 = new PHPRtfLite_ParFormat('left');
+    $this->_format->h2 = new PHPRtfLite_ParFormat('center');
     $this->_format->h2->setSpaceAfter(6);
     $this->_format->h2->setSpaceBefore(6);
 
