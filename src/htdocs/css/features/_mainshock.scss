@@ -15,10 +15,6 @@
     }
   }
 
-  .hide { /* missing product */
-    display: none;
-  }
-
   .mainshock > div {
     display: flex;
     flex-wrap: wrap;
@@ -96,6 +92,10 @@
 
     .earthquake h4 {
       text-align: left;
+    }
+
+    .hide { /* missing product */
+      display: none;
     }
 
     .two-up { /* two products per row */

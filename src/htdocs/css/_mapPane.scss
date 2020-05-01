@@ -14,6 +14,12 @@
   > canvas {
     display: none;
   }
+
+  .spinner div {
+    height: .9em;
+    top: -.8em;
+    width: .9em;
+  }
 }
 
 /* Rendering order of features
@@ -104,6 +110,16 @@
   .leaflet-control-layers-expanded {
     background: #fff;
     padding: 6px 10px;
+  }
+  .leaflet-control-layers-overlays {
+    div > span {
+      align-items: baseline;
+      display: flex;
+    }
+
+    .count {
+      font-size: .9em;
+    }
   }
   .leaflet-control-layers-separator {
     border-top-color: #cabede;
