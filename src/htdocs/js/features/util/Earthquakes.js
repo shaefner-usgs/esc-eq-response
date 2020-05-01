@@ -50,7 +50,7 @@ _DEFAULTS = {
  *     getListTable: {Function},
  *     getSlider: {Function},
  *     getSubHeader: {Function},
- *     list: {Object},
+ *     list: {Array},
  *     mapLayer: {L.layer},
  *     plotTraces: {Object},
  *   }
@@ -376,7 +376,7 @@ var Earthquakes = function (options) {
       '</div>';
     } else if (type === 'subheader') {
       template = '<h3>' +
-        'M <span class="mag">{mag}</span>+ Earthquakes (<span class="num">{num}</span>)' +
+        'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
       '</h3>';
     } else if (type === 'table') { // lists on summary pane
       template = '<table class="{tableClasses}">' +
@@ -922,8 +922,8 @@ var Earthquakes = function (options) {
    */
   _this.getSubHeader = function () {
     var data = {
-      mag: _range.initial,
-      num: _this.bins.cumulative[_range.initial]
+      count: _this.bins.cumulative[_range.initial],
+      mag: _range.initial
     };
 
     return L.Util.template(_templates.subheader, data);
