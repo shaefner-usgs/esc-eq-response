@@ -49,7 +49,6 @@ _FEATURECLASSES = {
  * @return _this {Object}
  *   {
  *     getFeature: {Function},
- *     getFeatureId: {Function},
  *     getFeatures: {Function},
  *     getStatus: {Function},
  *     instantiateFeature: {Function},
@@ -68,6 +67,7 @@ var Features = function (options) {
       _showLayer,
 
       _addFeature,
+      _addLoadingSpinner,
       _initFeature,
       _instantiateFeatures,
       _loadJson,
@@ -85,7 +85,7 @@ var Features = function (options) {
   };
 
   /**
-   * Add a Feature to map, plots and summary panes
+   * Add a Feature to map, plots and summary panes; add count to edit pane
    *
    * @param feature {Object}
    */
@@ -93,10 +93,13 @@ var Features = function (options) {
     _features[feature.id] = feature; // store added feature
 
     try {
-      // Add feature to map, plots and summary panes if prop is set
-      _app.MapPane.addFeature(feature); // relevant prop: mapLayer
-      _app.PlotsPane.addFeature(feature); // relevant prop: plotTraces
-      _app.SummaryPane.addFeature(feature); // relevant prop: summary
+      // Add Feature to map, plots and summary panes if property is set
+      _app.MapPane.addFeature(feature); // 'mapLayer' property
+      _app.PlotsPane.addFeature(feature); // 'plotTraces' property
+      _app.SummaryPane.addFeature(feature); // 'summary' property
+
+      // Add Feature's count if applicable (aftershocks, foreshocks, historical)
+      _app.EditPane.addCount(feature);
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
@@ -111,6 +114,19 @@ var Features = function (options) {
       _app.StatusBar.addError(feature, '<h4>Error Adding ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
     }
+  };
+
+  /**
+   * Add a container with only the Feature's name and a loading 'spinner' to
+   *   map, plots and summary panes while data is being fetched
+   *
+   * @param feature {Object}
+   */
+  _addLoadingSpinner = function (feature) {
+    _app.EditPane.addLoadingSpinner(feature);
+    _app.MapPane.addLoadingSpinner(feature);
+    _app.PlotsPane.addLoadingSpinner(feature);
+    _app.SummaryPane.addLoadingSpinner(feature);
   };
 
   /**
@@ -143,6 +159,7 @@ var Features = function (options) {
     }
 
     if (feature.url) {
+      _addLoadingSpinner(feature);
       _loadJson(feature);
     } else { // Feature does not require feed data, or it's not available
       feature.initFeature();
@@ -315,28 +332,6 @@ var Features = function (options) {
     });
 
     return feature;
-  };
-
-  /**
-   * Get a Feature's id from its name/title
-   *
-   * @param name {String}
-   *     name (or title) property of Feature
-   *
-   * @return id {String}
-   */
-  _this.getFeatureId = function (name) {
-    var feature,
-        id;
-
-    Object.keys(_features).forEach(function(key) {
-      feature = _features[key];
-      if (name === feature.name || name === feature.title) {
-        id = key;
-      }
-    });
-
-    return id;
   };
 
   /**
