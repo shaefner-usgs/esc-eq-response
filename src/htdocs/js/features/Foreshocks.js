@@ -17,17 +17,18 @@ var AppUtil = require('AppUtil'),
  * @return _this {Object}
  *   {
  *     bins: {Object},
+ *     count: {Integer},
  *     cumulativeEqs: {Array},
  *     description: {String},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
+ *     list: {Array},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
  *     sortBy: {String},
  *     summary: {String},
- *     title: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
@@ -51,9 +52,11 @@ var Foreshocks = function (options) {
     _app = options.app;
 
     _this.id = 'foreshocks';
+    _this.mapLayer = true;
     _this.name = 'Foreshocks';
     _this.showLayer = true;
     _this.sortBy = 'utcTime';
+    _this.summary = true;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -147,9 +150,7 @@ var Foreshocks = function (options) {
     _this.description = _Earthquakes.getDescription();
     _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
-    //_this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
-    _this.title = _this.name + ' (' + _this.count + ')';
   };
 
 

@@ -51,8 +51,10 @@ var FocalMechanism = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'focal-mechanism';
+    _this.mapLayer = true;
     _this.name = 'Focal Mechanism';
     _this.showLayer = false;
+    _this.summary = true;
     _this.zoomToLayer = false;
   };
 

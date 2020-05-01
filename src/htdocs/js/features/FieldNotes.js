@@ -38,13 +38,13 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
+ *     count: {Integer},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
- *     title: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
@@ -74,9 +74,12 @@ var FieldNotes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
+    _count = 0;
+
     _Lightbox = Lightbox();
 
     _this.id = 'fieldnotes';
+    _this.mapLayer = true;
     _this.name = 'Fieldnotes';
     _this.showLayer = false;
     _this.url = _getFeedUrl();
@@ -327,13 +330,11 @@ var FieldNotes = function (options) {
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
-    _count = 0;
-
+    _this.count = _count;
     _this.mapLayer = L.geoJson(json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _this.title = _this.name + ' (' + _count + ')';
   };
 
 

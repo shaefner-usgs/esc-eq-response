@@ -22,7 +22,6 @@ var AppUtil = require('AppUtil');
  *     initFeature: {Function},
  *     name: {String),
  *     summary: {String},
- *     title: {String},
  *     url: {String}
  *   }
  */
@@ -51,7 +50,7 @@ var PagerCities = function (options) {
     ];
     _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
-    _this.title = 'Population Exposure';
+    _this.summary = true;
     _this.url = _getFeedUrl();
   };
 
@@ -147,7 +146,7 @@ var PagerCities = function (options) {
     });
 
     if (rows) {
-      summary = '<h4><a href="' + url + '">' + _this.title + '</a></h4>';
+      summary = '<h4><a href="' + url + '">Population Exposure</a></h4>';
       summary += '<table>' +
         '<tr><th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th><tr>';
       summary += rows;
@@ -185,6 +184,8 @@ var PagerCities = function (options) {
     if (_this.url) { // url not set when feed is unavailable
       _this.cities = json.onepager_cities.sort(_compare);
       _this.summary = _getSummary(_this.cities);
+    } else {
+      _this.summary = '';
     }
   };
 

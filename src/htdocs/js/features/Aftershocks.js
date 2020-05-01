@@ -17,12 +17,14 @@ var AppUtil = require('AppUtil'),
  * @return _this {Object}
  *   {
  *     bins: {Object},
+ *     count: {Integer},
  *     cumulativeEqs: {Array},
  *     description: {String},
  *     destroy: {Function},
  *     forecast: {Array},
  *     id: {String},
  *     initFeature: {Function},
+ *     list: {Array},
  *     mapLayer: {L.layer},
  *     model: {Object},
  *     name: {String},
@@ -30,7 +32,6 @@ var AppUtil = require('AppUtil'),
  *     showLayer: {Boolean},
  *     sortBy: {String},
  *     summary: {String},
- *     title: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
@@ -61,9 +62,12 @@ var Aftershocks = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'aftershocks';
+    _this.mapLayer = true;
     _this.name = 'Aftershocks';
+    _this.plotTraces = true;
     _this.showLayer = true;
     _this.sortBy = 'utcTime';
+    _this.summary = true;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -248,7 +252,6 @@ var Aftershocks = function (options) {
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
-    _this.title = _this.name + ' (' + _this.count + ')';
 
     // The following props depend on summary being set
     _this.forecast = _forecast;
