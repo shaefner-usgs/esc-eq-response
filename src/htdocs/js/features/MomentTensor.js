@@ -51,8 +51,10 @@ var MomentTensor = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'moment-tensor';
+    _this.mapLayer = true;
     _this.name = 'Moment Tensor';
     _this.showLayer = false;
+    _this.summary = true;
     _this.zoomToLayer = false;
   };
 

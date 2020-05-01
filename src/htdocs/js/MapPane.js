@@ -28,6 +28,7 @@ require('mappane/TerrainLayer');
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
+ *     addLoadingSpinner: {Function},
  *     initView: {Function},
  *     map: {Object},
  *     openPopup: {Function},
@@ -45,6 +46,7 @@ var MapPane = function (options) {
       _initialLoad,
       _layerControl,
       _mapNavButton,
+      _placeholders,
       _staticLayers,
 
       _addLayerControl,
@@ -52,7 +54,6 @@ var MapPane = function (options) {
       _compareLayers,
       _createMapPane,
       _fitBounds,
-      _getLayerId,
       _getSortValue,
       _getStaticLayers,
       _hideZoomControl,
@@ -71,6 +72,7 @@ var MapPane = function (options) {
     _el = options.el || document.createElement('div');
     _initialLoad = true;
     _mapNavButton = document.querySelector('#navBar [href="#mapPane"]');
+    _placeholders = {};
     _staticLayers = _getStaticLayers();
 
     _initMap();
@@ -104,7 +106,7 @@ var MapPane = function (options) {
         showLayer;
 
     _this.map.on('overlayadd overlayremove', function (e) {
-      id = _app.Features.getFeatureId(e.name);
+      id = e.layer.id;
       showLayer = false;
 
       if (e.type === 'overlayadd') {
@@ -143,6 +145,8 @@ var MapPane = function (options) {
   /**
    * Create a separate pane for each Feature (used to control stacking order)
    *
+   * Pane is set/applied in layer's Factory during creation
+   *
    * @param id {String}
    * @param parent {String <overlayPane | tilePane>}
    */
@@ -170,32 +174,6 @@ var MapPane = function (options) {
   };
 
   /**
-   * Get the id value for a layer, which is typically the Feature's id prop,
-   *   except in cases where the map layer is not a Feature layer (i.e. faults)
-   *
-   * @param layer {L.layer}
-   *
-   * @return id {String}
-   */
-  _getLayerId = function (layer) {
-    var features,
-        id;
-
-    if (layer.hasOwnProperty('id')) { // faults
-      id = layer.id;
-    } else {
-      features = _app.Features.getFeatures();
-      Object.keys(features).forEach(function(key) {
-        if (layer === features[key].mapLayer) {
-          id = key;
-        }
-      });
-    }
-
-    return id;
-  };
-
-  /**
    * Get the sort value of a Leaflet layer, which is its z-index value
    *
    * @param layer {L.Layer}
@@ -212,7 +190,7 @@ var MapPane = function (options) {
     if (_isBaseLayer(layer)) {
       sortValue = 1; // base layers don't have a z-index/don't need to be sorted
     } else {
-      className = 'leaflet-' + _getLayerId(layer) + '-pane';
+      className = 'leaflet-' + layer.id + '-pane';
       leafletPane = _el.querySelector('.' + className);
       styles = window.getComputedStyle(leafletPane);
       sortValue = Number(styles.getPropertyValue('z-index'));
@@ -286,8 +264,7 @@ var MapPane = function (options) {
     });
     _this.reset(); // set initial state of map
 
-    // Create custom pane for Faults overlay within tilePane
-    _createMapPane('faults', 'tilePane'); // pane is applied in Faults factory
+    _createMapPane('faults', 'tilePane');
 
     // Add default layers to map (i.e. toggle on in layer control)
     _staticLayers.defaults.forEach(function(layer) {
@@ -351,22 +328,57 @@ var MapPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var title;
-
-    title = feature.title || feature.name;
+    var layer,
+        name,
+        placeholder;
 
     if (feature.mapLayer) {
-      _createMapPane(feature.id, 'overlayPane'); // applied in mapLayer's marker options
-      _layerControl.addOverlay(feature.mapLayer, title);
+      layer = feature.mapLayer;
+      layer.id = feature.id; // attach Feature id to Leaflet layer
 
-      // Turn layer "on" and zoom map if set to be displayed / zoomed by default
+      name = feature.name;
+      if (feature.hasOwnProperty('count')) {
+        name += '<span class="count">' + feature.count + '</span>';
+      }
+
+      placeholder = _placeholders[feature.id];
+      if (placeholder) { // temporary layer shown while data is loading
+        _layerControl.removeLayer(placeholder);
+      } else {
+        _createMapPane(feature.id, 'overlayPane');
+      }
+
+      _layerControl.addOverlay(layer, name);
+
+      // Turn layer "on" and set map extent to contain layer if applicable
       if (feature.showLayer) {
-        _this.map.addLayer(feature.mapLayer);
+        _this.map.addLayer(layer);
 
         if (feature.zoomToLayer) {
           _setBounds(feature);
         }
       }
+    }
+  };
+
+  /**
+   * Add a Feature's name and a loading 'spinner' to the layer controller
+   *
+   * @param feature {Object}
+   */
+  _this.addLoadingSpinner = function (feature) {
+    var layer,
+        name;
+
+    if (feature.mapLayer) {
+      layer = L.layerGroup(); // empty placeholder layer
+      layer.id = feature.id;
+      name = feature.name + '<div class="spinner"><div></div></div>';
+
+      _createMapPane(feature.id, 'overlayPane');
+
+      _layerControl.addOverlay(layer, name);
+      _placeholders[feature.id] = layer; // cache placeholder layers
     }
   };
 
@@ -446,7 +458,8 @@ var MapPane = function (options) {
 
   /**
    * Reset map pane to initial state
-   *   Set default map extent and purge canvas elements (FM, MT)
+   *
+   * Set default map extent and purge canvas elements (FM, MT)
    */
   _this.reset = function () {
     var canvasEls,

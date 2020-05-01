@@ -38,13 +38,13 @@ _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
+ *     count: {Integer},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     showLayer: {Boolean},
- *     title: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
@@ -86,6 +86,7 @@ var ShakeMapStations = function (options) {
     _shakemap = mainshock.json.properties.products.shakemap;
 
     _this.id = 'shakemap-stations';
+    _this.mapLayer = true;
     _this.name = 'ShakeMap Stations';
     _this.showLayer = false;
     _this.url = _getFeedUrl();
@@ -397,8 +398,8 @@ var ShakeMapStations = function (options) {
    *     feed data for feature
    */
   _this.initFeature = function (json) {
+    _this.count = _count;
     _this.mapLayer = _getMapLayer(json);
-    _this.title = _this.name + ' (' + _count + ')';
   };
 
 

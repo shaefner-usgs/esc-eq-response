@@ -17,18 +17,19 @@ var AppUtil = require('AppUtil'),
  * @return _this {Object}
  *   {
  *     bins: {Object},
+ *     count: {Integer},
  *     cumulativeEqs: {Array},
  *     description: {String},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
+ *     list: {Array},
  *     mapLayer: {L.layer},
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
  *     sortBy: {String},
  *     summary: {String},
- *     title: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
  *   }
@@ -52,9 +53,12 @@ var Historical = function (options) {
     _app = options.app;
 
     _this.id = 'historical';
+    _this.mapLayer = true;
     _this.name = 'Historical Seismicity';
+    _this.plotTraces = true;
     _this.showLayer = true;
     _this.sortBy = 'mag';
+    _this.summary = true;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
@@ -150,7 +154,6 @@ var Historical = function (options) {
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _getSummary();
-    _this.title = _this.name + ' (' + _this.count + ')';
   };
 
 

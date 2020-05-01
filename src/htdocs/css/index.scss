@@ -70,6 +70,10 @@ h1, h2, h3, h4 {
   font-weight: 400;
   margin: 1rem 0;
 }
+h2, h3 {
+  align-items: baseline;
+  display: flex;
+}
 h1 {
   font-size: 2.1rem;
   margin-top: 0;
@@ -124,6 +128,25 @@ tr {
   padding: 1em;
 }
 
+.count {
+  font-size: .8em;
+  margin-left: .3em;
+  opacity: 1;
+  transition: opacity .3s ease-in-out;
+
+  &.hide {
+    opacity: 0;
+    transition: none;
+  }
+
+  &:after {
+    content: ")";
+  }
+  &:before {
+    content: "(";
+  }
+}
+
 .darker {
   background: $bg-color-darker;
 }
@@ -145,6 +168,48 @@ tr {
 
   &#mapPane {
     padding: 0;
+  }
+}
+
+.spinner {
+  display: block;
+  opacity: 1;
+  position: relative;
+
+  &.hide {
+    display: none;
+    opacity: 0;
+  }
+
+  div {
+    animation: sk-scaleout 1.0s infinite ease-in-out;
+    background-color: #333;
+    border-radius: 50%;
+    height: .8em;
+    left: .5em;
+    position: absolute;
+    top: -.7em;
+    width: .8em;
+  }
+}
+
+@-webkit-keyframes sk-scaleout {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+@keyframes sk-scaleout {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
   }
 }
 

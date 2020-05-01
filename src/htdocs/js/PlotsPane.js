@@ -17,6 +17,7 @@ var AppUtil = require('AppUtil');
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
+ *     addLoadingSpinner: {Function},
  *     getPlots: {Function},
  *     removeFeature: {Function},
  *     render: {Function},
@@ -362,24 +363,34 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var description,
+    var count,
         div,
         isActive,
         params,
-        title;
+        spinner;
 
-    // Don't plot mainshock on its own (it's included in other Features' plots)
+    // Skip mainshock (it's included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
-      if (feature.description) {
-        description = feature.description;
+      div = _el.querySelector('div.' + feature.id);
+      spinner = div.querySelector('.spinner');
+
+      if (spinner) { // hide loading spinner
+        spinner.classList.add('hide');
       }
-      title = feature.title || feature.name;
 
-      div = document.createElement('div');
-      div.classList.add('content', 'feature', feature.id);
-      div.innerHTML = '<h2>' + title + '</h2>' + description;
+      if (feature.hasOwnProperty('count')) { // add count to Feature name
+        count = document.createElement('span');
+        count.classList.add('count', 'hide');
+        count.textContent = feature.count;
 
-      _featuresEl.appendChild(div);
+        div.querySelector('h2').appendChild(count);
+
+        // Trigger a reflow, then unhide (to enable CSS transition)
+        count.focus();
+        count.classList.remove('hide');
+      }
+
+      div.insertAdjacentHTML('beforeend', feature.description); // preserves CSS transition
 
       params = {};
       Object.keys(feature.plotTraces).forEach(function(plotId) {
@@ -400,6 +411,25 @@ var PlotsPane = function (options) {
       if (isActive) {
         _this.render();
       }
+    }
+  };
+
+  /**
+   * Add a Feature's container, name and a loading 'spinner' to plots pane
+   *
+   * @param feature {Object}
+   */
+  _this.addLoadingSpinner = function (feature) {
+    var div;
+
+    // Mainshock is included in other Features' plots, but not separately
+    if (feature.plotTraces && feature.id !== 'mainshock') {
+      div = document.createElement('div');
+      div.classList.add('content', 'feature', feature.id);
+      div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +
+        '<div></div></div></h2>';
+
+      _featuresEl.appendChild(div);
     }
   };
 

@@ -37,16 +37,21 @@
           <fieldset>
             <legend>Mainshock to Present</legend>
             <div class="mainshock">
-              <h3>Mainshock</h3>
+              <h3>Mainshock
+                <div class="hide spinner"><div></div></div>
+              </h3>
               <label for="eqid">
                 <p>Event ID (typically 2 letters followed by 8-10 characters)</p>
               </label>
               <input type="text" id="eqid" value="" required="required"
                 pattern="^[^/\\:]+$" tabindex="2" />
             </div>
-            <div class="details hide"></div>
+            <div class="hide details"></div>
             <div class="aftershocks">
-              <h3>Aftershocks</h3>
+              <h3>Aftershocks
+                <div class="hide spinner"><div></div></div>
+                <span class="hide count"></span>
+              </h3>
               <label for="as-mag">
                 <p>Min magnitude</p>
               </label>
@@ -64,7 +69,10 @@
           <fieldset>
             <legend>Before the Mainshock</legend>
             <div class="foreshocks">
-              <h3>Foreshocks</h3>
+              <h3>Foreshocks
+                <div class="hide spinner"><div></div></div>
+                <span class="hide count"></span>
+              </h3>
               <label for="fs-mag">
                 <p>Min magnitude</p>
               </label>
@@ -85,7 +93,10 @@
                 tabindex="7" />
             </div>
             <div class="historical">
-              <h3>Historical Seismicity</h3>
+              <h3>Historical Seismicity
+                <div class="hide spinner"><div></div></div>
+                <span class="hide count"></span>
+              </h3>
               <label for="hs-mag">
                 <p>Min magnitude</p>
               </label>

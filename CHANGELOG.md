@@ -5,6 +5,9 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
+* Add loading spinners next to Feature's name on all panes while fetching data
+* Add count totals next to Feature's name on edit pane
+* Clean up hiding animation on Status Bar, which was janky sometimes
 * Add (2d) plots to Summary RTF
 * Formatting / typography / style tweaks to Summary RTF
 * Disable RTF download button while features are refreshing

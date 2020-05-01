@@ -18,6 +18,8 @@ var AppUtil = require('AppUtil');
  *
  * @return _this {Object}
  *   {
+ *     addCount: {Function},
+ *     addLoadingSpinner: {Function},
  *     focusedField: {String},
  *     initFeatures: {Function},
  *     reset: {Function},
@@ -44,6 +46,7 @@ var EditPane = function (options) {
       _hideMainshock,
       _initListeners,
       _refreshFeature,
+      _resetCounts,
       _resetForm,
       _resetTitle,
       _setFormFieldValues,
@@ -246,6 +249,19 @@ var EditPane = function (options) {
   };
 
   /**
+   * Reset counts from Feature headers on form controls
+   */
+  _resetCounts = function () {
+    var counts;
+
+    counts = _el.querySelectorAll('.count');
+    counts.forEach(function(count) {
+      count.classList.add('hide');
+      count.textContent = '';
+    });
+  };
+
+  /**
    * Reset querystring/significant eqs (input fields are already cleared)
    */
   _resetForm = function () {
@@ -344,6 +360,53 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Add count to Feature's name and hide laoding 'spinner'
+   *
+   * @param feature {Object}
+   */
+  _this.addCount = function (feature) {
+    var count,
+        div,
+        spinner;
+
+    div = _el.querySelector('form .' + feature.id);
+
+    if (div) { // Feature has configuration params
+      spinner = div.querySelector('.spinner');
+      spinner.classList.add('hide');
+
+      count = div.querySelector('.count');
+      if (count && feature.hasOwnProperty('count')) { // add count if applicable
+        count.textContent = feature.count;
+        count.classList.remove('hide');
+      }
+    }
+  };
+
+  /**
+   * Show loading 'spinner' next to Feature's name and hide count
+   *
+   * @param feature {Object}
+   */
+  _this.addLoadingSpinner = function (feature) {
+    var count,
+        div,
+        spinner;
+
+    div = _el.querySelector('form .' + feature.id);
+
+    if (div) { // Feature has configuration params
+      spinner = div.querySelector('.spinner');
+      spinner.classList.remove('hide');
+
+      count = div.querySelector('.count');
+      if (count) {
+        count.classList.add('hide');
+      }
+    }
+  };
+
+  /**
    * Create Features (and subsequently add them to map, plots and summary panes)
    */
   _this.initFeatures = function () {
@@ -365,6 +428,7 @@ var EditPane = function (options) {
    */
   _this.reset = function () {
     _hideMainshock();
+    _resetCounts();
     _resetForm();
     _resetTitle();
 

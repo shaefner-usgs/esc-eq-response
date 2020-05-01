@@ -28,7 +28,7 @@ var StatusBar = function (options) {
       _el,
 
       _hide,
-      _remove,
+      _removeItem,
       _show;
 
 
@@ -52,7 +52,7 @@ var StatusBar = function (options) {
    *
    * @param el {Element}
    */
-  _remove = function (el) {
+  _removeItem = function (el) {
     var parent;
 
     parent = el.parentNode;
@@ -180,12 +180,12 @@ var StatusBar = function (options) {
     items = _el.querySelectorAll('.' + id);
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
-        _hide();
-
-        // Don't remove last item until after hide css transition is complete
-        window.setTimeout(_remove, 500, items[i]);
+        // Leave final item up a bit longer
+        window.setTimeout(_hide, 500);
+        // Don't remove from DOM until after CSS hide transition is complete
+        window.setTimeout(_removeItem, 1500, items[i]);
       } else {
-        _remove(items[i]);
+        _removeItem(items[i]);
       }
     }
   };
