@@ -17,6 +17,7 @@ var AppUtil = require('AppUtil'),
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
+ *     addLoadingSpinner: {Function},
  *     removeFeature: {Function},
  *     reset: {Function}
  *   }
@@ -34,6 +35,7 @@ var SummaryPane = function (options) {
       _addDownloadButton,
       _addListeners,
       _addTimestamp,
+      _configTable,
       _getSliderValue,
       _initTableSort,
       _onMouseClick,
@@ -68,12 +70,12 @@ var SummaryPane = function (options) {
    *     Array of cumulative eqs by magnitude
    */
   _addListeners = function (el, cumulativeEqs) {
-    var i,
+    var count,
+        i,
         input,
         j,
         mag,
         magValue,
-        num,
         output,
         rows,
         scrollY,
@@ -83,8 +85,8 @@ var SummaryPane = function (options) {
 
     input = el.querySelector('.slider input');
     if (input) {
+      count = el.querySelector('h3 .count');
       mag = el.querySelector('h3 .mag');
-      num = el.querySelector('h3 .num');
       output = input.nextElementSibling;
       slider = input.parentNode;
       table = el.querySelector('div.filter + .eqlist');
@@ -94,8 +96,8 @@ var SummaryPane = function (options) {
         scrollY = window.pageYOffset;
 
         // Show / hide eqs in list and display slider's numeric value
+        count.innerHTML = cumulativeEqs[magValue];
         mag.innerHTML = magValue;
-        num.innerHTML = cumulativeEqs[magValue];
         output.value = magValue;
         slider.style.setProperty('--val', magValue);
         for (i = magValue; i <= input.getAttribute('max'); i ++) {
@@ -157,6 +159,28 @@ var SummaryPane = function (options) {
     time = document.createElement('time');
     time.classList.add('updated');
     _el.insertBefore(time, _featuresEl);
+  };
+
+  /**
+   * Configure sliders, sorting for eq list table (if present)
+   *
+   * @param div {Element}
+   * @param feature {Object}
+   */
+  _configTable = function (div, feature) {
+    var slider,
+        table;
+
+    slider = div.querySelector('.slider input');
+    table = div.querySelector('table.eqlist');
+
+    if (slider) {
+      _setSliderStyles(slider, feature.id); // set initial colored section of range slider
+    }
+    if (table) {
+      _addListeners(div, feature.cumulativeEqs);
+      _initTableSort(feature.id);
+    }
   };
 
   /**
@@ -329,46 +353,41 @@ var SummaryPane = function (options) {
   _this.addFeature = function (feature) {
     var button,
         canvas,
+        count,
         div,
-        placeholder,
-        slider,
-        status,
-        table,
-        title;
+        spinner,
+        status;
 
     if (feature.summary) {
-      placeholder = _el.querySelector('div.' + feature.id);
+      div = _el.querySelector('div.' + feature.id);
+      spinner = div.querySelector('.spinner');
 
-      if (placeholder) { // add summary to existing placeholder if it exists
-        placeholder.innerHTML = feature.summary;
-        placeholder.classList.remove('hide');
-
-        // Canvas elements (beachballs) are rendered before summary is added
-        canvas = _el.querySelector('canvas.' + feature.id);
-        if (canvas) { // move beachball into place (FM, MT features)
-          placeholder.querySelector('a').appendChild(canvas);
-        }
-      } else { // or create new element and add title / summary
-        title = feature.title || feature.name;
-
-        div = document.createElement('div');
-        div.classList.add('content', 'feature', feature.id);
-        div.innerHTML = '<h2>' + title + '</h2>' + feature.summary;
-
-        _featuresEl.appendChild(div);
-
-        // Configure dynamic elements (sliders, table sorting) if present
-        slider = div.querySelector('.slider input');
-        table = div.querySelector('table.eqlist');
-        if (slider) {
-          _setSliderStyles(slider, feature.id); // set initial colored section of range slider
-        }
-        if (table) {
-          _addListeners(div, feature.cumulativeEqs);
-          _initTableSort(feature.id);
-        }
+      if (spinner) { // hide loading spinner
+        spinner.classList.add('hide');
       }
 
+      if (feature.hasOwnProperty('count')) { // add count to Feature name
+        count = document.createElement('span');
+        count.classList.add('count', 'hide');
+        count.textContent = feature.count;
+
+        div.querySelector('h2').appendChild(count);
+
+        // Trigger a reflow, then unhide (to enable CSS transition)
+        count.focus();
+        count.classList.remove('hide');
+      }
+
+      div.insertAdjacentHTML('beforeend', feature.summary); // preserves CSS transition
+      div.classList.remove('hide'); // for placeholders, which are hidden by default
+
+      // Canvas elements (FM, MT beachballs) are already rendered (but hidden)
+      canvas = _el.querySelector('canvas.' + feature.id);
+      if (canvas) { // move beachball into correct place (which unhides it)
+        div.querySelector('a').appendChild(canvas);
+      }
+
+      _configTable(div, feature);
       _updateTimestamp();
     }
 
@@ -381,6 +400,28 @@ var SummaryPane = function (options) {
     if (status === 'finished') {
       button = document.querySelector('.event-summary');
       button.removeAttribute('disabled');
+    }
+  };
+
+  /**
+   * Add a Feature's container, name and a loading 'spinner' to summary pane
+   *
+   * @param feature {Object}
+   */
+  _this.addLoadingSpinner = function (feature) {
+    var div,
+        placeholder;
+
+    // Some Features are rendered in an existing placeholder (in mainshock section)
+    placeholder = _el.querySelector('.' + feature.id);
+
+    if (feature.summary && !placeholder) {
+      div = document.createElement('div');
+      div.classList.add('content', 'feature', feature.id);
+      div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +
+        '<div></div></div></h2>';
+
+      _featuresEl.appendChild(div);
     }
   };
 
