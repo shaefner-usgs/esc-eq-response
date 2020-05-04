@@ -356,7 +356,7 @@ var Earthquakes = function (options) {
         '</dl>' +
       '</div>';
     } else if (type === 'row') { // lists on summary pane
-      template = '<tr class="m{magInt}">' +
+      template = '<tr class="m{magInt}" title="View earthquake on map">' +
         '<td class="mag" data-sort="{mag}">{magDisplay}</td>' +
         '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
         '<td class="location">{location}</td>' +
