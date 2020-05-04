@@ -467,15 +467,15 @@ var MapPane = function (options) {
     var canvasEls,
         i;
 
-    _bounds = L.latLngBounds();
-    _initialLoad = true;
-
-    _this.map.setView([40, -96], 4); // United States
-
     canvasEls = document.querySelectorAll('#mapPane > canvas');
     for (i = 0; i < canvasEls.length; i ++) {
       _el.removeChild(canvasEls[i]);
     }
+
+    _bounds = L.latLngBounds();
+    _initialLoad = true;
+
+    _this.map.setView([40, -96], 4); // United States
   };
 
 
