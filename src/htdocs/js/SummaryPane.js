@@ -34,6 +34,7 @@ var SummaryPane = function (options) {
 
       _addDownloadButton,
       _addListeners,
+      _addSortTitles,
       _addTimestamp,
       _configTable,
       _getSliderValue,
@@ -59,6 +60,31 @@ var SummaryPane = function (options) {
     document.body.appendChild(_style);
 
     _addTimestamp();
+  };
+
+  /**
+   * Add button to download Event Summary document
+   *
+   * @param div {Element}
+   *     mainshock container
+   */
+  _addDownloadButton = function (div) {
+    var button;
+
+    button = document.createElement('button');
+    button.classList.add('event-summary');
+    button.innerHTML = '<img src="img/download.png" width="13" alt="download" />';
+    button.innerHTML += 'Event Summary';
+    button.setAttribute('disabled', 'disabled');
+    button.setAttribute('title', 'Download RTF Document');
+    button.type = 'button';
+
+    button.addEventListener('click', function() {
+      _app.Feeds.reset();
+      _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
+    });
+
+    div.appendChild(button);
   };
 
   /**
@@ -125,29 +151,12 @@ var SummaryPane = function (options) {
     }
   };
 
-  /**
-   * Add button to download Event Summary document
-   *
-   * @param div {Element}
-   *     mainshock container
-   */
-  _addDownloadButton = function (div) {
-    var button;
+  _addSortTitles = function (table) {
+    var ths = table.querySelectorAll('th');
 
-    button = document.createElement('button');
-    button.classList.add('event-summary');
-    button.innerHTML = '<img src="img/download.png" width="13" alt="download" />';
-    button.innerHTML += 'Event Summary';
-    button.setAttribute('disabled', 'disabled');
-    button.setAttribute('title', 'Download RTF Document');
-    button.type = 'button';
-
-    button.addEventListener('click', function() {
-      _app.Feeds.reset();
-      _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
+    ths.forEach(function(th) {
+      th.setAttribute('title', 'Sort by ' + th.textContent.toUpperCase());
     });
-
-    div.appendChild(button);
   };
 
   /**
@@ -243,6 +252,7 @@ var SummaryPane = function (options) {
 
     table = _el.querySelector('.' + id + ' .sortable');
     if (table) {
+      _addSortTitles(table);
       new Tablesort(table);
     }
   };
