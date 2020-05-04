@@ -98,8 +98,10 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add event listeners for setting Features's showLayer property when user
+   * Add event listeners for tracking Features's showLayer property when user
    *   toggles layers on/off
+   *
+   * Listener is triggered anytime a layer is added/removed, even programmatically
    */
   _addListeners = function () {
     var id,
@@ -451,9 +453,9 @@ var MapPane = function (options) {
     if (mapLayer) {
       _this.map.removeLayer(mapLayer); // sets showLayer prop to false
       _layerControl.removeLayer(mapLayer);
-    }
 
-    feature.showLayer = showLayer; // set to cached value
+      feature.showLayer = showLayer; // set back to cached value
+    }
   };
 
   /**

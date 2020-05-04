@@ -82,6 +82,7 @@ var Features = function (options) {
 
     _app = options.app;
     _features = {};
+    _showLayer = {};
   };
 
   /**
@@ -154,8 +155,8 @@ var Features = function (options) {
       }
     }
 
-    if (typeof _showLayer === 'boolean') { // used cached value if set
-      feature.showLayer = _showLayer;
+    if (_showLayer.hasOwnProperty(feature.id)) { // used cached value if set
+      feature.showLayer = _showLayer[feature.id];
     }
 
     if (feature.url) {
@@ -272,10 +273,9 @@ var Features = function (options) {
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
 
-      _showLayer = feature.showLayer; // cache value
+      _showLayer[feature.id] = feature.showLayer; // cache value
 
       delete _features[feature.id];
-
       feature.destroy();
     }
   };
@@ -311,6 +311,7 @@ var Features = function (options) {
    *
    *     Example of optional props that might also be set:
    *
+   *     count: {Integer}, // number of items
    *     dependencies: {Array}, // other features that need to be loaded first
    *     description: {String}, // text description of feature
    *     json: {String}, // json feed data (mainshock only)
@@ -318,7 +319,6 @@ var Features = function (options) {
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
    *     showLayer: {Boolean}, // whether or not mapLayer is "on" by default
    *     summary: {String}, // HTML for SummaryPane
-   *     title: {Number} // typically the feature's name with count appended
    *     zoomToLayer: {Boolean}, // whether or not map zooms to fit layer by default
    *   }
    */
@@ -411,6 +411,7 @@ var Features = function (options) {
 
     _eqid = null;
     _features = {};
+    _showLayer = {};
   };
 
 
