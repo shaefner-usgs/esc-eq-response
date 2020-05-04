@@ -527,6 +527,8 @@ var PlotsPane = function (options) {
     });
 
     _featuresEl.innerHTML = '';
+    _plots = {};
+
     _this.rendered = false;
   };
 
