@@ -79,35 +79,38 @@ var NavBar = function (options) {
    *
    * @param id {String}
    */
-   _changePane = function (id) {
-     var field;
+  _changePane = function (id) {
+    var field,
+        numPlots;
 
-     if (id === 'plotsPane' && !_app.PlotsPane.rendered) {
-       _app.StatusBar.addItem({
-         id: 'rendering',
-         name: 'Plots'
-       }, {
-         prepend: 'Rendering'
-       });
+    numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
 
-       // Add a slight delay; otherwise rendering message does not display
-       window.setTimeout(function() {
-         _hidePanes();
-         _showPane(id);
-         _app.StatusBar.removeItem('rendering');
-       }, 20);
-     } else {
-       if (id === 'editPane') { // focus appropriate field
-         field = 'eqid'; // default
-         if (_app.EditPane.focusedField) {
-           field = _app.EditPane.focusedField;
-         }
-        document.getElementById(field).focus();
-       }
-       _hidePanes();
-       _showPane(id);
-     }
-   };
+    if (id === 'plotsPane' && numPlots > 0 && !_app.PlotsPane.rendered) {
+      _app.StatusBar.addItem({
+        id: 'rendering',
+        name: 'Plots'
+      }, {
+        prepend: 'Rendering'
+      });
+
+      // Add a slight delay; otherwise rendering message does not display
+      window.setTimeout(function() {
+        _hidePanes();
+        _showPane(id);
+        _app.StatusBar.removeItem('rendering');
+      }, 20);
+    } else {
+      if (id === 'editPane') { // focus appropriate field
+        field = 'eqid'; // default
+        if (_app.EditPane.focusedField) {
+          field = _app.EditPane.focusedField;
+        }
+      document.getElementById(field).focus();
+      }
+      _hidePanes();
+      _showPane(id);
+    }
+  };
 
   /**
    * Get id of selected pane from url (defaults to 'editPane' if not set)
