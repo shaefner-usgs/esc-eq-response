@@ -341,7 +341,7 @@ var Earthquakes = function (options) {
     var template;
 
     if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
-      template = '<div class="earthquake">' +
+      template = '<div class="earthquake {type}">' +
         '<h4><a href="{url}">{title}</a></h4>' +
         '{bubblesHtml}' +
         '<dl>' +
@@ -351,6 +351,8 @@ var Earthquakes = function (options) {
           '<dd>{location}</dd>' +
           '<dt>Depth</dt>' +
           '<dd>{depthDisplay}</dd>' +
+          '<dt class="distance"><abbr title="Distance and direction from mainshock">Distance</abbr></dt>' +
+          '<dd class="distance">{distanceDisplay}</dd>' +
           '<dt>Status</dt>' +
           '<dd>{status}</dd>' +
         '</dl>' +
@@ -601,6 +603,7 @@ var Earthquakes = function (options) {
         popup,
         props,
         tooltip,
+        type,
         utcTime;
 
     props = feature.properties;
@@ -620,6 +623,7 @@ var Earthquakes = function (options) {
     }
 
     if (_id === 'mainshock') { // add verbose time props to mainshock
+      type = 'selected'; // selected event
       if (eqMomentLocal) {
         _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
       }
@@ -627,9 +631,10 @@ var Earthquakes = function (options) {
     } else { // calculate distance/direction from mainshock
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
       latlon = AppUtil.LatLon(coords[1], coords[0]);
-      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
+      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+      type = '';
     }
 
     eq = {
@@ -652,6 +657,7 @@ var Earthquakes = function (options) {
       status: props.status,
       title: magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
+      type: type,
       url: props.url,
       utcTime: utcTime
     };

@@ -172,4 +172,8 @@
   time {
     display: block;
   }
+
+  &.selected .distance {
+    display: none;
+  }
 }
