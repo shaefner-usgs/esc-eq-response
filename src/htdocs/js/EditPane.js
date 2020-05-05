@@ -369,7 +369,7 @@ var EditPane = function (options) {
         div,
         spinner;
 
-    div = _el.querySelector('form .' + feature.id);
+    div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configuration params
       spinner = div.querySelector('.spinner');
@@ -393,7 +393,7 @@ var EditPane = function (options) {
         div,
         spinner;
 
-    div = _el.querySelector('form .' + feature.id);
+    div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configuration params
       spinner = div.querySelector('.spinner');
