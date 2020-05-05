@@ -138,6 +138,7 @@ var Application = function (options) {
    * Set app to default state: remove Features, clear status bar, etc.
    */
   _this.resetApp = function () {
+    _this.Features.reset(); // reset Features first
     _this.EditPane.reset();
     _this.Feeds.reset();
     _this.MapPane.reset();
@@ -145,9 +146,6 @@ var Application = function (options) {
     _this.PlotsPane.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
-
-    // Reset Features last so other Classes can use Features during reset
-    _this.Features.reset();
   };
 
 

@@ -519,13 +519,6 @@ var PlotsPane = function (options) {
    * Reset plots pane to initial state
    */
   _this.reset = function () {
-    var features;
-
-    features = _app.Features.getFeatures();
-    Object.keys(features).forEach(function(feature) {
-      _this.removeFeature(feature);
-    });
-
     _featuresEl.innerHTML = '';
     _plots = {};
 
