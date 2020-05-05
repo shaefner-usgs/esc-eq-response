@@ -432,6 +432,8 @@ var EditPane = function (options) {
     _resetForm();
     _resetTitle();
 
+    _eqidPrevValue = null;
+
     _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
   };
 

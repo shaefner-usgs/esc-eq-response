@@ -474,6 +474,7 @@ var MapPane = function (options) {
 
     _bounds = L.latLngBounds();
     _initialLoad = true;
+    _placeholders = {};
 
     _this.map.setView([40, -96], 4); // United States
   };
