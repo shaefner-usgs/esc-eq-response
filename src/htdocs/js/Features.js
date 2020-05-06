@@ -112,8 +112,10 @@ var Features = function (options) {
     }
     catch (error) {
       console.error(error);
+
       _app.StatusBar.addError(feature, '<h4>Error Adding ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
+      _removeFeature(feature);
     }
   };
 
@@ -239,10 +241,9 @@ var Features = function (options) {
         }
 
         errorMsg += '</ul>';
+
         _app.StatusBar.addError(feature, errorMsg);
         _removeFeature(feature);
-
-        delete _features[feature.id];
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -251,12 +252,9 @@ var Features = function (options) {
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
-        //errorMsg += '<a href="#" class="reload"></a>';
 
         _app.StatusBar.addError(feature, errorMsg);
         _removeFeature(feature);
-
-        delete _features[feature.id];
       },
       timeout: 20000
     });
