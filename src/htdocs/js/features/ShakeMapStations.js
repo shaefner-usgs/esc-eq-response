@@ -86,7 +86,7 @@ var ShakeMapStations = function (options) {
     _shakemap = mainshock.json.properties.products.shakemap;
 
     _this.id = 'shakemap-stations';
-    _this.mapLayer = true;
+    _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
     _this.showLayer = false;
     _this.url = _getFeedUrl();

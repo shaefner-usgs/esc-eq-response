@@ -425,7 +425,7 @@ var SummaryPane = function (options) {
     // Some Features are rendered in an existing placeholder (in mainshock section)
     placeholder = _el.querySelector('.' + feature.id);
 
-    if (feature.summary && !placeholder) {
+    if (feature.hasOwnProperty('summary') && !placeholder) {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
       div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +

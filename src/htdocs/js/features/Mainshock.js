@@ -49,11 +49,11 @@ var Mainshock = function (options) {
     _eqid = options.eqid;
 
     _this.id = 'mainshock';
-    _this.mapLayer = true;
+    _this.mapLayer = null;
     _this.name = 'Mainshock';
-    _this.plotTraces = true;
+    _this.plotTraces = null;
     _this.showLayer = true;
-    _this.summary = true;
+    _this.summary = null;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };

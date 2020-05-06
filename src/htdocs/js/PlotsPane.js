@@ -423,7 +423,7 @@ var PlotsPane = function (options) {
     var div;
 
     // Mainshock is included in other Features' plots, but not separately
-    if (feature.plotTraces && feature.id !== 'mainshock') {
+    if (feature.hasOwnProperty('plotTraces') && feature.id !== 'mainshock') {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
       div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +

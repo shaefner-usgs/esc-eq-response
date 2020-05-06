@@ -79,7 +79,7 @@ var FieldNotes = function (options) {
     _Lightbox = Lightbox();
 
     _this.id = 'fieldnotes';
-    _this.mapLayer = true;
+    _this.mapLayer = null;
     _this.name = 'Fieldnotes';
     _this.showLayer = false;
     _this.url = _getFeedUrl();

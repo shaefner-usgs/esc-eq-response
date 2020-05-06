@@ -50,7 +50,7 @@ var PagerCities = function (options) {
     ];
     _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
-    _this.summary = true;
+    _this.summary = null;
     _this.url = _getFeedUrl();
   };
 

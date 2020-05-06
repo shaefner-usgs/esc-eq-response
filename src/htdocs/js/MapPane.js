@@ -372,7 +372,7 @@ var MapPane = function (options) {
     var layer,
         name;
 
-    if (feature.mapLayer) {
+    if (feature.hasOwnProperty('mapLayer')) {
       layer = L.layerGroup(); // empty placeholder layer
       layer.id = feature.id;
       name = feature.name + '<div class="spinner"><div></div></div>';

@@ -53,12 +53,12 @@ var Historical = function (options) {
     _app = options.app;
 
     _this.id = 'historical';
-    _this.mapLayer = true;
+    _this.mapLayer = null;
     _this.name = 'Historical Seismicity';
-    _this.plotTraces = true;
+    _this.plotTraces = null;
     _this.showLayer = true;
     _this.sortBy = 'mag';
-    _this.summary = true;
+    _this.summary = null;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };

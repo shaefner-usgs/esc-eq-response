@@ -62,12 +62,12 @@ var Aftershocks = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'aftershocks';
-    _this.mapLayer = true;
+    _this.mapLayer = null;
     _this.name = 'Aftershocks';
-    _this.plotTraces = true;
+    _this.plotTraces = null;
     _this.showLayer = true;
     _this.sortBy = 'utcTime';
-    _this.summary = true;
+    _this.summary = null;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
