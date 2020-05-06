@@ -368,16 +368,18 @@ var Features = function (options) {
 
     FeatureClass = _FEATURECLASSES[id];
 
-    if (id === 'mainshock') {
-      _eqid = AppUtil.getParam('eqid');
+    if (FeatureClass) {
+      if (id === 'mainshock') {
+        _eqid = AppUtil.getParam('eqid');
+      }
+
+      feature = FeatureClass({
+        app: _app,
+        eqid: _eqid
+      });
+
+      _initFeature(feature);
     }
-
-    feature = FeatureClass({
-      app: _app,
-      eqid: _eqid
-    });
-
-    _initFeature(feature);
   };
 
   /**
