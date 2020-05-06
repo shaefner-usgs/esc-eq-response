@@ -22,6 +22,7 @@ var AppUtil = require('AppUtil');
  *     addLoadingSpinner: {Function},
  *     focusedField: {String},
  *     initFeatures: {Function},
+ *     removeFeature: {Function},
  *     reset: {Function},
  *     selSignificantEq: {Function},
  *     setDefaults: {Function},
@@ -420,6 +421,29 @@ var EditPane = function (options) {
 
       // Instantiate mainshock (other features are created after mainshock is ready)
       _app.Features.instantiateFeature('mainshock');
+    }
+  };
+
+  /**
+   * Hide loading 'spinner' and count next to Feature's name
+   *
+   * @param feature {Object}
+   */
+  _this.removeFeature = function (feature) {
+    var count,
+        div,
+        spinner;
+
+    div = _el.querySelector('.' + feature.id);
+
+    if (div) { // Feature has configuration params
+      count = div.querySelector('.count');
+      spinner = div.querySelector('.spinner');
+
+      spinner.classList.add('hide');
+      if (count) {
+        count.classList.add('hide');
+      }
     }
   };
 

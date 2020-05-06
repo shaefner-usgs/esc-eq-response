@@ -346,6 +346,7 @@ var MapPane = function (options) {
       placeholder = _placeholders[feature.id];
       if (placeholder) { // temporary layer shown while data is loading
         _layerControl.removeLayer(placeholder);
+        delete _placeholders[feature.id];
       } else {
         _createMapPane(feature.id, 'overlayPane');
       }
@@ -445,9 +446,11 @@ var MapPane = function (options) {
    */
   _this.removeFeature = function (feature) {
     var mapLayer,
+        placeholder,
         showLayer;
 
     mapLayer = feature.mapLayer;
+    placeholder = _placeholders[feature.id];
     showLayer = feature.showLayer; // cache value
 
     if (mapLayer) {
@@ -455,6 +458,10 @@ var MapPane = function (options) {
       _layerControl.removeLayer(mapLayer);
 
       feature.showLayer = showLayer; // set back to cached value
+    }
+
+    if (placeholder) {
+      _layerControl.removeLayer(placeholder);
     }
   };
 

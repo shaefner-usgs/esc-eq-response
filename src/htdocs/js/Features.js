@@ -267,6 +267,7 @@ var Features = function (options) {
    */
   _removeFeature = function (feature) {
     if (feature) {
+      _app.EditPane.removeFeature(feature);
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
