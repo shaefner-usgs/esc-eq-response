@@ -15,10 +15,14 @@
     display: none;
   }
 
-  .spinner div {
-    height: .9em;
-    top: -.8em;
-    width: .9em;
+  .spinner {
+    width: 1.5em;
+
+    div {
+      height: .9em;
+      top: -.75em;
+      width: .9em;
+    }
   }
 }
 
