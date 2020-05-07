@@ -101,7 +101,7 @@ var EditPane = function (options) {
     if (_eqidPrevValue && _eqid.value !== _eqidPrevValue) {
       isNew = true;
     }
-    _eqidPrevValue = _eqid.value;
+    _eqidPrevValue = _eqid.value; // cache previous value
 
     return isNew;
   };
@@ -455,8 +455,6 @@ var EditPane = function (options) {
     _resetCounts();
     _resetForm();
     _resetTitle();
-
-    _eqidPrevValue = null;
 
     _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
   };
