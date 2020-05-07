@@ -23,7 +23,7 @@ var Lightbox = function (options) {
   var _this,
       _initialize,
 
-      _addCloseListener,
+      _addListener,
       _handleEscapeKey;
 
 
@@ -34,11 +34,11 @@ var Lightbox = function (options) {
   };
 
   /**
-   * Add click to close event
+   * Add listener for close button
    *
    * @param div {Element}
    */
-  _addCloseListener = function (div) {
+  _addListener = function (div) {
     div.addEventListener('click', function(e) {
       e.preventDefault();
       _this.hide();
@@ -78,7 +78,7 @@ var Lightbox = function (options) {
 
     document.body.appendChild(div);
 
-    _addCloseListener(div);
+    _addListener(div);
   };
 
   /**

@@ -58,7 +58,7 @@ var FieldNotes = function (options) {
       _popup,
       _Lightbox,
 
-      _addEventListeners,
+      _addListeners,
       _genPopupContent,
       _getCustomProps,
       _getFeedUrl,
@@ -94,7 +94,7 @@ var FieldNotes = function (options) {
    *
    * @param div {Element}
    */
-  _addEventListeners = function (div) {
+  _addListeners = function (div) {
     var photo,
         toggle;
 
@@ -147,7 +147,7 @@ var FieldNotes = function (options) {
 
     div = L.DomUtil.create('div');
     div.innerHTML = innerHTML;
-    _addEventListeners(div);
+    _addListeners(div);
 
     return div;
   };
@@ -307,7 +307,7 @@ var FieldNotes = function (options) {
     _popup = null;
     _Lightbox = null;
 
-    _addEventListeners = null;
+    _addListeners = null;
     _genPopupContent = null;
     _getCustomProps = null;
     _getFeedUrl = null;
