@@ -54,7 +54,6 @@ var FieldNotes = function (options) {
       _initialize,
 
       _app,
-      _count,
       _markerOptions,
       _popup,
       _Lightbox,
@@ -74,7 +73,6 @@ var FieldNotes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
-    _count = 0;
 
     _Lightbox = Lightbox();
 
@@ -255,8 +253,6 @@ var FieldNotes = function (options) {
       })
       .bindTooltip(props.title)
       .on('popupopen', _updatePopup);
-
-    _count ++;
   };
 
   /**
@@ -307,7 +303,6 @@ var FieldNotes = function (options) {
     _initialize = null;
 
     _app = null;
-    _count = null;
     _markerOptions = null;
     _popup = null;
     _Lightbox = null;
@@ -330,7 +325,7 @@ var FieldNotes = function (options) {
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
-    _this.count = _count;
+    _this.count = json.features.length;
     _this.mapLayer = L.geoJson(json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
