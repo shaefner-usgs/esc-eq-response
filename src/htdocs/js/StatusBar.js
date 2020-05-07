@@ -25,10 +25,12 @@ var StatusBar = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
 
+      _addListeners,
       _hide,
-      _removeItem,
+      _removeNode,
       _show;
 
 
@@ -37,35 +39,57 @@ var StatusBar = function (options) {
   _initialize = function (options) {
     options = options || {};
 
+    _app = options.app;
     _el = options.el || document.createElement('div');
   };
 
   /**
-   * Hide status bar container (uses css slide-down animation)
+   * Add listeners for close/reload buttons on an Error item
+   *
+   * @param item {Object}
+   */
+  _addListeners = function (item) {
+    var close,
+        reload;
+
+    close = _el.querySelector('.' + item.id + ' .close');
+    reload = _el.querySelector('.' + item.id + ' .reload');
+
+    close.addEventListener('click', function(e) {
+      e.preventDefault();
+      _this.removeItem(item.id);
+    });
+
+    reload.addEventListener('click', function(e) {
+      e.preventDefault();
+      _this.removeItem(item.id);
+      _app.Features.instantiateFeature(item.id);
+    });
+  };
+
+  /**
+   * Hide status bar container
    */
   _hide = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Remove a status bar entry from DOM
+   * Remove a status bar entry (node) from DOM
    *
    * @param el {Element}
    */
-  _removeItem = function (el) {
+  _removeNode = function (el) {
     var parent;
 
     parent = el.parentNode;
     if (parent) {
-      if (parent.children.length === 1) {
-        _hide(); // should already be hidden, but just in case...
-      }
       parent.removeChild(el);
     }
   };
 
   /**
-   * Show status bar container (uses css slide-up animation)
+   * Show status bar container
    */
   _show = function () {
     _el.classList.remove('hide');
@@ -85,23 +109,18 @@ var StatusBar = function (options) {
    * @param errorMsg {String}
    */
   _this.addError = function (item, errorMsg) {
-    var closeButton,
-        error;
+    var div;
 
-    error = document.createElement('div');
-    error.classList.add(item.id, 'error');
-    error.innerHTML = errorMsg + '<a href="#" class="close"></a>';
+    div = document.createElement('div');
+    div.classList.add(item.id, 'error');
+    div.innerHTML = errorMsg +
+      '<a href="#" class="reload"></a>' +
+      '<a href="#" class="close"></a>';
 
-    closeButton = error.querySelector('.close');
-    closeButton.addEventListener('click', function(e) {
-      e.preventDefault();
-      _this.removeItem(item.id);
-    });
-
-    // Remove any leftover items for this item before adding another
+    // Remove any leftover items with this id, then add item
     _this.removeItem(item.id);
-
-    _el.appendChild(error);
+    _el.appendChild(div);
+    _addListeners(item);
     _show();
   };
 
@@ -114,7 +133,10 @@ var StatusBar = function (options) {
    *     name: {String} (optional)
    *   }
    * @param options {Object}
-   *     optional
+   *   {
+   *     append: {String}, (optional)
+   *     prepend: {String} (optional)
+   *   }
    */
   _this.addItem = function (item, options) {
     var animEllipsis,
@@ -127,10 +149,9 @@ var StatusBar = function (options) {
       append: '',
       prepend: 'Loading'
     };
-    div = document.createElement('div');
-    msg = '';
     options = Util.extend({}, defaults, options);
 
+    msg = '';
     if (item.name) {
       msg = item.name;
     }
@@ -142,13 +163,13 @@ var StatusBar = function (options) {
     }
     msg += animEllipsis;
 
-    // Remove any leftover items with this id, then add item
-    _this.removeItem(item.id);
-
+    div = document.createElement('div');
     div.classList.add(item.id);
     div.innerHTML = '<h4>' + msg + '</h4>';
-    _el.appendChild(div);
 
+    // Remove any leftover items with this id, then add item
+    _this.removeItem(item.id);
+    _el.appendChild(div);
     _show();
   };
 
@@ -169,7 +190,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Wrapper method to remove item from status bar (and hide status bar if empty)
+   * Remove an item from status bar (and hide status bar if empty)
    *
    * @param id {String}
    */
@@ -180,12 +201,12 @@ var StatusBar = function (options) {
     items = _el.querySelectorAll('.' + id);
     for (i = 0; i < items.length; i ++) {
       if (_el.children.length === 1) {
-        // Leave final item up a bit longer
-        window.setTimeout(_hide, 500);
-        // Don't remove from DOM until after CSS hide transition is complete
-        window.setTimeout(_removeItem, 1500, items[i]);
+        _hide();
+
+        // Don't remove node until after CSS hide transition is complete
+        window.setTimeout(_removeNode, 1000, items[i]);
       } else {
-        _removeItem(items[i]);
+        _removeNode(items[i]);
       }
     }
   };

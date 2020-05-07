@@ -79,6 +79,7 @@ var Application = function (options) {
       el: options.plotsPane
     });
     _this.StatusBar = StatusBar({
+      app: _this,
       el: options.statusBar
     });
 
