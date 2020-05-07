@@ -151,6 +151,11 @@ var SummaryPane = function (options) {
     }
   };
 
+  /**
+   * Add title attributes to <th>'s to inform user of sort capability
+   *
+   * @param table {Element}
+   */
   _addSortTitles = function (table) {
     var ths = table.querySelectorAll('th');
 
