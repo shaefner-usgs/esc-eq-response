@@ -87,7 +87,7 @@ var Svg = function (options) {
   };
 
   /**
-   * Expose SVG circle generator as a public method
+   * Create an SVG circle
    *
    * @param opts {Object}
    *

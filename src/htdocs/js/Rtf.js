@@ -6,8 +6,8 @@ var Xhr = require('util/Xhr');
 
 
 /**
- * Create Event Summary RTF document by sending a json string as raw POST data
- *   to a PHP script
+ * Create an Event Summary RTF document by sending a json string as
+ *   raw POST data to a PHP script that generates the binary file
  *
  * @param options {Object}
  *   {
