@@ -54,7 +54,6 @@ var ShakeMapStations = function (options) {
       _initialize,
 
       _app,
-      _count,
       _markerOptions,
       _shakemap,
 
@@ -81,7 +80,6 @@ var ShakeMapStations = function (options) {
     mainshock = options.app.Features.getFeature('mainshock');
 
     _app = options.app;
-    _count = 0;
     _markerOptions = options.markerOptions;
     _shakemap = mainshock.json.properties.products.shakemap;
 
@@ -333,8 +331,6 @@ var ShakeMapStations = function (options) {
       minWidth: 300,
       maxWidth: 425
     }).bindTooltip(tooltip);
-
-    _count ++;
   };
 
   /**
@@ -371,7 +367,6 @@ var ShakeMapStations = function (options) {
     _initialize = null;
 
     _app = null;
-    _count = null;
     _markerOptions = null;
     _shakemap = null;
 
@@ -398,7 +393,7 @@ var ShakeMapStations = function (options) {
    *     feed data for feature
    */
   _this.initFeature = function (json) {
-    _this.count = _count;
+    _this.count = json.features.length;
     _this.mapLayer = _getMapLayer(json);
   };
 
