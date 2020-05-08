@@ -85,6 +85,11 @@ var StatusBar = function (options) {
     parent = el.parentNode;
     if (parent) {
       parent.removeChild(el);
+
+      // Due to a timing issue w/ CSS animation, 'hide' class is not always set
+      if (!parent.hasChildNodes()) {
+        parent.style.display = 'none';
+      }
     }
   };
 
@@ -93,6 +98,7 @@ var StatusBar = function (options) {
    */
   _show = function () {
     _el.classList.remove('hide');
+    _el.style.display = 'block'; // undo setting to 'none' in _removeNode()
   };
 
   // ----------------------------------------------------------
@@ -204,7 +210,7 @@ var StatusBar = function (options) {
         _hide();
 
         // Don't remove node until after CSS hide transition is complete
-        window.setTimeout(_removeNode, 1000, items[i]);
+        window.setTimeout(_removeNode, 500, items[i]);
       } else {
         _removeNode(items[i]);
       }
