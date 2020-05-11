@@ -46,24 +46,24 @@ var StatusBar = function (options) {
   /**
    * Add listeners for close/reload buttons on an Error item
    *
-   * @param item {Object}
+   * @param id: {String}
    */
-  _addListeners = function (item) {
+  _addListeners = function (id) {
     var close,
         reload;
 
-    close = _el.querySelector('.' + item.id + ' .close');
-    reload = _el.querySelector('.' + item.id + ' .reload');
+    close = _el.querySelector('.' + id + ' .close');
+    reload = _el.querySelector('.' + id + ' .reload');
 
     close.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.removeItem(item.id);
+      _this.removeItem(id);
     });
 
     reload.addEventListener('click', function(e) {
       e.preventDefault();
-      _this.removeItem(item.id);
-      _app.Features.instantiateFeature(item.id);
+      _this.removeItem(id);
+      _app.Features.instantiateFeature(id);
     });
   };
 
@@ -108,25 +108,22 @@ var StatusBar = function (options) {
   /**
    * Add an error to status bar
    *
-   * @param item {Object}
-   *   {
-   *     id: {String}
-   *   }
+   * @param id: {String}
    * @param errorMsg {String}
    */
-  _this.addError = function (item, errorMsg) {
+  _this.addError = function (id, errorMsg) {
     var div;
 
     div = document.createElement('div');
-    div.classList.add(item.id, 'error');
+    div.classList.add(id, 'error');
     div.innerHTML = errorMsg +
       '<a href="#" class="reload"></a>' +
       '<a href="#" class="close"></a>';
 
     // Remove any leftover items with this id, then add item
-    _this.removeItem(item.id);
+    _this.removeItem(id);
     _el.appendChild(div);
-    _addListeners(item);
+    _addListeners(id);
     _show();
   };
 

@@ -456,9 +456,7 @@ var Rtf = function (options) {
         error: function (e, xhr) {
           console.error(xhr.statusText + xhr.responseText);
 
-          _app.StatusBar.addError({
-            id: 'rtf'
-          }, '<h4>Error Creating Event Summary</h4>');
+          _app.StatusBar.addError('rtf', '<h4>Error Creating Event Summary</h4>');
         },
         headers: {
           'Content-Type': 'application/json'

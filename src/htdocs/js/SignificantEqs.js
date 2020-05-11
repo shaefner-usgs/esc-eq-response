@@ -122,7 +122,7 @@ var SignificantEqs = function (options) {
         }
         errorMsg += '</ul>';
 
-        _app.StatusBar.addError({id: 'significant'}, errorMsg);
+        _app.StatusBar.addError('significant', errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -130,7 +130,7 @@ var SignificantEqs = function (options) {
         errorMsg += '<li>Request timed out (can&rsquo;t connect to ' +
           'earthquake.usgs.gov)</li></ul>';
 
-        _app.StatusBar.addError({id: 'significant'}, errorMsg);
+        _app.StatusBar.addError('significant', errorMsg);
       },
       timeout: 20000
     });

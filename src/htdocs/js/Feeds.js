@@ -138,7 +138,7 @@ var Feeds = function (options) {
         }
 
         errorMsg += '</ul>';
-        _app.StatusBar.addError(feed, errorMsg);
+        _app.StatusBar.addError(feed.id, errorMsg);
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -148,7 +148,7 @@ var Feeds = function (options) {
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
 
-        _app.StatusBar.addError(feed, errorMsg);
+        _app.StatusBar.addError(feed.id, errorMsg);
       },
       timeout: 20000
     });

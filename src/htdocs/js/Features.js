@@ -113,7 +113,7 @@ var Features = function (options) {
     catch (error) {
       console.error(error);
 
-      _app.StatusBar.addError(feature, '<h4>Error Adding ' + feature.name +
+      _app.StatusBar.addError(feature.id, '<h4>Error Adding ' + feature.name +
         '</h4><ul><li>' + error + '</li></ul>');
       _removeFeature(feature);
     }
@@ -242,7 +242,7 @@ var Features = function (options) {
 
         errorMsg += '</ul>';
 
-        _app.StatusBar.addError(feature, errorMsg);
+        _app.StatusBar.addError(feature.id, errorMsg);
         _removeFeature(feature);
       },
       ontimeout: function (xhr) {
@@ -253,7 +253,7 @@ var Features = function (options) {
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
 
-        _app.StatusBar.addError(feature, errorMsg);
+        _app.StatusBar.addError(feature.id, errorMsg);
         _removeFeature(feature);
       },
       timeout: 20000
