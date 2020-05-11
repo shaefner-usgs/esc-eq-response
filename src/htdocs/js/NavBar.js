@@ -98,7 +98,7 @@ var NavBar = function (options) {
         _hidePanes();
         _showPane(id);
         _app.StatusBar.removeItem('rendering');
-      }, 20);
+      }, 25);
     } else {
       if (id === 'editPane') { // focus appropriate field
         field = 'eqid'; // default
