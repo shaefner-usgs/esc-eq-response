@@ -198,9 +198,9 @@ var EditPane = function (options) {
     _addListener([_eqid], 'input', _loadEvent);
 
     // Update Features when params are changed (fires when change is committed)
-    _addListener(aftershocks, 'change', _refreshFeature);
-    _addListener(foreshocks, 'change', _refreshFeature);
-    _addListener(historical, 'change', _refreshFeature);
+    _addListener(aftershocks, 'input', _refreshFeature);
+    _addListener(foreshocks, 'input', _refreshFeature);
+    _addListener(historical, 'input', _refreshFeature);
 
     // Clear Features when reset button is pressed
     _addListener([reset], 'click', _app.resetApp);
