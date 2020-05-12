@@ -160,7 +160,7 @@ var Features = function (options) {
   _initFeature = function (feature) {
     var flag;
 
-    if (feature.dependencies) { // finish loading dependencies first
+    if (Array.isArray(feature.dependencies)) { // finish loading dependencies first
       feature.dependencies.forEach(function(dependency) {
         if (!_this.getFeature(dependency)) { // dependency not ready
           flag = 'waiting';
@@ -178,7 +178,7 @@ var Features = function (options) {
       feature.showLayer = _showLayer[feature.id];
     }
 
-    if (feature.url) {
+    if (typeof(feature.url) === 'string') {
       _addLoadingSpinner(feature);
       _loadJson(feature);
     } else { // Feature does not require feed data, or it's not available

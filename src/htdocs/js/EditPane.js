@@ -219,7 +219,7 @@ var EditPane = function (options) {
       _timers[id] = [];
     }
 
-    _timers[id].forEach(function(timer) { // clear any previous requests
+    _timers[id].forEach(function(timer) { // clear throttled requests
       window.clearTimeout(timer);
       _timers[id].shift();
     });
@@ -252,7 +252,7 @@ var EditPane = function (options) {
         _timers[featureId] = [];
       }
 
-      _timers[featureId].forEach(function(timer) { // clear any previous requests
+      _timers[featureId].forEach(function(timer) { // clear throttled requests
         window.clearTimeout(timer);
         _timers[featureId].shift();
       });
