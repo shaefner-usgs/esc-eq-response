@@ -411,7 +411,7 @@ var SummaryPane = function (options) {
     }
 
     // Enable Event Summary download button once all Features are loaded
-    status = _app.Features.getStatus();
+    status = _app.Features.getLoadingStatus();
     if (status === 'finished') {
       button = document.querySelector('.event-summary');
       button.removeAttribute('disabled');

@@ -50,7 +50,7 @@ _FEATURECLASSES = {
  *   {
  *     getFeature: {Function},
  *     getFeatures: {Function},
- *     getStatus: {Function},
+ *     getLoadingStatus: {Function},
  *     instantiateFeature: {Function},
  *     refreshFeature: {Function},
  *     reset: {Function}
@@ -63,9 +63,9 @@ var Features = function (options) {
       _app,
       _eqid,
       _features,
-      _numFeatures,
       _prevFeatures,
       _showLayer,
+      _totalFeatures,
 
       _addFeature,
       _addLoadingSpinner,
@@ -94,6 +94,8 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addFeature = function (feature) {
+    feature.isLoading = false;
+
     try {
       // Add Feature to map, plots and summary panes if property is set
       _app.MapPane.addFeature(feature); // 'mapLayer' property
@@ -156,11 +158,13 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _initFeature = function (feature) {
-    var flag;
+    var dependency,
+        flag;
 
     if (Array.isArray(feature.dependencies)) { // finish loading dependencies first
-      feature.dependencies.forEach(function(dependency) {
-        if (!_this.getFeature(dependency)) { // dependency not ready
+      feature.dependencies.forEach(function(id) {
+        dependency = _this.getFeature(id);
+        if (!dependency || dependency.isLoading) {
           flag = 'waiting';
           window.setTimeout(function() {
             _initFeature(feature);
@@ -179,7 +183,7 @@ var Features = function (options) {
     if (typeof(feature.url) === 'string') {
       _addLoadingSpinner(feature);
       _loadJson(feature);
-    } else { // Feature does not require feed data, or it's not available
+    } else { // Feature does not require remote feed data, or it's not available
       feature.initFeature();
       _addFeature(feature);
     }
@@ -192,7 +196,7 @@ var Features = function (options) {
    *   depend on it.
    */
   _instantiateFeatures = function () {
-    _numFeatures = Object.keys(_FEATURECLASSES).length;
+    _totalFeatures = Object.keys(_FEATURECLASSES).length;
 
     Object.keys(_FEATURECLASSES).forEach(function(id) {
       if (id !== 'mainshock') { // skip mainshock
@@ -361,11 +365,21 @@ var Features = function (options) {
    *
    * @return status {String}
    */
-  _this.getStatus = function () {
-    var status = '';
+  _this.getLoadingStatus = function () {
+    var numFeatures,
+        status;
 
-    if (Object.keys(_features).length === _numFeatures) {
+    numFeatures = Object.keys(_features).length;
+    status = 'loading';
+
+    if (numFeatures === _totalFeatures) {
       status = 'finished';
+
+      Object.keys(_features).forEach(function(id) {
+        if (_features[id].isLoading) {
+          status = 'loading';
+        }
+      });
     }
 
     return status;
@@ -391,6 +405,7 @@ var Features = function (options) {
         app: _app,
         eqid: _eqid
       });
+      feature.isLoading = true;
 
       _features[feature.id] = feature; // store new feature
 
@@ -430,7 +445,7 @@ var Features = function (options) {
 
     _eqid = null;
     _features = {};
-    _numFeatures = null;
+    _totalFeatures = null;
     _showLayer = {};
   };
 
