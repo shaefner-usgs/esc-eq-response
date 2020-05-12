@@ -51,15 +51,16 @@ var MapPane = function (options) {
 
       _addLayerControl,
       _addListeners,
+      _addMapControls,
       _compareLayers,
       _createMapPane,
       _fitBounds,
       _getSortValue,
       _getStaticLayers,
-      _hideZoomControl,
       _initMap,
       _isBaseLayer,
-      _setBounds;
+      _setBounds,
+      _setDefaultMapExtent;
 
 
   _this = {};
@@ -117,6 +118,27 @@ var MapPane = function (options) {
 
       _app.Features.getFeature(id).showLayer = showLayer;
     });
+  };
+
+  /**
+   * Set up Leaflet map controllers: layers, mouse position, scale
+   */
+  _addMapControls = function () {
+    var zoomControl;
+
+    _layerControl = _addLayerControl();
+
+    L.control.mousePosition({ // plugin
+      position: 'bottomcenter'
+    }).addTo(_this.map);
+
+    L.control.scale().addTo(_this.map);
+
+    // Hide zoom control on mobile (in favor of pinch-to-zoom)
+    zoomControl = _el.querySelector('.leaflet-control-zoom');
+    if (L.Browser.mobile) {
+      zoomControl.classList.add('hide');
+    }
   };
 
   /**
@@ -246,25 +268,12 @@ var MapPane = function (options) {
   };
 
   /**
-   * Hide zoom control on mobile (in favor of pinch-to-zoom)
-   */
-  _hideZoomControl = function () {
-    var control;
-
-    control = _el.querySelector('.leaflet-control-zoom');
-    if (L.Browser.mobile) {
-      control.classList.add('hide');
-    }
-  };
-
-  /**
    * Create Leaflet map instance
    */
   _initMap = function () {
     _this.map = L.map(_el.querySelector('.map'), {
       worldCopyJump: true
     });
-    _this.reset(); // set initial state of map
 
     _createMapPane('faults', 'tilePane');
 
@@ -273,13 +282,8 @@ var MapPane = function (options) {
       _this.map.addLayer(layer);
     });
 
-    // Add / remove Leaflet controls
-    _layerControl = _addLayerControl();
-    L.control.mousePosition({
-      position: 'bottomcenter'
-    }).addTo(_this.map);
-    L.control.scale().addTo(_this.map);
-    _hideZoomControl();
+    _addMapControls();
+    _setDefaultMapExtent();
 
     // Remember user's map settings (selected layers, map extent)
     // _this.map.restoreMap({
@@ -320,6 +324,13 @@ var MapPane = function (options) {
     _fitBounds(); // call in case MapPane is visible while Features are being added
   };
 
+  /**
+   * Set map extent to United States
+   */
+  _setDefaultMapExtent = function () {
+    _this.map.setView([40, -96], 4);
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -343,8 +354,8 @@ var MapPane = function (options) {
         name += '<span class="count">' + feature.count + '</span>';
       }
 
-      placeholder = _placeholders[feature.id];
-      if (placeholder) { // temporary layer shown while data is loading
+      placeholder = _placeholders[feature.id]; // loading status in layer control
+      if (placeholder) {
         _layerControl.removeLayer(placeholder);
         delete _placeholders[feature.id];
       } else {
@@ -381,7 +392,7 @@ var MapPane = function (options) {
       _createMapPane(feature.id, 'overlayPane');
 
       _layerControl.addOverlay(layer, name);
-      _placeholders[feature.id] = layer; // cache placeholder layers
+      _placeholders[feature.id] = layer; // cache placeholder layer
     }
   };
 
@@ -450,7 +461,7 @@ var MapPane = function (options) {
         showLayer;
 
     mapLayer = feature.mapLayer;
-    placeholder = _placeholders[feature.id];
+    placeholder = _placeholders[feature.id]; // loading status in layer control
     showLayer = feature.showLayer; // cache value
 
     if (mapLayer) {
@@ -462,18 +473,18 @@ var MapPane = function (options) {
 
     if (placeholder) {
       _layerControl.removeLayer(placeholder);
+      delete _placeholders[feature.id];
     }
   };
 
   /**
    * Reset map pane to initial state
-   *
-   * Set default map extent and purge canvas elements (FM, MT)
    */
   _this.reset = function () {
     var canvasEls,
         i;
 
+    // Purge existing canvas elements (FM, MT beachballs)
     canvasEls = document.querySelectorAll('#mapPane > canvas');
     for (i = 0; i < canvasEls.length; i ++) {
       _el.removeChild(canvasEls[i]);
@@ -483,7 +494,13 @@ var MapPane = function (options) {
     _initialLoad = true;
     _placeholders = {};
 
-    _this.map.setView([40, -96], 4); // United States
+    // Reset layer controller
+    if (_layerControl) {
+      _layerControl.remove();
+      _layerControl = _addLayerControl();
+    }
+
+    _setDefaultMapExtent();
   };
 
 
