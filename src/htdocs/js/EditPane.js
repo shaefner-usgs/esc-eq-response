@@ -18,7 +18,7 @@ var AppUtil = require('AppUtil');
  *
  * @return _this {Object}
  *   {
- *     addCount: {Function},
+ *     addFeature: {Function},
  *     addLoadingSpinner: {Function},
  *     focusedField: {String},
  *     initFeatures: {Function},
@@ -390,7 +390,7 @@ var EditPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.addCount = function (feature) {
+  _this.addFeature = function (feature) {
     var count,
         div,
         spinner;

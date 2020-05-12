@@ -99,9 +99,7 @@ var Features = function (options) {
       _app.MapPane.addFeature(feature); // 'mapLayer' property
       _app.PlotsPane.addFeature(feature); // 'plotTraces' property
       _app.SummaryPane.addFeature(feature); // 'summary' property
-
-      // Add Feature's count if applicable (aftershocks, foreshocks, historical)
-      _app.EditPane.addCount(feature);
+      _app.EditPane.addFeature(feature); // 'count' property
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
