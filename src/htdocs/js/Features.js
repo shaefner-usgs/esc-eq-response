@@ -64,10 +64,12 @@ var Features = function (options) {
       _eqid,
       _features,
       _numFeatures,
+      _prevFeatures,
       _showLayer,
 
       _addFeature,
       _addLoadingSpinner,
+      _cacheFeature,
       _initFeature,
       _instantiateFeatures,
       _loadJson,
@@ -82,6 +84,7 @@ var Features = function (options) {
 
     _app = options.app;
     _features = {};
+    _prevFeatures = {};
     _showLayer = {};
   };
 
@@ -91,8 +94,6 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addFeature = function (feature) {
-    _features[feature.id] = feature; // store added feature
-
     try {
       // Add Feature to map, plots and summary panes if property is set
       _app.MapPane.addFeature(feature); // 'mapLayer' property
@@ -130,6 +131,22 @@ var Features = function (options) {
     _app.MapPane.addLoadingSpinner(feature);
     _app.PlotsPane.addLoadingSpinner(feature);
     _app.SummaryPane.addLoadingSpinner(feature);
+  };
+
+  /**
+   * Cache a previous Feature - store in Array because multiple Ajax requests
+   *   can 'stack up'
+   *
+   * Used to purge former Feature when Feature refresh is complete
+   *
+   * @param feature {Object}
+   */
+  _cacheFeature = function (feature) {
+    if (!_prevFeatures.hasOwnProperty(feature.id)) {
+      _prevFeatures[feature.id] = [];
+    }
+
+    _prevFeatures[feature.id].push(feature);
   };
 
   /**
@@ -173,14 +190,14 @@ var Features = function (options) {
   /**
    * Wrapper method to loop through Feature classes and instantiate them
    *
-   * Skip mainshock which is added separately so it's available for other
-   *   Features that depend on it.
+   * Mainshock already created separately so it's available for Features that
+   *   depend on it.
    */
   _instantiateFeatures = function () {
     _numFeatures = Object.keys(_FEATURECLASSES).length;
 
     Object.keys(_FEATURECLASSES).forEach(function(id) {
-      if (id !== 'mainshock') { // skip mainshock (already done)
+      if (id !== 'mainshock') { // skip mainshock
         _this.instantiateFeature(id);
       }
     });
@@ -210,7 +227,6 @@ var Features = function (options) {
         _addFeature(feature);
 
         _app.StatusBar.removeItem(feature.id);
-        feature.isLoading = false;
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
@@ -378,23 +394,27 @@ var Features = function (options) {
         eqid: _eqid
       });
 
+      _features[feature.id] = feature; // store new feature
+
       _initFeature(feature);
     }
   };
 
   /**
-   * Refresh a Feature when user manipulates parameters on edit pane
+   * Refresh a Feature - called when user manipulates parameters on edit pane
    *
    * @param feature {Object}
+   *     existing Feature before refresh
    */
   _this.refreshFeature = function (feature) {
-    if (feature) {
-      feature.isLoading = true; // flag to block multiple/simultaneous refreshes
-      if (feature.plotTraces) {
-        _app.PlotsPane.rendered = false;
-      }
+    var oldestFeature;
 
-      _removeFeature(feature);
+    if (feature) {
+      _cacheFeature(feature);
+
+      // Remove previous Feature ('oldest' in Array), then create new Feature
+      oldestFeature = _prevFeatures[feature.id].shift();
+      _removeFeature(oldestFeature);
       _this.instantiateFeature(feature.id);
 
       // Also refresh FieldNotes when Aftershocks is refreshed (uses same params)
