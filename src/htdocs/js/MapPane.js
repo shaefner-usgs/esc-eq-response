@@ -105,18 +105,19 @@ var MapPane = function (options) {
    * Listener is triggered anytime a layer is added/removed, even programmatically
    */
   _addListeners = function () {
-    var id,
+    var feature,
         showLayer;
 
     _this.map.on('overlayadd overlayremove', function (e) {
-      id = e.layer.id;
-      showLayer = false;
+      feature = _app.Features.getFeature(e.layer.id);
 
+      showLayer = false;
       if (e.type === 'overlayadd') {
         showLayer = true;
       }
-
-      _app.Features.getFeature(id).showLayer = showLayer;
+      if (feature && feature.hasOwnProperty('showLayer')) {
+        feature.showLayer = showLayer;
+      }
     });
   };
 
