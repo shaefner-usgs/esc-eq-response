@@ -38,7 +38,6 @@ var EditPane = function (options) {
       _eqid,
       _eqidPrevValue,
       _fields,
-      _throttle,
 
       _addListener,
       _checkIfNew,
@@ -46,6 +45,7 @@ var EditPane = function (options) {
       _getDefaults,
       _hideMainshock,
       _initListeners,
+      _loadEvent,
       _refreshFeature,
       _resetCounts,
       _resetForm,
@@ -53,6 +53,7 @@ var EditPane = function (options) {
       _setFormFieldValues,
       _setQueryStringValues,
       _storeFocus,
+      _timers,
       _updateParam,
       _viewMap;
 
@@ -67,6 +68,7 @@ var EditPane = function (options) {
     _eqid = document.getElementById('eqid');
     _eqidPrevValue = null;
     _fields = _el.querySelectorAll('input'); // all form fields
+    _timers = {};
 
     _initListeners();
     _setFormFieldValues();
@@ -192,15 +194,15 @@ var EditPane = function (options) {
     // Remember focused field
     _addListener(_fields, 'focus', _storeFocus);
 
-    // Get a new set of feature layers when eqid is changed
-    _addListener([_eqid], 'input', _this.initFeatures);
+    // Load a new set of Feature layers when eqid is changed
+    _addListener([_eqid], 'input', _loadEvent);
 
-    // Update features when params are changed (fires when change is committed)
+    // Update Features when params are changed (fires when change is committed)
     _addListener(aftershocks, 'change', _refreshFeature);
     _addListener(foreshocks, 'change', _refreshFeature);
     _addListener(historical, 'change', _refreshFeature);
 
-    // Clear features when reset button is pressed
+    // Clear Features when reset button is pressed
     _addListener([reset], 'click', _app.resetApp);
 
     // Switch to map pane when 'View Map' button is clicked
@@ -208,44 +210,67 @@ var EditPane = function (options) {
   };
 
   /**
-   * Refresh a Feature
-   *   triggered when a form field inside div is changed by user
+   * Throttle loading so multiple requests don't stack up when typing an Event ID
+   */
+  _loadEvent = function () {
+    var id = this.id;
+
+    if (!_timers.hasOwnProperty(id)) {
+      _timers[id] = [];
+    }
+
+    _timers[id].forEach(function(timer) { // clear any previous requests
+      window.clearTimeout(timer);
+      _timers[id].shift();
+    });
+
+    _timers[id].push( // throttle requests
+      window.setTimeout(function() {
+        _this.initFeatures();
+      }, 500)
+    );
+  };
+
+  /**
+   * Refresh a Feature - triggered when a form field is changed by user
    */
   _refreshFeature = function () {
     var button,
         div,
         eqidIsValid,
         feature,
-        id;
+        featureId;
 
     eqidIsValid = _checkIfValid();
 
     if (eqidIsValid) {
-      div = this;
-      id = div.className;
-      feature = _app.Features.getFeature(id);
+      div = this; // parent container of form field
+      featureId = div.className;
+      feature = _app.Features.getFeature(featureId);
 
-      if (feature) {
-        // Disable download button while feature is refreshing
-        button = document.querySelector('.event-summary');
-        button.setAttribute('disabled', 'disabled');
-
-        // Throttle requests so they can't fire off repeatedly in rapid succession
-        window.clearTimeout(_throttle); // first clear any queued refresh
-        _throttle = window.setTimeout(function() {
-          // Even with a throttle in place, Ajax requests can still 'stack up'
-          // Wait until previous request is finished before starting another
-          if (feature.isLoading) {
-            window.setTimeout(function() {
-              _refreshFeature.call(div);
-            }, 100);
-          } else {
-            _app.Features.refreshFeature(feature);
-          }
-        }, 250);
-      } else { // feature never instantiated (likely due to a bad ajax request)
-        _app.Features.instantiateFeature(id);
+      if (!_timers.hasOwnProperty(featureId)) {
+        _timers[featureId] = [];
       }
+
+      _timers[featureId].forEach(function(timer) { // clear any previous requests
+        window.clearTimeout(timer);
+        _timers[featureId].shift();
+      });
+
+      // Throttle so multiple requests don't stack up
+      _timers[featureId].push(
+        window.setTimeout(function() {
+          if (feature) {
+            // Disable download button while feature is refreshing
+            button = document.querySelector('.event-summary');
+            button.setAttribute('disabled', 'disabled');
+
+            _app.Features.refreshFeature(feature);
+          } else { // feature never instantiated (likely due to a bad ajax request)
+            _app.Features.instantiateFeature(featureId);
+          }
+        }, 500)
+      );
     }
   };
 
@@ -278,7 +303,7 @@ var EditPane = function (options) {
         select.parentNode.removeChild(select);
         _app.SignificantEqs.addSignificantEqs();
       }
-    }, 10);
+    }, 25);
   };
 
   /**
