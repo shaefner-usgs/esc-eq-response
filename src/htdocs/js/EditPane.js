@@ -423,6 +423,7 @@ var EditPane = function (options) {
 
     if (div) { // Feature has configuration params
       spinner = div.querySelector('.spinner');
+      spinner.innerHTML = '<div></div>';
       spinner.classList.remove('hide');
 
       count = div.querySelector('.count');
