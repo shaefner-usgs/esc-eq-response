@@ -428,7 +428,7 @@ var SummaryPane = function (options) {
         placeholder;
 
     // Some Features are rendered in an existing placeholder (in mainshock section)
-    placeholder = _el.querySelector('.' + feature.id);
+    placeholder = _el.querySelector('.' + feature.id + '.placeholder');
 
     if (feature.hasOwnProperty('summary') && !placeholder) {
       div = document.createElement('div');
@@ -441,7 +441,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Remove a Feature from summary pane
+   * Remove a Feature from summary pane (but leave placeholders intact)
    *
    * @param feature {Object}
    */
@@ -451,7 +451,9 @@ var SummaryPane = function (options) {
     el  = _el.querySelector('.' + feature.id);
 
     if (el) {
-      el.parentNode.removeChild(el);
+      if (!el.classList.contains('placeholder')) {
+        el.parentNode.removeChild(el);
+      }
     }
   };
 

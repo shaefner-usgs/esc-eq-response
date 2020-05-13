@@ -109,12 +109,12 @@ var Mainshock = function (options) {
     }
 
     // Add placeholders for beachballs
-    summary += '<div class="focal-mechanism hide two-up"></div>';
-    summary += '<div class="moment-tensor hide two-up"></div>';
+    summary += '<div class="focal-mechanism placeholder hide two-up"></div>';
+    summary += '<div class="moment-tensor placeholder hide two-up"></div>';
     summary += '</div>'; // .products div
 
     // Add placeholder for Population Exposure table
-    summary += '<div class="pager-cities hide"></div>';
+    summary += '<div class="pager-cities placeholder hide"></div>';
     summary += '</div>'; // parent div
 
     return summary;
