@@ -336,6 +336,7 @@ var Features = function (options) {
    *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
    *     showLayer: {Boolean}, // whether or not mapLayer is "on" by default
    *     summary: {String}, // HTML for SummaryPane
+   *     url: {String}, // URL of feed data for Feature
    *     zoomToLayer: {Boolean}, // whether or not map zooms to fit layer by default
    *   }
    */
