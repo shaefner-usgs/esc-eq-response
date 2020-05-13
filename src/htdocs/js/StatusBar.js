@@ -46,14 +46,16 @@ var StatusBar = function (options) {
   /**
    * Add listeners for close/reload buttons on an Error item
    *
-   * @param id: {String}
+   * @param div {Element}
+   * @param id {String}
+   *     Feature id
    */
-  _addListeners = function (id) {
+  _addListeners = function (div, id) {
     var close,
         reload;
 
-    close = _el.querySelector('.' + id + ' .close');
-    reload = _el.querySelector('.' + id + ' .reload');
+    close = div.querySelector('.close');
+    reload = div.querySelector('.reload');
 
     close.addEventListener('click', function(e) {
       e.preventDefault();
@@ -108,7 +110,8 @@ var StatusBar = function (options) {
   /**
    * Add an error to status bar
    *
-   * @param id: {String}
+   * @param id {String}
+   *     Feature id
    * @param errorMsg {String}
    */
   _this.addError = function (id, errorMsg) {
@@ -123,7 +126,7 @@ var StatusBar = function (options) {
     // Remove any leftover items with this id, then add item
     _this.removeItem(id);
     _el.appendChild(div);
-    _addListeners(id);
+    _addListeners(div, id);
     _show();
   };
 
@@ -132,7 +135,7 @@ var StatusBar = function (options) {
    *
    * @param item {Object}
    *   {
-   *     id: {String},
+   *     id: {String}, (Feature id)
    *     name: {String} (optional)
    *   }
    * @param options {Object}
@@ -180,6 +183,7 @@ var StatusBar = function (options) {
    * Check if an error exists for item
    *
    * @param id {String}
+   *     Feature id
    *
    * @return {Boolean}
    */
@@ -196,6 +200,7 @@ var StatusBar = function (options) {
    * Remove an item from status bar (and hide status bar if empty)
    *
    * @param id {String}
+   *     Feature id
    */
   _this.removeItem = function (id) {
     var i,
