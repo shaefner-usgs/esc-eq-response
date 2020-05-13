@@ -108,14 +108,17 @@ var Mainshock = function (options) {
         mmi + '" /></a></div>';
     }
 
-    // Add placeholders for beachballs
+    // Add placeholders for beachballs, Population Exposure table
     summary += '<div class="focal-mechanism placeholder hide two-up"></div>';
     summary += '<div class="moment-tensor placeholder hide two-up"></div>';
     summary += '</div>'; // .products div
-
-    // Add placeholder for Population Exposure table
     summary += '<div class="pager-cities placeholder hide"></div>';
     summary += '</div>'; // parent div
+
+    summary += '<button class="event-summary" disabled="disabled" ' +
+      'title="Download RTF Document" type="button">';
+    summary += '<img src="img/download.png" width="13" alt="download">Event Summary';
+    summary += '</button>';
 
     return summary;
   };

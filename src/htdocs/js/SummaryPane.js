@@ -32,7 +32,6 @@ var SummaryPane = function (options) {
       _style,
       _tz,
 
-      _addDownloadButton,
       _addListeners,
       _addSortTitles,
       _addTimestamp,
@@ -60,31 +59,6 @@ var SummaryPane = function (options) {
     document.body.appendChild(_style);
 
     _addTimestamp();
-  };
-
-  /**
-   * Add button to download Event Summary document
-   *
-   * @param div {Element}
-   *     mainshock container
-   */
-  _addDownloadButton = function (div) {
-    var button;
-
-    button = document.createElement('button');
-    button.classList.add('event-summary');
-    button.innerHTML = '<img src="img/download.png" width="13" alt="download" />';
-    button.innerHTML += 'Event Summary';
-    button.setAttribute('disabled', 'disabled');
-    button.setAttribute('title', 'Download RTF Document');
-    button.type = 'button';
-
-    button.addEventListener('click', function() {
-      _app.Feeds.reset();
-      _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
-    });
-
-    div.appendChild(button);
   };
 
   /**
@@ -406,8 +380,14 @@ var SummaryPane = function (options) {
       _updateTimestamp();
     }
 
+
+
     if (feature.id === 'mainshock') {
-      _addDownloadButton(div);
+      button = document.querySelector('.event-summary');
+      button.addEventListener('click', function() {
+        _app.Feeds.reset();
+        _app.Feeds.instantiateFeeds(); // load external feed data for Summary Doc
+      });
     }
 
     // Enable Event Summary download button once all Features are loaded
