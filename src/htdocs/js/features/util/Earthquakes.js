@@ -341,7 +341,7 @@ var Earthquakes = function (options) {
     var template;
 
     if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
-      template = '<div class="earthquake {type}">' +
+      template = '<div class="earthquake {cssClass}">' +
         '<h4><a href="{url}">{title}</a></h4>' +
         '{bubblesHtml}' +
         '<dl>' +
@@ -591,6 +591,7 @@ var Earthquakes = function (options) {
         bearingString,
         compassPoints,
         coords,
+        cssClass,
         days,
         distance,
         eq,
@@ -603,7 +604,6 @@ var Earthquakes = function (options) {
         popup,
         props,
         tooltip,
-        type,
         utcTime;
 
     props = feature.properties;
@@ -623,23 +623,24 @@ var Earthquakes = function (options) {
     }
 
     if (_id === 'mainshock') { // add verbose time props to mainshock
-      type = 'selected'; // selected event
+      cssClass = 'selected'; // selected event
       if (eqMomentLocal) {
         _this.localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
       }
       _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
     } else { // calculate distance/direction from mainshock
+      cssClass = '';
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
       latlon = AppUtil.LatLon(coords[1], coords[0]);
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
       distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-      type = '';
     }
 
     eq = {
       alert: props.alert, // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
+      cssClass: cssClass,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
       distance: distance,
@@ -657,7 +658,6 @@ var Earthquakes = function (options) {
       status: props.status,
       title: magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
-      type: type,
       url: props.url,
       utcTime: utcTime
     };
@@ -724,7 +724,7 @@ var Earthquakes = function (options) {
 
     age = _getAge(props.time);
     fillColor = _COLORS[age];
-    radius = AppUtil.getRadius(props.mag);
+    radius = AppUtil.getRadius(AppUtil.round(props.mag, 1));
 
     _markerOptions.fillColor = fillColor;
     _markerOptions.pane = _id; // put markers in custom Leaflet map pane
