@@ -349,9 +349,9 @@ var SummaryPane = function (options) {
 
     if (feature.summary) {
       div = _el.querySelector('div.' + feature.id);
-      spinner = div.querySelector('.spinner');
 
-      if (spinner) { // hide loading spinner
+      spinner = div.querySelector('.spinner'); // loading spinner
+      if (spinner) {
         spinner.classList.add('hide');
       }
 
@@ -362,13 +362,16 @@ var SummaryPane = function (options) {
 
         div.querySelector('h2').appendChild(count);
 
-        // Trigger a reflow, then unhide (to enable CSS transition)
+        // Trigger a reflow (to enable CSS transition), then unhide
         count.focus();
         count.classList.remove('hide');
       }
 
       div.insertAdjacentHTML('beforeend', feature.summary); // preserves CSS transition
-      div.classList.remove('hide'); // for placeholders, which are hidden by default
+
+      if (div.classList.contains('placeholder')) {
+        div.classList.remove('hide'); // placeholders hidden by default
+      }
 
       // Canvas elements (FM, MT beachballs) are already rendered (but hidden)
       canvas = _el.querySelector('canvas.' + feature.id);
@@ -380,8 +383,6 @@ var SummaryPane = function (options) {
       _updateTimestamp();
     }
 
-
-
     if (feature.id === 'mainshock') {
       button = document.querySelector('.event-summary');
       button.addEventListener('click', function() {
@@ -390,11 +391,9 @@ var SummaryPane = function (options) {
       });
     }
 
-    // Enable Event Summary download button once all Features are loaded
     status = _app.Features.getLoadingStatus();
     if (status === 'finished') {
-      button = document.querySelector('.event-summary');
-      button.removeAttribute('disabled');
+      _this.enableDownload();
     }
   };
 
@@ -418,6 +417,26 @@ var SummaryPane = function (options) {
 
       _featuresEl.appendChild(div);
     }
+  };
+
+  /**
+   * Disable download RTF button
+   */
+  _this.disableDownload = function () {
+    var button;
+
+    button = document.querySelector('.event-summary');
+    button.setAttribute('disabled', 'disabled');
+  };
+
+  /**
+   * Enable download RTF button
+   */
+  _this.enableDownload = function () {
+    var button;
+
+    button = document.querySelector('.event-summary');
+    button.removeAttribute('disabled');
   };
 
   /**
