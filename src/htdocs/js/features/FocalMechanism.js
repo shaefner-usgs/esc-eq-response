@@ -18,6 +18,7 @@ require('mappane/CanvasMarker');
  *
  * @return _this {Object}
  *   {
+ *     beachball: {Element},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
@@ -102,7 +103,7 @@ var FocalMechanism = function (options) {
     beachball = _getBeachBall(size);
 
     if (beachball) {
-      // Render beachball (hidden via css and shown when layer is turned on)
+      // Render (hidden) beachball to DOM; move/unhide when layer is turned on
       beachball.render(document.querySelector('#mapPane'));
 
       coords = [
@@ -141,22 +142,16 @@ var FocalMechanism = function (options) {
    * @return summary {String}
    */
   _getSummary = function () {
-    var beachball,
-        summary,
+    var summary,
         url;
 
-    beachball = _getBeachBall(180);
-    if (beachball) {
-      // Immediately render (hidden) beachball before adding summary. It will
-      //   be moved into place/unhidden when summary is added by SummaryPane.js
-      beachball.render(document.querySelector('#summaryPane'));
-
+    if (_this.beachball) {
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
         '/focal-mechanism';
       summary = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
-    }
 
-    return summary;
+      return summary;
+    }
   };
 
   // ----------------------------------------------------------
@@ -184,6 +179,7 @@ var FocalMechanism = function (options) {
    * Init Feature
    */
   _this.initFeature = function () {
+    _this.beachball = _getBeachBall(180);
     _this.mapLayer = _getMapLayer();
     _this.summary = _getSummary();
   };

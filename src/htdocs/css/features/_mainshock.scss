@@ -1,8 +1,4 @@
 #summaryPane {
-  > canvas { /* hide rendered beachballs not yet moved into place under mainshock */
-    display: none;
-  }
-
   .event-summary {
     margin-top: 1em;
     padding-left: 32px;
@@ -13,6 +9,10 @@
       position: absolute;
       top: 8px;
     }
+  }
+
+  .hide { /* missing product */
+    display: none;
   }
 
   .mainshock > div {
@@ -92,10 +92,6 @@
 
     .earthquake h4 {
       text-align: left;
-    }
-
-    .hide { /* missing product */
-      display: none;
     }
 
     .two-up { /* two products per row */

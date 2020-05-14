@@ -341,7 +341,6 @@ var SummaryPane = function (options) {
    */
   _this.addFeature = function (feature) {
     var button,
-        canvas,
         count,
         div,
         spinner,
@@ -369,14 +368,11 @@ var SummaryPane = function (options) {
 
       div.insertAdjacentHTML('beforeend', feature.summary); // preserves CSS transition
 
+      if (feature.hasOwnProperty('beachball')) {
+        feature.beachball.render(_el.querySelector('.' + feature.id + ' a'));
+      }
       if (div.classList.contains('placeholder')) {
         div.classList.remove('hide'); // placeholders hidden by default
-      }
-
-      // Canvas elements (FM, MT beachballs) are already rendered (but hidden)
-      canvas = _el.querySelector('canvas.' + feature.id);
-      if (canvas) { // move beachball into correct place (which unhides it)
-        div.querySelector('a').appendChild(canvas);
       }
 
       _configTable(div, feature);
