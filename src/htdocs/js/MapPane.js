@@ -122,7 +122,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set up Leaflet map controllers: layers, mouse position, scale
+   * Set up Leaflet map controls: layers, mouse position, scale, zoom
    */
   _addMapControls = function () {
     var zoomControl;
@@ -136,8 +136,8 @@ var MapPane = function (options) {
     L.control.scale().addTo(_this.map);
 
     // Hide zoom control on mobile (in favor of pinch-to-zoom)
-    zoomControl = _el.querySelector('.leaflet-control-zoom');
     if (L.Browser.mobile) {
+      zoomControl = _el.querySelector('.leaflet-control-zoom');
       zoomControl.classList.add('hide');
     }
   };
@@ -182,8 +182,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Zoom map extent to contain _bounds
-   *   _bounds includes all Features with 'zoomToLayer' prop set to true
+   * Zoom map extent to contain _bounds, which includes all Features with
+   *   'zoomToLayer' prop set to true
    */
   _fitBounds = function () {
     if (_bounds.isValid()) {
@@ -225,8 +225,9 @@ var MapPane = function (options) {
   };
 
   /**
-   * Get all 'static' map layers
-   *   excludes 'dynamic' Feature layers that depend on user-set parameters
+   * Get 'static' map layers that are the same on all maps
+   *
+   * Excludes 'dynamic' Feature layers that depend on user-set parameters
    *
    * @return layers {Object}
    *    {
@@ -272,17 +273,19 @@ var MapPane = function (options) {
    * Create Leaflet map instance
    */
   _initMap = function () {
+    var layers;
+
+    layers = [];
+    _staticLayers.defaults.forEach(function(layer) {
+      layers.push(layer);
+    });
+
     _this.map = L.map(_el.querySelector('.map'), {
+      layers: layers,
       worldCopyJump: true
     });
 
     _createMapPane('faults', 'tilePane');
-
-    // Add default layers to map (i.e. toggle on in layer control)
-    _staticLayers.defaults.forEach(function(layer) {
-      _this.map.addLayer(layer);
-    });
-
     _addMapControls();
     _setDefaultMapExtent();
 
@@ -326,7 +329,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set map extent to United States
+   * Set map extent to continental United States
    */
   _setDefaultMapExtent = function () {
     _this.map.setView([40, -96], 4);
@@ -377,7 +380,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add a Feature's name and a loading 'spinner' to the layer controller
+   * Add a Feature's name and a loading 'spinner' to the layer control
    *
    * @param feature {Object}
    */
@@ -398,8 +401,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set initial map extent when user views MapPane for the first time; need
-   *   to do this because Leaflet doesn't manipulate the map when not visible
+   * Set initial map extent when user views MapPane for the first time; need to
+   *   do this because Leaflet doesn't manipulate the map when it's not visible
    */
   _this.initView = function () {
     if (_initialLoad) {
@@ -410,8 +413,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Open popup matching eqid in Feature layer - used for displaying map popups
-   *   from user interaction on other panes
+   * Open map popup matching eqid in Feature layer - used for displaying popups
+   *   from user interaction on plot/summary panes
    *
    * @param id {String}
    *     id of feature
