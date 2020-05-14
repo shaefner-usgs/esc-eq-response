@@ -368,7 +368,7 @@ var Earthquakes = function (options) {
       '</tr>';
     } else if (type === 'slider') {
       template = '<div class="filter">' +
-        '<h4>Filter earthquake list by magnitude</h4>' +
+        '<h4>Filter earthquakes by magnitude</h4>' +
         '<div class="min">{min}</div>' +
         '<div class="inverted slider" style="--min:{min}; --max:{max}; --val:{initial};">' +
           '<input id="{id}" type="range" min="{min}" max="{max}" value="{initial}"/>' +
@@ -378,7 +378,7 @@ var Earthquakes = function (options) {
       '</div>';
     } else if (type === 'subheader') {
       template = '<h3>' +
-        'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
+        'M <span class="mag">{mag}</span>+ Earthquake List <span class="count">{count}</span>' +
       '</h3>';
     } else if (type === 'table') { // lists on summary pane
       template = '<table class="{tableClasses}">' +
