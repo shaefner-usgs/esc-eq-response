@@ -210,7 +210,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Throttle loading so multiple requests don't stack up when typing an Event ID
+   * Load a new Event - triggered when the Event ID field is changed
    */
   _loadEvent = function () {
     var id = this.id;
@@ -232,11 +232,10 @@ var EditPane = function (options) {
   };
 
   /**
-   * Refresh a Feature - triggered when a form field is changed by user
+   * Refresh a Feature - triggered when a Feature's form field is changed
    */
   _refreshFeature = function () {
-    var button,
-        div,
+    var div,
         eqidIsValid,
         feature,
         featureId;
@@ -257,14 +256,10 @@ var EditPane = function (options) {
         _timers[featureId].shift();
       });
 
-      // Throttle so multiple requests don't stack up
-      _timers[featureId].push(
+      _timers[featureId].push( // throttle requests
         window.setTimeout(function() {
           if (feature) {
-            // Disable download button while feature is refreshing
-            button = document.querySelector('.event-summary');
-            button.setAttribute('disabled', 'disabled');
-
+            _app.SummaryPane.disableDownload();
             _app.Features.refreshFeature(feature);
           } else { // feature never instantiated (likely due to a bad ajax request)
             _app.Features.instantiateFeature(featureId);
@@ -275,7 +270,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset counts from Feature headers on form controls
+   * Reset counts on Feature headers for form controls
    */
   _resetCounts = function () {
     var counts;
