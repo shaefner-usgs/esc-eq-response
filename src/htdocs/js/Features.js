@@ -446,8 +446,8 @@ var Features = function (options) {
 
     _eqid = null;
     _features = {};
-    _totalFeatures = null;
     _showLayer = {};
+    _totalFeatures = null;
   };
 
 
