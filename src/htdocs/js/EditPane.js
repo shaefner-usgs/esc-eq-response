@@ -38,6 +38,7 @@ var EditPane = function (options) {
       _eqid,
       _eqidPrevValue,
       _fields,
+      _timers,
 
       _addListener,
       _checkIfNew,
@@ -53,7 +54,6 @@ var EditPane = function (options) {
       _setFormFieldValues,
       _setQueryStringValues,
       _storeFocus,
-      _timers,
       _updateParam,
       _viewMap;
 
@@ -210,7 +210,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Load a new Event - triggered when the Event ID field is changed
+   * Load a new Event (triggered when the Event ID field is changed)
    */
   _loadEvent = function () {
     var id = this.id;
@@ -232,7 +232,7 @@ var EditPane = function (options) {
   };
 
   /**
-   * Refresh a Feature - triggered when a Feature's form field is changed
+   * Refresh a Feature (triggered when a Feature's form field is changed)
    */
   _refreshFeature = function () {
     var div,
@@ -283,12 +283,12 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset querystring/significant eqs (input fields are already cleared)
+   * Reset significant eqs (input fields cleared by reset button), querystring
    */
   _resetForm = function () {
     var select;
 
-    // Set a slight delay so 'Reset' button can finish clearing form fields first
+    // Set a slight delay so 'Reset' button can finish clearing input fields first
     setTimeout(function() {
       _setQueryStringValues(); // reset query string
 
@@ -492,7 +492,7 @@ var EditPane = function (options) {
 
     _eqid.value = significant.options[index].value;
 
-    // Call manually: eqid input event not triggered when value changed programmatically
+    // Call manually (eqid input event not triggered when value changed programmatically)
     _setQueryStringValues();
     _this.initFeatures();
   };
