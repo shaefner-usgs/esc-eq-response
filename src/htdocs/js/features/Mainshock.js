@@ -86,7 +86,7 @@ var Mainshock = function (options) {
 
     summary = '<div>';
     summary += '<div class="products">';
-    summary += _Earthquakes.mapLayer.getLayers()[0].getPopup().getContent();
+    summary += _this.mapLayer.getLayers()[0].getPopup().getContent();
 
     // Add DYFI, ShakeMap thumbs
     if (products.dyfi) {
