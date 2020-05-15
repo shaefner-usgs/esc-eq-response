@@ -4,7 +4,9 @@
 /**
  * Set up navbar to switch between panes (i.e. 'pages') of single page app
  *
- * Also save / set scroll positions to return pane to previous state
+ * Also save / set scroll positions to return pane to previous state, and deal
+ *   with issues where map/plots don't display correctly when created while
+ *   their respective pane is hidden
  *
  * @param options {Object}
  *   {
@@ -31,6 +33,7 @@ var NavBar = function (options) {
       _changePane,
       _getPaneId,
       _hidePanes,
+      _renderPlots,
       _saveScrollPosition,
       _setScrollPosition,
       _showPane;
@@ -80,36 +83,8 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _changePane = function (id) {
-    var field,
-        numPlots;
-
-    numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
-
-    if (id === 'plotsPane' && numPlots > 0 && !_app.PlotsPane.rendered) {
-      _app.StatusBar.addItem({
-        id: 'rendering',
-        name: 'Plots'
-      }, {
-        prepend: 'Rendering'
-      });
-
-      // Add a slight delay; otherwise rendering message does not display
-      window.setTimeout(function() {
-        _hidePanes();
-        _showPane(id);
-        _app.StatusBar.removeItem('rendering');
-      }, 25);
-    } else {
-      if (id === 'editPane') { // focus appropriate field
-        field = 'eqid'; // default
-        if (_app.EditPane.focusedField) {
-          field = _app.EditPane.focusedField;
-        }
-      document.getElementById(field).focus();
-      }
-      _hidePanes();
-      _showPane(id);
-    }
+    _hidePanes();
+    _showPane(id);
   };
 
   /**
@@ -151,6 +126,31 @@ var NavBar = function (options) {
   };
 
   /**
+   * Render plots and display rendering message (Plots pane must be active first)
+   */
+  _renderPlots = function () {
+    var numPlots;
+
+    numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
+    if (numPlots > 0 && !_app.PlotsPane.rendered) {
+      _app.StatusBar.addItem({
+        id: 'rendering',
+        name: 'Plots'
+      }, {
+        prepend: 'Rendering'
+      });
+
+      // Add a slight delay; otherwise rendering message does not display
+      window.setTimeout(function() {
+        _app.PlotsPane.render();
+        _app.StatusBar.removeItem('rendering');
+      }, 25);
+    }
+
+    _app.PlotsPane.resize(); // in case user adjusted window size
+  };
+
+  /**
    * Save user's current scroll position in session storage
    */
   _saveScrollPosition = function () {
@@ -160,7 +160,7 @@ var NavBar = function (options) {
     id = _getPaneId();
     position = window.pageYOffset;
 
-    // Throttle scroll event so it doesn't fire off repeatedly in rapid succession
+    // Throttle scroll event so it doesn't fire off in rapid succession
     window.clearTimeout(_throttle);
     _throttle = window.setTimeout(function() {
       window.sessionStorage.setItem(id, position);
@@ -168,7 +168,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Set to user's former scroll position, which is saved in sessionStorage
+   * Set scroll position to former value, which is saved in sessionStorage
    *
    * @param id {String}
    */
@@ -183,7 +183,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Show selected pane in UI; highlight selected nav button
+   * Show selected pane in UI/set scroll position; highlight selected nav button
    *
    * @param id {String}
    */
@@ -192,25 +192,22 @@ var NavBar = function (options) {
         pane;
 
     button = _el.querySelector('[href="#' + id + '"]');
-    pane = document.getElementById(id);
-
     button.classList.add('selected');
+
+    pane = document.getElementById(id);
     pane.classList.remove('hide');
 
-    // Scroll to user's former position
-    _setScrollPosition(id);
+    _setScrollPosition(id); // scroll to user's former position
 
-    // Update map container / render plots when unhidden so they display correctly
-    if (id === 'mapPane') {
+    // Map and plots need special care to display correctly when unhidden
+    if (id === 'editPane') {
+      _app.EditPane.setFocusedField();
+    } else if (id === 'mapPane') {
       _app.MapPane.map.invalidateSize();
       _app.MapPane.initView();
-      // Fire an event so L.popup.update() can be called (in MapPane.js) after
-      //   map is visible, which seems to be necessary for Leaflet to display
-      //   popups correctly when they're added and the map is not visible
-      _app.MapPane.map.fire('visible');
+      _app.MapPane.map.fire('visible'); // for popups added when map is hidden
     } else if (id === 'plotsPane') {
-      _app.PlotsPane.render();
-      _app.PlotsPane.resize();
+      _renderPlots();
     }
   };
 

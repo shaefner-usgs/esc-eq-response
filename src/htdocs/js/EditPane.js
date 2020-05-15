@@ -265,6 +265,7 @@ var EditPane = function (options) {
           } else { // feature never instantiated (likely due to a bad ajax request)
             _app.Features.instantiateFeature(featureId);
           }
+          _app.PlotsPane.rendered = false; // flag to re-render plots for Feature
         }, 500)
       );
     }
