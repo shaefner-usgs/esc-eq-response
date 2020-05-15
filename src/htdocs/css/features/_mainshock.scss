@@ -90,8 +90,14 @@
       padding: 2px;
     }
 
-    .earthquake h4 {
-      text-align: left;
+    .earthquake {
+      h4 {
+        text-align: left;
+      }
+
+      .distance {
+        display: none;
+      }
     }
 
     .two-up { /* two products per row */
