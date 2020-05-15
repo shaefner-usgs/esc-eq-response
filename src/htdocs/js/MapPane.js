@@ -59,8 +59,8 @@ var MapPane = function (options) {
       _getStaticLayers,
       _initMap,
       _isBaseLayer,
-      _setBounds,
-      _setDefaultMapExtent;
+      _setDefaultMapExtent,
+      _setInitialMapExtent;
 
 
   _this = {};
@@ -182,19 +182,20 @@ var MapPane = function (options) {
   };
 
   /**
-   * Zoom map extent to contain _bounds, which includes all Features with
-   *   'zoomToLayer' prop set to true
+   * Set map extent to contain bounds or _bounds (_bounds includes all Features
+   *   with 'zoomToLayer' prop set to true)
+   *
+   * @param bounds {L.bounds}
+   *     optional - uses _bounds if not set
    */
-  _fitBounds = function () {
-    if (_bounds.isValid()) {
-      _this.map.fitBounds(_bounds, {
+  _fitBounds = function (bounds) {
+    if (!bounds) {
+      bounds = _bounds;
+    }
+    if (bounds.isValid()) {
+      _this.map.fitBounds(bounds, {
         paddingTopLeft: L.point(0, 40) // accommodate navbar
       });
-    }
-
-    // Zoom out if map is zoomed too close for context (i.e. mainshock only)
-    if (_this.map.getZoom() > 17) {
-      _this.map.setZoom(12);
     }
   };
 
@@ -318,21 +319,31 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set map bounds to contain Feature
-   *
-   * @param feature {Object}
-   */
-  _setBounds = function (feature) {
-    _bounds.extend(feature.mapLayer.getBounds());
-
-    _fitBounds(); // call in case MapPane is visible while Features are being added
-  };
-
-  /**
    * Set map extent to continental United States
    */
   _setDefaultMapExtent = function () {
     _this.map.setView([40, -96], 4);
+  };
+
+  /**
+   * Set intial map extent to center on mainshock and contain all aftershocks,
+   *   foreshocks, historical seismicity
+   *
+   * @param latlng {L.latLng}
+   */
+  _setInitialMapExtent = function (latLng) {
+    var bounds,
+        maxDistance;
+
+    // Distance from mainshock to include all earthquake Feature layers
+    maxDistance = Math.max(
+      Number(document.querySelector('input#as-dist').value),
+      Number(document.querySelector('input#fs-dist').value),
+      Number(document.querySelector('input#hs-dist').value)
+    );
+
+    bounds = latLng.toBounds(maxDistance * 1000); // km -> meters
+    _fitBounds(bounds);
   };
 
   // ----------------------------------------------------------
@@ -347,7 +358,8 @@ var MapPane = function (options) {
   _this.addFeature = function (feature) {
     var layer,
         name,
-        placeholder;
+        placeholder,
+        status;
 
     if (feature.mapLayer) {
       layer = feature.mapLayer;
@@ -362,20 +374,29 @@ var MapPane = function (options) {
       if (placeholder) {
         _layerControl.removeLayer(placeholder);
         delete _placeholders[feature.id];
-      } else {
+      } else { // map pane not yet created
         _createMapPane(feature.id, 'overlayPane');
       }
 
       _layerControl.addOverlay(layer, name);
 
-      // Turn layer "on" and set map extent to contain layer if applicable
+      if (feature.id === 'mainshock') {
+        _setInitialMapExtent(layer.getLayers()[0].getLatLng());
+      }
+
+      // Turn layer "on" and set map bounds to contain Feature, if applicable
       if (feature.showLayer) {
         _this.map.addLayer(layer);
-
-        if (feature.zoomToLayer) {
-          _setBounds(feature);
-        }
       }
+      if (feature.zoomToLayer) {
+        _bounds.extend(layer.getBounds());
+      }
+    }
+
+    // Set final map extent once all Features are loaded
+    status = _app.Features.getLoadingStatus();
+    if (status === 'finished') {
+      _fitBounds();
     }
   };
 
@@ -405,11 +426,13 @@ var MapPane = function (options) {
    *   do this because Leaflet doesn't manipulate the map when it's not visible
    */
   _this.initView = function () {
-    if (_initialLoad) {
-      _fitBounds();
-    }
+    var status;
 
-    _initialLoad = false;
+    status = _app.Features.getLoadingStatus();
+    if (_initialLoad && status === 'finished') {
+      _fitBounds();
+      _initialLoad = false;
+    }
   };
 
   /**
