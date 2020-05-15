@@ -802,7 +802,7 @@ class Rtf {
       $this->_createTableBinnedData($section6, 'aftershocks', 'past');
 
       $section6->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $magThreshold+ Earthquake List ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
@@ -911,7 +911,7 @@ class Rtf {
       $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
 
       $section7->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $magThreshold+ Earthquake List ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
@@ -958,7 +958,7 @@ class Rtf {
       $this->_createTableBinnedData($section8, 'historical', 'prior');
 
       $section8->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $magThreshold+ Earthquake List ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
