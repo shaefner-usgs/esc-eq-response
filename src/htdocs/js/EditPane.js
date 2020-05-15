@@ -20,12 +20,12 @@ var AppUtil = require('AppUtil');
  *   {
  *     addFeature: {Function},
  *     addLoadingSpinner: {Function},
- *     focusedField: {String},
  *     initFeatures: {Function},
  *     removeFeature: {Function},
  *     reset: {Function},
  *     selSignificantEq: {Function},
  *     setDefaults: {Function},
+ *     setFocusedField: {Function}
  *     showMainshock: {Function}
  *   }
  */
@@ -38,6 +38,7 @@ var EditPane = function (options) {
       _eqid,
       _eqidPrevValue,
       _fields,
+      _focusedField,
       _timers,
 
       _addListener,
@@ -51,9 +52,9 @@ var EditPane = function (options) {
       _resetCounts,
       _resetForm,
       _resetTitle,
+      _saveFocusedField,
       _setFormFieldValues,
       _setQueryStringValues,
-      _storeFocus,
       _updateParam,
       _viewMap;
 
@@ -192,7 +193,7 @@ var EditPane = function (options) {
     _addListener(_fields, 'input', _updateParam);
 
     // Remember focused field
-    _addListener(_fields, 'focus', _storeFocus);
+    _addListener(_fields, 'focus', _saveFocusedField);
 
     // Load a new set of Feature layers when eqid is changed
     _addListener([_eqid], 'input', _loadEvent);
@@ -341,12 +342,12 @@ var EditPane = function (options) {
   };
 
   /**
-   * Store id of form field selected (focused) by user
+   * Save id of form field selected (focused) by user
    *
    * @param e {Event}
    */
-  _storeFocus = function (e) {
-    _this.focusedField = e.target.id;
+  _saveFocusedField = function (e) {
+    _focusedField = e.target.id;
   };
 
   /**
@@ -517,6 +518,19 @@ var EditPane = function (options) {
 
     // Next, update all form fields to match url params
     _setFormFieldValues();
+  };
+
+  /**
+   * Set focus to field last selected by user (or Event ID field by default)
+   */
+  _this.setFocusedField = function () {
+    var field;
+
+    field = 'eqid'; // default
+    if (_focusedField) {
+      field = _focusedField;
+    }
+    document.getElementById(field).focus();
   };
 
   /**
