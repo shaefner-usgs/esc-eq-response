@@ -388,7 +388,7 @@ var MapPane = function (options) {
       if (feature.showLayer) {
         _this.map.addLayer(layer);
       }
-      if (feature.zoomToLayer) {
+      if (feature.zoomToLayer && _initialLoad) {
         _bounds.extend(layer.getBounds());
       }
     }
