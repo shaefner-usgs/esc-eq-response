@@ -157,13 +157,15 @@ tr {
   padding: 2.5em 0 0;
   position: absolute;
   top: 0;
-  transition: opacity .15s ease-out;
+  transition: opacity .25s ease-out;
   width: 100%;
 
   &.hide {
+    display: none;
     max-height: 1vh;
     opacity: 0;
     overflow: hidden;
+    transition: none;
   }
 
   &#mapPane {
