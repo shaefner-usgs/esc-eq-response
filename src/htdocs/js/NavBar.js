@@ -76,9 +76,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Switch between panes in UI
-   *   show rendering message for first load of plots
-   *   track focused field on EditPane
+   * Switch to selected pane in UI
    *
    * @param id {String}
    */
@@ -118,15 +116,15 @@ var NavBar = function (options) {
 
     for (i = 0; i < _panes.length; i ++) {
       pane = _panes[i];
-      button = _el.querySelector('[href="#' + pane.getAttribute('id') + '"]');
-
-      button.classList.remove('selected');
       pane.classList.add('hide');
+
+      button = _el.querySelector('[href="#' + pane.getAttribute('id') + '"]');
+      button.classList.remove('selected');
     }
   };
 
   /**
-   * Render plots and display rendering message (Plots pane must be active first)
+   * Display rendering message (and render plots) when plots pane is activated
    */
   _renderPlots = function () {
     var numPlots;
@@ -147,7 +145,7 @@ var NavBar = function (options) {
       }, 25);
     }
 
-    _app.PlotsPane.resize(); // in case user adjusted window size
+    _app.PlotsPane.resize(); // in case user adjusted window size in another pane
   };
 
   /**
@@ -183,7 +181,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Show selected pane in UI/set scroll position; highlight selected nav button
+   * Show selected pane and set scroll position; highlight selected nav button
    *
    * @param id {String}
    */
@@ -197,7 +195,7 @@ var NavBar = function (options) {
     pane = document.getElementById(id);
     pane.classList.remove('hide');
 
-    _setScrollPosition(id); // scroll to user's former position
+    _setScrollPosition(id);
 
     // Map and plots need special care to display correctly when unhidden
     if (id === 'editPane') {
