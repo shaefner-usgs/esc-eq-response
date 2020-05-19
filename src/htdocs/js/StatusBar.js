@@ -111,23 +111,26 @@ var StatusBar = function (options) {
   /**
    * Add an error to status bar
    *
-   * @param id {String}
-   *     Feature id
-   * @param errorMsg {String}
+   * @param error {Object}
+   *   {
+   *     id: {String}, (Feature id)
+   *     message: {String}, (error message)
+   *     status: {Number} (status code; optional)
+   *   }
    */
-  _this.addError = function (id, errorMsg) {
+  _this.addError = function (error) {
     var div;
 
     div = document.createElement('div');
-    div.classList.add(id, 'error');
-    div.innerHTML = errorMsg +
+    div.classList.add(error.id, 'error');
+    div.innerHTML = error.message +
       '<a href="#" class="reload"></a>' +
       '<a href="#" class="close"></a>';
 
     // Remove any leftover items with this id, then add item
-    _this.removeItem(id);
+    _this.removeItem(error.id);
     _el.appendChild(div);
-    _addListeners(div, id);
+    _addListeners(div, error.id);
     _show();
   };
 

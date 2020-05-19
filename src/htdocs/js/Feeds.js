@@ -128,6 +128,7 @@ var Feeds = function (options) {
         if (xhr.responseText) {
           console.error(xhr.responseText);
         }
+
         if (status) {
           if (status.message) {
             errorMsg += '<li>' + status.message + '</li>';
@@ -138,7 +139,12 @@ var Feeds = function (options) {
         }
 
         errorMsg += '</ul>';
-        _app.StatusBar.addError(feed.id, errorMsg);
+
+        _app.StatusBar.addError({
+          id: feed.id,
+          message: errorMsg,
+          status: status
+        });
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -148,7 +154,10 @@ var Feeds = function (options) {
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
 
-        _app.StatusBar.addError(feed.id, errorMsg);
+        _app.StatusBar.addError({
+          id: feed.id,
+          message: errorMsg
+        });
       },
       timeout: 20000
     });

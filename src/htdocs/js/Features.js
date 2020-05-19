@@ -114,8 +114,11 @@ var Features = function (options) {
     catch (error) {
       console.error(error);
 
-      _app.StatusBar.addError(feature.id, '<h4>Error Adding ' + feature.name +
-        '</h4><ul><li>' + error + '</li></ul>');
+      _app.StatusBar.addError({
+        id: feature.id,
+        message: '<h4>Error Adding ' + feature.name + '</h4><ul><li>' + error +
+          '</li></ul>'
+      });
       _removeFeature(feature);
     }
   };
@@ -229,15 +232,14 @@ var Features = function (options) {
         if (feature.id === 'mainshock') {
           feature.json = json; // store mainshock json (used by other features)
         }
+
         feature.initFeature(json);
         _addFeature(feature);
-
         _app.StatusBar.removeItem(feature.id);
       },
       error: function (status, xhr) {
         errorMsg += '<ul>';
 
-        // Show response in console and add additional info to error message
         if (xhr.responseText) {
           console.error(xhr.responseText);
 
@@ -250,6 +252,7 @@ var Features = function (options) {
               'required)</li>';
           }
         }
+
         if (status) {
           if (status === 404 && feature.id === 'mainshock') {
             errorMsg += '<li>Event ID ' + _eqid + ' not found</li>';
@@ -264,7 +267,11 @@ var Features = function (options) {
 
         errorMsg += '</ul>';
 
-        _app.StatusBar.addError(feature.id, errorMsg);
+        _app.StatusBar.addError({
+          id: feature.id,
+          message: errorMsg,
+          status: status
+        });
         _removeFeature(feature);
       },
       ontimeout: function (xhr) {
@@ -275,7 +282,10 @@ var Features = function (options) {
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';
 
-        _app.StatusBar.addError(feature.id, errorMsg);
+        _app.StatusBar.addError({
+          id: feature.id,
+          message: errorMsg
+        });
         _removeFeature(feature);
       },
       timeout: 20000

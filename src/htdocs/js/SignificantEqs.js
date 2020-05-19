@@ -98,7 +98,7 @@ var SignificantEqs = function (options) {
       name: 'Significant Earthquakes'
     });
 
-    errorMsg = '<h4>Error Loading Significant Earthquakes</h4><ul>';
+    errorMsg = '<h4>Error Loading Significant Earthquakes</h4>';
     url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 
     Xhr.ajax({
@@ -108,10 +108,12 @@ var SignificantEqs = function (options) {
         _this.addSignificantEqs();
       },
       error: function (status, xhr) {
-        // Show response in console and add additional info to error message
+        errorMsg += '<ul>';
+
         if (xhr.responseText) {
           console.error(xhr.responseText);
         }
+
         if (status) {
           if (status.message) {
             errorMsg += '<li>' + status.message + '</li>';
@@ -120,9 +122,13 @@ var SignificantEqs = function (options) {
             errorMsg += '<li>http status code: ' + status + '</li>';
           }
         }
+
         errorMsg += '</ul>';
 
-        _app.StatusBar.addError('significant', errorMsg);
+        _app.StatusBar.addError({
+          id: 'significant',
+          message: errorMsg
+        });
       },
       ontimeout: function (xhr) {
         console.error(xhr);
@@ -130,7 +136,10 @@ var SignificantEqs = function (options) {
         errorMsg += '<li>Request timed out (can&rsquo;t connect to ' +
           'earthquake.usgs.gov)</li></ul>';
 
-        _app.StatusBar.addError('significant', errorMsg);
+        _app.StatusBar.addError({
+          id: 'significant',
+          message: errorMsg
+        });
       },
       timeout: 20000
     });
