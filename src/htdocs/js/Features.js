@@ -184,6 +184,8 @@ var Features = function (options) {
       if (feature.url) {
         _addLoadingSpinner(feature);
         _loadJson(feature);
+      } else { // no feed data available
+        feature.isLoading = false;
       }
     } else { // Feature does not require remote feed data
       feature.initFeature();
