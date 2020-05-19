@@ -16,6 +16,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *   {
  *     addError: {Function},
  *     addItem: {Function},
+ *     clearItems: {Function},
  *     hasError: {Function},
  *     removeItem: {Function},
  *     reset: {Function}
@@ -177,6 +178,17 @@ var StatusBar = function (options) {
     _this.removeItem(item.id);
     _el.appendChild(div);
     _show();
+  };
+
+  /**
+   * Clear all items from status bar (and hide)
+   */
+  _this.clearItems = function () {
+    while (_el.firstChild) {
+      _el.removeChild(_el.lastChild); // faster to remove lastChild
+    }
+
+    _hide();
   };
 
   /**
