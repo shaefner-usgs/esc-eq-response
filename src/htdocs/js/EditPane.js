@@ -260,10 +260,12 @@ var EditPane = function (options) {
       feature = _app.Features.getFeature(featureId);
 
       // Immediately show loading status (don't wait for trottle timers)
-      _app.StatusBar.addItem({
-        id: feature.id,
-        name: feature.name
-      });
+      if (feature) { // not set if Feature failed to load (e.g. bad request)
+        _app.StatusBar.addItem({
+          id: feature.id,
+          name: feature.name
+        });
+      }
 
       if (!_timers.hasOwnProperty(featureId)) {
         _timers[featureId] = [];
