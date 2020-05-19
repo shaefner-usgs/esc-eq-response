@@ -214,22 +214,33 @@ var EditPane = function (options) {
    * Load a new Event (triggered when the Event ID field is changed)
    */
   _loadEvent = function () {
-    var id = this.id;
+    var id = 'mainshock';
 
-    if (!_timers.hasOwnProperty(id)) {
-      _timers[id] = [];
+    if (this.value) {
+      // Immediately show loading status (don't wait for trottle timers)
+      _app.StatusBar.clearItems();
+      _app.StatusBar.addItem({
+        id: id,
+        name: 'Mainshock'
+      });
+
+      if (!_timers.hasOwnProperty(id)) {
+        _timers[id] = [];
+      }
+
+      _timers[id].forEach(function(timer) { // clear throttled requests
+        window.clearTimeout(timer);
+        _timers[id].shift();
+      });
+
+      _timers[id].push( // throttle requests
+        window.setTimeout(function() {
+          _this.initFeatures();
+        }, 500)
+      );
+    } else {
+      _app.resetApp();
     }
-
-    _timers[id].forEach(function(timer) { // clear throttled requests
-      window.clearTimeout(timer);
-      _timers[id].shift();
-    });
-
-    _timers[id].push( // throttle requests
-      window.setTimeout(function() {
-        _this.initFeatures();
-      }, 500)
-    );
   };
 
   /**
@@ -247,6 +258,12 @@ var EditPane = function (options) {
       div = this; // parent container of form field
       featureId = div.className;
       feature = _app.Features.getFeature(featureId);
+
+      // Immediately show loading status (don't wait for trottle timers)
+      _app.StatusBar.addItem({
+        id: feature.id,
+        name: feature.name
+      });
 
       if (!_timers.hasOwnProperty(featureId)) {
         _timers[featureId] = [];
