@@ -181,9 +181,11 @@ var Features = function (options) {
     }
 
     if (typeof(feature.url) === 'string') {
-      _addLoadingSpinner(feature);
-      _loadJson(feature);
-    } else { // Feature does not require remote feed data, or it's not available
+      if (feature.url) {
+        _addLoadingSpinner(feature);
+        _loadJson(feature);
+      }
+    } else { // Feature does not require remote feed data
       feature.initFeature();
       _addFeature(feature);
     }
