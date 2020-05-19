@@ -58,16 +58,19 @@ var StatusBar = function (options) {
     close = div.querySelector('.close');
     reload = div.querySelector('.reload');
 
-    close.addEventListener('click', function(e) {
-      e.preventDefault();
-      _this.removeItem(id);
-    });
-
-    reload.addEventListener('click', function(e) {
-      e.preventDefault();
-      _this.removeItem(id);
-      _app.Features.instantiateFeature(id);
-    });
+    if (close) {
+      close.addEventListener('click', function(e) {
+        e.preventDefault();
+        _this.removeItem(id);
+      });
+    }
+    if (reload) {
+      reload.addEventListener('click', function(e) {
+        e.preventDefault();
+        _this.removeItem(id);
+        _app.Features.instantiateFeature(id);
+      });
+    }
   };
 
   /**
@@ -119,13 +122,18 @@ var StatusBar = function (options) {
    *   }
    */
   _this.addError = function (error) {
-    var div;
+    var content,
+        div;
+
+    content = error.message;
+    if (error.status !== 400) {
+      content += '<a href="#" class="reload"></a>';
+    }
+    content += '<a href="#" class="close"></a>';
 
     div = document.createElement('div');
     div.classList.add(error.id, 'error');
-    div.innerHTML = error.message +
-      '<a href="#" class="reload"></a>' +
-      '<a href="#" class="close"></a>';
+    div.innerHTML = content;
 
     // Remove any leftover items with this id, then add item
     _this.removeItem(error.id);
