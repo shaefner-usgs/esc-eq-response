@@ -5,14 +5,27 @@ esc-eq-response Changelog
 
 An in-progress version being developed on the `master` branch.
 
-* Add loading spinners next to Feature's name on all panes while fetching data
-* Add count totals next to Feature's name on edit pane
-* Clean up hiding animation on Status Bar, which was janky sometimes
-* Add (2d) plots to Summary RTF
-* Formatting / typography / style tweaks to Summary RTF
+* Add Feature's name / loading spinners to map, plots, summary panes while fetching
+* Add loading spinners / count totals next to Feature's name on edit pane
+* Add reload button to Status bar when fetching fails
+* Add Distance (and direction from mainshock) in map popups
+* Add title tips to list tables: "View earthquake on map", "Sort by (field)"
+* Add (2d) plots to aftershocks, historical sections of Summary RTF
+* Tweak formatting / typography / style on Summary RTF
 * Disable RTF download button while features are refreshing
-* Don't show cumulative plots with only a single event
 * Remember focused field on edit pane when switching between panes
+* Don't show cumulative plots with only a single event
+* Don't alter map extent when tweaking Feature params (after viewing map for 1st time)
+* Bug fix: set correct layer visibility/map extent when selecting a new event
+* Bug fix: properly throttle repeated requests when tweaking params
+* Bug fix: round eq mag to tenths when calculating radius to size consistently
+* Bug fix: properly track showLayer prop for which Features to display on map
+* Clean up jankiness
+  - Feature refreshes happen as you type/more reliable - no more "phantom" map layers
+  - Stop "scroll jump" when switching between panes
+  - Status bar: fixes for animations/rendering plots; show immediately when tweaking params
+  - Zoom to initial map extent smoother when loading a new event
+* Code cleanup/optimization
 
 ## 0.7.0 (2020-04-03)
 
