@@ -126,7 +126,7 @@ var StatusBar = function (options) {
         div;
 
     content = error.message;
-    if (error.status !== 400) {
+    if (_app.Features.isFeature(error.id) && error.status !== 400) {
       content += '<a href="#" class="reload"></a>';
     }
     content += '<a href="#" class="close"></a>';

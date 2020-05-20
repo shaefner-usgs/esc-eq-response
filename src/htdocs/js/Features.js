@@ -52,6 +52,7 @@ _FEATURECLASSES = {
  *     getFeatures: {Function},
  *     getLoadingStatus: {Function},
  *     instantiateFeature: {Function},
+ *     isFeature: {Function},
  *     refreshFeature: {Function},
  *     reset: {Function}
  *   }
@@ -426,6 +427,25 @@ var Features = function (options) {
 
       _initFeature(feature);
     }
+  };
+
+  /**
+   * Check if id matches any Feature's id value
+   *
+   * @param id {String}
+   *
+   * @return isFeature {Boolean}
+   */
+  _this.isFeature = function (id) {
+    var isFeature = false;
+
+    Object.keys(_FEATURECLASSES).forEach(function(key) {
+      if (id === key) {
+        isFeature = true;
+      }
+    });
+
+    return isFeature;
   };
 
   /**
