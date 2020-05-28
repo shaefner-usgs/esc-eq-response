@@ -104,7 +104,7 @@ var FocalMechanism = function (options) {
 
     if (beachball) {
       // Render (hidden) beachball to DOM; move/unhide when layer is turned on
-      beachball.render(document.querySelector('#mapPane'));
+      beachball.render(document.getElementById('mapPane'));
 
       coords = [
         _mainshock.json.geometry.coordinates[1],

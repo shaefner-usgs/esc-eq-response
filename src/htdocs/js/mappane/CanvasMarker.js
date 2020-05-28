@@ -38,7 +38,7 @@ L.CanvasMarker = L.Marker.extend({
 
     className = this.options.icon.options.className;
     canvas = document.querySelector('.map canvas.' + className);
-    mapPane = document.querySelector('#mapPane');
+    mapPane = document.getElementById('mapPane');
 
     // Move canvas element from marker to below map
     if (canvas) {
