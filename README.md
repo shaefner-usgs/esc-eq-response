@@ -29,7 +29,7 @@ npm config get cafile
 
 ```
 
-3. Download PHPRtfLite and setup.
+3. Download [PHPRtfLite](https://github.com/phprtflite/PHPRtfLite) and setup.
 
 ```
 cd src-eq-response
