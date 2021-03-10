@@ -146,7 +146,7 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _cacheFeature = function (feature) {
-    if (!_prevFeatures.hasOwnProperty(feature.id)) {
+    if (!Object.prototype.hasOwnProperty.call(_prevFeatures, feature.id)) {
       _prevFeatures[feature.id] = [];
     }
 
@@ -180,8 +180,8 @@ var Features = function (options) {
       }
     }
 
-    if (_showLayer.hasOwnProperty(feature.id)) { // used cached value if set
-      feature.showLayer = _showLayer[feature.id];
+    if (Object.prototype.hasOwnProperty.call(_showLayer, feature.id)) {
+      feature.showLayer = _showLayer[feature.id]; // used cached value
     }
 
     if (typeof(feature.url) === 'string') {
@@ -278,7 +278,7 @@ var Features = function (options) {
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        matches = feature.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        matches = feature.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';

@@ -149,7 +149,7 @@ var Feeds = function (options) {
       ontimeout: function (xhr) {
         console.error(xhr);
 
-        matches = feed.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        matches = feed.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
         domain = matches && matches[1];
         errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
           ')</li></ul>';

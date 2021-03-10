@@ -68,10 +68,10 @@ __fromProduct = function (product) {
 
   if (type === 'focal-mechanism') {
     tensor = __fromStrikeDipRake(
-        Number(product['nodal-plane-1-strike']),
-        Number(product['nodal-plane-1-dip']),
-        Number(product['nodal-plane-1-rake'] || product['nodal-plane-1-slip'] || 0),
-        Number(product['scalar-moment'] || Math.SQRT2));
+      Number(product['nodal-plane-1-strike']),
+      Number(product['nodal-plane-1-dip']),
+      Number(product['nodal-plane-1-rake'] || product['nodal-plane-1-slip'] || 0),
+      Number(product['scalar-moment'] || Math.SQRT2));
   } else if (type === 'moment-tensor') {
     tensor = Tensor({
       mrr: Number(product['tensor-mrr']),
@@ -94,7 +94,7 @@ __fromProduct = function (product) {
     type = product['derived-magnitude-type'];
     if (!type) {
       type = product['beachball-type'];
-      if (type && _BEACHBALL_METHODS.hasOwnProperty(type)) {
+      if (type && Object.prototype.hasOwnProperty.call(_BEACHBALL_METHODS, type)) {
         type = _BEACHBALL_METHODS[type];
       }
     }
@@ -241,7 +241,7 @@ __sortEigenvalues = function (v1, v2) {
  * @param mtp {Number}
  *        mtp value in N-m.
  */
- Tensor = function (options) {
+Tensor = function (options) {
   var _this,
       _initialize;
 

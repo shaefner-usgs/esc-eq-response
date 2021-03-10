@@ -25,7 +25,6 @@ var NavBar = function (options) {
 
       _app,
       _el,
-      _navButtons,
       _panes,
       _throttle,
 
@@ -48,7 +47,6 @@ var NavBar = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('div');
-    _navButtons = _el.querySelectorAll('.panes a');
     _panes = document.querySelectorAll('section.pane');
 
     id = _getPaneId();

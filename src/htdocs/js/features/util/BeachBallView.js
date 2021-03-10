@@ -9,11 +9,9 @@ var _D2R,
     _DEFAULTS,
     _EPSILON,
     _MERGE_THRESHOLD,
-    _R2D,
     _SPLIT_THRESHOLD;
 
 _D2R = Math.PI / 180;
-_R2D = 180 / Math.PI;
 
 _EPSILON = Number.EPSILON || 1e-16;
 
@@ -563,12 +561,12 @@ var BeachBallView = function (options) {
     // create hidden element with text content
     el = document.createElement('div');
     el.setAttribute('style',
-        'height:auto;' +
-        'position:absolute;' +
-        'visibility:hidden;' +
-        'white-space:nowrap;' +
-        'width:auto;' +
-        'font:' + font + ';');
+      'height:auto;' +
+      'position:absolute;' +
+      'visibility:hidden;' +
+      'white-space:nowrap;' +
+      'width:auto;' +
+      'font:' + font + ';');
     el.innerText = text;
 
     // add to view element and measure
@@ -598,12 +596,12 @@ var BeachBallView = function (options) {
 
     point = _this.getVectorPoint(axis);
     _canvas.text(text,
-        _labelAxesFont,
-        _this.projectX(point.x),
-        _this.projectY(point.y),
-        null,
-        'black',
-        'center');
+      _labelAxesFont,
+      _this.projectX(point.x),
+      _this.projectY(point.y),
+      null,
+      'black',
+      'center');
   };
 
   /**
@@ -621,16 +619,16 @@ var BeachBallView = function (options) {
 
     tick = label.tick;
     _canvas.line(
-        tick.x.map(_this.projectX),
-        tick.y.map(_this.projectY),
-        'black');
+      tick.x.map(_this.projectX),
+      tick.y.map(_this.projectY),
+      'black');
 
     _canvas.text(label.text, label.font,
-        _this.projectX(label.x),
-        _this.projectY(label.y),
-        null,
-        'black',
-        label.align);
+      _this.projectX(label.x),
+      _this.projectY(label.y),
+      null,
+      'black',
+      label.align);
   };
 
   /**
@@ -832,10 +830,10 @@ var BeachBallView = function (options) {
     // draw polygons
     polygons.forEach(function(p) {
       _canvas.polygon(
-          p.x.map(_this.projectX),
-          p.y.map(_this.projectY),
-          _lineColor,
-          _fillColor);
+        p.x.map(_this.projectX),
+        p.y.map(_this.projectY),
+        _lineColor,
+        _fillColor);
     });
 
     // draw nodal plane lines
@@ -844,9 +842,9 @@ var BeachBallView = function (options) {
         var line;
         line = _this.getPlaneLine(np);
         _canvas.line(
-            line.x.map(_this.projectX),
-            line.y.map(_this.projectY),
-            _lineColor);
+          line.x.map(_this.projectX),
+          line.y.map(_this.projectY),
+          _lineColor);
       });
     }
 

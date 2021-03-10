@@ -115,7 +115,7 @@ var MapPane = function (options) {
       if (e.type === 'overlayadd') {
         showLayer = true;
       }
-      if (feature && feature.hasOwnProperty('showLayer')) {
+      if (feature && Object.prototype.hasOwnProperty.call(feature, 'showLayer')) {
         feature.showLayer = showLayer;
       }
     });
@@ -366,7 +366,7 @@ var MapPane = function (options) {
       layer.id = feature.id; // attach Feature id to Leaflet layer
 
       name = feature.name;
-      if (feature.hasOwnProperty('count')) {
+      if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
         name += '<span class="count">' + feature.count + '</span>';
       }
 
@@ -409,7 +409,7 @@ var MapPane = function (options) {
     var layer,
         name;
 
-    if (feature.hasOwnProperty('mapLayer')) {
+    if (Object.prototype.hasOwnProperty.call(feature, 'mapLayer')) {
       layer = L.layerGroup(); // empty placeholder layer
       layer.id = feature.id;
       name = feature.name + '<div class="spinner"><div></div></div>';

@@ -136,12 +136,13 @@ var FieldNotes = function (options) {
         '</a>';
     }
 
-    innerHTML = L.Util.template('<h4>{title}</h4>' +
-      '<time>{timestamp} {timezone}</time>' +
-      '<p class="description">{description}</p>' +
-      '<p class="notes">{notes}</p>' +
-      img + _getCustomProps(props) +
-      '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>',
+    innerHTML = L.Util.template(
+      '<h4>{title}</h4>' +
+        '<time>{timestamp} {timezone}</time>' +
+        '<p class="description">{description}</p>' +
+        '<p class="notes">{notes}</p>' +
+        img + _getCustomProps(props) +
+        '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>',
       props
     );
 

@@ -1,15 +1,8 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
-
-
-var _DEFAULTS = {};
-
 /**
  * Create a lightbox overlay
- *
- * @param options {Object}
  *
  * @return _this {Object}
  *   {
@@ -19,19 +12,14 @@ var _DEFAULTS = {};
  *     show: {Function}
  *   }
  */
-var Lightbox = function (options) {
+var Lightbox = function () {
   var _this,
-      _initialize,
 
       _addListener,
       _handleEscapeKey;
 
 
   _this = {};
-
-  _initialize = function (options) {
-    options = Util.extend({}, _DEFAULTS, options);
-  };
 
   /**
    * Add listener for close button
@@ -123,9 +111,6 @@ var Lightbox = function (options) {
     document.addEventListener('keydown', _handleEscapeKey);
   };
 
-
-  _initialize(options);
-  options = null;
   return _this;
 };
 

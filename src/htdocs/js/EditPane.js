@@ -224,7 +224,7 @@ var EditPane = function (options) {
         name: 'Mainshock'
       });
 
-      if (!_timers.hasOwnProperty(id)) {
+      if (!Object.prototype.hasOwnProperty.call(_timers, id)) {
         _timers[id] = [];
       }
 
@@ -267,7 +267,7 @@ var EditPane = function (options) {
         });
       }
 
-      if (!_timers.hasOwnProperty(featureId)) {
+      if (!Object.prototype.hasOwnProperty.call(_timers, featureId)) {
         _timers[featureId] = [];
       }
 
@@ -417,8 +417,9 @@ var EditPane = function (options) {
       spinner = div.querySelector('.spinner');
       spinner.classList.add('hide');
 
+      // Add count if applicable
       count = div.querySelector('.count');
-      if (count && feature.hasOwnProperty('count')) { // add count if applicable
+      if (count && Object.prototype.hasOwnProperty.call(feature, 'count')) {
         count.textContent = feature.count;
         count.classList.remove('hide');
       }

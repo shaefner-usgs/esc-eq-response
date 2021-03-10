@@ -378,7 +378,8 @@ var PlotsPane = function (options) {
         spinner.classList.add('hide');
       }
 
-      if (feature.hasOwnProperty('count')) { // add count to Feature name
+      // Add count to Feature name
+      if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
         count = document.createElement('span');
         count.classList.add('count', 'hide');
         count.textContent = feature.count;
@@ -390,7 +391,7 @@ var PlotsPane = function (options) {
         count.classList.remove('hide');
       }
 
-      div.insertAdjacentHTML('beforeend', feature.description); // preserves CSS transition
+      div.insertAdjacentHTML('beforeend', feature.description); // preserve CSS transition
 
       params = {};
       Object.keys(feature.plotTraces).forEach(function(plotId) {
@@ -423,7 +424,9 @@ var PlotsPane = function (options) {
     var div;
 
     // Mainshock is included in other Features' plots, but not separately
-    if (feature.hasOwnProperty('plotTraces') && feature.id !== 'mainshock') {
+    if (Object.prototype.hasOwnProperty.call(feature, 'plotTraces') &&
+      feature.id !== 'mainshock'
+    ) {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
       div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +

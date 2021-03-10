@@ -20,8 +20,6 @@ _DEFAULTS = {
 /**
  * Creates <svg> elements
  *
- * @param options {Object}
- *
  * @return _this {Object}
  *   {
  *     getBeachBall: {Function},
@@ -31,16 +29,11 @@ _DEFAULTS = {
  *     getTriangle: {Function}
  *   }
  */
-var Svg = function (options) {
-  var _this,
-      _initialize;
+var Svg = function () {
+  var _this;
 
 
   _this = {};
-
-  _initialize = function (options) {
-    options = options || {};
-  };
 
   // ----------------------------------------------------------
   // Public methods
@@ -134,31 +127,31 @@ var Svg = function (options) {
    *
    * @return ol {Element}
    */
-   _this.getCircleRange = function (opts) {
-      var circle,
-          i,
-          li,
-          max,
-          min,
-          ol;
+  _this.getCircleRange = function (opts) {
+    var circle,
+        i,
+        li,
+        max,
+        min,
+        ol;
 
-      opts = opts || {};
-      max = opts.max || 7;
-      min = opts.min || 0;
-      ol = document.createElement('ol');
-      ol.classList.add('mags');
+    opts = opts || {};
+    max = opts.max || 7;
+    min = opts.min || 0;
+    ol = document.createElement('ol');
+    ol.classList.add('mags');
 
-      for (i = min; i <= max; i ++) {
-        li = document.createElement('li');
-        circle = _this.getCircle({
-          radius: AppUtil.getRadius(i)
-        });
-        li.appendChild(circle);
-        ol.appendChild(li);
-      }
+    for (i = min; i <= max; i ++) {
+      li = document.createElement('li');
+      circle = _this.getCircle({
+        radius: AppUtil.getRadius(i)
+      });
+      li.appendChild(circle);
+      ol.appendChild(li);
+    }
 
-      return ol;
-   };
+    return ol;
+  };
 
   /**
    * Create an SVG line segment
@@ -223,8 +216,6 @@ var Svg = function (options) {
   };
 
 
-  _initialize(options);
-  options = null;
   return _this;
 };
 

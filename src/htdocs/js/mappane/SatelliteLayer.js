@@ -53,7 +53,7 @@ L.SatelliteLayer = function (provider, options) {
     _places = L.tileLayer(_placesUrl, options);
     _transportationUrl = 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}';
     _transportation = L.tileLayer(_transportationUrl, options);
-    return L.layerGroup([_base, _places]);
+    return L.layerGroup([_base, _places, _transportation]);
   } else {
     return _base;
   }

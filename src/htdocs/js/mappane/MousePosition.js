@@ -60,7 +60,7 @@ L.Control.MousePosition = L.Control.extend({
 });
 
 L.Map.mergeOptions({
-    positionControl: false
+  positionControl: false
 });
 
 L.Map.addInitHook(function () {

@@ -128,7 +128,7 @@ AppUtil.getTimeZone = function () {
   now = new Date().toString();
   try {
     if (now.indexOf('(') > -1) {
-      tz = now.match(/\([^\)]+\)/)[0].match(/[A-Z]/g).join('');
+      tz = now.match(/\([^)]+\)/)[0].match(/[A-Z]/g).join('');
     } else {
       tz = now.match(/[A-Z]{3,4}/)[0];
     }
@@ -179,9 +179,11 @@ AppUtil.romanize = function (num) {
   }
   num = Math.round(num) || 1; // return 'I' for values less than 1
   digits = String(num).split('');
-  key = ['','C','CC','CCC','CD','D','DC','DCC','DCCC','CM',
-         '','X','XX','XXX','XL','L','LX','LXX','LXXX','XC',
-         '','I','II','III','IV','V','VI','VII','VIII','IX'];
+  key = [
+    '', 'C', 'CC', 'CCC', 'CD', 'D', 'DC', 'DCC', 'DCCC', 'CM',
+    '', 'X', 'XX', 'XXX', 'XL', 'L', 'LX', 'LXX', 'LXXX', 'XC',
+    '', 'I' ,'II' ,'III' ,'IV' ,'V' ,'VI' ,'VII' ,'VIII' ,'IX'
+  ];
   roman = '';
   i = 3;
 

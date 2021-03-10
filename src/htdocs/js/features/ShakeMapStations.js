@@ -53,7 +53,6 @@ var ShakeMapStations = function (options) {
   var _this,
       _initialize,
 
-      _app,
       _markerOptions,
       _shakemap,
 
@@ -79,7 +78,6 @@ var ShakeMapStations = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
     mainshock = options.app.Features.getFeature('mainshock');
 
-    _app = options.app;
     _markerOptions = options.markerOptions;
     _shakemap = mainshock.json.properties.products.shakemap;
 
@@ -110,23 +108,23 @@ var ShakeMapStations = function (options) {
 
     return [
       '<tr>',
-        '<th scope="row" class="station-channel-name freeze">',
-          channel.name,
-        '</th>',
-        '<td class="station-channel-pga">',
-          _formatComponent(amplitude.pga),
-        '</td>',
-        '<td class="station-channel-pgv">',
-          _formatComponent(amplitude.pgv),
-        '</td>',
-        '<td class="station-channel-psa03">',
-          _formatComponent(amplitude.psa03),
-        '<td class="station-channel-psa10">',
-          _formatComponent(amplitude.psa10),
-        '</td>',
-        '<td class="station-channel-psa30">',
-          _formatComponent(amplitude.psa30),
-        '</td>',
+      '  <th scope="row" class="station-channel-name freeze">',
+      channel.name,
+      '  </th>',
+      '  <td class="station-channel-pga">',
+      _formatComponent(amplitude.pga),
+      '  </td>',
+      '  <td class="station-channel-pgv">',
+      _formatComponent(amplitude.pgv),
+      '  </td>',
+      '  <td class="station-channel-psa03">',
+      _formatComponent(amplitude.psa03),
+      '  <td class="station-channel-psa10">',
+      _formatComponent(amplitude.psa10),
+      '  </td>',
+      '  <td class="station-channel-psa30">',
+      _formatComponent(amplitude.psa30),
+      '  </td>',
       '</tr>'
     ].join('');
   };
@@ -136,15 +134,15 @@ var ShakeMapStations = function (options) {
 
     var markup = [
       '<div class="scroll-wrapper">',
-        '<table class="station-channels-map">',
-          '<tr>',
-            '<th scope="col" class="station-channels-map-name freeze">name</th>',
-            '<th scope="col" class="station-channels-map-pga">pga</th>',
-            '<th scope="col" class="station-channels-map-pgv">pgv</th>',
-            '<th scope="col" class="station-channels-map-psa03">psa03</th>',
-            '<th scope="col" class="station-channels-map-psa10">psa10</th>',
-            '<th scope="col" class="station-channels-map-psa30">psa30</th>',
-          '</tr>',
+      '  <table class="station-channels-map">',
+      '    <tr>',
+      '      <th scope="col" class="station-channels-map-name freeze">name</th>',
+      '      <th scope="col" class="station-channels-map-pga">pga</th>',
+      '      <th scope="col" class="station-channels-map-pgv">pgv</th>',
+      '      <th scope="col" class="station-channels-map-psa03">psa03</th>',
+      '      <th scope="col" class="station-channels-map-psa10">psa10</th>',
+      '      <th scope="col" class="station-channels-map-psa30">psa30</th>',
+      '    </tr>',
     ];
 
     for (; i < numChannels; i++) {
@@ -184,7 +182,7 @@ var ShakeMapStations = function (options) {
         content.push(parseFloat(value, 10).toFixed(3));
 
         // display flag with title text
-        if (_FLAG_DESCRIPTIONS.hasOwnProperty(flag)) {
+        if (Object.prototype.hasOwnProperty.call(_FLAG_DESCRIPTIONS, flag)) {
           content.push('<abbr title="' + _FLAG_DESCRIPTIONS[flag] + '">(' +
               flag + ')</abbr>');
         } else {
@@ -205,7 +203,7 @@ var ShakeMapStations = function (options) {
 
   _formatLocation = function (feature) {
     return ((feature.properties.location) ?
-        (feature.properties.location + '<br/>') : '') + ' (' +
+      (feature.properties.location + '<br/>') : '') + ' (' +
         feature.geometry.coordinates[1] + ', ' +
         feature.geometry.coordinates[0] + ')';
   };
@@ -232,44 +230,46 @@ var ShakeMapStations = function (options) {
     var p = feature.properties,
         romanIntensity = AppUtil.romanize(p.intensity) || 'I';
 
-    var markup = ['<div class="station-popup">',
-      '<h4 class="station-title">', _formatTitle(feature), '</h4>',
-      '<ul class="station-summary">',
-        '<li class="station-summary-intensity roman mmi', romanIntensity, '">',
-          romanIntensity,
-          '<br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
-        '</li>',
-        '<li class="station-summary-pga">',
-          AppUtil.round(p.pga, 3, '&ndash;'),
-          '<br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
-        '</li>',
-        '<li class="station-summary-pgv">',
-          AppUtil.round(p.pgv, 3, '&ndash;'),
-          '<br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
-        '</li>',
-        '<li class="station-summary-distance">',
-          AppUtil.round(p.distance, 1, '&ndash;'),' km',
-          '<br><abbr title="Distance (km)">Dist</abbr></br>',
-        '</li>',
-      '</ul>',
-      '<dl class="station-metadata horizontal">',
-        '<dt class="station-metadata-network">Network</dt>',
-        '<dd class="station-metadata-network">',
-          (p.network || '&ndash;'),
-        '</dd>',
-        '<dt class="station-metadata-location">Location</dt>',
-        '<dd class="station-metadata-location">',
-          _formatLocation(feature),
-        '</dd>',
-        '<dt class="station-metadata-source">Source</dt>',
-        '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
-        '<dt class="station-metadata-intensity">Intensity</dt>',
-        '<dd class="station-metadata-intensity">',
-          AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
-        '</dd>',
-      '</dl>',
+    var markup = [
+      '<div class="station-popup">',
+      '  <h4 class="station-title">', _formatTitle(feature), '</h4>',
+      '  <ul class="station-summary">',
+      '    <li class="station-summary-intensity roman mmi', romanIntensity, '">',
+      romanIntensity,
+      '      <br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
+      '    </li>',
+      '    <li class="station-summary-pga">',
+      AppUtil.round(p.pga, 3, '&ndash;'),
+      '      <br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
+      '    </li>',
+      '    <li class="station-summary-pgv">',
+      AppUtil.round(p.pgv, 3, '&ndash;'),
+      '      <br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
+      '    </li>',
+      '    <li class="station-summary-distance">',
+      AppUtil.round(p.distance, 1, '&ndash;'),' km',
+      '      <br><abbr title="Distance (km)">Dist</abbr></br>',
+      '    </li>',
+      '  </ul>',
+      '  <dl class="station-metadata horizontal">',
+      '    <dt class="station-metadata-network">Network</dt>',
+      '    <dd class="station-metadata-network">',
+      (p.network || '&ndash;'),
+      '    </dd>',
+      '    <dt class="station-metadata-location">Location</dt>',
+      '    <dd class="station-metadata-location">',
+      _formatLocation(feature),
+      '    </dd>',
+      '    <dt class="station-metadata-source">Source</dt>',
+      '    <dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
+      '    <dt class="station-metadata-intensity">Intensity</dt>',
+      '    <dd class="station-metadata-intensity">',
+      AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
+      '    </dd>',
+      '  </dl>',
       _createChannelTable(p.channels),
-    '</div>'];
+      '</div>'
+    ];
 
     return markup.join('');
   };
@@ -366,7 +366,6 @@ var ShakeMapStations = function (options) {
   _this.destroy = function () {
     _initialize = null;
 
-    _app = null;
     _markerOptions = null;
     _shakemap = null;
 

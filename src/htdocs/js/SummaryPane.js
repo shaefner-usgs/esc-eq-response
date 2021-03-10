@@ -220,13 +220,13 @@ var SummaryPane = function (options) {
       return a - b;
     };
     Tablesort.extend('number', function(item) {
-      return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
-        item.match(/^-?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
-        item.match(/^-?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
-      }, function(a, b) {
-        a = cleanNumber(a);
-        b = cleanNumber(b);
-        return compareNumber(b, a);
+      return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+        item.match(/^-?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+        item.match(/^-?(\d)*-?([,.]){0,1}-?(\d)+([E,e][-+][\d]+)?%?$/); // Number
+    }, function(a, b) {
+      a = cleanNumber(a);
+      b = cleanNumber(b);
+      return compareNumber(b, a);
     });
 
     table = _el.querySelector('.' + id + ' .sortable');
@@ -354,7 +354,8 @@ var SummaryPane = function (options) {
         spinner.classList.add('hide');
       }
 
-      if (feature.hasOwnProperty('count')) { // add count to Feature name
+      // Add count to Feature name
+      if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
         count = document.createElement('span');
         count.classList.add('count', 'hide');
         count.textContent = feature.count;
@@ -366,9 +367,9 @@ var SummaryPane = function (options) {
         count.classList.remove('hide');
       }
 
-      div.insertAdjacentHTML('beforeend', feature.summary); // preserves CSS transition
+      div.insertAdjacentHTML('beforeend', feature.summary); // preserve CSS transition
 
-      if (feature.hasOwnProperty('beachball')) {
+      if (Object.prototype.hasOwnProperty.call(feature, 'beachball')) {
         feature.beachball.render(_el.querySelector('.' + feature.id + ' a'));
       }
       if (div.classList.contains('placeholder')) {
@@ -405,7 +406,7 @@ var SummaryPane = function (options) {
     // Some Features are rendered in an existing placeholder (in mainshock section)
     placeholder = _el.querySelector('.' + feature.id + '.placeholder');
 
-    if (feature.hasOwnProperty('summary') && !placeholder) {
+    if (Object.prototype.hasOwnProperty.call(feature, 'summary') && !placeholder) {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
       div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +

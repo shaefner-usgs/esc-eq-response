@@ -68,8 +68,6 @@ var Canvas = function (options) {
   _this.clear = function () {
     if (_context.clearRect) {
       _context.clearRect(0, 0, _canvas.width, _canvas.height);
-    } else {
-      _canvas.width = _canvas.width;
     }
   };
 
