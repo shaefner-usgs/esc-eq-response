@@ -37,7 +37,7 @@ html {
 
 a {
   color: $link-color;
-  text-decoration-color: color($link-color tint(75%));
+  text-decoration-color: scale-color($link-color, $lightness: 75%);
   text-decoration-skip-ink: none;
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
@@ -47,7 +47,7 @@ a {
     color: $link-color-active;
   }
   &:hover {
-    text-decoration-color: color($link-color tint(25%));
+    text-decoration-color: scale-color($link-color, $lightness: 25%);
   }
   &:visited {
     color: $link-color-visited;

@@ -20,8 +20,8 @@
     transition: all .25s ease-in;
 
     &:hover {
-      background-color: color($accent-color-lighter lightness(92%));
-      color: color($link-color whiteness(25%));
+      background-color: scale-color($accent-color-lighter, $lightness: -3%);
+      color: scale-color($link-color, $blackness: 5%);
     }
     &.selected {
       background-color: $link-color;

@@ -39,13 +39,13 @@
       }
 
       &:hover {
-        border-color: color($accent-color tint(50%));
+        border-color: scale-color($accent-color, $whiteness: 50%);
         color: $accent-color;
         transition-duration: 0s;
 
         abbr {
-          color: color($accent-color tint(40%));
-          border-color: color($accent-color tint(40%));
+          color: scale-color($accent-color, $whiteness: 40%);
+          border-color: scale-color($accent-color, $whiteness: 40%);
           transition-duration: 0s;
         }
         h4 {

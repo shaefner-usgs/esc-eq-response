@@ -66,12 +66,12 @@
     }
 
     .plotly [data-title]:after {
-      background: color($accent-color alpha(8%));
+      background: scale-color($accent-color, $alpha: -92%);
       color: $accent-color;
     }
 
     .plotly [data-title]:before {
-      border-color: transparent transparent color($accent-color alpha(8%));
+      border-color: transparent transparent scale-color($accent-color, $alpha: -92%);
     }
   }
 

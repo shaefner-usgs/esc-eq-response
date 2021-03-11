@@ -4,7 +4,7 @@
 button {
   -webkit-appearance: button;
   background-color: $accent-color;
-  border: 1px solid color($accent-color shade(15%));
+  border: 1px solid scale-color($accent-color, $blackness: 15%);
   border-radius: 4px;
   color: #fff;
   cursor: pointer;
@@ -23,8 +23,8 @@ button {
   &:active,
   &:hover,
   &:focus {
-    background-color: color($accent-color tint(8%));
-    border-color: color($accent-color shade(50%));
+    background-color: scale-color($accent-color, $whiteness: 8%);
+    border-color: scale-color($accent-color, $blackness: 50%);
   }
 
   &:active {
@@ -43,15 +43,15 @@ button {
 
   &.reset {
     background-color: $reset-button-color;
-    border-color: color($reset-button-color shade(15%));
+    border-color: scale-color($reset-button-color, $blackness: 15%);
     color: $text-color-lighter;
     text-shadow: 1px 1px 3px #ddd;
 
     &:active,
     &:hover,
     &:focus {
-      background-color: color($reset-button-color tint(30%));
-      border-color: color($reset-button-color shade(25%));
+      background-color: scale-color($reset-button-color, $whiteness: 30%);
+      border-color: scale-color($reset-button-color, $blackness: 25%);
     }
   }
 }
@@ -131,7 +131,7 @@ input[type=text], input[type=number] {
 --------------------------------------------- */
 
 $track-w: 18em;
-$track-h: 4px;
+$track-h: .25em;
 $thumb-d: 1.2em;
 $track-c: $accent-color;
 $track-bg: $border-color;
@@ -206,12 +206,12 @@ div.filter {
     background: $bg-color;
     color: $text-color;
     display: block;
-    left: calc(.5 * $thumb-d);
+    left: .5 * $thumb-d;
     line-height: 1;
     padding: .25em .5em;
     position: absolute;
     top: 0;
-    transform: translate(calc((var(--val) - var(--min))/(var(--max) - var(--min)) * calc($dist) - 50%));
+    transform: translate(calc((var(--val) - var(--min)) / (var(--max) - var(--min)) * #{$dist} - 50%));
   }
 
   &::-moz-focus-outer {
@@ -229,7 +229,7 @@ div.filter {
   }
 
   &::-webkit-slider-thumb {
-    margin-top: calc(.5 * ($track-h - $thumb-d));
+    margin-top: .5 * ($track-h - $thumb-d);
     @include thumb
   }
   &::-moz-range-thumb {

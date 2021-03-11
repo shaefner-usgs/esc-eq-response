@@ -10,7 +10,7 @@ $font-size: 15px;
 
 $accent-color: #7234dc; /*#6e00ff*/
 $accent-color-lighter: hsla(262, 46%, 95%, .96);
-$accent-color-lightest: color($accent-color alpha(3%));
+$accent-color-lightest: scale-color($accent-color, $alpha: -97%);
 
 $bg-color: #fff;
 $bg-color-darker: #f7f7f7;
