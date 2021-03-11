@@ -2,7 +2,7 @@
 
 
 var AppUtil = require('AppUtil'),
-    Xhr = require('util/Xhr');
+    Xhr = require('hazdev-webutils/src/util/Xhr');
 
 
 /**

@@ -6,7 +6,7 @@ var HistoricalEvents = require('feeds/HistoricalEvents'),
     PagerComments = require('feeds/PagerComments'),
     ShakeMapInfo = require('feeds/ShakeMapInfo'),
     ShakeAlert = require('feeds/ShakeAlert'),
-    Xhr = require('util/Xhr');
+    Xhr = require('hazdev-webutils/src/util/Xhr');
 
 
 var _FEEDCLASSES;

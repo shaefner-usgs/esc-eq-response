@@ -12,7 +12,7 @@ var Aftershocks = require('features/Aftershocks'),
     PagerCities = require('features/PagerCities'),
     PagerExposures = require('features/PagerExposures'),
     ShakeMapStations = require('features/ShakeMapStations'),
-    Xhr = require('util/Xhr');
+    Xhr = require('hazdev-webutils/src/util/Xhr');
 
 
 var _FEATURECLASSES;
