@@ -41,7 +41,7 @@ var copy = {
     filter: 'isFile',
     rename: function (dest, src) {
       // grab 'src' version of Leaflet to make debugging easier (uglified for dist)
-      var newName = src.replace(/leaflet-src\.js(.map)?$/, 'leaflet.js$1');
+      var newName = src.replace(/leaflet-src\.js$/, 'leaflet.js');
 
       return dest + '/' + newName;
     },
