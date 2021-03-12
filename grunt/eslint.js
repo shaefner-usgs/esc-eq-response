@@ -1,11 +1,13 @@
 'use strict';
 
 
-var config = require('./config');
+var config = require('./config'),
+    summary = require('eslint-summary');
 
 var eslint = {
   options: {
-    configFile: '.eslintrc.json'
+    configFile: '.eslintrc.json',
+    format: summary
   },
 
   build: {
