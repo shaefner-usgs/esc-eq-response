@@ -15,9 +15,6 @@ var watch = {
   },
 
   js: {
-    options: {
-      spawn: false
-    },
     files: [
       config.src + '/htdocs/**/*.js'
     ],
@@ -27,7 +24,7 @@ var watch = {
     ]
   },
 
-  livereload: {
+  liveReload: {
     options: {
       livereload: config.liveReloadPort
     },
