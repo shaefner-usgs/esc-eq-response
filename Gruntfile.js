@@ -19,6 +19,7 @@ module.exports = function (grunt) {
     'eslint',
     'browserify',
     'sass',
+    'postcss:build',
     'copy:build',
     'copy:leaflet',
     'connect:build'
@@ -27,7 +28,7 @@ module.exports = function (grunt) {
   grunt.registerTask('dist', [
     'build',
     'clean:dist',
-    'postcss',
+    'postcss:dist',
     'uglify',
     'copy:dist',
     'connect:dist'

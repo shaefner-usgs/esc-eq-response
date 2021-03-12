@@ -4,14 +4,28 @@
 var config = require('./config');
 
 var postcss = {
-  options: {
-    processors: [
-      require('autoprefixer')(),
-      require('cssnano')() // minify
-    ]
+  build: {
+    options: {
+      processors: [
+        require('autoprefixer')(),
+      ]
+    },
+    files: [{
+      cwd: config.build + '/' + config.src,
+      dest: config.build + '/' + config.src,
+      expand: true,
+      src: [
+        'htdocs/**/*.css'
+      ]
+    }]
   },
 
   dist: {
+    options: {
+      processors: [
+        require('cssnano')() // minify
+      ]
+    },
     files: [{
       cwd: config.build + '/' + config.src,
       dest: config.dist,

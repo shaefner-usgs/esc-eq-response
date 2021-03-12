@@ -38,7 +38,8 @@ var watch = {
       config.src + '/htdocs/**/*.scss'
     ],
     tasks: [
-      'sass'
+      'sass',
+      'postcss:build'
     ]
   },
 
