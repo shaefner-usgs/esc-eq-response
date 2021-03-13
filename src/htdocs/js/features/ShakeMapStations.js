@@ -179,7 +179,7 @@ var ShakeMapStations = function (options) {
       // Add flag class for all non-zero flags
       if (flag && flag !== '0') {
         content.push('<span class="station-flag">');
-        content.push(parseFloat(value, 10).toFixed(3));
+        content.push(parseFloat(value, 10).toFixed(2));
 
         // display flag with title text
         if (Object.prototype.hasOwnProperty.call(_FLAG_DESCRIPTIONS, flag)) {
@@ -191,7 +191,7 @@ var ShakeMapStations = function (options) {
         content.push('</span>');
       } else {
         content.push('<span>');
-        content.push(parseFloat(value, 10).toFixed(3));
+        content.push(parseFloat(value, 10).toFixed(2));
         content.push('</span>');
       }
     } else {
@@ -240,16 +240,16 @@ var ShakeMapStations = function (options) {
               '<br><abbr title="Modified Mercalli Intensity">mmi</abbr></br>',
             '</li>',
             '<li class="station-summary-pga">',
-              AppUtil.round(p.pga, 3, '&ndash;'),
+              AppUtil.round(p.pga, 2),
               '<br><abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr></br>',
             '</li>',
             '<li class="station-summary-pgv">',
-              AppUtil.round(p.pgv, 3, '&ndash;'),
+              AppUtil.round(p.pgv, 2),
               '<br><abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr></br>',
             '</li>',
             '<li class="station-summary-distance">',
-              AppUtil.round(p.distance, 1, '&ndash;'),' km',
-              '<br><abbr title="Distance (km)">Dist</abbr></br>',
+              AppUtil.round(p.distance, 1), ' km',
+              '<br><abbr title="Distance">Dist</abbr></br>',
             '</li>',
           '</ul>',
           '<dl class="station-metadata horizontal">',
@@ -265,7 +265,7 @@ var ShakeMapStations = function (options) {
             '<dd class="station-metadata-source">', (p.source || '&ndash;'), '</dd>',
             '<dt class="station-metadata-intensity">Intensity</dt>',
             '<dd class="station-metadata-intensity">',
-              AppUtil.round(p.intensity, 1/*, '&ndash;'*/),
+              AppUtil.round(p.intensity, 1),
             '</dd>',
           '</dl>',
         _createChannelTable(p.channels),
