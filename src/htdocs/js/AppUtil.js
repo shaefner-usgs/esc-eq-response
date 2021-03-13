@@ -209,7 +209,7 @@ AppUtil.round = function (num, precision, empty) {
   var multiplier,
       rounded;
 
-  if (!num && num !== 0) {
+  if (!num && num !== 0 || num === 'null') { // 'null' value might be a string
     return empty || '&ndash;';
   }
 
