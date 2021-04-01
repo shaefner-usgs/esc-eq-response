@@ -283,6 +283,7 @@ var MapPane = function (options) {
 
     _this.map = L.map(_el.querySelector('.map'), {
       layers: layers,
+      tap: false, // fix for popups not opening in Safari, see: https://github.com/Leaflet/Leaflet/issues/7255
       worldCopyJump: true
     });
 
