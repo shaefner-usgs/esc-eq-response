@@ -21,8 +21,7 @@ module.exports = function (grunt) {
     'sass',
     'postcss:build',
     'copy:build',
-    'copy:leaflet',
-    'connect:build'
+    'copy:leaflet'
   ]);
 
   grunt.registerTask('dist', [
@@ -36,6 +35,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'build',
+    'connect:build',
     'watch'
   ]);
 };
