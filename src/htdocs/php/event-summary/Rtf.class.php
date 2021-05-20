@@ -1,7 +1,7 @@
 <?php
 
 // Load php RTF library/API (https://github.com/phprtflite/PHPRtfLite)
-include_once '../lib/PHPRtfLite.php';
+include_once '../../lib/PHPRtfLite.php';
 PHPRtfLite::registerAutoloader();
 
 date_default_timezone_set('America/Los_Angeles');
