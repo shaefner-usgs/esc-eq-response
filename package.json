@@ -35,6 +35,7 @@
     "babelify": "^10.0.0",
     "cssnano": "^4.1.10",
     "eslint-summary": "^1.0.0",
+    "gateway": "^1.0.0",
     "grunt": "^1.3.0",
     "grunt-browserify": "^6.0.0",
     "grunt-contrib-clean": "^2.0.0",

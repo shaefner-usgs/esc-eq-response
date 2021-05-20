@@ -2,6 +2,7 @@
 
 
 var config = require('./config'),
+    gateway = require('gateway'),
     rewrite = require('http-rewrite-middleware');
 
 var MOUNT_PATH = config.ini.MOUNT_PATH;
@@ -11,7 +12,10 @@ var addMiddleware = function(connect, options, middlewares) {
     rewrite.getMiddleware([{
       from: '^' + MOUNT_PATH + '/(.*)$',
       to: '/$1'
-    }])
+    }]),
+    gateway(options.base[0], {
+      '.php': 'php-cgi'
+    })
   );
 
   return middlewares;
