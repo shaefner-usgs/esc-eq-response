@@ -5,7 +5,7 @@ Web application that creates an interactive map, plots and summary for an earthq
 
 ## Installation
 
-First install [node.js](https://nodejs.org/), [grunt](http://gruntjs.com) and [Composer](https://getcomposer.org/).
+First install [Node.js](https://nodejs.org/), [Grunt](http://gruntjs.com) and [Composer](https://getcomposer.org/).
 
 **Note**: You will need PHP with CGI installed in order to generate an earthquake summary RTF file.
 
