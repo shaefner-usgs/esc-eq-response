@@ -22,7 +22,8 @@ module.exports = function (grunt) {
     'postcss:build',
     'copy:build',
     'copy:leaflet',
-    'copy:phprtflite'
+    'copy:phprtflite',
+    'copy:plotly'
   ]);
 
   grunt.registerTask('dist', [

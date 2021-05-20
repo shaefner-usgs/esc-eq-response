@@ -62,6 +62,16 @@ var copy = {
       'PHPRtfLite/**/*',
       'PHPRtfLite.php'
     ]
+  },
+
+  plotly: {
+    cwd: 'node_modules/plotly.js/dist',
+    dest: config.build + '/' + config.src + '/htdocs/lib/plotly',
+    expand: true,
+    filter: 'isFile',
+    src: [
+      'plotly-gl3d.js'
+    ]
   }
 };
 
