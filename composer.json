@@ -1,11 +1,11 @@
 {
-    "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/shaefner-usgs/PHPRtfLite"
-      }
-    ],
-    "require": {
-        "phprtflite/phprtflite": "dev-master"
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/shaefner-usgs/PHPRtfLite"
     }
+  ],
+  "require": {
+      "phprtflite/phprtflite": "dev-master"
+  }
 }
