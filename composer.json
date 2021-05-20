@@ -6,6 +6,6 @@
     }
   ],
   "require": {
-      "phprtflite/phprtflite": "dev-master"
+    "phprtflite/phprtflite": "dev-master"
   }
 }
