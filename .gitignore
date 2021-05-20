@@ -8,6 +8,7 @@ src/conf/httpd.conf
 
 # Dependencies
 node_modules
+vendor
 
 # IDEs and editors
 *.sublime-workspace

@@ -51,6 +51,17 @@ var copy = {
       'leaflet-src.js.map',
       'leaflet.css'
     ]
+  },
+
+  phprtflite: {
+    cwd: 'vendor/phprtflite/phprtflite/lib',
+    dest: config.build + '/' + config.src + '/htdocs/lib',
+    expand: true,
+    filter: 'isFile',
+    src: [
+      'PHPRtfLite/**/*',
+      'PHPRtfLite.php'
+    ]
   }
 };
 

@@ -21,7 +21,8 @@ module.exports = function (grunt) {
     'sass',
     'postcss:build',
     'copy:build',
-    'copy:leaflet'
+    'copy:leaflet',
+    'copy:phprtflite'
   ]);
 
   grunt.registerTask('dist', [

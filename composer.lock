@@ -1,0 +1,57 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "3b29729c4667b4c89f87dd955e7b3734",
+    "packages": [
+        {
+            "name": "phprtflite/phprtflite",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shaefner-usgs/PHPRtfLite.git",
+                "reference": "90f59c3bdf2b739cc6682b19996c0ed70f3e5a92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shaefner-usgs/PHPRtfLite/zipball/90f59c3bdf2b739cc6682b19996c0ed70f3e5a92",
+                "reference": "90f59c3bdf2b739cc6682b19996c0ed70f3e5a92",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPRtfLite": "lib/"
+                }
+            },
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Steffen Zeidler",
+                    "email": "sigma_z@sigma-scripts.de"
+                }
+            ],
+            "description": "PHPRtfLite is an API enabling developers to create rtf documents with php.",
+            "support": {
+                "source": "https://github.com/shaefner-usgs/PHPRtfLite/tree/master"
+            },
+            "time": "2021-05-20T03:48:07+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "phprtflite/phprtflite": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
+}
