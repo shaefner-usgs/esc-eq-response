@@ -5,7 +5,7 @@ date_default_timezone_set('America/Los_Angeles');
 downloadFile($_GET['file']);
 
 /**
- * Trigger download of the (temporary) RTF file created by Rtf.php
+ * Trigger download of the (temporary) RTF file created by Rtf.php.
  *
  * @param file {String}
  *     full path of RTF file
