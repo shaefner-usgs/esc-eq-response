@@ -17,7 +17,7 @@ var AppUtil = require('AppUtil'),
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
- *     addLoadingSpinner: {Function},
+ *     addLoader: {Function},
  *     removeFeature: {Function},
  *     reset: {Function}
  *   }
@@ -399,7 +399,7 @@ var SummaryPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.addLoadingSpinner = function (feature) {
+  _this.addLoader = function (feature) {
     var div,
         placeholder;
 

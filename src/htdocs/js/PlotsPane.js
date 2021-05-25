@@ -17,7 +17,7 @@ var AppUtil = require('AppUtil');
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
- *     addLoadingSpinner: {Function},
+ *     addLoader: {Function},
  *     getPlots: {Function},
  *     removeFeature: {Function},
  *     render: {Function},
@@ -420,7 +420,7 @@ var PlotsPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.addLoadingSpinner = function (feature) {
+  _this.addLoader = function (feature) {
     var div;
 
     // Mainshock is included in other Features' plots, but not separately

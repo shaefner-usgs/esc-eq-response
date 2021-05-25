@@ -69,7 +69,7 @@ var Features = function (options) {
       _totalFeatures,
 
       _addFeature,
-      _addLoadingSpinner,
+      _addLoader,
       _cacheFeature,
       _initFeature,
       _instantiateFeatures,
@@ -130,11 +130,11 @@ var Features = function (options) {
    *
    * @param feature {Object}
    */
-  _addLoadingSpinner = function (feature) {
-    _app.EditPane.addLoadingSpinner(feature);
-    _app.MapPane.addLoadingSpinner(feature);
-    _app.PlotsPane.addLoadingSpinner(feature);
-    _app.SummaryPane.addLoadingSpinner(feature);
+  _addLoader = function (feature) {
+    _app.EditPane.addLoader(feature);
+    _app.MapPane.addLoader(feature);
+    _app.PlotsPane.addLoader(feature);
+    _app.SummaryPane.addLoader(feature);
   };
 
   /**
@@ -186,7 +186,7 @@ var Features = function (options) {
 
     if (typeof(feature.url) === 'string') {
       if (feature.url) {
-        _addLoadingSpinner(feature);
+        _addLoader(feature);
         _loadJson(feature);
       } else { // no feed data available
         feature.isLoading = false;

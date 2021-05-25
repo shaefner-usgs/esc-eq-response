@@ -28,7 +28,7 @@ require('mappane/TerrainLayer');
  * @return _this {Object}
  *   {
  *     addFeature: {Function},
- *     addLoadingSpinner: {Function},
+ *     addLoader: {Function},
  *     initView: {Function},
  *     map: {Object},
  *     openPopup: {Function},
@@ -406,7 +406,7 @@ var MapPane = function (options) {
    *
    * @param feature {Object}
    */
-  _this.addLoadingSpinner = function (feature) {
+  _this.addLoader = function (feature) {
     var layer,
         name;
 
