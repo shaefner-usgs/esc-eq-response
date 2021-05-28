@@ -1,16 +1,23 @@
+@use 'sass:color';
+
 $breakpoint-phone-width: 735px;
 $breakpoint-tablet-width: 1023px;
+
+$button-border-radius: 4px;
 
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
 $font-family-mmi: Tahoma, Verdana, Segoe, sans-serif;
 $font-size: 15px;
 
+$hover-off-duration: .3s;
+$hover-on-duration: .05s;
+
 /* Colors */
 
 $accent-color: #7234dc; /*#6e00ff*/
-$accent-color-lighter: hsla(262, 46%, 95%, .96);
-$accent-color-lightest: scale-color($accent-color, $alpha: -97%);
+$accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 92%);
+$accent-color-lightest: color.scale($accent-color, $alpha: -97%);
 
 $bg-color: #fff;
 $bg-color-darker: #f7f7f7;
@@ -20,11 +27,9 @@ $border-color-lighter: #efefef;
 $border-color-lightest: #f6f6f6;
 
 $link-color: $accent-color;
-$link-color-active: #DC406D;
+$link-color-active: $accent-color;
 $link-color-hover: $accent-color;
 $link-color-visited: $accent-color;
-
-$reset-button-color: #efefef;
 
 $text-color: #333;
 $text-color-darker: #000;
@@ -34,52 +39,20 @@ $text-color-lightest: #999;
 /* MMI / PAGER (impact bubbles) */
 
 $mmiI-color: #fff;
-$mmiI-text-color: $text-color-darker;
-
 $mmiII-color: #acd8e9;
-$mmiII-text-color: $text-color-darker;
-
 $mmiIII-color: #acd8e9;
-$mmiIII-text-color: $text-color-darker;
-
 $mmiIV-color: #83d0da;
-$mmiIV-text-color: $text-color-darker;
-
 $mmiV-color: #7bc87f;
-$mmiV-text-color: $text-color-darker;
-
 $mmiVI-color: #f9f518;
-$mmiVI-text-color: $text-color-darker;
-
 $mmiVII-color: #fac611;
-$mmiVII-text-color: $text-color-darker;
-
 $mmiVIII-color: #fa8a11;
-$mmiVIII-text-color: $text-color-darker;
-
 $mmiIX-color: #f7100c;
-$mmiIX-text-color: $text-color-darker;
-
 $mmiX-color: #c80f0a;
-$mmiX-text-color: $text-color-darker;
-
 $mmiXI-color: #c80f0a;
-$mmiXI-text-color: $text-color-darker;
-
 $mmiXII-color: #c80f0a;
-$mmiXII-text-color: $text-color-darker;
 
 $pager-pending-color: #fff;
-$pager-pending-text-color: $text-color-darker;
-
 $pager-green-color: #00b04f;
-$pager-green-text-color: $text-color-darker;
-
 $pager-yellow-color: #ff0;
-$pager-yellow-text-color: $text-color-darker;
-
 $pager-orange-color: #f90;
-$pager-orange-text-color: $text-color-darker;
-
 $pager-red-color: #f00;
-$pager-red-text-color: $text-color-darker;

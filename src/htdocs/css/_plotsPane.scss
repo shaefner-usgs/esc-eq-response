@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use 'variables' as *;
+
 #plotsPane {
   height: 100%;
 
@@ -19,21 +22,6 @@
   .cumulative {
     height: 40vh;
   }
-  .hypocenters {
-    height: 90vh;
-  }
-  .magtime {
-    height: 40vh;
-  }
-
-  .feature {
-    width: 100%;
-  }
-
-  .features {
-    display: flex;
-    flex-wrap: wrap;
-  }
 
   .hovertext {
     path {
@@ -45,6 +33,10 @@
       fill: #222 !important;
       font-family: $font-family !important;
     }
+  }
+
+  .hypocenters {
+    height: 90vh;
   }
 
   .js-plotly-plot {
@@ -66,16 +58,21 @@
     }
 
     .plotly [data-title]:after {
-      background: scale-color($accent-color, $alpha: -92%);
+      background: color.scale($accent-color, $alpha: -92%);
       color: $accent-color;
     }
 
     .plotly [data-title]:before {
-      border-color: transparent transparent scale-color($accent-color, $alpha: -92%);
+      border-color: transparent transparent color.scale($accent-color, $alpha: -92%);
     }
   }
 
-  .xtitle, .ytitle {
+  .magtime {
+    height: 40vh;
+  }
+
+  .xtitle,
+  .ytitle {
     font-weight: 500 !important; /* match weight of 3d plots, which can't be changed */
   }
 }

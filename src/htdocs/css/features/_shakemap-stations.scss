@@ -1,36 +1,14 @@
-.bubble,
-.mmi {
-  display: block;
-  line-height: 1;
-  text-align: center;
-
-  > span {
-    display: block;
-    max-width: 100%;
-    color: #000;
-  }
-
-  > abbr {
-    color: $text-color-lighter;
-    font-size: 0.8em;
-  }
-}
-
-.bubble-border,
-.mmi {
-  border-radius: 2px;
-  box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
-  padding: 0.5em 0;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
-}
+@use '../variables' as *;
 
 .station-channels-map {
-  margin-top: 1em;
+  margin: 1rem 0;
 
-  td, th {
-    padding-left: .5em;
-    padding-right: .5em;
+  td,
+  th {
+    padding-left: .5rem;
+    padding-right: .5rem;
   }
+
   tr {
     white-space: nowrap;
   }
@@ -44,6 +22,18 @@
   opacity: 0.85;
   position: absolute;
 
+  &:after {
+    border: 12px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, .6);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    content: ' ';
+    display: block;
+    left: -1px;
+    position: absolute;
+    top: -13px;
+    z-index: 1;
+  }
   &:before {
     border: 10px solid transparent;
     border-left-width: 6px;
@@ -55,25 +45,13 @@
     top: -10px;
     z-index: 2;
   }
-
-  &:after {
-    border: 12px solid transparent;
-    border-bottom-color: rgba(0, 0, 0, 0.6);
-    border-left-width: 8px;
-    border-right-width: 8px;
-    content: ' ';
-    display: block;
-    left: -1px;
-    position: absolute;
-    top: -13px;
-    z-index: 1;
-  }
 }
 
 .station-metadata {
-  margin: 1.5em 0;
+  margin: 1.5rem 0;
 }
 
+/* Leaflet marker colors */
 .station-mmiI:before {
   border-bottom-color: $mmiI-color;
 }
@@ -116,134 +94,65 @@
   list-style: none;
   padding: 0;
 
-  > li {
-    display: inline-block;
-    float: left;
-    line-height: 1;
-    padding: 4px;
-    text-align: center;
-    width: 25%;
-
-    > abbr {
-      clear: left;
-      color: $text-color-lightest;
-      font-size: .6875em;
-    }
-  }
-
   &:after {
     clear: both;
     content: ' ';
     display: block;
   }
 
+  abbr {
+    clear: left;
+    color: $text-color-lightest;
+    display: inline-block;
+    font-size: .6875rem;
+    margin-top: .25rem;
+  }
+
+  li {
+    display: inline-block;
+    float: left;
+    line-height: 1;
+    padding: 4px;
+    text-align: center;
+    width: 25%;
+  }
+
   .mmiI {
-    background-color: $mmiI-color !important;
+    background-color: $mmiI-color;
     box-shadow: 0 0 1px #666;
-    color: $mmiI-text-color !important;
-
-    > abbr {
-      color: $mmiI-text-color !important;
-    }
   }
-
   .mmiII {
-    background-color: $mmiII-color !important;
-    color: $mmiII-text-color !important;
-
-    > abbr {
-      color: $mmiII-text-color !important;
-    }
+    background-color: $mmiII-color;
   }
-
   .mmiIII {
-    background-color: $mmiIII-color !important;
-    color: $mmiIII-text-color !important;
-
-    > abbr {
-      color: $mmiIII-text-color !important;
-    }
+    background-color: $mmiIII-color;
   }
-
   .mmiIV {
-    background-color: $mmiIV-color !important;
-    color: $mmiIV-text-color !important;
-
-    > abbr {
-      color: $mmiIV-text-color !important;
-    }
+    background-color: $mmiIV-color;
   }
-
   .mmiV {
-    background-color: $mmiV-color !important;
-    color: $mmiV-text-color !important;
-
-    > abbr {
-      color: $mmiV-text-color !important;
-    }
+    background-color: $mmiV-color;
   }
-
   .mmiVI {
-    background-color: $mmiVI-color !important;
-    color: $mmiVI-text-color !important;
-
-    > abbr {
-      color: $mmiVI-text-color !important;
-    }
+    background-color: $mmiVI-color;
   }
-
   .mmiVII {
-    background-color: $mmiVII-color !important;
-    color: $mmiVII-text-color !important;
-
-    > abbr {
-      color: $mmiVII-text-color !important;
-    }
+    background-color: $mmiVII-color;
   }
-
   .mmiVIII {
-    background-color: $mmiVIII-color !important;
-    color: $mmiVIII-text-color !important;
-
-    > abbr {
-      color: $mmiVIII-text-color !important;
-    }
+    background-color: $mmiVIII-color;
   }
-
   .mmiIX {
-    background-color: $mmiIX-color !important;
-    color: $mmiIX-text-color !important;
-
-    > abbr {
-      color: $mmiIX-text-color !important;
-    }
+    background-color: $mmiIX-color;
   }
-
   .mmiX {
-    background-color: $mmiX-color !important;
-    color: $mmiX-text-color !important;
-
-    > abbr {
-      color: $mmiX-text-color !important;
-    }
+    background-color: $mmiX-color;
   }
-
   .mmiXI {
-    background-color: $mmiXI-color !important;
-    color: $mmiXI-text-color !important;
-
-    > abbr {
-      color: $mmiXI-text-color !important;
-    }
+    background-color: $mmiXI-color;
   }
-
   .mmiXII {
-    background-color: $mmiXII-color !important;
-    color: $mmiXII-text-color !important;
-
-    > abbr {
-      color: $mmiXII-text-color !important;
-    }
+    background-color: $mmiXII-color;
   }
 
   .roman {
@@ -253,10 +162,10 @@
 }
 
 .station-summary-intensity {
-  text-align: center;
+  color: $text-color;
 
   > abbr {
-    color: $text-color-lightest;
-    font-size: .6875em;
+    border-bottom-color: $text-color;
+    color: $text-color;
   }
 }

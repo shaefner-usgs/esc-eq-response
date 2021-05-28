@@ -1,16 +1,22 @@
+@use 'variables' as *;
+
 #statusBar {
   bottom: 0;
-  box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, .06);
   height: 44px;
   left: 0;
   position: fixed;
   width: 100%;
   z-index: 10000;
 
+  &.hide {
+    height: 0;
+    transition: height .25s ease-in .25s;
+  }
+
   div {
-    background-color: rgba(255, 255, 120, 0.95);
-    border-top: 2px solid rgba(255, 255, 0, 1);
-    color: #fff;
+    background-color: rgba(255, 255, 120, .95);
+    border-top: 2px solid rgb(255, 255, 0);
     display: none;
     min-height: 44px;
     padding: 10px 0;
@@ -20,7 +26,7 @@
     width: 100%;
 
     &.error {
-      background-color: rgba(223, 62, 62, 0.92);
+      background-color: rgba(223, 62, 62, .92);
       border-color: rgb(195, 0, 0);
       padding: 1px 0;
       text-shadow: 1px 1px 3px #922c2c;
@@ -39,7 +45,6 @@
     color: $text-color;
     font-size: 20px;
     line-height: 1;
-    margin: 0;
     text-align: center;
   }
 
@@ -54,25 +59,9 @@
     &:after {
       content: ', ';
     }
+
     &:last-child:after {
       content: '';
-    }
-  }
-
-  span { /* Loading animation */
-    animation: loading 1s infinite;
-    display: inline-block;
-    font: 1.2em georgia;
-    line-height: .25;
-
-    &:nth-child(1) {
-      padding-left: 3px;
-    }
-    &:nth-child(2) {
-      animation-delay: .15s;
-    }
-    &:nth-child(3) {
-      animation-delay: .3s;
     }
   }
 
@@ -82,58 +71,54 @@
     text-align: center;
   }
 
-  .close, .reload {
+  .close,
+  .reload {
     background-color: rgb(195, 0, 0);
     border-radius: 50%;
     height: 32px;
     opacity: 0.75;
     position: absolute;
     top: 5px;
-    transition: opacity .25s ease-out;
+    transition: opacity .25s ease-in-out;
     width: 32px;
 
     &:hover {
       opacity: 1;
     }
   }
+
   .close {
     right: 3px;
 
-    &:before, &:after { /* 'X' */
+    &:after,
+    &:before { /* 'X' */
       background-color: #fff;
-      content: ' ';
+      content: '';
       height: 20px;
       left: 15px;
       position: absolute;
       top: 6px;
       width: 2px;
     }
-    &:before {
-      transform: rotate(45deg);
-    }
     &:after {
       transform: rotate(-45deg);
     }
+    &:before {
+      transform: rotate(45deg);
+    }
   }
+
   .reload {
     padding: 7px;
     right: 40px;
 
-    &:before, &:after { /* Partial circle w/ arrow */
+    &:after,
+    &:before { /* Partial circle w/ arrow */
       content: '';
       display: block;
     }
-    &:before {
-      border-color: transparent white white white;
-      border-radius: 50%;
-      border-style: solid;
-      border-width: 2px;
-      height: 18px;
-      width: 18px;
-      transform: rotate(45deg);
-    }
     &:after {
-      border-color: transparent transparent transparent white;
+      border-color: transparent transparent transparent #fff;
       border-style: solid;
       border-width: 4px 0 4px 6px;
       height: 0;
@@ -142,19 +127,14 @@
       left: 50%;
       width: 0;
     }
-  }
-
-  &.hide {
-    height: 0;
-    transition: height .25s ease-out .25s;
-  }
-}
-
-@keyframes loading {
-  0%, 100% {
-    opacity: .1;
-  }
-  20% {
-    opacity: 1;
+    &:before {
+      border-color: transparent #fff #fff #fff;
+      border-radius: 50%;
+      border-style: solid;
+      border-width: 2px;
+      height: 18px;
+      width: 18px;
+      transform: rotate(45deg);
+    }
   }
 }

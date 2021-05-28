@@ -1,49 +1,64 @@
+@use '../variables' as *;
+
 .leaflet-popup.fieldnotes {
-  dl, h4, p, time {
+  dl,
+  h4,
+  p,
+  time {
     margin-left: 20px;
     margin-right: 20px;
   }
   dl {
-    margin-top: .5em;
+    margin-top: .5rem;
   }
+
   dt {
-    width: 7.5em;
+    width: 7.5rem;
   }
+
   img {
     display: block;
     margin: 0 auto;
     max-height: 300px;
     max-width: 100%;
   }
+
   time {
     color: $text-color-lighter;
-    font-size: .9em;
+    font-size: .9rem;
     margin-top: 4px;
   }
 
-  /* Hide custom props by default */
+  .custom {
+    max-height: 400px;
+    overflow: hidden;
+    transition: max-height .3s ease-out;
+  }
+
   .hide + .custom {
-    display: none;
+    max-height: 0;
+    transition: max-height .1s ease-in;
   }
 
   .leaflet-popup-content {
     margin-left: 0;
     margin-right: 0;
   }
+
   .leaflet-popup-content-wrapper {
     padding-left: 0;
     padding-right: 0;
   }
 
   .operator {
+    border-top: 1px solid $border-color-lighter;
+    margin-bottom: 0;
+    margin-top: 1.5rem;
+
     a {
       display: inline-block;
       padding-top: 3px;
     }
-
-    border-top: 1px solid $border-color-lighter;
-    margin-bottom: 0;
-    margin-top: 1.5em;
   }
 
   .photo {
@@ -62,15 +77,6 @@
     margin-bottom: 0;
     position: relative;
 
-    a {
-      padding-left: 10px;
-      position: relative;
-
-      &:active {
-        color: $accent-color;
-      }
-    }
-
     &:before {
       border-bottom: 4px solid transparent;
       border-left: 6px solid $accent-color;
@@ -79,37 +85,23 @@
       height: 0;
       left: 0;
       position: absolute;
-      top: .2em;
-      transition: all .25s;
+      top: .25rem;
+      transform: rotate(90deg);
+      transition: transform .3s ease-in-out;
       width: 0;
     }
-  }
 
-  .spinner {
-    animation: rotate 0.75s infinite linear;
-    border: 5px solid $text-color-lighter;
-    border-radius: 50%;
-    border-right-color: transparent;
-    display: block;
-    height: 20px;
-    left: 47%;
-    position: absolute;
-    top: 47%;
-    width: 20px;
-    z-index: 1000;
-  }
+    &.hide:before {
+      transform: rotate(0deg);
+    }
 
-  /* Rotate triangle down to point down when custom props are visible */
-  :not(.hide):before {
-    transform: rotate(90deg);
-  }
-}
+    a {
+      padding-left: 10px;
+      position: relative;
 
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
+      &:active {
+        color: $accent-color;
+      }
+    }
   }
 }
