@@ -111,7 +111,6 @@ var FieldNotes = function (options) {
       toggle.addEventListener('click', function(e) {
         e.preventDefault();
         this.closest('.properties').classList.toggle('hide');
-        _popup.update();
       });
     }
   };

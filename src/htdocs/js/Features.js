@@ -125,8 +125,8 @@ var Features = function (options) {
   };
 
   /**
-   * Add a container with only the Feature's name and a loading 'spinner' to
-   *   map, plots and summary panes while data is being fetched
+   * Add a container with only the Feature's name and a 'loader' to map, plots
+   *   and summary panes while data is being fetched
    *
    * @param feature {Object}
    */

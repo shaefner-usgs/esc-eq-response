@@ -335,7 +335,7 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add a Feature to summary pane
+   * Add a Feature to summary pane; add count and remove 'loader'
    *
    * @param feature {Object}
    */
@@ -343,15 +343,15 @@ var SummaryPane = function (options) {
     var button,
         count,
         div,
-        spinner,
+        loader,
         status;
 
     if (feature.summary) {
       div = _el.querySelector('div.' + feature.id);
+      loader = div.querySelector('.breather');
 
-      spinner = div.querySelector('.spinner'); // loading spinner
-      if (spinner) {
-        spinner.classList.add('hide');
+      if (loader) {
+        loader.classList.add('hide');
       }
 
       // Add count to Feature name
@@ -395,7 +395,7 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Add a Feature's container, name and a loading 'spinner' to summary pane
+   * Add a Feature's container, name and a 'loader' to summary pane
    *
    * @param feature {Object}
    */
@@ -409,7 +409,7 @@ var SummaryPane = function (options) {
     if (Object.prototype.hasOwnProperty.call(feature, 'summary') && !placeholder) {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
-      div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +
+      div.innerHTML = '<h2>' + feature.name + '<div class="breather">' +
         '<div></div></div></h2>';
 
       _featuresEl.appendChild(div);

@@ -402,20 +402,20 @@ var EditPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add count to Feature's name and hide laoding 'spinner'
+   * Add count to Feature's name and hide 'loader'
    *
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
     var count,
         div,
-        spinner;
+        loader;
 
     div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configuration params
-      spinner = div.querySelector('.spinner');
-      spinner.classList.add('hide');
+      loader = div.querySelector('.breather');
+      loader.classList.add('hide');
 
       // Add count if applicable
       count = div.querySelector('.count');
@@ -427,21 +427,21 @@ var EditPane = function (options) {
   };
 
   /**
-   * Show loading 'spinner' next to Feature's name and hide count
+   * Show 'loader' next to Feature's name and hide count
    *
    * @param feature {Object}
    */
   _this.addLoader = function (feature) {
     var count,
         div,
-        spinner;
+        loader;
 
     div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configuration params
-      spinner = div.querySelector('.spinner');
-      spinner.innerHTML = '<div></div>';
-      spinner.classList.remove('hide');
+      loader = div.querySelector('.breather');
+      loader.innerHTML = '<div></div>';
+      loader.classList.remove('hide');
 
       count = div.querySelector('.count');
       if (count) {
@@ -468,22 +468,22 @@ var EditPane = function (options) {
   };
 
   /**
-   * Hide loading 'spinner' and count next to Feature's name
+   * Hide 'loader' and count next to Feature's name
    *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
     var count,
         div,
-        spinner;
+        loader;
 
     div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configuration params
       count = div.querySelector('.count');
-      spinner = div.querySelector('.spinner');
+      loader = div.querySelector('.breather');
 
-      spinner.classList.add('hide');
+      loader.classList.add('hide');
       if (count) {
         count.classList.add('hide');
       }
