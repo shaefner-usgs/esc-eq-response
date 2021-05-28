@@ -1,0 +1,163 @@
+@use 'sass:color';
+@use 'leaflet/control-bottomCenter';
+@use 'leaflet/mousePosition';
+@use 'variables' as *;
+
+#mapPane {
+  /* Rendering order of features on map and layer controller. All layers (except
+     faults) are rendered in leaflet-overlay-pane which has a z-index of 400. */
+  .leaflet-focal-mechanism-pane {
+    z-index: 425;
+  }
+  .leaflet-moment-tensor-pane {
+    z-index: 424;
+  }
+  .leaflet-mainshock-pane {
+    z-index: 423;
+  }
+  .leaflet-aftershocks-pane {
+    z-index: 422;
+  }
+  .leaflet-foreshocks-pane {
+    z-index: 421;
+  }
+  .leaflet-historical-pane {
+    z-index: 420;
+  }
+  .leaflet-shakemap-stations-pane {
+    z-index: 419;
+  }
+  .leaflet-fieldnotes-pane {
+    z-index: 418;
+  }
+  .leaflet-faults-pane {
+    z-index: 417;
+  }
+
+  .leaflet-control-container {
+    font-family: $font-family;
+
+    .leaflet-control-attribution {
+      background-color: rgba(255, 255, 255, .5);
+      color: $text-color-lighter;
+      max-width: 300px;
+      overflow: hidden; /* Quell long attributions */
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      a {
+        color: $text-color-lighter;
+
+        &:hover {
+          color: $text-color;
+          text-decoration: none;
+        }
+      }
+    }
+
+    .leaflet-control-layers {
+      font: $font-size $font-family-headers;
+
+      label {
+        cursor: pointer;
+        line-height: 1.3;
+        margin: 6px 0;
+
+        span {
+          align-items: center;
+          display: flex;
+        }
+      }
+    }
+
+    .leaflet-control-layers,
+    .leaflet-control-zoom {
+      border: 1px solid $link-color;
+      box-shadow: none;
+    }
+    .leaflet-control-layers,
+    .leaflet-control-zoom a {
+      background: rgba(249, 245, 255, .75);
+    }
+    .leaflet-control-zoom a {
+      color: $link-color;
+
+      &:hover {
+        background: rgba(255, 255, 255, .75);
+      }
+
+      &:first-child {
+        border-top-left-radius: $button-border-radius;
+        border-top-right-radius: $button-border-radius;
+        border-bottom-color: color.scale($accent-color, $lightness: 75%);
+      }
+      &:last-child {
+        border-bottom-left-radius: $button-border-radius;
+        border-bottom-right-radius: $button-border-radius;
+      }
+    }
+
+    .leaflet-control-layers-expanded {
+      background: #fff;
+      padding: 3px 10px;
+    }
+
+    .leaflet-control-layers-overlays {
+      div > span {
+        align-items: baseline;
+        display: flex;
+      }
+
+      .count {
+        font-size: .9em;
+      }
+    }
+
+    .leaflet-control-layers-separator {
+      border-top-color: color.scale($accent-color, $lightness: 90%);
+      margin: 5px -10px;
+    }
+
+    /* Use img w/ accent color for Leaflet layers toggle control */
+    .leaflet-control-layers-toggle {
+      background-image: url(../img/layers@2x.png);
+    }
+  }
+
+  .leaflet-popup-content {
+    color: $text-color;
+    font: $font-size $font-family;
+
+    a {
+      color: $link-color;
+    }
+
+    [datetime] {
+      min-width: 20rem; /* Prevent datetime from wrapping */
+    }
+  }
+
+  /* Push top controls down to accommodate toolbar */
+  .leaflet-top .leaflet-control {
+    margin-top: 50px;
+  }
+
+  /* Scroll wide tables in Leaflet popups elegantly */
+  .scroll-wrapper {
+    overflow: auto;
+
+    th.freeze {
+      background: white;
+      left: 0;
+      position: sticky;
+    }
+  }
+
+  /* Hide attribution text on (small screen) mobile devices */
+  @media only screen
+    and (max-width: $breakpoint-tablet-width) {
+      .leaflet-control-attribution {
+        display: none;
+      }
+  }
+}
