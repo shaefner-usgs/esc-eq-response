@@ -8,7 +8,7 @@
 
     a {
       border: 1px solid $border-color;
-      border-radius: 3px;
+      border-radius: $button-border-radius;
       color: $text-color;
       display: block;
       margin-right: 1rem;
@@ -48,7 +48,7 @@
 
       h4 {
         background: $bg-color-darker;
-        border-radius: 3px 3px 0 0;
+        border-radius: $button-border-radius $button-border-radius 0 0;
         padding: 4px 0;
         transition: background $hover-off-duration ease-in;
       }

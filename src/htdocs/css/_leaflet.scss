@@ -73,6 +73,7 @@
     .leaflet-control-layers,
     .leaflet-control-zoom {
       border: 1px solid $link-color;
+      border-radius: $button-border-radius;
       box-shadow: none;
     }
     .leaflet-control-layers,
@@ -99,6 +100,7 @@
 
     .leaflet-control-layers-expanded {
       background: #fff;
+      border-radius: $button-border-radius;
       padding: 3px 10px;
     }
 

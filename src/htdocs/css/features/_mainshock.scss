@@ -16,7 +16,7 @@
   .dyfi img,
   .shakemap img {
     border: 2px solid #ccc;
-    border-radius: 5px;
+    border-radius: $button-border-radius;
     padding: 2px;
 
     &.mmiI {
