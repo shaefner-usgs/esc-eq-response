@@ -17,7 +17,7 @@ $hover-on-duration: .05s;
 
 $accent-color: #7234dc; /*#6e00ff*/
 $accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 92%);
-$accent-color-lightest: color.scale($accent-color, $alpha: -97%);
+$accent-color-lightest: color.scale($accent-color, $lightness: 97.5%);
 
 $bg-color: #fff;
 $bg-color-darker: #f7f7f7;
