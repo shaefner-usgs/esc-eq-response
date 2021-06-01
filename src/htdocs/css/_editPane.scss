@@ -7,7 +7,7 @@
 
   fieldset {
     border: 1px solid $border-color;
-    border-radius: 4px;
+    border-radius: $button-border-radius;
     margin-top: 1rem;
     padding: 0 1.75rem 2rem;
 
