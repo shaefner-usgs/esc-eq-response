@@ -7,36 +7,6 @@
 $separator-color: color.scale($accent-color, $lightness: 80%);
 
 #mapPane {
-  /* Rendering order of features on map and layer controller. All layers (except
-     faults) are rendered in leaflet-overlay-pane which has a z-index of 400. */
-  .leaflet-focal-mechanism-pane {
-    z-index: 425;
-  }
-  .leaflet-moment-tensor-pane {
-    z-index: 424;
-  }
-  .leaflet-mainshock-pane {
-    z-index: 423;
-  }
-  .leaflet-aftershocks-pane {
-    z-index: 422;
-  }
-  .leaflet-foreshocks-pane {
-    z-index: 421;
-  }
-  .leaflet-historical-pane {
-    z-index: 420;
-  }
-  .leaflet-shakemap-stations-pane {
-    z-index: 419;
-  }
-  .leaflet-fieldnotes-pane {
-    z-index: 418;
-  }
-  .leaflet-faults-pane {
-    z-index: 417;
-  }
-
   .leaflet-container {
     font: $font-size $font-family;
   }
