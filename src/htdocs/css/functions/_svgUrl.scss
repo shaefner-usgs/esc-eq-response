@@ -1,0 +1,78 @@
+@use 'sass:math';
+
+// Create an optimized SVG data URL.
+//
+// from: https://codepen.io/jakob-e/pen/doMoML (v 1.0.6)
+//
+// Usage examples:
+//
+// .class {
+//   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg">.....</svg>');
+// }
+//
+// or
+//
+// .class {
+//   @include background-svg('<svg xmlns="http://www.w3.org/2000/svg">.....</svg>');
+// }
+
+@function svg-url($svg){
+  // Add missing namespace
+  @if not str-index($svg,xmlns) {
+    $svg: str-replace($svg, '<svg','<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+
+  $encoded: '';
+  $slice: 2000;
+  $index: 0;
+  $loops: ceil(math.div(str-length($svg), $slice));
+
+  // Chunk up string in order to avoid  "stack level too deep" error
+  @for $i from 1 through $loops {
+    $chunk: str-slice($svg, $index, $index + $slice - 1);
+
+    // Encode
+    $chunk: str-replace($chunk, '"', '\'');
+    $chunk: str-replace($chunk, '%', '%25');
+    $chunk: str-replace($chunk, '#', '%23');
+    $chunk: str-replace($chunk, '{', '%7B');
+    $chunk: str-replace($chunk, '}', '%7D');
+    $chunk: str-replace($chunk, '<', '%3C');
+    $chunk: str-replace($chunk, '>', '%3E');
+
+    // The maybe list - only include on documented fail
+    // $chunk: str-replace($chunk, '&', '%26');
+    // $chunk: str-replace($chunk, '|', '%7C');
+    // $chunk: str-replace($chunk, '[', '%5B');
+    // $chunk: str-replace($chunk, ']', '%5D');
+    // $chunk: str-replace($chunk, '^', '%5E');
+    // $chunk: str-replace($chunk, '`', '%60');
+    // $chunk: str-replace($chunk, ';', '%3B');
+    // $chunk: str-replace($chunk, '?', '%3F');
+    // $chunk: str-replace($chunk, ':', '%3A');
+    // $chunk: str-replace($chunk, '@', '%40');
+    // $chunk: str-replace($chunk, '=', '%3D');
+
+    $encoded: #{$encoded}#{$chunk};
+    $index: $index + $slice;
+  }
+
+  @return url("data:image/svg+xml,#{$encoded}");
+}
+
+// Background image SVG mixin.
+@mixin background-svg($svg){
+  background-image: svg-url($svg);
+}
+
+// Replace characters in a string
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+
+  @return if($index,
+    str-slice($string, 1, $index - 1) + $replace +
+    str-replace(str-slice($string, $index +
+    str-length($search)), $search, $replace),
+    $string
+  );
+}
