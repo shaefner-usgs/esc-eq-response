@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use 'functions/svgUrl' as *;
 @use 'leaflet/control-bottomCenter';
 @use 'leaflet/mousePosition';
 @use 'variables' as *;
@@ -134,7 +135,32 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
   /* Use $accent-color colored SVG image for Leaflet layers toggle control */
   .leaflet-control-layers-toggle {
-    background-image: url(../img/layers@2x.png);
+    background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" ' +
+      'height="26" width="26" viewBox="0 0 26 26">' +
+        '<style type="text/css">' +
+          '.border {' +
+            'fill: #{$accent-color};' +
+          '}' +
+          '.layer1 {' +
+            'fill: ' + color.scale($accent-color, $alpha: -15%, $lightness: 52%) + ';' +
+          '}' +
+          '.layer2 {' +
+            'fill: ' + color.scale($accent-color, $alpha: -18%, $lightness: 80%) + ';' +
+          '}' +
+          '.layer3 {' +
+            'fill: ' + color.scale($accent-color, $alpha: -45%, $lightness: 91%) + ';' +
+            'stroke: #{$accent-color};' +
+            'stroke-width: 0.2;' +
+          '}' +
+        '</style>' +
+        '<path class="layer1" d="M0,16.9l13-8l13,8l-13,8L0,16.9"/>' +
+        '<path class="border" d="M0,16.9L0,18l13,8l13-8l0-1.1l-13,8L0,16.9z"/>' +
+        '<path class="layer2" d="M0,12.9l13-8l13,8l-13,8L0,12.9"/>' +
+        '<path class="border" d="M0,12.9V14l13,8l13-8v-1.1l-13,8L0,12.9z"/>' +
+        '<path class="layer3" d="M0,8.8l13-8l13,8l-13,8L0,8.8"/>' +
+        '<path class="border" d="M0,8.8V10l13,8l13-8V8.8l-13,8L0,8.8z"/>' +
+      '</svg>'
+    );
   }
 
   .leaflet-popup-close-button {
