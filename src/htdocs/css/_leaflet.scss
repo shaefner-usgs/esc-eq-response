@@ -3,6 +3,8 @@
 @use 'leaflet/mousePosition';
 @use 'variables' as *;
 
+$separator-color: color.scale($accent-color, $lightness: 80%);
+
 #mapPane {
   /* Rendering order of features on map and layer controller. All layers (except
      faults) are rendered in leaflet-overlay-pane which has a z-index of 400. */
@@ -34,101 +36,131 @@
     z-index: 417;
   }
 
-  .leaflet-control-container {
-    font-family: $font-family;
+  .leaflet-container {
+    font: $font-size $font-family;
+  }
 
-    .leaflet-control-attribution {
-      background-color: rgba(255, 255, 255, .5);
+  .leaflet-control-attribution,
+  .leaflet-control-scale-line {
+    font-size: .75rem;
+    line-height: 1;
+  }
+  .leaflet-control-attribution {
+    background-color: rgba(255, 255, 255, .5);
+    color: $text-color-lighter;
+    max-width: 300px;
+    overflow: hidden; /* Quell long attributions */
+    padding: 2px 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    a {
       color: $text-color-lighter;
-      max-width: 300px;
-      overflow: hidden; /* Quell long attributions */
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-      a {
-        color: $text-color-lighter;
-
-        &:hover {
-          color: $text-color;
-          text-decoration: none;
-        }
-      }
-    }
-
-    .leaflet-control-layers {
-      font: $font-size $font-family-headers;
-
-      label {
-        cursor: pointer;
-        line-height: 1.3;
-        margin: 6px 0;
-
-        span {
-          align-items: center;
-          display: flex;
-        }
-      }
-    }
-
-    .leaflet-control-layers,
-    .leaflet-control-zoom {
-      border: 1px solid $link-color;
-      border-radius: $button-border-radius;
-      box-shadow: none;
-    }
-    .leaflet-control-layers,
-    .leaflet-control-zoom a {
-      background: rgba(249, 245, 255, .75);
-    }
-    .leaflet-control-zoom a {
-      color: $link-color;
+      transition: color $hover-off-duration ease-in;
 
       &:hover {
-        background: rgba(255, 255, 255, .75);
-      }
-
-      &:first-child {
-        border-top-left-radius: $button-border-radius;
-        border-top-right-radius: $button-border-radius;
-        border-bottom-color: color.scale($accent-color, $lightness: 75%);
-      }
-      &:last-child {
-        border-bottom-left-radius: $button-border-radius;
-        border-bottom-right-radius: $button-border-radius;
+        color: $text-color;
+        text-decoration: none;
+        transition: color $hover-on-duration ease-out;
       }
     }
+  }
 
-    .leaflet-control-layers-expanded {
-      background: #fff;
-      border-radius: $button-border-radius;
-      padding: 3px 10px;
-    }
+  .leaflet-control-layers,
+  .leaflet-control-zoom {
+    border: 1px solid $link-color;
+    border-radius: $button-border-radius;
+    box-shadow: none;
+  }
+  .leaflet-control-layers,
+  .leaflet-control-zoom a {
+    background: rgba(255, 255, 255, .95);
+  }
+  .leaflet-control-layers {
+    font-family: $font-family-headers;
 
-    .leaflet-control-layers-overlays {
-      div > span {
-        align-items: baseline;
+    label {
+      cursor: pointer;
+      line-height: 1.3;
+      margin: 6px 0;
+
+      span {
+        align-items: center;
         display: flex;
       }
+    }
+  }
+  .leaflet-control-zoom a {
+    color: $link-color;
+    transition: background $hover-off-duration ease-in;
 
-      .count {
-        font-size: .9em;
-      }
+    &:hover {
+      background: $accent-color-lightest;
+      transition: text-decoration-color $hover-on-duration ease-out;
     }
 
-    .leaflet-control-layers-separator {
-      border-top-color: color.scale($accent-color, $lightness: 90%);
-      margin: 5px -10px;
+    &:first-child {
+      border-bottom-color: $separator-color;
+      border-top-left-radius: $button-border-radius;
+      border-top-right-radius: $button-border-radius;
+    }
+    &:last-child {
+      border-bottom-left-radius: $button-border-radius;
+      border-bottom-right-radius: $button-border-radius;
+    }
+  }
+
+  .leaflet-control-layers-expanded {
+    background: #fff;
+    border-radius: $button-border-radius;
+    padding: 3px 10px;
+  }
+
+  .leaflet-control-layers-overlays {
+    div > span {
+      align-items: baseline;
+      display: flex;
     }
 
-    /* Use img w/ accent color for Leaflet layers toggle control */
-    .leaflet-control-layers-toggle {
-      background-image: url(../img/layers@2x.png);
+    .count {
+      font-size: .9em;
+    }
+  }
+
+  .leaflet-control-layers-separator {
+    border-top-color: $separator-color;
+    margin: 5px -10px;
+  }
+
+  /* Use $accent-color colored SVG image for Leaflet layers toggle control */
+  .leaflet-control-layers-toggle {
+    background-image: url(../img/layers@2x.png);
+  }
+
+  .leaflet-popup-close-button {
+    border-radius: 50%;
+    color: $accent-color;
+    height: 23px;
+    line-height: 1.35;
+    padding: 0;
+    right: 2px;
+    top: 2px;
+    text-align: center;
+    transition: background $hover-off-duration ease-in;
+    width: 23px;
+
+    &:hover {
+      background: $accent-color-lightest;
+      transition: background $hover-on-duration ease-out;
+    }
+    &:active {
+      background: $accent-color-lighter;
+      transition: background .05s ease-out;
     }
   }
 
   .leaflet-popup-content {
     color: $text-color;
-    font: $font-size $font-family;
 
     a {
       color: $link-color;
