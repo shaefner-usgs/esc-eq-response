@@ -15,16 +15,15 @@
 // .class {
 //   @include background-svg('<svg xmlns="http://www.w3.org/2000/svg">.....</svg>');
 // }
-
-@function svg-url($svg){
+@function svg-url($svg) {
   // Add missing namespace
   @if not str-index($svg,xmlns) {
     $svg: str-replace($svg, '<svg','<svg xmlns="http://www.w3.org/2000/svg"');
   }
 
   $encoded: '';
-  $slice: 2000;
   $index: 0;
+  $slice: 2000;
   $loops: ceil(math.div(str-length($svg), $slice));
 
   // Chunk up string in order to avoid  "stack level too deep" error
@@ -61,11 +60,11 @@
 }
 
 // Background image SVG mixin.
-@mixin background-svg($svg){
+@mixin background-svg($svg) {
   background-image: svg-url($svg);
 }
 
-// Replace characters in a string
+// Replace characters in a string.
 @function str-replace($string, $search, $replace: '') {
   $index: str-index($string, $search);
 
