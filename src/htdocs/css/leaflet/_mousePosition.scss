@@ -3,8 +3,8 @@
 .leaflet-control-mouseposition {
   background-color: rgba(255, 255, 255, .5);
   color: $text-color;
-  font: 11px/1.5 $font-family;
+  font-size: .75rem;
   margin: 0 0 5px 0 !important;
-  padding: 0 3px;
+  padding: 2px 4px;
   user-select: none;
 }
