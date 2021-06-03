@@ -170,7 +170,6 @@ tr {
 .pane {
   display: block;
   left: 0;
-  opacity: 1;
   padding: 2.5rem 0 0;
   position: absolute;
   top: 0;
@@ -179,7 +178,6 @@ tr {
   &.hide {
     display: none;
     max-height: 1vh;
-    opacity: 0;
     overflow: hidden;
   }
 }
