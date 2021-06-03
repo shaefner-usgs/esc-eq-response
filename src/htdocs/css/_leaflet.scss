@@ -123,10 +123,10 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
             'stroke-width: 0.2;' +
           '}' +
         '</style>' +
-        '<path class="layer1" d="M0,16.9l13-8l13,8l-13,8L0,16.9"/>' +
-        '<path class="border" d="M0,16.9L0,18l13,8l13-8l0-1.1l-13,8L0,16.9z"/>' +
-        '<path class="layer2" d="M0,12.9l13-8l13,8l-13,8L0,12.9"/>' +
-        '<path class="border" d="M0,12.9V14l13,8l13-8v-1.1l-13,8L0,12.9z"/>' +
+        '<path class="layer1" d="M0,16.7l13-8l13,8l-13,8L0,16.7"/>' +
+        '<path class="border" d="M0,16.7L0,18l13,8l13-8l0-1.3l-13,8L0,16.7z"/>' +
+        '<path class="layer2" d="M0,12.7l13-8l13,8l-13,8L0,12.7"/>' +
+        '<path class="border" d="M0,12.7V14l13,8l13-8v-1.3l-13,8L0,12.7z"/>' +
         '<path class="layer3" d="M0,8.8l13-8l13,8l-13,8L0,8.8"/>' +
         '<path class="border" d="M0,8.8V10l13,8l13-8V8.8l-13,8L0,8.8z"/>' +
       '</svg>'
