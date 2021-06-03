@@ -5,45 +5,43 @@
   .hovertext {
     path {
       fill: #fff !important;
-      fill-opacity: 0.9 !important;
+      fill-opacity: 0.9;
       stroke: #ccc !important;
     }
+
     text {
-      fill: #222 !important;
-      font-family: $font-family !important;
+      fill: $text-color !important;
+      font: $font-size $font-family !important;
     }
   }
 
   .js-plotly-plot {
     width: 100%;
 
-    /* Color plotly buttons, title tips using accent-color */
-    .modebar-btn path {
-      fill: $accent-color;
-      opacity: 0.4;
+    .modebar-btn {
+      path {
+        fill: color.scale($accent-color, $alpha: -4%, $lightness: 75%) !important;
+      }
+
+      &.active path,
+      &:hover path {
+        fill: $accent-color !important;
+      }
     }
 
-    .modebar-btn.active path,
-    .modebar-btn:hover path {
-      opacity: 1;
-    }
-
-    .modebar-group {
-      margin-left: 0;
-    }
-
-    .plotly [data-title]:after {
-      background: color.scale($accent-color, $alpha: -92%);
-      color: $accent-color;
-    }
-
-    .plotly [data-title]:before {
-      border-color: transparent transparent color.scale($accent-color, $alpha: -92%);
+    .plotly [data-title] {
+      &:after {
+        background: $accent-color-lightest;
+        color: $accent-color;
+      }
+      &:before {
+        border-color: transparent transparent $accent-color-lightest;
+      }
     }
   }
 
   .xtitle,
   .ytitle {
-    font-weight: 500 !important; /* match weight of 3d plots, which can't be changed */
+    font-weight: 500 !important;
   }
 }
