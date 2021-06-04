@@ -55,8 +55,7 @@ var EditPane = function (options) {
       _saveFocusedField,
       _setFormFieldValues,
       _setQueryStringValues,
-      _updateParam,
-      _viewMap;
+      _updateParam;
 
 
   _this = {};
@@ -180,14 +179,12 @@ var EditPane = function (options) {
     var aftershocks,
         foreshocks,
         historical,
-        reset,
-        viewmap;
+        reset;
 
     aftershocks = _el.querySelectorAll('.aftershocks');
     foreshocks = _el.querySelectorAll('.foreshocks');
     historical = _el.querySelectorAll('.historical');
     reset = _el.querySelector('.reset');
-    viewmap = _el.querySelector('.viewmap');
 
     // Update querystring param when form field is changed
     _addListener(_fields, 'input', _updateParam);
@@ -205,9 +202,6 @@ var EditPane = function (options) {
 
     // Clear Features when reset button is pressed
     _addListener([reset], 'click', _app.resetApp);
-
-    // Switch to map pane when 'View Map' button is clicked
-    _addListener([viewmap], 'click', _viewMap);
   };
 
   /**
@@ -388,15 +382,6 @@ var EditPane = function (options) {
     AppUtil.setParam(id, value);
   };
 
-  /**
-   * Switch to map pane when 'View Map' button clicked
-   */
-  _viewMap = function () {
-    if (!_el.querySelector('.viewmap').hasAttribute('disabled')) {
-      location.hash = '#mapPane';
-    }
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -460,8 +445,6 @@ var EditPane = function (options) {
 
     eqidIsValid = _checkIfValid();
     if (eqidIsValid) {
-      _el.querySelector('.viewmap').removeAttribute('disabled');
-
       // Instantiate mainshock (other features are created after mainshock is ready)
       _app.Features.instantiateFeature('mainshock');
     }
@@ -498,8 +481,6 @@ var EditPane = function (options) {
     _resetCounts();
     _resetForm();
     _resetTitle();
-
-    _el.querySelector('.viewmap').setAttribute('disabled', 'disabled');
   };
 
   /**
