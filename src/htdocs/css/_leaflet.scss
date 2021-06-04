@@ -39,7 +39,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
   .leaflet-control-layers,
   .leaflet-control-zoom {
-    border: 1px solid $link-color;
+    border: 1px solid $accent-color;
     border-radius: $button-border-radius;
     box-shadow: none;
   }
