@@ -186,10 +186,11 @@ var PlotsPane = function (options) {
    * @return layout {Object}
    */
   _getPlotlyLayout = function (plotId, zRatio) {
-    var layout,
-        spikecolor,
-        titlefont;
+    var color,
+        layout,
+        spikecolor;
 
+    color = '#555';
     layout = {
       font: {
         family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
@@ -204,9 +205,6 @@ var PlotsPane = function (options) {
       showlegend: false
     };
     spikecolor = '#7234dc';
-    titlefont = {
-      color: '#555'
-    };
 
     if (plotId === 'hypocenters') {
       layout.scene = {
@@ -225,39 +223,63 @@ var PlotsPane = function (options) {
         },
         xaxis: {
           spikecolor: spikecolor,
-          title: 'Longitude',
-          titlefont: titlefont,
+          title: {
+            font: {
+              color: color
+            },
+            text: 'Longitude'
+          },
           zeroline: false
         },
         yaxis: {
           spikecolor: spikecolor,
-          title: 'Latitude',
-          titlefont: titlefont,
+          title: {
+            font: {
+              color: color
+            },
+            text: 'Latitude'
+          },
           zeroline: false
         },
         zaxis: {
           spikecolor: spikecolor,
-          title: 'Depth (km)',
-          titlefont: titlefont,
+          title: {
+            font: {
+              color: color
+            },
+            text: 'Depth (km)'
+          },
           zeroline: false
         }
       };
     } else {
       layout.xaxis = {
-        title: 'Time (UTC)',
-        titlefont: titlefont
+        title: {
+          font: {
+            color: color
+          },
+          text: 'Time (UTC)'
+        }
       };
     }
 
     if (plotId === 'magtime') {
       layout.yaxis = {
-        title: 'Magnitude',
-        titlefont: titlefont
+        title: {
+          font: {
+            color: color
+          },
+          text: 'Magnitude'
+        }
       };
     } else {
       layout.yaxis = {
-        title: 'Earthquakes',
-        titlefont: titlefont
+        title: {
+          font: {
+            color: color
+          },
+          text: 'Earthquakes'
+        }
       };
     }
 
