@@ -354,7 +354,7 @@ var Earthquakes = function (options) {
           '<dt class="distance"><abbr title="Distance and direction from mainshock">Distance</abbr></dt>' +
           '<dd class="distance">{distanceDisplay}</dd>' +
           '<dt>Status</dt>' +
-          '<dd>{status}</dd>' +
+          '<dd class="status">{status}</dd>' +
         '</dl>' +
       '</div>';
     } else if (type === 'row') { // lists on summary pane
