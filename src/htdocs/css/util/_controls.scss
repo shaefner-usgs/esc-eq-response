@@ -258,7 +258,10 @@ input[type="number"] {
   align-items: center;
   display: flex;
   height: 4.5rem;
-  margin-top: 1.5rem;
   position: relative;
   width: $track-w;
+}
+
+.slider-container {
+  display: flex;
 }

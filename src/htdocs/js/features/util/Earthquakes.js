@@ -368,13 +368,15 @@ var Earthquakes = function (options) {
       '</tr>';
     } else if (type === 'slider') {
       template = '<div class="filter">' +
-        '<h4>Filter earthquakes by magnitude</h4>' +
-        '<div class="min">{min}</div>' +
-        '<div class="inverted slider" style="--min:{min}; --max:{max}; --val:{initial};">' +
-          '<input id="{id}" type="range" min="{min}" max="{max}" value="{initial}"/>' +
-          '<output for="{id}">{initial}</output>' +
+        '<label for="{id}">Filter earthquakes by magnitude</label>' +
+        '<div class="slider-container">' +
+          '<div class="min">{min}</div>' +
+          '<div class="inverted slider" style="--min:{min}; --max:{max}; --val:{initial};">' +
+            '<input id="{id}" type="range" min="{min}" max="{max}" value="{initial}"/>' +
+            '<output for="{id}">{initial}</output>' +
+          '</div>' +
+          '<div class="max">{max}</div>' +
         '</div>' +
-        '<div class="max">{max}</div>' +
       '</div>';
     } else if (type === 'subheader') {
       template = '<h3>' +

@@ -70,17 +70,12 @@
   .filter {
     align-items: center;
     display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
     margin: 1rem 0 0;
-    position: relative;
 
-    h4 {
-      font: 1rem $font-family;
-      position: absolute;
-      top: 0;
-
-      &:after {
-        content: ':';
-      }
+    label {
+      margin-left: 1rem;
     }
   }
 
