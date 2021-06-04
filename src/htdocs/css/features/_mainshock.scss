@@ -3,8 +3,14 @@
 #summaryPane {
   button {
     margin-top: 1rem;
-    padding-left: 32px;
-    position: relative;
+
+    &:before {
+      content: 'Download';
+      display: block;
+      font-size: 0.8rem;
+      font-weight: normal;
+      margin-bottom: -0.15rem;
+    }
 
     img {
       left: 12px;
