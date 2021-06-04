@@ -81,6 +81,7 @@ var Earthquakes = function (options) {
       _getDuration,
       _getHtmlTemplate,
       _getIntervals,
+      _getLocation,
       _getPlotlyTrace,
       _getRange,
       _onEachFeature,
@@ -419,6 +420,23 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get formatted lat/lng coordinate pair.
+   *
+   * @param coords {Array}
+   *
+   * @return {String}
+   */
+  _getLocation = function (coords) {
+    var lat,
+        lng;
+
+    lat = [Math.abs(coords[1]).toFixed(3), '&deg;', (coords[1] < 0 ? 'S':'N')].join('');
+    lng = [Math.abs(coords[0]).toFixed(3), '&deg;', (coords[0] < 0 ? 'W':'E')].join('');
+
+    return lat + ', ' + lng;
+  };
+
+  /**
    * Get plot's trace option for plotly.js
    *
    * @param plotId {String <cumulative | hypocenters | magtime>}
@@ -651,7 +669,7 @@ var Earthquakes = function (options) {
       eqid: feature.id,
       felt: props.felt, // DYFI felt reports
       isoTime: eqMoment.toISOString(),
-      location: AppUtil.round(coords[1], 3) + ', ' + AppUtil.round(coords[0], 3),
+      location: _getLocation(coords),
       localTime: localTime,
       mag: parseFloat(AppUtil.round(props.mag, 1)),
       magInt: Math.floor(AppUtil.round(props.mag, 1)),
