@@ -71,7 +71,7 @@ button {
   &:hover {
     background: $accent-color;
     color: #fff;
-    text-shadow: 1px 1px 3px #444;
+    text-shadow: $button-text-shadow;
     transition: all $hover-on-duration ease-out;
   }
   &:active {
@@ -110,7 +110,7 @@ input[type="radio"] {
     justify-content: center;
     margin-right: 8px;
     position: relative;
-    text-shadow: 1px 1px 3px #333;
+    text-shadow: $button-text-shadow;
     top: 0px;
     width: 16px;
   }
