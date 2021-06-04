@@ -18,19 +18,20 @@
       width: 6rem;
 
       &:hover {
-        border-color: color.scale($accent-color, $whiteness: 50%);
-        color: $accent-color;
+        border-color: $accent-color;
+        color: $text-color-darker;
         transition: all $hover-on-duration ease-out;
 
         abbr {
-          border-color: color.scale($accent-color, $whiteness: 60%);
-          color: color.scale($accent-color, $whiteness: 40%);
+          border-color: color.scale($text-color-lightest, $lightness: -5%);
+          color: color.scale($text-color-lightest, $lightness: -15%);
           transition: all $hover-on-duration ease-out;
         }
 
         h4 {
+          color: $accent-color;
           background: $accent-color-lightest;
-          transition: background $hover-on-duration ease-out;
+          transition: all $hover-on-duration ease-out;
         }
       }
 
@@ -49,8 +50,9 @@
       h4 {
         background: $bg-color-darker;
         border-radius: $button-border-radius $button-border-radius 0 0;
+        color: $text-color;
         padding: 4px 0;
-        transition: background $hover-off-duration ease-in;
+        transition: all $hover-off-duration ease-in;
       }
 
       ul {

@@ -28,10 +28,6 @@
   }
 
   .bin {
-    td,
-    th {
-      padding: .4rem;
-    }
     td {
       &.total {
         background-color: $bg-color-darker;
@@ -108,7 +104,7 @@
       &.selected,
       &:hover:not(.no-sort) {
         background: $accent-color-lightest;
-        color: $link-color;
+        color: $text-color-darker;
         cursor: pointer;
         transition: all $hover-on-duration ease-out;
       }
