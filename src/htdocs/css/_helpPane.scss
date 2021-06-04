@@ -46,7 +46,7 @@
     > li {
       counter-increment: item;
       margin: 2rem 0;
-      padding-left: 33px;
+      padding-left: 2.2rem;
       position: relative;
 
       &:before {
@@ -54,14 +54,14 @@
         color: $bg-color;
         content: counter(item);
         position: absolute;
-        font-size: 17px;
-        height: 25px;
+        font-size: 1.15rem;
+        height: 1.7rem;
         left: 0;
         line-height: 1;
-        padding-top: 4px;
+        padding-top: .3rem;
         text-align: center;
         top: 0;
-        width: 25px;
+        width: 1.7rem;
       }
 
       &:first-child {
