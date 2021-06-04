@@ -1,9 +1,11 @@
+@use 'sass:color';
+@use 'variables' as *;
+
 #navBar {
   background-color: $accent-color-lighter;
   display: flex;
-  font: 600 1rem $font-family-headers;
+  font: 700 1rem/1 $font-family-headers;
   left: 0;
-  line-height: 1;
   margin: 0;
   padding: 0;
   position: fixed;
@@ -17,18 +19,21 @@
     padding: 12px 15px;
     text-decoration: none;
     text-transform: uppercase;
-    transition: all .25s ease-in;
+    transition: all $hover-off-duration ease-in;
 
     &:hover {
-      background-color: scale-color($accent-color-lighter, $lightness: -3%);
-      color: scale-color($link-color, $blackness: 5%);
+      background-color: color.scale($accent-color-lighter, $lightness: -2.5%);
+      color: color.scale($link-color, $blackness: 5%);
+      transition: all $hover-on-duration ease-out;
     }
+
     &.selected {
-      background-color: $link-color;
+      background-color: $accent-color;
       color: #fff;
-      text-shadow: 1px 1px 3px #444;
+      text-shadow: $button-text-shadow;
     }
   }
+
   li {
     list-style: none;
     margin: 0;

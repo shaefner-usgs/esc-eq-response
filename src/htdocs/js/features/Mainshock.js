@@ -116,9 +116,7 @@ var Mainshock = function (options) {
     summary += '</div>'; // parent div
 
     summary += '<button class="event-summary" disabled="disabled" ' +
-      'title="Download RTF Document" type="button">';
-    summary += '<img src="img/download.png" width="13" alt="download">Event Summary';
-    summary += '</button>';
+      'title="Download RTF Document" type="button">Event Summary</button>';
 
     return summary;
   };

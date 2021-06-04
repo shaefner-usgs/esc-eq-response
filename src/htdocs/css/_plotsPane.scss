@@ -19,63 +19,12 @@
   .cumulative {
     height: 40vh;
   }
+
   .hypocenters {
     height: 90vh;
   }
+
   .magtime {
     height: 40vh;
-  }
-
-  .feature {
-    width: 100%;
-  }
-
-  .features {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .hovertext {
-    path {
-      fill: #fff !important;
-      fill-opacity: 0.9 !important;
-      stroke: #ccc !important;
-    }
-    text {
-      fill: #222 !important;
-      font-family: $font-family !important;
-    }
-  }
-
-  .js-plotly-plot {
-    width: 100%;
-
-    /* Color plotly buttons, title tips using accent-color */
-    .modebar-btn path {
-      fill: $accent-color;
-      opacity: 0.4;
-    }
-
-    .modebar-btn.active path,
-    .modebar-btn:hover path {
-      opacity: 1;
-    }
-
-    .modebar-group {
-      margin-left: 0;
-    }
-
-    .plotly [data-title]:after {
-      background: scale-color($accent-color, $alpha: -92%);
-      color: $accent-color;
-    }
-
-    .plotly [data-title]:before {
-      border-color: transparent transparent scale-color($accent-color, $alpha: -92%);
-    }
-  }
-
-  .xtitle, .ytitle {
-    font-weight: 500 !important; /* match weight of 3d plots, which can't be changed */
   }
 }

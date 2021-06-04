@@ -358,7 +358,7 @@ var PlotsPane = function (options) {
 
   /**
    * Add a Feature to plots pane - creates plots, but only renders them once
-   *   plots pane is visible
+   *   plots pane is visible; add count and remove 'loader'
    *
    * @param feature {Object}
    */
@@ -366,16 +366,16 @@ var PlotsPane = function (options) {
     var count,
         div,
         isActive,
-        params,
-        spinner;
+        loader,
+        params;
 
     // Skip mainshock (it's included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       div = _el.querySelector('div.' + feature.id);
-      spinner = div.querySelector('.spinner');
+      loader = div.querySelector('.breather');
 
-      if (spinner) { // hide loading spinner
-        spinner.classList.add('hide');
+      if (loader) {
+        loader.classList.add('hide');
       }
 
       // Add count to Feature name
@@ -416,7 +416,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add a Feature's container, name and a loading 'spinner' to plots pane
+   * Add a Feature's container, name and a 'loader' to plots pane
    *
    * @param feature {Object}
    */
@@ -429,7 +429,7 @@ var PlotsPane = function (options) {
     ) {
       div = document.createElement('div');
       div.classList.add('content', 'feature', feature.id);
-      div.innerHTML = '<h2>' + feature.name + '<div class="spinner">' +
+      div.innerHTML = '<h2>' + feature.name + '<div class="breather">' +
         '<div></div></div></h2>';
 
       _featuresEl.appendChild(div);

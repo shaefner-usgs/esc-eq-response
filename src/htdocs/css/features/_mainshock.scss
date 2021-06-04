@@ -1,13 +1,65 @@
+@use '../variables' as *;
+
 #summaryPane {
-  .event-summary {
-    margin-top: 1em;
-    padding-left: 32px;
-    position: relative;
+  button {
+    margin-top: 1rem;
+
+    &:before {
+      content: 'Download';
+      display: block;
+      font-size: 0.8rem;
+      font-weight: normal;
+      margin-bottom: -0.15rem;
+    }
 
     img {
       left: 12px;
       position: absolute;
       top: 8px;
+    }
+  }
+
+  .dyfi img,
+  .shakemap img {
+    border: 2px solid #ccc;
+    border-radius: $button-border-radius;
+    padding: 2px;
+
+    &.mmiI {
+      border-color: $border-color-lighter; /* add subtle grey border so it shows up */
+    }
+    &.mmiII {
+      border-color: $mmiII-color;
+    }
+    &.mmiIII {
+      border-color: $mmiIII-color;
+    }
+    &.mmiIV {
+      border-color: $mmiIV-color;
+    }
+    &.mmiV {
+      border-color: $mmiV-color;
+    }
+    &.mmiVI {
+      border-color: $mmiVI-color;
+    }
+    &.mmiVII {
+      border-color: $mmiVII-color;
+    }
+    &.mmiVIII {
+      border-color: $mmiVIII-color;
+    }
+    &.mmiIX {
+      border-color: $mmiIX-color;
+    }
+    &.mmiX {
+      border-color: $mmiX-color;
+    }
+    &.mmiXI {
+      border-color: $mmiXI-color;
+    }
+    &.mmiXII {
+      border-color: $mmiXII-color;
     }
   }
 
@@ -22,7 +74,7 @@
 
   .pager-cities,
   .products {
-    margin: 0 0 1em 0;
+    margin: 0 0 1rem 0;
     max-width: 100%;
     width: 420px;
   }
@@ -31,27 +83,31 @@
     border-left: 1px solid $border-color-lightest;
     padding-left: 40px;
 
-    h4 {
-      margin-top: 0;
-    }
-
     table {
-      margin-top: .5em;
+      margin-top: .5rem;
       width: 100%;
     }
-    td, th {
-      padding: 0.25em;
+
+    td,
+    th {
+      padding: 0.25rem;
     }
+
     td:nth-child(3) {
       text-align: right;
     }
+
     tr {
       border: none; /* override general table border styles */
       border-top: 1px solid $border-color-lighter;
 
-      &.city,
-      &:first-child {
+      &.city {
         border: none;
+      }
+
+      &:first-child {
+        border-bottom: 1px solid $border-color;
+        border-top: none;
       }
       &:last-child {
         border-bottom: 1px solid $border-color-lighter;
@@ -60,7 +116,7 @@
 
     .city td {
       color: $text-color-lightest;
-      padding: 0 .25em .3em .25em;
+      padding: 0 .25rem .3rem .25rem;
     }
   }
 
@@ -74,20 +130,12 @@
     }
 
     h4 {
-      margin: 0;
       text-align: center;
 
-      &+img,
-      &+canvas {
-        margin-top: .5em;
+      &+canvas,
+      &+img {
+        margin-top: .5rem;
       }
-    }
-
-    .dyfi img,
-    .shakemap img {
-      border: 2px solid #ccc;
-      border-radius: 5px;
-      padding: 2px;
     }
 
     .earthquake {
@@ -104,19 +152,21 @@
       max-width: 190px;
       width: 50%;
 
-      a {
-        display: block;
-        margin: 1em .75em 0 .75em;
-      }
-      canvas, img {
-        width: 100%;
-      }
-
       &:nth-child(2n) a { /* first product in row */
         margin-left: 0;
       }
       &:nth-child(2n+1) a { /* second product in row */
         margin-right: 0;
+      }
+
+      a {
+        display: block;
+        margin: 1rem .75rem 0 .75rem;
+      }
+
+      canvas,
+      img {
+        width: 100%;
       }
     }
   }

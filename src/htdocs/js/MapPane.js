@@ -138,7 +138,7 @@ var MapPane = function (options) {
     // Hide zoom control on mobile (in favor of pinch-to-zoom)
     if (L.Browser.mobile) {
       zoomControl = _el.querySelector('.leaflet-control-zoom');
-      zoomControl.classList.add('hide');
+      zoomControl.style.display = 'none';
     }
   };
 
@@ -402,7 +402,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add a Feature's name and a loading 'spinner' to the layer control
+   * Add a Feature's name and a 'loader' to the layer control
    *
    * @param feature {Object}
    */
@@ -413,7 +413,7 @@ var MapPane = function (options) {
     if (Object.prototype.hasOwnProperty.call(feature, 'mapLayer')) {
       layer = L.layerGroup(); // empty placeholder layer
       layer.id = feature.id;
-      name = feature.name + '<div class="spinner"><div></div></div>';
+      name = feature.name + '<div class="breather"><div></div></div>';
 
       _createMapPane(feature.id, 'overlayPane');
 

@@ -157,19 +157,20 @@ var StatusBar = function (options) {
    *   }
    */
   _this.addItem = function (item, options) {
-    var animEllipsis,
-        defaults,
+    var defaults,
         div,
+        loader,
         msg;
 
-    animEllipsis = '<span>.</span><span>.</span><span>.</span>';
     defaults = {
       append: '',
       prepend: 'Loading'
     };
+    div = document.createElement('div');
+    loader = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>';
+    msg = '';
     options = Util.extend({}, defaults, options);
 
-    msg = '';
     if (item.name) {
       msg = item.name;
     }
@@ -179,9 +180,8 @@ var StatusBar = function (options) {
     if (options.prepend) {
       msg = options.prepend + ' ' + msg;
     }
-    msg += animEllipsis;
+    msg += loader;
 
-    div = document.createElement('div');
     div.classList.add(item.id);
     div.innerHTML = '<h4>' + msg + '</h4>';
 

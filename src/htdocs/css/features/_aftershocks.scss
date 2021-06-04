@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use '../variables' as *;
+
 #summaryPane {
   .probabilities {
     display: flex;
@@ -5,55 +8,61 @@
 
     a {
       border: 1px solid $border-color;
-      border-radius: 3px;
+      border-radius: $button-border-radius;
       color: $text-color;
       display: block;
-      margin-right: 1em;
+      margin-right: 1rem;
       text-align: center;
       text-decoration: none;
-      transition: all .35s ease-out;
-      width: 6em;
+      transition: all $hover-off-duration ease-in;
+      width: 6rem;
+
+      &:hover {
+        border-color: $accent-color;
+        color: $text-color-darker;
+        transition: all $hover-on-duration ease-out;
+
+        abbr {
+          border-color: color.scale($text-color-lightest, $lightness: -5%);
+          color: color.scale($text-color-lightest, $lightness: -15%);
+          transition: all $hover-on-duration ease-out;
+        }
+
+        h4 {
+          color: $accent-color;
+          background: $accent-color-lightest;
+          transition: all $hover-on-duration ease-out;
+        }
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
 
       abbr {
         color: $text-color-lightest;
-        font-size: .8em;
+        font-size: .8rem;
         display: inline-block;
         margin-top: 5px;
-        transition: color .35s ease-out;
+        transition: all $hover-off-duration ease-in;
       }
+
       h4 {
         background: $bg-color-darker;
-        border-radius: 3px 3px 0 0;
-        margin: 0;
+        border-radius: $button-border-radius $button-border-radius 0 0;
+        color: $text-color;
         padding: 4px 0;
-        transition: background .35s ease-out;
+        transition: all $hover-off-duration ease-in;
       }
+
       ul {
         list-style: none;
-        margin: .75em 0 1em;
+        margin: .75rem 0 1rem;
         padding: 0;
       }
 
       .probability {
-        font: 1.25em $font-family-mmi;
-      }
-
-      &:hover {
-        border-color: scale-color($accent-color, $whiteness: 50%);
-        color: $accent-color;
-        transition-duration: 0s;
-
-        abbr {
-          color: scale-color($accent-color, $whiteness: 40%);
-          border-color: scale-color($accent-color, $whiteness: 40%);
-          transition-duration: 0s;
-        }
-        h4 {
-          background: $accent-color-lightest;
-        }
-      }
-      &:last-child {
-        margin-right: 0;
+        font: 1.25rem $font-family-mmi;
       }
     }
   }

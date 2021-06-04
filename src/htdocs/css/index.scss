@@ -1,116 +1,128 @@
-@import '_variables.scss';
+@use 'sass:color';
+@use 'editPane';
+@use 'features';
+@use 'helpPane';
+@use 'impactBubbles';
+@use 'leaflet';
+@use 'mapPane';
+@use 'navBar';
+@use 'plotly';
+@use 'plotsPane';
+@use 'statusBar';
+@use 'summaryPane';
+@use 'tablesort/src/tablesort';
+@use 'util';
+@use 'variables' as *;
 
-@import '_editPane.scss';
-@import '_formElements.scss';
-@import '_helpPane.scss';
-@import '_impactBubbles.scss';
-@import '_lightbox.scss';
-@import '_mapPane.scss';
-@import '_navBar.scss';
-@import '_plotsPane.scss';
-@import '_statusBar.scss';
-@import '_summaryPane.scss';
-
-@import 'features/_aftershocks.scss';
-@import 'features/_earthquakes.scss';
-@import 'features/_fieldnotes.scss';
-@import 'features/_mainshock.scss';
-@import 'features/_shakemap-stations.scss';
-
-abbr[title] {
-  text-decoration: none; /* clean up default styling in Chrome */
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  box-sizing: border-box;
-  font: $font-size $font-family;
-}
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
 a {
   color: $link-color;
-  text-decoration-color: scale-color($link-color, $lightness: 75%);
+  text-decoration-color: color.scale($link-color, $lightness: 75%);
   text-decoration-skip-ink: none;
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
-  transition: text-decoration-color .2s ease-in-out;
+  transition: text-decoration-color $hover-off-duration ease-in;
 
   &:active {
     color: $link-color-active;
   }
   &:hover {
-    text-decoration-color: scale-color($link-color, $lightness: 25%);
+    text-decoration-color: color.scale($link-color, $lightness: 25%);
+    transition: text-decoration-color $hover-on-duration ease-out;
   }
   &:visited {
     color: $link-color-visited;
   }
 }
 
+abbr {
+  border-bottom: 1px dotted #bbb;
+  cursor: help;
+
+  &[title] {
+    text-decoration: none; /* clean up default styling in Chrome */
+  }
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 body {
   background: $bg-color;
   color: $text-color;
   position: relative;
 }
 
-abbr {
-  border-bottom: 1px dotted #bbb;
-  cursor: help;
-}
-
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: $font-family-headers;
   font-weight: 400;
-  margin: 1rem 0;
 }
-h2, h3 {
+h2,
+h3 {
   align-items: baseline;
   display: flex;
 }
 h1 {
   font-size: 2.1rem;
-  margin-top: 0;
+  margin: 0 0 1rem;
 }
 h2 {
   font-size: 2rem;
+  margin: 1rem 0;
 }
 h3 {
   font-size: 1.5rem;
+  margin: 1rem 0;
 }
 h4 {
   font-size: 1.2rem;
+  margin: 0;
 }
 
-p > strong {
-  font-weight: 500;
+html {
+  box-sizing: border-box;
+  font: $font-size $font-family;
+}
+
+p {
+  margin: 1rem 0;
+
+  > strong {
+    font-weight: 500;
+  }
 }
 
 table {
   border-collapse: collapse;
-  margin: 0 0 1em;
+  margin: 0 0 1rem;
 }
 
-td, th {
-  padding: .4em .8em;
+td,
+th {
+  padding: .4rem .75rem;
 
   &:first-child {
     padding-left: 5px;
   }
-  &:last-child:not(.total) {
+  &:last-child {
     padding-right: 5px;
   }
 }
 
 th {
-  border-bottom: 1px solid $border-color;
-  font: 600 .95rem $font-family-headers;
+  font: 700 .95rem $font-family-headers;
+  padding-bottom: .3rem;
   text-align: center;
   text-transform: uppercase;
 }
@@ -118,21 +130,21 @@ th {
 tr {
   border-bottom: 1px solid $border-color-lighter;
 
-  &:first-child { /* header row; borders set in 'th' selector */
-    border: none;
+  &:first-child {
+    border-bottom: 1px solid $border-color;
   }
 }
 
 .content {
   line-height: 1.6;
-  padding: 1em;
+  padding: 1rem;
 }
 
 .count {
   font-size: .8em;
   margin-left: .3em;
   opacity: 1;
-  transition: opacity .3s ease-in-out;
+  transition: opacity .25s ease-out;
 
   &.hide {
     opacity: 0;
@@ -147,77 +159,33 @@ tr {
   }
 }
 
-.darker {
-  background: $bg-color-darker;
+.feature {
+  width: 100%;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .pane {
+  display: block;
   left: 0;
-  opacity: 1;
-  padding: 2.5em 0 0;
+  padding: 2.5rem 0 0;
   position: absolute;
   top: 0;
-  transition: opacity .25s ease-out;
   width: 100%;
 
   &.hide {
     display: none;
     max-height: 1vh;
-    opacity: 0;
     overflow: hidden;
-    transition: none;
-  }
-
-  &#mapPane {
-    padding: 0;
-  }
-}
-
-.spinner {
-  display: block;
-  opacity: 1;
-  position: relative;
-
-  &.hide {
-    display: none;
-    opacity: 0;
-  }
-
-  div {
-    animation: sk-scaleout 1.0s infinite ease-in-out;
-    background-color: #333;
-    border-radius: 50%;
-    height: .8em;
-    left: .5em;
-    position: absolute;
-    top: -.7em;
-    width: .8em;
-  }
-}
-
-@-webkit-keyframes sk-scaleout {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1.0);
-    opacity: 0;
-  }
-}
-
-@keyframes sk-scaleout {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1.0);
-    opacity: 0;
   }
 }
 
 @media only screen
   and (max-width: $breakpoint-phone-width) {
     .content {
-      padding: 1em .5em;
+      padding: 1rem .5rem;
     }
 }

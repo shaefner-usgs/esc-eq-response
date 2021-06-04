@@ -1,0 +1,10 @@
+@use '../variables' as *;
+
+.leaflet-control-mouseposition {
+  background-color: rgba(255, 255, 255, .5);
+  color: $text-color;
+  font-size: .75rem;
+  margin: 0 0 5px 0 !important;
+  padding: 2px 4px;
+  user-select: none;
+}

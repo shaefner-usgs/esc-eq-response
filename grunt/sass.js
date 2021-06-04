@@ -7,6 +7,9 @@ var config = require('./config'),
 var sass = {
   options: {
     implementation: dartSass,
+    includePaths: [
+      'node_modules'
+    ],
     outputStyle: 'expanded',
     sourceComments: true,
     sourceMap: true,

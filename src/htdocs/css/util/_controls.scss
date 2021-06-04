@@ -1,0 +1,281 @@
+@use 'sass:color';
+@use '../variables' as *;
+
+$reset-button-color: #efefef;
+$thumb-d: 1.2rem;
+$track-bg: $border-color;
+$track-c: $accent-color;
+$track-h: .25rem;
+$track-w: 18rem;
+$dist: $track-w - $thumb-d;
+
+@mixin track($color1, $color2) {
+  background: linear-gradient($color1, $color1) no-repeat $color2;
+  background-size: 25% 100%;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+  height: $track-h;
+  width: $track-w;
+}
+
+@mixin thumb() {
+  background: #fff;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  box-shadow: 0px 1px 2px #bbb;
+  box-sizing: border-box;
+  height: $thumb-d;
+  width: $thumb-d;
+}
+
+/* Buttons
+--------------------------------------------- */
+
+button {
+  appearance: none;
+  background: $bg-color;
+  border: 1px solid $accent-color;
+  border-radius: $button-border-radius;
+  color: $accent-color;
+  cursor: pointer;
+  font: 700 1.1rem $font-family-headers;
+  margin-top: 1.5rem;
+  padding: 5px 12px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: all $hover-off-duration ease-in;
+  user-select: none;
+  white-space: nowrap;
+
+  &.reset {
+    background: $reset-button-color;
+    border-color: color.scale($reset-button-color, $blackness: 15%);
+    color: $text-color-lighter;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background: color.scale($reset-button-color, $lightness: 40%);
+      border-color: color.scale($reset-button-color, $blackness: 25%);
+      color: $text-color;
+      text-shadow: none;
+    }
+    &:active {
+      box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
+    }
+  }
+
+  &:active,
+  &:focus,
+  &:hover {
+    background: $accent-color;
+    color: #fff;
+    text-shadow: $button-text-shadow;
+    transition: all $hover-on-duration ease-out;
+  }
+  &:active {
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, .35);
+    outline: 0;
+  }
+  &:focus {
+    outline: 0;
+  }
+
+  &[disabled] {
+    background: $bg-color;
+    box-shadow: none;
+    color: $accent-color;
+    cursor: not-allowed;
+    opacity: .3;
+    text-shadow: none;
+  }
+}
+
+/* Check boxes / radio inputs (customized to Leaflet's html rendering)
+--------------------------------------------- */
+
+input[type="checkbox"],
+input[type="radio"] {
+  display: none;
+
+  + span:before {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #888;
+    content: '\00a0';
+    display: flex;
+    font: 1rem/1 'Arial Unicode MS';
+    height: 1rem;
+    justify-content: center;
+    margin-right: .5rem;
+    position: relative;
+    text-shadow: $button-text-shadow;
+    top: 0px;
+    width: 1rem;
+  }
+}
+input[type="checkbox"] + span:before {
+  border-radius: 3px;
+}
+input[type="radio"] + span:before {
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+input[type="checkbox"]:checked + span:before,
+input[type="radio"]:checked + span:before {
+  background-color: $accent-color;
+  border-color: $accent-color;
+  color: #fff;
+}
+input[type="checkbox"]:checked + span:before {
+  content: '\2713';
+}
+input[type="radio"]:checked + span:before {
+  content: '\25CF';
+}
+
+/* Text / number inputs
+--------------------------------------------- */
+
+input[type="text"],
+input[type="number"] {
+  border: 1px solid $border-color-lighter;
+  border-radius: $button-border-radius;
+  box-shadow: inset 0 1px 4px 0 hsla(0, 0%, 0%, .08);
+  font-size: .9rem;
+  margin: 0 1px 3px 0;
+  outline: none;
+  padding: 6px 0 6px 6px;
+  transition: all .25s ease-in-out;
+  width: 12rem;
+
+  &:autofill {
+    background: none !important;
+  }
+
+  &:focus {
+    border: 1px solid $accent-color;
+    box-shadow: 0 0 3px $accent-color;
+  }
+
+  &:invalid {
+    border: 1px solid #c00;
+    box-shadow: 0 0 3px #c00;
+  }
+}
+
+/* Range inputs - adapted from:
+   https://css-tricks.com/sliding-nightmare-understanding-range-input/
+--------------------------------------------- */
+
+div.filter {
+  align-items: center;
+  display: flex;
+  margin: 1rem 0 0;
+  position: relative;
+
+  h4 {
+    font: 1rem $font-family;
+    position: absolute;
+    top: 0;
+
+    &:after {
+      content: ':';
+    }
+  }
+}
+
+[type='range'] {
+  background: transparent;
+  cursor: pointer;
+  flex: 1;
+  font: inherit;
+  margin: 0;
+  min-height: $thumb-d;
+  outline: 0;
+  padding: 0;
+
+  &,
+  &::-webkit-slider-thumb {
+    appearance: none
+  }
+
+  &::-moz-focus-outer {
+    border: 0;
+  }
+
+  &::-moz-range-thumb {
+    @include thumb;
+  }
+  &::-ms-thumb {
+    margin-top: 0;
+    @include thumb;
+  }
+  &::-webkit-slider-thumb {
+    margin-top: .5 * ($track-h - $thumb-d);
+    @include thumb;
+  }
+
+  &::-moz-range-track {
+    @include track($track-c, $track-bg);
+  }
+  &::-ms-track {
+    @include track($track-c, $track-bg);
+  }
+  &::-webkit-slider-runnable-track {
+    @include track($track-c, $track-bg);
+  }
+
+  &::-ms-tooltip {
+    display: none;
+  }
+
+  ~ output {
+    background: $bg-color;
+    color: $text-color;
+    display: block;
+    left: .5 * $thumb-d;
+    line-height: 1;
+    padding: .25rem .5rem;
+    position: absolute;
+    top: 0;
+    transform: translate(calc((var(--val) - var(--min)) / (var(--max) - var(--min)) * #{$dist} - 50%));
+  }
+}
+
+.inverted [type='range'] {
+  &::-moz-range-track {
+    @include track($track-bg, $track-c);
+  }
+  &::-ms-track {
+    @include track($track-bg, $track-c);
+  }
+  &::-webkit-slider-runnable-track {
+    @include track($track-bg, $track-c);
+  }
+}
+
+.max,
+.min {
+  color: $text-color-lighter;
+  font-size: .9rem;
+  font-weight: 300;
+  margin-top: 1.5rem;
+}
+.max {
+  padding-left: .75rem;
+}
+.min {
+  padding-right: .75rem;
+}
+
+.slider {
+  align-items: center;
+  display: flex;
+  height: 4.5rem;
+  margin-top: 1.5rem;
+  position: relative;
+  width: $track-w;
+}

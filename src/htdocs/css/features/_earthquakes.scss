@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 #summaryPane {
   table.m0 tr.m0,
   table.m1 tr.m1,
@@ -26,30 +28,26 @@
   }
 
   .bin {
-    td, th {
-      padding-left: .4em;
-      padding-right: .4em;
-    }
     td {
-      &:not(:first-child) {
-        text-align: right;
-      }
-
       &.total {
         background-color: $bg-color-darker;
       }
-    }
 
+      &:not(:first-child) {
+        text-align: right;
+      }
+    }
     th {
       &.period {
         border-bottom: 1px solid $border-color-lighter;
         font-weight: 400;
         text-align: right;
       }
+
       &.rowlabel {
         border-bottom: 1px solid $border-color-lighter;
         border-right: 1px solid $border-color;
-        padding-right: 1em;
+        padding-right: 1rem;
         text-align: center;
       }
     }
@@ -58,10 +56,10 @@
   .bins {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: -1.25em;
+    margin-bottom: -1.25rem;
 
     table {
-      margin-right: 2em;
+      margin-right: 2rem;
 
       &:last-child {
         margin-right: 0;
@@ -75,85 +73,60 @@
 
   .eqlist {
     td {
-      .tz {
-        display: none;
-      }
-
       &.depth,
       &.distance,
       &.mag {
         text-align: right;
       }
+
       &.distance span {
         display: inline-block;
         text-align: left;
-        width: 1.5em;
+        width: 1.5rem;
       }
+
       &.latlng {
         text-align: center;
+      }
+
+      .tz {
+        display: none;
       }
     }
 
     th {
       position: relative;
-
-      &.sort-header {
-        cursor: pointer;
-        white-space: nowrap;
-
-        &:after {
-          border-color: #404040 transparent;
-          border-style: solid;
-          border-width: 0 4px 4px;
-          content: '';
-          display: inline-block;
-          margin: 8px 0 4px 2px;
-          position: absolute;
-          visibility: hidden;
-        }
-        &:hover {
-          color: $text-color-darker;
-        }
-        &:selection {
-          background: transparent;
-        }
-
-        &.sort-up:after,
-        &.sort-down:after {
-          opacity: 1.0;
-          visibility: visible;
-        }
-        &.sort-up:after {
-          border-bottom: none;
-          border-width: 4px 4px 0;
-        }
-      }
     }
 
     tr {
-      transition: all .25s ease-out;
-    }
-    tr:hover:not(.no-sort), .selected {
-      background: $accent-color-lightest;
-      color: $link-color;
-      cursor: pointer;
-      transition-duration: 0s;
+      transition: all $hover-off-duration ease-in;
+
+      &.selected,
+      &:hover:not(.no-sort) {
+        background: $accent-color-lightest;
+        color: $text-color-darker;
+        cursor: pointer;
+        transition: all $hover-on-duration ease-out;
+      }
     }
   }
 }
 
 /* Earthquake details shown on edit, map (popup), and summary panes
     (also used for other (i.e. non-eq) Leaflet popups) */
-.earthquake, .leaflet-popup-content {
-  dd, dt {
+.earthquake,
+.leaflet-popup-content {
+  &.selected .distance {
+    display: none;
+  }
+
+  dd,
+  dt {
     line-height: 1.7;
   }
   dd {
     color: $text-color;
-    margin-left: 5em;
-  }
-  dl {
-    margin-bottom: 0;
+    margin-left: 5rem;
   }
   dt {
     clear: left;
@@ -161,19 +134,17 @@
     display: inline-block;
     float: left;
     font-weight: 300;
-    letter-spacing: .015em;
-    margin-right: .75em;
+    letter-spacing: .015rem;
+    margin-right: .75rem;
     text-align: right;
-    width: 4.25em;
-  }
-  h4 {
-    margin: 0;
-  }
-  time {
-    display: block;
+    width: 4.25rem;
   }
 
-  &.selected .distance {
-    display: none;
+  dl {
+    margin-bottom: 0;
+  }
+
+  time {
+    display: block;
   }
 }

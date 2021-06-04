@@ -1,0 +1,84 @@
+@use '../variables' as *;
+
+.breather {
+  display: block;
+  opacity: 1;
+  position: relative;
+
+  &.hide {
+    display: none;
+    opacity: 0;
+  }
+
+  div {
+    animation: scale 1s infinite ease-in-out;
+    background-color: $text-color;
+    border-radius: 50%;
+    height: .8em;
+    left: .5em;
+    position: absolute;
+    top: -.7em;
+    width: .8em;
+  }
+}
+
+.ellipsis {
+  span {
+    animation: opacify 1s infinite linear;
+    display: inline-block;
+    font: 1.5rem georgia;
+    line-height: .25;
+
+    &:nth-child(1) {
+      padding-left: 3px;
+    }
+    &:nth-child(2) {
+      animation-delay: .2s;
+    }
+    &:nth-child(3) {
+      animation-delay: .4s;
+    }
+  }
+}
+
+.spinner {
+  animation: rotate 0.75s infinite linear;
+  border: 5px solid $text-color-lighter;
+  border-radius: 50%;
+  border-right-color: transparent;
+  display: block;
+  height: 20px;
+  left: 47%;
+  position: absolute;
+  top: 47%;
+  width: 20px;
+  z-index: 1000;
+}
+
+@keyframes opacify {
+  0%, 100% {
+    opacity: .1;
+  }
+  20% {
+    opacity: 1;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.0);
+  }
+}
