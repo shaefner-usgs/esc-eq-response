@@ -67,6 +67,23 @@
     }
   }
 
+  .filter {
+    align-items: center;
+    display: flex;
+    margin: 1rem 0 0;
+    position: relative;
+
+    h4 {
+      font: 1rem $font-family;
+      position: absolute;
+      top: 0;
+
+      &:after {
+        content: ':';
+      }
+    }
+  }
+
   .hide-year .year {
     display: none; /* hide year column when duration is 30 days or less */
   }

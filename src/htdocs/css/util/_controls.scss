@@ -170,23 +170,6 @@ input[type="number"] {
    https://css-tricks.com/sliding-nightmare-understanding-range-input/
 --------------------------------------------- */
 
-div.filter {
-  align-items: center;
-  display: flex;
-  margin: 1rem 0 0;
-  position: relative;
-
-  h4 {
-    font: 1rem $font-family;
-    position: absolute;
-    top: 0;
-
-    &:after {
-      content: ':';
-    }
-  }
-}
-
 [type='range'] {
   background: transparent;
   cursor: pointer;
