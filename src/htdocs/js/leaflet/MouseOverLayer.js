@@ -2,7 +2,7 @@
 'use strict';
 
 
-require('mappane/Utfgrid');
+require('leaflet/Utfgrid');
 
 /**
  * This class enables mouseover labels on Leaflet Map using UtfGrid

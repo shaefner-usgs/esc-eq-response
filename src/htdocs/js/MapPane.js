@@ -3,14 +3,14 @@
 
 
 // Leaflet plugins and layer factories (attached to global L var)
-require('mappane/Control-bottomCenter');
-require('mappane/DarkLayer');
-require('mappane/FaultsLayer');
-require('mappane/GreyscaleLayer');
-require('mappane/MousePosition');
-//require('mappane/RestoreMap');
-require('mappane/SatelliteLayer');
-require('mappane/TerrainLayer');
+require('leaflet/Control-bottomCenter');
+require('leaflet/DarkLayer');
+require('leaflet/FaultsLayer');
+require('leaflet/GreyscaleLayer');
+require('leaflet/MousePosition');
+//require('leaflet/RestoreMap');
+require('leaflet/SatelliteLayer');
+require('leaflet/TerrainLayer');
 
 
 /**

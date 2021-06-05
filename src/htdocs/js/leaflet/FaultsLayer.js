@@ -2,7 +2,7 @@
 'use strict';
 
 
-require('mappane/MouseOverLayer');
+require('leaflet/MouseOverLayer');
 
 
 /**
