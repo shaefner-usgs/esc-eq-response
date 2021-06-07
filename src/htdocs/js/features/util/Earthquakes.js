@@ -381,7 +381,7 @@ var Earthquakes = function (options) {
       '</div>';
     } else if (type === 'subheader') {
       template = '<h3>' +
-        'M <span class="mag">{mag}</span>+ Earthquake List <span class="count">{count}</span>' +
+        'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
       '</h3>';
     } else if (type === 'table') { // lists on summary pane
       template = '<table class="{tableClasses}">' +
