@@ -213,6 +213,19 @@ AppUtil.round = function (num, precision, empty) {
 };
 
 /**
+ * Set all form field values to match values in querystring
+ */
+AppUtil.setFormFieldValues = function () {
+  var params = AppUtil.getParams();
+
+  Object.keys(params).forEach(function(key) {
+    if (document.getElementById(key)) {
+      document.getElementById(key).value = params[key];
+    }
+  });
+};
+
+/**
  * Set the value of a URL parameter
  *
  * @param name {String}
@@ -235,6 +248,20 @@ AppUtil.setParam = function (name, value) {
   queryString = '?' + pairs.join('&');
 
   window.history.replaceState({}, '', queryString + hash);
+};
+
+/**
+ * Set all querystring values to match values in form fields
+ */
+AppUtil.setQueryStringValues = function () {
+  var fields,
+      i;
+
+  fields = document.querySelectorAll('#editPane input');
+
+  for (i = 0; i < fields.length; i ++) {
+    AppUtil.setParam(fields[i].id, fields[i].value);
+  }
 };
 
 /**
@@ -269,6 +296,24 @@ AppUtil.stripslashes = function (str) {
  */
 AppUtil.ucfirst = function (str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/**
+ * Update URL parameter (triggered when a form field is changed by user)
+ *
+ * @param e {Event}
+ */
+AppUtil.updateParam = function (e) {
+  var el,
+      id,
+      value;
+
+  id = e.target.id;
+  el = document.getElementById(id);
+  value = el.value.replace(/\s+/g, ''); // strip whitespace
+  el.value = value;
+
+  AppUtil.setParam(id, value);
 };
 
 

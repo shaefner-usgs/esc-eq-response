@@ -52,10 +52,7 @@ var EditPane = function (options) {
       _resetCounts,
       _resetForm,
       _resetTitle,
-      _saveFocusedField,
-      _setFormFieldValues,
-      _setQueryStringValues,
-      _updateParam;
+      _saveFocusedField;
 
 
   _this = {};
@@ -71,8 +68,8 @@ var EditPane = function (options) {
     _timers = {};
 
     _initListeners();
-    _setFormFieldValues();
-    _setQueryStringValues();
+    AppUtil.setFormFieldValues();
+    AppUtil.setQueryStringValues();
   };
 
   /**
@@ -187,7 +184,7 @@ var EditPane = function (options) {
     reset = _el.querySelector('.reset');
 
     // Update querystring param when form field is changed
-    _addListener(_fields, 'input', _updateParam);
+    _addListener(_fields, 'input', AppUtil.updateParam);
 
     // Remember focused field
     _addListener(_fields, 'focus', _saveFocusedField);
@@ -305,7 +302,7 @@ var EditPane = function (options) {
 
     // Set a slight delay so 'Reset' button can finish clearing input fields first
     setTimeout(function() {
-      _setQueryStringValues(); // reset query string
+      AppUtil.setQueryStringValues(); // reset query string
 
       // Rebuild significant eqs pulldown (to set selected item if necessary)
       select = _el.querySelector('.significant');
@@ -332,54 +329,12 @@ var EditPane = function (options) {
   };
 
   /**
-   * Set all form field values to match values in querystring
-   */
-  _setFormFieldValues = function () {
-    var params = AppUtil.getParams();
-
-    Object.keys(params).forEach(function(key) {
-      if (document.getElementById(key)) {
-        document.getElementById(key).value = params[key];
-      }
-    });
-  };
-
-  /**
-   * Set all querystring values to match values in form fields
-   */
-  _setQueryStringValues = function () {
-    var i;
-
-    for (i = 0; i < _fields.length; i ++) {
-      AppUtil.setParam(_fields[i].id, _fields[i].value);
-    }
-  };
-
-  /**
    * Save id of form field selected (focused) by user
    *
    * @param e {Event}
    */
   _saveFocusedField = function (e) {
     _focusedField = e.target.id;
-  };
-
-  /**
-   * Update URL parameter (triggered when a form field is changed by user)
-   *
-   * @param e {Event}
-   */
-  _updateParam = function (e) {
-    var el,
-        id,
-        value;
-
-    id = e.target.id;
-    el = document.getElementById(id);
-    value = el.value.replace(/\s+/g, ''); // strip whitespace
-    el.value = value;
-
-    AppUtil.setParam(id, value);
   };
 
   // ----------------------------------------------------------
@@ -496,7 +451,7 @@ var EditPane = function (options) {
     _eqid.value = significant.options[index].value;
 
     // Call manually (eqid input event not triggered when value changed programmatically)
-    _setQueryStringValues();
+    AppUtil.setQueryStringValues();
     _this.initFeatures();
   };
 
@@ -519,7 +474,7 @@ var EditPane = function (options) {
     });
 
     // Next, update all form fields to match url params
-    _setFormFieldValues();
+    AppUtil.setFormFieldValues();
   };
 
   /**
