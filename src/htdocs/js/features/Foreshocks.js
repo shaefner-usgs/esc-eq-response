@@ -2,7 +2,8 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes');
+    Earthquakes = require('features/util/Earthquakes'),
+    Moment = require('moment');
 
 
 /**
@@ -72,13 +73,13 @@ var Foreshocks = function (options) {
 
     mainshock = _app.Features.getFeature('mainshock');
     urlParams = {
-      endtime: AppUtil.Moment(mainshock.json.properties.time - 1000).utc()
+      endtime: Moment(mainshock.json.properties.time - 1000).utc()
         .toISOString().slice(0, -5),
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(AppUtil.getParam('fs-dist')),
       minmagnitude: Number(AppUtil.getParam('fs-mag')) - 0.05, // account for rounding to tenths
-      starttime: AppUtil.Moment(mainshock.json.properties.time).utc()
+      starttime: Moment(mainshock.json.properties.time).utc()
         .subtract(AppUtil.getParam('fs-days'), 'days').toISOString()
         .slice(0, -5)
     };

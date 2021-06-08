@@ -1,17 +1,9 @@
 'use strict';
 
 
-var LatLon = require('util/LatLon'),
-    Moment = require('moment');
-
-
 // Static object with utility methods
-var AppUtil = function () {
-};
+var AppUtil = function () {};
 
-// Attach (expose) helper libraries
-AppUtil.LatLon = LatLon;
-AppUtil.Moment = Moment;
 
 /**
  * Add commas to large numbers

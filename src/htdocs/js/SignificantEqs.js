@@ -2,6 +2,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Moment = require('moment'),
     Xhr = require('hazdev-webutils/src/util/Xhr');
 
 
@@ -60,7 +61,7 @@ var SignificantEqs = function (options) {
       _json.features.forEach(function(feature) {
         props = feature.properties;
 
-        date = AppUtil.Moment.utc(props.time).format('MMM D HH:mm:ss');
+        date = Moment.utc(props.time).format('MMM D HH:mm:ss');
         mag = AppUtil.round(props.mag, 1);
 
         selectedStatus = '';

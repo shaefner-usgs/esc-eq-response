@@ -2,7 +2,8 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes');
+    Earthquakes = require('features/util/Earthquakes'),
+    Moment = require('moment');
 
 
 /**
@@ -85,7 +86,7 @@ var Aftershocks = function (options) {
       longitude: _mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(AppUtil.getParam('as-dist')),
       minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: AppUtil.Moment(_mainshock.json.properties.time + 1000)
+      starttime: Moment(_mainshock.json.properties.time + 1000)
         .utc().toISOString().slice(0, -5)
     };
 
@@ -177,9 +178,9 @@ var Aftershocks = function (options) {
       mostRecentEqTime = mostRecentEq.isoTime;
 
       duration = AppUtil.round(
-        AppUtil.Moment.duration(
-          AppUtil.Moment.utc() -
-          AppUtil.Moment.utc(mostRecentEqTime)
+        Moment.duration(
+          Moment.utc() -
+          Moment.utc(mostRecentEqTime)
         ).asDays(), 1
       ) + ' days';
 

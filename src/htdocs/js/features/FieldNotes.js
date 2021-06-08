@@ -4,6 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Lightbox = require('util/Lightbox'),
+    Moment = require('moment'),
     Util = require('hazdev-webutils/src/util/Util');
 
 
@@ -203,9 +204,9 @@ var FieldNotes = function (options) {
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
-    after = AppUtil.Moment(mainshock.json.properties.time + 1000).utc()
+    after = Moment(mainshock.json.properties.time + 1000).utc()
       .format('X');
-    before = AppUtil.Moment(mainshock.json.properties.time).utc()
+    before = Moment(mainshock.json.properties.time).utc()
       .add(30, 'days').format('X');
     pairs = [];
     urlParams = {
