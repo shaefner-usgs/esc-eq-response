@@ -1,7 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
+var AppUtil = require('util/AppUtil'),
     Tablesort = require('tablesort');
 
 

@@ -2,8 +2,8 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
-    Lightbox = require('Lightbox'),
+var AppUtil = require('util/AppUtil'),
+    Lightbox = require('util/Lightbox'),
     Util = require('hazdev-webutils/src/util/Util');
 
 

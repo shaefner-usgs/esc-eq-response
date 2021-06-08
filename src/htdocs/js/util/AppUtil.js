@@ -1,7 +1,7 @@
 'use strict';
 
 
-var LatLon = require('LatLon'),
+var LatLon = require('util/LatLon'),
     Moment = require('moment');
 
 

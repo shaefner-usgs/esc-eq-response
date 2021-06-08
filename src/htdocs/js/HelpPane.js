@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Svg = require('Svg');
+var Svg = require('util/Svg');
 
 
 /**

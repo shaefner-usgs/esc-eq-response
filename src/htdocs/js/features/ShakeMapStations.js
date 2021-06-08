@@ -2,7 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('AppUtil'),
+var AppUtil = require('util/AppUtil'),
     Util = require('hazdev-webutils/src/util/Util');
 
 

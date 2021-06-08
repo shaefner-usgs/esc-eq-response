@@ -2,7 +2,7 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
-    AppUtil = require('AppUtil'),
+    AppUtil = require('util/AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
