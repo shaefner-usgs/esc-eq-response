@@ -5,10 +5,10 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Handle form fields and set URL to match application state; display mainshock
- *   details
+ * Handle form fields and set URL to match application state; display Mainshock
+ *   details.
  *
- * Also kicks off creation of Features
+ * Also kicks off creation of Features.
  *
  * @param options {Object}
  *   {
@@ -21,6 +21,7 @@ var AppUtil = require('util/AppUtil');
  *     addFeature: {Function},
  *     addLoader: {Function},
  *     initFeatures: {Function},
+ *     postInit: {Function},
  *     removeFeature: {Function},
  *     reset: {Function},
  *     selSignificantEq: {Function},
@@ -208,7 +209,7 @@ var EditPane = function (options) {
     var id = 'mainshock';
 
     if (this.value) {
-      // Immediately show loading status (don't wait for trottle timers)
+      // Immediately show loading status (don't wait for throttle timers)
       _app.StatusBar.clearItems();
       _app.StatusBar.addItem({
         id: id,
@@ -402,6 +403,17 @@ var EditPane = function (options) {
     if (eqidIsValid) {
       // Instantiate mainshock (other features are created after mainshock is ready)
       _app.Features.instantiateFeature('mainshock');
+    }
+  };
+
+  /**
+   * Initialization that depends on app's "primary" Classes already being
+   *   instantiated in Application.js.
+   */
+  _this.postInit = function () {
+    // Get things rolling if eqid is already set
+    if (AppUtil.getParam('eqid') !== '') {
+      _this.initFeatures();
     }
   };
 

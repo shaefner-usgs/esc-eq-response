@@ -1,55 +1,55 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    EditPane = require('EditPane'),
+var EditPane = require('EditPane'),
     Features = require('Features'),
     Feeds = require('Feeds'),
     HelpPane = require('HelpPane'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
-    StatusBar = require('StatusBar'),
     Rtf = require('Rtf'),
     SignificantEqs = require('SignificantEqs'),
+    StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane');
 
 
 /**
- * Earthquake Response Application - set up and configure app's components
+ * Earthquake Response Application - set up and configure app's "primary"
+ *   components (Classes).
  *
  * @param options {Object}
  *   {
- *     editPane: {Element},
- *     helpPane: {Element},
- *     mapPane: {Element},
- *     navBar: {Element},
- *     plotsPane: {Element},
- *     statusBar: {Element},
- *     summaryPane: {Element}
+ *     EditPane: {Element},
+ *     HelpPane: {Element},
+ *     MapPane: {Element},
+ *     NavBar: {Element},
+ *     PlotsPane: {Element},
+ *     StatusBar: {Element},
+ *     SummaryPane: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     EditPane: {Function},
- *     Features: {Function},
- *     Feeds: {Function},
- *     HelpPane: {Function},
- *     MapPane: {Function},
- *     NavBar: {Function},
- *     PlotsPane: {Function},
- *     Rtf: {Function},
- *     SignificantEqs: {Function},
- *     resetApp: {Function},
- *     StatusBar: {Function},
- *     SummaryPane: {Function}
+ *     EditPane: {Object},
+ *     Features: {Object},
+ *     Feeds: {Object},
+ *     HelpPane: {Object},
+ *     MapPane: {Object},
+ *     NavBar: {Object},
+ *     PlotsPane: {Object},
+ *     Rtf: {Object},
+ *     SignificantEqs: {Object},
+ *     StatusBar: {Object},
+ *     SummaryPane: {Object},
+ *     resetApp: {Function}
  *   }
  */
 var Application = function (options) {
   var _this,
       _initialize,
 
-      _initComponents,
+      _instantiateClasses,
       _redirect;
 
 
@@ -57,78 +57,59 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _redirect();
-    _initComponents(options);
-
-    // Remove initial loading message
-    _this.StatusBar.removeItem('initial');
-
-    // Get things rolling if eqid is already set
-    if (AppUtil.getParam('eqid') !== '') {
-      _this.EditPane.initFeatures();
-    }
+    _instantiateClasses(options);
   };
 
   /**
-   * Instantiate app components and store them in a superglobal 'app' object
-   *   that is shared between Classes
+   * Instantiate app's "primary" Classes and store/share them via the 'app'
+   *   property so their public methods/props are accessible to other Classes.
    */
-  _initComponents = function (options) {
-    // Instantiate PlotsPane, StatusBar first so they're available immediately
-    _this.PlotsPane = PlotsPane({
-      app: _this,
-      el: options.plotsPane
-    });
-    _this.StatusBar = StatusBar({
-      app: _this,
-      el: options.statusBar
+  _instantiateClasses = function (options) {
+    var classes = [
+      EditPane,
+      Features,
+      Feeds,
+      HelpPane,
+      MapPane,
+      NavBar,
+      PlotsPane,
+      Rtf,
+      SignificantEqs,
+      StatusBar,
+      SummaryPane
+    ];
+
+    classes.forEach(function(appClass) {
+      var name = appClass.name;
+
+      _this[name] = appClass({
+        app: _this,
+        el: options[name] || null
+      });
     });
 
-    _this.EditPane = EditPane({
-      app: _this,
-      el: options.editPane
-    });
-    _this.Features = Features({
-      app: _this
-    });
-    _this.Feeds = Feeds({
-      app: _this
-    });
-    _this.HelpPane = HelpPane({
-      el: options.helpPane
-    });
-    _this.MapPane = MapPane({
-      app: _this,
-      el: options.mapPane
-    });
-    _this.NavBar = NavBar({
-      app: _this,
-      el: options.navBar
-    });
-    _this.Rtf = Rtf({
-      app: _this
-    });
-    _this.SignificantEqs = SignificantEqs({
-      app: _this
-    });
-    _this.SummaryPane = SummaryPane({
-      app: _this,
-      el: options.summaryPane
+    // Run postInit()'s which depend on other Classes being instantiated first
+    classes.forEach(function(appClass) {
+      var name = appClass.name;
+
+      if (typeof _this[name].postInit === 'function') {
+        _this[name].postInit();
+      }
     });
   };
 
   /**
-   * URL params were shortened to make URLs more succinct; redirect users using old params
+   * Redirect users using old (less succinct) param names.
    */
   _redirect = function () {
-    var url;
+    var url  = window.location.href;
 
-    url = window.location.href;
     url = url.replace(/aftershocks/g, 'as');
     url = url.replace(/foreshocks/g, 'fs');
     url = url.replace(/historical/g, 'hs');
     url = url.replace(/minmag/g, 'mag');
 
-    history.replaceState(null, null, url);
+    history.replaceState(null, '', url);
   };
 
   // ----------------------------------------------------------
@@ -136,10 +117,11 @@ var Application = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set app to default state: remove Features, clear status bar, etc.
+   * Set app to default state (no Mainshock selected).
    */
   _this.resetApp = function () {
     _this.Features.reset(); // reset Features first
+
     _this.EditPane.reset();
     _this.Feeds.reset();
     _this.MapPane.reset();

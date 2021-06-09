@@ -18,6 +18,7 @@ var Util = require('hazdev-webutils/src/util/Util');
  *     addItem: {Function},
  *     clearItems: {Function},
  *     hasError: {Function},
+ *     postInit: {Function},
  *     removeItem: {Function},
  *     reset: {Function}
  *   }
@@ -217,6 +218,14 @@ var StatusBar = function (options) {
     if (error) {
       return true;
     }
+  };
+
+  /**
+   * Initialization that depends on app's "primary" Classes already being
+   *   instantiated in Application.js.
+   */
+  _this.postInit = function () {
+    _this.removeItem('initial'); // remove initial "Loading..." message
   };
 
   /**

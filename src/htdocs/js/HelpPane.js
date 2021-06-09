@@ -11,9 +11,12 @@ var Svg = require('util/Svg');
  *   {
  *     el: {Element}
  *   }
+ *
+ * @ return _this {Object)
  */
 var HelpPane = function (options) {
-  var _initialize,
+  var _this,
+      _initialize,
 
       _el,
       _legend,
@@ -21,6 +24,8 @@ var HelpPane = function (options) {
 
       _addSvgElements;
 
+
+  _this = {};
 
   _initialize = function (options) {
     options = options || {};
@@ -87,6 +92,7 @@ var HelpPane = function (options) {
 
   _initialize(options);
   options = null;
+  return _this;
 };
 
 

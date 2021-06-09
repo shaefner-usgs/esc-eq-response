@@ -2,11 +2,11 @@
 
 
 /**
- * Set up navbar to switch between panes (i.e. 'pages') of single page app
+ * Set up NavBar to switch between panes (i.e. 'pages') of single page app.
  *
  * Also save / set scroll positions to return pane to previous state, and deal
  *   with issues where map/plots don't display correctly when created while
- *   their respective pane is hidden
+ *   their respective pane is hidden.
  *
  * @param options {Object}
  *   {
@@ -16,6 +16,7 @@
  *
  * @return _this {Object}
  *   {
+ *     postInit: {Function},
  *     reset: {Function}
  *   }
  */
@@ -41,18 +42,11 @@ var NavBar = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var id;
-
     options = options || {};
 
     _app = options.app;
     _el = options.el || document.createElement('div');
     _panes = document.querySelectorAll('section.pane');
-
-    id = _getPaneId();
-
-    _changePane(id);
-    _addListeners();
   };
 
   /**
@@ -210,6 +204,17 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Initialization that depends on app's "primary" Classes already being
+   *   instantiated in Application.js.
+   */
+  _this.postInit = function () {
+    var id = _getPaneId();
+
+    _changePane(id);
+    _addListeners();
+  };
 
   /**
    * Reset saved scroll positions for all panes except 'Edit'

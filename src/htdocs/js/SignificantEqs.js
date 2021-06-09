@@ -16,7 +16,8 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
- *     addSignificantEqs: {Function}
+ *     addSignificantEqs: {Function},
+ *     postInit: {Function}
  *   }
  */
 var SignificantEqs = function (options) {
@@ -36,8 +37,6 @@ var SignificantEqs = function (options) {
     options = options || {};
 
     _app = options.app;
-
-    _loadJson();
   };
 
   /**
@@ -166,6 +165,14 @@ var SignificantEqs = function (options) {
       refNode.parentNode.insertBefore(selectMenu, refNode);
       selectMenu.addEventListener('change', _app.EditPane.selSignificantEq);
     }
+  };
+
+  /**
+   * Initialization that depends on app's "primary" Classes already being
+   *   instantiated in Application.js.
+   */
+  _this.postInit = function () {
+    _loadJson();
   };
 
 

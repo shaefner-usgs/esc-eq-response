@@ -4,11 +4,11 @@
 var Application = require('Application');
 
 Application({
-  editPane: document.getElementById('editPane'),
-  helpPane: document.getElementById('helpPane'),
-  mapPane: document.getElementById('mapPane'),
-  navBar: document.getElementById('navBar'),
-  plotsPane: document.getElementById('plotsPane'),
-  statusBar: document.getElementById('statusBar'),
-  summaryPane: document.getElementById('summaryPane')
+  EditPane: document.getElementById('editPane'),
+  HelpPane: document.getElementById('helpPane'),
+  MapPane: document.getElementById('mapPane'),
+  NavBar: document.getElementById('navBar'),
+  PlotsPane: document.getElementById('plotsPane'),
+  StatusBar: document.getElementById('statusBar'),
+  SummaryPane: document.getElementById('summaryPane')
 });
