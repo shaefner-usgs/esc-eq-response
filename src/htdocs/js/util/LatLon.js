@@ -31,7 +31,8 @@ function LatLon(lat, lon) {
  * @param point {LatLon}
  *     Latitude/longitude of destination point.
  * @param radius {Number}
- *     (Mean) radius of earth (defaults to radius in metres).
+ *     (Mean) radius of earth (defaults to radius in meters).
+ *
  * @return {Number}
  *     Distance between this point and destination point (same units as radius).
  *
@@ -62,12 +63,13 @@ LatLon.prototype.distanceTo = function(point, radius) {
 };
 
 /**
- * Foward azimuth (takeoff bearing) from point to destination.
+ * Forward azimuth (takeoff bearing) from point to destination.
  *
  * @param point {LatLon}
  *     Latitude/longitude of destination point.
+ *
  * @return {Number}
- *     Foward azimuth (degrees) from point to destination (-180.0, 180.0).
+ *     Forward azimuth (degrees) from point to destination (-180.0, 180.0).
  *
  * @example
  *     var p1 = new LatLon(52.205, 0.119);
@@ -89,12 +91,12 @@ LatLon.prototype.bearing = function(point) {
   return bearing;
 };
 
-/** Extend Number object with method to convert numeric degrees to radians */
+/* Extend Number object with method to convert numeric degrees to radians */
 if (Number.prototype.toRadians === undefined) {
   Number.prototype.toRadians = function() { return this * Math.PI / 180; };
 }
 
-/** Extend Number object with method to convert radians to numeric (signed) degrees */
+/* Extend Number object with method to convert radians to numeric (signed) degrees */
 if (Number.prototype.toDegrees === undefined) {
   Number.prototype.toDegrees = function() { return this * 180 / Math.PI; };
 }
