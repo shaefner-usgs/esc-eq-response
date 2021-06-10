@@ -234,12 +234,10 @@ AppUtil.setFormFieldValues = function () {
  * @param value {Mixed}
  */
 AppUtil.setParam = function (name, value) {
-  var hash,
-      pairs,
+  var pairs,
       params,
       queryString;
 
-  hash = location.hash;
   pairs = [];
   params = AppUtil.getParams();
   queryString = '?';
@@ -250,7 +248,7 @@ AppUtil.setParam = function (name, value) {
   });
   queryString += pairs.join('&');
 
-  window.history.replaceState({}, '', queryString + hash);
+  window.history.replaceState({}, '', queryString + location.hash);
 };
 
 /**
@@ -258,13 +256,20 @@ AppUtil.setParam = function (name, value) {
  */
 AppUtil.setQueryStringValues = function () {
   var fields,
-      i;
+      i,
+      pairs,
+      queryString;
 
   fields = document.querySelectorAll('#editPane input');
+  pairs = [];
+  queryString = '?';
 
   for (i = 0; i < fields.length; i ++) {
-    AppUtil.setParam(fields[i].id, fields[i].value);
+    pairs.push(fields[i].id + '=' + fields[i].value);
   }
+  queryString += pairs.join('&');
+
+  window.history.replaceState({}, '', queryString + location.hash);
 };
 
 /**
