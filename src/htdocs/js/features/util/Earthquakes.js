@@ -220,7 +220,7 @@ var Earthquakes = function (options) {
         threshold;
 
     mag = AppUtil.round(feature.properties.mag, 1);
-    threshold = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    threshold = AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-mag');
 
     if (mag >= threshold || _id === 'mainshock') { // don't filter out mainshock
       return true;
@@ -578,7 +578,7 @@ var Earthquakes = function (options) {
     max = cumulativeEqs.length - 1;
     initial = max; // default to highest mag eq in list
     maxNumberEqs = 25; // max number of eqs to display by default
-    min = Math.floor(AppUtil.getParam(AppUtil.lookup(_id) + '-mag'));
+    min = Math.floor(AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-mag'));
 
     // Find the mag level where the number of eqs is less than maxNumberEqs
     cumulativeEqs.some(function(number, magInt) {
@@ -829,9 +829,9 @@ var Earthquakes = function (options) {
         duration,
         mag;
 
-    distance = AppUtil.getParam(AppUtil.lookup(_id) + '-dist');
+    distance = AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-dist');
     duration = _getDuration(_id);
-    mag = AppUtil.getParam(AppUtil.lookup(_id) + '-mag');
+    mag = AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-mag');
 
     description = '<p class="description"><strong>M ' + mag + '+</strong> ' +
       'earthquakes within <strong>' + distance + ' km</strong> of the ' +
