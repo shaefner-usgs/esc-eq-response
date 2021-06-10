@@ -178,7 +178,7 @@ var FieldNotes = function (options) {
       if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
         foundProps = true;
         value = props[key] || '&ndash;';
-        html += '<dt>' + AppUtil.ucfirst(key) + '</dt><dd>' + value + '</dd>';
+        html += '<dt>' + key + '</dt><dd>' + value + '</dd>';
       }
     });
     html += '</dl>';
