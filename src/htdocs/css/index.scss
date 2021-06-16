@@ -43,6 +43,7 @@ a {
 abbr {
   border-bottom: 1px dotted #bbb;
   cursor: help;
+  font-variant: none; /* avoid browser-default small caps */
 
   &[title] {
     text-decoration: none; /* clean up default styling in Chrome */
@@ -64,7 +65,8 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,
+h5 {
   font-family: $font-family-headers;
   font-weight: 400;
 }
@@ -88,6 +90,10 @@ h3 {
 h4 {
   font-size: 1.2rem;
   margin: 0;
+}
+h5 {
+  font-size: 1rem;
+  margin: 1rem 0 .5rem;
 }
 
 html {
