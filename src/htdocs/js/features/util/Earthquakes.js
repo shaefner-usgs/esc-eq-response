@@ -34,14 +34,14 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquakes json feed and create Leaflet map layer, Plotly.js traces
+ * Parse earthquakes JSON feed and create Leaflet map layer, Plotly.js traces
  *   and content (description, sliders and tables) for summary pane.
  *
  * @param options {Object}
  *   {
  *     app: {Object}, // Application
  *     id: {String}, // Feature id
- *     json: {Object} // Feature json data
+ *     json: {Object} // Feature JSON data
  *   }
  *
  * @return _this {Object}
@@ -211,7 +211,7 @@ var Earthquakes = function (options) {
    *   0.05 to account for rounding mags to nearest tenth
    *
    * @param feature {Object}
-   *     geojson feature
+   *     geoJSON feature
    *
    * @return {Boolean}
    */
@@ -274,18 +274,18 @@ var Earthquakes = function (options) {
     if (data.cdi) { // DYFI
       template += '<a href="{url}/dyfi" class="mmi{cdi}" ' +
         'title="Did You Feel It? maximum reported intensity ({felt} ' +
-        'responses)"><strong class="roman">{cdi}</strong><br>' +
+        'responses)"><strong class="roman">{cdi}</strong>' +
         '<abbr title="Did You Feel It?">DYFI?</abbr></a>';
     }
     if (data.mmi) { // ShakeMap
       template += '<a href="{url}/shakemap" class="mmi{mmi}" ' +
         'title="ShakeMap maximum estimated intensity"><strong class="roman">' +
-        '{mmi}</strong><br><abbr title="ShakeMap">ShakeMap</abbr></a>';
+        '{mmi}</strong><abbr title="ShakeMap">ShakeMap</abbr></a>';
     }
     if (data.alert) { // PAGER
       template += '<a href="{url}/pager" class="pager-alertlevel-' +
         '{alert}" title="PAGER estimated impact alert level"><strong ' +
-        'class="roman">{alert}</strong><br><abbr title="Prompt Assessment of ' +
+        'class="roman">{alert}</strong><abbr title="Prompt Assessment of ' +
         'Global Earthquakes for Response">PAGER</abbr></a>';
     }
     if (data.tsunami) { // Tsunami
@@ -605,7 +605,7 @@ var Earthquakes = function (options) {
    *   to bins
    *
    * @param feature {Object}
-   *     geojson feature
+   *     geoJSON feature
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
@@ -694,7 +694,7 @@ var Earthquakes = function (options) {
     layer.bindPopup(popup, {
       autoPanPaddingTopLeft: L.point(50, 50),
       autoPanPaddingBottomRight: L.point(60, 40),
-      maxWidth: 350,
+      maxWidth: 375,
       minWidth: 250
     }).bindTooltip(tooltip);
 
@@ -731,7 +731,7 @@ var Earthquakes = function (options) {
    * Create Leaflet markers and add additional properties to plot data
    *
    * @param feature {Object}
-   *     geojson feature
+   *     geoJSON feature
    * @param latlng {L.LatLng}
    *
    * @return {L.CircleMarker}

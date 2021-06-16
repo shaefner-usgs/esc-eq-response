@@ -20,10 +20,12 @@
 
   > a,
   > span {
+    align-items: center;
     background-color: #fff;
     border-radius: $button-border-radius;
     color: $text-color-darker !important;
-    display: block;
+    display: flex;
+    flex-direction: column;
     letter-spacing: .03rem;
     line-height: 1rem;
     max-width: 6rem;
