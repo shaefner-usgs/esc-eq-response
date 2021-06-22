@@ -72,14 +72,14 @@
     flex-wrap: wrap;
   }
 
-  .pager-cities,
+  .pager-exposures,
   .products {
     margin: 0 0 1rem 0;
     max-width: 100%;
     width: 420px;
   }
 
-  .pager-cities {
+  .pager-exposures {
     border-left: 1px solid $border-color-lightest;
     padding-left: 40px;
 
@@ -115,7 +115,8 @@
     }
 
     .city td {
-      color: $text-color-lightest;
+      color: $text-color-lighter;
+      font-weight: 300;
       padding: 0 .25rem .3rem .25rem;
     }
   }
@@ -179,7 +180,7 @@
         display: block;
       }
 
-      .pager-cities,
+      .pager-exposures,
       .products {
         border: none;
         padding: 0;

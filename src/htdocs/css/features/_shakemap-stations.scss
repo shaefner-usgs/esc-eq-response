@@ -1,12 +1,11 @@
 @use '../variables' as *;
 
 .station-channels-map {
-  margin: 1rem 0;
-
   td,
   th {
     padding-left: .5rem;
     padding-right: .5rem;
+    text-align: center;
   }
 
   tr {
@@ -45,10 +44,6 @@
     top: -10px;
     z-index: 2;
   }
-}
-
-.station-metadata {
-  margin: 1.5rem 0;
 }
 
 /* Leaflet marker colors */
@@ -90,82 +85,26 @@
 }
 
 .station-summary {
-  display: block;
+  display: flex;
   list-style: none;
+  margin: 1rem 0;
   padding: 0;
 
-  &:after {
-    clear: both;
-    content: ' ';
-    display: block;
-  }
-
-  abbr {
-    clear: left;
-    color: $text-color-lightest;
-    display: inline-block;
-    font-size: .6875rem;
-    margin-top: .25rem;
-  }
-
   li {
-    display: inline-block;
-    float: left;
-    line-height: 1;
-    padding: 4px;
-    text-align: center;
     width: 25%;
-  }
 
-  .mmiI {
-    background-color: $mmiI-color;
-    box-shadow: 0 0 1px #666;
-  }
-  .mmiII {
-    background-color: $mmiII-color;
-  }
-  .mmiIII {
-    background-color: $mmiIII-color;
-  }
-  .mmiIV {
-    background-color: $mmiIV-color;
-  }
-  .mmiV {
-    background-color: $mmiV-color;
-  }
-  .mmiVI {
-    background-color: $mmiVI-color;
-  }
-  .mmiVII {
-    background-color: $mmiVII-color;
-  }
-  .mmiVIII {
-    background-color: $mmiVIII-color;
-  }
-  .mmiIX {
-    background-color: $mmiIX-color;
-  }
-  .mmiX {
-    background-color: $mmiX-color;
-  }
-  .mmiXI {
-    background-color: $mmiXI-color;
-  }
-  .mmiXII {
-    background-color: $mmiXII-color;
-  }
+    &:not(.impact-bubble) {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      line-height: 1rem;
+      padding: .25rem 0;
 
-  .roman {
-    font-family: $font-family-mmi;
-    text-transform: uppercase;
-  }
-}
-
-.station-summary-intensity {
-  color: $text-color;
-
-  > abbr {
-    border-bottom-color: $text-color;
-    color: $text-color;
+      abbr {
+        color: $text-color-lightest;
+        font-size: .6875rem;
+        margin-top: .15rem;
+      }
+    }
   }
 }
