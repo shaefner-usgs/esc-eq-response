@@ -62,22 +62,29 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
   }
   .leaflet-control-zoom a {
+    border-radius: 0;
     color: $link-color;
-    transition: background $hover-off-duration ease-in;
+    transition: all .15s ease-in;
 
     &:hover {
       background: $accent-color-lightest;
-      transition: text-decoration-color $hover-on-duration ease-out;
+      transition: background $hover-on-duration ease-out;
+    }
+    &:active {
+      background: $accent-color;
+      border-radius: 0 !important; /* clean up rendering issue */
+      color: $bg-color;
+      transition: all $hover-on-duration ease-out;
     }
 
     &:first-child {
       border-bottom-color: $separator-color;
-      border-top-left-radius: $button-border-radius;
-      border-top-right-radius: $button-border-radius;
+      border-top-left-radius: $button-border-radius - 1;
+      border-top-right-radius: $button-border-radius - 1;
     }
     &:last-child {
-      border-bottom-left-radius: $button-border-radius;
-      border-bottom-right-radius: $button-border-radius;
+      border-bottom-left-radius: $button-border-radius - 1;
+      border-bottom-right-radius: $button-border-radius - 1;
     }
   }
 
@@ -134,6 +141,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-popup-close-button {
+    background: none;
     border-radius: 50%;
     color: $accent-color;
     height: 23px;
@@ -142,7 +150,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     right: 2px;
     top: 2px;
     text-align: center;
-    transition: background $hover-off-duration ease-in;
+    transition: all $hover-off-duration ease-in;
     width: 23px;
 
     &:hover {
@@ -150,8 +158,9 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
       transition: background $hover-on-duration ease-out;
     }
     &:active {
-      background: $accent-color-lighter;
-      transition: background .05s ease-out;
+      background: $accent-color;
+      color: $bg-color;
+      transition: all $hover-on-duration ease-out;
     }
   }
 
