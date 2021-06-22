@@ -29,7 +29,7 @@ _DEFAULTS = {
 };
 
 /**
- * Create Fieldnotes Feature
+ * Create FieldNotes Feature.
  *
  * @param options {Object}
  *   {
@@ -43,7 +43,7 @@ _DEFAULTS = {
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
- *     mapLayer: {L.layer},
+ *     mapLayer: {L.Layer},
  *     name: {String},
  *     showLayer: {Boolean},
  *     url: {String},
@@ -56,12 +56,11 @@ var FieldNotes = function (options) {
 
       _app,
       _markerOptions,
-      _popup,
       _Lightbox,
 
       _addListeners,
-      _genPopupContent,
-      _getCustomProps,
+      _createList,
+      _createPopup,
       _getFeedUrl,
       _onEachFeature,
       _pointToLayer,
@@ -74,7 +73,6 @@ var FieldNotes = function (options) {
     options = Util.extend({}, _DEFAULTS, options);
 
     _app = options.app;
-
     _Lightbox = Lightbox();
 
     _this.id = 'fieldnotes';
@@ -86,20 +84,23 @@ var FieldNotes = function (options) {
 
     _markerOptions = Util.extend({
       icon: L.icon(options.iconOptions),
-      pane: _this.id // put markers in custom Leaflet map pane
+      pane: _this.id // control stacking order
     }, options.markerOptions);
   };
 
   /**
-   * Add listeners to popups for expanding custom props and lightboxing photos
+   * Add event listeners to map popup.
    *
    * @param div {Element}
+   *     L.Popup div
    */
   _addListeners = function (div) {
     var photo,
         toggle;
 
     photo = div.querySelector('.photo');
+    toggle = div.querySelector('.toggle');
+
     if (photo) {
       photo.addEventListener('click', function(e) {
         e.preventDefault();
@@ -107,7 +108,6 @@ var FieldNotes = function (options) {
       });
     }
 
-    toggle = div.querySelector('.toggle');
     if (toggle) {
       toggle.addEventListener('click', function(e) {
         e.preventDefault();
@@ -117,82 +117,87 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create popup content
-   *
-   * @param props {Object}
-   *
-   * @return div {Element}
-   */
-  _genPopupContent = function (props) {
-    var div,
-        img,
-        innerHTML;
-
-    img = '';
-    if (props.attachment) {
-      img = '<a class="photo" href="{attachment}">' +
-          '<div class="spinner"></div>' +
-          '<img src="{attachment}" alt="photo" />' +
-        '</a>';
-    }
-
-    innerHTML = L.Util.template(
-      '<h4>{title}</h4>' +
-        '<time>{timestamp} {timezone}</time>' +
-        '<p class="description">{description}</p>' +
-        '<p class="notes">{notes}</p>' +
-        img + _getCustomProps(props) +
-        '<p class="operator"><a href="mailto:{operator}">{operator}</a></p>',
-      props
-    );
-
-    div = L.DomUtil.create('div');
-    div.innerHTML = innerHTML;
-    _addListeners(div);
-
-    return div;
-  };
-
-  /**
-   * Get 'custom' properties that only apply to each observation type
+   * Create 'Additional properties' list html. These are 'custom' props that
+   *   vary based on observation type.
    *
    * @param props {Object}
    *
    * @return html {String}
    */
-  _getCustomProps = function (props) {
-    var foundProps,
-        html,
+  _createList = function (props) {
+    var html,
+        list,
         skipProps,
         value;
 
-    foundProps = false;
-
-    // Props that are shared by all types
+    html = '';
+    list = '';
     skipProps = ['accuracy', 'attachment', 'description', 'form', 'igid',
       'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
       'timezone', 'title', 'zaccuracy'];
 
-    html = '<dl class="custom">';
     Object.keys(props).forEach(function (key) {
-      if (skipProps.indexOf(key) === -1) { // prop is not in skipProps
-        foundProps = true;
+      if (skipProps.indexOf(key) === -1) { // skip props shared by all types
         value = props[key] || '&ndash;';
-        html += '<dt>' + key + '</dt><dd>' + value + '</dd>';
+        list += '<dt>' + key + '</dt><dd>' + value + '</dd>';
       }
     });
-    html += '</dl>';
 
-    if (foundProps) {
+    if (list) {
       html = '<p class="properties hide">' +
-        '<a href="#" class="toggle">Additional properties</a></p>' + html;
+          '<a href="#" class="toggle">Additional properties</a>' +
+        '</p>' +
+        '<dl class="custom">' + list + '</dl>';
     }
 
     return html;
   };
 
   /**
-   * Get URL of json feed
+   * Create Leaflet popup content.
+   *
+   * @param data {Object}
+   *
+   * @return div {Element}
+   */
+  _createPopup = function (data) {
+    var div,
+        html,
+        img,
+        props;
+
+    div = L.DomUtil.create('div');
+    img = '';
+    props = _createList(data);
+
+    if (data.attachment) {
+      img = '<a class="photo" href="{attachment}">' +
+          '<div class="spinner"></div>' +
+          '<img src="{attachment}" alt="photo" />' +
+        '</a>';
+    }
+
+    html = L.Util.template(
+      '<h4>{title}</h4>' +
+        '<time>{timestamp} {timezone}</time>' +
+        '<p class="description">{description}</p>' +
+        '<p class="notes">{notes}</p>' +
+        img +
+        props +
+        '<p class="operator">' +
+          '<a href="mailto:{operator}">{operator}</a>' +
+        '</p>',
+      data
+    );
+    div.innerHTML = html;
+
+    _addListeners(div);
+
+    return div;
+  };
+
+  /**
+   * Get URL of JSON feed.
    *
    * @return {String}
    */
@@ -204,10 +209,8 @@ var FieldNotes = function (options) {
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
-    after = Moment(mainshock.json.properties.time + 1000).utc()
-      .format('X');
-    before = Moment(mainshock.json.properties.time).utc()
-      .add(30, 'days').format('X');
+    after = Moment(mainshock.json.properties.time + 1000).utc().format('X');
+    before = Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
     pairs = [];
     urlParams = {
       between: after + ',' + before,
@@ -215,6 +218,7 @@ var FieldNotes = function (options) {
       lon: mainshock.json.geometry.coordinates[0],
       radius: AppUtil.getParam('as-dist') // use aftershocks radius
     };
+
     Object.keys(urlParams).forEach(function(key) {
       pairs.push(key + '=' + urlParams[key]);
     });
@@ -224,29 +228,26 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create Leaflet popups and tooltips
+   * Create Leaflet popups and tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
-    var props;
+    var props = feature.properties;
 
-    props = feature.properties;
-
-    // Strip slashes from json encoded values
+    // Strip slashes from JSON encoded values
     Object.keys(props).forEach(function(key) {
       props[key] = AppUtil.stripslashes(props[key]);
     });
 
-    // Create title prop
     props.title = props.form;
     if (props.site) {
       props.title += ': ' + props.site;
     }
 
     layer
-      .bindPopup(_genPopupContent(props), {
+      .bindPopup(_createPopup(props), {
         autoPanPadding: L.point(50, 50),
         className: 'fieldnotes',
         maxWidth: 398, /* fits 4X3 images 'flush' in popup (max-height is 300px) */
@@ -257,7 +258,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create Leaflet markers
+   * Create Leaflet markers.
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -269,26 +270,27 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Update popup position and add Lightbox after image loads
+   * Update popup position after image loads and add Lightbox.
    *
    * @param e {Event}
    */
   _updatePopup = function (e) {
     var image,
+        popup,
         regex,
         url;
 
-    _popup = e.popup; // store in closure for access in other methods
-
     image = new Image();
+    popup = e.popup;
     regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
-    url = regex.exec(_popup.getContent().outerHTML);
+    url = regex.exec(popup.getContent().outerHTML);
 
-    if (url) { // popup has a photo
-      image.onload = function () {
-        _popup.update(); // pan map to contain popup after image loads
-      };
+    if (url) { // popup includes a photo
       image.src = url[0];
+      image.onload = function () {
+        popup.update(); // pan map to contain popup after image loads
+      };
+
       _Lightbox.add('<img src="' + image.src + '" alt="enlarged photo" />');
     }
   };
@@ -298,19 +300,18 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _app = null;
     _markerOptions = null;
-    _popup = null;
     _Lightbox = null;
 
     _addListeners = null;
-    _genPopupContent = null;
-    _getCustomProps = null;
+    _createList = null;
+    _createPopup = null;
     _getFeedUrl = null;
     _onEachFeature = null;
     _pointToLayer = null;
@@ -320,7 +321,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Init Feature (set properties that depend on external feed data)
+   * Initialize Feature (set properties that depend on external feed data).
    *
    * @param json {Object}
    *     feed data for Feature

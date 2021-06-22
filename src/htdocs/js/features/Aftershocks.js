@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -7,7 +8,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create Aftershocks Feature
+ * Create Aftershocks Feature.
  *
  * @param options {Object}
  *   {
@@ -19,19 +20,18 @@ var AppUtil = require('util/AppUtil'),
  *   {
  *     bins: {Object},
  *     count: {Integer},
- *     cumulativeEqs: {Array},
  *     description: {String},
  *     destroy: {Function},
  *     forecast: {Array},
  *     id: {String},
  *     initFeature: {Function},
  *     list: {Array},
- *     mapLayer: {L.layer},
+ *     mapLayer: {L.Layer},
  *     model: {Object},
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
- *     sortBy: {String},
+ *     sortByField: {String},
  *     summary: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
@@ -48,9 +48,11 @@ var Aftershocks = function (options) {
       _model,
       _Earthquakes,
 
+      _createForecast,
+      _createProbabilities,
+      _createSummary,
       _getFeedUrl,
-      _getProbabilities,
-      _getSummary;
+      _getProbability;
 
 
   _this = {};
@@ -67,21 +69,150 @@ var Aftershocks = function (options) {
     _this.name = 'Aftershocks';
     _this.plotTraces = null;
     _this.showLayer = true;
-    _this.sortBy = 'utcTime';
+    _this.sortByField = 'utcTime';
     _this.summary = null;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
 
   /**
-   * Get URL of json feed
+   * Create forecast HTML.
+   *
+   * @return html {String}
+   */
+  _createForecast = function () {
+    var content,
+        data,
+        html,
+        oaf;
+
+    oaf = _mainshock.json.properties.products.oaf;
+
+    if (oaf) { // forecast exists
+      content = JSON.parse(oaf[0].contents[''].bytes);
+      data = {
+        probabilities: _createProbabilities(content),
+      };
+      html = '';
+
+      // Store forecast and model to return as public props
+      _forecast = content.forecast;
+      _model = content.model;
+
+      if (data.probabilities) {
+        data.model = content.model.name;
+        data.timeFrame = content.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
+
+        html = L.Util.template(
+          '<h3>Aftershock Forecast</h3>' +
+          '<p>The probability of one or more aftershocks in the specified ' +
+            'magnitude range during the <strong>next {timeFrame}</strong>.' +
+            'The likely number of aftershocks (95% confidence range) is also ' +
+            'included.</p>' +
+          '<div class="probabilities">{probabilities}</div>' +
+          '<p class="model"><strong>Model</strong>: {model}</p>',
+          data
+        );
+      }
+    }
+
+    return html;
+  };
+
+  /**
+   * Create probability buttons HTML.
+   *
+   * @param oaf {Object}
+   *
+   * @return html {String}
+   */
+  _createProbabilities = function (oaf) {
+    var data,
+        html;
+
+    data = {
+      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast'
+    };
+    html = '';
+
+    oaf.forecast.forEach(function(period) {
+      if (period.label === oaf.advisoryTimeFrame) { // 'primary emphasis' period
+        period.bins.forEach(function(bin) {
+          data.mag = bin.magnitude;
+          data.probability = _getProbability(bin.probability);
+          data.range = bin.p95minimum  + '&ndash;' + bin.p95maximum;
+
+          if (bin.p95minimum === 0 && bin.p95maximum === 0) {
+            data.range = 0;
+          }
+
+          html += L.Util.template(
+            '<a href="{url}">' +
+              '<h4>M {mag}+</h4>' +
+              '<ul>' +
+                '<li class="probability">{probability}</li>' +
+                '<li class="likely">' +
+                  '<abbr title="Likely number of aftershocks">{range}</abbr>' +
+                '</li>' +
+              '</ul>' +
+            '</a>',
+            data
+          );
+        });
+      }
+    });
+
+    return html;
+  };
+
+  /**
+   * Create summary HTML.
+   *
+   * @return html {String}
+   */
+  _createSummary = function () {
+    var duration,
+        html,
+        mostRecentEq;
+
+    html = _Earthquakes.createDescription();
+
+    if (_this.count > 0) {
+      mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
+      duration = AppUtil.round(
+        Moment.duration(
+          Moment.utc() -
+          Moment.utc(mostRecentEq.isoTime)
+        ).asDays(), 1
+      ) + ' days';
+
+      html += '<div class="bins">';
+      html += _Earthquakes.createBinTable('first');
+      html += _Earthquakes.createBinTable('past');
+      html += '</div>';
+      html += _createForecast();
+
+      if (_this.count > 1) {
+        html += '<h3>Most Recent Aftershock</h3>';
+        html += '<p>The most recent aftershock was <strong>' + duration +
+          ' ago</strong>.</p>';
+        html += _Earthquakes.createListTable('mostRecent');
+      }
+
+      html += _Earthquakes.createSlider();
+      html += _Earthquakes.createListTable('all');
+    }
+
+    return html;
+  };
+
+  /**
+   * Get URL of JSON feed.
    *
    * @return {String}
    */
   _getFeedUrl = function () {
-    var urlParams;
-
-    urlParams = {
+    var urlParams = {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(AppUtil.getParam('as-dist')),
@@ -94,113 +225,24 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get aftershock probabilities HTML
+   * Get probability as a percentage string.
    *
-   * @return html {String}
+   * @param probability {Number}
+   *
+   * @return percentage {String}
    */
-  _getProbabilities = function () {
-    var data,
-        html,
-        oaf,
-        probability,
-        range,
-        timeFrame,
-        url;
+  _getProbability = function (probability) {
+    var percentage;
 
-    html = '';
-    oaf = _mainshock.json.properties.products.oaf;
-    url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast';
-
-    if (oaf) { // add forecast to html output
-      data = JSON.parse(oaf[0].contents[''].bytes);
-
-      // Store forecast and model to attach as returned (public) props
-      _forecast = data.forecast;
-      _model = data.model;
-
-      data.forecast.forEach(function(period) {
-        if (period.label === data.advisoryTimeFrame) { // show 'primary emphasis' period
-          period.bins.forEach(function(bin) {
-            if (bin.probability < 0.01) {
-              probability = '&lt; 1%';
-            } else if (bin.probability > 0.99) {
-              probability = '&gt; 99%';
-            } else {
-              probability = AppUtil.round(100 * bin.probability, 0) + '%';
-            }
-            if (bin.p95minimum === 0 && bin.p95maximum === 0) {
-              range = 0;
-            } else {
-              range = bin.p95minimum  + '&ndash;' + bin.p95maximum;
-            }
-            html += '<a href="' + url + '"><h4>M ' + bin.magnitude + '+</h4>' +
-              '<ul>' +
-                '<li class="probability">' + probability + '</li>' +
-                '<li class="likely"><abbr title="Likely number of ' +
-                  'aftershocks">' + range + '</abbr></li>' +
-              '</ul></a>';
-          });
-        }
-      });
+    if (probability < 0.01) {
+      percentage = '&lt; 1%';
+    } else if (probability > 0.99) {
+      percentage = '&gt; 99%';
+    } else {
+      percentage = AppUtil.round(100 * probability, 0) + '%';
     }
 
-    if (html) { // add explanatory text to html output
-      timeFrame = data.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
-      html = '<h3>Aftershock Forecast</h3>' +
-        '<p>The probability of one or more aftershocks in the specified ' +
-          'magnitude range during the <strong>next ' + timeFrame +
-          '</strong>. The likely number of aftershocks (95% confidence ' +
-          'range) is also included.</p>' +
-        '<div class="probabilities">' + html + '</div>' +
-        '<p class="model"><strong>Model</strong>: ' + data.model.name + '</p>';
-    }
-
-    return html;
-  };
-
-  /**
-   * Get summary HTML
-   *
-   * @param json {Object}
-   *
-   * @return summary {String}
-   */
-  _getSummary = function () {
-    var duration,
-        mostRecentEq,
-        mostRecentEqTime,
-        summary;
-
-    summary = _Earthquakes.getDescription();
-
-    if (_this.count > 0) {
-      mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
-      mostRecentEqTime = mostRecentEq.isoTime;
-
-      duration = AppUtil.round(
-        Moment.duration(
-          Moment.utc() -
-          Moment.utc(mostRecentEqTime)
-        ).asDays(), 1
-      ) + ' days';
-
-      summary += '<div class="bins">';
-      summary += _Earthquakes.getBinnedTable('first');
-      summary += _Earthquakes.getBinnedTable('past');
-      summary += '</div>';
-      summary += _getProbabilities();
-      if (_this.count > 1) {
-        summary += '<h3>Most Recent Aftershock</h3>';
-        summary += '<p>The most recent aftershock was <strong>' + duration +
-          ' ago</strong>.';
-        summary += _Earthquakes.getListTable('mostRecent');
-      }
-      summary += _Earthquakes.getSubHeader();
-      summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable('all');
-    }
-
-    return summary;
+    return percentage;
   };
 
   // ----------------------------------------------------------
@@ -208,7 +250,7 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -220,15 +262,17 @@ var Aftershocks = function (options) {
     _model = null;
     _Earthquakes = null;
 
+    _createForecast = null;
+    _createProbabilities = null;
+    _createSummary = null;
     _getFeedUrl = null;
-    _getProbabilities = null;
-    _getSummary = null;
+    _getProbability = null;
 
     _this = null;
   };
 
   /**
-   * Init Feature (set properties that depend on external feed data)
+   * Initialize Feature (set properties that depend on external feed data).
    *
    * @param json {Object}
    *     feed data for Feature
@@ -238,23 +282,18 @@ var Aftershocks = function (options) {
       app: _app,
       id: _this.id,
       json: json,
-      sortBy: _this.sortBy
+      sortByField: _this.sortByField
     });
 
-    _this.bins = {};
-    if (_Earthquakes.bins.first) {
-      _this.bins.first = _Earthquakes.bins.first;
-      _this.bins.past = _Earthquakes.bins.past;
-    }
+    _this.bins = _Earthquakes.bins;
     _this.count = json.metadata.count;
-    _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
-    _this.description = _Earthquakes.getDescription();
+    _this.description = _Earthquakes.createDescription();
     _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _getSummary();
+    _this.summary = _createSummary();
 
-    // The following props depend on summary being set
+    // The following props depend on summary being created
     _this.forecast = _forecast;
     _this.model = _model;
   };

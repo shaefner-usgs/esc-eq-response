@@ -7,7 +7,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create Historical Seismicity Feature
+ * Create Historical Seismicity Feature.
  *
  * @param options {Object}
  *   {
@@ -19,17 +19,16 @@ var AppUtil = require('util/AppUtil'),
  *   {
  *     bins: {Object},
  *     count: {Integer},
- *     cumulativeEqs: {Array},
  *     description: {String},
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
  *     list: {Array},
- *     mapLayer: {L.layer},
+ *     mapLayer: {L.Layer},
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
- *     sortBy: {String},
+ *     sortByField: {String},
  *     summary: {String},
  *     url: {String},
  *     zoomToLayer: {Boolean}
@@ -42,8 +41,8 @@ var Historical = function (options) {
       _app,
       _Earthquakes,
 
-      _getFeedUrl,
-      _getSummary;
+      _createSummary,
+      _getFeedUrl;
 
 
   _this = {};
@@ -58,14 +57,31 @@ var Historical = function (options) {
     _this.name = 'Historical Seismicity';
     _this.plotTraces = null;
     _this.showLayer = true;
-    _this.sortBy = 'mag';
+    _this.sortByField = 'mag';
     _this.summary = null;
     _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
 
   /**
-   * Get URL of json feed
+   * Create summary HTML.
+   *
+   * @return html {String}
+   */
+  _createSummary = function () {
+    var html = _Earthquakes.createDescription();
+
+    if (_this.count > 0) {
+      html += _Earthquakes.createBinTable('prior');
+      html += _Earthquakes.createSlider();
+      html += _Earthquakes.createListTable('all');
+    }
+
+    return html;
+  };
+
+  /**
+   * Get URL of JSON feed.
    *
    * @return {String}
    */
@@ -89,34 +105,12 @@ var Historical = function (options) {
     return Earthquakes.getFeedUrl(urlParams);
   };
 
-  /**
-   * Get summary HTML
-   *
-   * @param json {Object}
-   *
-   * @return summary {String}
-   */
-  _getSummary = function () {
-    var summary;
-
-    summary = _Earthquakes.getDescription();
-
-    if (_this.count > 0) {
-      summary += _Earthquakes.getBinnedTable('prior');
-      summary += _Earthquakes.getSubHeader();
-      summary += _Earthquakes.getSlider();
-      summary += _Earthquakes.getListTable('all');
-    }
-
-    return summary;
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -124,14 +118,14 @@ var Historical = function (options) {
     _app = null;
     _Earthquakes = null;
 
+    _createSummary = null;
     _getFeedUrl = null;
-    _getSummary = null;
 
     _this = null;
   };
 
   /**
-   * Init Feature (set properties that depend on external feed data)
+   * Initialize Feature (set properties that depend on external feed data).
    *
    * @param json {Object}
    *     feed data for Feature
@@ -141,20 +135,16 @@ var Historical = function (options) {
       app: _app,
       id: _this.id,
       json: json,
-      sortBy: _this.sortBy
+      sortByField: _this.sortByField
     });
 
-    _this.bins = {};
-    if (_Earthquakes.bins.prior) {
-      _this.bins.prior = _Earthquakes.bins.prior;
-    }
+    _this.bins = _Earthquakes.bins;
     _this.count = json.metadata.count;
-    _this.cumulativeEqs = _Earthquakes.bins.cumulative; // for eq mag filters on summary
-    _this.description = _Earthquakes.getDescription();
+    _this.description = _Earthquakes.createDescription();
     _this.list = _Earthquakes.list;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _getSummary();
+    _this.summary = _createSummary();
   };
 
 

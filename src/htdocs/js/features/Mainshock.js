@@ -1,12 +1,14 @@
+/* global L */
 'use strict';
 
 
 var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes');
+    Earthquakes = require('features/util/Earthquakes'),
+    Moment = require('moment');
 
 
 /**
- * Create Mainshock Feature
+ * Create Mainshock Feature.
  *
  * @param options {Object}
  *   {
@@ -19,12 +21,15 @@ var AppUtil = require('util/AppUtil'),
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
- *     mapLayer: {L.layer},
+ *     json: {Object},
+ *     localTime: {String},
+ *     mapLayer: {L.Layer},
  *     name: {String},
  *     plotTraces: {Object},
  *     showLayer: {Boolean},
  *     summary: {String},
  *     url: {String},
+ *     utcTime: {String},
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -36,8 +41,8 @@ var Mainshock = function (options) {
       _eqid,
       _Earthquakes,
 
-      _getFeedUrl,
-      _getSummary;
+      _createSummary,
+      _getFeedUrl;
 
 
   _this = {};
@@ -59,7 +64,78 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Create summary HTML.
+   *
+   * @return html {String}
+   */
+  _createSummary = function () {
+    var data,
+        html,
+        products;
+
+    data = {
+      cdi: AppUtil.romanize(_this.json.properties.cdi),
+      dyfi: '',
+      mainshock: _this.mapLayer.getLayers()[0].getPopup().getContent(),
+      mmi: AppUtil.romanize(_this.json.properties.mmi),
+      shakemap: '',
+      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid
+    };
+    products = _this.json.properties.products;
+
+    if (products.dyfi) {
+      data.dyfiImg = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
+      data.dyfi = L.Util.template(
+        '<div class="dyfi two-up">' +
+          '<a href="{url}/dyfi">' +
+            '<h4>Did You Feel It?</h4>' +
+            '<img src="{dyfiImg}" class="mmi{cdi}" />' +
+          '</a>' +
+        '</div>',
+        data
+      );
+    }
+
+    if (products.shakemap) {
+      if (products.shakemap[0].contents['download/tvmap.jpg']) {
+        data.shakemapImg = products.shakemap[0].contents['download/tvmap.jpg'].url;
+      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
+        data.shakemapImg = products.shakemap[0].contents['download/intensity.jpg'].url;
+      }
+
+      data.shakemap = L.Util.template(
+        '<div class="shakemap two-up">' +
+          '<a href="{url}/shakemap">' +
+            '<h4>ShakeMap</h4>' +
+            '<img src="{shakemapImg}" class="mmi{mmi}" />' +
+          '</a>' +
+        '</div>',
+        data
+      );
+    }
+
+    html = L.Util.template(
+      '<div>' +
+        '<div class="products">' +
+          '{mainshock}' +
+          '{dyfi}' +
+          '{shakemap}' +
+          '<div class="focal-mechanism placeholder hide two-up"></div>' +
+          '<div class="moment-tensor placeholder hide two-up"></div>' +
+        '</div>' +
+        '<div class="pager-exposures placeholder hide"></div>' +
+      '</div>' +
+      '<button class="event-summary" disabled="disabled" ' +
+        'title="Download RTF Document" type="button">Event Summary' +
+      '</button>',
+      data
+    );
+
+    return html;
+  };
+
+  /**
+   * Get URL of JSON feed.
    *
    * @return {String}
    */
@@ -68,65 +144,12 @@ var Mainshock = function (options) {
       _eqid + '.geojson';
   };
 
-  /**
-   * Get summary HTML
-   *
-   * @return summary {String}
-   */
-  _getSummary = function () {
-    var cdi,
-        imgSrc,
-        mmi,
-        products,
-        summary,
-        url;
-
-    products = _this.json.properties.products;
-    url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid;
-
-    summary = '<div>';
-    summary += '<div class="products">';
-    summary += _this.mapLayer.getLayers()[0].getPopup().getContent();
-
-    // Add DYFI, ShakeMap thumbs
-    if (products.dyfi) {
-      cdi = AppUtil.romanize(_this.json.properties.cdi);
-      imgSrc = products.dyfi[0].contents[products.dyfi[0].code + '_ciim_geo.jpg'].url;
-      summary += '<div class="dyfi two-up"><a href="' + url + '/dyfi">' +
-        '<h4>Did You Feel It?</h4><img src="' + imgSrc + '" class="mmi' + cdi +
-        '" /></a></div>';
-    }
-    if (products.shakemap) {
-      if (products.shakemap[0].contents['download/tvmap.jpg']) {
-        imgSrc = products.shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (products.shakemap[0].contents['download/intensity.jpg'].url) {
-        imgSrc = products.shakemap[0].contents['download/intensity.jpg'].url;
-      }
-      mmi = AppUtil.romanize(_this.json.properties.mmi);
-      summary += '<div class="shakemap two-up"><a href="' + url +
-        '/shakemap"><h4>ShakeMap</h4><img src="' + imgSrc + '" class="mmi' +
-        mmi + '" /></a></div>';
-    }
-
-    // Add placeholders for beachballs, Population Exposure table
-    summary += '<div class="focal-mechanism placeholder hide two-up"></div>';
-    summary += '<div class="moment-tensor placeholder hide two-up"></div>';
-    summary += '</div>'; // .products div
-    summary += '<div class="pager-cities placeholder hide"></div>';
-    summary += '</div>'; // parent div
-
-    summary += '<button class="event-summary" disabled="disabled" ' +
-      'title="Download RTF Document" type="button">Event Summary</button>';
-
-    return summary;
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -136,29 +159,43 @@ var Mainshock = function (options) {
     _Earthquakes = null;
 
     _getFeedUrl = null;
-    _getSummary = null;
+    _createSummary = null;
 
     _this = null;
   };
 
   /**
-   * Init Feature (set properties that depend on external feed data)
+   * Initialize Feature (set properties that depend on external feed data).
    *
    * @param json {Object}
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
+    var eqMoment,
+        eqMomentLocal,
+        localTime,
+        props;
+
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
       json: json
     });
 
-    _this.localTime = _Earthquakes.localTime;
+    props = json.properties;
+    eqMoment = Moment.utc(props.time, 'x');
+
+    if (props.tz) {
+      eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
+      localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
+    }
+
+    _this.json = json; // used by other Features
+    _this.localTime = localTime;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _getSummary();
-    _this.utcTime = _Earthquakes.utcTime;
+    _this.summary = _createSummary();
+    _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
   };
 
 

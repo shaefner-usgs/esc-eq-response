@@ -8,7 +8,7 @@ require('leaflet/CanvasMarker');
 
 
 /**
- * Create Focal Mechanism Feature
+ * Create Focal Mechanism Feature.
  *
  * @param options {Object}
  *   {
@@ -22,7 +22,7 @@ require('leaflet/CanvasMarker');
  *     destroy: {Function},
  *     id: {String},
  *     initFeature: {Function},
- *     mapLayer: {L.layer},
+ *     mapLayer: {L.Layer},
  *     name: {String},
  *     showLayer: {Boolean},
  *     summary: {String},
@@ -37,9 +37,9 @@ var FocalMechanism = function (options) {
       _eqid,
       _mainshock,
 
-      _getBeachBall,
-      _getMapLayer,
-      _getSummary;
+      _createBeachBall,
+      _createMapLayer,
+      _createSummary;
 
 
   _this = {};
@@ -60,13 +60,13 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get focal mechanism beachball
+   * Create beachball.
    *
    * @param size {Number}
    *
-   * @return beachball {Object}
+   * @return beachball {Object || null}
    */
-  _getBeachBall = function (size) {
+  _createBeachBall = function (size) {
     var beachball,
         focalMechanism;
 
@@ -86,37 +86,35 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get Leaflet map layer
+   * Create Leaflet map layer.
    *
    * @return mapLayer {L.layer}
    */
-  _getMapLayer = function () {
+  _createMapLayer = function () {
     var beachball,
         coords,
-        mainshock,
         mapLayer,
         popup,
         size,
         tooltip;
 
     size = 40;
-    beachball = _getBeachBall(size);
+    beachball = _createBeachBall(size);
 
     if (beachball) {
-      // Render (hidden) beachball to DOM; move/unhide when layer is turned on
-      beachball.render(document.getElementById('mapPane'));
-
       coords = [
         _mainshock.json.geometry.coordinates[1],
         _mainshock.json.geometry.coordinates[0]
       ];
 
-      // Get popup, tooltip content from mainshock Feature
+      // Get popup, tooltip from Mainshock (FeatureGroup contains only 1 layer)
       _app.Features.getFeature('mainshock').mapLayer.eachLayer(function(layer) {
-        mainshock = layer; // only 1 layer in FeatureGroup
+        popup = layer.getPopup().getContent();
+        tooltip = layer.getTooltip().getContent();
       });
-      popup = mainshock.getPopup().getContent();
-      tooltip = mainshock.getTooltip().getContent();
+
+      // Render (hidden) beachball to MapPane for use by CanvasMarker
+      beachball.render(document.getElementById('mapPane'));
 
       mapLayer = L.canvasMarker(coords, {
         icon: L.divIcon({
@@ -125,10 +123,11 @@ var FocalMechanism = function (options) {
         }),
         pane: _this.id // put marker in custom Leaflet map pane
       });
+
       mapLayer.bindPopup(popup, {
         autoPanPaddingTopLeft: L.point(50, 50),
         autoPanPaddingBottomRight: L.point(60, 40),
-        maxWidth: 350,
+        maxWidth: 375,
         minWidth: 250
       }).bindTooltip(tooltip);
     }
@@ -137,21 +136,23 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get summary HTML
+   * Create summary HTML.
    *
-   * @return summary {String}
+   * @return html {String}
    */
-  _getSummary = function () {
-    var summary,
+  _createSummary = function () {
+    var html,
         url;
+
+    html = '';
 
     if (_this.beachball) {
       url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
         '/focal-mechanism';
-      summary = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
-
-      return summary;
+      html = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
     }
+
+    return html;
   };
 
   // ----------------------------------------------------------
@@ -159,7 +160,7 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -168,20 +169,20 @@ var FocalMechanism = function (options) {
     _eqid = null;
     _mainshock = null;
 
-    _getBeachBall = null;
-    _getMapLayer = null;
-    _getSummary = null;
+    _createBeachBall = null;
+    _createMapLayer = null;
+    _createSummary = null;
 
     _this = null;
   };
 
   /**
-   * Init Feature
+   * Initialize Feature.
    */
   _this.initFeature = function () {
-    _this.beachball = _getBeachBall(180);
-    _this.mapLayer = _getMapLayer();
-    _this.summary = _getSummary();
+    _this.beachball = _createBeachBall(180);
+    _this.mapLayer = _createMapLayer();
+    _this.summary = _createSummary();
   };
 
 
