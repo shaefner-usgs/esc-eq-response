@@ -87,13 +87,13 @@ var Aftershocks = function (options) {
         oaf;
 
     oaf = _mainshock.json.properties.products.oaf;
+    html = '';
 
     if (oaf) { // forecast exists
       content = JSON.parse(oaf[0].contents[''].bytes);
       data = {
         probabilities: _createProbabilities(content),
       };
-      html = '';
 
       // Store forecast and model to return as public props
       _forecast = content.forecast;
