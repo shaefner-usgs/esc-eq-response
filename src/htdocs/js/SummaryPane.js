@@ -167,7 +167,7 @@ var SummaryPane = function (options) {
       _setSliderStyles(slider, feature.id); // set initial colored section of range slider
     }
     if (table) {
-      _addListeners(div, feature.cumulativeEqs);
+      _addListeners(div, feature.bins.mag);
       _initTableSort(feature.id);
     }
   };
