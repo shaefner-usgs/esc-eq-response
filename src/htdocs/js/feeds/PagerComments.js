@@ -2,11 +2,11 @@
 
 
 /**
- * PAGER Comments Feed
+ * Get PAGER Comments Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} // Application
  *   }
  *
  * @return _this {Object}
@@ -39,7 +39,7 @@ var PagerComments = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get URL of JSON feed.
    *
    * @return url {String}
    */
@@ -55,6 +55,7 @@ var PagerComments = function (options) {
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
+
       if (contents['json/comments.json']) {
         url = contents['json/comments.json'].url;
       }
@@ -72,8 +73,10 @@ var PagerComments = function (options) {
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
     _getFeedUrl = null;
+
     _this = null;
   };
 

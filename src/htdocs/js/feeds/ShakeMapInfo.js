@@ -2,11 +2,11 @@
 
 
 /**
- * ShakeMap Info Feed
+ * Get ShakeMap Info Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} // Application
  *   }
  *
  * @return _this {Object}
@@ -39,7 +39,7 @@ var ShakeMapInfo = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get URL of JSON feed.
    *
    * @return url {String}
    */
@@ -55,6 +55,7 @@ var ShakeMapInfo = function (options) {
 
     if (products.shakemap) {
       contents = products.shakemap[0].contents;
+
       if (contents['download/info.json']) {
         url = contents['download/info.json'].url;
       }
@@ -72,8 +73,10 @@ var ShakeMapInfo = function (options) {
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
     _getFeedUrl = null;
+
     _this = null;
   };
 

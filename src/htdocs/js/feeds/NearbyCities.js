@@ -2,11 +2,11 @@
 
 
 /**
- * Nearby Cities Feed
+ * Get Nearby Cities Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} // Application
  *   }
  *
  * @return _this {Object}
@@ -39,7 +39,7 @@ var NearbyCities = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get URL of JSON feed.
    *
    * @return url {String}
    */
@@ -55,6 +55,7 @@ var NearbyCities = function (options) {
 
     if (products['nearby-cities']) {
       contents = products['nearby-cities'][0].contents;
+
       if (contents['nearby-cities.json']) {
         url = contents['nearby-cities.json'].url;
       }
@@ -72,8 +73,10 @@ var NearbyCities = function (options) {
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
     _getFeedUrl = null;
+
     _this = null;
   };
 

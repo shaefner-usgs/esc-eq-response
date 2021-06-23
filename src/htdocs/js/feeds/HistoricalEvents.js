@@ -2,7 +2,7 @@
 
 
 /**
- * Historical Events Feed
+ * Get Historical Events Feed.
  *
  * @param options {Object}
  *   {
@@ -39,7 +39,7 @@ var HistoricalEvents = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get URL of JSON feed.
    *
    * @return url {String}
    */
@@ -55,10 +55,10 @@ var HistoricalEvents = function (options) {
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
+
       if (contents['json/historical_earthquakes.json']) {
         url = contents['json/historical_earthquakes.json'].url;
       }
-
     }
 
     return url;
@@ -73,8 +73,10 @@ var HistoricalEvents = function (options) {
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
     _getFeedUrl = null;
+
     _this = null;
   };
 

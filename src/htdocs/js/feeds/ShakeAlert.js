@@ -2,7 +2,7 @@
 
 
 /**
- * ShakeAlert Feed
+ * Get ShakeAlert Feed.
  *
  * @param options {Object}
  *   {
@@ -39,7 +39,7 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get URL of JSON feed.
    *
    * @return url {String}
    */
@@ -55,10 +55,10 @@ var ShakeAlert = function (options) {
 
     if (products['shake-alert']) {
       contents = products['shake-alert'][0].contents;
+
       if (contents['summary.json']) {
         url = contents['summary.json'].url;
       }
-
     }
 
     return url;
@@ -73,8 +73,10 @@ var ShakeAlert = function (options) {
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
     _getFeedUrl = null;
+
     _this = null;
   };
 
