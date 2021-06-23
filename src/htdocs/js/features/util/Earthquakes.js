@@ -551,7 +551,7 @@ var Earthquakes = function (options) {
     });
 
     if (threshold < _minMag) { // happens when there's no smaller mag eqs
-      threshold = _minMag;
+      threshold = Math.floor(_minMag);
     }
 
     return threshold;
@@ -659,7 +659,7 @@ var Earthquakes = function (options) {
       location: _getLocation(coords),
       localTime: localTime,
       mag: parseFloat(AppUtil.round(props.mag, 1)),
-      magInt: Math.floor(AppUtil.round(props.mag, 1)),
+      magInt: Math.floor(props.mag, 1),
       magDisplay: magDisplay,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status,
@@ -905,7 +905,7 @@ var Earthquakes = function (options) {
       id: _id,
       mag: magThreshold,
       max: _this.bins.mag.length - 1,
-      min: _minMag
+      min: Math.floor(_minMag)
     };
     html = '';
     singleMagBin = _this.bins.mag.every(function(value, i, array) {
