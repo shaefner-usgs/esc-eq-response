@@ -39,10 +39,10 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
- *     id: {String} // Feature's id
- *     json: {Object} // Feature's JSON data
- *     sortByField: {String} // Default sort field for table
+ *     app: {Object} Application
+ *     id: {String} Feature's id
+ *     json: {Object} Feature's JSON data
+ *     sortByField: {String} Default sort field for table
  *   }
  *
  * @return _this {Object}
