@@ -6,17 +6,17 @@
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     cities: {Object},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     name: {String),
+ *     cities: {Object}
+ *     destroy: {Function}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     name: {String)
  *     url: {String}
  *   }
  */

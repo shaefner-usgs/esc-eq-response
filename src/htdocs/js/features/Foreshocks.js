@@ -11,25 +11,25 @@ var AppUtil = require('util/AppUtil'),
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     bins: {Object},
- *     count: {Integer},
- *     description: {String},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     list: {Array},
- *     mapLayer: {L.Layer},
- *     name: {String},
- *     showLayer: {Boolean},
- *     sortByField: {String},
- *     summary: {String},
- *     url: {String},
+ *     bins: {Object}
+ *     count: {Integer}
+ *     description: {String}
+ *     destroy: {Function}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     list: {Array}
+ *     mapLayer: {L.Layer}
+ *     name: {String}
+ *     showLayer: {Boolean}
+ *     sortByField: {String}
+ *     summary: {String}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */

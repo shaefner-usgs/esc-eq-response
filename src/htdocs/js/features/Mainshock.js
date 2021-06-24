@@ -12,24 +12,24 @@ var AppUtil = require('util/AppUtil'),
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     json: {Object},
- *     localTime: {String},
- *     mapLayer: {L.Layer},
- *     name: {String},
- *     plotTraces: {Object},
- *     showLayer: {Boolean},
- *     summary: {String},
- *     url: {String},
- *     utcTime: {String},
+ *     destroy: {Function}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     json: {Object}
+ *     localTime: {String}
+ *     mapLayer: {L.Layer}
+ *     name: {String}
+ *     plotTraces: {Object}
+ *     showLayer: {Boolean}
+ *     summary: {String}
+ *     url: {String}
+ *     utcTime: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */

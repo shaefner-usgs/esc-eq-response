@@ -33,20 +33,20 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     count: {Integer},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     mapLayer: {L.Layer},
- *     name: {String},
- *     showLayer: {Boolean},
- *     url: {String},
+ *     count: {Integer}
+ *     destroy: {Function}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     mapLayer: {L.Layer}
+ *     name: {String}
+ *     showLayer: {Boolean}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */

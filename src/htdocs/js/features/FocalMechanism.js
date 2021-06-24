@@ -12,20 +12,20 @@ require('leaflet/CanvasMarker');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     beachball: {Element},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     mapLayer: {L.Layer},
- *     name: {String},
- *     showLayer: {Boolean},
- *     summary: {String},
+ *     beachball: {Element}
+ *     destroy: {Function}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     mapLayer: {L.Layer}
+ *     name: {String}
+ *     showLayer: {Boolean}
+ *     summary: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */

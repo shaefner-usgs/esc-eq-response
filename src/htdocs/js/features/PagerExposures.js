@@ -10,19 +10,19 @@ var AppUtil = require('util/AppUtil');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
+ *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
- *     dependencies: {Array},
- *     destroy: {Function},
- *     exposures: {Object},
- *     id: {String},
- *     initFeature: {Function},
- *     name: {String),
- *     summary: {String},
+ *     dependencies: {Array}
+ *     destroy: {Function}
+ *     exposures: {Object}
+ *     id: {String}
+ *     initFeature: {Function}
+ *     name: {String)
+ *     summary: {String}
  *     url: {String}
  *   }
  */

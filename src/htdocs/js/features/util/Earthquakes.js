@@ -39,8 +39,8 @@ _DEFAULTS = {
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     id: {String}, // Feature's id
+ *     app: {Object} // Application
+ *     id: {String} // Feature's id
  *     json: {Object} // Feature's JSON data
  *     sortByField: {String} // Default sort field for table
  *   }
@@ -48,13 +48,13 @@ _DEFAULTS = {
  * @return _this {Object}
  *   {
  *     bins: {Object}
- *     createBinTable: {Function},
- *     createDescription: {Function},
- *     createListTable: {Function},
- *     createSlider: {Function},
- *     list: {Array},
- *     mapLayer: {L.layer},
- *     plotTraces: {Object},
+ *     createBinTable: {Function}
+ *     createDescription: {Function}
+ *     createListTable: {Function}
+ *     createSlider: {Function}
+ *     list: {Array}
+ *     mapLayer: {L.layer}
+ *     plotTraces: {Object}
  *   }
  */
 var Earthquakes = function (options) {
