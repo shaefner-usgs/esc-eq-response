@@ -4,8 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     LatLon = require('util/LatLon'),
-    Moment = require('moment'),
-    Util = require('hazdev-webutils/src/util/Util');
+    Moment = require('moment');
 
 
 var _COLORS,
@@ -94,7 +93,7 @@ var Earthquakes = function (options) {
     var coords,
         mainshock;
 
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
     _id = options.id;
