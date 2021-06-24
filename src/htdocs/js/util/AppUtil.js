@@ -27,11 +27,42 @@ AppUtil.addCommas = function (num) {
   if (parts.length > 1) {
     dec = '.' + parts[1];
   }
+
   while (regex.test(int)) {
     int = int.replace(regex, '$1' + ',' + '$2');
   }
 
   return int + dec;
+};
+
+/**
+ * Creates a function that is a composition of other functions.
+ *
+ * For example:
+ *      a(b(c(x))) === compose(c, b, a)(x);
+ *
+ * Each function should accept as an argument, the result of the previous
+ * function call in the chain. It is allowable for all functions to have no
+ * return value as well.
+ *
+ * @param ... {Function}
+ *     a variable set of functions to call, in order
+ *
+ * @return {Function}
+ *     the composition of the functions provided as arguments
+ */
+AppUtil.compose = function () {
+  var fns = arguments;
+
+  return function (result) {
+    fns.forEach(function(fn) {
+      if (fn && fn.call) {
+        result = fn.call(this, result);
+      }
+    });
+
+    return result;
+  };
 };
 
 /**
@@ -77,31 +108,6 @@ AppUtil.getRadius = function (mag) {
   var radius = 2 * Math.pow(10, (0.15 * mag));
 
   return Math.round(radius * 10) / 10; // round to nearest tenth
-};
-
-/**
- * Get shaking intensity / level for a given MMI value.
- *
- * @param mmi {Integer}
- *
- * @return {Object}
- */
-AppUtil.getShakingLevel = function (mmi) {
-  var shaking = [
-    {}, // no zero-level values
-    {intensity: 'I',    level: 'Not felt'},
-    {intensity: 'II',   level: 'Weak'},
-    {intensity: 'III',  level: 'Weak'},
-    {intensity: 'IV',   level: 'Light'},
-    {intensity: 'V',    level: 'Moderate'},
-    {intensity: 'VI',   level: 'Strong'},
-    {intensity: 'VII',  level: 'Very strong'},
-    {intensity: 'VIII', level: 'Severe'},
-    {intensity: 'IX',   level: 'Violent'},
-    {intensity: 'X+',   level: 'Extreme'}
-  ];
-
-  return shaking[mmi];
 };
 
 /**
@@ -190,20 +196,23 @@ AppUtil.romanize = function (num) {
 /**
  * Round a number to a given number of decimal places.
  *
+ * Always return the explicit number of decimal places specified by the
+ * precision parameter (i.e. return '2.0' for example).
+ *
  * @param num {Number}
  * @param precision {Number}
  *     optional number of decimal places; default is 0
  * @param empty {String}
- *     optional string to return if num is null; default is 'ndash;'
+ *     optional string to return if num is null; default is '&ndash;'
  *
  * @return {String}
- *     NOTE: does not return a Number (for explicit display of e.g. M 2.0 eqs)
+ *     NOTE: does not return a Number
  */
-AppUtil.round = function (num, precision = 0, empty = 'ndash;') {
+AppUtil.round = function (num, precision = 0, empty = '&ndash;') {
   var multiplier,
       rounded;
 
-  if (!num && num !== 0 || num === 'null') { // 'null' value might be a string
+  if (!num && num !== 0 || num === 'null') { // in case 'null' value is a string
     return empty;
   }
 
@@ -240,12 +249,13 @@ AppUtil.setParam = function (name, value) {
 
   pairs = [];
   params = AppUtil.getParams();
+  params[name] = value;
   queryString = '?';
 
-  params[name] = value;
   Object.keys(params).forEach(function(key) {
     pairs.push(key + '=' + params[key]);
   });
+
   queryString += pairs.join('&');
 
   window.history.replaceState({}, '', queryString + location.hash);
@@ -267,6 +277,7 @@ AppUtil.setQueryStringValues = function () {
   for (i = 0; i < fields.length; i ++) {
     pairs.push(fields[i].id + '=' + fields[i].value);
   }
+
   queryString += pairs.join('&');
 
   window.history.replaceState({}, '', queryString + location.hash);
