@@ -2,7 +2,7 @@
 'use strict';
 
 
-require('leaflet/Utfgrid');
+require('utfgrid');
 
 
 /**
