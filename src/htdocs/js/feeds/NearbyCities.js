@@ -11,9 +11,9 @@
  *
  * @return _this {Object}
  *   {
- *     destroy: {Function},
- *     id: {String},
- *     name: {String),
+ *     destroy: {Function}
+ *     id: {String}
+ *     name: {String}
  *     url: {String}
  *   }
  */
