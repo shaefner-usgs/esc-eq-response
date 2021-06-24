@@ -2,26 +2,23 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
-
-
 /**
- * Factory for Dark base layer
+ * Factory for Dark base layer.
  *
  * @param provider {String}
  *     default is 'cartodb'
  * @param options {Object}
- *     L.TileLayer options
+ *     L.tileLayer options
  *
- * @return {L.TileLayer}
+ * @return {L.tileLayer || L.layerGroup}
  */
 L.DarkLayer = function (provider, options) {
-  var _base,
-      _providers,
-      _ref,
-      _url;
+  var base,
+      labels,
+      providers,
+      url;
 
-  _providers = {
+  providers = {
     cartodb: {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">' +
         'OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">' +
@@ -37,27 +34,26 @@ L.DarkLayer = function (provider, options) {
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
     }
   };
-
   provider = provider || 'cartodb';
-  options = Util.extend(_providers[provider], options);
+  options = Object.assign(providers[provider], options);
+  url = providers[provider].url;
+  base = L.tileLayer(url, options);
 
-  _url = _providers[provider].url;
-  _base = L.tileLayer(_url, options);
-
-  // Esri dark layer doesn't inlcude labels; add them
+  // ESRI Dark layer doesn't include labels; add them
   if (provider === 'esri') {
-    _ref = L.tileLayer(
+    labels = L.tileLayer(
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
     );
-    return L.layerGroup([_base, _ref]);
+
+    return L.layerGroup([base, labels]);
   } else {
-    return _base;
+    return base;
   }
 };
-
 
 L.darkLayer = function () {
   return new L.DarkLayer();
 };
+
 
 module.exports = L.DarkLayer;

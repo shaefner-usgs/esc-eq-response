@@ -4,7 +4,7 @@
 
 /**
  * This class extends Map._initControlPos to create a bottom-center control
- *   container
+ * container.
  */
 L.Map.prototype._initControlPos = (function (_initControlPos) {
   return function () {

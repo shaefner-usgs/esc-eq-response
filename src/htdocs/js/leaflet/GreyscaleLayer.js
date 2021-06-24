@@ -2,26 +2,23 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
-
-
 /**
- * Factory for Greyscale base layer
+ * Factory for Greyscale base layer.
  *
  * @param provider {String}
  *     default is 'cartodb'
  * @param options {Object}
- *     L.TileLayer options
+ *     L.tileLayer options
  *
- * @return {L.TileLayer}
+ * @return {L.tileLayer || L.layerGroup}
  */
 L.GreyscaleLayer = function (provider, options) {
-  var _base,
-      _providers,
-      _ref,
-      _url;
+  var base,
+      labels,
+      providers,
+      url;
 
-  _providers = {
+  providers = {
     cartodb: {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">' +
         'OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">' +
@@ -45,27 +42,26 @@ L.GreyscaleLayer = function (provider, options) {
       url: 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png'
     }
   };
-
   provider = provider || 'cartodb';
-  options = Util.extend(_providers[provider], options);
+  options = Object.assign(providers[provider], options);
+  url = providers[provider].url;
+  base = L.tileLayer(url, options);
 
-  _url = _providers[provider].url;
-  _base = L.tileLayer(_url, options);
-
-  // Esri greyscale layer doesn't inlcude labels; add them
+  // ESRI Greyscale layer doesn't include labels; add them
   if (provider === 'esri') {
-    _ref = L.tileLayer(
+    labels = L.tileLayer(
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
     );
-    return L.layerGroup([_base, _ref]);
+
+    return L.layerGroup([base, labels]);
   } else {
-    return _base;
+    return base;
   }
 };
-
 
 L.greyscaleLayer = function () {
   return new L.GreyscaleLayer();
 };
+
 
 module.exports = L.GreyscaleLayer;
