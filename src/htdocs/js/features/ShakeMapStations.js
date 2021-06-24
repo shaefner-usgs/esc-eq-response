@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    Util = require('hazdev-webutils/src/util/Util');
+var AppUtil = require('util/AppUtil');
 
 
 var _DEFAULTS,
@@ -75,7 +74,7 @@ var ShakeMapStations = function (options) {
   _initialize = function (options) {
     var mainshock;
 
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
     mainshock = options.app.Features.getFeature('mainshock');
 
     _markerOptions = options.markerOptions;

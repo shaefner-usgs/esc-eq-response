@@ -4,8 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Lightbox = require('util/Lightbox'),
-    Moment = require('moment'),
-    Util = require('hazdev-webutils/src/util/Util');
+    Moment = require('moment');
 
 
 var _DEFAULTS,
@@ -70,7 +69,7 @@ var FieldNotes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
     _Lightbox = Lightbox();
@@ -82,7 +81,7 @@ var FieldNotes = function (options) {
     _this.url = _getFeedUrl();
     _this.zoomToLayer = false;
 
-    _markerOptions = Util.extend({
+    _markerOptions = Object.assign({
       icon: L.icon(options.iconOptions),
       pane: _this.id // control stacking order
     }, options.markerOptions);
