@@ -2,7 +2,7 @@
 
 
 /**
- * Create a lightbox overlay
+ * Create a Lightbox overlay.
  *
  * @return _this {Object}
  *   {
@@ -22,7 +22,7 @@ var Lightbox = function () {
   _this = {};
 
   /**
-   * Add listener for close button
+   * Add listener for close button.
    *
    * @param div {Element}
    */
@@ -34,7 +34,7 @@ var Lightbox = function () {
   };
 
   /**
-   * Hide lightbox when user hits escape key
+   * Hide Lightbox when user hits the escape key.
    *
    * @param e {Event}
    */
@@ -49,33 +49,29 @@ var Lightbox = function () {
   // ----------------------------------------------------------
 
   /**
-   * Add Lightbox to document
+   * Add Lightbox to document.
    *
    * @param html {String}
-   *     Lightbox content (typically an img tag)
+   *     Lightbox content (typically an <img> element)
    */
   _this.add = function (html) {
-    var div;
+    var div = document.createElement('div');
 
-    // first remove any existing lightbox
-    _this.remove();
-
-    div = document.createElement('div');
     div.classList.add('lightbox', 'hide');
     div.innerHTML = html;
 
+    _this.remove(); // first remove any existing Lightbox
     document.body.appendChild(div);
 
     _addListener(div);
   };
 
   /**
-   * Hide lightbox
+   * Hide Lightbox.
    */
   _this.hide = function () {
-    var div;
+    var div = document.querySelector('body > .lightbox');
 
-    div = document.querySelector('body > .lightbox');
     if (div) {
       div.classList.add('hide');
     }
@@ -85,24 +81,22 @@ var Lightbox = function () {
   };
 
   /**
-   * Remove lightbox from document
+   * Remove Lightbox from document.
    */
   _this.remove = function () {
-    var div;
+    var div = document.querySelector('body > .lightbox');
 
-    div = document.querySelector('body > .lightbox');
     if (div) {
       div.parentNode.removeChild(div);
     }
   };
 
   /**
-   * Show lightbox
+   * Show Lightbox.
    */
   _this.show = function () {
-    var div;
+    var div = document.querySelector('body > .lightbox');
 
-    div = document.querySelector('body > .lightbox');
     if (div) {
       div.classList.remove('hide');
     }
