@@ -3,8 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes'),
-    Moment = require('moment');
+    Earthquakes = require('features/util/Earthquakes');
 
 
 /**
@@ -19,17 +18,16 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *   {
  *     destroy: {Function}
+ *     details: {Object}
  *     id: {String}
  *     initFeature: {Function}
  *     json: {Object}
- *     localTime: {String}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     plotTraces: {Object}
  *     showLayer: {Boolean}
  *     summary: {String}
  *     url: {String}
- *     utcTime: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -171,31 +169,17 @@ var Mainshock = function (options) {
    *     feed data for Feature
    */
   _this.initFeature = function (json) {
-    var eqMoment,
-        eqMomentLocal,
-        localTime,
-        props;
-
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
       json: json
     });
 
-    props = json.properties;
-    eqMoment = Moment.utc(props.time, 'x');
-
-    if (props.tz) {
-      eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
-      localTime = eqMomentLocal.format('dddd MMMM D, YYYY h:mm:ss A');
-    }
-
+    _this.details = _Earthquakes.list[0];
     _this.json = json; // used by other Features
-    _this.localTime = localTime;
     _this.mapLayer = _Earthquakes.mapLayer;
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _createSummary();
-    _this.utcTime = eqMoment.format('dddd MMMM D, YYYY HH:mm:ss.SSS');
   };
 
 
