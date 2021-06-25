@@ -20,9 +20,9 @@ var _DEFAULTS = {
  *
  * @return _this {Object}
  *   {
- *     createCircle: {Function},
- *     createCircleRange: {Function},
- *     createLine: {Function},
+ *     createCircle: {Function}
+ *     createCircleRange: {Function}
+ *     createLine: {Function}
  *     createTriangle: {Function}
  *   }
  */

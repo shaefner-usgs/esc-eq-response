@@ -6,9 +6,9 @@
  *
  * @return _this {Object}
  *   {
- *     add: {Function},
- *     hide: {Function},
- *     remove: {Function},
+ *     add: {Function}
+ *     hide: {Function}
+ *     remove: {Function}
  *     show: {Function}
  *   }
  */
