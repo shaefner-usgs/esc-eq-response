@@ -254,9 +254,9 @@ class Rtf {
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
 
-    $datetime = $this->_data->time->utc . ' (UTC)';
+    $datetime = strip_tags($this->_data->time->utc);
     if (property_exists($this->_data->time, 'local')) {
-      $datetime .= '<br>' . $this->_data->time->local . ' (local time at epicenter)';
+      $datetime .= '<br>' . strip_tags($this->_data->time->local);
     }
 
     $nearbyCitiesList = '';
