@@ -1,7 +1,7 @@
 @use 'sass:color';
-@use 'functions/svgUrl' as *;
 @use 'leaflet/control-bottomCenter';
 @use 'leaflet/mousePosition';
+@use 'util/svgUrl' as *;
 @use 'variables' as *;
 
 $separator-color: color.scale($accent-color, $lightness: 80%);
