@@ -135,9 +135,9 @@ var Aftershocks = function (options) {
     };
     html = '';
 
-    oaf.forecast.forEach(function(period) {
+    oaf.forecast.forEach(period => {
       if (period.label === oaf.advisoryTimeFrame) { // 'primary emphasis' period
-        period.bins.forEach(function(bin) {
+        period.bins.forEach(bin => {
           data.mag = bin.magnitude;
           data.probability = _getProbability(bin.probability);
           data.range = bin.p95minimum  + '&ndash;' + bin.p95maximum;

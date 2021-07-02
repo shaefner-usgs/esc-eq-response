@@ -108,7 +108,7 @@ var FocalMechanism = function (options) {
       ];
 
       // Get popup, tooltip from Mainshock (FeatureGroup contains only 1 layer)
-      _app.Features.getFeature('mainshock').mapLayer.eachLayer(function(layer) {
+      _app.Features.getFeature('mainshock').mapLayer.eachLayer(layer => {
         popup = layer.getPopup().getContent();
         tooltip = layer.getTooltip().getContent();
       });

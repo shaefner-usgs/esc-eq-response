@@ -27,7 +27,7 @@ var Lightbox = function () {
    * @param div {Element}
    */
   _addListener = function (div) {
-    div.addEventListener('click', function(e) {
+    div.addEventListener('click', e => {
       e.preventDefault();
       _this.hide();
     });

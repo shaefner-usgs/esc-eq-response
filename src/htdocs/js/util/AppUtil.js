@@ -54,8 +54,8 @@ AppUtil.addCommas = function (num) {
 AppUtil.compose = function () {
   var fns = arguments;
 
-  return function (result) {
-    fns.forEach(function(fn) {
+  return result => {
+    fns.forEach(fn => {
       if (fn && fn.call) {
         result = fn.call(this, result);
       }
@@ -90,7 +90,7 @@ AppUtil.getParams = function () {
   params = {};
   queryString = location.search.slice(1);
 
-  queryString.replace(/([^=]*)=([^&]*)&*/g, function (match, key, value) {
+  queryString.replace(/([^=]*)=([^&]*)&*/g, (match, key, value) => {
     params[key] = value;
   });
 
@@ -229,7 +229,7 @@ AppUtil.round = function (num, precision = 0, empty = '&ndash;') {
 AppUtil.setFormFieldValues = function () {
   var params = AppUtil.getParams();
 
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     if (document.getElementById(key)) {
       document.getElementById(key).value = params[key];
     }
@@ -252,7 +252,7 @@ AppUtil.setParam = function (name, value) {
   params[name] = value;
   queryString = '?';
 
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
   });
 
@@ -293,7 +293,7 @@ AppUtil.setQueryStringValues = function () {
  * @return {String}
  */
 AppUtil.stripslashes = function (str) {
-  return (str + '').replace(/\\(.?)/g, function (s, n1) {
+  return (str + '').replace(/\\(.?)/g, (s, n1) => {
     switch (n1) {
       case '\\':
         return '\\';

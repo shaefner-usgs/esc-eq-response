@@ -76,7 +76,7 @@ var PagerExposures = function (options) {
     population = _this.exposures.population;
     shaking = _this.exposures.shaking;
 
-    mmis.forEach(function(mmi, i) {
+    mmis.forEach((mmi, i) => {
       if (mmi >= 2 && population[i] > 0) { // skip mmi below 2 and when nobody affected
         data = {
           intensity: shaking[i].intensity,
@@ -94,7 +94,7 @@ var PagerExposures = function (options) {
           data
         );
 
-        cities.forEach(function(city) {
+        cities.forEach(city => {
           if (mmi === Number(AppUtil.round(city.mmi, 0))) {
             data = {
               name: city.name,
@@ -221,7 +221,7 @@ var PagerExposures = function (options) {
     ];
     values = [];
 
-    mmis.forEach(function (val) {
+    mmis.forEach(val => {
       values.push(shaking[val]);
     });
 

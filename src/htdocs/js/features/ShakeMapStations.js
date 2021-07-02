@@ -277,7 +277,7 @@ var ShakeMapStations = function (options) {
           '</th>' +
         '</tr>';
 
-    channels.forEach(function(channel) {
+    channels.forEach(channel => {
       html += _createRow(channel);
     });
 
@@ -309,7 +309,7 @@ var ShakeMapStations = function (options) {
   _getAmplitudes = function (amps) {
     var amplitudes = {};
 
-    amps.forEach(function(amplitude) {
+    amps.forEach(amplitude => {
       amplitudes[amplitude.name] = amplitude;
     });
 

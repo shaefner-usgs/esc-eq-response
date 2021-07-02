@@ -101,14 +101,14 @@ var FieldNotes = function (options) {
     toggle = div.querySelector('.toggle');
 
     if (photo) {
-      photo.addEventListener('click', function(e) {
+      photo.addEventListener('click', e => {
         e.preventDefault();
         _Lightbox.show();
       });
     }
 
     if (toggle) {
-      toggle.addEventListener('click', function(e) {
+      toggle.addEventListener('click', e => {
         e.preventDefault();
         this.closest('.properties').classList.toggle('hide');
       });
@@ -117,7 +117,7 @@ var FieldNotes = function (options) {
 
   /**
    * Create 'Additional properties' list html. These are 'custom' props that
-   *   vary based on observation type.
+   * vary based on observation type.
    *
    * @param props {Object}
    *
@@ -135,7 +135,7 @@ var FieldNotes = function (options) {
       'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
       'timezone', 'title', 'zaccuracy'];
 
-    Object.keys(props).forEach(function (key) {
+    Object.keys(props).forEach(key => {
       if (skipProps.indexOf(key) === -1) { // skip props shared by all types
         value = props[key] || '&ndash;';
         list += '<dt>' + key + '</dt><dd>' + value + '</dd>';
@@ -218,7 +218,7 @@ var FieldNotes = function (options) {
       radius: AppUtil.getParam('as-dist') // use aftershocks radius
     };
 
-    Object.keys(urlParams).forEach(function(key) {
+    Object.keys(urlParams).forEach(key => {
       pairs.push(key + '=' + urlParams[key]);
     });
 
@@ -236,7 +236,7 @@ var FieldNotes = function (options) {
     var props = feature.properties;
 
     // Strip slashes from JSON encoded values
-    Object.keys(props).forEach(function(key) {
+    Object.keys(props).forEach(key => {
       props[key] = AppUtil.stripslashes(props[key]);
     });
 
