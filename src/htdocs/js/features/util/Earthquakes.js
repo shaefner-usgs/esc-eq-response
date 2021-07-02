@@ -34,7 +34,7 @@ _DEFAULTS = {
 
 /**
  * Parse earthquakes JSON feed and create Leaflet map layer, Plotly.js traces
- *   and content for SummaryPane (description, slider and tables).
+ * and content for SummaryPane (description, slider and tables).
  *
  * @param options {Object}
  *   {
@@ -290,7 +290,7 @@ var Earthquakes = function (options) {
 
   /**
    * Get time intervals object template. Creating it via a method allows
-   *   multiple copies to coexist.
+   * multiple copies to coexist.
    *
    * @return {Object}
    */
@@ -353,12 +353,12 @@ var Earthquakes = function (options) {
       x = _plotData.time.slice();
 
       // Fill y with values from 1 to length of x and date field
-      y = Array.from(new Array(x.length), function (val, i) {
+      y = Array.from(new Array(x.length), (val, i) => {
         return i + 1;
       });
 
       // Add date field to hover text
-      text = y.map(function(val, i) {
+      text = y.map((val, i) => {
         return val + '<br />' + date[i];
       });
 
@@ -527,7 +527,7 @@ var Earthquakes = function (options) {
 
   /**
    * Get the magnitude threshold where no more than maxNumEqs will be visible by
-   *   default.
+   * default.
    *
    * @return threshold {Number}
    */
@@ -542,9 +542,10 @@ var Earthquakes = function (options) {
     maxNumEqs = 25; // max number to display by default
     threshold = maxMag; // default
 
-    magBins.some(function(number, magInt) {
+    magBins.some((number, magInt) => {
       if (number <= maxNumEqs) {
         threshold = magInt;
+
         return true;
       }
     });
@@ -588,7 +589,7 @@ var Earthquakes = function (options) {
 
   /**
    * Create Leaflet popups, tooltips and data for summary, plots; add earthquake
-   *   to bins.
+   * to bins.
    *
    * @param feature {Object}
    *     geoJSON feature
@@ -765,10 +766,10 @@ var Earthquakes = function (options) {
     }
 
     if (_this.bins[type]) {
-      Object.keys(_this.bins[type]).sort().forEach(function(th) {
+      Object.keys(_this.bins[type]).sort().forEach(th => {
         rows += '<tr><th class="rowlabel">' + th + '</th>';
 
-        Object.keys(_this.bins[type][th]).forEach(function(period) {
+        Object.keys(_this.bins[type][th]).forEach(period => {
           td = _this.bins[type][th][period];
           tdClasses = [period];
 
@@ -840,6 +841,7 @@ var Earthquakes = function (options) {
         thClasses,
         tr;
 
+    data = {};
     eqs = _this.list;
     fields = ['depth', 'distance', 'eventId', 'location', 'mag', 'utcTime'];
     magThreshold = _getThreshold();
@@ -848,40 +850,38 @@ var Earthquakes = function (options) {
     thClasses = {};
     type = type || 'all';
 
-    fields.forEach(function(field) {
+    fields.forEach(field => {
       thClasses[field] = [field];
 
       if (_sortByField && field === _sortByField) {
         thClasses[field].push('sort-default');
       }
+
+      data[field] = thClasses[field].join(' ');
     });
 
     if (type === 'mostRecent') {
       eqs = [_this.list[_this.list.length - 1]];
       magThreshold = 0; // always show most recent eq
     }
-
     if (eqs.length > 1) {
       tableClasses.push('sortable');
     }
 
     // Add row (eq) to table data
-    eqs.forEach(function(eq) {
+    eqs.forEach(eq => {
       magInt = eq.magInt;
       tr = L.Util.template(_getTemplate('listRow'), eq);
+      rows += tr;
 
       if (magInt >= magThreshold && tableClasses.indexOf('m' + magInt) === -1) {
         tableClasses.push('m' + magInt); // flag to display mag level by default
       }
-      rows += tr;
     });
 
-    data = {
+    Object.assign(data, {
       cssClasses: tableClasses.join(' '),
       rows: rows
-    };
-    fields.forEach(function(field) {
-      data[field] = thClasses[field].join(' ');
     });
 
     return L.Util.template(_getTemplate('listTable'), data);
@@ -907,7 +907,7 @@ var Earthquakes = function (options) {
       min: Math.floor(_minMag)
     };
     html = '';
-    singleMagBin = _this.bins.mag.every(function(value, i, array) {
+    singleMagBin = _this.bins.mag.every((value, i, array) => {
       return array[0] === value; // all values are the same
     });
 
@@ -943,7 +943,7 @@ Earthquakes.getFeedUrl = function (params) {
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
   pairs = ['format=geojson', 'orderby=time-asc'];
 
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
   });
 
