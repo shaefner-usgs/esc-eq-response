@@ -5,7 +5,7 @@
 */
 
 /**
- * Creates a LatLon point on the earth's surface at the specified latitude / longitude.
+ * Creates a LatLon point on the Earth's surface at the specified lat/lng.
  *
  * @param lat {Number}
  *     Latitude in degrees.
@@ -26,7 +26,8 @@ function LatLon(lat, lon) {
 }
 
 /**
- * Returns the distance from ‘this’ point to destination point (using haversine formula).
+ * Returns the distance from ‘this’ point to destination point (using haversine
+ * formula).
  *
  * @param point {LatLon}
  *     Latitude/longitude of destination point.
