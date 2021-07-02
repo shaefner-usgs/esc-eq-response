@@ -445,7 +445,7 @@ var Earthquakes = function (options) {
     var template;
 
     if (type === 'binTable') {
-      template = '<table class="{cssClasses}">' +
+      template = '<table class="{classNames}">' +
           '<tr>' +
             '<th class="period">{type}:</th>' +
             '<th class="day">Day</th>' +
@@ -471,7 +471,7 @@ var Earthquakes = function (options) {
           '<td class="eventId">{eqid}</td>' +
         '</tr>';
     } else if (type === 'listTable') {
-      template = '<table class="{cssClasses}">' +
+      template = '<table class="{classNames}">' +
           '<tr class="no-sort">' +
             '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th class="{utcTime}" data-sort-order="desc">Time (UTC)</th>' +
@@ -485,7 +485,7 @@ var Earthquakes = function (options) {
           '{rows}' +
         '</table>';
     } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
-      template = '<div class="earthquake {cssClass}">' +
+      template = '<div class="earthquake {className}">' +
           '<h4><a href="{url}">{title}</a></h4>' +
           '{bubblesHtml}' +
           '<dl>' +
@@ -598,9 +598,9 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
+        className,
         compassPoints,
         coords,
-        cssClass,
         days,
         distance,
         eq,
@@ -608,6 +608,7 @@ var Earthquakes = function (options) {
         eqMomentLocal,
         latlon,
         localTime,
+        mag,
         magDisplay,
         magType,
         popup,
@@ -619,8 +620,9 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqMoment = Moment.utc(props.time, 'x');
+    mag = parseFloat(AppUtil.round(props.mag, 1));
     magType = props.magType || 'M';
-    magDisplay = magType + ' ' + AppUtil.round(props.mag, 1);
+    magDisplay = magType + ' ' + mag;
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     tooltip = magDisplay + ' - ' + utcTime;
@@ -634,10 +636,10 @@ var Earthquakes = function (options) {
     }
 
     if (_id === 'mainshock') {
-      cssClass = 'selected';
+      className = 'selected';
     } else { // calculate distance/direction from Mainshock
+      className = '';
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-      cssClass = '';
       latlon = LatLon(coords[1], coords[0]);
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
@@ -647,7 +649,7 @@ var Earthquakes = function (options) {
     eq = {
       alert: props.alert, // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
-      cssClass: cssClass,
+      className: className,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
       distance: distance,
@@ -658,8 +660,8 @@ var Earthquakes = function (options) {
       isoTime: eqMoment.toISOString(),
       location: _getLocation(coords),
       localTime: localTime,
-      mag: parseFloat(AppUtil.round(props.mag, 1)),
-      magInt: Math.floor(props.mag, 1),
+      mag: mag,
+      magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status,
@@ -785,7 +787,7 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      cssClasses: tableClasses.join(' '),
+      classNames: tableClasses.join(' '),
       rows: rows,
       type: type
     };
@@ -850,16 +852,6 @@ var Earthquakes = function (options) {
     thClasses = {};
     type = type || 'all';
 
-    fields.forEach(field => {
-      thClasses[field] = [field];
-
-      if (_sortByField && field === _sortByField) {
-        thClasses[field].push('sort-default');
-      }
-
-      data[field] = thClasses[field].join(' ');
-    });
-
     if (type === 'mostRecent') {
       eqs = [_this.list[_this.list.length - 1]];
       magThreshold = 0; // always show most recent eq
@@ -868,7 +860,7 @@ var Earthquakes = function (options) {
       tableClasses.push('sortable');
     }
 
-    // Add row (eq) to table data
+    // Add row (eq) to table
     eqs.forEach(eq => {
       magInt = eq.magInt;
       tr = L.Util.template(_getTemplate('listRow'), eq);
@@ -879,9 +871,19 @@ var Earthquakes = function (options) {
       }
     });
 
-    Object.assign(data, {
-      cssClasses: tableClasses.join(' '),
+    data = {
+      classNames: tableClasses.join(' '),
       rows: rows
+    };
+
+    fields.forEach(field => {
+      thClasses[field] = [field];
+
+      if (_sortByField && field === _sortByField) {
+        thClasses[field].push('sort-default');
+      }
+
+      data[field] = thClasses[field].join(' ');
     });
 
     return L.Util.template(_getTemplate('listTable'), data);
