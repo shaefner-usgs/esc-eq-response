@@ -1,6 +1,6 @@
 'use strict';
 
-var Matrix = require('hazdev-webutils/src/math/Matrix');
+var Matrix = require('./Matrix');
 
 
 var _BEACHBALL_METHODS,
