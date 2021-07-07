@@ -622,7 +622,7 @@ var Earthquakes = function (options) {
     eqMoment = Moment.utc(props.time, 'x');
     mag = parseFloat(AppUtil.round(props.mag, 1));
     magType = props.magType || 'M';
-    magDisplay = magType + ' ' + mag;
+    magDisplay = magType + ' ' + AppUtil.round(props.mag, 1);
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     tooltip = magDisplay + ' - ' + utcTime;
