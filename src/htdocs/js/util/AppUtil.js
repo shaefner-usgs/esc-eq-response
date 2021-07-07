@@ -266,7 +266,6 @@ AppUtil.setParam = function (name, value) {
  */
 AppUtil.setQueryStringValues = function () {
   var fields,
-      i,
       pairs,
       queryString;
 
@@ -274,9 +273,9 @@ AppUtil.setQueryStringValues = function () {
   pairs = [];
   queryString = '?';
 
-  for (i = 0; i < fields.length; i ++) {
-    pairs.push(fields[i].id + '=' + fields[i].value);
-  }
+  fields.forEach(field => {
+    pairs.push(field.id + '=' + field.value);
+  });
 
   queryString += pairs.join('&');
 
