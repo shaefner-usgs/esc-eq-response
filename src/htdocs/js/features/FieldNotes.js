@@ -88,7 +88,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Add event listeners to map popup.
+   * Add event listeners to map popups.
    *
    * @param div {Element}
    *     L.Popup div
@@ -100,6 +100,7 @@ var FieldNotes = function (options) {
     photo = div.querySelector('.photo');
     toggle = div.querySelector('.toggle');
 
+    // Show full-size photo in a Lightbox
     if (photo) {
       photo.addEventListener('click', e => {
         e.preventDefault();
@@ -107,6 +108,7 @@ var FieldNotes = function (options) {
       });
     }
 
+    // Show/hide additional props
     if (toggle) {
       toggle.addEventListener('click', e => {
         e.preventDefault();
