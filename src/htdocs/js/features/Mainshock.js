@@ -17,6 +17,7 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
+ *     addListener: {Function}
  *     destroy: {Function}
  *     details: {Object}
  *     id: {String}
@@ -145,6 +146,18 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Add event listener for download button.
+   */
+  _this.addListener = function () {
+    var button = document.querySelector('.event-summary');
+
+    button.addEventListener('click', () => {
+      _app.Feeds.reset();
+      _app.Feeds.instantiateFeeds(); // load external feed data for RTF Summary
+    });
+  };
 
   /**
    * Destroy this Class to aid in garbage collection.
