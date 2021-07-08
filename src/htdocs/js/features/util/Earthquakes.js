@@ -146,8 +146,6 @@ var Earthquakes = function (options) {
    * @param type {String <first | past | prior>}
    */
   _addEqToBin = function (days, magInt, type) {
-    var i;
-
     _initBins(magInt, type);
 
     // Add eq to appropriate bin(s)
@@ -176,7 +174,7 @@ var Earthquakes = function (options) {
 
     // Number eqs by magnitude, inclusive (M i+ eqs)
     if (type !== 'past') { // don't calculate totals 2x for aftershocks
-      for (i = magInt; i >= 0; i --) {
+      for (var i = magInt; i >= 0; i --) {
         _this.bins.mag[i] ++;
       }
     }
@@ -564,13 +562,11 @@ var Earthquakes = function (options) {
    * @param type {String}
    */
   _initBins = function (magInt, type) {
-    var i;
-
     // Range slider (filter)
     if (!_this.bins.mag) {
       _this.bins.mag = [];
     }
-    for (i = magInt; i >= 0; i --) {
+    for (var i = magInt; i >= 0; i --) {
       if (!_this.bins.mag[i]) {
         _this.bins.mag[i] = 0;
       }

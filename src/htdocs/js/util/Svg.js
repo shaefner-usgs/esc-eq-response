@@ -86,7 +86,6 @@ var Svg = function () {
    */
   _this.createCircleRange = function (opts) {
     var circle,
-        i,
         li,
         ol;
 
@@ -98,7 +97,7 @@ var Svg = function () {
 
     ol.classList.add('mags');
 
-    for (i = opts.min; i <= opts.max; i ++) {
+    for (var i = opts.min; i <= opts.max; i ++) {
       circle = _this.createCircle({
         radius: AppUtil.getRadius(i)
       });
