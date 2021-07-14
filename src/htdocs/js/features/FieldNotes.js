@@ -139,7 +139,7 @@ var FieldNotes = function (options) {
 
     Object.keys(props).forEach(key => {
       if (skipProps.indexOf(key) === -1) { // skip props shared by all types
-        value = props[key] || '&ndash;';
+        value = props[key] || '–';
         list += '<dt>' + key + '</dt><dd>' + value + '</dd>';
       }
     });

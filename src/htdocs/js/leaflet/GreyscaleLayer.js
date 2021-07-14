@@ -5,12 +5,11 @@
 /**
  * Factory for Greyscale base layer.
  *
- * @param provider {String}
- *     default is 'cartodb'
+ * @param provider {String} optional; default is 'cartodb'
  * @param options {Object}
  *     L.tileLayer options
  *
- * @return {L.tileLayer || L.layerGroup}
+ * @return {L.tileLayer|L.layerGroup}
  */
 L.GreyscaleLayer = function (provider, options) {
   var base,
@@ -28,7 +27,7 @@ L.GreyscaleLayer = function (provider, options) {
       url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png'
     },
     esri: {
-      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ',
       maxZoom: 16,
       subdomains: ['server', 'services'],
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
@@ -36,7 +35,7 @@ L.GreyscaleLayer = function (provider, options) {
     stamen: {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
         '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> ' +
-        '&mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        '— Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 20,
       subdomains: 'abcd',
       url: 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png'

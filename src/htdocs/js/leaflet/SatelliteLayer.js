@@ -5,12 +5,11 @@
 /**
  * Factory for Satellite base layer.
  *
- * @param provider {String}
- *     default is 'esri'
+ * @param provider {String} optional; default is 'esri'
  * @param options {Object}
  *     L.tileLayer options
  *
- * @return {L.tileLayer || L.layerGroup}
+ * @return {L.tileLayer|L.layerGroup}
  */
 L.SatelliteLayer = function (provider, options) {
   var base,
@@ -23,7 +22,7 @@ L.SatelliteLayer = function (provider, options) {
 
   providers = {
     esri: {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, ' +
+      attribution: 'Tiles &copy; Esri — Source: Esri, i-cubed, USDA, ' +
         'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the ' +
         'GIS User Community',
       subdomains: ['server', 'services'],
@@ -31,7 +30,7 @@ L.SatelliteLayer = function (provider, options) {
     },
     mapquest: {
       attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> ' +
-        '&mdash; Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of ' +
+        '— Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of ' +
         'Agriculture, Farm Service Agency',
       subdomains: '1234',
       url: 'http://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg'

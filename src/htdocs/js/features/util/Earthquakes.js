@@ -143,7 +143,7 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <first | past | prior>}
+   * @param type {String <first|past|prior>}
    */
   _addEqToBin = function (days, magInt, type) {
     _initBins(magInt, type);
@@ -313,8 +313,8 @@ var Earthquakes = function (options) {
     var lat,
         lng;
 
-    lat = [Math.abs(coords[1]).toFixed(3), '&deg;', (coords[1] < 0 ? 'S':'N')].join('');
-    lng = [Math.abs(coords[0]).toFixed(3), '&deg;', (coords[0] < 0 ? 'W':'E')].join('');
+    lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
+    lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
 
     return lat + ', ' + lng;
   };
@@ -322,10 +322,10 @@ var Earthquakes = function (options) {
   /**
    * Get a plot's trace option for plotly.js.
    *
-   * @param plotId {String <cumulative | hypocenters | magtime>}
-   * @param type {String <scatter | scatter3d>}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
+   * @param type {String <scatter|scatter3d>}
    *
-   * @return trace {Object || null}
+   * @return trace {Object|null}
    */
   _getPlotlyTrace = function (plotId, type) {
     var date,
@@ -435,7 +435,7 @@ var Earthquakes = function (options) {
   /**
    * Get the template HTML for a given type of content.
    *
-   * @param type {String <binTable | description | listRow | listTable | popup | slider | subheader>}
+   * @param type {String <binTable|description|listRow|listTable|popup|slider|subheader>}
    *
    * @return template {String}
    */
@@ -456,8 +456,8 @@ var Earthquakes = function (options) {
         '</table>';
     } else if (type === 'description') {
       template = '<p class="description">' +
-          '<strong>M {mag}+</strong> earthquakes within <strong>{distance} km</strong> ' +
-          'of the mainshock&rsquo;s epicenter{ending}.' +
+          '<strong>M {mag}+</strong> earthquakes within <strong>{distance} ' +
+          'km</strong> of the mainshock’s epicenter{ending}.' +
         '</p>';
     } else if (type === 'listRow') {
       template = '<tr class="m{magInt}" title="View earthquake on map">' +
@@ -741,7 +741,7 @@ var Earthquakes = function (options) {
   /**
    * Create binned earthquake data table HTML.
    *
-   * @param type {String <first | past | prior>}
+   * @param type {String <first|past|prior>}
    *
    * @return {String}
    */
@@ -823,8 +823,8 @@ var Earthquakes = function (options) {
   /**
    * Create earthquake list table HTML.
    *
-   * @param type {String}
-   *     'all' or 'mostRecent' (Aftershocks only); default is 'all'
+   * @param type {String <all|mostRecent>} default is 'all'
+   *     'mostRecent' is for Aftershocks only
    *
    * @return {String}
    */

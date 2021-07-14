@@ -119,7 +119,7 @@ var ShakeMapStations = function (options) {
         html = '<span>' + value + '</span>';
       }
     } else {
-      html = '<span>&ndash;</span>';
+      html = '<span>–</span>';
     }
 
     return html;
@@ -165,10 +165,10 @@ var ShakeMapStations = function (options) {
       pgv: AppUtil.round(props.pgv, 2),
       distance: AppUtil.round(props.distance, 1),
       intensity: AppUtil.round(props.intensity, 1),
-      network: (props.network || '&ndash;'),
+      network: props.network || '–',
       location: _getLocation(station),
       romanIntensity: AppUtil.romanize(props.intensity) || 'I',
-      source: (props.source || '&ndash;'),
+      source: props.source || '–',
       title: _getTitle(station)
     };
     html = L.Util.template(
@@ -351,8 +351,8 @@ var ShakeMapStations = function (options) {
         lng;
 
     coords = station.geometry.coordinates;
-    lat = [Math.abs(coords[1]).toFixed(3), '&deg;', (coords[1] < 0 ? 'S':'N')].join('');
-    lng = [Math.abs(coords[0]).toFixed(3), '&deg;', (coords[0] < 0 ? 'W':'E')].join('');
+    lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
+    lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
 
     return station.properties.location || lat + ', ' + lng;
   };
@@ -370,8 +370,8 @@ var ShakeMapStations = function (options) {
 
     props = station.properties;
     data = {
-      code: props.code || '&ndash;',
-      name: props.name || '&ndash;'
+      code: props.code || '–',
+      name: props.name || '–'
     };
 
     return L.Util.template('<strong>{code}</strong> {name}', data);

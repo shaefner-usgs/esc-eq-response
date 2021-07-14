@@ -11,11 +11,11 @@ L.Control.MousePosition = L.Control.extend({
   options: {
     emptyString: '',
     latFormatter: function(n) {
-      return [Math.abs(n).toFixed(3), '&deg;', (n<0?'S':'N')].join('');
+      return [Math.abs(n).toFixed(3), '°', (n<0?'S':'N')].join('');
     },
     lngFirst: false,
     lngFormatter: function(n) {
-      return [Math.abs(n).toFixed(3), '&deg;', (n<0?'W':'E')].join('');
+      return [Math.abs(n).toFixed(3), '°', (n<0?'W':'E')].join('');
     },
     numDigits: 3,
     position: 'bottomleft',

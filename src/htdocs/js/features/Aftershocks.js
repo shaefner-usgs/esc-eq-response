@@ -140,7 +140,7 @@ var Aftershocks = function (options) {
         period.bins.forEach(bin => {
           data.mag = bin.magnitude;
           data.probability = _getProbability(bin.probability);
-          data.range = bin.p95minimum  + '&ndash;' + bin.p95maximum;
+          data.range = bin.p95minimum  + '–' + bin.p95maximum;
 
           if (bin.p95minimum === 0 && bin.p95maximum === 0) {
             data.range = 0;
