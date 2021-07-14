@@ -110,8 +110,9 @@ var FieldNotes = function (options) {
 
     // Show/hide additional props
     if (toggle) {
-      toggle.addEventListener('click', e => {
+      toggle.addEventListener('click', function(e) {
         e.preventDefault();
+
         this.closest('.properties').classList.toggle('hide');
       });
     }
@@ -148,7 +149,7 @@ var FieldNotes = function (options) {
       html = '<p class="properties hide">' +
           '<a href="#" class="toggle">Additional properties</a>' +
         '</p>' +
-        '<dl class="custom">' + list + '</dl>';
+        `<dl class="custom">${list}</dl>`;
     }
 
     return html;
@@ -292,7 +293,7 @@ var FieldNotes = function (options) {
         popup.update(); // pan map to contain popup after image loads
       };
 
-      _Lightbox.add('<img src="' + image.src + '" alt="enlarged photo" />');
+      _Lightbox.add(`<img src="${image.src}" alt="enlarged photo" />`);
     }
   };
 

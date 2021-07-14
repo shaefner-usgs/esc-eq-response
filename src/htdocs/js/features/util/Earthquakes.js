@@ -765,7 +765,7 @@ var Earthquakes = function (options) {
 
     if (_this.bins[type]) {
       Object.keys(_this.bins[type]).sort().forEach(th => {
-        rows += '<tr><th class="rowlabel">' + th + '</th>';
+        rows += `<tr><th class="rowlabel">${th}</th>`;
 
         Object.keys(_this.bins[type][th]).forEach(period => {
           td = _this.bins[type][th][period];
@@ -775,7 +775,7 @@ var Earthquakes = function (options) {
             tdClasses.push('total');
           }
 
-          rows += '<td class="' + tdClasses.join(' ') + '">' + td + '</td>';
+          rows += `<td class="${tdClasses.join(' ')}">${td}</td>`;
         });
 
         rows += '</tr>';
@@ -805,10 +805,10 @@ var Earthquakes = function (options) {
 
     if (_id === 'aftershocks') {
       ending = '. The duration of the aftershock sequence is <strong>' +
-        duration.length + ' ' + duration.interval + '</strong>';
+        `${duration.length} ${duration.interval}</strong>`;
     } else {
-      ending = ' in the prior <strong>' + duration.length + ' ' +
-        duration.interval +  '</strong> before the mainshock';
+      ending = ` in the prior <strong>${duration.length} ${duration.interval} ` +
+        '</strong> before the mainshock';
     }
 
     data = {

@@ -131,7 +131,7 @@ var Aftershocks = function (options) {
         html;
 
     data = {
-      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/oaf/forecast'
+      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${_eqid}/oaf/forecast`
     };
     html = '';
 
@@ -194,8 +194,7 @@ var Aftershocks = function (options) {
 
       if (_this.count > 1) {
         html += '<h3>Most Recent Aftershock</h3>';
-        html += '<p>The most recent aftershock was <strong>' + duration +
-          ' ago</strong>.</p>';
+        html += `<p>The most recent aftershock was <strong>${duration} ago</strong>.</p>`;
         html += _Earthquakes.createListTable('mostRecent');
       }
 

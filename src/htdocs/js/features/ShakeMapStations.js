@@ -10,11 +10,11 @@ var _DEFAULTS,
     _MARKER_DEFAULTS;
 
 _FLAG_DESCRIPTIONS = {
-  'G': 'Glitch (clipped or below noise)',
-  'I': 'Incomplete time series',
-  'M': 'Manually flagged',
-  'N': 'Not in list of known stations',
-  'T': 'Outlier'
+  G: 'Glitch (clipped or below noise)',
+  I: 'Incomplete time series',
+  M: 'Manually flagged',
+  N: 'Not in list of known stations',
+  T: 'Outlier'
 };
 _MARKER_DEFAULTS = {
   iconAnchor: [7, 5],
@@ -110,13 +110,13 @@ var ShakeMapStations = function (options) {
 
         // display flag with title text
         if (Object.prototype.hasOwnProperty.call(_FLAG_DESCRIPTIONS, flag)) {
-          html += '<abbr title="' + _FLAG_DESCRIPTIONS[flag] + '">(' + flag + ')</abbr>';
+          html += `<abbr title="${_FLAG_DESCRIPTIONS[flag]}">(${flag})</abbr>`;
         } else {
-          html += '(' + flag + ')';
+          html += `(${flag})`;
         }
         html += '</span>';
       } else {
-        html = '<span>' + value + '</span>';
+        html = `<span>${value}</span>`;
       }
     } else {
       html = '<span>–</span>';
@@ -257,7 +257,8 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _createTable = function (channels) {
-    var html = '<table class="station-channels-map">' +
+    var html = '' +
+      '<table class="station-channels-map">' +
         '<tr>' +
           '<th scope="col" class="station-channels-map-name freeze">Name</th>' +
           '<th scope="col" class="station-channels-map-pga">' +

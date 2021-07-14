@@ -127,7 +127,7 @@ var PagerExposures = function (options) {
 
     data = {
       rows: _createRows(),
-      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/pager'
+      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${_eqid}/pager`
     };
     html = '';
 

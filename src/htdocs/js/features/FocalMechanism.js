@@ -147,9 +147,8 @@ var FocalMechanism = function (options) {
     html = '';
 
     if (_this.beachball) {
-      url = 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid +
-        '/focal-mechanism';
-      html = '<a href="' + url + '"><h4>' + _this.name + '</h4></a>';
+      url = `https://earthquake.usgs.gov/earthquakes/eventpage/${_eqid}/focal-mechanism`;
+      html = `<a href="${url}"><h4>${_this.name}</h4></a>`;
     }
 
     return html;

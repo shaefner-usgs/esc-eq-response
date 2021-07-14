@@ -139,8 +139,7 @@ var Mainshock = function (options) {
    * @return {String}
    */
   _getFeedUrl = function () {
-    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' +
-      _eqid + '.geojson';
+    return `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${_eqid}.geojson`;
   };
 
   // ----------------------------------------------------------
