@@ -200,15 +200,15 @@ AppUtil.romanize = function (num) {
  * precision parameter (i.e. return '2.0' for example).
  *
  * @param num {Number}
- * @param precision {Number}
- *     optional number of decimal places; default is 0
- * @param empty {String}
- *     optional string to return if num is null; default is '&ndash;'
+ * @param precision {Number} optional; default is 0
+ *     number of decimal places
+ * @param empty {String} optional; default is '–'
+ *     string to return if num is null
  *
  * @return {String}
  *     NOTE: does not return a Number
  */
-AppUtil.round = function (num, precision = 0, empty = '&ndash;') {
+AppUtil.round = function (num, precision = 0, empty = '–') {
   var multiplier,
       rounded;
 
