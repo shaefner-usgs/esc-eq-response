@@ -153,8 +153,7 @@ var Mainshock = function (options) {
     var button = document.querySelector('.event-summary');
 
     button.addEventListener('click', () => {
-      _app.Feeds.reset();
-      _app.Feeds.instantiateFeeds(); // load external feed data for RTF Summary
+      _app.Feeds.initFeeds(); // load external feed data for RTF Summary
     });
   };
 
