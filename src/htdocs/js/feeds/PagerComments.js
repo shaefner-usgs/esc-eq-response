@@ -6,7 +6,7 @@
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
