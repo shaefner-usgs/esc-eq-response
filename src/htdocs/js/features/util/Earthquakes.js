@@ -325,7 +325,7 @@ var Earthquakes = function (options) {
    * @param plotId {String <cumulative|hypocenters|magtime>}
    * @param type {String <scatter|scatter3d>}
    *
-   * @return trace {Object|null}
+   * @return trace {Object|undefined}
    */
   _getPlotlyTrace = function (plotId, type) {
     var date,
