@@ -1,11 +1,10 @@
 'use strict';
 
-/* Taken from:
-  http://www.movable-type.co.uk/scripts/latlong.html
-*/
 
 /**
  * Creates a LatLon point on the Earth's surface at the specified lat/lng.
+ *
+ * Taken from: http://www.movable-type.co.uk/scripts/latlong.html
  *
  * @param lat {Number}
  *     Latitude in degrees.

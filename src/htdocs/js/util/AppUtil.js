@@ -6,37 +6,40 @@ var AppUtil = function () {};
 
 
 /**
- * Add commas to large numbers.
+ * Add commas to large numbers (10,000 and greater).
  *
  * @param num {Number}
  *
  * @return {String}
  */
 AppUtil.addCommas = function (num) {
-  var dec,
-      int,
+  var decStr,
+      intStr,
+      numStr,
       parts,
       regex;
 
-  dec = '';
-  num = String(num);
-  parts = num.split('.');
-  int = parts[0];
+  decStr = '';
+  numStr = String(num);
+  parts = numStr.split('.');
+  intStr = parts[0];
   regex = /(\d+)(\d{3})/;
 
   if (parts.length > 1) {
-    dec = '.' + parts[1];
+    decStr = '.' + parts[1];
   }
 
-  while (regex.test(int)) {
-    int = int.replace(regex, '$1' + ',' + '$2');
+  if (numStr.length > 4) {
+    while (regex.test(intStr)) {
+      intStr = intStr.replace(regex, '$1' + ',' + '$2');
+    }
   }
 
-  return int + dec;
+  return intStr + decStr;
 };
 
 /**
- * Creates a function that is a composition of other functions.
+ * Create a function that is a composition of other functions.
  *
  * For example:
  *      a(b(c(x))) === compose(c, b, a)(x);
@@ -98,7 +101,7 @@ AppUtil.getParams = function () {
 };
 
 /**
- * Get circle marker radius for a given eq magnitude.
+ * Get the circle marker radius for a given eq magnitude.
  *
  * @param mag {Number}
  *
@@ -111,10 +114,10 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
- * Get the timezone on user's device.
+ * Get the timezone on the user's device.
  *
- * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
- *  offset-amount-in-js/12496442#12496442
+ * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-
+ *   not-gmt-offset-amount-in-js/12496442#12496442
  *
  * @return tz {String}
  *     PST, CST, etc
@@ -224,7 +227,7 @@ AppUtil.round = function (num, precision = 0, empty = '–') {
 };
 
 /**
- * Set all form field values to match the values in querystring.
+ * Set all form field values to match the values in the querystring.
  */
 AppUtil.setFormFieldValues = function () {
   var params = AppUtil.getParams();
@@ -262,7 +265,7 @@ AppUtil.setParam = function (name, value) {
 };
 
 /**
- * Set all querystring values to match the values in form fields.
+ * Set all querystring values to match the values in the form fields.
  */
 AppUtil.setQueryStringValues = function () {
   var fields,
@@ -283,9 +286,9 @@ AppUtil.setQueryStringValues = function () {
 };
 
 /**
- * Strip backslashes from escaped strings.
+ * Strip backslashes from an escaped string.
  *
- * https://locutus.io/php/strings/stripslashes/
+ * Taken from: https://locutus.io/php/strings/stripslashes/
  *
  * @param str {String}
  *
