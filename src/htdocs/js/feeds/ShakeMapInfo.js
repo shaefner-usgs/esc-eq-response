@@ -2,7 +2,7 @@
 
 
 /**
- * Get ShakeMap Info Feed.
+ * ShakeMap Info Feed.
  *
  * @param options {Object}
  *   {
@@ -39,7 +39,7 @@ var ShakeMapInfo = function (options) {
   };
 
   /**
-   * Get URL of JSON feed.
+   * Get the JSON feed's URL.
    *
    * @return url {String}
    */
@@ -69,14 +69,12 @@ var ShakeMapInfo = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
-
     _app = null;
     _getFeedUrl = null;
-
     _this = null;
   };
 
