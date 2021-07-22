@@ -29,7 +29,10 @@ L.GreyscaleLayer = function (provider, options) {
     esri: {
       attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ',
       maxZoom: 16,
-      subdomains: ['server', 'services'],
+      subdomains: [
+        'server',
+        'services'
+      ],
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
     },
     stamen: {
@@ -52,7 +55,10 @@ L.GreyscaleLayer = function (provider, options) {
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
     );
 
-    return L.layerGroup([base, labels]);
+    return L.layerGroup([
+      base,
+      labels
+    ]);
   } else {
     return base;
   }

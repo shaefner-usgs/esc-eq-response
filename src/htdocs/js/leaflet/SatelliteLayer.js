@@ -25,7 +25,10 @@ L.SatelliteLayer = function (provider, options) {
       attribution: 'Tiles &copy; Esri — Source: Esri, i-cubed, USDA, ' +
         'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the ' +
         'GIS User Community',
-      subdomains: ['server', 'services'],
+      subdomains: [
+        'server',
+        'services'
+      ],
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
     },
     mapquest: {
@@ -48,7 +51,11 @@ L.SatelliteLayer = function (provider, options) {
     transportationUrl = 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}';
     transportation = L.tileLayer(transportationUrl, options);
 
-    return L.layerGroup([base, places, transportation]);
+    return L.layerGroup([
+      base,
+      places,
+      transportation
+    ]);
   } else {
     return base;
   }

@@ -6,7 +6,7 @@ require('utfgrid');
 
 
 /**
- * This class enables mouseover labels that track the cursor on using UtfGrid.
+ * This class enables mouseover labels that track the cursor on UtfGrid.
  *
  * @param options {Object}
  *   {

@@ -31,7 +31,10 @@ L.FaultsLayer = function () {
     minZoom: 0,
     maxZoom: 5
   });
-  layer = L.layerGroup([plates, faults]);
+  layer = L.layerGroup([
+    plates,
+    faults
+  ]);
 
   // Set id value used by CSS for stacking order of overlays on Leaflet map
   layer.id = 'faults';

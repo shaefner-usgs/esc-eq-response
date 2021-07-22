@@ -6,9 +6,8 @@
  * This class extends L.Marker to move an existing <canvas> in the DOM to the
  * Marker when the Marker is turned on in the layers control.
  *
- * This is necessary b/c Leaflet creates/destroys markers in the DOM when they
- * are turned on/off in the layers control. When the <canvas> is added to the
- * DOM, the marker doesn't exist.
+ * This is necessary b/c Leaflet dynamically creates/destroys markers when they
+ * are turned on/off in the layers control.
  *
  * @return {L.marker}
  */
