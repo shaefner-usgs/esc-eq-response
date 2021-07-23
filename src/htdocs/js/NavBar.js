@@ -2,21 +2,20 @@
 
 
 /**
- * Set up NavBar to switch between panes (i.e. 'pages') of single page app.
+ * Switch between panes (i.e. 'pages') of the app and save/set scroll positions.
  *
- * Also save / set scroll positions to return pane to previous state, and deal
- *   with issues where map/plots don't display correctly when created while
- *   their respective pane is hidden.
+ * Also mitigate issues where map/plots don't render correctly when they're
+ * created while their respective pane is hidden.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} Application
  *     el: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     postInit: {Function},
+ *     postInit: {Function}
  *     reset: {Function}
  *   }
  */
@@ -30,13 +29,14 @@ var NavBar = function (options) {
       _throttle,
 
       _addListeners,
-      _changePane,
       _getPaneId,
       _hidePanes,
+      _renderPane,
       _renderPlots,
       _saveScrollPosition,
       _setScrollPosition,
-      _showPane;
+      _showPane,
+      _switchPanes;
 
 
   _this = {};
@@ -50,35 +50,22 @@ var NavBar = function (options) {
   };
 
   /**
-   * Add event listeners for switching panes / saving scroll position
+   * Add event listeners.
    */
   _addListeners = function () {
-    var id;
-
-    // Update UI when user switches pane
-    window.addEventListener('hashchange', function () {
-      id = _getPaneId();
-      _changePane(id);
+    // Update the UI when user switches panes
+    window.addEventListener('hashchange', () => {
+      _switchPanes();
     });
 
-    // Save current scroll postion when user scrolls page
-    window.addEventListener('scroll', function () {
+    // Save scroll position when user scrolls
+    window.addEventListener('scroll', () => {
       _saveScrollPosition();
     });
   };
 
   /**
-   * Switch to selected pane in UI
-   *
-   * @param id {String}
-   */
-  _changePane = function (id) {
-    _hidePanes();
-    _showPane(id);
-  };
-
-  /**
-   * Get id of selected pane from url (defaults to 'editPane' if not set)
+   * Get the id value of the selected pane from the URL.
    *
    * @return id {String}
    */
@@ -99,29 +86,47 @@ var NavBar = function (options) {
   };
 
   /**
-   * Hide all panes in UI; set all nav buttons to unselected
+   * Hide all panes and unselect all nav buttons.
    */
   _hidePanes = function () {
     var button,
-        i,
-        pane;
+        id;
 
-    for (i = 0; i < _panes.length; i ++) {
-      pane = _panes[i];
-      pane.classList.add('hide');
+    _panes.forEach(pane => {
+      id = pane.getAttribute('id');
+      button = _el.querySelector('[href="#' + id + '"]');
 
-      button = _el.querySelector('[href="#' + pane.getAttribute('id') + '"]');
       button.classList.remove('selected');
+      pane.classList.add('hide');
+    });
+  };
+
+  /**
+   * Render the pane matching the given id value. These are extra steps that
+   * are necessary to render the selected pane correctly when it is unhidden.
+   *
+   * @param id {String}
+   */
+  _renderPane = function (id) {
+    _setScrollPosition(id);
+
+    if (id === 'editPane') {
+      _app.EditPane.setFocusedField();
+    } else if (id === 'mapPane') {
+      _app.MapPane.map.invalidateSize();
+      _app.MapPane.setView();
+      _app.MapPane.map.fire('visible'); // for popups added when map is hidden
+    } else if (id === 'plotsPane') {
+      _renderPlots();
     }
   };
 
   /**
-   * Display rendering message (and render plots) when plots pane is activated
+   * Render the plots (and display the rendering status).
    */
   _renderPlots = function () {
-    var numPlots;
+    var numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
 
-    numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
     if (numPlots > 0 && !_app.PlotsPane.rendered) {
       _app.StatusBar.addItem({
         id: 'rendering',
@@ -137,11 +142,11 @@ var NavBar = function (options) {
       }, 25);
     }
 
-    _app.PlotsPane.resize(); // in case user adjusted window size in another pane
+    _app.PlotsPane.resize(); // in case user adjusted window size
   };
 
   /**
-   * Save user's current scroll position in session storage
+   * Save the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
     var id,
@@ -150,22 +155,21 @@ var NavBar = function (options) {
     id = _getPaneId();
     position = window.pageYOffset;
 
-    // Throttle scroll event so it doesn't fire off in rapid succession
     window.clearTimeout(_throttle);
+
+    // Throttle scroll event
     _throttle = window.setTimeout(function() {
       window.sessionStorage.setItem(id, position);
-    }, 25);
+    }, 50);
   };
 
   /**
-   * Set scroll position to former value, which is saved in sessionStorage
+   * Set the scroll position to the previous value.
    *
    * @param id {String}
    */
   _setScrollPosition = function (id) {
-    var position;
-
-    position = window.sessionStorage.getItem(id);
+    var position = window.sessionStorage.getItem(id);
 
     if (position) {
       window.scroll(0, position);
@@ -173,7 +177,8 @@ var NavBar = function (options) {
   };
 
   /**
-   * Show selected pane and set scroll position; highlight selected nav button
+   * Show the pane matching the given id value and select the appropriate nav
+   * button.
    *
    * @param id {String}
    */
@@ -182,23 +187,22 @@ var NavBar = function (options) {
         pane;
 
     button = _el.querySelector('[href="#' + id + '"]');
-    button.classList.add('selected');
-
     pane = document.getElementById(id);
+
+    button.classList.add('selected');
     pane.classList.remove('hide');
 
-    _setScrollPosition(id);
+    _renderPane(id);
+  };
 
-    // Map and plots need special care to display correctly when unhidden
-    if (id === 'editPane') {
-      _app.EditPane.setFocusedField();
-    } else if (id === 'mapPane') {
-      _app.MapPane.map.invalidateSize();
-      _app.MapPane.initView();
-      _app.MapPane.map.fire('visible'); // for popups added when map is hidden
-    } else if (id === 'plotsPane') {
-      _renderPlots();
-    }
+  /**
+   * Switch between panes.
+   */
+  _switchPanes = function () {
+    var id = _getPaneId();
+
+    _hidePanes();
+    _showPane(id);
   };
 
   // ----------------------------------------------------------
@@ -206,29 +210,26 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Initialization that depends on app's "primary" Classes already being
-   *   instantiated in Application.js.
+   * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    var id = _getPaneId();
-
-    _changePane(id);
     _addListeners();
+    _switchPanes();
   };
 
   /**
-   * Reset saved scroll positions for all panes except 'Edit'
+   * Reset saved scroll positions for all panes except EditPane.
    */
   _this.reset = function () {
-    var i,
-        id;
+    var id;
 
-    for (i = 0; i < _panes.length; i ++) {
-      id = _panes[i].getAttribute('id');
+    _panes.forEach(pane => {
+      id = pane.getAttribute('id');
+
       if (id !== 'editPane') {
         window.sessionStorage.setItem(id, 0);
       }
-    }
+    });
   };
 
 

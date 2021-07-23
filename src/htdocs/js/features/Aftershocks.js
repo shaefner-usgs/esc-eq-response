@@ -13,27 +13,27 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *   {
  *     app: {Object} Application
- *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
  *     bins: {Object}
  *     count: {Integer}
+ *     create: {Function}
  *     description: {String}
  *     destroy: {Function}
  *     forecast: {Array}
+ *     getFeedUrl: {Function}
  *     id: {String}
- *     initFeature: {Function}
  *     list: {Array}
  *     mapLayer: {L.Layer}
  *     model: {Object}
  *     name: {String}
  *     plotTraces: {Object}
+ *     reset: {Function}
  *     showLayer: {Boolean}
  *     sortByField: {String}
  *     summary: {String}
- *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -42,7 +42,6 @@ var Aftershocks = function (options) {
       _initialize,
 
       _app,
-      _eqid,
       _forecast,
       _mainshock,
       _model,
@@ -51,8 +50,7 @@ var Aftershocks = function (options) {
       _createForecast,
       _createProbabilities,
       _createSummary,
-      _getFeedUrl,
-      _getProbability;
+      _getPercentage;
 
 
   _this = {};
@@ -61,7 +59,6 @@ var Aftershocks = function (options) {
     options = options || {};
 
     _app = options.app;
-    _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'aftershocks';
@@ -71,12 +68,11 @@ var Aftershocks = function (options) {
     _this.showLayer = true;
     _this.sortByField = 'utcTime';
     _this.summary = null;
-    _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
 
   /**
-   * Create forecast HTML.
+   * Create aftershocks forecast HTML.
    *
    * @return html {String}
    */
@@ -120,7 +116,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Create probability buttons HTML.
+   * Create aftershocks probability buttons HTML.
    *
    * @param oaf {Object}
    *
@@ -128,10 +124,12 @@ var Aftershocks = function (options) {
    */
   _createProbabilities = function (oaf) {
     var data,
+        eqid,
         html;
 
+    eqid = AppUtil.getParam('eqid');
     data = {
-      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${_eqid}/oaf/forecast`
+      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
     };
     html = '';
 
@@ -139,7 +137,7 @@ var Aftershocks = function (options) {
       if (period.label === oaf.advisoryTimeFrame) { // 'primary emphasis' period
         period.bins.forEach(bin => {
           data.mag = bin.magnitude;
-          data.probability = _getProbability(bin.probability);
+          data.probability = _getPercentage(bin.probability);
           data.range = bin.p95minimum  + '–' + bin.p95maximum;
 
           if (bin.p95minimum === 0 && bin.p95maximum === 0) {
@@ -206,37 +204,19 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get URL of JSON feed.
-   *
-   * @return {String}
-   */
-  _getFeedUrl = function () {
-    var urlParams = {
-      latitude: _mainshock.json.geometry.coordinates[1],
-      longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(AppUtil.getParam('as-dist')),
-      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(_mainshock.json.properties.time + 1000)
-        .utc().toISOString().slice(0, -5)
-    };
-
-    return Earthquakes.getFeedUrl(urlParams);
-  };
-
-  /**
    * Get probability as a percentage string.
    *
    * @param probability {Number}
    *
    * @return percentage {String}
    */
-  _getProbability = function (probability) {
+  _getPercentage = function (probability) {
     var percentage;
 
     if (probability < 0.01) {
-      percentage = '&lt; 1%';
+      percentage = '< 1%';
     } else if (probability > 0.99) {
-      percentage = '&gt; 99%';
+      percentage = '> 99%';
     } else {
       percentage = AppUtil.round(100 * probability, 0) + '%';
     }
@@ -249,34 +229,12 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection.
-   */
-  _this.destroy = function () {
-    _initialize = null;
-
-    _app = null;
-    _eqid = null;
-    _forecast = null;
-    _mainshock = null;
-    _model = null;
-    _Earthquakes = null;
-
-    _createForecast = null;
-    _createProbabilities = null;
-    _createSummary = null;
-    _getFeedUrl = null;
-    _getProbability = null;
-
-    _this = null;
-  };
-
-  /**
-   * Initialize Feature (set properties that depend on external feed data).
+   * Create Feature (set properties that depend on external feed data).
    *
    * @param json {Object}
    *     feed data for Feature
    */
-  _this.initFeature = function (json) {
+  _this.create = function (json) {
     _Earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
@@ -292,9 +250,56 @@ var Aftershocks = function (options) {
     _this.plotTraces = _Earthquakes.plotTraces;
     _this.summary = _createSummary();
 
-    // The following props depend on summary being created
+    // The following props depend on summary being created first
     _this.forecast = _forecast;
     _this.model = _model;
+  };
+
+  /**
+   * Destroy this Class to aid in garbage collection.
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _forecast = null;
+    _mainshock = null;
+    _model = null;
+    _Earthquakes = null;
+
+    _createForecast = null;
+    _createProbabilities = null;
+    _createSummary = null;
+    _getPercentage = null;
+
+    _this = null;
+  };
+
+  /**
+   * Get the JSON feed's URL.
+   *
+   * @return {String}
+   */
+  _this.getFeedUrl = function () {
+    var urlParams = {
+      latitude: _mainshock.json.geometry.coordinates[1],
+      longitude: _mainshock.json.geometry.coordinates[0],
+      maxradiuskm: Number(AppUtil.getParam('as-dist')),
+      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
+      starttime: Moment(_mainshock.json.properties.time + 1000).utc()
+        .toISOString().slice(0, -5)
+    };
+
+    return Earthquakes.getFeedUrl(urlParams);
+  };
+
+  /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.mapLayer = null;
+    _this.plotTraces = null;
+    _this.summary = null;
   };
 
 

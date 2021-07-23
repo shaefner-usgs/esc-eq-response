@@ -32,19 +32,19 @@ _DEFAULTS = {
  * @param options {Object}
  *   {
  *     app: {Object} Application
- *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
  *     count: {Integer}
+ *     create: {Function}
  *     destroy: {Function}
+ *     getFeedUrl: {Function}
  *     id: {String}
- *     initFeature: {Function}
  *     mapLayer: {L.Layer}
  *     name: {String}
+ *     reset: {Function}
  *     showLayer: {Boolean}
- *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -52,6 +52,7 @@ var ShakeMapStations = function (options) {
   var _this,
       _initialize,
 
+      _mainshock,
       _markerOptions,
       _shakemap,
 
@@ -62,7 +63,6 @@ var ShakeMapStations = function (options) {
       _createTable,
       _filter,
       _getAmplitudes,
-      _getFeedUrl,
       _getLocation,
       _getTitle,
       _onEachFeature,
@@ -72,19 +72,15 @@ var ShakeMapStations = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var mainshock;
-
     options = Object.assign({}, _DEFAULTS, options);
-    mainshock = options.app.Features.getFeature('mainshock');
 
+    _mainshock = options.app.Features.getFeature('mainshock');
     _markerOptions = options.markerOptions;
-    _shakemap = mainshock.json.properties.products.shakemap;
 
     _this.id = 'shakemap-stations';
     _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
     _this.showLayer = false;
-    _this.url = _getFeedUrl();
     _this.zoomToLayer = false;
   };
 
@@ -318,29 +314,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get URL of JSON feed.
-   *
-   * @return url {String}
-   */
-  _getFeedUrl = function () {
-    var contents,
-        url;
-
-    url = '';
-
-    if (_shakemap) {
-      contents = _shakemap[0].contents;
-
-      if (contents['download/stationlist.json']) {
-        url = contents['download/stationlist.json'].url;
-      }
-    }
-
-    return url;
-  };
-
-  /**
-   * Get station's location.
+   * Get station's location as a formatted lat/lng coordinate pair.
    *
    * @param station {Object}
    *
@@ -422,11 +396,23 @@ var ShakeMapStations = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Create Feature (set properties that depend on external feed data).
+   *
+   * @param json {Object}
+   *     feed data for feature
+   */
+  _this.create = function (json) {
+    _this.count = json.features.length;
+    _this.mapLayer = _createMapLayer(json);
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
 
+    _mainshock = null;
     _markerOptions = null;
     _shakemap = null;
 
@@ -437,7 +423,6 @@ var ShakeMapStations = function (options) {
     _createTable = null;
     _filter = null;
     _getAmplitudes = null;
-    _getFeedUrl = null;
     _getLocation = null;
     _getTitle = null;
     _onEachFeature = null;
@@ -447,14 +432,34 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Initialize Feature (set properties that depend on external feed data).
+   * Get the JSON feed's URL.
    *
-   * @param json {Object}
-   *     feed data for feature
+   * @return url {String}
    */
-  _this.initFeature = function (json) {
-    _this.count = json.features.length;
-    _this.mapLayer = _createMapLayer(json);
+  _this.getFeedUrl = function () {
+    var contents,
+        url;
+
+    url = '';
+
+    _shakemap = _mainshock.json.properties.products.shakemap;
+
+    if (_shakemap) {
+      contents = _shakemap[0].contents;
+
+      if (contents['download/stationlist.json']) {
+        url = contents['download/stationlist.json'].url;
+      }
+    }
+
+    return url;
+  };
+
+  /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.mapLayer = null;
   };
 
 

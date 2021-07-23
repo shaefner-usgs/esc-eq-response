@@ -5,10 +5,10 @@ var EditPane = require('EditPane'),
     Features = require('Features'),
     Feeds = require('Feeds'),
     HelpPane = require('HelpPane'),
+    JsonFeed = require('JsonFeed'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
-    Rtf = require('Rtf'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane');
@@ -16,90 +16,99 @@ var EditPane = require('EditPane'),
 
 /**
  * Earthquake Response Application - set up and configure app's "primary"
- *   components (Classes).
+ * Classes.
  *
  * @param options {Object}
  *   {
- *     EditPane: {Element},
- *     HelpPane: {Element},
- *     MapPane: {Element},
- *     NavBar: {Element},
- *     PlotsPane: {Element},
- *     StatusBar: {Element},
+ *     EditPane: {Element}
+ *     HelpPane: {Element}
+ *     MapPane: {Element}
+ *     NavBar: {Element}
+ *     PlotsPane: {Element}
+ *     StatusBar: {Element}
  *     SummaryPane: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     EditPane: {Object},
- *     Features: {Object},
- *     Feeds: {Object},
- *     HelpPane: {Object},
- *     MapPane: {Object},
- *     NavBar: {Object},
- *     PlotsPane: {Object},
- *     Rtf: {Object},
- *     SignificantEqs: {Object},
- *     StatusBar: {Object},
- *     SummaryPane: {Object},
- *     resetApp: {Function}
+ *     EditPane: {Object}
+ *     Features: {Object}
+ *     Feeds: {Object}
+ *     HelpPane: {Object}
+ *     JsonFeed: {Object}
+ *     MapPane: {Object}
+ *     NavBar: {Object}
+ *     PlotsPane: {Object}
+ *     SignificantEqs: {Object}
+ *     StatusBar: {Object}
+ *     SummaryPane: {Object}
+ *     reset: {Function}
  *   }
  */
 var Application = function (options) {
   var _this,
       _initialize,
 
-      _instantiateClasses,
+      _els,
+
+      _initClasses,
       _redirect;
 
 
   _this = {};
 
   _initialize = function (options) {
+    _els = options || {};
+
     _redirect();
-    _instantiateClasses(options);
+    _initClasses();
   };
 
   /**
    * Instantiate app's "primary" Classes and store/share them via the 'app'
-   *   property so their public methods/props are accessible to other Classes.
+   * property so their public methods/props are accessible to other Classes.
    */
-  _instantiateClasses = function (options) {
-    var classes = [
+  _initClasses = function () {
+    var appClasses,
+        name,
+        postInits;
+
+    appClasses = [
+      Features, // must be first
       EditPane,
-      Features,
       Feeds,
       HelpPane,
+      JsonFeed,
       MapPane,
       NavBar,
       PlotsPane,
-      Rtf,
       SignificantEqs,
       StatusBar,
       SummaryPane
     ];
+    postInits = [];
 
-    classes.forEach(function(appClass) {
-      var name = appClass.name;
+    appClasses.forEach(appClass => {
+      name = appClass.name; // name of Class
 
       _this[name] = appClass({
         app: _this,
-        el: options[name] || null
+        el: _els[name] || null
       });
-    });
-
-    // Run postInit()'s which depend on other Classes being instantiated first
-    classes.forEach(function(appClass) {
-      var name = appClass.name;
 
       if (typeof _this[name].postInit === 'function') {
-        _this[name].postInit();
+        postInits.push(_this[name]);
       }
+    });
+
+    // Run post-initialization code now that all Classes are ready
+    postInits.forEach(name => {
+      name.postInit();
     });
   };
 
   /**
-   * Redirect users using old (less succinct) param names.
+   * Redirect users using old (less succinct) parameter names.
    */
   _redirect = function () {
     var url  = window.location.href;
@@ -117,11 +126,10 @@ var Application = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set app to default state (no Mainshock selected).
+   * Reset app to default state (i.e. no Mainshock selected).
    */
-  _this.resetApp = function () {
+  _this.reset = function () {
     _this.Features.reset(); // reset Features first
-
     _this.EditPane.reset();
     _this.Feeds.reset();
     _this.MapPane.reset();

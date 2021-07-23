@@ -2,16 +2,13 @@
 'use strict';
 
 
-var Xhr = require('hazdev-webutils/src/util/Xhr');
-
-
 /**
- * Create an Event Summary RTF document by sending a json string as
- *   raw POST data to a PHP script that generates the binary file
+ * Create an Event Summary RTF document using a JSON string that is sent as a
+ * POST data Blob to a PHP script that generates the binary file.
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
@@ -37,8 +34,7 @@ var Rtf = function (options) {
       _getProducts,
       _getPromise,
       _getPromises,
-      _getSortValues,
-      _initPlots;
+      _getSortValues;
 
 
   _this = {};
@@ -50,7 +46,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Sort an array of earthquake objects by key
+   * Comparison function to sort an Array of earthquakes by _sortKey.
    *
    * @params a, b {Objects}
    *     Objects to compare/sort
@@ -62,31 +58,32 @@ var Rtf = function (options) {
         bValue,
         comparison;
 
-    if (_sortKey) { // not set for unsorted (1 row) tables
-      // Case insensitive sort for strings
+    if (_sortKey) { // not set for unsorted (i.e. single row) tables
       aValue = a[_sortKey];
+      bValue = b[_sortKey];
+      comparison = 0;
+
+      // Case insensitive sort for strings
       if (typeof a[_sortKey] === 'string') {
         aValue = a[_sortKey].toUpperCase();
       }
-      bValue = b[_sortKey];
       if (typeof b[_sortKey] === 'string') {
-        bValue = b[_sortKey].toUpperCase(); // case insensitive
+        bValue = b[_sortKey].toUpperCase();
       }
 
-      // Use ISO time to properly sort date/time fields
+      // Use ISO time to sort date/time fields
       if (_sortKey === 'utcTime') {
         aValue = a.isoTime;
         bValue = b.isoTime;
       }
 
-      comparison = 0;
       if (aValue > bValue) {
         comparison = 1;
       } else if (aValue < bValue) {
         comparison = -1;
       }
 
-      if (_sortOrder === 'up') { // order flag inverted?? by table sorting library
+      if (_sortOrder === 'up') {
         comparison *= -1;
       }
 
@@ -95,7 +92,8 @@ var Rtf = function (options) {
   };
 
   /**
-   * Filter out eqs below mag threshold (set via summary pane's filter sliders)
+   * Filter out earthquakes below the current mag threshold which is set on
+   * SummaryPane's range slider.
    *
    * @param feature {Object}
    *
@@ -108,28 +106,26 @@ var Rtf = function (options) {
 
     list = feature.list;
     slider = document.querySelector('.' + feature.id + ' .filter output');
+    sortValues = _getSortValues(feature.id);
 
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
-      list = feature.list.filter(function (eq) {
+      list = feature.list.filter(eq => {
         return eq.mag >= _magThreshold;
       });
     }
 
-    // Set sort key, order here (not in _compare) so it only gets set once/feature
-    if (list.length > 0) {
-      sortValues = _getSortValues(feature.id);
-      if (sortValues) {
-        _sortKey = sortValues.key;
-        _sortOrder = sortValues.order;
-      }
+    // Set sort key, order here (not in _compare) so it only gets set once/Feature
+    if (list.length > 1 && sortValues) {
+      _sortKey = sortValues.key;
+      _sortOrder = sortValues.order;
     }
 
     return list;
   };
 
   /**
-   * Get focal mechanism, moment tensor beachballs as a dataUrl (base64 encoded)
+   * Get FocalMechanism, MomentTensor beachballs as base64 encoded dataURLs.
    *
    * @return beachballs {Object}
    */
@@ -144,8 +140,9 @@ var Rtf = function (options) {
       mt: document.querySelector('#summaryPane .moment-tensor canvas')
     };
 
-    Object.keys(canvasEls).forEach(function(key) {
+    Object.keys(canvasEls).forEach(key => {
       beachball = canvasEls[key];
+
       if (beachball) {
         beachballs[key] = beachball.toDataURL('image/png');
       }
@@ -155,11 +152,11 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get an array of div containers for all (2d) plots, grouped by Feature
+   * Get an Array of <div> containers for all 2d plots, grouped by Feature.
    *
    * @return divs {Object}
    *   {
-   *     featureId: [div1, ...],
+   *     featureId: [div1, ...]
    *     ...
    *   }
    */
@@ -171,11 +168,11 @@ var Rtf = function (options) {
     divs = {};
     plots = _app.PlotsPane.getPlots();
 
-    Object.keys(plots).forEach(function(featureId) {
+    Object.keys(plots).forEach(featureId => {
       divs[featureId] = [];
       params = plots[featureId].params;
 
-      Object.keys(params).forEach(function(plotId) {
+      Object.keys(params).forEach(plotId => {
         if (plotId !== 'hypocenters') { // skip 3d plots
           divs[featureId].push(params[plotId].graphDiv);
         }
@@ -186,7 +183,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get POST data json object used to populate Event Summary RTF document
+   * Get the POST data JSON object used to populate the Event Summary RTF.
    *
    * @return data {Object}
    */
@@ -214,7 +211,7 @@ var Rtf = function (options) {
     products = _getProducts(mainshock.json.properties.products);
     props = mainshock.json.properties;
 
-    // IMPORTANT: Set appropriate types for 'empty' values (i.e. not js 'undefined')
+    // IMPORTANT: Set appropriate types for 'empty' values (i.e. not undefined)
     data = {
       aftershocks: {
         bins: aftershocks.bins,
@@ -254,8 +251,8 @@ var Rtf = function (options) {
       shakemap: products.shakemap || '',
       summary: products.summary || '',
       time: {
-        local: mainshock.localTime,
-        utc: mainshock.utcTime
+        local: mainshock.details.localTime,
+        utc: mainshock.details.utcTime
       },
       title: props.title,
       urls: {
@@ -265,7 +262,7 @@ var Rtf = function (options) {
     };
 
     // Add feed data fetched for Event Summary document
-    Object.keys(feeds).forEach(function(id) {
+    Object.keys(feeds).forEach(id => {
       data[id] = feeds[id].json;
     });
 
@@ -273,8 +270,8 @@ var Rtf = function (options) {
   };
 
   /**
-   * Check if DYFI, ShakeMap, PAGER, Summary products exist, and if they do,
-   *   return select properties for each
+   * Check if DYFI, PAGER, ShakeMap and Summary products exist, and if they do,
+   * return select properties for each.
    *
    * @param products {Object}
    *
@@ -296,6 +293,7 @@ var Rtf = function (options) {
         responses: Number(products.dyfi[0].properties.numResp)
       };
     }
+
     if (products.losspager) {
       contents = products.losspager[0].contents;
       pager = {
@@ -305,14 +303,17 @@ var Rtf = function (options) {
         fatalities: contents['alertfatal.png'].url
       };
     }
+
     if (products.shakemap) {
       contents = products.shakemap[0].contents;
+
       if (contents['download/tvmap.jpg']) {
         shakemap = contents['download/tvmap.jpg'].url;
       } else if (contents['download/intensity.jpg'].url) {
         shakemap = contents['download/intensity.jpg'].url;
       }
     }
+
     if (products['general-text']) {
       summary = products['general-text'][0].contents[''].bytes;
     }
@@ -326,14 +327,15 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get a Promise to (2d) plot image as a dataUrl (base64 encoded)
+   * Get a Promise to (2d) plot image as a base64 encoded dataURL.
    *
    * @param div {Element}
-   * @param featureId {String}
+   * @param id {String}
+   *     Feature id
    *
    * @return promise {Object}
    */
-  _getPromise = function (div, featureId) {
+  _getPromise = function (div, id) {
     var promise,
         type;
 
@@ -342,15 +344,15 @@ var Rtf = function (options) {
       format: 'png',
       height: 300,
       width: 800
-    }).then(function(dataUrl) {
-      _plots[featureId][type] = dataUrl;
+    }).then(dataUrl => {
+      _plots[id][type] = dataUrl;
     });
 
     return promise;
   };
 
   /**
-   * Wrapper method to get a Promise to each (2d) plot image
+   * Wrapper method to get a Promise to each (2d) plot image.
    *
    * @return promises {Array}
    */
@@ -360,12 +362,13 @@ var Rtf = function (options) {
 
     plotDivs = _getPlotDivs();
     promises = [];
+    _plots = {};
 
-    Object.keys(plotDivs).forEach(function(featureId) {
-      _plots[featureId] = {}; // initialize object that stores a Feature's plots
+    Object.keys(plotDivs).forEach(id => {
+      _plots[id] = {};
 
-      plotDivs[featureId].forEach(function(div) {
-        promises.push(_getPromise(div, featureId));
+      plotDivs[id].forEach(div => {
+        promises.push(_getPromise(div, id));
       });
     });
 
@@ -373,14 +376,15 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get the sort key (set as a CSS class on a <th>) and order for an eq list
+   * Get the current sort key (set as a CSS class on a <th>) and sort order for
+   * an earthquake list.
    *
-   * @param featureId {String}
-   *     Feature ID
+   * @param id {String}
+   *     Feature id
    *
    * @return {Object}
    */
-  _getSortValues = function (featureId) {
+  _getSortValues = function (id) {
     var el,
         key,
         order,
@@ -391,15 +395,16 @@ var Rtf = function (options) {
 
     regex1 = /sort-(up|down)/; // finds current sorted-by th
     regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
-    ths = document.querySelectorAll('.' + featureId + ' .eqlist.sortable th');
+    ths = document.querySelectorAll('.' + id + ' .eqlist.sortable th');
 
-    if (ths.length === 0) { // unsorted table (happens when there is only 1 row)
+    if (ths.length === 0) { // non-sorted table (only 1 row)
       return;
     }
 
-    ths.forEach(function(th) {
-      th.classList.forEach(function(className) {
+    ths.forEach(th => {
+      th.classList.forEach(className => {
         result = regex1.exec(className);
+
         if (result) {
           el = th; // field (element) table is sorted by
           order = result[1]; // 'up' or 'down'
@@ -407,8 +412,8 @@ var Rtf = function (options) {
       });
     });
 
-    key = Array.from(el.classList).filter(function (cssClass) {
-      return !regex2.test(cssClass); // weeds out sorting algorithm CSS classes
+    key = Array.from(el.classList).filter(className => {
+      return !regex2.test(className); // weeds out sorting algorithm CSS classes
     });
 
     return {
@@ -417,61 +422,49 @@ var Rtf = function (options) {
     };
   };
 
-  /**
-   * Store plot image .pngs, which are each returned as a Promise from Plot.ly
-   *
-   * @return promises {Array}
-   */
-  _initPlots = function () {
-    var promises;
-
-    _plots = {};
-    promises = _getPromises(); // promises that populate _plots
-
-    return promises;
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Create Event Summary RTF file and then trigger download of file
+   * Create the Event Summary RTF and trigger a download of the file.
    */
   _this.create = function () {
     var data,
-        plots;
+        url;
+
+    // PHP file that creates the Summary RTF and returns a JSON response
+    url = `${location.protocol}//${location.host}/php/event-summary/create.php`;
 
     // Render plots so that their images can be captured
     if (!_app.PlotsPane.rendered) {
       _app.PlotsPane.render();
     }
 
-    plots = _initPlots();
+    Promise.all(_getPromises()).then(() => {
+      data = new Blob([JSON.stringify(_getPostData())], {
+        type: 'application/json'
+      });
 
-    Promise.all(plots).then(function() {
-      data = JSON.stringify(_getPostData());
-
-      Xhr.ajax({
-        error: function (e, xhr) {
-          console.error(xhr.statusText + xhr.responseText);
-
-          _app.StatusBar.addError({
-            id: 'rtf',
-            message: '<h4>Error Creating Event Summary</h4>'
-          });
-        },
-        headers: {
+      // Upload data to the server and create the RTF
+      _app.JsonFeed.fetch({
+        id: 'rtf',
+        name: 'Event Summary',
+        url: url
+      }, {
+        body: data,
+        headers: new Headers({
           'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        rawdata: data,
-        success: function (json) {
+        }),
+        method: 'POST'
+      }).then(json => { // trigger download on success
+        if (json.file) {
           window.location.assign('php/event-summary/download.php?file=' + json.file);
 
           _app.StatusBar.removeItem('rtf');
-        },
-        url: 'php/event-summary/create.php'
+        } else if (json.error) {
+          console.error(json.error);
+        }
       });
     });
   };

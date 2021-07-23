@@ -4,39 +4,36 @@
 var HistoricalEvents = require('feeds/HistoricalEvents'),
     NearbyCities = require('feeds/NearbyCities'),
     PagerComments = require('feeds/PagerComments'),
+    Rtf = require('Rtf'),
     ShakeMapInfo = require('feeds/ShakeMapInfo'),
-    ShakeAlert = require('feeds/ShakeAlert'),
-    Xhr = require('hazdev-webutils/src/util/Xhr');
+    ShakeAlert = require('feeds/ShakeAlert');
 
-
-var _FEEDCLASSES;
 
 /**
- * Set which feeds get included, and the order they are loaded.
- *
- * IMPORTANT: the Object key must match the id property set in the Feed class.
+ * Set which Feeds get included, and the order they are loaded.
  */
-_FEEDCLASSES = {
-  'historical-events': HistoricalEvents,
-  'nearby-cities': NearbyCities,
-  'pager-comments': PagerComments,
-  'shakemap-info': ShakeMapInfo,
-  'shake-alert': ShakeAlert
-};
+var _FEEDCLASSES = [
+  HistoricalEvents,
+  NearbyCities,
+  PagerComments,
+  ShakeMapInfo,
+  ShakeAlert
+];
 
 
 /**
- * Load external feed data included in Event Summary doc but not shown in web app
+ * Load external feed data that is included in the Event Summary RTF but not on
+ * the web page.
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     getFeeds: {Function},
- *     instantiateFeeds: {Function},
+ *     getFeeds: {Function}
+ *     loadFeeds: {Function}
  *     reset: {Function}
  *   }
  */
@@ -46,11 +43,11 @@ var Feeds = function (options) {
 
       _app,
       _feeds,
-      _numFeeds,
+      _numProcessed,
+      _Rtf,
 
       _createRtf,
-      _instantiateFeed,
-      _loadJson;
+      _initFeeds;
 
 
   _this = {};
@@ -60,13 +57,18 @@ var Feeds = function (options) {
 
     _app = options.app;
     _feeds = {};
+    _Rtf = Rtf({
+      app: _app
+    });
   };
 
   /**
-   * Wrapper method to create RTF document (first checks if all Feeds are loaded)
+   * Create the RTF document if all Feeds are ready.
    */
   _createRtf = function () {
-    if (Object.keys(_feeds).length === _numFeeds) {
+    _numProcessed ++;
+
+    if (_numProcessed === _FEEDCLASSES.length) {
       _app.StatusBar.addItem({
         id: 'rtf',
         name: 'Event Summary'
@@ -74,92 +76,22 @@ var Feeds = function (options) {
         prepend: 'Creating'
       });
 
-      _app.Rtf.create();
+      _Rtf.create();
     }
   };
 
   /**
-   * Instantiate a Feed
-   *
-   * @param FeedClass {Object}
+   * Instantiate Feeds and store them in _feeds.
    */
-  _instantiateFeed = function (FeedClass) {
+  _initFeeds = function () {
     var feed;
 
-    feed = FeedClass({
-      app: _app
-    });
+    _FEEDCLASSES.forEach(FeedClass => {
+      feed = FeedClass({
+        app: _app
+      });
 
-    if (feed.url) {
-      _loadJson(feed);
-    } else { // feed does not exist
-      -- _numFeeds;
-      _createRtf();
-    }
-  };
-
-  /**
-   * Load a json feed
-   *   upon success, store feed's data to Feed instance in json prop
-   *
-   * @param feed {Object}
-   */
-  _loadJson = function (feed) {
-    var domain,
-        errorMsg,
-        matches;
-
-    errorMsg = '<h4>Error Loading ' + feed.name + '</h4>';
-
-    _app.StatusBar.addItem(feed);
-
-    Xhr.ajax({
-      url: feed.url,
-      success: function (json) {
-        feed.json = json;
-        _feeds[feed.id] = feed;
-
-        _app.StatusBar.removeItem(feed.id);
-        _createRtf();
-      },
-      error: function (status, xhr) {
-        errorMsg += '<ul>';
-
-        if (xhr.responseText) {
-          console.error(xhr.responseText);
-        }
-
-        if (status) {
-          if (status.message) {
-            errorMsg += '<li>' + status.message + '</li>';
-          }
-          else {
-            errorMsg += '<li>http status code: ' + status + '</li>';
-          }
-        }
-
-        errorMsg += '</ul>';
-
-        _app.StatusBar.addError({
-          id: feed.id,
-          message: errorMsg,
-          status: status
-        });
-      },
-      ontimeout: function (xhr) {
-        console.error(xhr);
-
-        matches = feed.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
-        domain = matches && matches[1];
-        errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
-          ')</li></ul>';
-
-        _app.StatusBar.addError({
-          id: feed.id,
-          message: errorMsg
-        });
-      },
-      timeout: 20000
+      _feeds[feed.id] = feed;
     });
   };
 
@@ -168,7 +100,7 @@ var Feeds = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get all Feeds
+   * Get all Feeds, keyed by their id value.
    *
    * @return _feeds {Object}
    */
@@ -177,24 +109,37 @@ var Feeds = function (options) {
   };
 
   /**
-   * Wrapper method to loop through Feed classes and instantiate them
+   * Load feed data.
    */
-  _this.instantiateFeeds = function () {
-    var FeedClass;
+  _this.loadFeeds = function () {
+    var feed;
 
-    _numFeeds = Object.keys(_FEEDCLASSES).length;
+    _numProcessed = 0;
 
-    Object.keys(_FEEDCLASSES).forEach(function(id) {
-      FeedClass = _FEEDCLASSES[id];
-      _instantiateFeed(FeedClass);
+    if (Object.keys(_feeds).length === 0) {
+      _initFeeds();
+    }
+
+    Object.keys(_feeds).forEach(id => {
+      feed = _feeds[id];
+
+      if (feed.url) {
+        _app.JsonFeed.fetch(feed).then(json => {
+          feed.json = json;
+
+          _createRtf();
+        });
+      } else { // feed does not exist
+        _createRtf();
+      }
     });
   };
 
   /**
-   * Reset to initial state
+   * Reset to initial state; destroy Feeds.
    */
   _this.reset = function () {
-    Object.keys(_feeds).forEach(function(id) {
+    Object.keys(_feeds).forEach(id => {
       _feeds[id].destroy();
     });
 

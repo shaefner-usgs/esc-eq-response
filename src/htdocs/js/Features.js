@@ -2,7 +2,6 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
-    AppUtil = require('util/AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
@@ -11,49 +10,44 @@ var Aftershocks = require('features/Aftershocks'),
     MomentTensor = require('features/MomentTensor'),
     PagerCities = require('features/PagerCities'),
     PagerExposures = require('features/PagerExposures'),
-    ShakeMapStations = require('features/ShakeMapStations'),
-    Xhr = require('hazdev-webutils/src/util/Xhr');
+    ShakeMapStations = require('features/ShakeMapStations');
 
-
-var _FEATURECLASSES;
 
 /**
  * Set which Features get added, and the order they are loaded (Mainshock must
- *   be first). Stacking order is set in CSS.
- *
- * IMPORTANT: the Object key must match the id property set in the Feature class.
- *   This id value might also used as a reference in other .js/.css files.
+ * be first). Stacking order is set in CSS.
  */
-_FEATURECLASSES = {
-  mainshock: Mainshock,
-  'pager-exposures': PagerExposures, // load ASAP: dependency for PagerCities
-  'focal-mechanism': FocalMechanism,
-  'moment-tensor': MomentTensor,
-  aftershocks: Aftershocks,
-  foreshocks: Foreshocks,
-  historical: Historical,
-  'pager-cities': PagerCities,
-  'shakemap-stations': ShakeMapStations,
-  fieldnotes: FieldNotes
-};
+var _FEATURECLASSES = [
+  Mainshock,
+  PagerCities, // load ASAP: dependency for PagerExposures
+  FocalMechanism,
+  MomentTensor,
+  Aftershocks,
+  Foreshocks,
+  Historical,
+  PagerExposures,
+  ShakeMapStations,
+  FieldNotes
+];
 
 
 /**
- * Create, load, refresh and add/remove Features on map, plots and summary panes
+ * Load, create, add, remove and refresh Features on Map/Plots/SummaryPanes.
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     getFeature: {Function},
- *     getFeatures: {Function},
- *     getLoadingStatus: {Function},
- *     instantiateFeature: {Function},
- *     isFeature: {Function},
- *     refreshFeature: {Function},
+ *     createFeature: {Function}
+ *     getFeature: {Function}
+ *     getFeatures: {Function}
+ *     getLoadingStatus: {Function}
+ *     isFeature: {Function}
+ *     postInit: {Function}
+ *     refreshFeature: {Function}
  *     reset: {Function}
  *   }
  */
@@ -62,20 +56,18 @@ var Features = function (options) {
       _initialize,
 
       _app,
-      _eqid,
       _features,
       _prevFeatures,
-      _showLayer,
-      _totalFeatures,
 
       _addFeature,
-      _addLoader,
+      _addLoaders,
       _cacheFeature,
-      _initFeature,
-      _instantiateFeatures,
-      _loadJson,
-      _removeFeature,
-      _removeAllFeatures;
+      _checkDependencies,
+      _createFeatures,
+      _initFeatures,
+      _loadFeature,
+      _removeFeatures,
+      _removeFeature;
 
 
   _this = {};
@@ -86,35 +78,29 @@ var Features = function (options) {
     _app = options.app;
     _features = {};
     _prevFeatures = {};
-    _showLayer = {};
   };
 
   /**
-   * Add a Feature to map, plots and summary panes; add count to edit pane
+   * Add the given Feature to Map/Plots/SummaryPanes; add the Feature's count to
+   * EditPane.
    *
    * @param feature {Object}
    */
   _addFeature = function (feature) {
-    feature.isLoading = false;
-
     try {
-      // Add Feature to map, plots and summary panes if property is set
-      _app.MapPane.addFeature(feature); // 'mapLayer' property
-      _app.PlotsPane.addFeature(feature); // 'plotTraces' property
-      _app.SummaryPane.addFeature(feature); // 'summary' property
-      _app.EditPane.addFeature(feature); // 'count' property
+      _app.MapPane.addFeature(feature);
+      _app.PlotsPane.addFeature(feature);
+      _app.SummaryPane.addFeature(feature);
+      _app.EditPane.addCount(feature);
 
       if (feature.id === 'mainshock') {
         _app.EditPane.showMainshock();
         _app.EditPane.setDefaults();
 
-        // Instantiate other Features now that Mainshock ready
-        _instantiateFeatures();
+        // Create the other Features now that the Mainshock is ready
+        _createFeatures();
       }
-    }
-    catch (error) {
-      console.error(error);
-
+    } catch (error) {
       _app.StatusBar.addError({
         id: feature.id,
         message: '<h4>Error Adding ' + feature.name + '</h4><ul><li>' + error +
@@ -125,12 +111,13 @@ var Features = function (options) {
   };
 
   /**
-   * Add a container with only the Feature's name and a 'loader' to map, plots
-   *   and summary panes while data is being fetched
+   * Add a 'loader' on Edit/Map/Plots/SummaryPanes while fetching data for a
+   * Feature. Also adds the Feature's name in a container <div> on
+   * Plots/SummaryPanes and in the layer controller on MapPane.
    *
    * @param feature {Object}
    */
-  _addLoader = function (feature) {
+  _addLoaders = function (feature) {
     _app.EditPane.addLoader(feature);
     _app.MapPane.addLoader(feature);
     _app.PlotsPane.addLoader(feature);
@@ -138,10 +125,9 @@ var Features = function (options) {
   };
 
   /**
-   * Cache a previous Feature - store in Array because multiple Ajax requests
-   *   can 'stack up'
-   *
-   * Used to purge former Feature when Feature refresh is complete
+   * Cache an existing Feature (in an Array due to the potential of 'stacked'
+   * Fetch requests). Used to purge the 'previous' Feature when a refresh
+   * completes.
    *
    * @param feature {Object}
    */
@@ -154,246 +140,29 @@ var Features = function (options) {
   };
 
   /**
-   * Initialize a Feature
-   *
-   * First, load feed data (if Feature's url property is set); call methods to
-   *    create / add Feature (via _loadJson's callback if loading feed data)
+   * Check for dependencies for a given Feature and delay creating the Feature
+   * until its dependencies are ready.
    *
    * @param feature {Object}
-   */
-  _initFeature = function (feature) {
-    var dependency,
-        flag;
-
-    if (Array.isArray(feature.dependencies)) { // finish loading dependencies first
-      feature.dependencies.forEach(function(id) {
-        dependency = _this.getFeature(id);
-        if (!dependency || dependency.isLoading) {
-          flag = 'waiting';
-          window.setTimeout(function() {
-            _initFeature(feature);
-          }, 250);
-        }
-      });
-      if (flag === 'waiting') {
-        return; // exit if dependencies are not ready
-      }
-    }
-
-    if (Object.prototype.hasOwnProperty.call(_showLayer, feature.id)) {
-      feature.showLayer = _showLayer[feature.id]; // used cached value
-    }
-
-    if (typeof(feature.url) === 'string') {
-      if (feature.url) {
-        _addLoader(feature);
-        _loadJson(feature);
-      } else { // no feed data available
-        feature.isLoading = false;
-      }
-    } else { // Feature does not require remote feed data
-      feature.initFeature();
-      _addFeature(feature);
-    }
-  };
-
-  /**
-   * Wrapper method to loop through Feature classes and instantiate them
-   *
-   * Mainshock already created separately so it's available for Features that
-   *   depend on it.
-   */
-  _instantiateFeatures = function () {
-    _totalFeatures = Object.keys(_FEATURECLASSES).length;
-
-    Object.keys(_FEATURECLASSES).forEach(function(id) {
-      if (id !== 'mainshock') { // skip mainshock
-        _this.instantiateFeature(id);
-      }
-    });
-  };
-
-  /**
-   * Load a json feed
-   *
-   * @param feature {Object}
-   */
-  _loadJson = function (feature) {
-    var domain,
-        errorMsg,
-        matches;
-
-    errorMsg = '<h4>Error Loading ' + feature.name + '</h4>';
-
-    _app.StatusBar.addItem(feature);
-
-    Xhr.ajax({
-      url: feature.url,
-      success: function (json) {
-        if (feature.id === 'mainshock') {
-          feature.json = json; // store mainshock json (used by other features)
-        }
-
-        feature.initFeature(json);
-        _addFeature(feature);
-        _app.StatusBar.removeItem(feature.id);
-      },
-      error: function (status, xhr) {
-        errorMsg += '<ul>';
-
-        if (xhr.responseText) {
-          console.error(xhr.responseText);
-
-          if (xhr.responseText.match('limit of 20000')) { // status code 400
-            errorMsg += '<li>Modify the parameters to match fewer ' +
-              'earthquakes (max 20,000)</li>';
-          }
-          else if (xhr.responseText.match('parameter combination')){ // status code 400
-            errorMsg += '<li>Missing required parameters (all fields are ' +
-              'required)</li>';
-          }
-        }
-
-        if (status) {
-          if (status === 404 && feature.id === 'mainshock') {
-            errorMsg += '<li>Event ID ' + _eqid + ' not found</li>';
-          }
-          else if (status.message) {
-            errorMsg += '<li>' + status.message + '</li>';
-          }
-          else {
-            errorMsg += '<li>http status code: ' + status + '</li>';
-          }
-        }
-
-        errorMsg += '</ul>';
-
-        _app.StatusBar.addError({
-          id: feature.id,
-          message: errorMsg,
-          status: status
-        });
-        _removeFeature(feature);
-      },
-      ontimeout: function (xhr) {
-        console.error(xhr);
-
-        matches = feature.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
-        domain = matches && matches[1];
-        errorMsg += '<ul><li>Request timed out (can&rsquo;t connect to ' + domain +
-          ')</li></ul>';
-
-        _app.StatusBar.addError({
-          id: feature.id,
-          message: errorMsg
-        });
-        _removeFeature(feature);
-      },
-      timeout: 20000
-    });
-  };
-
-  /**
-   * Remove a Feature from map, plots and summary panes, and destroy it
-   *
-   * @param feature {Object}
-   */
-  _removeFeature = function (feature) {
-    if (feature) {
-      _app.EditPane.removeFeature(feature);
-      _app.MapPane.removeFeature(feature);
-      _app.PlotsPane.removeFeature(feature);
-      _app.SummaryPane.removeFeature(feature);
-
-      _showLayer[feature.id] = feature.showLayer; // cache value
-
-      delete _features[feature.id];
-      feature.destroy();
-    }
-  };
-
-  /**
-   * Remove all Features from map, plots and summary panes
-   */
-  _removeAllFeatures = function () {
-    if (_features) {
-      Object.keys(_features).forEach(function(id) {
-        _removeFeature(_features[id]);
-      });
-    }
-  };
-
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
-  /**
-   * Get a Feature
-   *
-   * @param id {String}
-   *     id of feature
-   *
-   * @return feature {Object}
-   *   {
-   *     Required props:
-   *
-   *     destroy: {Function}, // garbage collection
-   *     id: {String}, // unique id of feature
-   *     name: {String}, // display name of feature
-   *
-   *     Example of optional props that might also be set:
-   *
-   *     count: {Integer}, // number of items
-   *     dependencies: {Array}, // other features that need to be loaded first
-   *     description: {String}, // text description of feature
-   *     json: {String}, // json feed data (mainshock only)
-   *     mapLayer: {L.Layer}, // Leaflet map layer for MapPane
-   *     plotTraces: {Object}, // data traces for PlotPane formatted for Plot.ly
-   *     showLayer: {Boolean}, // whether or not mapLayer is "on" by default
-   *     summary: {String}, // HTML for SummaryPane
-   *     url: {String}, // URL of feed data for Feature
-   *     zoomToLayer: {Boolean}, // whether or not map zooms to fit layer by default
-   *   }
-   */
-  _this.getFeature = function (id) {
-    var feature;
-
-    Object.keys(_features).forEach(function(key) {
-      if (id === key) {
-        feature = _features[id];
-      }
-    });
-
-    return feature;
-  };
-
-  /**
-   * Get all Features
-   *
-   * @return _features {Object}
-   */
-  _this.getFeatures = function () {
-    return _features;
-  };
-
-  /**
-   * Get status of loading Features
    *
    * @return status {String}
    */
-  _this.getLoadingStatus = function () {
-    var numFeatures,
+  _checkDependencies = function (feature) {
+    var dependency,
         status;
 
-    numFeatures = Object.keys(_features).length;
-    status = 'loading';
+    status = 'complete'; // default
 
-    if (numFeatures === _totalFeatures) {
-      status = 'finished';
+    if (Array.isArray(feature.dependencies)) { // load dependencies first
+      feature.dependencies.forEach(id => {
+        dependency = _features[id];
 
-      Object.keys(_features).forEach(function(id) {
-        if (_features[id].isLoading) {
+        if (dependency.isLoading) {
           status = 'loading';
+
+          window.setTimeout(function() {
+            _this.createFeature(feature.id);
+          }, 250);
         }
       });
     }
@@ -402,44 +171,192 @@ var Features = function (options) {
   };
 
   /**
-   * Instantiate a Feature
-   *
-   * @param id {String}
+   * Wrapper method to create Features. Skips the Mainshock which was already
+   * created since other Features depend on it.
    */
-  _this.instantiateFeature = function (id) {
-    var feature,
-        FeatureClass;
-
-    FeatureClass = _FEATURECLASSES[id];
-
-    if (FeatureClass) {
-      if (id === 'mainshock') {
-        _eqid = AppUtil.getParam('eqid');
+  _createFeatures = function () {
+    Object.keys(_features).forEach(id => {
+      if (id !== 'mainshock') {
+        _this.createFeature(id);
       }
+    });
+  };
 
+  /**
+   * Instantiate Features and store them in _features.
+   */
+  _initFeatures = function () {
+    var feature;
+
+    _FEATURECLASSES.forEach(FeatureClass => {
       feature = FeatureClass({
-        app: _app,
-        eqid: _eqid
+        app: _app
       });
+
       feature.isLoading = true;
+      _features[feature.id] = feature;
+    });
+  };
 
-      _features[feature.id] = feature; // store new feature
+  /**
+   * Load feed data (if available) for a given Feature and then create/add it.
+   *
+   * @param feature {Object}
+   */
+  _loadFeature = function (feature) {
+    if (feature.url) {
+      _addLoaders(feature);
+      _app.JsonFeed.fetch(feature).then(json => {
+        if (json) {
+          feature.isLoading = false;
 
-      _initFeature(feature);
+          feature.create(json);
+          _addFeature(feature);
+        } else {
+          _removeFeature(feature);
+        }
+      });
+    } else { // data feed not available
+      feature.isLoading = false;
     }
   };
 
   /**
-   * Check if id matches any Feature's id value
+   * Remove all Features from Map/Plots/SummaryPanes and destroy them.
+   */
+  _removeFeatures = function () {
+    var feature;
+
+    if (_features) {
+      Object.keys(_features).forEach(id => {
+        feature = _features[id];
+
+        _removeFeature(feature);
+        feature.destroy();
+      });
+    }
+  };
+
+  /**
+   * Remove the given Feature from Map/Plots/SummaryPanes; remove the Feature's
+   * count from EditPane.
+   *
+   * @param feature {Object}
+   */
+  _removeFeature = function (feature) {
+    if (_this.isFeature(feature.id)) {
+      _app.EditPane.removeCount(feature);
+      _app.MapPane.removeFeature(feature);
+      _app.PlotsPane.removeFeature(feature);
+      _app.SummaryPane.removeFeature(feature);
+    }
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Create the Feature matching the given id value.
+   *
+   * @param id {String}
+   *     Feature id
+   */
+  _this.createFeature = function (id) {
+    var feature,
+        status;
+
+    if (_this.isFeature(id)) {
+      feature = _features[id];
+      feature.isLoading = true;
+      status = _checkDependencies(feature);
+
+      if (status === 'loading') {
+        return; // dependencies are not ready
+      }
+
+      if (feature.getFeedUrl) {
+        feature.url = feature.getFeedUrl();
+
+        _loadFeature(feature); // creates Feature after loading data
+      } else { // data feed not required
+        feature.isLoading = false;
+
+        feature.create();
+        _addFeature(feature);
+      }
+    }
+  };
+
+  /**
+   * Get the Feature matching the given id value.
+   *
+   * @param id {String}
+   *     Feature id
+   *
+   * @return feature {Object|undefined}
+   *   {
+   *     Required props
+   *
+   *     create: {Function}
+   *     id: {String} unique Feature id
+   *     name: {String} display name of Feature
+   *
+   *     Example of optional props that might also be set
+   *
+   *     count: {Integer} number of items
+   *     dependencies: {Array} other Features that need to be loaded first
+   *     description: {String} text description of Feature
+   *     json: {String} JSON feed data (Mainshock only)
+   *     mapLayer: {L.Layer} Leaflet map layer for MapPane
+   *     plotTraces: {Object} data traces for PlotsPane formatted for Plot.ly
+   *     showLayer: {Boolean} whether or not map layer is "on" by default
+   *     summary: {String} HTML for SummaryPane
+   *     url: {String} URL of feed data for Feature
+   *     zoomToLayer: {Boolean} whether or not map zooms to fit layer by default
+   *   }
+   */
+  _this.getFeature = function (id) {
+    return _features[id];
+  };
+
+  /**
+   * Get all Features, keyed by their id value.
+   *
+   * @return _features {Object}
+   */
+  _this.getFeatures = function () {
+    return _features;
+  };
+
+  /**
+   * Get the loading status of Features.
+   *
+   * @return status {String}
+   */
+  _this.getLoadingStatus = function () {
+    var status = 'complete'; // default
+
+    Object.keys(_features).forEach(id => {
+      if (_features[id].isLoading) {
+        status = 'loading';
+      }
+    });
+
+    return status;
+  };
+
+  /**
+   * Check if the given id matches an existing Feature's id value.
    *
    * @param id {String}
    *
    * @return isFeature {Boolean}
    */
   _this.isFeature = function (id) {
-    var isFeature = false;
+    var isFeature = false; // default
 
-    Object.keys(_FEATURECLASSES).forEach(function(key) {
+    Object.keys(_features).forEach(function(key) {
       if (id === key) {
         isFeature = true;
       }
@@ -449,39 +366,51 @@ var Features = function (options) {
   };
 
   /**
-   * Refresh a Feature - called when user manipulates parameters on edit pane
+   * Initialization that depends on other Classes being ready before running.
+   */
+  _this.postInit = function () {
+    _initFeatures();
+  };
+
+  /**
+   * Refresh the given Feature.
    *
    * @param feature {Object}
    *     existing Feature before refresh
    */
   _this.refreshFeature = function (feature) {
-    var oldestFeature;
+    var prevFeature;
 
-    if (feature) {
+    if (_this.isFeature(feature.id)) {
       _cacheFeature(feature);
 
-      // Remove previous Feature ('oldest' in Array), then create new Feature
-      oldestFeature = _prevFeatures[feature.id].shift();
-      _removeFeature(oldestFeature);
-      _this.instantiateFeature(feature.id);
+      prevFeature = _prevFeatures[feature.id].shift(); // 'oldest' Feature
 
-      // Also refresh FieldNotes when Aftershocks is refreshed (uses same params)
+      _removeFeature(prevFeature);
+
+      if (feature.reset) {
+        feature.reset();
+      }
+
+      _this.createFeature(feature.id);
+
+      // Refresh FieldNotes when Aftershocks is refreshed (shares EditPane params)
       if (feature.id === 'aftershocks') {
-        _this.refreshFeature(_this.getFeature('fieldnotes'));
+        _this.refreshFeature(_features.fieldnotes);
       }
     }
   };
 
   /**
-   * Reset to initial state
+   * Reset to initial state; remove all Features.
    */
   _this.reset = function () {
-    _removeAllFeatures();
+    _removeFeatures();
 
-    _eqid = null;
     _features = {};
-    _showLayer = {};
-    _totalFeatures = null;
+    _prevFeatures = {};
+
+    _initFeatures();
   };
 
 

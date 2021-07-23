@@ -33,19 +33,19 @@ _DEFAULTS = {
  * @param options {Object}
  *   {
  *     app: {Object} Application
- *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
  *     count: {Integer}
+ *     create: {Function}
  *     destroy: {Function}
+ *     getFeedUrl: {Function}
  *     id: {String}
- *     initFeature: {Function}
  *     mapLayer: {L.Layer}
  *     name: {String}
+ *     reset: {Function}
  *     showLayer: {Boolean}
- *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -60,7 +60,6 @@ var FieldNotes = function (options) {
       _addListeners,
       _createList,
       _createPopup,
-      _getFeedUrl,
       _onEachFeature,
       _pointToLayer,
       _updatePopup;
@@ -78,12 +77,11 @@ var FieldNotes = function (options) {
     _this.mapLayer = null;
     _this.name = 'Fieldnotes';
     _this.showLayer = false;
-    _this.url = _getFeedUrl();
     _this.zoomToLayer = false;
 
     _markerOptions = Object.assign({
       icon: L.icon(options.iconOptions),
-      pane: _this.id // control stacking order
+      pane: _this.id // controls stacking order
     }, options.markerOptions);
   };
 
@@ -119,7 +117,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create 'Additional properties' list html. These are 'custom' props that
+   * Create the 'Additional properties' list HTML. These are 'custom' props that
    * vary based on observation type.
    *
    * @param props {Object}
@@ -141,12 +139,13 @@ var FieldNotes = function (options) {
     Object.keys(props).forEach(key => {
       if (skipProps.indexOf(key) === -1) { // skip props shared by all types
         value = props[key] || '–';
-        list += '<dt>' + key + '</dt><dd>' + value + '</dd>';
+        list += `<dt>${key}</dt><dd>${value}</dd>`;
       }
     });
 
     if (list) {
-      html = '<p class="properties hide">' +
+      html = '' +
+        '<p class="properties hide">' +
           '<a href="#" class="toggle">Additional properties</a>' +
         '</p>' +
         `<dl class="custom">${list}</dl>`;
@@ -199,37 +198,6 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Get URL of JSON feed.
-   *
-   * @return {String}
-   */
-  _getFeedUrl = function () {
-    var after,
-        before,
-        mainshock,
-        pairs,
-        urlParams;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    after = Moment(mainshock.json.properties.time + 1000).utc().format('X');
-    before = Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
-    pairs = [];
-    urlParams = {
-      between: after + ',' + before,
-      lat: mainshock.json.geometry.coordinates[1],
-      lon: mainshock.json.geometry.coordinates[0],
-      radius: AppUtil.getParam('as-dist') // use aftershocks radius
-    };
-
-    Object.keys(urlParams).forEach(key => {
-      pairs.push(key + '=' + urlParams[key]);
-    });
-
-    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
-      pairs.join('&');
-  };
-
-  /**
    * Create Leaflet popups and tooltips.
    *
    * @param feature {Object}
@@ -252,7 +220,7 @@ var FieldNotes = function (options) {
       .bindPopup(_createPopup(props), {
         autoPanPadding: L.point(50, 50),
         className: 'fieldnotes',
-        maxWidth: 398, /* fits 4X3 images 'flush' in popup (max-height is 300px) */
+        maxWidth: 398, // fits 4X3 images 'flush' in popup (max-height is 300px)
         minWidth: 320
       })
       .bindTooltip(props.title)
@@ -302,6 +270,20 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Create Feature (set properties that depend on external feed data).
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.create = function (json) {
+    _this.count = json.features.length;
+    _this.mapLayer = L.geoJson(json, {
+      onEachFeature: _onEachFeature,
+      pointToLayer: _pointToLayer
+    });
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
@@ -314,7 +296,6 @@ var FieldNotes = function (options) {
     _addListeners = null;
     _createList = null;
     _createPopup = null;
-    _getFeedUrl = null;
     _onEachFeature = null;
     _pointToLayer = null;
     _updatePopup = null;
@@ -323,17 +304,41 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Initialize Feature (set properties that depend on external feed data).
+   * Get the JSON feed's URL.
    *
-   * @param json {Object}
-   *     feed data for Feature
+   * @return {String}
    */
-  _this.initFeature = function (json) {
-    _this.count = json.features.length;
-    _this.mapLayer = L.geoJson(json, {
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
+  _this.getFeedUrl = function () {
+    var after,
+        before,
+        mainshock,
+        pairs,
+        urlParams;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    after = Moment(mainshock.json.properties.time + 1000).utc().format('X');
+    before = Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
+    pairs = [];
+    urlParams = {
+      between: after + ',' + before,
+      lat: mainshock.json.geometry.coordinates[1],
+      lon: mainshock.json.geometry.coordinates[0],
+      radius: AppUtil.getParam('as-dist') // use aftershocks radius
+    };
+
+    Object.keys(urlParams).forEach(key => {
+      pairs.push(key + '=' + urlParams[key]);
     });
+
+    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
+      pairs.join('&');
+  };
+
+  /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.mapLayer = null;
   };
 
 

@@ -6,23 +6,24 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Set up and create Plotly.js plots; also adds / removes plots
+ * Create interactive plots using Plotly. Add/remove/render a Feature's plots
+ * as they are created/updated from external feed data.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} Application
  *     el: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     addFeature: {Function},
- *     addLoader: {Function},
- *     getPlots: {Function},
- *     removeFeature: {Function},
- *     render: {Function},
- *     rendered: {Boolean},
- *     reset: {Function},
+ *     addFeature: {Function}
+ *     addLoader: {Function}
+ *     getPlots: {Function}
+ *     removeFeature: {Function}
+ *     render: {Function}
+ *     rendered: {Boolean}
+ *     reset: {Function}
  *     resize: {Function}
  *   }
  */
@@ -35,14 +36,15 @@ var PlotsPane = function (options) {
       _featuresEl,
       _plots,
 
+      _addCount,
       _addListeners,
-      _addPlotContainer,
-      _checkIfActive,
+      _addContainer,
       _getPlotlyConfig,
+      _getPlotlyData,
       _getPlotlyLayout,
       _getPlotlyParams,
-      _getPlotlyTraces,
-      _getRatio;
+      _getRatio,
+      _isActive;
 
 
   _this = {};
@@ -64,7 +66,36 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add event listeners to earthquakes on 2d plots, which open popups on map
+   * Add the count value to the Feature's name and hide the 'loader'.
+   *
+   * @param feature {Object}
+   * @param div {Element}
+   */
+  _addCount = function (feature, div) {
+    var count,
+        loader;
+
+    count = document.createElement('span');
+    loader = div.querySelector('.breather');
+
+    if (loader) {
+      loader.classList.add('hide');
+    }
+
+    if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
+      count.classList.add('count', 'hide');
+      count.textContent = feature.count;
+
+      div.querySelector('h2').appendChild(count);
+
+      // Trigger a reflow (to enable CSS transition), then unhide
+      count.focus();
+      count.classList.remove('hide');
+    }
+  };
+
+  /**
+   * Add event listeners.
    *
    * @param plot {Element}
    */
@@ -75,44 +106,49 @@ var PlotsPane = function (options) {
         plotId,
         points;
 
-    plot.on('plotly_click', function (data) {
+    // Show the map and open a popup when the user clicks an eq on a 2d plot
+    plot.on('plotly_click', data => {
       points = data.points[0];
-
       eqids = points.data.eqid;
       featureId = points.data.feature;
       index = points.pointNumber;
       plotId = points.data.plotid;
 
-      // First point (at index 0) on cumulative aftershocks curve is mainshock
+      // The first point (index 0) on cumulative aftershocks curve is Mainshock
       if (index === 0 && plotId === 'cumulative' && featureId === 'aftershocks') {
         featureId = 'mainshock';
       }
 
-      _app.MapPane.openPopup(featureId, eqids[index]);
+      _app.MapPane.openPopup(eqids[index], featureId);
     });
   };
 
   /**
-   * Add plot's container / title to DOM
+   * Add a plot's container and name to the DOM.
    *
    * @param featureId {String}
-   * @param plotId {String}
-   * @param plotTitle {String}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
    *
    * @return container {Element}
    */
-  _addPlotContainer = function (featureId, plotId, plotTitle) {
+  _addContainer = function (featureId, plotId) {
     var container,
         h3,
+        names,
         parent;
 
     container = document.createElement('div');
-    container.classList.add(plotId);
-
     h3 = document.createElement('h3');
-    h3.innerHTML = plotTitle;
-
+    names = {
+      cumulative: 'Cumulative Earthquakes',
+      hypocenters: '3D Hypocenters',
+      magtime: 'Magnitude vs. Time'
+    };
     parent = _featuresEl.querySelector('.' + featureId);
+
+    h3.innerHTML = names[plotId];
+
+    container.classList.add(plotId);
     parent.appendChild(h3);
     parent.appendChild(container);
 
@@ -120,23 +156,10 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Check if plots pane is currently active
-   *
-   * @return {Boolean}
-   */
-  _checkIfActive = function () {
-    if (location.hash === '#plotsPane') {
-      return true;
-    }
-
-    return false;
-  };
-
-  /**
-   * Get plot config option for Plotly.js
+   * Get the Plotly config option for a plot.
    *
    * @param featureId {String}
-   * @param plotId {String}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
    *
    * @return config {Object}
    */
@@ -148,7 +171,7 @@ var PlotsPane = function (options) {
     config = {
       displaylogo: false,
       modeBarButtonsToAdd: [{
-        click: function(gd) {
+        click: gd => {
           eqid = AppUtil.getParam('eqid');
           opts = {
             filename: eqid + '-' + featureId + '-' + plotId,
@@ -156,6 +179,7 @@ var PlotsPane = function (options) {
             height: 500,
             width: 1200
           };
+
           if (gd.classList.contains('hypocenters')) {
             opts.height = 1000;
           }
@@ -177,11 +201,32 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get plot layout option for Plotly.js
+   * Get the Plotly data option for a plot. The Mainshock's trace is added to
+   * hypocenters and magtime plots.
    *
-   * @param plotId {String}
-   * @param zRatio {Number}
-   *     optional; only needed for hypocenters plot
+   * @param feature {Object}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
+   *
+   * @return data {Array}
+   */
+  _getPlotlyData = function (feature, plotId) {
+    var data = [
+      feature.plotTraces[plotId]
+    ];
+
+    if (plotId === 'hypocenters' || plotId === 'magtime') {
+      data.push(_app.Features.getFeature('mainshock').plotTraces[plotId]);
+    }
+
+    return data;
+  };
+
+  /**
+   * Get the Plotly layout option for a plot.
+   *
+   * @param plotId {String <cumulative|hypocenters|magtime>}
+   * @param zRatio {Number} optional
+   *     only needed for hypocenters plot
    *
    * @return layout {Object}
    */
@@ -204,7 +249,7 @@ var PlotsPane = function (options) {
       },
       showlegend: false
     };
-    spikecolor = '#7234dc';
+    spikecolor = '#7234dc'; // accent-color
 
     if (plotId === 'hypocenters') {
       layout.scene = {
@@ -287,71 +332,36 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get Plotly.js parameters used to instantiate plots
+   * Get the Plotly parameters that are used to instantiate a new plot.
    *
    * @param feature {Object}
-   * @param plotId {String <cumulative | hypocenters | magtime>}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
    *
    * @return {Object}
    *     Plotly.newPlot signature
    */
   _getPlotlyParams = function (feature, plotId) {
-    var config,
-        container,
-        data,
-        layout,
-        titles,
+    var container,
         zRatio;
 
-    titles = {
-      cumulative: 'Cumulative Earthquakes',
-      hypocenters: '3D Hypocenters',
-      magtime: 'Magnitude vs. Time'
-    };
+    container = _addContainer(feature.id, plotId);
 
     if (plotId === 'hypocenters') {
       zRatio = _getRatio(feature.plotTraces.hypocenters);
     }
 
-    config = _getPlotlyConfig(feature.id, plotId);
-    container = _addPlotContainer(feature.id, plotId, titles[plotId]);
-    data = _getPlotlyTraces(feature, plotId);
-    layout = _getPlotlyLayout(plotId, zRatio);
-
     return {
       graphDiv: container,
       options: {
-        data: data,
-        layout: layout,
-        config: config
+        data: _getPlotlyData(feature, plotId),
+        layout: _getPlotlyLayout(plotId, zRatio),
+        config: _getPlotlyConfig(feature.id, plotId)
       }
     };
   };
 
   /**
-   * Get plot traces option for Plotly.js (mainshock trace is added to
-   *   hypocenters, magtime plots)
-   *
-   * @param feature {Object}
-   * @param plotId {String}
-   *
-   * @return traces {Array}
-   */
-  _getPlotlyTraces = function (feature, plotId) {
-    var traces;
-
-    traces = [
-      feature.plotTraces[plotId]
-    ];
-    if (plotId === 'hypocenters' || plotId === 'magtime') {
-      traces.push(_app.Features.getFeature('mainshock').plotTraces[plotId]);
-    }
-
-    return traces;
-  };
-
-  /**
-   * Get ratio of depth values to latitude values to scale 3d plot correctly
+   * Get the ratio of depth:latitude for scaling a 3d plot.
    *
    * @param trace {Object}
    *     plot's data trace
@@ -374,49 +384,42 @@ var PlotsPane = function (options) {
     return ratio;
   };
 
+  /**
+   * Check if PlotsPane is currently active.
+   *
+   * @return {Boolean}
+   */
+  _isActive = function () {
+    if (location.hash === '#plotsPane') {
+      return true;
+    }
+
+    return false;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Add a Feature to plots pane - creates plots, but only renders them once
-   *   plots pane is visible; add count and remove 'loader'
+   * Add a Feature's plots. Plots are created, but not rendered, until PlotsPane
+   * is active.
    *
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var count,
-        div,
-        isActive,
-        loader,
+    var div,
         params;
 
-    // Skip mainshock (it's included in other Features' plots)
+    // Skip Mainshock (it's included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       div = _el.querySelector('div.' + feature.id);
-      loader = div.querySelector('.breather');
-
-      if (loader) {
-        loader.classList.add('hide');
-      }
-
-      // Add count to Feature name
-      if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
-        count = document.createElement('span');
-        count.classList.add('count', 'hide');
-        count.textContent = feature.count;
-
-        div.querySelector('h2').appendChild(count);
-
-        // Trigger a reflow, then unhide (to enable CSS transition)
-        count.focus();
-        count.classList.remove('hide');
-      }
-
-      div.insertAdjacentHTML('beforeend', feature.description); // preserve CSS transition
-
       params = {};
-      Object.keys(feature.plotTraces).forEach(function(plotId) {
+
+      // Inserting node this way preserves CSS transitions
+      div.insertAdjacentHTML('beforeend', feature.description);
+
+      Object.keys(feature.plotTraces).forEach(plotId => {
         if (feature.plotTraces[plotId]) { // null if no data
           if (plotId !== 'cumulative' || feature.count > 1) { // skip cumul. plot w/ 1eq
             params[plotId] = _getPlotlyParams(feature, plotId);
@@ -424,57 +427,57 @@ var PlotsPane = function (options) {
         }
       });
 
-      // Plot.ly params to create plot
       _plots[feature.id] = {
         params: params,
         rendered: false
       };
 
-      isActive = _checkIfActive();
-      if (isActive) {
+      _addCount(feature, div);
+
+      if (_isActive()) {
         _this.render();
       }
     }
   };
 
   /**
-   * Add a Feature's container, name and a 'loader' to plots pane
+   * Add a Feature's container, name and 'loader'.
    *
    * @param feature {Object}
    */
   _this.addLoader = function (feature) {
     var div;
 
-    // Mainshock is included in other Features' plots, but not separately
+    // Mainshock is included in other Features' plots, but not on its own
     if (Object.prototype.hasOwnProperty.call(feature, 'plotTraces') &&
       feature.id !== 'mainshock'
     ) {
       div = document.createElement('div');
-      div.classList.add('content', 'feature', feature.id);
       div.innerHTML = '<h2>' + feature.name + '<div class="breather">' +
         '<div></div></div></h2>';
+
+      div.classList.add('content', 'feature', feature.id);
 
       _featuresEl.appendChild(div);
     }
   };
 
   /**
-   * Get Plot.ly params for all Features that have plots
+   * Get Plotly params for all Features that have plots.
    *
-   * @return {Object}
+   * @return _plots {Object}
    */
   _this.getPlots = function () {
     return _plots;
   };
 
   /**
-   * Remove a Feature from plots pane
+   * Remove a Feature's plots.
    *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
     var el,
-        i,
         plots;
 
     el = _el.querySelector('.' + feature.id);
@@ -482,15 +485,16 @@ var PlotsPane = function (options) {
     if (el) {
       plots = el.querySelectorAll('.js-plotly-plot');
 
-      for (i = 0; i < plots.length; i ++) {
-        Plotly.purge(plots[i]);
-      }
+      plots.forEach(plot => {
+        Plotly.purge(plot);
+      });
+
       el.parentNode.removeChild(el);
     }
   };
 
   /**
-   * Render plots
+   * Render plots.
    */
   _this.render = function () {
     var graphDiv,
@@ -501,31 +505,32 @@ var PlotsPane = function (options) {
         resetButton;
 
     // Loop thru Features
-    Object.keys(_plots).forEach(function(featureId) {
-      params = _plots[featureId].params;
-      rendered = _plots[featureId].rendered;
+    Object.keys(_plots).forEach(id => {
+      params = _plots[id].params;
+      rendered = _plots[id].rendered;
 
       if (!rendered) {
         // Loop thru plot types for Feature
-        Object.keys(params).forEach(function(plotId) {
+        Object.keys(params).forEach(plotId => {
           graphDiv = params[plotId].graphDiv;
           options = params[plotId].options;
 
           Plotly.newPlot(graphDiv, options);
+
           if (plotId !== 'hypocenters') { // skip click events on 3d plots
             _addListeners(graphDiv);
           }
         });
 
-        _plots[featureId].rendered = true;
+        _plots[id].rendered = true;
 
         // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
         if (params.hypocenters) {
           resetButton = params.hypocenters.graphDiv.querySelector(
             '[data-attr="resetLastSave"]'
           );
-          resetButton.setAttribute('data-title', 'Autoscale');
           path = resetButton.querySelector('path');
+
           path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 ' +
             '187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 ' +
             '0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
@@ -533,6 +538,7 @@ var PlotsPane = function (options) {
             '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
             '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 ' +
             '0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
+          resetButton.setAttribute('data-title', 'Autoscale');
         }
       }
     });
@@ -541,12 +547,12 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Reset plots pane to initial state
+   * Reset to default state.
    */
   _this.reset = function () {
-    _featuresEl.innerHTML = '';
     _plots = {};
 
+    _featuresEl.innerHTML = '';
     _this.rendered = false;
   };
 
@@ -554,17 +560,12 @@ var PlotsPane = function (options) {
    * Resize plots: adds responsive / fluid sizing
    */
   _this.resize = function () {
-    var i,
-        isActive,
-        plots;
+    var plots = _el.querySelectorAll('.js-plotly-plot');
 
-    isActive = _checkIfActive();
-
-    if (isActive) {
-      plots = _el.querySelectorAll('.js-plotly-plot');
-      for (i = 0; i < plots.length; i ++) {
-        Plotly.Plots.resize(plots[i]);
-      }
+    if (_isActive()) {
+      plots.forEach(plot => {
+        Plotly.Plots.resize(plot);
+      });
     }
   };
 

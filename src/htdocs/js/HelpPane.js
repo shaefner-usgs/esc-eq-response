@@ -5,24 +5,25 @@ var Svg = require('util/Svg');
 
 
 /**
- * Add SVG elements to help pane
+ * Add SVG elements to HelpPane.
  *
  * @param options {Object}
  *   {
+ *     app: {Object} Application
  *     el: {Element}
  *   }
  *
- * @ return _this {Object)
+ * @return _this {Object)
  */
 var HelpPane = function (options) {
   var _this,
       _initialize,
 
       _el,
-      _legend,
       _Svg,
 
-      _addSvgElements;
+      _addSvgElements,
+      _getColors;
 
 
   _this = {};
@@ -31,23 +32,49 @@ var HelpPane = function (options) {
     options = options || {};
 
     _el = options.el || document.createElement('div');
-    _legend = _el.querySelector('.legend');
     _Svg = Svg();
 
     _addSvgElements();
   };
 
   /**
-   * Add SVG elements to legend HTML
+   * Add the SVG elements to the legend.
    */
   _addSvgElements = function () {
     var circle,
-        circles,
+        colors,
+        legend,
         line,
         range,
         triangle;
 
-    circles = {
+    colors = _getColors();
+    legend = _el.querySelector('.legend');
+    line = _Svg.createLine({
+      color: '#c00',
+      opacity: '0.5'
+    });
+    range = _Svg.createCircleRange();
+    triangle = _Svg.createTriangle();
+
+    Object.keys(colors).forEach(key => {
+      circle = _Svg.createCircle(colors[key]);
+
+      legend.querySelector('.' + key).appendChild(circle);
+    });
+
+    legend.querySelector('.faults').appendChild(line);
+    legend.querySelector('.magnitude').appendChild(range);
+    legend.querySelector('.shakemap').appendChild(triangle);
+  };
+
+  /**
+   * Get the colors of the circles.
+   *
+   * @return colors {Object}
+   */
+  _getColors = function () {
+    var colors = {
       asDay: {
         fillColor: '#f90'
       },
@@ -71,22 +98,7 @@ var HelpPane = function (options) {
       },
     };
 
-    Object.keys(circles).forEach(function(key) {
-      circle = _Svg.getCircle(circles[key]);
-      _legend.querySelector('.' + key).appendChild(circle);
-    });
-
-    line = _Svg.getLine({
-      color: '#c00',
-      opacity: '0.5'
-    });
-    _legend.querySelector('.faults').appendChild(line);
-
-    range = _Svg.getCircleRange();
-    _legend.querySelector('.magnitude').appendChild(range);
-
-    triangle = _Svg.getTriangle();
-    _legend.querySelector('.shakemap').appendChild(triangle);
+    return colors;
   };
 
 

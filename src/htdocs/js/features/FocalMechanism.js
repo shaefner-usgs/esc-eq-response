@@ -2,7 +2,8 @@
 'use strict';
 
 
-var BeachBall = require('features/util/BeachBall');
+var AppUtil = require('util/AppUtil'),
+    BeachBall = require('features/util/BeachBall');
 
 require('leaflet/CanvasMarker');
 
@@ -13,17 +14,17 @@ require('leaflet/CanvasMarker');
  * @param options {Object}
  *   {
  *     app: {Object} Application
- *     eqid: {String} Mainshock event id
  *   }
  *
  * @return _this {Object}
  *   {
  *     beachball: {Element}
+ *     create: {Function}
  *     destroy: {Function}
  *     id: {String}
- *     initFeature: {Function}
  *     mapLayer: {L.Layer}
  *     name: {String}
+ *     reset: {Function}
  *     showLayer: {Boolean}
  *     summary: {String}
  *     zoomToLayer: {Boolean}
@@ -34,7 +35,6 @@ var FocalMechanism = function (options) {
       _initialize,
 
       _app,
-      _eqid,
       _mainshock,
 
       _createBeachBall,
@@ -48,7 +48,6 @@ var FocalMechanism = function (options) {
     options = options || {};
 
     _app = options.app;
-    _eqid = options.eqid;
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'focal-mechanism';
@@ -107,13 +106,13 @@ var FocalMechanism = function (options) {
         _mainshock.json.geometry.coordinates[0]
       ];
 
-      // Get popup, tooltip from Mainshock (FeatureGroup contains only 1 layer)
-      _app.Features.getFeature('mainshock').mapLayer.eachLayer(layer => {
+      // Get popup, tooltip from Mainshock (a FeatureGroup with a single layer)
+      _mainshock.mapLayer.eachLayer(layer => {
         popup = layer.getPopup().getContent();
         tooltip = layer.getTooltip().getContent();
       });
 
-      // Render (hidden) beachball to MapPane for use by CanvasMarker
+      // Render beachball (hidden by default) for use by CanvasMarker
       beachball.render(document.getElementById('mapPane'));
 
       mapLayer = L.canvasMarker(coords, {
@@ -141,13 +140,15 @@ var FocalMechanism = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var html,
+    var eqid,
+        html,
         url;
 
+    eqid = AppUtil.getParam('eqid');
     html = '';
 
     if (_this.beachball) {
-      url = `https://earthquake.usgs.gov/earthquakes/eventpage/${_eqid}/focal-mechanism`;
+      url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/focal-mechanism`;
       html = `<a href="${url}"><h4>${_this.name}</h4></a>`;
     }
 
@@ -159,13 +160,21 @@ var FocalMechanism = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Create Feature.
+   */
+  _this.create = function () {
+    _this.beachball = _createBeachBall(180);
+    _this.mapLayer = _createMapLayer();
+    _this.summary = _createSummary();
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _app = null;
-    _eqid = null;
     _mainshock = null;
 
     _createBeachBall = null;
@@ -176,12 +185,11 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Initialize Feature.
+   * Reset to initial state.
    */
-  _this.initFeature = function () {
-    _this.beachball = _createBeachBall(180);
-    _this.mapLayer = _createMapLayer();
-    _this.summary = _createSummary();
+  _this.reset = function () {
+    _this.mapLayer = null;
+    _this.summary = null;
   };
 
 
