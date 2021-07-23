@@ -2,26 +2,22 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
-
-
 /**
- * Factory for Greyscale base layer
+ * Factory for Greyscale base layer.
  *
- * @param provider {String}
- *     default is 'cartodb'
+ * @param provider {String} optional; default is 'cartodb'
  * @param options {Object}
- *     L.TileLayer options
+ *     L.tileLayer options
  *
- * @return {L.TileLayer}
+ * @return {L.tileLayer|L.layerGroup}
  */
 L.GreyscaleLayer = function (provider, options) {
-  var _base,
-      _providers,
-      _ref,
-      _url;
+  var base,
+      labels,
+      providers,
+      url;
 
-  _providers = {
+  providers = {
     cartodb: {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">' +
         'OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">' +
@@ -31,41 +27,46 @@ L.GreyscaleLayer = function (provider, options) {
       url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}@2x.png'
     },
     esri: {
-      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ',
       maxZoom: 16,
-      subdomains: ['server', 'services'],
+      subdomains: [
+        'server',
+        'services'
+      ],
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
     },
     stamen: {
       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
         '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> ' +
-        '&mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        '— Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 20,
       subdomains: 'abcd',
       url: 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png'
     }
   };
-
   provider = provider || 'cartodb';
-  options = Util.extend(_providers[provider], options);
+  options = Object.assign(providers[provider], options);
+  url = providers[provider].url;
+  base = L.tileLayer(url, options);
 
-  _url = _providers[provider].url;
-  _base = L.tileLayer(_url, options);
-
-  // Esri greyscale layer doesn't inlcude labels; add them
+  // ESRI Greyscale layer doesn't include labels; add them
   if (provider === 'esri') {
-    _ref = L.tileLayer(
+    labels = L.tileLayer(
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}'
     );
-    return L.layerGroup([_base, _ref]);
+
+    return L.layerGroup([
+      base,
+      labels
+    ]);
   } else {
-    return _base;
+    return base;
   }
 };
-
 
 L.greyscaleLayer = function () {
   return new L.GreyscaleLayer();
 };
+
 
 module.exports = L.GreyscaleLayer;

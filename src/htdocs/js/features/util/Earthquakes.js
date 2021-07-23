@@ -4,8 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     LatLon = require('util/LatLon'),
-    Moment = require('moment'),
-    Util = require('hazdev-webutils/src/util/Util');
+    Moment = require('moment');
 
 
 var _COLORS,
@@ -34,27 +33,28 @@ _DEFAULTS = {
 
 
 /**
- * Parse earthquakes JSON feed and create Leaflet map layer, Plotly.js traces
- *   and content for SummaryPane (description, slider and tables).
+ * Parse a JSON feed containing a list of earthquakes and create a Leaflet map
+ * layer, Plotly traces and components for creating the description,
+ * range slider and tables).
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     id: {String}, // Feature's id
- *     json: {Object} // Feature's JSON data
- *     sortByField: {String} // Default sort field for table
+ *     app: {Object} Application
+ *     id: {String} Feature's id
+ *     json: {Object} Feature's JSON data
+ *     sortByField: {String} Default sort field for table
  *   }
  *
  * @return _this {Object}
  *   {
  *     bins: {Object}
- *     createBinTable: {Function},
- *     createDescription: {Function},
- *     createListTable: {Function},
- *     createSlider: {Function},
- *     list: {Array},
- *     mapLayer: {L.layer},
- *     plotTraces: {Object},
+ *     createBinTable: {Function}
+ *     createDescription: {Function}
+ *     createListTable: {Function}
+ *     createSlider: {Function}
+ *     list: {Array}
+ *     mapLayer: {L.layer}
+ *     plotTraces: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -62,7 +62,7 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
-      _id,
+      _featureId,
       _mainshockLatlon,
       _mainshockMoment,
       _markerOptions,
@@ -94,10 +94,10 @@ var Earthquakes = function (options) {
     var coords,
         mainshock;
 
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
-    _id = options.id;
+    _featureId = options.id;
     _markerOptions = options.markerOptions;
     _plotData = {
       color: [],
@@ -113,13 +113,13 @@ var Earthquakes = function (options) {
     };
     _sortByField = options.sortByField;
 
-    if (_id !== 'mainshock') {
+    if (_featureId !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockMoment = Moment.utc(mainshock.json.properties.time, 'x');
-      _minMag = AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-mag');
+      _minMag = AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-mag');
       _nowMoment = Moment.utc();
       _pastDayMoment = Moment.utc().subtract(1, 'days');
       _pastHourMoment = Moment.utc().subtract(1, 'hours');
@@ -144,14 +144,12 @@ var Earthquakes = function (options) {
    *
    * @param days {Integer}
    * @param magInt {Integer}
-   * @param type {String <first | past | prior>}
+   * @param type {String <first|past|prior>}
    */
   _addEqToBin = function (days, magInt, type) {
-    var i;
-
     _initBins(magInt, type);
 
-    // Add eq to appropriate bin(s)
+    // Add eq to appropriate bin(s) for tables
     _this.bins[type]['m ' + magInt].total ++;
     _this.bins[type].total.total ++;
 
@@ -175,9 +173,9 @@ var Earthquakes = function (options) {
       }
     }
 
-    // Number eqs by magnitude, inclusive (M i+ eqs)
-    if (type !== 'past') { // don't calculate totals 2x for aftershocks
-      for (i = magInt; i >= 0; i --) {
+    // Number of eqs by magnitude, inclusive (M i+ eqs) for range slider
+    if (type !== 'past') { // don't calculate totals 2x for Aftershocks
+      for (var i = magInt; i >= 0; i --) {
         _this.bins.mag[i] ++;
       }
     }
@@ -240,9 +238,9 @@ var Earthquakes = function (options) {
     var age,
         eqMoment;
 
-    age = _id; // everything but aftershocks
+    age = _featureId; // everything but Aftershocks
 
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
 
       if (eqMoment.isSameOrAfter(_pastHourMoment)) {
@@ -267,19 +265,19 @@ var Earthquakes = function (options) {
   _getDuration = function () {
     var duration;
 
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       duration = {
         length: Number(AppUtil.round(
           Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
         )),
         interval: 'days'
       };
-    } else if (_id === 'foreshocks') {
+    } else if (_featureId === 'foreshocks') {
       duration = {
         length: Number(AppUtil.getParam('fs-days')),
         interval: 'days'
       };
-    } else if (_id === 'historical') {
+    } else if (_featureId === 'historical') {
       duration = {
         length: Number(AppUtil.getParam('hs-years')),
         interval: 'years'
@@ -290,8 +288,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get time intervals object template. Creating it via a method allows
-   *   multiple copies to coexist.
+   * Get time intervals Object template for binned data. Creating it via a
+   * method allows multiple copies to coexist.
    *
    * @return {Object}
    */
@@ -316,19 +314,19 @@ var Earthquakes = function (options) {
     var lat,
         lng;
 
-    lat = [Math.abs(coords[1]).toFixed(3), '&deg;', (coords[1] < 0 ? 'S':'N')].join('');
-    lng = [Math.abs(coords[0]).toFixed(3), '&deg;', (coords[0] < 0 ? 'W':'E')].join('');
+    lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
+    lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
 
     return lat + ', ' + lng;
   };
 
   /**
-   * Get a plot's trace option for plotly.js.
+   * Get a plot's trace option for Plotly.
    *
-   * @param plotId {String <cumulative | hypocenters | magtime>}
-   * @param type {String <scatter | scatter3d>}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
+   * @param type {String <scatter|scatter3d>}
    *
-   * @return trace {Object || null}
+   * @return trace {Object|undefined}
    */
   _getPlotlyTrace = function (plotId, type) {
     var date,
@@ -354,17 +352,17 @@ var Earthquakes = function (options) {
       x = _plotData.time.slice();
 
       // Fill y with values from 1 to length of x and date field
-      y = Array.from(new Array(x.length), function (val, i) {
+      y = Array.from(new Array(x.length), (val, i) => {
         return i + 1;
       });
 
       // Add date field to hover text
-      text = y.map(function(val, i) {
+      text = y.map((val, i) => {
         return val + '<br />' + date[i];
       });
 
       // Add origin point (mainshock) to beginning of aftershocks trace
-      if (_id === 'aftershocks') {
+      if (_featureId === 'aftershocks') {
         date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
         eqid.unshift(AppUtil.getParam('eqid'));
         x.unshift(_mainshockMoment.format());
@@ -390,7 +388,7 @@ var Earthquakes = function (options) {
 
     trace = {
       eqid: eqid,
-      feature: _id,
+      feature: _featureId,
       hoverinfo: 'text',
       hoverlabel: {
         font: {
@@ -438,15 +436,16 @@ var Earthquakes = function (options) {
   /**
    * Get the template HTML for a given type of content.
    *
-   * @param type {String <binTable | description | listRow | listTable | popup | slider | subheader>}
+   * @param type {String <binTable|description|listRow|listTable|popup|slider|subheader>}
    *
    * @return template {String}
    */
   _getTemplate = function (type) {
-    var template;
+    var template = '';
 
     if (type === 'binTable') {
-      template = '<table class="{cssClasses}">' +
+      template = '' +
+        '<table class="{classNames}">' +
           '<tr>' +
             '<th class="period">{type}:</th>' +
             '<th class="day">Day</th>' +
@@ -458,12 +457,14 @@ var Earthquakes = function (options) {
           '{rows}' +
         '</table>';
     } else if (type === 'description') {
-      template = '<p class="description">' +
-          '<strong>M {mag}+</strong> earthquakes within <strong>{distance} km</strong> ' +
-          'of the mainshock&rsquo;s epicenter{ending}.' +
+      template = '' +
+        '<p class="description">' +
+          '<strong>M {mag}+</strong> earthquakes within <strong>{distance} ' +
+          'km</strong> of the mainshock’s epicenter{ending}.' +
         '</p>';
     } else if (type === 'listRow') {
-      template = '<tr class="m{magInt}" title="View earthquake on map">' +
+      template = '' +
+        '<tr class="m{magInt}" title="View earthquake on map">' +
           '<td class="mag" data-sort="{mag}">{magDisplay}</td>' +
           '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
           '<td class="location">{location}</td>' +
@@ -472,7 +473,8 @@ var Earthquakes = function (options) {
           '<td class="eventId">{eqid}</td>' +
         '</tr>';
     } else if (type === 'listTable') {
-      template = '<table class="{cssClasses}">' +
+      template = '' +
+        '<table class="{classNames}">' +
           '<tr class="no-sort">' +
             '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
             '<th class="{utcTime}" data-sort-order="desc">Time (UTC)</th>' +
@@ -486,7 +488,8 @@ var Earthquakes = function (options) {
           '{rows}' +
         '</table>';
     } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
-      template = '<div class="earthquake {cssClass}">' +
+      template = '' +
+        '<div class="earthquake {className}">' +
           '<h4><a href="{url}">{title}</a></h4>' +
           '{bubblesHtml}' +
           '<dl>' +
@@ -518,7 +521,8 @@ var Earthquakes = function (options) {
           '</div>' +
         '</div>';
     } else if (type === 'subheader') {
-      template = '<h3>' +
+      template = '' +
+        '<h3>' +
           'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
         '</h3>';
     }
@@ -528,7 +532,7 @@ var Earthquakes = function (options) {
 
   /**
    * Get the magnitude threshold where no more than maxNumEqs will be visible by
-   *   default.
+   * default.
    *
    * @return threshold {Number}
    */
@@ -543,9 +547,10 @@ var Earthquakes = function (options) {
     maxNumEqs = 25; // max number to display by default
     threshold = maxMag; // default
 
-    magBins.some(function(number, magInt) {
+    magBins.some((number, magInt) => {
       if (number <= maxNumEqs) {
         threshold = magInt;
+
         return true;
       }
     });
@@ -558,19 +563,17 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Initialize the object templates for storing binned data.
+   * Initialize the Object templates for storing binned data.
    *
    * @param magInt {Integer}
    * @param type {String}
    */
   _initBins = function (magInt, type) {
-    var i;
-
     // Range slider (filter)
     if (!_this.bins.mag) {
       _this.bins.mag = [];
     }
-    for (i = magInt; i >= 0; i --) {
+    for (var i = magInt; i >= 0; i --) {
       if (!_this.bins.mag[i]) {
         _this.bins.mag[i] = 0;
       }
@@ -588,8 +591,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create Leaflet popups, tooltips and data for summary, plots; add earthquake
-   *   to bins.
+   * Create Leaflet popups, tooltips and data for summary and plots; add
+   * earthquake to bins.
    *
    * @param feature {Object}
    *     geoJSON feature
@@ -598,9 +601,9 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
+        className,
         compassPoints,
         coords,
-        cssClass,
         days,
         distance,
         eq,
@@ -608,6 +611,7 @@ var Earthquakes = function (options) {
         eqMomentLocal,
         latlon,
         localTime,
+        mag,
         magDisplay,
         magType,
         popup,
@@ -619,13 +623,14 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqMoment = Moment.utc(props.time, 'x');
+    mag = parseFloat(AppUtil.round(props.mag, 1));
     magType = props.magType || 'M';
     magDisplay = magType + ' ' + AppUtil.round(props.mag, 1);
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
     tooltip = magDisplay + ' - ' + utcTime;
 
-    // Add local time if tz prop included in feed
+    // Add local time if tz prop is included in feed
     if (props.tz) {
       eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
       localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
@@ -633,11 +638,11 @@ var Earthquakes = function (options) {
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_id === 'mainshock') {
-      cssClass = 'selected';
+    if (_featureId === 'mainshock') {
+      className = 'selected';
     } else { // calculate distance/direction from Mainshock
+      className = '';
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-      cssClass = '';
       latlon = LatLon(coords[1], coords[0]);
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
@@ -647,7 +652,7 @@ var Earthquakes = function (options) {
     eq = {
       alert: props.alert, // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
-      cssClass: cssClass,
+      className: className,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
       distance: distance,
@@ -658,8 +663,8 @@ var Earthquakes = function (options) {
       isoTime: eqMoment.toISOString(),
       location: _getLocation(coords),
       localTime: localTime,
-      mag: parseFloat(AppUtil.round(props.mag, 1)),
-      magInt: Math.floor(props.mag, 1),
+      mag: mag,
+      magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status,
@@ -683,7 +688,7 @@ var Earthquakes = function (options) {
       minWidth: 250
     }).bindTooltip(tooltip);
 
-    // Note: additional plotData props are added in _pointToLayer
+    // Note: additional plotData props are added in _pointToLayer()
     _plotData.date.push(eq.utcTime);
     _plotData.depth.push(coords[2] * -1); // set to negative for 3d plots
     _plotData.eqid.push(eq.eqid);
@@ -694,21 +699,21 @@ var Earthquakes = function (options) {
     _plotData.time.push(eqMoment.format());
 
     // Bin eq totals by magnitude and time / period
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       days = Math.ceil(Moment.duration(eqMoment - _mainshockMoment).asDays());
       _addEqToBin(days, eq.magInt, 'first');
 
       days = Math.ceil(Moment.duration(_nowMoment - eqMoment).asDays());
       _addEqToBin(days, eq.magInt, 'past');
     }
-    else if (_id === 'historical' || _id === 'foreshocks') {
+    else if (_featureId === 'historical' || _featureId === 'foreshocks') {
       days = Math.ceil(Moment.duration(_mainshockMoment - eqMoment).asDays());
       _addEqToBin(days, eq.magInt, 'prior');
     }
   };
 
   /**
-   * Create Leaflet markers and add additional properties to plot data.
+   * Create Leaflet markers and data for plots.
    *
    * @param feature {Object}
    *     geoJSON feature
@@ -726,12 +731,12 @@ var Earthquakes = function (options) {
     radius = AppUtil.getRadius(AppUtil.round(props.mag, 1));
 
     _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _id; // put markers in custom Leaflet map pane
+    _markerOptions.pane = _featureId; // custom Leaflet pane to control stacking order
     _markerOptions.radius = radius;
 
     // Note: additional plotData props are added in _onEachFeature
     _plotData.color.push(fillColor);
-    _plotData.size.push(radius * 2); // plotly.js uses diameter
+    _plotData.size.push(radius * 2); // Plotly uses diameter
 
     return L.circleMarker(latlng, _markerOptions);
   };
@@ -743,7 +748,7 @@ var Earthquakes = function (options) {
   /**
    * Create binned earthquake data table HTML.
    *
-   * @param type {String <first | past | prior>}
+   * @param type {String <first|past|prior>}
    *
    * @return {String}
    */
@@ -756,7 +761,7 @@ var Earthquakes = function (options) {
         td,
         tdClasses;
 
-    duration = _getDuration(_id);
+    duration = _getDuration(_featureId);
     days = Moment.duration(duration.length, duration.interval).asDays();
     rows = '';
     tableClasses = ['bin'];
@@ -766,10 +771,10 @@ var Earthquakes = function (options) {
     }
 
     if (_this.bins[type]) {
-      Object.keys(_this.bins[type]).sort().forEach(function(th) {
-        rows += '<tr><th class="rowlabel">' + th + '</th>';
+      Object.keys(_this.bins[type]).sort().forEach(th => {
+        rows += `<tr><th class="rowlabel">${th}</th>`;
 
-        Object.keys(_this.bins[type][th]).forEach(function(period) {
+        Object.keys(_this.bins[type][th]).forEach(period => {
           td = _this.bins[type][th][period];
           tdClasses = [period];
 
@@ -777,7 +782,7 @@ var Earthquakes = function (options) {
             tdClasses.push('total');
           }
 
-          rows += '<td class="' + tdClasses.join(' ') + '">' + td + '</td>';
+          rows += `<td class="${tdClasses.join(' ')}">${td}</td>`;
         });
 
         rows += '</tr>';
@@ -785,7 +790,7 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      cssClasses: tableClasses.join(' '),
+      classNames: tableClasses.join(' '),
       rows: rows,
       type: type
     };
@@ -794,7 +799,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create description HTML.
+   * Create Feature description HTML.
    *
    * @return {String}
    */
@@ -803,18 +808,18 @@ var Earthquakes = function (options) {
         duration,
         ending;
 
-    duration = _getDuration(_id);
+    duration = _getDuration(_featureId);
 
-    if (_id === 'aftershocks') {
+    if (_featureId === 'aftershocks') {
       ending = '. The duration of the aftershock sequence is <strong>' +
-        duration.length + ' ' + duration.interval + '</strong>';
+        `${duration.length} ${duration.interval}</strong>`;
     } else {
-      ending = ' in the prior <strong>' + duration.length + ' ' +
-        duration.interval +  '</strong> before the mainshock';
+      ending = ` in the prior <strong>${duration.length} ${duration.interval} ` +
+        '</strong> before the mainshock';
     }
 
     data = {
-      distance: AppUtil.getParam(AppUtil.lookupPrefix(_id) + '-dist'),
+      distance: AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-dist'),
       ending: ending,
       mag: _minMag
     };
@@ -825,8 +830,8 @@ var Earthquakes = function (options) {
   /**
    * Create earthquake list table HTML.
    *
-   * @param type {String}
-   *     'all' or 'mostRecent' (Aftershocks only); default is 'all'
+   * @param type {String <all|mostRecent>} default is 'all'
+   *     'mostRecent' is for Aftershocks only
    *
    * @return {String}
    */
@@ -841,6 +846,7 @@ var Earthquakes = function (options) {
         thClasses,
         tr;
 
+    data = {};
     eqs = _this.list;
     fields = ['depth', 'distance', 'eventId', 'location', 'mag', 'utcTime'];
     magThreshold = _getThreshold();
@@ -849,39 +855,37 @@ var Earthquakes = function (options) {
     thClasses = {};
     type = type || 'all';
 
-    fields.forEach(function(field) {
+    if (type === 'mostRecent') {
+      eqs = [_this.list[_this.list.length - 1]];
+      magThreshold = 0; // always show most recent eq
+    }
+    if (eqs.length > 1) {
+      tableClasses.push('sortable');
+    }
+
+    // Add row (eq) to table
+    eqs.forEach(eq => {
+      magInt = eq.magInt;
+      tr = L.Util.template(_getTemplate('listRow'), eq);
+      rows += tr;
+
+      if (magInt >= magThreshold && tableClasses.indexOf('m' + magInt) === -1) {
+        tableClasses.push('m' + magInt); // flag to display mag level by default
+      }
+    });
+
+    data = {
+      classNames: tableClasses.join(' '),
+      rows: rows
+    };
+
+    fields.forEach(field => {
       thClasses[field] = [field];
 
       if (_sortByField && field === _sortByField) {
         thClasses[field].push('sort-default');
       }
-    });
 
-    if (type === 'mostRecent') {
-      eqs = [_this.list[_this.list.length - 1]];
-      magThreshold = 0; // always show most recent eq
-    }
-
-    if (eqs.length > 1) {
-      tableClasses.push('sortable');
-    }
-
-    // Add row (eq) to table data
-    eqs.forEach(function(eq) {
-      magInt = eq.magInt;
-      tr = L.Util.template(_getTemplate('listRow'), eq);
-
-      if (magInt >= magThreshold && tableClasses.indexOf('m' + magInt) === -1) {
-        tableClasses.push('m' + magInt); // flag to display mag level by default
-      }
-      rows += tr;
-    });
-
-    data = {
-      cssClasses: tableClasses.join(' '),
-      rows: rows
-    };
-    fields.forEach(function(field) {
       data[field] = thClasses[field].join(' ');
     });
 
@@ -889,7 +893,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create magnitude range slider (filter) and/or sub header HTML.
+   * Create magnitude range slider (filter) and/or subheader HTML.
    *
    * @return html {String}
    */
@@ -902,18 +906,18 @@ var Earthquakes = function (options) {
     magThreshold = _getThreshold();
     data = {
       count: _this.bins.mag[magThreshold],
-      id: _id,
+      id: _featureId,
       mag: magThreshold,
       max: _this.bins.mag.length - 1,
       min: Math.floor(_minMag)
     };
     html = '';
-    singleMagBin = _this.bins.mag.every(function(value, i, array) {
+    singleMagBin = _this.bins.mag.every((value, i, array) => {
       return array[0] === value; // all values are the same
     });
 
     if (!singleMagBin) {
-      html = L.Util.template(_getTemplate('slider'), data);
+      html = L.Util.template(_getTemplate('slider'), data); // includes subheader
     } else {
       html = L.Util.template(_getTemplate('subheader'), data);
     }
@@ -929,7 +933,7 @@ var Earthquakes = function (options) {
 
 
 /**
- * Static method: get the URL for the JSON feed.
+ * Static method to get the URL of the earthquakes JSON feed.
  *
  * @param params {Object}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
@@ -944,7 +948,7 @@ Earthquakes.getFeedUrl = function (params) {
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
   pairs = ['format=geojson', 'orderby=time-asc'];
 
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
   });
 

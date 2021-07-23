@@ -1,3 +1,5 @@
+@use 'leaflet/leaflet';
+
 #mapPane,
 .map {
   height: 100%;
@@ -13,10 +15,20 @@
     display: none;
   }
 
+  .breather { /* loader */
+    width: 1.5em;
+
+    div {
+      height: .9em;
+      top: -.75em;
+      width: .9em;
+    }
+  }
+
   /*
     Rendering order of features on map and layer controller. All map layers
-      (except faults) are rendered in leaflet-overlay-pane which has a z-index
-      of 400.
+    (except faults) are rendered in leaflet-overlay-pane which has a z-index of
+    400.
   */
   .leaflet-focal-mechanism-pane {
     z-index: 425;
@@ -46,13 +58,14 @@
     z-index: 417;
   }
 
-  .breather { /* loader */
-    width: 1.5em;
+  /* Scroll wide tables in Leaflet popups elegantly */
+  .scroll-wrapper {
+    overflow: auto;
 
-    div {
-      height: .9em;
-      top: -.75em;
-      width: .9em;
+    th.freeze {
+      background: white;
+      left: 0;
+      position: sticky;
     }
   }
 }

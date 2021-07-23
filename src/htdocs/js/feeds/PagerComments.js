@@ -2,18 +2,18 @@
 
 
 /**
- * PAGER Comments Feed
+ * PAGER Comments Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     destroy: {Function},
- *     id: {String},
- *     name: {String),
+ *     destroy: {Function}
+ *     id: {String}
+ *     name: {String}
  *     url: {String}
  *   }
  */
@@ -39,7 +39,7 @@ var PagerComments = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get the JSON feed's URL.
    *
    * @return url {String}
    */
@@ -55,6 +55,7 @@ var PagerComments = function (options) {
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
+
       if (contents['json/comments.json']) {
         url = contents['json/comments.json'].url;
       }
@@ -68,7 +69,7 @@ var PagerComments = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;

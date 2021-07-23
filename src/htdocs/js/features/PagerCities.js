@@ -2,22 +2,21 @@
 
 
 /**
- * Get PAGER Cities for PAGER Exposures Feature.
+ * Create PAGER Cities list for PAGER Exposures Feature.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     cities: {Object},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     name: {String),
- *     url: {String}
+ *     cities: {Object}
+ *     create: {Function}
+ *     destroy: {Function}
+ *     getFeedUrl: {Function}
+ *     id: {String}
+ *     name: {String)
  *   }
  */
 var PagerCities = function (options) {
@@ -26,8 +25,7 @@ var PagerCities = function (options) {
 
       _app,
 
-      _compare,
-      _getFeedUrl;
+      _compare;
 
 
   _this = {};
@@ -39,7 +37,6 @@ var PagerCities = function (options) {
 
     _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
-    _this.url = _getFeedUrl();
   };
 
   /**
@@ -60,12 +57,39 @@ var PagerCities = function (options) {
     return 0;
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
-   * Get URL of JSON feed.
+   * Create cities list.
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.create = function (json) {
+    _this.cities = json.onepager_cities.sort(_compare);
+  };
+
+  /**
+   * Destroy this Class to aid in garbage collection.
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+
+    _compare = null;
+
+    _this = null;
+  };
+
+  /**
+   * Get the JSON feed's URL.
    *
    * @return url {String}
    */
-  _getFeedUrl = function () {
+  _this.getFeedUrl = function () {
     var contents,
         mainshock,
         products,
@@ -84,36 +108,6 @@ var PagerCities = function (options) {
     }
 
     return url;
-  };
-
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
-  /**
-   * Destroy this Class to aid in garbage collection.
-   */
-  _this.destroy = function () {
-    _initialize = null;
-
-    _app = null;
-
-    _compare = null;
-    _getFeedUrl = null;
-
-    _this = null;
-  };
-
-  /**
-   * Initialize Feature (set properties that depend on external feed data).
-   *
-   * @param json {Object}
-   *     feed data for Feature
-   */
-  _this.initFeature = function (json) {
-    if (_this.url) { // url not set when feed is unavailable
-      _this.cities = json.onepager_cities.sort(_compare);
-    }
   };
 
 

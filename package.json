@@ -26,10 +26,12 @@
     "leaflet": "^1.7.1",
     "moment": "^2.15.1",
     "plotly.js": "^1.58.4",
-    "tablesort": "shaefner-usgs/tablesort"
+    "tablesort": "shaefner-usgs/tablesort",
+    "utfgrid": "danzel/Leaflet.utfgrid"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
+    "@babel/plugin-transform-runtime": "^7.14.5",
     "@babel/preset-env": "^7.13.9",
     "@lodder/grunt-postcss": "^3.0.0",
     "autoprefixer": "^10.2.4",
@@ -45,7 +47,6 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^23.0.0",
     "grunt-sass": "^3.1.0",
-    "hazdev-webutils": "~0.2.0",
     "http-rewrite-middleware": "^0.1.6",
     "ini": "^2.0.0",
     "load-grunt-tasks": "^5.1.0",

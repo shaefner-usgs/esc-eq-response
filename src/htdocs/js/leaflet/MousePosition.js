@@ -3,31 +3,33 @@
 
 
 /**
- * This class displays geographic coordinates of the mouse pointer as it moves
+ * This class displays geographic coordinates of the mouse pointer as it moves.
  *
  * Copyright 2013 Ardhi Lukianto (https://github.com/ardhi/Leaflet.MousePosition)
  */
 L.Control.MousePosition = L.Control.extend({
   options: {
-    position: 'bottomleft',
-    separator: ', ',
     emptyString: '',
-    lngFirst: false,
-    numDigits: 3,
-    lngFormatter: function(n) {
-      return [Math.abs(n).toFixed(3), '&deg;', (n<0?'W':'E')].join('');
-    },
     latFormatter: function(n) {
-      return [Math.abs(n).toFixed(3), '&deg;', (n<0?'S':'N')].join('');
+      return [Math.abs(n).toFixed(3), '°', (n<0?'S':'N')].join('');
     },
-    prefix: ''
+    lngFirst: false,
+    lngFormatter: function(n) {
+      return [Math.abs(n).toFixed(3), '°', (n<0?'W':'E')].join('');
+    },
+    numDigits: 3,
+    position: 'bottomleft',
+    prefix: '',
+    separator: ', '
   },
 
   onAdd: function (map) {
     this._container = L.DomUtil.create('div', 'leaflet-control-mouseposition');
+    this._container.innerHTML = this.options.emptyString;
+
     L.DomEvent.disableClickPropagation(this._container);
+
     map.on('mousemove', this._onMouseMove, this);
-    this._container.innerHTML=this.options.emptyString;
 
     return this._container;
   },
@@ -37,26 +39,21 @@ L.Control.MousePosition = L.Control.extend({
   },
 
   _onMouseMove: function (e) {
-    var lng = L.Util.formatNum(e.latlng.lng, this.options.numDigits);
-    // need to correct for rollover of map if user scrolls
-    if (lng >= 0) {
-      lng = ((lng + 180)%360) - 180;
+    var lat,
+        lng,
+        value;
+
+    lat = this.options.latFormatter(e.latlng.lat);
+    lng = this.options.lngFormatter(e.latlng.lng);
+
+    if (this.options.lngFirst) {
+      value = lng + this.options.separator + lat;
     } else {
-      lng = (((lng + 180) + (Math.ceil(Math.abs(lng + 180)/360)*360))%360) - 180;
+      value = lat + this.options.separator + lng;
     }
-    if (this.options.lngFormatter) {
-      lng = this.options.lngFormatter(lng);
-    }
-    var lat = L.Util.formatNum(e.latlng.lat, this.options.numDigits);
-    if (this.options.latFormatter) {
-      lat = this.options.latFormatter(lat);
-    }
-    var value = this.options.lngFirst ? lng + this.options.separator + lat : lat + this.options.separator + lng;
-    var prefixAndValue = this.options.prefix + ' ' + value;
 
-    this._container.innerHTML = prefixAndValue;
+    this._container.innerHTML = this.options.prefix + ' ' + value;
   }
-
 });
 
 L.Map.mergeOptions({

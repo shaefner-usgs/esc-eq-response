@@ -2,18 +2,18 @@
 
 
 /**
- * Historical Events Feed
+ * Historical Events Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object} // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     destroy: {Function},
- *     id: {String},
- *     name: {String),
+ *     destroy: {Function}
+ *     id: {String}
+ *     name: {String}
  *     url: {String}
  *   }
  */
@@ -39,7 +39,7 @@ var HistoricalEvents = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get the JSON feed's URL.
    *
    * @return url {String}
    */
@@ -55,10 +55,10 @@ var HistoricalEvents = function (options) {
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
+
       if (contents['json/historical_earthquakes.json']) {
         url = contents['json/historical_earthquakes.json'].url;
       }
-
     }
 
     return url;
@@ -69,7 +69,7 @@ var HistoricalEvents = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;

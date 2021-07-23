@@ -6,32 +6,66 @@ var AppUtil = function () {};
 
 
 /**
- * Add commas to large numbers.
+ * Add commas to large numbers (10,000 and greater).
  *
  * @param num {Number}
  *
  * @return {String}
  */
 AppUtil.addCommas = function (num) {
-  var dec,
-      int,
+  var decStr,
+      intStr,
+      numStr,
       parts,
       regex;
 
-  dec = '';
-  num = String(num);
-  parts = num.split('.');
-  int = parts[0];
+  decStr = '';
+  numStr = String(num);
+  parts = numStr.split('.');
+  intStr = parts[0];
   regex = /(\d+)(\d{3})/;
 
   if (parts.length > 1) {
-    dec = '.' + parts[1];
-  }
-  while (regex.test(int)) {
-    int = int.replace(regex, '$1' + ',' + '$2');
+    decStr = '.' + parts[1];
   }
 
-  return int + dec;
+  if (numStr.length > 4) {
+    while (regex.test(intStr)) {
+      intStr = intStr.replace(regex, '$1' + ',' + '$2');
+    }
+  }
+
+  return intStr + decStr;
+};
+
+/**
+ * Create a function that is a composition of other functions.
+ *
+ * For example:
+ *      a(b(c(x))) === compose(c, b, a)(x);
+ *
+ * Each function should accept as an argument, the result of the previous
+ * function call in the chain. It is allowable for all functions to have no
+ * return value as well.
+ *
+ * @param ... {Function}
+ *     a variable set of functions to call, in order
+ *
+ * @return {Function}
+ *     the composition of the functions provided as arguments
+ */
+AppUtil.compose = function () {
+  var fns = arguments;
+
+  return result => {
+    fns.forEach(fn => {
+      if (fn && fn.call) {
+        result = fn.call(this, result);
+      }
+    });
+
+    return result;
+  };
 };
 
 /**
@@ -59,7 +93,7 @@ AppUtil.getParams = function () {
   params = {};
   queryString = location.search.slice(1);
 
-  queryString.replace(/([^=]*)=([^&]*)&*/g, function (match, key, value) {
+  queryString.replace(/([^=]*)=([^&]*)&*/g, (match, key, value) => {
     params[key] = value;
   });
 
@@ -67,7 +101,7 @@ AppUtil.getParams = function () {
 };
 
 /**
- * Get circle marker radius for a given eq magnitude.
+ * Get the circle marker radius for a given eq magnitude.
  *
  * @param mag {Number}
  *
@@ -80,35 +114,10 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
- * Get shaking intensity / level for a given MMI value.
+ * Get the timezone on the user's device.
  *
- * @param mmi {Integer}
- *
- * @return {Object}
- */
-AppUtil.getShakingLevel = function (mmi) {
-  var shaking = [
-    {}, // no zero-level values
-    {intensity: 'I',    level: 'Not felt'},
-    {intensity: 'II',   level: 'Weak'},
-    {intensity: 'III',  level: 'Weak'},
-    {intensity: 'IV',   level: 'Light'},
-    {intensity: 'V',    level: 'Moderate'},
-    {intensity: 'VI',   level: 'Strong'},
-    {intensity: 'VII',  level: 'Very strong'},
-    {intensity: 'VIII', level: 'Severe'},
-    {intensity: 'IX',   level: 'Violent'},
-    {intensity: 'X+',   level: 'Extreme'}
-  ];
-
-  return shaking[mmi];
-};
-
-/**
- * Get the timezone on user's device.
- *
- * https://stackoverflow.com/questions/2897478/get-client-timezone-not-gmt-
- *  offset-amount-in-js/12496442#12496442
+ * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-
+ *   not-gmt-offset-amount-in-js/12496442#12496442
  *
  * @return tz {String}
  *     PST, CST, etc
@@ -190,20 +199,23 @@ AppUtil.romanize = function (num) {
 /**
  * Round a number to a given number of decimal places.
  *
+ * Always return the explicit number of decimal places specified by the
+ * precision parameter (i.e. return '2.0' for example).
+ *
  * @param num {Number}
- * @param precision {Number}
- *     optional number of decimal places; default is 0
- * @param empty {String}
- *     optional string to return if num is null; default is 'ndash;'
+ * @param precision {Number} optional; default is 0
+ *     number of decimal places
+ * @param empty {String} optional; default is '–'
+ *     string to return if num is null
  *
  * @return {String}
- *     NOTE: does not return a Number (for explicit display of e.g. M 2.0 eqs)
+ *     NOTE: does not return a Number
  */
-AppUtil.round = function (num, precision = 0, empty = 'ndash;') {
+AppUtil.round = function (num, precision = 0, empty = '–') {
   var multiplier,
       rounded;
 
-  if (!num && num !== 0 || num === 'null') { // 'null' value might be a string
+  if (!num && num !== 0 || num === 'null') { // in case 'null' value is a string
     return empty;
   }
 
@@ -215,12 +227,12 @@ AppUtil.round = function (num, precision = 0, empty = 'ndash;') {
 };
 
 /**
- * Set all form field values to match the values in querystring.
+ * Set all form field values to match the values in the querystring.
  */
 AppUtil.setFormFieldValues = function () {
   var params = AppUtil.getParams();
 
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     if (document.getElementById(key)) {
       document.getElementById(key).value = params[key];
     }
@@ -240,23 +252,23 @@ AppUtil.setParam = function (name, value) {
 
   pairs = [];
   params = AppUtil.getParams();
+  params[name] = value;
   queryString = '?';
 
-  params[name] = value;
-  Object.keys(params).forEach(function(key) {
+  Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
   });
+
   queryString += pairs.join('&');
 
   window.history.replaceState({}, '', queryString + location.hash);
 };
 
 /**
- * Set all querystring values to match the values in form fields.
+ * Set all querystring values to match the values in the form fields.
  */
 AppUtil.setQueryStringValues = function () {
   var fields,
-      i,
       pairs,
       queryString;
 
@@ -264,25 +276,26 @@ AppUtil.setQueryStringValues = function () {
   pairs = [];
   queryString = '?';
 
-  for (i = 0; i < fields.length; i ++) {
-    pairs.push(fields[i].id + '=' + fields[i].value);
-  }
+  fields.forEach(field => {
+    pairs.push(field.id + '=' + field.value);
+  });
+
   queryString += pairs.join('&');
 
   window.history.replaceState({}, '', queryString + location.hash);
 };
 
 /**
- * Strip backslashes from escaped strings.
+ * Strip backslashes from an escaped string.
  *
- * https://locutus.io/php/strings/stripslashes/
+ * Taken from: https://locutus.io/php/strings/stripslashes/
  *
  * @param str {String}
  *
  * @return {String}
  */
 AppUtil.stripslashes = function (str) {
-  return (str + '').replace(/\\(.?)/g, function (s, n1) {
+  return (str + '').replace(/\\(.?)/g, (s, n1) => {
     switch (n1) {
       case '\\':
         return '\\';

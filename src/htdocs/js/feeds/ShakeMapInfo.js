@@ -2,18 +2,18 @@
 
 
 /**
- * ShakeMap Info Feed
+ * ShakeMap Info Feed.
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     destroy: {Function},
- *     id: {String},
- *     name: {String),
+ *     destroy: {Function}
+ *     id: {String}
+ *     name: {String}
  *     url: {String}
  *   }
  */
@@ -39,7 +39,7 @@ var ShakeMapInfo = function (options) {
   };
 
   /**
-   * Get URL of json feed
+   * Get the JSON feed's URL.
    *
    * @return url {String}
    */
@@ -55,6 +55,7 @@ var ShakeMapInfo = function (options) {
 
     if (products.shakemap) {
       contents = products.shakemap[0].contents;
+
       if (contents['download/info.json']) {
         url = contents['download/info.json'].url;
       }
@@ -68,7 +69,7 @@ var ShakeMapInfo = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection
+   * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;

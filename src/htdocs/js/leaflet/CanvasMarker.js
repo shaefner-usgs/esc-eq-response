@@ -3,8 +3,13 @@
 
 
 /**
- * This class extends L.Marker by adding an existing canvas element in the page
- *   to the Leaflet Marker whenever it is turned on by user in the layer control
+ * This class extends L.Marker to move an existing <canvas> in the DOM to the
+ * Marker when the Marker is turned on in the layers control.
+ *
+ * This is necessary b/c Leaflet dynamically creates/destroys markers when they
+ * are turned on/off in the layers control.
+ *
+ * @return {L.marker}
  */
 L.CanvasMarker = L.Marker.extend({
   initialize: function (latlng, options) {
@@ -17,17 +22,15 @@ L.CanvasMarker = L.Marker.extend({
         className,
         marker;
 
-    // Call L.Marker's onAdd method first
+    className = this.id;
+    canvas = document.querySelector('#mapPane > canvas.' + className);
+
     L.Marker.prototype.onAdd.call(this, map);
 
-    className = this.options.icon.options.className;
-    canvas = document.querySelector('#mapPane > canvas.' + className);
-    marker = document.querySelector('.leaflet-map-pane .' + className);
-
-    // Move canvas element from below map to marker - it's added to the DOM
-    //   immediately when created, but the marker doesn't exist yet
     if (canvas) {
-      marker.appendChild(canvas);
+      marker = document.querySelector('.map .' + className);
+
+      marker.appendChild(canvas); // move <canvas> to Marker
     }
   },
 
@@ -40,12 +43,10 @@ L.CanvasMarker = L.Marker.extend({
     canvas = document.querySelector('.map canvas.' + className);
     mapPane = document.getElementById('mapPane');
 
-    // Move canvas element from marker to below map
     if (canvas) {
-      mapPane.appendChild(canvas);
+      mapPane.appendChild(canvas); // put <canvas> back
     }
 
-    // Call L.Marker's onRemove method last
     L.Marker.prototype.onRemove.call(this, map);
   }
 });
@@ -53,5 +54,6 @@ L.CanvasMarker = L.Marker.extend({
 L.canvasMarker = function(latlng, options) {
   return new L.CanvasMarker(latlng, options);
 };
+
 
 module.exports = L.CanvasMarker;

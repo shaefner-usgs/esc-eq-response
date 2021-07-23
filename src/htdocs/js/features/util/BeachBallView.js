@@ -1,8 +1,9 @@
 /* This is based on code in GMT, utilmeca.c. */
 'use strict';
 
-var Canvas = require('features/util/Canvas'),
-    Util = require('hazdev-webutils/src/util/Util');
+
+var AppUtil = require('util/AppUtil'),
+    Canvas = require('features/util/Canvas');
 
 
 var _D2R,
@@ -135,7 +136,7 @@ var BeachBallView = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _this.el = options.el;
 
@@ -265,7 +266,7 @@ var BeachBallView = function (options) {
   /**
    * Free references.
    */
-  _this.destroy = Util.compose(function () {
+  _this.destroy = AppUtil.compose(function () {
     if (!_this) {
       return;
     }
@@ -864,7 +865,6 @@ var BeachBallView = function (options) {
     // draw azimuth labels
     azimuthLabels.forEach(_this.labelAzimuth);
 
-    //Util.empty(_this.el);
     _this.el.appendChild(_canvas.canvas);
     _canvas.destroy();
     _canvas = null;

@@ -1,8 +1,8 @@
 @use 'sass:color';
-@use 'functions/svgUrl' as *;
-@use 'leaflet/control-bottomCenter';
-@use 'leaflet/mousePosition';
-@use 'variables' as *;
+@use 'control-bottomCenter';
+@use 'mousePosition';
+@use '../util/svgUrl' as *;
+@use '../variables' as *;
 
 $separator-color: color.scale($accent-color, $lightness: 80%);
 
@@ -179,17 +179,6 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   /* Push top controls down to accommodate toolbar */
   .leaflet-top .leaflet-control {
     margin-top: 50px;
-  }
-
-  /* Scroll wide tables in Leaflet popups elegantly */
-  .scroll-wrapper {
-    overflow: auto;
-
-    th.freeze {
-      background: white;
-      left: 0;
-      position: sticky;
-    }
   }
 
   /* Hide attribution text on (small screen) mobile devices */

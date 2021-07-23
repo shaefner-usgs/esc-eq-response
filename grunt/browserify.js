@@ -18,6 +18,9 @@ var browserify = {
       babelify.configure({
         presets: [
           '@babel/preset-env'
+        ],
+        plugins: [
+          '@babel/plugin-transform-runtime'
         ]
       })
     ]

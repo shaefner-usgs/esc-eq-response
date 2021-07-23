@@ -1,8 +1,9 @@
 'use strict';
 
-var BeachBallView = require('features/util/BeachBallView'),
-    Tensor = require('features/util/Tensor'),
-    Util = require('hazdev-webutils/src/util/Util');
+
+var AppUtil = require('util/AppUtil'),
+    BeachBallView = require('features/util/BeachBallView'),
+    Tensor = require('features/util/Tensor');
 
 
 var _DEFAULTS = {
@@ -32,7 +33,7 @@ var BeachBall = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _className = options.className;
     _data = options.data;
@@ -46,7 +47,7 @@ var BeachBall = function (options) {
     _tensor = Tensor.fromProduct(_data);
   };
 
-  _this.destroy = Util.compose(function () {
+  _this.destroy = AppUtil.compose(function () {
     if (_beachballView) {
       _beachballView.destroy();
     }

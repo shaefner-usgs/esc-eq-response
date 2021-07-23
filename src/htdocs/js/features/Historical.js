@@ -11,26 +11,26 @@ var AppUtil = require('util/AppUtil'),
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     bins: {Object},
- *     count: {Integer},
- *     description: {String},
- *     destroy: {Function},
- *     id: {String},
- *     initFeature: {Function},
- *     list: {Array},
- *     mapLayer: {L.Layer},
- *     name: {String},
- *     plotTraces: {Object},
- *     showLayer: {Boolean},
- *     sortByField: {String},
- *     summary: {String},
- *     url: {String},
+ *     bins: {Object}
+ *     count: {Integer}
+ *     create: {Function}
+ *     description: {String}
+ *     destroy: {Function}
+ *     getFeedUrl: {Function}
+ *     id: {String}
+ *     list: {Array}
+ *     mapLayer: {L.Layer}
+ *     name: {String}
+ *     plotTraces: {Object}
+ *     reset: {Function}
+ *     showLayer: {Boolean}
+ *     sortByField: {String}
+ *     summary: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -41,8 +41,7 @@ var Historical = function (options) {
       _app,
       _Earthquakes,
 
-      _createSummary,
-      _getFeedUrl;
+      _createSummary;
 
 
   _this = {};
@@ -59,7 +58,6 @@ var Historical = function (options) {
     _this.showLayer = true;
     _this.sortByField = 'mag';
     _this.summary = null;
-    _this.url = _getFeedUrl();
     _this.zoomToLayer = true;
   };
 
@@ -80,12 +78,53 @@ var Historical = function (options) {
     return html;
   };
 
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
   /**
-   * Get URL of JSON feed.
+   * Create Feature (set properties that depend on external feed data).
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.create = function (json) {
+    _Earthquakes = Earthquakes({
+      app: _app,
+      id: _this.id,
+      json: json,
+      sortByField: _this.sortByField
+    });
+
+    _this.bins = _Earthquakes.bins;
+    _this.count = json.metadata.count;
+    _this.description = _Earthquakes.createDescription();
+    _this.list = _Earthquakes.list;
+    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.plotTraces = _Earthquakes.plotTraces;
+    _this.summary = _createSummary();
+  };
+
+  /**
+   * Destroy this Class to aid in garbage collection.
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _Earthquakes = null;
+
+    _createSummary = null;
+
+    _this = null;
+  };
+
+  /**
+   * Get the JSON feed's URL.
    *
    * @return {String}
    */
-  _getFeedUrl = function () {
+  _this.getFeedUrl = function () {
     var mainshock,
         urlParams;
 
@@ -105,46 +144,13 @@ var Historical = function (options) {
     return Earthquakes.getFeedUrl(urlParams);
   };
 
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Reset to initial state.
    */
-  _this.destroy = function () {
-    _initialize = null;
-
-    _app = null;
-    _Earthquakes = null;
-
-    _createSummary = null;
-    _getFeedUrl = null;
-
-    _this = null;
-  };
-
-  /**
-   * Initialize Feature (set properties that depend on external feed data).
-   *
-   * @param json {Object}
-   *     feed data for Feature
-   */
-  _this.initFeature = function (json) {
-    _Earthquakes = Earthquakes({
-      app: _app,
-      id: _this.id,
-      json: json,
-      sortByField: _this.sortByField
-    });
-
-    _this.bins = _Earthquakes.bins;
-    _this.count = json.metadata.count;
-    _this.description = _Earthquakes.createDescription();
-    _this.list = _Earthquakes.list;
-    _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotTraces = _Earthquakes.plotTraces;
-    _this.summary = _createSummary();
+  _this.reset = function () {
+    _this.mapLayer = null;
+    _this.plotTraces = null;
+    _this.summary = null;
   };
 
 

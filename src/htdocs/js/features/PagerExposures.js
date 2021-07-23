@@ -10,20 +10,20 @@ var AppUtil = require('util/AppUtil');
  *
  * @param options {Object}
  *   {
- *     app: {Object}, // Application
- *     eqid: {String} // Mainshock event id
+ *     app: {Object} Application
  *   }
  *
  * @return _this {Object}
  *   {
- *     dependencies: {Array},
- *     destroy: {Function},
- *     exposures: {Object},
- *     id: {String},
- *     initFeature: {Function},
- *     name: {String),
- *     summary: {String},
- *     url: {String}
+ *     create: {Function}
+ *     dependencies: {Array}
+ *     destroy: {Function}
+ *     exposures: {Object}
+ *     getFeedUrl: {Function}
+ *     id: {String}
+ *     name: {String)
+ *     reset: {Function}
+ *     summary: {String}
  *   }
  */
 var PagerExposures = function (options) {
@@ -31,12 +31,10 @@ var PagerExposures = function (options) {
       _initialize,
 
       _app,
-      _eqid,
 
       _createRows,
       _createSummary,
       _getExposures,
-      _getFeedUrl,
       _getShakingValues;
 
 
@@ -46,7 +44,6 @@ var PagerExposures = function (options) {
     options = options || {};
 
     _app = options.app;
-    _eqid = options.eqid;
 
     _this.dependencies = [
       'pager-cities'
@@ -54,7 +51,6 @@ var PagerExposures = function (options) {
     _this.id = 'pager-exposures';
     _this.name = 'PAGER Exposures';
     _this.summary = null;
-    _this.url = _getFeedUrl();
   };
 
   /**
@@ -76,7 +72,7 @@ var PagerExposures = function (options) {
     population = _this.exposures.population;
     shaking = _this.exposures.shaking;
 
-    mmis.forEach(function(mmi, i) {
+    mmis.forEach((mmi, i) => {
       if (mmi >= 2 && population[i] > 0) { // skip mmi below 2 and when nobody affected
         data = {
           intensity: shaking[i].intensity,
@@ -94,7 +90,7 @@ var PagerExposures = function (options) {
           data
         );
 
-        cities.forEach(function(city) {
+        cities.forEach(city => {
           if (mmi === Number(AppUtil.round(city.mmi, 0))) {
             data = {
               name: city.name,
@@ -123,11 +119,13 @@ var PagerExposures = function (options) {
    */
   _createSummary = function () {
     var data,
+        eqid,
         html;
 
+    eqid = AppUtil.getParam('eqid');
     data = {
       rows: _createRows(),
-      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid + '/pager'
+      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/pager`
     };
     html = '';
 
@@ -159,7 +157,6 @@ var PagerExposures = function (options) {
         mmi;
 
     mmi = json.population_exposure.mmi;
-
     exposures = {
       mmi: mmi.reverse(),
       population: json.population_exposure.aggregated_exposure.reverse(),
@@ -167,32 +164,6 @@ var PagerExposures = function (options) {
     };
 
     return exposures;
-  };
-
-  /**
-   * Get URL of JSON feed.
-   *
-   * @return url {String}
-   */
-  _getFeedUrl = function () {
-    var contents,
-        mainshock,
-        products,
-        url;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
-    url = '';
-
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/exposures.json']) {
-        url = contents['json/exposures.json'].url;
-      }
-    }
-
-    return url;
   };
 
   /**
@@ -221,7 +192,7 @@ var PagerExposures = function (options) {
     ];
     values = [];
 
-    mmis.forEach(function (val) {
+    mmis.forEach(val => {
       values.push(shaking[val]);
     });
 
@@ -233,36 +204,63 @@ var PagerExposures = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Create Feature (set properties that depend on external feed data).
+   *
+   * @param json {Object}
+   *     feed data for Feature
+   */
+  _this.create = function (json) {
+    _this.exposures = _getExposures(json);
+    _this.summary = _createSummary();
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _app = null;
-    _eqid = null;
 
     _createRows = null;
     _createSummary = null;
     _getExposures = null;
-    _getFeedUrl = null;
     _getShakingValues = null;
 
     _this = null;
   };
 
   /**
-   * Initialize Feature (set properties that depend on external feed data).
+   * Get the JSON feed's URL.
    *
-   * @param json {Object}
-   *     feed data for Feature
+   * @return url {String}
    */
-  _this.initFeature = function (json) {
-    if (_this.url) { // url not set when feed is unavailable
-      _this.exposures = _getExposures(json);
-      _this.summary = _createSummary();
-    } else {
-      _this.summary = '';
+  _this.getFeedUrl = function () {
+    var contents,
+        mainshock,
+        products,
+        url;
+
+    mainshock = _app.Features.getFeature('mainshock');
+    products = mainshock.json.properties.products;
+    url = '';
+
+    if (products.losspager) {
+      contents = products.losspager[0].contents;
+
+      if (contents['json/exposures.json']) {
+        url = contents['json/exposures.json'].url;
+      }
     }
+
+    return url;
+  };
+
+  /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.summary = null;
   };
 
 

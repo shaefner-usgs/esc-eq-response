@@ -1,20 +1,22 @@
 @use 'sass:math';
 
-// Create an optimized SVG data URL.
-//
-// from: https://codepen.io/jakob-e/pen/doMoML (v 1.0.6)
-//
-// Usage examples:
-//
-// .class {
-//   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg">.....</svg>');
-// }
-//
-// or
-//
-// .class {
-//   @include background-svg('<svg xmlns="http://www.w3.org/2000/svg">.....</svg>');
-// }
+/**
+ * Create an optimized SVG data URL.
+ *
+ * Taken from: https://codepen.io/jakob-e/pen/doMoML (v 1.0.6)
+ *
+ * Usage examples:
+ *
+ * .class {
+ *   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg">...</svg>');
+ * }
+ *
+ *   or
+ *
+ * .class {
+ *   @include background-svg('<svg xmlns="http://www.w3.org/2000/svg">...</svg>');
+ * }
+ */
 @function svg-url($svg) {
   // Add missing namespace
   @if not str-index($svg,xmlns) {

@@ -1,7 +1,5 @@
 'use strict';
 
-var Util = require('hazdev-webutils/src/util/Util');
-
 
 var _DEFAULTS = {
   canvas: null,
@@ -39,7 +37,7 @@ var Canvas = function (options) {
   _initialize = function (options) {
     var scale = window.devicePixelRatio || 1;
 
-    options = Util.extend({}, _DEFAULTS, options);
+    options = Object.assign({}, _DEFAULTS, options);
 
     _canvas = options.canvas;
     if (_canvas === null) {

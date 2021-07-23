@@ -1,25 +1,23 @@
 'use strict';
 
 
-var Util = require('hazdev-webutils/src/util/Util');
-
-
 /**
- * Set up a status bar to inform user of app's status (loading state, errors)
+ * Show the loading state of app and external feed data and log errors.
  *
  * @param options {Object}
  *   {
+ *     app: {Object} Application
  *     el: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     addError: {Function},
- *     addItem: {Function},
- *     clearItems: {Function},
- *     hasError: {Function},
- *     postInit: {Function},
- *     removeItem: {Function},
+ *     addError: {Function}
+ *     addItem: {Function}
+ *     clearItems: {Function}
+ *     hasError: {Function}
+ *     postInit: {Function}
+ *     removeItem: {Function}
  *     reset: {Function}
  *   }
  */
@@ -31,6 +29,7 @@ var StatusBar = function (options) {
       _el,
 
       _addListeners,
+      _getMessage,
       _hide,
       _removeNode,
       _show;
@@ -46,7 +45,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Add listeners for close/reload buttons on an Error item
+   * Add event listeners.
    *
    * @param div {Element}
    * @param id {String}
@@ -59,41 +58,71 @@ var StatusBar = function (options) {
     close = div.querySelector('.close');
     reload = div.querySelector('.reload');
 
+    // Remove StatusBar item
     if (close) {
-      close.addEventListener('click', function(e) {
+      close.addEventListener('click', e => {
         e.preventDefault();
         _this.removeItem(id);
       });
     }
+
+    // Reload a Feature
     if (reload) {
-      reload.addEventListener('click', function(e) {
+      reload.addEventListener('click', e => {
         e.preventDefault();
         _this.removeItem(id);
-        _app.Features.instantiateFeature(id);
+        _app.Features.createFeature(id);
       });
     }
   };
 
   /**
-   * Hide status bar container
+   * Get the loading message.
+   *
+   * @param item {Object}
+   * @param opts {Object}
+   *
+   * @return {String}
+   */
+  _getMessage = function (item, opts) {
+    var loader,
+        msg;
+
+    loader = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>';
+    msg = '';
+
+    if (item.name) {
+      msg += item.name;
+    }
+    if (opts.append) {
+      msg += ' ' + opts.append;
+    }
+    if (opts.prepend) {
+      msg = opts.prepend + ' ' + msg;
+    }
+
+    return msg += loader;
+  };
+
+  /**
+   * Hide the StatusBar container.
    */
   _hide = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Remove a status bar entry (node) from DOM
+   * Remove a StatusBar item (node) from the DOM.
    *
    * @param el {Element}
    */
   _removeNode = function (el) {
-    var parent;
+    var parent = el.parentNode;
 
-    parent = el.parentNode;
     if (parent) {
       parent.removeChild(el);
 
-      // Due to a timing issue w/ CSS animation, 'hide' class is not always set
+      // Due to a timing issue w/ CSS transition, 'hide' class is not always set
       if (!parent.hasChildNodes()) {
         parent.style.display = 'none';
       }
@@ -101,11 +130,12 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Show status bar container
+   * Show the StatusBar container.
    */
   _show = function () {
-    _el.classList.remove('hide');
     _el.style.display = 'block'; // undo setting to 'none' in _removeNode()
+
+    _el.classList.remove('hide');
   };
 
   // ----------------------------------------------------------
@@ -113,30 +143,34 @@ var StatusBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add an error to status bar
+   * Add an error to the StatusBar (and show it).
    *
    * @param error {Object}
    *   {
-   *     id: {String}, (Feature id)
-   *     message: {String}, (error message)
-   *     status: {Number} (status code; optional)
+   *     id: {String} Feature id
+   *     message: {String} error message
+   *     status: {Number|String} optional; status code or 'timeout'
    *   }
    */
   _this.addError = function (error) {
     var content,
-        div;
+        div,
+        isFeature;
 
     content = error.message;
-    if (_app.Features.isFeature(error.id) && error.status !== 400) {
+    div = document.createElement('div');
+    isFeature = _app.Features.isFeature(error.id);
+
+    if (isFeature && error.status !== 400 && error.status !== 404) {
       content += '<a href="#" class="reload"></a>';
     }
-    content += '<a href="#" class="close"></a>';
 
-    div = document.createElement('div');
-    div.classList.add(error.id, 'error');
+    content += '<a href="#" class="close"></a>';
     div.innerHTML = content;
 
-    // Remove any leftover items with this id, then add item
+    div.classList.add(error.id, 'error');
+
+    // Remove any leftover items with this id, then add it
     _this.removeItem(error.id);
     _el.appendChild(div);
     _addListeners(div, error.id);
@@ -144,56 +178,44 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Add an item to status bar
+   * Add an item to the StatusBar (and show it).
    *
    * @param item {Object}
    *   {
-   *     id: {String}, (Feature id)
-   *     name: {String} (optional)
+   *     id: {String} Feature id
+   *     name: {String} optional
    *   }
-   * @param options {Object}
+   * @param opts {Object}
    *   {
-   *     append: {String}, (optional)
-   *     prepend: {String} (optional)
+   *     append: {String} optional
+   *     prepend: {String} optional
    *   }
    */
-  _this.addItem = function (item, options) {
+  _this.addItem = function (item, opts) {
     var defaults,
         div,
-        loader,
-        msg;
+        message;
 
     defaults = {
       append: '',
       prepend: 'Loading'
     };
     div = document.createElement('div');
-    loader = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>';
-    msg = '';
-    options = Util.extend({}, defaults, options);
+    opts = Object.assign({}, defaults, opts);
+    message = _getMessage(item, opts);
 
-    if (item.name) {
-      msg = item.name;
-    }
-    if (options.append) {
-      msg += ' ' + options.append;
-    }
-    if (options.prepend) {
-      msg = options.prepend + ' ' + msg;
-    }
-    msg += loader;
+    div.innerHTML = '<h4>' + message + '</h4>';
 
     div.classList.add(item.id);
-    div.innerHTML = '<h4>' + msg + '</h4>';
 
-    // Remove any leftover items with this id, then add item
+    // Remove any leftover items with this id, then add it
     _this.removeItem(item.id);
     _el.appendChild(div);
     _show();
   };
 
   /**
-   * Clear all items from status bar (and hide)
+   * Clear all items from the StatusBar (and hide it).
    */
   _this.clearItems = function () {
     while (_el.firstChild) {
@@ -204,7 +226,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Check if an error exists for item
+   * Check if an error already exists for a given item.
    *
    * @param id {String}
    *     Feature id
@@ -212,50 +234,49 @@ var StatusBar = function (options) {
    * @return {Boolean}
    */
   _this.hasError = function (id) {
-    var error;
+    var error = _el.querySelector('.' + id + '.error');
 
-    error = _el.querySelector('.' + id + '.error');
     if (error) {
       return true;
     }
+
+    return false;
   };
 
   /**
-   * Initialization that depends on app's "primary" Classes already being
-   *   instantiated in Application.js.
+   * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
     _this.removeItem('initial'); // remove initial "Loading..." message
   };
 
   /**
-   * Remove an item from status bar (and hide status bar if empty)
+   * Remove an item from the StatusBar (and hide it if it's empty).
    *
    * @param id {String}
    *     Feature id
    */
   _this.removeItem = function (id) {
-    var i,
-        items;
+    var items = _el.querySelectorAll('.' + id);
 
-    items = _el.querySelectorAll('.' + id);
-    for (i = 0; i < items.length; i ++) {
+    items.forEach(item => { // also remove duplicate items
       if (_el.children.length === 1) {
         _hide();
 
-        // Don't remove node until after CSS hide transition is complete
-        window.setTimeout(_removeNode, 500, items[i]);
+        // Don't remove node until CSS transition is complete
+        window.setTimeout(_removeNode, 500, item);
       } else {
-        _removeNode(items[i]);
+        _removeNode(item);
       }
-    }
+    });
   };
 
   /**
-   * Clear all items from status bar
+   * Clear all items from the StatusBar.
    */
   _this.reset = function () {
     _el.innerHTML = '';
+
     _hide();
   };
 
