@@ -1,7 +1,6 @@
 @use 'sass:color';
-@use 'control-bottomCenter';
-@use 'mousePosition';
-@use '../util/svgUrl' as *;
+
+@use 'svgUrl' as *;
 @use '../variables' as *;
 
 $separator-color: color.scale($accent-color, $lightness: 80%);

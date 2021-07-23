@@ -1,5 +1,6 @@
 @use 'sass:color';
-@use '../variables' as *;
+
+@use 'variables' as *;
 
 $reset-button-color: #efefef;
 $thumb-d: 1.2rem;

@@ -1,8 +1,13 @@
 @use 'sass:color';
+
+@use 'controls';
 @use 'editPane';
-@use 'features';
+@use 'features/index' as features;
 @use 'helpPane';
 @use 'impactBubbles';
+@use 'leaflet/index' as leaflet;
+@use 'lightbox';
+@use 'loaders';
 @use 'mapPane';
 @use 'navBar';
 @use 'plotly';
@@ -10,7 +15,6 @@
 @use 'statusBar';
 @use 'summaryPane';
 @use 'tablesort/src/tablesort';
-@use 'util';
 @use 'variables' as *;
 
 *,
