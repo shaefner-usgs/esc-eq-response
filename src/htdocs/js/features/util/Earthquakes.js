@@ -34,7 +34,7 @@ _DEFAULTS = {
 
 /**
  * Parse a JSON feed containing a list of earthquakes and create a Leaflet map
- * layer, Plotly.js traces and components for creating the description,
+ * layer, Plotly traces and components for creating the description,
  * range slider and tables).
  *
  * @param options {Object}
@@ -321,7 +321,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get a plot's trace option for plotly.js.
+   * Get a plot's trace option for Plotly.
    *
    * @param plotId {String <cumulative|hypocenters|magtime>}
    * @param type {String <scatter|scatter3d>}
@@ -736,7 +736,7 @@ var Earthquakes = function (options) {
 
     // Note: additional plotData props are added in _onEachFeature
     _plotData.color.push(fillColor);
-    _plotData.size.push(radius * 2); // plotly.js uses diameter
+    _plotData.size.push(radius * 2); // Plotly uses diameter
 
     return L.circleMarker(latlng, _markerOptions);
   };
