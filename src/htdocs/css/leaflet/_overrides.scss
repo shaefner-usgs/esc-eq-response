@@ -88,7 +88,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-layers-expanded {
-    background: #fff;
+    background: $bg-color;
     border-radius: $button-border-radius;
     padding: 3px 10px;
   }

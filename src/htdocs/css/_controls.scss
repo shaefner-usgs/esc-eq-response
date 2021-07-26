@@ -21,7 +21,7 @@ $dist: $track-w - $thumb-d;
 }
 
 @mixin thumb() {
-  background: #fff;
+  background: $bg-color;
   border: 1px solid #aaa;
   border-radius: 50%;
   box-shadow: 0px 1px 2px #bbb;
@@ -102,7 +102,7 @@ input[type="radio"] {
 
   + span:before {
     align-items: center;
-    background-color: #fff;
+    background-color: $bg-color;
     border: 1px solid #888;
     content: '\00a0';
     display: flex;
