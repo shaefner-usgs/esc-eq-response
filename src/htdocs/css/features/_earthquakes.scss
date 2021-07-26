@@ -121,6 +121,11 @@
         cursor: pointer;
         transition: all $hover-on-duration ease-out;
       }
+
+      &:active td {
+        background: $accent-color;
+        color: #fff;
+      }
     }
   }
 }
