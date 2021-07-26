@@ -250,7 +250,6 @@ var EditPane = function (options) {
       _timers[id].push(
         window.setTimeout(function() {
           if (feature) {
-            _app.SummaryPane.disableButton();
             _app.Features.refreshFeature(feature);
           } else { // Feature never created (likely due to a bad Fetch request)
             _app.Features.createFeature(id);

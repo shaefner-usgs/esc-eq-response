@@ -87,13 +87,20 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addFeature = function (feature) {
+    var status = _this.getLoadingStatus();
+
     try {
       _app.MapPane.addFeature(feature);
       _app.PlotsPane.addFeature(feature);
       _app.SummaryPane.addFeature(feature);
       _app.EditPane.addCount(feature);
 
+      if (status === 'complete') {
+        _this.getFeature('mainshock').enableButton();
+      }
+
       if (feature.id === 'mainshock') {
+        feature.addListener();
         _app.EditPane.showMainshock();
         _app.EditPane.setDefaults();
 
@@ -382,6 +389,7 @@ var Features = function (options) {
     var prevFeature;
 
     if (_this.isFeature(feature.id)) {
+      _this.getFeature('mainshock').disableButton();
       _cacheFeature(feature);
 
       prevFeature = _prevFeatures[feature.id].shift(); // 'oldest' Feature

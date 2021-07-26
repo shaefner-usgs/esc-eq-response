@@ -21,7 +21,6 @@ var AppUtil = require('util/AppUtil'),
  *   {
  *     addFeature: {Function}
  *     addLoader: {Function}
- *     disableButton: {Function}
  *     removeFeature: {Function}
  *     reset: {Function}
  *   }
@@ -44,7 +43,6 @@ var SummaryPane = function (options) {
       _configTable,
       _filterList,
       _getSliderValue,
-      _handleButton,
       _initTableSort,
       _openPopup,
       _setSliderStyles,
@@ -247,28 +245,6 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Handle download RTF button. Add listeners and enable button when all
-   * Features are ready.
-   *
-   * @param feature {Object}
-   */
-  _handleButton = function (feature) {
-    var button,
-        status;
-
-    if (feature.id === 'mainshock') {
-      feature.addListener();
-    }
-
-    status = _app.Features.getLoadingStatus();
-    if (status === 'complete') {
-      button = document.querySelector('.event-summary');
-
-      button.removeAttribute('disabled');
-    }
-  };
-
-  /**
    * Configure and instantiate the Tablesort plugin.
    *
    * @param id {String}
@@ -426,8 +402,6 @@ var SummaryPane = function (options) {
       _configTable(feature.id);
       _updateTimestamp();
     }
-
-    _handleButton(feature);
   };
 
   /**
@@ -451,15 +425,6 @@ var SummaryPane = function (options) {
 
       _featuresEl.appendChild(div);
     }
-  };
-
-  /**
-   * Disable download RTF button.
-   */
-  _this.disableButton = function () {
-    var button = document.querySelector('.event-summary');
-
-    button.setAttribute('disabled', 'disabled');
   };
 
   /**

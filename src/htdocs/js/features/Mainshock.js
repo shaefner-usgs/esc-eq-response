@@ -20,6 +20,8 @@ var AppUtil = require('util/AppUtil'),
  *     create: {Function}
  *     details: {Object}
  *     destroy: {Function}
+ *     disableButton: {Function}
+ *     enableButton: {Function}
  *     getFeedUrl: {Function}
  *     id: {String}
  *     json: {Object}
@@ -201,6 +203,24 @@ var Mainshock = function (options) {
     _createSummary = null;
 
     _this = null;
+  };
+
+  /**
+   * Disable download RTF button.
+   */
+  _this.disableButton = function () {
+    var button = document.querySelector('.event-summary');
+
+    button.setAttribute('disabled', 'disabled');
+  };
+
+  /**
+   * Enable download RTF button.
+   */
+  _this.enableButton = function () {
+    var button = document.querySelector('.event-summary');
+
+    button.removeAttribute('disabled');
   };
 
   /**
