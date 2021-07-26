@@ -30,9 +30,16 @@
         }
 
         h4 {
-          color: $accent-color;
           background: $accent-color-lightest;
+          color: $text-color-darker;
           transition: all $hover-on-duration ease-out;
+        }
+      }
+
+      &:active {
+        h4 {
+          background: $accent-color;
+          color: #fff;
         }
       }
 
@@ -42,8 +49,8 @@
 
       abbr {
         color: $text-color-lightest;
-        font-size: .8rem;
         display: inline-block;
+        font-size: .8rem;
         margin-top: 5px;
         transition: all $hover-off-duration ease-in;
       }
