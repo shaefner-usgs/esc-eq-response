@@ -113,9 +113,7 @@ var NavBar = function (options) {
     if (id === 'editPane') {
       _app.EditPane.setFocusedField();
     } else if (id === 'mapPane') {
-      _app.MapPane.map.invalidateSize();
-      _app.MapPane.setView();
-      _app.MapPane.map.fire('visible'); // for popups added when map is hidden
+      _app.MapPane.render();
     } else if (id === 'plotsPane') {
       _renderPlots();
     }

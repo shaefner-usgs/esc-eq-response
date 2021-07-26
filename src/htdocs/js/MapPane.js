@@ -27,11 +27,10 @@ require('leaflet/TerrainLayer');
  *   {
  *     addFeature: {Function}
  *     addLoader: {Function}
- *     map: {Object}
  *     openPopup: {Function}
  *     removeFeature: {Function}
+ *     render: {Function}
  *     reset: {Function}
- *     setView: {Function}
  *   }
  */
 var MapPane = function (options) {
@@ -43,6 +42,7 @@ var MapPane = function (options) {
       _el,
       _initialLoad,
       _layerControl,
+      _map,
       _placeholders,
       _staticLayers,
 
@@ -84,9 +84,9 @@ var MapPane = function (options) {
 
     L.control.mousePosition({
       position: 'bottomcenter'
-    }).addTo(_this.map);
+    }).addTo(_map);
 
-    L.control.scale().addTo(_this.map);
+    L.control.scale().addTo(_map);
   };
 
   /**
@@ -101,7 +101,7 @@ var MapPane = function (options) {
         sortFunction: _compareLayers,
         sortLayers: true
       }
-    ).addTo(_this.map);
+    ).addTo(_map);
 
     return control;
   };
@@ -117,7 +117,7 @@ var MapPane = function (options) {
         showLayer;
 
     // Track a Feature's showLayer property when the layer is toggled on/off
-    _this.map.on('overlayadd overlayremove', e => {
+    _map.on('overlayadd overlayremove', e => {
       feature = _app.Features.getFeature(e.layer.id);
       showLayer = false;
 
@@ -164,8 +164,8 @@ var MapPane = function (options) {
    * @param parent {String <overlayPane|tilePane>}
    */
   _createPane = function (id, parent) {
-    if (!_this.map.getPane(id)) {
-      _this.map.createPane(id, _this.map.getPane(parent));
+    if (!_map.getPane(id)) {
+      _map.createPane(id, _map.getPane(parent));
     }
   };
 
@@ -268,7 +268,7 @@ var MapPane = function (options) {
   _initMap = function () {
     var zoomControl = _el.querySelector('.leaflet-control-zoom');
 
-    _this.map = L.map(_el.querySelector('.map'), {
+    _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
       tap: false, // fix for popups not opening in Safari, see: https://github.com/Leaflet/Leaflet/issues/7255
       worldCopyJump: true
@@ -307,7 +307,7 @@ var MapPane = function (options) {
    * Set the default map extent centered on the continental U.S.
    */
   _setDefaultView = function () {
-    _this.map.setView([40, -96], 4);
+    _map.setView([40, -96], 4);
   };
 
   /**
@@ -316,7 +316,7 @@ var MapPane = function (options) {
    */
   _setView = function () {
     if (_bounds.isValid()) {
-      _this.map.fitBounds(_bounds, {
+      _map.fitBounds(_bounds, {
         paddingTopLeft: L.point(0, 40) // accommodate NavBar
       });
     }
@@ -366,7 +366,7 @@ var MapPane = function (options) {
 
       // Turn layer "on" and set map bounds to contain Feature, if applicable
       if (feature.showLayer) {
-        _this.map.addLayer(layer);
+        _map.addLayer(layer);
       }
       if (feature.zoomToLayer && _initialLoad) {
         _bounds.extend(layer.getBounds());
@@ -409,11 +409,9 @@ var MapPane = function (options) {
    */
   _this.openPopup = function (eqid, featureId) {
     var layer,
-        map,
         marker;
 
     layer = _app.Features.getFeature(featureId).mapLayer;
-    map = _this.map;
 
     // Get the marker associated with the given eqid
     layer.eachLayer(eq => {
@@ -422,16 +420,16 @@ var MapPane = function (options) {
       }
     });
 
-    map.on('visible', () => {
+    _map.on('visible', () => {
       marker.getPopup().update(); // display popup properly
-      map.off('visible'); // remove listener
+      _map.off('visible'); // remove listener
     });
 
     window.location.href = '#mapPane';
 
     // Turn on Feature layer so its popup can be displayed
-    if (!map.hasLayer(layer)) {
-      map.addLayer(layer);
+    if (!_map.hasLayer(layer)) {
+      _map.addLayer(layer);
     }
 
     marker.openPopup();
@@ -452,7 +450,7 @@ var MapPane = function (options) {
     showLayer = feature.showLayer; // cache value
 
     if (mapLayer) {
-      _this.map.removeLayer(mapLayer); // sets showLayer prop to false
+      _map.removeLayer(mapLayer); // sets showLayer prop to false
       _layerControl.removeLayer(mapLayer);
 
       feature.showLayer = showLayer; // set back to cached value
@@ -461,6 +459,23 @@ var MapPane = function (options) {
     if (placeholder) {
       _layerControl.removeLayer(placeholder);
       delete _placeholders[feature.id];
+    }
+  };
+
+  /**
+   * Render the map correctly when the MapPane is activated.
+   */
+  _this.render = function () {
+    var status = _app.Features.getLoadingStatus();
+
+    _map.invalidateSize(); // updates map if its container size was changed
+    _map.fire('visible'); // displays popups added when map was hidden
+
+    // Set the initial view when MapPane is viewed for the first time.
+    if (_initialLoad && status === 'complete') {
+      _initialLoad = false;
+
+      _setView();
     }
   };
 
@@ -487,20 +502,6 @@ var MapPane = function (options) {
     }
 
     _setDefaultView();
-  };
-
-  /**
-   * Set the map view when the MapPane is viewed for the first time. This is
-   * necessary because Leaflet doesn't manipulate the map when it's not visible.
-   */
-  _this.setView = function () {
-    var status = _app.Features.getLoadingStatus();
-
-    if (_initialLoad && status === 'complete') {
-      _initialLoad = false;
-
-      _setView();
-    }
   };
 
 
