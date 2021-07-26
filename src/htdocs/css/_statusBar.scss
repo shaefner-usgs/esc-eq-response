@@ -15,7 +15,7 @@
   }
 
   div {
-    background-color: rgba(255, 255, 120, .95);
+    background: rgba(255, 255, 120, .95);
     border-top: 2px solid rgb(255, 255, 0);
     display: none;
     min-height: 44px;
@@ -26,7 +26,7 @@
     width: 100%;
 
     &.error {
-      background-color: rgba(223, 62, 62, .92);
+      background: rgba(223, 62, 62, .92);
       border-color: rgb(195, 0, 0);
       padding: 1px 0;
       text-shadow: 1px 1px 3px #922c2c;
@@ -73,7 +73,7 @@
 
   .close,
   .reload {
-    background-color: rgb(195, 0, 0);
+    background: rgb(195, 0, 0);
     border-radius: 50%;
     height: 32px;
     opacity: 0.75;
@@ -92,7 +92,7 @@
 
     &:after,
     &:before { /* 'X' */
-      background-color: #fff;
+      background: #fff;
       content: '';
       height: 20px;
       left: 15px;

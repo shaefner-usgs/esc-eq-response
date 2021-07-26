@@ -22,7 +22,7 @@
   > span,
   > .impact-bubble {
     align-items: center;
-    background-color: #fff;
+    background: #fff;
     border-radius: $button-border-radius;
     color: $text-color-darker !important;
     display: flex;
@@ -58,57 +58,57 @@
   }
 
   .mmiI {
-    background-color: $mmiI-color;
+    background: $mmiI-color;
     border: 1px solid $border-color-lightest;
   }
   .mmiII {
-    background-color: $mmiII-color;
+    background: $mmiII-color;
   }
   .mmiIII  {
-    background-color: $mmiIII-color;
+    background: $mmiIII-color;
   }
   .mmiIV {
-    background-color: $mmiIV-color;
+    background: $mmiIV-color;
   }
   .mmiV {
-    background-color: $mmiV-color;
+    background: $mmiV-color;
   }
   .mmiVI {
-    background-color: $mmiVI-color;
+    background: $mmiVI-color;
   }
   .mmiVII {
-    background-color: $mmiVII-color;
+    background: $mmiVII-color;
   }
   .mmiVIII {
-    background-color: $mmiVIII-color;
+    background: $mmiVIII-color;
   }
   .mmiIX {
-    background-color: $mmiIX-color;
+    background: $mmiIX-color;
   }
   .mmiX {
-    background-color: $mmiX-color;
+    background: $mmiX-color;
   }
   .mmiXI {
-    background-color: $mmiXI-color;
+    background: $mmiXI-color;
   }
   .mmiXII {
-    background-color: $mmiXII-color;
+    background: $mmiXII-color;
   }
 
   .pager-alertlevel-green {
-    background-color: $pager-green-color !important;
+    background: $pager-green-color !important;
   }
   .pager-alertlevel-orange {
-    background-color: $pager-orange-color !important;
+    background: $pager-orange-color !important;
   }
   .pager-alertlevel-pending {
-    background-color: $pager-pending-color;
+    background: $pager-pending-color;
   }
   .pager-alertlevel-red {
-    background-color: $pager-red-color !important;
+    background: $pager-red-color !important;
   }
   .pager-alertlevel-yellow {
-    background-color: $pager-yellow-color !important;
+    background: $pager-yellow-color !important;
   }
 
   .roman {

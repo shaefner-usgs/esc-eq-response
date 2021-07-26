@@ -3,7 +3,7 @@
 @use 'variables' as *;
 
 #navBar {
-  background-color: $accent-color-lighter;
+  background: $accent-color-lighter;
   display: flex;
   font: 700 1rem/1 $font-family-headers;
   left: 0;
@@ -23,13 +23,13 @@
     transition: all $hover-off-duration ease-in;
 
     &:hover {
-      background-color: color.scale($accent-color-lighter, $lightness: -2.5%);
+      background: color.scale($accent-color-lighter, $lightness: -2.5%);
       color: color.scale($link-color, $blackness: 5%);
       transition: all $hover-on-duration ease-out;
     }
 
     &.selected {
-      background-color: $accent-color;
+      background: $accent-color;
       color: #fff;
       text-shadow: $button-text-shadow;
     }

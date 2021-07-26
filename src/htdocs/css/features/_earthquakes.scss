@@ -30,7 +30,7 @@
   .bin {
     td {
       &.total {
-        background-color: $bg-color-darker;
+        background: $bg-color-darker;
       }
 
       &:not(:first-child) {
