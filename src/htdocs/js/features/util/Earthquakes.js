@@ -360,6 +360,11 @@ var Earthquakes = function (options) {
         eqid.unshift(AppUtil.getParam('eqid'));
         x.unshift(_mainshockTime.toISO());
         y.unshift(0);
+      } else if (_featureId === 'historical') { // and to the end of Historical trace
+        date.push(_mainshockTime.toFormat('LLL d, yyyy TT'));
+        eqid.push(AppUtil.getParam('eqid'));
+        x.push(_mainshockTime.toISO());
+        y.push(y.length + 1);
       }
 
       // Add date field to hover text
