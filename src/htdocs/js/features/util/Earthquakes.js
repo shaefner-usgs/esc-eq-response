@@ -62,6 +62,7 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
+      _duration,
       _featureId,
       _mainshockLatlon,
       _mainshockTime,
@@ -124,6 +125,7 @@ var Earthquakes = function (options) {
       _pastDay = _now.minus({ days: 1 });
       _pastHour = _now.minus({ hours: 1 });
       _pastWeek = _now.minus({ weeks: 1 });
+      _duration = _getDuration();
     }
 
     _this.bins = {};
@@ -751,14 +753,12 @@ var Earthquakes = function (options) {
   _this.createBinTable = function (type) {
     var data,
         days,
-        duration,
         rows,
         tableClasses,
         td,
         tdClasses;
 
-    duration = _getDuration(_featureId);
-    days = Luxon.Duration.fromObject(duration).as('days');
+    days = Luxon.Duration.fromObject(_duration).as('days');
     rows = '';
     tableClasses = ['bin'];
 
@@ -801,14 +801,12 @@ var Earthquakes = function (options) {
    */
   _this.createDescription = function () {
     var data,
-        duration,
         ending,
         interval,
         length;
 
-    duration = _getDuration(_featureId);
-    interval = Object.keys(duration)[0];
-    length = duration[interval];
+    interval = Object.keys(_duration)[0];
+    length = _duration[interval];
 
     if (_featureId === 'aftershocks') {
       ending = '. The duration of the aftershock sequence is <strong>' +
