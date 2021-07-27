@@ -352,18 +352,18 @@ var Earthquakes = function (options) {
         return i + 1;
       });
 
-      // Add date field to hover text
-      text = y.map((val, i) => {
-        return val + '<br />' + date[i];
-      });
-
-      // Add origin point (mainshock) to beginning of aftershocks trace
+      // Add origin point (Mainshock) to beginning of Aftershocks trace
       if (_featureId === 'aftershocks') {
         date.unshift(_mainshockTime.toFormat('LLL d, yyyy TT'));
         eqid.unshift(AppUtil.getParam('eqid'));
         x.unshift(_mainshockTime.toISO());
         y.unshift(0);
       }
+
+      // Add date field to hover text
+      text = y.map((val, i) => {
+        return val + '<br />' + date[i];
+      });
     } else { // hypocenters, magtime plots
       eqid = _plotData.eqid;
       text = _plotData.text;
