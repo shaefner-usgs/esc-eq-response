@@ -2,7 +2,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Moment = require('moment');
+    Luxon = require('luxon');
 
 
 /**
@@ -59,7 +59,7 @@ var SignificantEqs = function (options) {
     if (_json.features) {
       _json.features.forEach(feature => {
         props = feature.properties;
-        date = Moment.utc(props.time).format('MMM D HH:mm:ss');
+        date = Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d TT');
         mag = AppUtil.round(props.mag, 1);
         selectedStatus = '';
 

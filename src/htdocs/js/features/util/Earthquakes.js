@@ -4,7 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     LatLon = require('util/LatLon'),
-    Moment = require('moment');
+    Luxon = require('luxon');
 
 
 var _COLORS,
@@ -64,13 +64,13 @@ var Earthquakes = function (options) {
       _app,
       _featureId,
       _mainshockLatlon,
-      _mainshockMoment,
+      _mainshockTime,
       _markerOptions,
       _minMag,
-      _nowMoment,
-      _pastDayMoment,
-      _pastHourMoment,
-      _pastWeekMoment,
+      _now,
+      _pastDay,
+      _pastHour,
+      _pastWeek,
       _plotData,
       _sortByField,
 
@@ -118,12 +118,12 @@ var Earthquakes = function (options) {
       coords = mainshock.json.geometry.coordinates;
 
       _mainshockLatlon = LatLon(coords[1], coords[0]);
-      _mainshockMoment = Moment.utc(mainshock.json.properties.time, 'x');
+      _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _minMag = AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-mag');
-      _nowMoment = Moment.utc();
-      _pastDayMoment = Moment.utc().subtract(1, 'days');
-      _pastHourMoment = Moment.utc().subtract(1, 'hours');
-      _pastWeekMoment = Moment.utc().subtract(1, 'weeks');
+      _now = Luxon.DateTime.utc();
+      _pastDay = _now.minus({ days: 1 });
+      _pastHour = _now.minus({ hours: 1 });
+      _pastWeek = _now.minus({ weeks: 1 });
     }
 
     _this.bins = {};
@@ -230,24 +230,23 @@ var Earthquakes = function (options) {
    * Get the 'age' of an earthquake (i.e. mainshock, historical, pastday, etc).
    *
    * @param timestamp {Int}
-   *     milliseconds since 1970
    *
    * @return age {String}
    */
   _getAge = function (timestamp) {
     var age,
-        eqMoment;
+        eqTime;
 
     age = _featureId; // everything but Aftershocks
 
     if (_featureId === 'aftershocks') {
-      eqMoment = Moment.utc(timestamp, 'x'); // unix ms timestamp
+      eqTime = Luxon.DateTime.fromMillis(timestamp).toUTC();
 
-      if (eqMoment.isSameOrAfter(_pastHourMoment)) {
+      if (eqTime >= _pastHour) {
         age = 'pasthour';
-      } else if (eqMoment.isSameOrAfter(_pastDayMoment)) {
+      } else if (eqTime >= _pastDay) {
         age = 'pastday';
-      } else if (eqMoment.isSameOrAfter(_pastWeekMoment)) {
+      } else if (eqTime >= _pastWeek) {
         age = 'pastweek';
       } else {
         age = 'older';
@@ -263,24 +262,21 @@ var Earthquakes = function (options) {
    * @return duration {Object}
    */
   _getDuration = function () {
-    var duration;
+    var duration,
+        interval;
 
     if (_featureId === 'aftershocks') {
+      interval = Luxon.Interval.fromDateTimes(_mainshockTime, _now).length('days');
       duration = {
-        length: Number(AppUtil.round(
-          Moment.duration(_nowMoment - _mainshockMoment).asDays(), 1
-        )),
-        interval: 'days'
+        days: Number(AppUtil.round(interval, 1))
       };
     } else if (_featureId === 'foreshocks') {
       duration = {
-        length: Number(AppUtil.getParam('fs-days')),
-        interval: 'days'
+        days: Number(AppUtil.getParam('fs-days'))
       };
     } else if (_featureId === 'historical') {
       duration = {
-        length: Number(AppUtil.getParam('hs-years')),
-        interval: 'years'
+        years: Number(AppUtil.getParam('hs-years'))
       };
     }
 
@@ -363,9 +359,9 @@ var Earthquakes = function (options) {
 
       // Add origin point (mainshock) to beginning of aftershocks trace
       if (_featureId === 'aftershocks') {
-        date.unshift(_mainshockMoment.format('MMM D, YYYY HH:mm:ss'));
+        date.unshift(_mainshockTime.toFormat('LLL d, yyyy TT'));
         eqid.unshift(AppUtil.getParam('eqid'));
-        x.unshift(_mainshockMoment.format());
+        x.unshift(_mainshockTime.toISO());
         y.unshift(0);
       }
     } else { // hypocenters, magtime plots
@@ -607,8 +603,8 @@ var Earthquakes = function (options) {
         days,
         distance,
         eq,
-        eqMoment,
-        eqMomentLocal,
+        eqTime,
+        eqTimeLocal,
         latlon,
         localTime,
         mag,
@@ -622,18 +618,18 @@ var Earthquakes = function (options) {
 
     coords = feature.geometry.coordinates;
     props = feature.properties;
-    eqMoment = Moment.utc(props.time, 'x');
+    eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
     mag = parseFloat(AppUtil.round(props.mag, 1));
     magType = props.magType || 'M';
     magDisplay = magType + ' ' + AppUtil.round(props.mag, 1);
     template = '<time datetime="{isoTime}">{utcTime}</time>';
-    utcTime = eqMoment.format('MMM D, YYYY HH:mm:ss') + ' <span class="tz">UTC</span>';
+    utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
     tooltip = magDisplay + ' - ' + utcTime;
 
     // Add local time if tz prop is included in feed
     if (props.tz) {
-      eqMomentLocal = eqMoment.clone().utcOffset(props.tz);
-      localTime = eqMomentLocal.format('MMM D, YYYY h:mm:ss A') +
+      eqTimeLocal = eqTime().toUTC(props.tz);
+      localTime = eqTimeLocal.toFormat('LLL d, yyyy tt') +
         ' <span class="tz">at the epicenter</span>';
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
@@ -660,7 +656,7 @@ var Earthquakes = function (options) {
         bearingString + '</span>',
       eqid: feature.id,
       felt: props.felt, // DYFI felt reports
-      isoTime: eqMoment.toISOString(),
+      isoTime: eqTime.toISO(),
       location: _getLocation(coords),
       localTime: localTime,
       mag: mag,
@@ -696,18 +692,18 @@ var Earthquakes = function (options) {
     _plotData.lon.push(coords[0]);
     _plotData.mag.push(eq.mag);
     _plotData.text.push(eq.title + '<br />' + eq.utcTime);
-    _plotData.time.push(eqMoment.format());
+    _plotData.time.push(eqTime.toISO());
 
     // Bin eq totals by magnitude and time / period
     if (_featureId === 'aftershocks') {
-      days = Math.ceil(Moment.duration(eqMoment - _mainshockMoment).asDays());
+      days = Math.ceil(Luxon.Interval.fromDateTimes(_mainshockTime, eqTime).length('days'));
       _addEqToBin(days, eq.magInt, 'first');
 
-      days = Math.ceil(Moment.duration(_nowMoment - eqMoment).asDays());
+      days = Math.ceil(Luxon.Interval.fromDateTimes(eqTime, _now).length('days'));
       _addEqToBin(days, eq.magInt, 'past');
     }
     else if (_featureId === 'historical' || _featureId === 'foreshocks') {
-      days = Math.ceil(Moment.duration(_mainshockMoment - eqMoment).asDays());
+      days = Math.ceil(Luxon.Interval.fromDateTimes(eqTime, _mainshockTime).length('days'));
       _addEqToBin(days, eq.magInt, 'prior');
     }
   };
@@ -762,7 +758,7 @@ var Earthquakes = function (options) {
         tdClasses;
 
     duration = _getDuration(_featureId);
-    days = Moment.duration(duration.length, duration.interval).asDays();
+    days = Luxon.Duration.fromObject(duration).as('days');
     rows = '';
     tableClasses = ['bin'];
 
@@ -806,15 +802,19 @@ var Earthquakes = function (options) {
   _this.createDescription = function () {
     var data,
         duration,
-        ending;
+        ending,
+        interval,
+        length;
 
     duration = _getDuration(_featureId);
+    interval = Object.keys(duration)[0];
+    length = duration[interval];
 
     if (_featureId === 'aftershocks') {
       ending = '. The duration of the aftershock sequence is <strong>' +
-        `${duration.length} ${duration.interval}</strong>`;
+        `${length} ${interval}</strong>`;
     } else {
-      ending = ` in the prior <strong>${duration.length} ${duration.interval} ` +
+      ending = ` in the prior <strong>${length} ${interval} ` +
         '</strong> before the mainshock';
     }
 

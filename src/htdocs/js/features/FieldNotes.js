@@ -4,7 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Lightbox = require('util/Lightbox'),
-    Moment = require('moment');
+    Luxon = require('luxon');
 
 
 var _DEFAULTS,
@@ -316,8 +316,10 @@ var FieldNotes = function (options) {
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
-    after = Moment(mainshock.json.properties.time + 1000).utc().format('X');
-    before = Moment(mainshock.json.properties.time).utc().add(30, 'days').format('X');
+    after = Luxon.DateTime.fromMillis(mainshock.json.properties.time + 1000)
+      .toUTC().toSeconds();
+    before = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC()
+      .plus({ days: 30 }).toSeconds();
     pairs = [];
     urlParams = {
       between: after + ',' + before,

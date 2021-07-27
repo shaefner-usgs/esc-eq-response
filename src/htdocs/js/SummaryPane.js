@@ -2,7 +2,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Moment = require('moment'),
+    Luxon = require('luxon'),
     Tablesort = require('tablesort');
 
 
@@ -368,7 +368,7 @@ var SummaryPane = function (options) {
         timestamp;
 
     time = _el.querySelector('time');
-    timestamp = Moment().format('ddd MMM D, YYYY [at] h:mm:ss A') +
+    timestamp = Luxon.DateTime.now().toFormat("ccc LLL d, yyyy 'at' tt") + // eslint-disable-line
       ' (' + _tz + ')';
     time.innerHTML = timestamp;
   };

@@ -3,7 +3,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/Earthquakes'),
-    Moment = require('moment');
+    Luxon = require('luxon');
 
 
 /**
@@ -130,14 +130,14 @@ var Historical = function (options) {
 
     mainshock = _app.Features.getFeature('mainshock');
     urlParams = {
-      endtime: Moment(mainshock.json.properties.time - 1000).utc()
-        .toISOString().slice(0, -5),
+      endtime: Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
+        .toUTC().toISO().slice(0, -5),
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(AppUtil.getParam('hs-dist')),
       minmagnitude: Number(AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(mainshock.json.properties.time).utc()
-        .subtract(AppUtil.getParam('hs-years'), 'years').toISOString()
+      starttime: Luxon.DateTime.fromMillis(mainshock.json.properties.time)
+        .toUTC().minus({ years: AppUtil.getParam('hs-years') }).toISO()
         .slice(0, -5)
     };
 

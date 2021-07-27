@@ -4,7 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/Earthquakes'),
-    Moment = require('moment');
+    Luxon = require('luxon');
 
 
 /**
@@ -102,7 +102,7 @@ var Aftershocks = function (options) {
         html = L.Util.template(
           '<h3>Aftershock Forecast</h3>' +
           '<p>The probability of one or more aftershocks in the specified ' +
-            'magnitude range during the <strong>next {timeFrame}</strong>.' +
+            'magnitude range during the <strong>next {timeFrame}</strong>. ' +
             'The likely number of aftershocks (95% confidence range) is also ' +
             'included.</p>' +
           '<div class="probabilities">{probabilities}</div>' +
@@ -171,18 +171,18 @@ var Aftershocks = function (options) {
   _createSummary = function () {
     var duration,
         html,
+        interval,
         mostRecentEq;
 
     html = _Earthquakes.createDescription();
 
     if (_this.count > 0) {
       mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
-      duration = AppUtil.round(
-        Moment.duration(
-          Moment.utc() -
-          Moment.utc(mostRecentEq.isoTime)
-        ).asDays(), 1
-      ) + ' days';
+      interval = Luxon.Interval.fromDateTimes(
+        Luxon.DateTime.fromISO(mostRecentEq.isoTime),
+        Luxon.DateTime.utc()
+      ).length('days');
+      duration = AppUtil.round(interval, 1) + ' days';
 
       html += '<div class="bins">';
       html += _Earthquakes.createBinTable('first');
@@ -286,8 +286,8 @@ var Aftershocks = function (options) {
       longitude: _mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(AppUtil.getParam('as-dist')),
       minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: Moment(_mainshock.json.properties.time + 1000).utc()
-        .toISOString().slice(0, -5)
+      starttime: Luxon.DateTime.fromMillis(_mainshock.json.properties.time + 1000)
+        .toUTC().toISO().slice(0, -5)
     };
 
     return Earthquakes.getFeedUrl(urlParams);
