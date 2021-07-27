@@ -66,6 +66,7 @@ var Earthquakes = function (options) {
       _featureId,
       _mainshockLatlon,
       _mainshockTime,
+      _mainshockTitle,
       _markerOptions,
       _minMag,
       _now,
@@ -110,6 +111,7 @@ var Earthquakes = function (options) {
       mag: [],
       size: [],
       text: [],
+      title: [],
       time: []
     };
     _sortByField = options.sortByField;
@@ -120,6 +122,7 @@ var Earthquakes = function (options) {
 
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
+      _mainshockTitle = mainshock.details.title;
       _minMag = AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-mag');
       _now = Luxon.DateTime.utc();
       _pastDay = _now.minus({ days: 1 });
@@ -332,6 +335,7 @@ var Earthquakes = function (options) {
         mode,
         sizeref,
         text,
+        title,
         trace,
         x,
         y,
@@ -347,6 +351,7 @@ var Earthquakes = function (options) {
       // Copy data arrays so they can be modified w/o affecting orig. data
       date = _plotData.date.slice();
       eqid = _plotData.eqid.slice();
+      title = _plotData.title.slice();
       x = _plotData.time.slice();
 
       // Fill y with values from 1 to length of x and date field
@@ -358,18 +363,27 @@ var Earthquakes = function (options) {
       if (_featureId === 'aftershocks') {
         date.unshift(_mainshockTime.toFormat('LLL d, yyyy TT'));
         eqid.unshift(AppUtil.getParam('eqid'));
+        title.unshift(_mainshockTitle);
         x.unshift(_mainshockTime.toISO());
         y.unshift(0);
-      } else if (_featureId === 'historical') { // and to the end of Historical trace
+      } else if (_featureId === 'historical') { // and to end of Historical trace
         date.push(_mainshockTime.toFormat('LLL d, yyyy TT'));
         eqid.push(AppUtil.getParam('eqid'));
+        title.push(_mainshockTitle);
         x.push(_mainshockTime.toISO());
         y.push(y.length + 1);
       }
 
       // Add date field to hover text
       text = y.map((val, i) => {
-        return val + '<br />' + date[i];
+        if (
+          (i === 0 && _featureId === 'aftershocks') ||
+          (i === y.length - 1 && _featureId === 'historical')
+        ) {
+          val = 'Mainshock';
+        }
+
+        return `${title[i]} (${val})<br />${date[i]}`;
       });
     } else { // hypocenters, magtime plots
       eqid = _plotData.eqid;
@@ -699,6 +713,7 @@ var Earthquakes = function (options) {
     _plotData.lon.push(coords[0]);
     _plotData.mag.push(eq.mag);
     _plotData.text.push(eq.title + '<br />' + eq.utcTime);
+    _plotData.title.push(eq.title);
     _plotData.time.push(eqTime.toISO());
 
     // Bin eq totals by magnitude and time / period
