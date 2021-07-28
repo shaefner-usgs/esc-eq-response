@@ -66,7 +66,7 @@ var EditPane = function (options) {
     _timers = {};
 
     _addListeners();
-    AppUtil.setFormFieldValues();
+    AppUtil.setFieldValues();
   };
 
   /**
@@ -283,7 +283,7 @@ var EditPane = function (options) {
 
     // Add a slight delay so 'Reset' button can clear <input>s first
     setTimeout(() => {
-      AppUtil.setQueryStringValues(); // reset query string
+      AppUtil.setQueryString(); // reset query string
 
       // Rebuild <select> menu (sets selected item if applicable)
       if (select) {
@@ -427,7 +427,7 @@ var EditPane = function (options) {
     _eqid.value = significantEqs.options[index].value;
 
     // Input event is not triggered when it's changed programmatically
-    AppUtil.setQueryStringValues();
+    AppUtil.setQueryString();
     _createMainshock();
   };
 
@@ -447,8 +447,8 @@ var EditPane = function (options) {
 
     _initialLoad = false;
 
-    // Update all form fields to match URL params
-    AppUtil.setFormFieldValues();
+    // Update form fields to match URL params
+    AppUtil.setFieldValues();
   };
 
   /**

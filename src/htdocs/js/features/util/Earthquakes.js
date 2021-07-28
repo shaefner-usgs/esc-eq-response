@@ -123,7 +123,7 @@ var Earthquakes = function (options) {
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _mainshockTitle = mainshock.details.title;
-      _minMag = AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-mag');
+      _minMag = AppUtil.getParam(AppUtil.getPrefix(_featureId) + '-mag');
       _now = Luxon.DateTime.utc();
       _pastDay = _now.minus({ days: 1 });
       _pastHour = _now.minus({ hours: 1 });
@@ -837,7 +837,7 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      distance: AppUtil.getParam(AppUtil.lookupPrefix(_featureId) + '-dist'),
+      distance: AppUtil.getParam(AppUtil.getPrefix(_featureId) + '-dist'),
       ending: ending,
       mag: _minMag
     };
