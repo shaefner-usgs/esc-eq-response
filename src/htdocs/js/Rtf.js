@@ -395,7 +395,7 @@ var Rtf = function (options) {
 
     regex1 = /sort-(up|down)/; // finds current sorted-by th
     regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
-    ths = document.querySelectorAll('.' + id + ' .eqlist.sortable th');
+    ths = document.querySelectorAll('.' + id + ' .list.sortable th');
 
     if (ths.length === 0) { // non-sorted table (only 1 row)
       return;

@@ -111,7 +111,7 @@ var SummaryPane = function (options) {
 
     div = _el.querySelector('.' + id);
     input = div.querySelector('.slider input');
-    tables = div.querySelectorAll('table.eqlist');
+    tables = div.querySelectorAll('table.list');
 
     // Filter earthquake list when user interacts with range slider
     if (input) {
@@ -120,7 +120,7 @@ var SummaryPane = function (options) {
         mag: div.querySelector('h3 .mag'),
         output: input.nextElementSibling,
         slider: input.parentNode,
-        table: div.querySelector('div.filter + .eqlist')
+        table: div.querySelector('div.filter + .list')
       };
 
       input.addEventListener('input', _filterList);
@@ -178,7 +178,7 @@ var SummaryPane = function (options) {
 
     div = _el.querySelector('.' + id);
     slider = div.querySelector('.slider input');
-    table = div.querySelector('table.eqlist');
+    table = div.querySelector('table.list');
 
     if (slider) {
       _setSliderStyles(slider, id); // set range slider to initial value

@@ -869,7 +869,7 @@ var Earthquakes = function (options) {
     fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'];
     magThreshold = _getThreshold();
     rows = '';
-    tableClasses = ['eqlist'];
+    tableClasses = ['list'];
     thClasses = {};
     type = type || 'all';
 
