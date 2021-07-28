@@ -487,7 +487,7 @@ var Earthquakes = function (options) {
           '<td class="location">{location}</td>' +
           '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
           '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
-          '<td class="eventId">{eqid}</td>' +
+          '<td class="eqid">{eqid}</td>' +
         '</tr>';
     } else if (type === 'listTable') {
       template = '' +
@@ -500,7 +500,7 @@ var Earthquakes = function (options) {
             '<th class="{distance}" data-sort-method="number">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</th>' +
-            '<th class="{eventId}">Event ID</th>' +
+            '<th class="{eqid}">Event ID</th>' +
           '</tr>' +
           '{rows}' +
         '</table>';
@@ -866,7 +866,7 @@ var Earthquakes = function (options) {
 
     data = {};
     eqs = _this.list;
-    fields = ['depth', 'distance', 'eventId', 'location', 'mag', 'utcTime'];
+    fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'];
     magThreshold = _getThreshold();
     rows = '';
     tableClasses = ['eqlist'];
