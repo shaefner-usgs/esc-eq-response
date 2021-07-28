@@ -34,6 +34,7 @@
       &:after {
         background: $accent-color-lightest;
         color: $accent-color;
+        font: $font-size $font-family;
       }
       &:before {
         border-color: transparent transparent $accent-color-lightest;
