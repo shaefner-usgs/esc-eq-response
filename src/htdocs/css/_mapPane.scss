@@ -55,15 +55,4 @@
   .leaflet-faults-pane {
     z-index: 417;
   }
-
-  /* Scroll wide tables in Leaflet popups elegantly */
-  .scroll-wrapper {
-    overflow: auto;
-
-    th.freeze {
-      background: white;
-      left: 0;
-      position: sticky;
-    }
-  }
 }

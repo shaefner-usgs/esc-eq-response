@@ -1,6 +1,26 @@
 @use '../variables' as *;
 
+#plotsPane {
+  .cumulative {
+    height: 40vh;
+  }
+
+  .hypocenters {
+    height: 90vh;
+  }
+
+  .magtime {
+    height: 40vh;
+  }
+}
+
 #summaryPane {
+  h3 {
+    .mag {
+      margin-left: .25em; /* account for collapse of whitespace by display:flex */
+    }
+  }
+
   table.m0 tr.m0,
   table.m1 tr.m1,
   table.m2 tr.m2,
@@ -168,5 +188,20 @@
 
   .status {
     text-transform: capitalize;
+  }
+}
+
+@media only screen
+and (max-width: $breakpoint-phone-width) {
+  #summaryPane {
+    td {
+      padding-left: .5rem;
+      padding-right: .5rem;
+    }
+
+    .eqid,
+    .location {
+      display: none;
+    }
   }
 }

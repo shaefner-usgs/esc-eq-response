@@ -7,10 +7,6 @@
 
   h3 {
     margin-top: 2.25rem;
-
-    .mag {
-      margin-left: .25em; /* account for collapse of whitespace by display:flex */
-    }
   }
 
   time.updated {
@@ -36,20 +32,5 @@
   }
   .historical {
     order: 3;
-  }
-}
-
-@media only screen
-and (max-width: $breakpoint-phone-width) {
-  #summaryPane {
-    td {
-      padding-left: .5rem;
-      padding-right: .5rem;
-    }
-
-    .eqid,
-    .location {
-      display: none;
-    }
   }
 }
