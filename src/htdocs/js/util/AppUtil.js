@@ -69,39 +69,38 @@ AppUtil.compose = function () {
 };
 
 /**
- * Get the value of a URL parameter.
+ * Get the value of a given URL parameter.
  *
  * @param name {String}
  *
  * @return {String}
  */
 AppUtil.getParam = function (name) {
-  var params = AppUtil.getParams();
+  var url = new URL(location);
 
-  return params[name];
+  return url.searchParams.get(name);
 };
 
 /**
- * Get all URL parameter name/value pairs.
+ * Get the URL parameter prefix for a given Feature id.
  *
- * @return params {Object}
+ * @param id {String}
+ *
+ * @return {String}
  */
-AppUtil.getParams = function () {
-  var params,
-      queryString;
+AppUtil.getPrefix = function (id) {
+  var lookup = {
+    aftershocks: 'as',
+    foreshocks: 'fs',
+    historical: 'hs'
+  };
 
-  params = {};
-  queryString = location.search.slice(1);
-
-  queryString.replace(/([^=]*)=([^&]*)&*/g, (match, key, value) => {
-    params[key] = value;
-  });
-
-  return params;
+  return lookup[id];
 };
 
 /**
- * Get the circle marker radius for a given eq magnitude.
+ * Get the circle marker radius for a given eq magnitude, rounded to the nearest
+ * tenth.
  *
  * @param mag {Number}
  *
@@ -110,7 +109,7 @@ AppUtil.getParams = function () {
 AppUtil.getRadius = function (mag) {
   var radius = 2 * Math.pow(10, (0.15 * mag));
 
-  return Math.round(radius * 10) / 10; // round to nearest tenth
+  return Math.round(radius * 10) / 10;
 };
 
 /**
@@ -143,23 +142,6 @@ AppUtil.getTimeZone = function () {
   }
 
   return tz;
-};
-
-/**
- * Lookup table to get a URL parameter prefix from a Feature id.
- *
- * @param id {String}
- *
- * @return {String}
- */
-AppUtil.lookupPrefix = function (id) {
-  var lookup = {
-    aftershocks: 'as',
-    foreshocks: 'fs',
-    historical: 'hs'
-  };
-
-  return lookup[id];
 };
 
 /**
@@ -229,45 +211,34 @@ AppUtil.round = function (num, precision = 0, empty = '–') {
 /**
  * Set all form field values to match the values in the querystring.
  */
-AppUtil.setFormFieldValues = function () {
-  var params = AppUtil.getParams();
+AppUtil.setFieldValues = function () {
+  var params = new URLSearchParams(location.search);
 
-  Object.keys(params).forEach(key => {
-    if (document.getElementById(key)) {
-      document.getElementById(key).value = params[key];
+  params.forEach((value, name) => {
+    if (document.getElementById(name)) {
+      document.getElementById(name).value = value;
     }
   });
 };
 
 /**
- * Set the value of a URL parameter.
+ * Set the given URL parameter to the given value and update the URL.
  *
  * @param name {String}
  * @param value {Mixed}
  */
 AppUtil.setParam = function (name, value) {
-  var pairs,
-      params,
-      queryString;
+  var params = new URLSearchParams(location.search);
 
-  pairs = [];
-  params = AppUtil.getParams();
-  params[name] = value;
-  queryString = '?';
+  params.set(name, value);
 
-  Object.keys(params).forEach(key => {
-    pairs.push(key + '=' + params[key]);
-  });
-
-  queryString += pairs.join('&');
-
-  window.history.replaceState({}, '', queryString + location.hash);
+  window.history.replaceState({}, '', '?' + params.toString() + location.hash);
 };
 
 /**
- * Set all querystring values to match the values in the form fields.
+ * Set the querystring to match the values in the form fields.
  */
-AppUtil.setQueryStringValues = function () {
+AppUtil.setQueryString = function () {
   var fields,
       pairs,
       queryString;
