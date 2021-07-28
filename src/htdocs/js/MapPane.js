@@ -389,7 +389,7 @@ var MapPane = function (options) {
         name;
 
     if (Object.prototype.hasOwnProperty.call(feature, 'mapLayer')) {
-      layer = L.layerGroup(); // empty placeholder layer
+      layer = L.featureGroup(); // empty placeholder layer
       name = feature.name + '<div class="breather"><div></div></div>';
 
       layer.id = feature.id; // need access to Feature's id from Leaflet layer
