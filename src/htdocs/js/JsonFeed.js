@@ -126,6 +126,8 @@ var JsonFeed = function (options) {
         message: errorMsg,
         status: response.status || 'timeout'
       });
+
+      console.error(error);
     }
   };
 
