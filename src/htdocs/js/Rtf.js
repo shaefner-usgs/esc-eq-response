@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
  * Create an Event Summary RTF document using a JSON string that is sent as a
  * POST data Blob to a PHP script that generates the binary file.
@@ -242,8 +245,8 @@ var Rtf = function (options) {
         magThreshold: _magThreshold || 0,
         plots: _plots.historical
       },
-      mag: props.mag,
-      magType: props.magType,
+      mag: AppUtil.round(props.mag, 1),
+      magType: props.magType || 'M',
       pager: products.pager || {},
       'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
