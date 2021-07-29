@@ -482,7 +482,7 @@ var Earthquakes = function (options) {
     } else if (type === 'listRow') {
       template = '' +
         '<tr class="m{magInt}" title="View earthquake on map">' +
-          '<td class="mag" data-sort="{mag}">{magDisplay}</td>' +
+          '<td class="mag" data-sort="{mag}">{magType} <span>{magDisplay}</td>' +
           '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
           '<td class="location">{location}</td>' +
           '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
@@ -640,12 +640,12 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
-    mag = parseFloat(AppUtil.round(props.mag, 1));
+    magDisplay = AppUtil.round(props.mag, 1);
+    mag = parseFloat(magDisplay);
     magType = props.magType || 'M';
-    magDisplay = magType + ' ' + AppUtil.round(props.mag, 1);
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
-    tooltip = magDisplay + ' - ' + utcTime;
+    tooltip = magType + ' ' + magDisplay + ' - ' + utcTime;
 
     // Add local time if tz prop is included in feed
     if (props.tz) {
@@ -683,9 +683,10 @@ var Earthquakes = function (options) {
       mag: mag,
       magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
+      magType: magType,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status,
-      title: magDisplay + ' - ' + props.place,
+      title: magType + ' ' + magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
       url: props.url,
       utcTime: utcTime
