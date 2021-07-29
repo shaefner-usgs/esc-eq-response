@@ -24,7 +24,7 @@ try {
 }
 
 /**
- * Return response json, which contains the path to the temporary RTF file.
+ * Return response JSON, which contains the path to the temporary RTF file.
  *
  * @param $params {Array}
  */
@@ -35,7 +35,7 @@ function sendResponse($params) {
 }
 
 /**
- * Set HTTP Headers for CORS-compatible json response.
+ * Set HTTP Headers.
  *
  * @param $header {String}
  *     optional specific header to set
@@ -44,9 +44,8 @@ function setHeaders($header = '') {
   if ($header) {
     header($header);
   } else { // set general headers for all responses
+    header('Cache-control: no-cache, must-revalidate');
     header('Content-Type: application/json');
-    header('Access-Control-Allow-Headers: Accept, Authorization, Content-Type, Origin');
-    header('Access-Control-Allow-Methods: *');
-    header('Access-Control-Allow-Origin: *');
+    header('Expires: ' . date(DATE_RFC2822));
   }
 }
