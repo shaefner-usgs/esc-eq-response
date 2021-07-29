@@ -14,12 +14,6 @@
   visibility: visible;
   z-index: 10000;
 
-  img {
-    margin: auto;
-    max-height: 100%;
-    max-width: 100%;
-  }
-
   &.hide {
     opacity: 0;
     visibility: hidden;
@@ -48,5 +42,11 @@
   &:active:after {
     background: #fff;
     transition: background .05s ease-out;
+  }
+
+  img {
+    margin: auto;
+    max-height: 100%;
+    max-width: 100%;
   }
 }
