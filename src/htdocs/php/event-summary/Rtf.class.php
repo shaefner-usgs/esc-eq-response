@@ -72,7 +72,7 @@ class Rtf {
   }
 
   /**
-   * Sanitize data from external json feeds for known issues
+   * Sanitize data from external JSON feeds for known issues
    */
   private function _cleanData() {
     // Strip HTML tags, extra whitespace from summary
@@ -1201,7 +1201,7 @@ class Rtf {
    *     RTF Document section
    * @param $id {String}
    *     Feature id
-   * @param $type {String <first | past | prior>}
+   * @param $type {String <first|past|prior>}
    */
   private function _createTableBinnedData($section, $id, $type) {
     $data = $this->_data->{$id}->bins->{$type};
@@ -1344,6 +1344,8 @@ class Rtf {
         $fieldValue = strip_tags($eq->{$key});
         if ($key === 'utcTime') {
           $fieldValue = substr($fieldValue, 0, -4); // strip ' UTC' off end
+        } else if ($key === 'magDisplay') { // add mag type
+          $fieldValue = $eq->magType . ' ' . $fieldValue;
         }
         $cell->writeText($fieldValue);
       }
@@ -1461,7 +1463,7 @@ class Rtf {
    *
    * @param $section {Object}
    *     RTF Document section
-   * @param $type {String <number | probability>}
+   * @param $type {String <number|probability>}
    */
   private function _createTableForecast($section, $type) {
     $forecasts = $this->_data->aftershocks->forecast;
