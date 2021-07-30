@@ -194,6 +194,7 @@ var Rtf = function (options) {
     var aftershocks,
         beachballs,
         data,
+        feedJson,
         feeds,
         foreshocks,
         historical,
@@ -264,9 +265,13 @@ var Rtf = function (options) {
       }
     };
 
-    // Add feed data fetched for Event Summary document
+    // Add feed data that was fetched for the Summary doc.
     Object.keys(feeds).forEach(id => {
-      data[id] = feeds[id].json;
+      feedJson = feeds[id].json;
+
+      if (feedJson) {
+        data[id] = feedJson;
+      }
     });
 
     return data;

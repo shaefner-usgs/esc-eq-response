@@ -47,7 +47,8 @@ var Feeds = function (options) {
       _Rtf,
 
       _createRtf,
-      _initFeeds;
+      _initFeeds,
+      _loadFeed;
 
 
   _this = {};
@@ -95,6 +96,19 @@ var Feeds = function (options) {
     });
   };
 
+  /**
+   * Load the given feed.
+   *
+   * @param feed {Object}
+   */
+  _loadFeed = function (feed) {
+    _app.JsonFeed.fetch(feed).then(json => {
+      feed.json = json;
+
+      _createRtf();
+    });
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -109,7 +123,7 @@ var Feeds = function (options) {
   };
 
   /**
-   * Load feed data.
+   * Wrapper method to load all feeds and then create the RTF.
    */
   _this.loadFeeds = function () {
     var feed;
@@ -124,11 +138,7 @@ var Feeds = function (options) {
       feed = _feeds[id];
 
       if (feed.url) {
-        _app.JsonFeed.fetch(feed).then(json => {
-          feed.json = json;
-
-          _createRtf();
-        });
+        _loadFeed(feed);
       } else { // feed does not exist
         _createRtf();
       }
