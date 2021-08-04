@@ -105,7 +105,7 @@ var JsonFeed = function (options) {
       if (error.name === 'AbortError') { // timeout
         errorMsg += `<li>Request timed out (can’t connect to ${url.hostname})</li>`;
       } else if (response.status === 404 && opts.id === 'mainshock') {
-        errorMsg += `<li>Event ID ${AppUtil.getParam('eqid')} not found</li>`;
+        errorMsg += `<li>Can’t find Event ID ${AppUtil.getParam('eqid')} in catalog</li>`;
       } else {
         text = await response.text();
 
