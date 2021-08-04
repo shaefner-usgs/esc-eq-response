@@ -43,9 +43,12 @@ var SummaryPane = function (options) {
       _configTable,
       _filterList,
       _getSliderValue,
+      _hideMenu,
       _initTableSort,
       _openPopup,
+      _renderEffects,
       _setSliderStyles,
+      _showMenu,
       _unselectRow,
       _updateTimestamp;
 
@@ -107,30 +110,37 @@ var SummaryPane = function (options) {
     var div,
         input,
         tables,
+        ths,
         trs;
 
     div = _el.querySelector('.' + id);
     input = div.querySelector('.slider input');
     tables = div.querySelectorAll('table.list');
 
-    // Filter earthquake list when user interacts with range slider
+    // Filter the earthquake list when the user interacts with the range slider
     if (input) {
       _filterProps[input.id] = {
         count: div.querySelector('h3 .count'),
         mag: div.querySelector('h3 .mag'),
         output: input.nextElementSibling,
         slider: input.parentNode,
-        table: div.querySelector('div.filter + .list')
+        table: div.querySelector('div.filter + .wrapper .list')
       };
 
       input.addEventListener('input', _filterList);
     }
 
-    // Show map and open popup when user clicks an earthquake in a list
     if (tables) {
       tables.forEach(table => {
+        ths = table.querySelectorAll('th');
         trs = table.querySelectorAll('tr');
 
+        // Show the sort menu when the user clicks on the current sorted by option
+        ths.forEach(th => {
+          th.addEventListener('click', _showMenu);
+        });
+
+        // Show the map and open a popup when the user clicks on an earthquake
         trs.forEach(tr => {
           if (!tr.classList.contains('no-sort')) { // skip header row
             tr.addEventListener('click', _openPopup);
@@ -245,6 +255,28 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Hide (collapse) the sort menu. Applies to small screens only.
+   *
+   * @param e {Event}
+   */
+  _hideMenu = function (e) {
+    var table,
+        tagName,
+        wrapper;
+
+    table = this.closest('table');
+    tagName = e.target.tagName.toLowerCase();
+    wrapper = this.closest('.wrapper');
+
+    if (tagName === 'tr') { // ignore Tablesort Events
+      this.classList.remove('active');
+      table.classList.remove('show-menu');
+
+      wrapper.style.paddingTop = '0px';
+    }
+  };
+
+  /**
    * Configure and instantiate the Tablesort plugin.
    *
    * @param id {String}
@@ -324,6 +356,26 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Render the sort menu close button's mouse effects via added CSS classes due
+   * to the vagaries of styling pseudo-elements.
+   *
+   * @param e {Event}
+   */
+  _renderEffects = function (e) {
+    var tagName = e.target.tagName.toLowerCase();
+
+    if (tagName === 'tr') {
+      if (e.type === 'mousedown') {
+        this.classList.add('active');
+      } else if (e.type === 'mouseover') {
+        this.classList.add('hover');
+      } else if (e.type === 'mouseout') {
+        this.classList.remove('hover');
+      }
+    }
+  };
+
+  /**
    * Set dynamic, inline styles for colored section of input range sliders.
    *
    * @param input {Element}
@@ -347,6 +399,38 @@ var SummaryPane = function (options) {
     // Remove 'old' css rules first, then add new ones
     _style.textContent = _style.textContent.replace(oldRules, '');
     _style.appendChild(document.createTextNode(newRules));
+  };
+
+  /**
+   * Show (expand) the sort menu, which is collapsed by default. Applies to
+   * small screens only.
+   *
+   * @param e {Event}
+   */
+  _showMenu = function (e) {
+    var height,
+        mq,
+        table,
+        tr,
+        wrapper;
+
+    mq = window.matchMedia('(max-width: 735px)');
+    table = this.closest('table');
+    tr = this.closest('tr');
+    height = tr.offsetHeight + 'px';
+    wrapper = this.closest('.wrapper');
+
+    if (mq.matches && !table.classList.contains('show-menu')) {
+      e.stopImmediatePropagation(); // don't sort table
+
+      wrapper.style.paddingTop = height; // don't shift content
+      table.classList.add('show-menu');
+
+      tr.addEventListener('click', _hideMenu);
+      tr.addEventListener('mousedown', _renderEffects);
+      tr.addEventListener('mouseout', _renderEffects);
+      tr.addEventListener('mouseover', _renderEffects);
+    }
   };
 
   /**

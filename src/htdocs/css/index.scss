@@ -138,10 +138,6 @@ th {
 
 tr {
   border-bottom: 1px solid $border-color-lighter;
-
-  &:first-child {
-    border-bottom: 1px solid $border-color;
-  }
 }
 
 .content {
