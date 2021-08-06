@@ -19,6 +19,10 @@ AppUtil.addCommas = function (num) {
       parts,
       regex;
 
+  if (!num && num !== 0) {
+    return '';
+  }
+
   decStr = '';
   numStr = String(num);
   parts = numStr.split('.');
