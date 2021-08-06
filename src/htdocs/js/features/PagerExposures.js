@@ -34,8 +34,7 @@ var PagerExposures = function (options) {
 
       _createRows,
       _createSummary,
-      _getExposures,
-      _getShakingValues;
+      _getExposures;
 
 
   _this = {};
@@ -160,43 +159,10 @@ var PagerExposures = function (options) {
     exposures = {
       mmi: mmi.reverse(),
       population: json.population_exposure.aggregated_exposure.reverse(),
-      shaking: _getShakingValues(mmi)
+      shaking: AppUtil.getShakingValues(mmi)
     };
 
     return exposures;
-  };
-
-  /**
-   * Get shaking values (intensity/level) for an array of MMI values.
-   *
-   * @param mmis {Array}
-   *
-   * @return values {Array}
-   */
-  _getShakingValues = function (mmis) {
-    var shaking,
-        values;
-
-    shaking = [
-      {}, // no zero-level values
-      {intensity: 'I',    level: 'Not felt'},
-      {intensity: 'II',   level: 'Weak'},
-      {intensity: 'III',  level: 'Weak'},
-      {intensity: 'IV',   level: 'Light'},
-      {intensity: 'V',    level: 'Moderate'},
-      {intensity: 'VI',   level: 'Strong'},
-      {intensity: 'VII',  level: 'Very strong'},
-      {intensity: 'VIII', level: 'Severe'},
-      {intensity: 'IX',   level: 'Violent'},
-      {intensity: 'X+',   level: 'Extreme'}
-    ];
-    values = [];
-
-    mmis.forEach(val => {
-      values.push(shaking[val]);
-    });
-
-    return values;
   };
 
   // ----------------------------------------------------------
@@ -225,7 +191,6 @@ var PagerExposures = function (options) {
     _createRows = null;
     _createSummary = null;
     _getExposures = null;
-    _getShakingValues = null;
 
     _this = null;
   };

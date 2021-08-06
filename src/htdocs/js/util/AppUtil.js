@@ -113,6 +113,39 @@ AppUtil.getRadius = function (mag) {
 };
 
 /**
+ * Get the shaking values (intensity/level) for an array of MMI Integer values.
+ *
+ * @param mmis {Array}
+ *
+ * @return values {Array}
+ */
+AppUtil.getShakingValues = function (mmis) {
+  var shaking,
+      values;
+
+  shaking = [
+    {}, // no zero-level values
+    {intensity: 'I',    level: 'Not felt'},
+    {intensity: 'II',   level: 'Weak'},
+    {intensity: 'III',  level: 'Weak'},
+    {intensity: 'IV',   level: 'Light'},
+    {intensity: 'V',    level: 'Moderate'},
+    {intensity: 'VI',   level: 'Strong'},
+    {intensity: 'VII',  level: 'Very strong'},
+    {intensity: 'VIII', level: 'Severe'},
+    {intensity: 'IX',   level: 'Violent'},
+    {intensity: 'X+',   level: 'Extreme'}
+  ];
+  values = [];
+
+  mmis.forEach(val => {
+    values.push(shaking[val]);
+  });
+
+  return values;
+};
+
+/**
  * Get the timezone on the user's device.
  *
  * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-
