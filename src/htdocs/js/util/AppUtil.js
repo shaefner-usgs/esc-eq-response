@@ -95,7 +95,7 @@ AppUtil.getPrefix = function (id) {
     historical: 'hs'
   };
 
-  return lookup[id];
+  return lookup[id] || '';
 };
 
 /**
@@ -126,6 +126,7 @@ AppUtil.getTimeZone = function () {
       tz;
 
   now = new Date().toString();
+  tz = '';
 
   try {
     if (now.indexOf('(') > -1) {
@@ -158,7 +159,7 @@ AppUtil.romanize = function (num) {
       roman;
 
   if (typeof num !== 'number') {
-    return false; // ignore 'null' values
+    return ''; // ignore 'null' values
   }
 
   num = Math.round(num) || 1; // return 'I' for values less than 1
