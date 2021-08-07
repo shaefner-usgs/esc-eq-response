@@ -3,7 +3,8 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes');
+    Earthquakes = require('features/util/Earthquakes'),
+    Luxon = require('luxon');
 
 
 /**
@@ -43,6 +44,8 @@ var Mainshock = function (options) {
       _Earthquakes,
 
       _createSummary,
+      _getBubbles,
+      _getData,
       _setDyfiProps,
       _setShakeMapProps;
 
@@ -69,25 +72,47 @@ var Mainshock = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var data,
-        html,
-        products;
+    var bubbles,
+        data,
+        html;
 
-    data = {
-      cdi: AppUtil.romanize(_this.json.properties.cdi),
-      mainshock: _this.mapLayer.getLayers()[0].getPopup().getContent(),
-      mmi: AppUtil.romanize(_this.json.properties.mmi),
-      url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + _eqid
-    };
-    products = _this.json.properties.products;
-
-    _setDyfiProps(data, products.dyfi);
-    _setShakeMapProps(data, products.shakemap);
-
+    data = _getData();
+    bubbles = _getBubbles(data);
     html = L.Util.template(
+      '<ul class="strip">' +
+        '<li class="mag">' +
+          '<strong>Mag</strong>' +
+          '<span>{magDisplay}</span>' +
+          '<small>{magType}</small>' +
+        '</li>' +
+        '<li class="date">' +
+          '<strong>Date</strong>' +
+          '<span>{date}</span>' +
+          '<small>{dayofweek}</small>' +
+        '</li>' +
+        '<li class="time">' +
+          '<strong>Time</strong>' +
+          '<span>{time}</span>' +
+          '<small>UTC</small>' +
+        '</li>' +
+        bubbles +
+        '<li class="depth">' +
+          '<strong>Depth</strong>' +
+          '<span>{depthDisplay}</span>' +
+          '<small>km</small>' +
+        '</li>' +
+        '<li class="location">' +
+          '<strong>Location</strong>' +
+          '<span>{locationDisplay}</span>' +
+        '</li>' +
+        '<li class="status">' +
+          '<strong>Status</strong>' +
+          '<span>{statusIcon}</span>' +
+          '<small>{status}</small>' +
+        '</li>' +
+      '</ul>' +
       '<div>' +
         '<div class="products">' +
-          '{mainshock}' +
           '{dyfi}' +
           '{shakemap}' +
           '<div class="focal-mechanism placeholder hide two-up"></div>' +
@@ -102,6 +127,97 @@ var Mainshock = function (options) {
     );
 
     return html;
+  };
+
+  /**
+   * Get the 'impact bubbles' HTML templates.
+   *
+   * @param data {Object}
+   *
+   * @return bubbles {String}
+   */
+  _getBubbles = function (data) {
+    var bubbles = '';
+
+    if (data.cdi) {
+      bubbles +=
+        '<li class="bubble">' +
+          '<strong>' +
+            '<abbr title="Did You Feel It?">DYFI?</abbr>' +
+          '</strong>' +
+          '<div class="impact-bubbles">{dyfiBubble}</div>' +
+          '<small>{felt} responses</small>' +
+        '</li>';
+    }
+
+    if (data.mmi) {
+      bubbles +=
+        '<li class="bubble">' +
+          '<strong>ShakeMap</strong>' +
+          '<div class="impact-bubbles">{shakemapBubble}</div>' +
+          '<small>{level}</small>' +
+        '</li>';
+    }
+
+    if (data.alert) {
+      bubbles +=
+        '<li class="bubble">' +
+          '<strong>' +
+            '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
+          '</strong>' +
+          '<div class="impact-bubbles">{pagerBubble}</div>' +
+          '<small>Impact</small>' +
+        '</li>';
+    }
+
+    if (data.tsunami) {
+      bubbles +=
+        '<li class="bubble">' +
+          '<strong>Tsunami</strong>' +
+          '<div class="impact-bubbles">{tsunamiBubble}</div>' +
+        '</li>';
+    }
+
+    return bubbles;
+  };
+
+  /**
+   * Get the data used to create the details strip.
+   *
+   * @return data {Object}
+   */
+  _getData = function () {
+    var data,
+        eqTime,
+        mmiInt,
+        products;
+
+    eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
+    mmiInt = Math.round(_this.json.properties.mmi);
+    data = Object.assign({}, _this.details, {
+      date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
+      dayofweek: eqTime.toFormat('cccc'),
+      depthDisplay: AppUtil.round(_this.details.depth, 1),
+      dyfiBubble: _this.details.bubbles.dyfi || '',
+      level: AppUtil.getShakingValues([mmiInt])[0].level || '',
+      locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
+      pagerBubble: _this.details.bubbles.pager || '',
+      shakemapBubble: _this.details.bubbles.shakemap || '',
+      statusIcon: '', // default value
+      time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      tsunamiBubble: _this.details.bubbles.tsunami || ''
+    });
+    products = _this.json.properties.products;
+
+    // Add DYFI, ShakeMap props to data
+    _setDyfiProps(data, products.dyfi);
+    _setShakeMapProps(data, products.shakemap);
+
+    if (_this.details.status === 'reviewed') {
+      data.statusIcon = '<i class="icon-check"></i>';
+    }
+
+    return data;
   };
 
   /**

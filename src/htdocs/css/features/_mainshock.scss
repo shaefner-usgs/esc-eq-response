@@ -70,6 +70,7 @@
   .mainshock > div {
     display: flex;
     flex-wrap: wrap;
+    margin-top: .5rem;
   }
 
   .pager-exposures,
@@ -81,6 +82,7 @@
 
   .pager-exposures {
     border-left: 1px solid $border-color-lightest;
+    margin-top: 1rem;
     padding-left: 40px;
 
     table {
@@ -122,6 +124,7 @@
   }
 
   .products {
+    align-content: flex-start;
     display: flex;
     flex-wrap: wrap;
     padding-right: 40px;
@@ -139,24 +142,14 @@
       }
     }
 
-    .earthquake {
-      h4 {
-        text-align: left;
-      }
-
-      .distance {
-        display: none;
-      }
-    }
-
     .two-up { /* two products per row */
       max-width: 190px;
       width: 50%;
 
-      &:nth-child(2n) a { /* first product in row */
+      &:nth-child(odd) a {
         margin-left: 0;
       }
-      &:nth-child(2n+1) a { /* second product in row */
+      &:nth-child(even) a {
         margin-right: 0;
       }
 
@@ -168,6 +161,102 @@
       canvas,
       img {
         width: 100%;
+      }
+    }
+  }
+
+  .strip {
+    display: flex;
+    margin: 0;
+    overflow: scroll;
+    padding: 0;
+
+    li {
+      align-items: center;
+      border-right: 1px solid $border-color-lighter;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      list-style: none;
+      margin: .5rem 0;
+      padding: 0 1rem;
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        border: none;
+        padding-right: 0;
+      }
+
+      &:nth-of-type(7) { /* tsunami button */
+        position: relative;
+
+        .impact-bubbles {
+          height: 2.25rem;
+          position: absolute;
+          top: 1.75rem;
+        }
+      }
+
+      > small,
+      > span {
+        white-space: nowrap;
+      }
+      > small {
+        color: $text-color-lighter;
+        font-size: .8rem;
+        font-weight: 300;
+        line-height: 1.5;
+      }
+      > span {
+        font-size: 1.1rem;
+      }
+
+      > strong {
+        font: 700 .95rem $font-family-headers;
+        padding-bottom: .25rem;
+        text-transform: uppercase;
+      }
+    }
+
+    .bubble {
+      a {
+        width: 4.25rem;
+
+        abbr {
+          display: none;
+        }
+      }
+    }
+
+    .location {
+      position: relative;
+
+      span {
+        font-size: 1rem;
+        line-height: 1.25;
+        position: absolute;
+        text-align: center;
+        top: 1.7rem;
+      }
+    }
+
+    .mag {
+      span {
+        font-size: 1.75rem;
+        line-height: 1;
+      }
+    }
+
+    .status {
+      small {
+        text-transform: capitalize;
+      }
+
+      span {
+        color: green;
       }
     }
   }
