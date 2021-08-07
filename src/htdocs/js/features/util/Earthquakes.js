@@ -62,6 +62,7 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
+      _bubbles,
       _duration,
       _featureId,
       _mainshockLatlon,
@@ -187,48 +188,47 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create USGS 'impact bubbles' HTML.
+   * Create the USGS 'impact bubbles' HTML and store them in _bubbles.
    *
    * @param data {Object}
-   *
-   * @return html {String}
    */
   _createBubbles = function (data) {
-    var html,
-        template;
-
-    html = '';
-    template = '';
+    _bubbles = {};
 
     if (data.cdi) { // DYFI
-      template += '<a href="{url}/dyfi" class="mmi{cdi}" ' +
-        'title="Did You Feel It? maximum reported intensity ({felt} ' +
-        'responses)"><strong class="roman">{cdi}</strong>' +
-        '<abbr title="Did You Feel It?">DYFI?</abbr></a>';
+      _bubbles.dyfi = L.Util.template(
+        '<a href="{url}/dyfi" class="mmi{cdi}" title="Maximum reported ' +
+          'intensity ({felt} responses)">' +
+          '<strong class="roman">{cdi}</strong>' +
+          '<abbr title="Did You Feel It?">DYFI?</abbr>' +
+        '</a>', data);
     }
+
     if (data.mmi) { // ShakeMap
-      template += '<a href="{url}/shakemap" class="mmi{mmi}" ' +
-        'title="ShakeMap maximum estimated intensity"><strong class="roman">' +
-        '{mmi}</strong><abbr title="ShakeMap">ShakeMap</abbr></a>';
+      _bubbles.shakemap = L.Util.template(
+        '<a href="{url}/shakemap" class="mmi{mmi}" title="Maximum estimated intensity">' +
+          '<strong class="roman">{mmi}</strong>' +
+          '<abbr title="ShakeMap">ShakeMap</abbr>' +
+        '</a>', data);
     }
+
     if (data.alert) { // PAGER
-      template += '<a href="{url}/pager" class="pager-alertlevel-' +
-        '{alert}" title="PAGER estimated impact alert level"><strong ' +
-        'class="roman">{alert}</strong><abbr title="Prompt Assessment of ' +
-        'Global Earthquakes for Response">PAGER</abbr></a>';
-    }
-    if (data.tsunami) { // Tsunami
-      template += '<a href="http://www.tsunami.gov/" class="tsunami" ' +
-        'title="Tsunami Warning Center"><span class="hover"></span>' +
-        '<img src="img/tsunami.png" alt="Tsunami Warning Center"></a>';
+      _bubbles.pager = L.Util.template(
+        '<a href="{url}/pager" class="pager-alertlevel-{alert}" title="' +
+          'Estimated impact alert level">' +
+          '<strong class="roman">{alert}</strong>' +
+          '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
+        '</a>', data);
     }
 
-    if (template) {
-      template = '<div class="impact-bubbles">' + template + '</div>';
-      html = L.Util.template(template, data);
+    if (data.tsunami) {
+      _bubbles.tsunami = L.Util.template(
+        '<a href="http://www.tsunami.gov/" class="tsunami" title="Tsunami ' +
+          'Warning Center">' +
+          '<span class="hover"></span>' +
+          '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
+        '</a>', data);
     }
-
-    return html;
   };
 
   /**
@@ -624,11 +624,13 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
+        bubbles,
         className,
         compassPoints,
         coords,
         days,
         distance,
+        distanceDisplay,
         eq,
         eqTime,
         eqTimeLocal,
@@ -643,6 +645,7 @@ var Earthquakes = function (options) {
         tooltip,
         utcTime;
 
+    bubbles = '';
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
@@ -670,22 +673,23 @@ var Earthquakes = function (options) {
       bearing = _mainshockLatlon.bearing(latlon);
       bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
       distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
+        bearingString + '</span>';
     }
 
     eq = {
-      alert: props.alert, // PAGER
+      alert: props.alert || '', // PAGER
       cdi: AppUtil.romanize(props.cdi), // DYFI
       className: className,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
-      distance: distance,
-      distanceDisplay: AppUtil.round(distance, 1) + ' km <span>' +
-        bearingString + '</span>',
+      distance: distance || '',
+      distanceDisplay: distanceDisplay || '',
       eqid: feature.id,
-      felt: props.felt, // DYFI felt reports
+      felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
       location: _getLocation(coords),
-      localTime: localTime,
+      localTime: localTime || '',
       mag: mag,
       magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
@@ -698,8 +702,14 @@ var Earthquakes = function (options) {
       utcTime: utcTime
     };
 
+    _createBubbles(eq);
+    Object.keys(_bubbles).forEach(type => {
+      bubbles += _bubbles[type];
+    });
+
     // Set additional props that depend on other eq props already being set
-    eq.bubblesHtml = _createBubbles(eq);
+    eq.bubblesHtml = `<div class="impact-bubbles">${bubbles}</div>`;
+    eq.bubbles = _bubbles;
     eq.timeHtml = L.Util.template(template, eq);
 
     _this.list.push(eq);
