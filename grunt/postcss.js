@@ -6,6 +6,7 @@ var config = require('./config');
 var postcss = {
   build: {
     options: {
+      map: true,
       processors: [
         require('autoprefixer')(),
       ]
