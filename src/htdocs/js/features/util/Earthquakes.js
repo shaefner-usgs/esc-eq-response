@@ -461,7 +461,7 @@ var Earthquakes = function (options) {
     var template = '';
 
     if (type === 'binTable') {
-      template = '' +
+      template =
         '<table class="{classNames}">' +
           '<tr>' +
             '<th class="period">{type}:</th>' +
@@ -474,13 +474,13 @@ var Earthquakes = function (options) {
           '{rows}' +
         '</table>';
     } else if (type === 'description') {
-      template = '' +
+      template =
         '<p class="description">' +
           '<strong>M {mag}+</strong> earthquakes within <strong>{distance} ' +
           'km</strong> of the mainshock’s epicenter{ending}.' +
         '</p>';
     } else if (type === 'listRow') {
-      template = '' +
+      template =
         '<tr class="m{magInt}" title="View earthquake on map">' +
           '<td class="mag" data-sort="{mag}"><span>{magType} </span>{magDisplay}</td>' +
           '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
@@ -490,7 +490,7 @@ var Earthquakes = function (options) {
           '<td class="eqid">{eqid}</td>' +
         '</tr>';
     } else if (type === 'listTable') {
-      template = '' +
+      template =
         '<div class="wrapper">' +
           '<table class="{classNames}">' +
             '<thead>' +
@@ -511,7 +511,7 @@ var Earthquakes = function (options) {
           '</table>' +
         '</div>';
     } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
-      template = '' +
+      template =
         '<div class="earthquake {className}">' +
           '<h4><a href="{url}">{title}</a></h4>' +
           '{bubblesHtml}' +
@@ -544,7 +544,7 @@ var Earthquakes = function (options) {
           '</div>' +
         '</div>';
     } else if (type === 'subheader') {
-      template = '' +
+      template =
         '<h3>' +
           'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
         '</h3>';

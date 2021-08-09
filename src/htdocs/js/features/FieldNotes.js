@@ -144,7 +144,7 @@ var FieldNotes = function (options) {
     });
 
     if (list) {
-      html = '' +
+      html =
         '<p class="properties hide">' +
           '<a href="#" class="toggle">Additional properties</a>' +
         '</p>' +

@@ -253,7 +253,7 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _createTable = function (channels) {
-    var html = '' +
+    var html =
       '<table class="station-channels-map">' +
         '<tr>' +
           '<th scope="col" class="station-channels-map-name freeze">Name</th>' +
