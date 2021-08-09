@@ -11,9 +11,7 @@ var sass = {
       'node_modules'
     ],
     outputStyle: 'expanded',
-    sourceComments: true,
-    sourceMap: true,
-    sourceMapContents: true
+    sourceMap: config.build + '/' + config.src + '/htdocs/css/index.css.map'
   },
 
   build: {
