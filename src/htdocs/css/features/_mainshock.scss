@@ -146,6 +146,12 @@
       max-width: 190px;
       width: 50%;
 
+      /* special case where odd product is missing */
+      &.hide + .two-up:nth-child(even) a {
+        margin-left: 0;
+        margin-right: .75rem;
+      }
+
       &:nth-child(odd) a {
         margin-left: 0;
       }
