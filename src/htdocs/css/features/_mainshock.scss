@@ -70,7 +70,7 @@
   .mainshock > div {
     display: flex;
     flex-wrap: wrap;
-    margin-top: .5rem;
+    margin-top: 1rem;
   }
 
   .pager-exposures,
@@ -184,7 +184,7 @@
       flex-direction: column;
       justify-content: space-between;
       list-style: none;
-      margin: .5rem 0;
+      margin: 0;
       padding: 0 1rem;
 
       &:first-child {
