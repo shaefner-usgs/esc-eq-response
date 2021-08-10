@@ -13,7 +13,10 @@ var browserify = {
         config.src + '/htdocs/js'
       ]
     },
-    //noParse: [],
+    noParse: [
+      'luxon',
+      'tablesort'
+    ],
     transform: [
       babelify.configure({
         presets: [
