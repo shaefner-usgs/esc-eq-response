@@ -84,6 +84,13 @@ button {
     outline: 0;
   }
 
+  &:after {
+    display: block;
+    font-size: .75rem;
+    font-weight: 400;
+    margin-top: -.15rem;
+  }
+
   &[disabled] {
     background: $bg-color;
     box-shadow: none;
