@@ -120,9 +120,13 @@ var Mainshock = function (options) {
         '</div>' +
         '<div class="pager-exposures placeholder hide"></div>' +
       '</div>' +
-      '<button class="event-summary" disabled="disabled" ' +
-        'title="Download RTF Document" type="button">Event Summary' +
-      '</button>',
+      '<h3>Event Summary</h3>' +
+      '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
+        'relevant details, images and plots plus placeholders for talking ' +
+        'points and analysis. Microsoft Word is recommended for viewing the ' +
+        'document.</p>' +
+      '<button class="event-summary" disabled="disabled" type="button" ' +
+        'title="Download RTF Document">Download</button>',
       data
     );
 
