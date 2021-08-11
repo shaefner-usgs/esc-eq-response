@@ -62,7 +62,6 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
-      _bubbles,
       _duration,
       _featureId,
       _mainshockLatlon,
@@ -78,8 +77,8 @@ var Earthquakes = function (options) {
       _sortByField,
 
       _addEqToBin,
-      _createBubbles,
       _getAge,
+      _getBubbles,
       _getDuration,
       _getIntervals,
       _getLocation,
@@ -188,50 +187,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create the USGS 'impact bubbles' HTML and store them in _bubbles.
-   *
-   * @param data {Object}
-   */
-  _createBubbles = function (data) {
-    _bubbles = {};
-
-    if (data.cdi) { // DYFI
-      _bubbles.dyfi = L.Util.template(
-        '<a href="{url}/dyfi" class="mmi{cdi}" title="Maximum reported ' +
-          'intensity ({felt} responses)">' +
-          '<strong class="roman">{cdi}</strong>' +
-          '<abbr title="Did You Feel It?">DYFI?</abbr>' +
-        '</a>', data);
-    }
-
-    if (data.mmi) { // ShakeMap
-      _bubbles.shakemap = L.Util.template(
-        '<a href="{url}/shakemap" class="mmi{mmi}" title="Maximum estimated intensity">' +
-          '<strong class="roman">{mmi}</strong>' +
-          '<abbr title="ShakeMap">ShakeMap</abbr>' +
-        '</a>', data);
-    }
-
-    if (data.alert) { // PAGER
-      _bubbles.pager = L.Util.template(
-        '<a href="{url}/pager" class="pager-alertlevel-{alert}" title="' +
-          'Estimated impact alert level">' +
-          '<strong class="roman">{alert}</strong>' +
-          '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
-        '</a>', data);
-    }
-
-    if (data.tsunami) {
-      _bubbles.tsunami = L.Util.template(
-        '<a href="http://www.tsunami.gov/" class="tsunami" title="Tsunami ' +
-          'Warning Center">' +
-          '<span class="hover"></span>' +
-          '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
-        '</a>', data);
-    }
-  };
-
-  /**
    * Get the 'age' of an earthquake (i.e. mainshock, historical, pastday, etc).
    *
    * @param timestamp {Int}
@@ -259,6 +214,54 @@ var Earthquakes = function (options) {
     }
 
     return age;
+  };
+
+  /**
+   * Get the USGS 'impact bubbles' HTML templates.
+   *
+   * @param data {Object}
+   *
+   * @return bubbles {Object}
+   */
+  _getBubbles = function (data) {
+    var bubbles = {};
+
+    if (data.cdi) { // DYFI
+      bubbles.dyfi = L.Util.template(
+        '<a href="{url}/dyfi" class="mmi{cdi}" title="Maximum reported ' +
+          'intensity ({felt} responses)">' +
+          '<strong class="roman">{cdi}</strong>' +
+          '<abbr title="Did You Feel It?">DYFI?</abbr>' +
+        '</a>', data);
+    }
+
+    if (data.mmi) { // ShakeMap
+      bubbles.shakemap = L.Util.template(
+        '<a href="{url}/shakemap" class="mmi{mmi}" title="Maximum estimated intensity">' +
+          '<strong class="roman">{mmi}</strong>' +
+          '<abbr title="ShakeMap">ShakeMap</abbr>' +
+        '</a>', data);
+    }
+
+    if (data.alert) { // PAGER
+      bubbles.pager = L.Util.template(
+        '<a href="{url}/pager" class="pager-alertlevel-{alert}" title="' +
+          'Estimated impact alert level">' +
+          '<strong class="roman">{alert}</strong>' +
+          '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
+        '</a>', data);
+    }
+
+    if (data.tsunami) {
+      bubbles.tsunami = L.Util.template(
+        '<a href="http://www.tsunami.gov/" class="tsunami" title="Tsunami ' +
+          'Warning Center">' +
+          '<span class="hover"></span>' +
+          '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
+        '</a>', data);
+    }
+
+    return bubbles;
   };
 
   /**
@@ -510,14 +513,14 @@ var Earthquakes = function (options) {
             '</tbody>' +
           '</table>' +
         '</div>';
-    } else if (type === 'popup') { // Leaflet popups, mainshock details on edit/summary panes
+    } else if (type === 'popup') {
       template =
         '<div class="earthquake {className}">' +
           '<h4><a href="{url}">{title}</a></h4>' +
-          '{bubblesHtml}' +
+          '<div class="impact-bubbles">{bubblesStr}</div>' +
           '<dl>' +
             '<dt>Time</dt>' +
-            '<dd>{timeHtml}</dd>' +
+            '<dd>{htmlTime}</dd>' +
             '<dt>Location</dt>' +
             '<dd>{location}</dd>' +
             '<dt>Depth</dt>' +
@@ -624,6 +627,7 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
+        bubblesStr,
         bubbles,
         className,
         compassPoints,
@@ -645,7 +649,8 @@ var Earthquakes = function (options) {
         tooltip,
         utcTime;
 
-    bubbles = '';
+    bubblesStr = '';
+    className = _featureId;
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
@@ -664,10 +669,7 @@ var Earthquakes = function (options) {
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_featureId === 'mainshock') {
-      className = 'selected';
-    } else { // calculate distance/direction from Mainshock
-      className = '';
+    if (_featureId !== 'mainshock') { // calculate distance/direction from Mainshock
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
       latlon = LatLon(coords[1], coords[0]);
       bearing = _mainshockLatlon.bearing(latlon);
@@ -702,19 +704,22 @@ var Earthquakes = function (options) {
       utcTime: utcTime
     };
 
-    _createBubbles(eq);
-    Object.keys(_bubbles).forEach(type => {
-      bubbles += _bubbles[type];
+    bubbles = _getBubbles(eq);
+    Object.keys(bubbles).forEach(type => {
+      bubblesStr += bubbles[type];
     });
 
     // Set additional props that depend on other eq props already being set
-    eq.bubblesHtml = `<div class="impact-bubbles">${bubbles}</div>`;
-    eq.bubbles = _bubbles;
-    eq.timeHtml = L.Util.template(template, eq);
+    eq.bubbles = bubbles;
+    eq.htmlTime = L.Util.template(template, eq);
 
     _this.list.push(eq);
 
-    popup = L.Util.template(_getTemplate('popup'), eq);
+    popup = L.Util.template(_getTemplate('popup'),
+      Object.assign({}, eq, {
+        bubblesStr: bubblesStr
+      })
+    );
     layer.bindPopup(popup, {
       autoPanPaddingTopLeft: L.point(50, 50),
       autoPanPaddingBottomRight: L.point(60, 40),
