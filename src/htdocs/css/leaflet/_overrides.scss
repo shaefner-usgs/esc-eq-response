@@ -175,9 +175,9 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
   }
 
-  /* Push top controls down to accommodate toolbar */
+  /* Push top controls down to accommodate header */
   .leaflet-top .leaflet-control {
-    margin-top: 50px;
+    margin-top: 7.75rem;
   }
 
   /* Hide attribution text on (small screen) mobile devices */
