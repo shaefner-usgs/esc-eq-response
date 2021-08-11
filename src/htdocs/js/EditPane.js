@@ -50,7 +50,6 @@ var EditPane = function (options) {
       _refreshFeature,
       _resetCounts,
       _resetForm,
-      _resetTitle,
       _saveFocusedField;
 
 
@@ -294,19 +293,6 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset the page title to the app's name.
-   *
-   * @return title {String}
-   */
-  _resetTitle = function () {
-    var title = document.title.split('|')[1] || document.title;
-
-    document.title = title;
-
-    return title;
-  };
-
-  /**
    * Save the id value of the form field selected (focused) by the user.
    *
    * @param e {Event}
@@ -411,7 +397,6 @@ var EditPane = function (options) {
     _hideMainshock();
     _resetCounts();
     _resetForm();
-    _resetTitle();
   };
 
   /**
@@ -465,21 +450,19 @@ var EditPane = function (options) {
   };
 
   /**
-   * Show the Mainshock's details and update the <title>.
+   * Show the Mainshock's details.
    */
   _this.showMainshock = function () {
-    var appTitle,
-        details,
+    var details,
         mainshock;
 
-    appTitle = _resetTitle();
     details = _el.querySelector('.details');
     mainshock = _app.Features.getFeature('mainshock');
 
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent();
     details.classList.remove('hide');
 
-    document.title = mainshock.details.title + ' | ' + appTitle;
+    _app.setTitle(mainshock.details);
   };
 
 
