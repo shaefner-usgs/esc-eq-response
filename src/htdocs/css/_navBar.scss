@@ -1,43 +1,44 @@
-@use 'sass:color';
-
 @use 'variables' as *;
 
 #navBar {
-  background: $accent-color-lighter;
   display: flex;
-  font: 700 1rem/1 $font-family-headers;
-  left: 0;
-  margin: 0;
-  padding: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 10000;
+  justify-content: space-between;
 
-  a {
-    color: $link-color;
-    display: block;
-    padding: 12px 15px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: all $hover-off-duration ease-in;
-
-    &:hover {
-      background: color.scale($accent-color-lighter, $lightness: -2.5%);
-      color: color.scale($link-color, $blackness: 5%);
-      transition: all $hover-on-duration ease-out;
-    }
-
-    &.selected {
-      background: $accent-color;
-      color: #fff;
-      text-shadow: $button-text-shadow;
-    }
-  }
-
-  li {
-    list-style: none;
-    margin: 0;
+  #navMain {
+    display: flex;
+    font: 700 1rem/1 $font-family-headers;
+    margin: 0 0 0 -.5rem;
     padding: 0;
+
+    a {
+      border: 1px solid transparent;
+      border-bottom-width: 0;
+      border-radius: 6px 6px 0 0;
+      color: $link-color;
+      display: block;
+      padding: .6rem .85rem;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all $hover-off-duration ease-in;
+
+      &:hover {
+        border-color: $accent-color;
+        transition: all $hover-on-duration ease-out;
+      }
+
+      &.selected {
+        background: $accent-color;
+        border-color: $accent-color;
+        color: #fff;
+        text-shadow: $button-text-shadow;
+        transition: all $hover-on-duration ease-out;
+      }
+    }
+
+    li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
   }
 }
