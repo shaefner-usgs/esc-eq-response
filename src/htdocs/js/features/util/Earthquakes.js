@@ -721,8 +721,8 @@ var Earthquakes = function (options) {
       })
     );
     layer.bindPopup(popup, {
-      autoPanPaddingTopLeft: L.point(50, 50),
-      autoPanPaddingBottomRight: L.point(60, 40),
+      autoPanPaddingTopLeft: L.point(50, 130),
+      autoPanPaddingBottomRight: L.point(50, 50),
       maxWidth: 375,
       minWidth: 250
     }).bindTooltip(tooltip);

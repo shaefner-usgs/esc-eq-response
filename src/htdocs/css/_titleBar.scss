@@ -1,0 +1,28 @@
+@use 'variables' as *;
+
+#titleBar {
+  h1 {
+    font-size: 1.7rem;
+    line-height: 1;
+
+    a {
+      color: $text-color;
+      text-decoration-color: transparent;
+      text-decoration-skip-ink: none;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 2px;
+      transition: text-decoration-color $hover-off-duration ease-in;
+
+      &:hover {
+        text-decoration-color: $text-color;
+        transition: text-decoration-color $hover-on-duration ease-out;
+      }
+    }
+  }
+
+  p {
+    color: $text-color-lighter;
+    font-size: 1.2rem;
+    margin: .5rem 0;
+  }
+}

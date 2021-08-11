@@ -10,5 +10,6 @@ Application({
   NavBar: document.getElementById('navBar'),
   PlotsPane: document.getElementById('plotsPane'),
   StatusBar: document.getElementById('statusBar'),
-  SummaryPane: document.getElementById('summaryPane')
+  SummaryPane: document.getElementById('summaryPane'),
+  TitleBar: document.getElementById('titleBar')
 });

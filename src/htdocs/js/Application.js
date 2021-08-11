@@ -11,7 +11,8 @@ var EditPane = require('EditPane'),
     PlotsPane = require('PlotsPane'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
-    SummaryPane = require('SummaryPane');
+    SummaryPane = require('SummaryPane'),
+    TitleBar = require('TitleBar');
 
 
 /**
@@ -27,6 +28,7 @@ var EditPane = require('EditPane'),
  *     PlotsPane: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
+ *     TitleBar: {Element}
  *   }
  *
  * @return _this {Object}
@@ -43,6 +45,7 @@ var EditPane = require('EditPane'),
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     reset: {Function}
+ *     setTitle: {Function}
  *   }
  */
 var Application = function (options) {
@@ -84,7 +87,8 @@ var Application = function (options) {
       PlotsPane,
       SignificantEqs,
       StatusBar,
-      SummaryPane
+      SummaryPane,
+      TitleBar
     ];
     postInits = [];
 
@@ -137,6 +141,31 @@ var Application = function (options) {
     _this.PlotsPane.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
+    _this.TitleBar.reset();
+  };
+
+  /**
+   * Set the Document's title.
+   *
+   * @param opts {Object} optional; default is {}
+   *   {
+   *     title: {String} optional
+   *   }
+   */
+  _this.setTitle = function (opts = {}) {
+    var appName,
+        title;
+
+    appName = document.title.split(' | ')[1] || document.title; // initial <title>
+    title = appName; // default
+
+    if (opts.title) {
+      title = opts.title + ' | ' + appName;
+    }
+
+    document.title = title;
+
+    _this.TitleBar.setTitle(opts);
   };
 
 

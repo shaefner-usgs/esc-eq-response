@@ -362,7 +362,8 @@ var ShakeMapStations = function (options) {
     var tooltip = _getTitle(feature);
 
     layer.bindPopup(_createPopup(feature), {
-      autoPanPadding: L.point(50, 50),
+      autoPanPaddingTopLeft: L.point(50, 130),
+      autoPanPaddingBottomRight: L.point(50, 50),
       minWidth: 300,
       maxWidth: 425
     }).bindTooltip(tooltip);
