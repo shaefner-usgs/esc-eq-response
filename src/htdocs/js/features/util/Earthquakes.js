@@ -986,7 +986,10 @@ Earthquakes.getFeedUrl = function (params) {
       queryString;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-  pairs = ['format=geojson', 'orderby=time-asc'];
+  pairs = [
+    'format=geojson',
+    'orderby=time-asc'
+  ];
 
   Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
