@@ -12,17 +12,22 @@
   </head>
   <body>
     <header>
-      <ul id="navBar" class="panes">
-        <li><a href="#editPane">Edit</a></li>
-        <li><a href="#mapPane">Map</a></li>
-        <li><a href="#plotsPane">Plots</a></li>
-        <li><a href="#summaryPane">Summary</a></li>
-        <li><a href="#helpPane">Help</a></li>
-      </ul>
+      <div id="titleBar">
+        <h1>Earthquake Response App</h1>
+        <p>Select an earthquake to get started.</p>
+      </div>
+      <div id="navBar">
+        <ul id="navMain">
+          <li><a href="#editPane">Edit</a></li>
+          <li><a href="#mapPane">Map</a></li>
+          <li><a href="#plotsPane">Plots</a></li>
+          <li><a href="#summaryPane">Summary</a></li>
+          <li><a href="#helpPane">Help</a></li>
+        </ul>
+      </div>
     </header>
     <section id="editPane" class="hide pane">
       <div class="content">
-        <h1>Earthquake Response App</h1>
         <p>This web application creates a map, interactive plots, and summary
           for an earthquake using real-time data. It helps you visualize,
           analyze, and collect information to use in talking points and scientific
