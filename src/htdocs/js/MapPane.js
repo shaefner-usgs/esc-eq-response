@@ -317,7 +317,7 @@ var MapPane = function (options) {
   _setView = function () {
     if (_bounds.isValid()) {
       _map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 110) // accommodate header
+        paddingTopLeft: L.point(0, 120) // accommodate header
       });
     }
   };
