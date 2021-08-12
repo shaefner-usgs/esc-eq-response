@@ -458,9 +458,10 @@ var EditPane = function (options) {
 
     details = _el.querySelector('.details');
     mainshock = _app.Features.getFeature('mainshock');
-
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
+
     details.classList.remove('hide');
+    document.body.classList.remove('no-mainshock');
 
     _app.setTitle(mainshock.details);
   };

@@ -133,6 +133,8 @@ var Application = function (options) {
    * Reset app to default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
+    document.body.classList.add('no-mainshock');
+
     _this.Features.reset(); // reset Features first
     _this.EditPane.reset();
     _this.Feeds.reset();
