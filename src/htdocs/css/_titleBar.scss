@@ -22,7 +22,7 @@
 
   p {
     color: $text-color-lighter;
-    font-size: 1.2rem;
-    margin: .5rem 0;
+    font: 1.2rem $font-family-headers;
+    margin: .4rem 0;
   }
 }
