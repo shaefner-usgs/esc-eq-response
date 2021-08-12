@@ -114,6 +114,8 @@ var Features = function (options) {
           '</li></ul>'
       });
       _removeFeature(feature);
+
+      console.error(error);
     }
   };
 
