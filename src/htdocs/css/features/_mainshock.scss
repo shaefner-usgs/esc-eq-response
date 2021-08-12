@@ -63,10 +63,16 @@
     display: none;
   }
 
-  .mainshock > div {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 1rem;
+  .mainshock {
+    > div {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    h3 {
+      margin-top: 1rem;
+    }
   }
 
   .pager-exposures,
