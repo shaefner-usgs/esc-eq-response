@@ -347,7 +347,7 @@ var EditPane = function (options) {
       count = div.querySelector('.count');
       loader = div.querySelector('.breather');
 
-      loader.innerHTML = '<div></div>';
+      loader.innerHTML = '<span></span>';
       loader.classList.remove('hide');
 
       if (count) {

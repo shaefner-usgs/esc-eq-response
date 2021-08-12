@@ -502,8 +502,8 @@ var SummaryPane = function (options) {
 
     if (Object.prototype.hasOwnProperty.call(feature, 'summary') && !placeholder) {
       div = document.createElement('div');
-      div.innerHTML = '<h2>' + feature.name + '<div class="breather">' +
-        '<div></div></div></h2>';
+      div.innerHTML = '<h2>' + feature.name + '<span class="breather">' +
+        '<span></span></span></h2>';
 
       div.classList.add('content', 'feature', feature.id);
 
