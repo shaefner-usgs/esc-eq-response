@@ -459,7 +459,7 @@ var EditPane = function (options) {
     details = _el.querySelector('.details');
     mainshock = _app.Features.getFeature('mainshock');
 
-    details.appendChild(mainshock.mapLayer.getLayers()[0].getPopup().getContent());
+    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
     details.classList.remove('hide');
 
     _app.setTitle(mainshock.details);
