@@ -88,7 +88,7 @@
   }
 
   .close {
-    right: 3px;
+    right: 15px;
 
     &:after,
     &:before { /* 'X' */
@@ -110,7 +110,7 @@
 
   .reload {
     padding: 7px;
-    right: 40px;
+    right: 52px;
 
     &:after,
     &:before { /* Partial circle w/ arrow */
