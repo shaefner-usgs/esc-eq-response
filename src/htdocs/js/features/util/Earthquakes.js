@@ -198,7 +198,7 @@ var Earthquakes = function (options) {
     var button = el.querySelector('button');
 
     button.addEventListener('click', () => {
-      location.assign('/response/?eqid=' + eqid);
+      location.assign(`/response/?eqid=${eqid}#mapPane`);
     });
   };
 
