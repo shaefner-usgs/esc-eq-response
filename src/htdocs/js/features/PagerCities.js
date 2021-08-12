@@ -68,7 +68,13 @@ var PagerCities = function (options) {
    *     feed data for Feature
    */
   _this.create = function (json) {
-    _this.cities = json.onepager_cities.sort(_compare);
+    _this.cities = [];
+
+    if (json.onepager_cities) {
+      _this.cities = json.onepager_cities.sort(_compare);
+    } else if (Array.isArray(json)) { // sometimes data stored as top-level Array
+      _this.cities = json.sort(_compare);
+    }
   };
 
   /**
