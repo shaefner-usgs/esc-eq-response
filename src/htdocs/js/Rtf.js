@@ -467,7 +467,7 @@ var Rtf = function (options) {
         method: 'POST'
       }).then(json => { // trigger download on success
         if (json.file) {
-          window.location.assign('php/event-summary/download.php?file=' + json.file);
+          location.assign('php/event-summary/download.php?file=' + json.file);
 
           _app.StatusBar.removeItem('rtf');
         } else if (json.error) {
