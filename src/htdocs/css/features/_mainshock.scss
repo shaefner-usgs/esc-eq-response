@@ -3,6 +3,8 @@
 #summaryPane {
   button {
     margin-top: .5rem;
+    padding-bottom: 3px;
+    padding-top: 3px;
 
     &:after {
       content: 'Event Summary';
