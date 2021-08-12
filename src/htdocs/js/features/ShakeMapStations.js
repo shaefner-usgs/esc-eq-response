@@ -77,6 +77,7 @@ var ShakeMapStations = function (options) {
     _mainshock = options.app.Features.getFeature('mainshock');
     _markerOptions = options.markerOptions;
 
+    _this.count = 0;
     _this.id = 'shakemap-stations';
     _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
@@ -292,6 +293,8 @@ var ShakeMapStations = function (options) {
     var props = station.properties;
 
     if (props.network !== 'DYFI' && props.network !== 'INTENSITY') {
+      _this.count ++;
+
       return true;
     }
   };
@@ -403,7 +406,6 @@ var ShakeMapStations = function (options) {
    *     feed data for feature
    */
   _this.create = function (json) {
-    _this.count = json.features.length;
     _this.mapLayer = _createMapLayer(json);
   };
 
@@ -460,6 +462,7 @@ var ShakeMapStations = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
+    _this.count = 0;
     _this.mapLayer = null;
   };
 
