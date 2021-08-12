@@ -167,8 +167,23 @@
     (also used for other (i.e. non-eq) Leaflet popups) */
 .earthquake,
 .leaflet-popup-content {
-  &.mainshock .distance {
-    display: none;
+  &.mainshock {
+    button,
+    .distance {
+      display: none;
+    }
+  }
+
+  position: relative;
+
+  button {
+    &:after {
+      content: 'Earthquake';
+    }
+
+    bottom: .45rem;
+    position: absolute;
+    right: 0;
   }
 
   dd,

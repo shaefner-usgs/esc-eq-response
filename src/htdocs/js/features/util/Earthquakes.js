@@ -77,12 +77,14 @@ var Earthquakes = function (options) {
       _sortByField,
 
       _addEqToBin,
+      _addListeners,
       _getAge,
       _getBubbles,
       _getDuration,
       _getIntervals,
       _getLocation,
       _getPlotlyTrace,
+      _getPopup,
       _getTemplate,
       _getThreshold,
       _initBins,
@@ -184,6 +186,20 @@ var Earthquakes = function (options) {
         _this.bins.mag[i] ++;
       }
     }
+  };
+
+  /**
+   * Add event listener for 'Select' button in popups.
+   *
+   * @param el {Element}
+   * @param eqid {String}
+   */
+  _addListeners = function(el, eqid) {
+    var button = el.querySelector('button');
+
+    button.addEventListener('click', () => {
+      location.assign('/response/?eqid=' + eqid);
+    });
   };
 
   /**
@@ -454,6 +470,37 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the Leaflet popup content for a given earthquake.
+   *
+   * @param eq {Object}
+   *
+   * @return div {Element}
+   */
+  _getPopup = function (eq) {
+    var bubblesStr,
+        div,
+        popup;
+
+    bubblesStr = '';
+    div = L.DomUtil.create('div');
+
+    Object.keys(eq.bubbles).forEach(type => {
+      bubblesStr += eq.bubbles[type];
+    });
+
+    popup = L.Util.template(_getTemplate('popup'),
+      Object.assign({}, eq, {
+        bubblesStr: bubblesStr
+      })
+    );
+    div.innerHTML = popup;
+
+    _addListeners(div, eq.eqid);
+
+    return div;
+  };
+
+  /**
    * Get the template HTML for a given type of content.
    *
    * @param type {String <binTable|description|listRow|listTable|popup|slider|subheader>}
@@ -516,7 +563,7 @@ var Earthquakes = function (options) {
     } else if (type === 'popup') {
       template =
         '<div class="earthquake {className}">' +
-          '<h4><a href="{url}">{title}</a></h4>' +
+          '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubblesStr}</div>' +
           '<dl>' +
             '<dt>Time</dt>' +
@@ -532,6 +579,7 @@ var Earthquakes = function (options) {
             '<dt>Status</dt>' +
             '<dd class="status">{status}</dd>' +
           '</dl>' +
+          '<button type="button">Select</button>' +
         '</div>';
     } else if (type === 'slider') {
       template = _getTemplate('subheader') +
@@ -627,8 +675,6 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
-        bubblesStr,
-        bubbles,
         className,
         compassPoints,
         coords,
@@ -643,13 +689,11 @@ var Earthquakes = function (options) {
         mag,
         magDisplay,
         magType,
-        popup,
         props,
         template,
         tooltip,
         utcTime;
 
-    bubblesStr = '';
     className = _featureId;
     coords = feature.geometry.coordinates;
     props = feature.properties;
@@ -704,23 +748,13 @@ var Earthquakes = function (options) {
       utcTime: utcTime
     };
 
-    bubbles = _getBubbles(eq);
-    Object.keys(bubbles).forEach(type => {
-      bubblesStr += bubbles[type];
-    });
-
     // Set additional props that depend on other eq props already being set
-    eq.bubbles = bubbles;
+    eq.bubbles = _getBubbles(eq);
     eq.htmlTime = L.Util.template(template, eq);
 
     _this.list.push(eq);
 
-    popup = L.Util.template(_getTemplate('popup'),
-      Object.assign({}, eq, {
-        bubblesStr: bubblesStr
-      })
-    );
-    layer.bindPopup(popup, {
+    layer.bindPopup(_getPopup(eq), {
       autoPanPaddingTopLeft: L.point(50, 130),
       autoPanPaddingBottomRight: L.point(50, 50),
       maxWidth: 375,
