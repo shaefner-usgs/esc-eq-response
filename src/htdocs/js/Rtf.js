@@ -473,6 +473,13 @@ var Rtf = function (options) {
         } else if (json.error) {
           console.error(json.error);
         }
+      }).catch(error => {
+        _app.StatusBar.addError({
+          id: 'rtf',
+          message: `<h4>Error Creating Event Summary</h4><ul><li>${error}</li></ul>`
+        });
+
+        console.error(error);
       });
     });
   };

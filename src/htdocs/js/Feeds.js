@@ -106,6 +106,13 @@ var Feeds = function (options) {
       feed.json = json;
 
       _createRtf();
+    }).catch(error => {
+      _app.StatusBar.addError({
+        id: feed.id,
+        message: `<h4>Error Creating Event Summary</h4><ul><li>${error}</li></ul>`
+      });
+
+      console.error(error);
     });
   };
 

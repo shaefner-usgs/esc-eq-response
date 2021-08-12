@@ -110,8 +110,7 @@ var Features = function (options) {
     } catch (error) {
       _app.StatusBar.addError({
         id: feature.id,
-        message: '<h4>Error Adding ' + feature.name + '</h4><ul><li>' + error +
-          '</li></ul>'
+        message: `<h4>Error Adding ${feature.name}</h4><ul><li>${error}</li></ul>`
       });
       _removeFeature(feature);
 
@@ -224,6 +223,13 @@ var Features = function (options) {
         } else {
           _removeFeature(feature);
         }
+      }).catch(error => {
+        _app.StatusBar.addError({
+          id: feature.id,
+          message: `<h4>Error Adding ${feature.name}</h4><ul><li>${error}</li></ul>`
+        });
+
+        console.error(error);
       });
     } else { // data feed not available
       feature.isLoading = false;
