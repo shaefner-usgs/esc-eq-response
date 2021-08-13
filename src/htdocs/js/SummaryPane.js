@@ -38,7 +38,6 @@ var SummaryPane = function (options) {
 
       _addCount,
       _addListeners,
-      _addTimestamp,
       _addTitleAttrs,
       _configTable,
       _filterList,
@@ -67,8 +66,6 @@ var SummaryPane = function (options) {
 
     // Add <style> tag for dynamic range input (slider) styles
     document.body.appendChild(_style);
-
-    _addTimestamp();
   };
 
   /**
@@ -149,16 +146,6 @@ var SummaryPane = function (options) {
         });
       });
     }
-  };
-
-  /**
-   * Add a timestamp indicating the last update.
-   */
-  _addTimestamp = function () {
-    var time = document.createElement('time');
-
-    time.classList.add('updated');
-    _el.insertBefore(time, _featuresEl);
   };
 
   /**
