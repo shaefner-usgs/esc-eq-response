@@ -57,3 +57,17 @@ $pager-green-color: #00b04f;
 $pager-yellow-color: #ff0;
 $pager-orange-color: #f90;
 $pager-red-color: #f00;
+
+/* CSS variables (used for dynamic values via media queries) */
+
+:root {
+  --padding-header: 6rem;
+  --padding-gutter: 1rem; /* left and right page gutters */
+}
+
+@media only screen
+  and (max-width: $breakpoint-phone-width) {
+    :root {
+      --padding-gutter: .5rem;
+    }
+}

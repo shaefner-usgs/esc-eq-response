@@ -4,7 +4,7 @@ header {
   background: $accent-color-lightest;
   border-bottom: 2px solid $accent-color;
   left: 0;
-  padding: .5rem 1rem 0 1rem;
+  padding: .5rem var(--padding-gutter) 0 var(--padding-gutter);
   position: fixed;
   top: 0;
   width: 100%;
