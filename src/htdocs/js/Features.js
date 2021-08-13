@@ -250,6 +250,8 @@ var Features = function (options) {
         feature.destroy();
       });
     }
+
+    document.body.classList.add('no-mainshock');
   };
 
   /**
