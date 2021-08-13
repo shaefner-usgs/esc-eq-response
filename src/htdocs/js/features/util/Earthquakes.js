@@ -42,7 +42,7 @@ _DEFAULTS = {
  *     app: {Object} Application
  *     id: {String} Feature's id
  *     json: {Object} Feature's JSON data
- *     sortByField: {String} Default sort field for table
+ *     sortByField: {String} initial sortby field for table - optional; default is ''
  *   }
  *
  * @return _this {Object}
@@ -116,7 +116,7 @@ var Earthquakes = function (options) {
       title: [],
       time: []
     };
-    _sortByField = options.sortByField;
+    _sortByField = options.sortByField || '';
 
     if (_featureId !== 'mainshock') {
       mainshock = _app.Features.getFeature('mainshock');
