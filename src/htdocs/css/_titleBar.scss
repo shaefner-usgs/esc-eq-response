@@ -1,5 +1,7 @@
 @use 'variables' as *;
 
+$open-link-color: #666;
+
 #titleBar {
   h1 {
     font-size: 1.7rem;
@@ -7,16 +9,33 @@
 
     a {
       color: $text-color;
+      position: relative;
       text-decoration-color: transparent;
       text-decoration-skip-ink: none;
       text-decoration-thickness: 2px;
       text-underline-offset: 2px;
-      transition: text-decoration-color $hover-off-duration ease-in;
+      transition: all $hover-off-duration ease-in;
 
       &:hover {
-        text-decoration-color: $text-color;
-        transition: text-decoration-color $hover-on-duration ease-out;
+        color: $text-color-darker;
+        text-decoration-color: $open-link-color;
+        transition: all $hover-on-duration ease-out;
+
+        i {
+          color: $open-link-color;
+          opacity: 1;
+          transition: all $hover-on-duration ease-out;
+        }
       }
+    }
+
+    i {
+      font-size: 1.25rem;
+      opacity: 0;
+      position: absolute;
+      right: -2.25rem;
+      top: .5rem;
+      transition: all $hover-off-duration ease-in;
     }
   }
 

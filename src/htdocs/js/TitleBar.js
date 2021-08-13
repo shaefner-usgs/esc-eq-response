@@ -73,7 +73,7 @@ var TitleBar = function(options) {
     title = opts.title || document.title;
 
     if (opts.url) {
-      title = `<a href="${opts.url}">${title}</a>`;
+      title = `<a href="${opts.url}">${title}<i class="icon-link">&nbsp;</i></a>`;
     }
 
     h1.innerHTML = title;
