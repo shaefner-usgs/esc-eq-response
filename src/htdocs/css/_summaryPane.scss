@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 #summaryPane {
   h2 + p {
     margin-bottom: 2rem;
@@ -8,10 +10,9 @@
   }
 
   time.updated {
-    margin: 0 1rem;
-    position: absolute;
-    right: 0;
-    top: 3rem;
+    border-top: 1px solid $border-color;
+    display: block;
+    padding: 1rem var(--padding-gutter) 0;
 
     &:before {
       content: 'Updated: ';
