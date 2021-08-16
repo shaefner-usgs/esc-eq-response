@@ -45,6 +45,7 @@ var EditPane = require('EditPane'),
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     reset: {Function}
+ *     setScrollPosition: {Function}
  *     setTitle: {Function}
  *   }
  */
@@ -53,9 +54,13 @@ var Application = function (options) {
       _initialize,
 
       _els,
+      _throttle,
 
+      _addListeners,
       _initClasses,
-      _redirect;
+      _redirect,
+      _resetScrollPositions,
+      _saveScrollPosition;
 
 
   _this = {};
@@ -65,6 +70,16 @@ var Application = function (options) {
 
     _redirect();
     _initClasses();
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    // Save scroll position when user scrolls
+    window.addEventListener('scroll', () => {
+      _saveScrollPosition();
+    });
   };
 
   /**
@@ -105,6 +120,8 @@ var Application = function (options) {
       }
     });
 
+    _addListeners();
+
     // Run post-initialization code now that all Classes are ready
     postInits.forEach(name => {
       name.postInit();
@@ -125,6 +142,37 @@ var Application = function (options) {
     history.replaceState(null, '', url);
   };
 
+  /**
+   * Reset saved scroll positions.
+   */
+  _resetScrollPositions = function () {
+    var id;
+
+    _this.NavBar.panes.forEach(pane => {
+      id = pane.getAttribute('id');
+
+      window.sessionStorage.setItem(id, 0);
+    });
+  };
+
+  /**
+   * Save the current scroll position in sessionStorage.
+   */
+  _saveScrollPosition = function () {
+    var id,
+        position;
+
+    id = _this.NavBar.getPaneId();
+    position = window.pageYOffset;
+
+    window.clearTimeout(_throttle);
+
+    // Throttle scroll event
+    _throttle = window.setTimeout(function() {
+      window.sessionStorage.setItem(id, position);
+    }, 50);
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -133,6 +181,8 @@ var Application = function (options) {
    * Reset app to default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
+    _resetScrollPositions();
+
     _this.Features.reset(); // reset Features first
     _this.EditPane.reset();
     _this.Feeds.reset();
@@ -142,6 +192,19 @@ var Application = function (options) {
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
+  };
+
+  /**
+   * Set the scroll position to the previous value.
+   *
+   * @param id {String}
+   */
+  _this.setScrollPosition = function (id) {
+    var position = window.sessionStorage.getItem(id);
+
+    if (position) {
+      window.scroll(0, position);
+    }
   };
 
   /**
