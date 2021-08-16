@@ -65,20 +65,18 @@ var CatalogSearch = function (options) {
         period;
 
     nameParts = [
-      `M ${params.minmagnitude}+ Earthquakes`
+      `M ${params.minmagnitude}+ Earthquakes`,
+      'Custom Search' // default
     ];
 
-    if (params.period) {
+    if (params.period !== 'custom' &&
+        params.maxlatitude === _DEFAULTS.maxlatitude &&
+        params.maxlongitude === _DEFAULTS.maxlongitude &&
+        params.minlatitude === _DEFAULTS.minlatitude &&
+        params.minlongitude === _DEFAULTS.minlongitude
+    ) {
       period = params.period[0].toUpperCase() + params.period.slice(1);
       nameParts[1] = `Past ${period}`;
-    } else {
-      nameParts[1] = 'Custom Search';
-    }
-
-    if (params.maxlatitude !== 90 || params.maxlongitude !== 180 ||
-      params.minlatitude !== -90 || params.minlongitude !== -180
-    ) {
-      nameParts[1] = 'Custom Search';
     }
 
     _this.name = nameParts.join(', ');
@@ -110,9 +108,8 @@ var CatalogSearch = function (options) {
    *
    * @params {Object}
    *   {
-   *     endtime: {String}
-   *     starttime: {String}
-   *     ... (see _DEFAULTS)
+   *     period {String <day|week|month|year>}
+   *     ... (+ all API props, see: https://earthquake.usgs.gov/fdsnws/event/1/)
    *   }
    *
    * @return {String}
@@ -120,17 +117,17 @@ var CatalogSearch = function (options) {
   _this.getFeedUrl = function (params) {
     var minus = {};
 
-    params = Object.assign({}, _DEFAULTS, params);
+    params = Object.assign({
+      endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
+      starttime: Luxon.DateTime.now().minus({ days: 30 }).toUTC().toISO().slice(0, -5)
+    }, _DEFAULTS, params);
 
-    if (params.starttime && params.endtime) {
-      params.period = null; // override period w/ provided times
-    } else {
-      if (!params.period.match(/day|week|month|year/)) { // valid period values
+    if (params.period !== 'custom') {
+      if (!params.period.match(/day|week|month|year/)) {
         params.period = _DEFAULTS.period;
       }
-      minus[params.period + 's'] = 1;
 
-      params.endtime = Luxon.DateTime.now().toUTC().toISO().slice(0, -5);
+      minus[params.period + 's'] = 1;
       params.starttime = Luxon.DateTime.now().minus(minus).toUTC().toISO().slice(0, -5);
     }
 
