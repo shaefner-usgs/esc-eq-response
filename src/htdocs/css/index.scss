@@ -144,6 +144,10 @@ tr {
   border-bottom: 1px solid $border-color-lighter;
 }
 
+#sel-mainshock {
+  display: none;
+}
+
 .content {
   line-height: 1.6;
   padding: 1rem var(--padding-gutter);
@@ -182,7 +186,7 @@ tr {
   #summaryPane {
     height: auto;
 
-    &:not(.hide) ~ .sel-mainshock {
+    &:not(.hide) ~ #sel-mainshock {
       align-items: center;
       display: flex;
       flex-direction: column;
@@ -219,8 +223,4 @@ tr {
     max-height: 1vh;
     overflow: hidden;
   }
-}
-
-.sel-mainshock {
-  display: none;
 }
