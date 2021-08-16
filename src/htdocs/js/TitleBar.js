@@ -52,7 +52,7 @@ var TitleBar = function(options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    _app.setTitle(); // resets Document title and calls TitleBar's _this.setTitle()
+    _app.setTitle(); // resets Document title and calls TitleBar.setTitle()
   };
 
   /**
