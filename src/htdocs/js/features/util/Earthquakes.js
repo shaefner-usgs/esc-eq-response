@@ -1016,22 +1016,22 @@ var Earthquakes = function (options) {
  */
 Earthquakes.getFeedUrl = function (params) {
   var baseUri,
-      pairs,
-      queryString;
+      defaults,
+      pairs;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-  pairs = [
-    'format=geojson',
-    'orderby=time-asc'
-  ];
+  defaults = {
+    format: 'geojson',
+    orderby: 'time-asc'
+  };
+  pairs = [];
+  params = Object.assign(defaults, params);
 
   Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);
   });
 
-  queryString = '?' + pairs.join('&');
-
-  return baseUri + queryString;
+  return baseUri + '?' + pairs.join('&');
 };
 
 
