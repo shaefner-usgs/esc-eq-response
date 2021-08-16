@@ -219,10 +219,6 @@ tr {
     max-height: 1vh;
     overflow: hidden;
   }
-
-  &:not(#mapPane) {
-    padding-bottom: 1rem;
-  }
 }
 
 .sel-mainshock {
