@@ -44,6 +44,7 @@ var EditPane = require('EditPane'),
  *     SignificantEqs: {Object}
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
+ *     TitleBar: {Object}
  *     reset: {Function}
  *     setScrollPosition: {Function}
  *     setTitle: {Function}
