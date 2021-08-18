@@ -94,13 +94,9 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-layers-overlays {
-    div > span {
+    div > span { /* contains Feature count */
       align-items: baseline;
       display: flex;
-    }
-
-    .count {
-      font-size: .9em;
     }
   }
 
@@ -173,18 +169,5 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     [datetime] {
       min-width: 20rem; /* Prevent datetime from wrapping */
     }
-  }
-
-  /* Push top controls down to accommodate header */
-  .leaflet-top .leaflet-control {
-    margin-top: 7.75rem;
-  }
-
-  /* Hide attribution text on (small screen) mobile devices */
-  @media only screen
-    and (max-width: $breakpoint-tablet-width) {
-      .leaflet-control-attribution {
-        display: none;
-      }
   }
 }

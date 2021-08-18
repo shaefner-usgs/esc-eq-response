@@ -1,3 +1,8 @@
+@use 'leaflet/control-bottomCenter';
+@use 'leaflet/mousePosition';
+@use 'leaflet/overrides';
+@use 'variables' as *;
+
 #mapPane,
 .map {
   height: 100%;
@@ -54,5 +59,29 @@
   }
   .leaflet-faults-pane {
     z-index: 417;
+  }
+
+  /* Push top controls down to accommodate header */
+  .leaflet-top .leaflet-control {
+    margin-top: 7.75rem;
+  }
+
+  /* Scroll wide tables in Leaflet popups elegantly */
+  .scroll-wrapper {
+    overflow: auto;
+
+    th.freeze {
+      background: white;
+      left: 0;
+      position: sticky;
+    }
+  }
+
+  /* Hide attribution text on (small screen) mobile devices */
+  @media only screen
+    and (max-width: $breakpoint-tablet-width) {
+      .leaflet-control-attribution {
+        display: none;
+      }
   }
 }
