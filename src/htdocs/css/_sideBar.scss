@@ -1,0 +1,62 @@
+@use 'variables' as *;
+
+body.sidebar {
+  #plotsPane,
+  #summaryPane {
+    margin-right: $sidebar-width;
+  }
+
+  #sel-mainshock {
+    padding-right: $sidebar-width;
+  }
+
+  #sideBar {
+    border-left: 1px solid $border-color;
+    padding: 1rem var(--padding-gutter);
+    width: $sidebar-width;
+
+    .icon-close {
+      cursor: pointer;
+      position: fixed;
+      top: 8rem;
+      right: 1rem;
+    }
+  }
+
+  .leaflet-center {
+    padding-right: $sidebar-width;
+  }
+
+  .leaflet-right {
+    .leaflet-control-attribution {
+      margin-right: $sidebar-width;
+    }
+    .leaflet-control-layers {
+      margin-right: $sidebar-width + 10px;
+    }
+  }
+}
+
+#sideBar {
+  background: $bg-color;
+  bottom: 0;
+  overflow: scroll;
+  padding: 0;
+  position: fixed;
+  right: 0;
+  top: var(--padding-header);
+  width: 0;
+  z-index: 1000;
+
+  /* hide scrollbars */
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
+
+  section.hide {
+    display: none;
+  }
+}
