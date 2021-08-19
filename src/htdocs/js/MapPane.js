@@ -31,6 +31,7 @@ require('leaflet/TerrainLayer');
  *     removeFeature: {Function}
  *     render: {Function}
  *     reset: {Function}
+ *     shiftMap: {Function}
  *   }
  */
 var MapPane = function (options) {
@@ -502,6 +503,34 @@ var MapPane = function (options) {
     }
 
     _setDefaultView();
+  };
+
+  /**
+   * Shift the map to accommodate the Header and SideBar.
+   *
+   * @params opts {Object}
+   *   {
+   *     header: {Boolean} optional; default is false
+   *     sidebar: {Boolean} optional; default is false
+   *   }
+   */
+  _this.shiftMap = function (opts) {
+    var x = _app.sideBarWidth / 2;
+
+    if (!document.body.classList.contains('sidebar')) {
+      x = x * -1;
+    }
+
+    opts = Object.assign({
+      header: false,
+      sidebar: false
+    }, opts);
+
+    if (opts.sidebar) {
+      _map.panBy([x, 0], {
+        animate: false
+      });
+    }
   };
 
 
