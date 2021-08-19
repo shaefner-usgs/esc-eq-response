@@ -16,10 +16,7 @@ body.sidebar {
     width: $sidebar-width;
 
     .icon-close {
-      cursor: pointer;
       position: fixed;
-      top: 8rem;
-      right: 1rem;
     }
   }
 
@@ -58,5 +55,11 @@ body.sidebar {
 
   section.hide {
     display: none;
+  }
+
+  .icon-close {
+    cursor: pointer;
+    top: 8rem;
+    right: 1rem;
   }
 }

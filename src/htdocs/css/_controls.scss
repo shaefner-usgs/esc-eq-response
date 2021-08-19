@@ -125,6 +125,15 @@ button {
   }
 }
 
+/* Close buttons
+--------------------------------------------- */
+.icon-close {
+  @include close;
+
+  font-family: Tahoma, Verdana, sans-serif;
+  font-weight: bold;
+}
+
 /* Check boxes / radio inputs (customized to Leaflet's html rendering)
 --------------------------------------------- */
 
