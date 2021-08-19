@@ -45,9 +45,11 @@ var EditPane = require('EditPane'),
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     TitleBar: {Object}
+ *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
  *     setTitle: {Function}
+ *     sideBarWidth: {Number}
  *   }
  */
 var Application = function (options) {
@@ -67,7 +69,18 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    var sideBar,
+        width;
+
     _els = options || {};
+    sideBar = document.querySelector('#sideBar');
+
+    if (sideBar) {
+      width = sideBar.offsetWidth;
+    }
+
+    _this.headerHeight = document.querySelector('header').offsetHeight;
+    _this.sideBarWidth = width || null;
 
     _redirect();
     _initClasses();
