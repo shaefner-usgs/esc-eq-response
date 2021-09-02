@@ -117,9 +117,7 @@ var NavBar = function (options) {
   _renderPane = function (id) {
     _app.setScrollPosition(id);
 
-    if (id === 'editPane') {
-      _app.EditPane.setFocusedField();
-    } else if (id === 'mapPane') {
+    if (id === 'mapPane') {
       _app.MapPane.render();
     } else if (id === 'plotsPane') {
       _renderPlots();
@@ -259,7 +257,7 @@ var NavBar = function (options) {
         paneExists;
 
     hash = location.hash;
-    id = 'editPane'; // default
+    id = 'mapPane'; // default
     paneExists = document.querySelector('section' + hash);
 
     if (hash && paneExists) {
