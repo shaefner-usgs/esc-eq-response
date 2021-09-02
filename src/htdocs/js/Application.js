@@ -1,14 +1,16 @@
 'use strict';
 
 
-var EditPane = require('EditPane'),
+var AppUtil = require('util/AppUtil'),
     Features = require('Features'),
     Feeds = require('Feeds'),
-    HelpPane = require('HelpPane'),
     JsonFeed = require('JsonFeed'),
+    LegendBar = require('LegendBar'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
+    SelectBar = require('SelectBar'),
+    SettingsBar = require('SettingsBar'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane'),
@@ -21,11 +23,12 @@ var EditPane = require('EditPane'),
  *
  * @param options {Object}
  *   {
- *     EditPane: {Element}
- *     HelpPane: {Element}
+ *     LegendBar: {Element}
  *     MapPane: {Element}
  *     NavBar: {Element}
  *     PlotsPane: {Element}
+ *     SelectBar: {Element}
+ *     SettingsBar: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
  *     TitleBar: {Element}
@@ -33,14 +36,15 @@ var EditPane = require('EditPane'),
  *
  * @return _this {Object}
  *   {
- *     EditPane: {Object}
  *     Features: {Object}
  *     Feeds: {Object}
- *     HelpPane: {Object}
  *     JsonFeed: {Object}
+ *     LegendBar: {Object}
  *     MapPane: {Object}
  *     NavBar: {Object}
  *     PlotsPane: {Object}
+ *     SelectBar: {Object}
+ *     SettingsBar: {Object}
  *     SignificantEqs: {Object}
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
@@ -83,6 +87,7 @@ var Application = function (options) {
     _this.sideBarWidth = width || null;
 
     _redirect();
+    AppUtil.setFieldValues();
     _initClasses();
   };
 
@@ -107,13 +112,14 @@ var Application = function (options) {
 
     appClasses = [
       Features, // must be first
-      EditPane,
       Feeds,
-      HelpPane,
       JsonFeed,
+      LegendBar,
       MapPane,
       NavBar,
       PlotsPane,
+      SelectBar,
+      SettingsBar,
       SignificantEqs,
       StatusBar,
       SummaryPane,
@@ -198,11 +204,12 @@ var Application = function (options) {
     _resetScrollPositions();
 
     _this.Features.reset(); // reset Features first
-    _this.EditPane.reset();
     _this.Feeds.reset();
     _this.MapPane.reset();
     _this.NavBar.reset();
     _this.PlotsPane.reset();
+    _this.SelectBar.reset();
+    _this.SettingsBar.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
