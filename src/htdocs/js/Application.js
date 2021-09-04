@@ -73,18 +73,12 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var sideBar,
-        width;
+    var sideBar = document.getElementById('sideBar');
 
     _els = options || {};
-    sideBar = document.querySelector('#sideBar');
-
-    if (sideBar) {
-      width = sideBar.offsetWidth;
-    }
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
-    _this.sideBarWidth = width || null;
+    _this.sideBarWidth = sideBar.offsetWidth || null;
 
     _redirect();
     AppUtil.setFieldValues();
@@ -166,9 +160,12 @@ var Application = function (options) {
    * Reset saved scroll positions.
    */
   _resetScrollPositions = function () {
-    var id;
+    var id,
+        panes;
 
-    _this.NavBar.panes.forEach(pane => {
+    panes = document.querySelectorAll('section.pane');
+
+    panes.forEach(pane => {
       id = pane.getAttribute('id');
 
       window.sessionStorage.setItem(id, 0);
@@ -206,7 +203,6 @@ var Application = function (options) {
     _this.Features.reset(); // reset Features first
     _this.Feeds.reset();
     _this.MapPane.reset();
-    _this.NavBar.reset();
     _this.PlotsPane.reset();
     _this.SelectBar.reset();
     _this.SettingsBar.reset();
