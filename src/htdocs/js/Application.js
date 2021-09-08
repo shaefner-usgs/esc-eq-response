@@ -73,12 +73,10 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var sideBar = document.getElementById('sideBar');
-
     _els = options || {};
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
-    _this.sideBarWidth = sideBar.offsetWidth || null;
+    _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
     _redirect();
     AppUtil.setFieldValues();
