@@ -23,6 +23,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     overflow: hidden; /* Quell long attributions */
     padding: 2px 4px;
     text-overflow: ellipsis;
+    transition: margin $sidebar-duration ease;
     white-space: nowrap;
 
     a {
@@ -49,6 +50,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
   .leaflet-control-layers {
     font-family: $font-family-headers;
+    transition: margin $sidebar-duration ease;
 
     label {
       cursor: pointer;
