@@ -1,0 +1,42 @@
+@use 'variables' as *;
+
+#selectBar {
+  p + h3 {
+    margin: 1.25rem 0 .25rem;
+
+    span {
+      color: $text-color-lighter;
+      font-size: 1rem;
+      margin-left: .3rem;
+
+      &:after {
+        content: ')';
+      }
+      &:before {
+        content: '(';
+      }
+    }
+  }
+
+  ul + h3 {
+    margin-top: 1.25rem;
+  }
+
+  .details {
+    margin-top: 1.25rem;
+    max-height: 350px;
+    overflow: hidden;
+    transition: max-height .3s ease-out;
+
+    &.hide {
+      max-height: 0;
+      transition: max-height .1s ease-in;
+    }
+  }
+
+  .hide-link {
+    color: $text-color;
+    cursor: text;
+    text-decoration: none;
+  }
+}

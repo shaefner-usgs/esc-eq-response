@@ -1,0 +1,76 @@
+@use 'variables' as *;
+
+#significantEqs {
+  border: solid $border-color;
+  border-width: 1px 0;
+}
+
+div#significantEqs { /* loader */
+  height: 5rem;
+  position: relative;
+
+  .spinner {
+    top: 35%;
+  }
+}
+
+h4#significantEqs { /* no SignificantEqs msg */
+  padding: 1rem 0;
+}
+
+ul#significantEqs { /* list */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  li {
+    align-items: center;
+    border-bottom: 1px solid $border-color-lighter;
+    display: flex;
+    margin: 0;
+    padding: .5rem 0;
+    transition: all $hover-off-duration ease-in;
+
+    &:hover {
+      background: $accent-color-lightest;
+      color: $text-color-darker;
+      cursor: pointer;
+      transition: all $hover-on-duration ease-out;
+    }
+
+    &.selected {
+      background: $accent-color;
+      color: #fff;
+      transition: all $hover-on-duration ease-out;
+
+      &:hover {
+        cursor: auto;
+      }
+
+      p {
+        color: #fff;
+        transition: color $hover-on-duration ease-out;
+      }
+    }
+
+    &:last-child {
+      border: none;
+    }
+
+    div:first-of-type { /* mag */
+      font-size: 1.25rem;
+      min-width: 4rem;
+      text-align: center;
+    }
+  }
+
+  p {
+    color: $text-color-lighter;
+    margin: 0;
+    transition: color $hover-off-duration ease-in;
+  }
+}

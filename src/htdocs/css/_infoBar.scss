@@ -1,0 +1,43 @@
+@use 'variables' as *;
+
+#infoBar {
+  ol,
+  ul {
+    list-style: none;
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  .github {
+    border-top: 1px solid $border-color-lighter;
+    margin: 2rem 0 0;
+    padding-top: 4px;
+  }
+
+  .iconlist {
+    counter-reset: item;
+
+    > li {
+      counter-increment: item;
+      margin: 1rem 0;
+      padding-left: 2.2rem;
+      position: relative;
+
+      &:before {
+        background: #4a8def;
+        border-radius: 50%;
+        color: $bg-color;
+        content: counter(item);
+        font-size: 1.15rem;
+        height: 1.7rem;
+        left: 0;
+        line-height: 1;
+        padding-top: .3rem;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: 1.7rem;
+      }
+    }
+  }
+}
