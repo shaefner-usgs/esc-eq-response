@@ -11,9 +11,10 @@ $track-w: 18rem;
 $dist: $track-w - $thumb-d;
 
 @mixin close() { /* Note: used externally for Leaflet's close button */
-  background: none;
+  background: $bg-color;
   border-radius: 50%;
   color: $accent-color;
+  cursor: pointer;
   height: 23px;
   line-height: 1.35;
   padding: 0;
@@ -191,7 +192,7 @@ input[type="number"] {
   outline: none;
   padding: 6px 0 6px 6px;
   transition: all .25s ease-in-out;
-  width: 12rem;
+  width: 100%;
 
   &:autofill {
     background: none !important;
