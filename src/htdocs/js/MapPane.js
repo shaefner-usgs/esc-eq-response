@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 // Leaflet plugins and layer factories (these get attached to the global L obj)
 require('leaflet/Control-bottomCenter');
 require('leaflet/DarkLayer');
@@ -10,6 +13,7 @@ require('leaflet/GreyscaleLayer');
 require('leaflet/MousePosition');
 require('leaflet/SatelliteLayer');
 require('leaflet/TerrainLayer');
+require('leaflet/ZoomCenter');
 
 
 /**
@@ -40,8 +44,9 @@ var MapPane = function (options) {
 
       _app,
       _bounds,
+      _defaultBounds,
       _el,
-      _initialLoad,
+      _initialView,
       _layerControl,
       _map,
       _placeholders,
@@ -57,7 +62,6 @@ var MapPane = function (options) {
       _getStaticLayers,
       _initMap,
       _isBaseLayer,
-      _setDefaultView,
       _setView;
 
 
@@ -68,8 +72,12 @@ var MapPane = function (options) {
 
     _app = options.app;
     _bounds = L.latLngBounds();
+    _defaultBounds = L.latLngBounds([ // centered on contiguous U.S.
+      [8, -143],
+      [60, -48]
+    ]);
     _el = options.el || document.createElement('div');
-    _initialLoad = true;
+    _initialView = true;
     _placeholders = {};
     _staticLayers = _getStaticLayers();
 
@@ -88,6 +96,7 @@ var MapPane = function (options) {
     }).addTo(_map);
 
     L.control.scale().addTo(_map);
+    L.control.zoomCenter().addTo(_map);
   };
 
   /**
@@ -267,20 +276,23 @@ var MapPane = function (options) {
    * Create the Leaflet map instance.
    */
   _initMap = function () {
-    var zoomControl = _el.querySelector('.leaflet-control-zoom');
+    var zoomControl;
 
     _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
       tap: false, // fix for popups not opening in Safari, see: https://github.com/Leaflet/Leaflet/issues/7255
-      worldCopyJump: true
+      worldCopyJump: true,
+      zoomControl: false // hide default control in favor of custom control
     });
 
     _createPane('faults', 'tilePane');
     _addControls();
-    _setDefaultView();
+    _map.setView([0, 0], 1); // set arbitrary view to appease Leaflet
 
     // Hide zoom control on mobile (in favor of pinch-to-zoom)
     if (L.Browser.mobile) {
+      zoomControl = _el.querySelector('.leaflet-control-zoom');
+
       zoomControl.style.display = 'none';
     }
   };
@@ -305,21 +317,34 @@ var MapPane = function (options) {
   };
 
   /**
-   * Set the default map extent centered on the continental U.S.
+   * Set the map extent to contain an L.LatLngBounds instance.
+   *
+   * Note: _bounds can be passed to include all Features that have the
+   *       'zoomToLayer' property set to true.
+   *
+   * @param bounds {L.bounds} default is _defaultBounds
+   * @param animate {Boolean} default is false
    */
-  _setDefaultView = function () {
-    _map.setView([40, -96], 4);
-  };
+  _setView = function (bounds = _defaultBounds, animate = false) {
+    var status,
+        x;
 
-  /**
-   * Set the map extent to contain _bounds, which includes all Features whose
-   * 'zoomToLayer' property is set to true.
-   */
-  _setView = function () {
-    if (_bounds.isValid()) {
-      _map.fitBounds(_bounds, {
-        paddingTopLeft: L.point(0, 120) // accommodate header
+    status = _app.Features.getLoadingStatus();
+    x = 0;
+
+    if (AppUtil.getParam('sidebar')) {
+      x = -_app.sideBarWidth;
+    }
+
+    if (bounds.isValid()) {
+      _map.fitBounds(bounds, {
+        animate: animate,
+        paddingTopLeft: L.point(x, _app.headerHeight) // accommodate sidebar, header
       });
+
+      if (status === 'complete' && _app.NavBar.getPaneId() === 'mapPane') {
+        _initialView = false;
+      }
     }
   };
 
@@ -362,21 +387,22 @@ var MapPane = function (options) {
 
       if (feature.id === 'mainshock') {
         _bounds = _getBounds(layer.getLayers()[0].getLatLng());
-        _setView();
+
+        _setView(_bounds); // set initial map extent centered on Mainshock
       }
 
       // Turn layer "on" and set map bounds to contain Feature, if applicable
       if (feature.showLayer) {
         _map.addLayer(layer);
       }
-      if (feature.zoomToLayer && _initialLoad) {
+      if (feature.zoomToLayer && _initialView) {
         _bounds.extend(layer.getBounds());
       }
     }
 
     // Set final map extent once all Features are loaded
     if (status === 'complete') {
-      _setView();
+      _setView(_bounds, true);
     }
   };
 
@@ -467,16 +493,22 @@ var MapPane = function (options) {
    * Render the map correctly when the MapPane is activated.
    */
   _this.render = function () {
-    var status = _app.Features.getLoadingStatus();
+    var bounds,
+        status;
+
+    bounds = _defaultBounds;
+    status = _app.Features.getLoadingStatus();
 
     _map.invalidateSize(); // updates map if its container size was changed
     _map.fire('visible'); // displays popups added when map was hidden
 
-    // Set the initial view when MapPane is viewed for the first time.
-    if (_initialLoad && status === 'complete') {
-      _initialLoad = false;
+    // Set initial view (uses L.fitBounds, which only works when map is visible)
+    if (_initialView) {
+      if (status === 'complete') {
+        bounds = _bounds;
+      }
 
-      _setView();
+      _setView(bounds);
     }
   };
 
@@ -487,7 +519,7 @@ var MapPane = function (options) {
     var canvasEls = document.querySelectorAll('#mapPane > canvas');
 
     _bounds = L.latLngBounds();
-    _initialLoad = true;
+    _initialView = true;
     _placeholders = {};
 
     // Purge canvas elements (FM, MT beachballs)
@@ -502,35 +534,20 @@ var MapPane = function (options) {
       _layerControl = _addLayerControl();
     }
 
-    _setDefaultView();
+    _setView();
   };
 
   /**
-   * Shift the map to accommodate the Header and SideBar.
-   *
-   * @params opts {Object}
-   *   {
-   *     header: {Boolean} optional; default is false
-   *     sidebar: {Boolean} optional; default is false
-   *   }
+   * Shift the map to accommodate the SideBar opening/closing.
    */
-  _this.shiftMap = function (opts) {
+  _this.shiftMap = function () {
     var x = _app.sideBarWidth / 2;
 
     if (!document.body.classList.contains('sidebar')) {
       x = x * -1;
     }
 
-    opts = Object.assign({
-      header: false,
-      sidebar: false
-    }, opts);
-
-    if (opts.sidebar) {
-      _map.panBy([x, 0], {
-        animate: false
-      });
-    }
+    _map.panBy([x, 0]);
   };
 
 
