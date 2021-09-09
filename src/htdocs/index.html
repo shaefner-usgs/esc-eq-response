@@ -18,105 +18,20 @@
       </div>
       <nav id="navBar">
         <ul id="navMain">
-          <li><a href="#editPane">Edit</a></li>
           <li><a href="#mapPane">Map</a></li>
           <li><a href="#plotsPane">Plots</a></li>
           <li><a href="#summaryPane">Summary</a></li>
-          <li><a href="#helpPane">Help</a></li>
         </ul>
         <ul id="navSub">
-          <li><i class="icon-select"></i></li>
-          <li><i class="icon-search"></i></li>
-          <li><i class="icon-settings"></i></li>
-          <li><i class="icon-legend"></i></li>
-          <li><i class="icon-info"></i></li>
+          <li><i class="icon-selectBar"></i></li>
+          <li><i class="icon-searchBar"></i></li>
+          <li><i class="icon-settingsBar"></i></li>
+          <li><i class="icon-legendBar"></i></li>
+          <li><i class="icon-infoBar"></i></li>
         </ul>
       </nav>
     </header>
     <main>
-      <section id="editPane" class="hide pane">
-        <div class="content">
-          <p>This web application creates a map, interactive plots, and summary
-            for an earthquake using real-time data. It helps you visualize,
-            analyze, and collect information to use in talking points and scientific
-            response. Curious? Check out the <a href="./?eqid=nc72282711">2014
-            Napa earthquake</a>.</p>
-          <p>To get started, select a Mainshock from the list of Significant
-            Earthquakes or enter an Event ID manually.</p>
-        </div>
-        <div class="content darker">
-          <form>
-            <fieldset>
-              <legend>Mainshock to Present</legend>
-              <div class="mainshock">
-                <h3>Mainshock
-                  <span class="hide breather"></span>
-                </h3>
-                <label for="eqid">
-                  Event ID (typically 2 letters followed by 8-10 characters)
-                </label>
-                <input type="text" id="eqid" value="" required="required"
-                  pattern="^[^/\\:]+$" tabindex="2" />
-              </div>
-              <div class="hide details"></div>
-              <div class="aftershocks">
-                <h3>Aftershocks
-                  <span class="hide breather"></span>
-                  <span class="hide count"></span>
-                </h3>
-                <label for="as-mag">Min magnitude</label>
-                <input type="number" id="as-mag" value="0" min="0" max="9"
-                  step="0.1" autocomplete="off" required="required" tabindex="3" />
-                <label for="as-dist">Max distance from mainshock (km)</label>
-                <input type="number" id="as-dist" value="" min="1" step="1"
-                  autocomplete="off" required="required" tabindex="4" />
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend>Before the Mainshock</legend>
-              <div class="foreshocks">
-                <h3>Foreshocks
-                  <span class="hide breather"></span>
-                  <span class="hide count"></span>
-                </h3>
-                <label for="fs-mag">Min magnitude</label>
-                <input type="number" id="fs-mag" value="1" min="0" max="9"
-                  step="0.1" autocomplete="off" required="required" tabindex="5" />
-                <label for="fs-dist">Max distance from mainshock (km)</label>
-                <input type="number" id="fs-dist" value="" min="1" step="1"
-                  autocomplete="off" required="required" tabindex="6" />
-                <label for="fs-days">Max days before mainshock</label>
-                <input type="number" id="fs-days" value="30" min="1" step="1"
-                  autocomplete="off" required="required" tabindex="7" />
-              </div>
-              <div class="historical">
-                <h3>Historical Seismicity
-                  <span class="hide breather"></span>
-                  <span class="hide count"></span>
-                </h3>
-                <label for="hs-mag">Min magnitude</label>
-                <input type="number" id="hs-mag" value="" min="0" max="9"
-                  step="0.1" autocomplete="off" required="required" tabindex="8" />
-                <label for="hs-dist">Max distance from mainshock (km)</label>
-                <input type="number" id="hs-dist" value="" min="1" step="1"
-                  autocomplete="off" required="required" tabindex="9" />
-                <label for="hs-years">Max years before mainshock</label>
-                <input type="number" id="hs-years" value="10" min="1" step="1"
-                  autocomplete="off" required="required" tabindex="10" />
-              </div>
-            </fieldset>
-            <fieldset class="buttons">
-              <button type="reset" class="reset">Reset</button>
-              <p class="required">* All fields are required</p>
-            </fieldset>
-          </form>
-        </div>
-        <div class="content">
-          <p class="comcat">Earthquake data is from
-            <a href="https://earthquake.usgs.gov/data/comcat/data-availability.php">ComCat</a>.
-          </p>
-        </div>
-      </section>
       <section id="mapPane" class="hide pane">
         <div class="map"></div>
       </section>
@@ -127,87 +42,137 @@
         <div class="features"></div>
         <time id="updated"></time>
       </section>
-      <section id="helpPane" class="hide pane">
-        <div class="content">
-          <div class="columns">
-            <div class="column instructions">
-              <h2>Instructions</h2>
-              <ol class="iconlist">
-                <li>
-                  <h3>Select the ‘<em class="navbutton">Edit</em>’ tab and enter
-                    the <strong>Mainshock</strong> Event ID</h3>
-                  <p>Select an earthquake from ‘Significant Earthquakes in the
-                    Past Month’ or enter an Event ID manually.</p>
-                  <h4>Find an Earthquake</h4>
-                  <ul class="find">
-                    <li><a href="https://earthquake.usgs.gov/earthquakes/map">Latest
-                      Earthquakes</a></li>
-                    <li><a href="https://earthquake.usgs.gov/earthquakes/search">Search
-                      Earthquake Catalog</a></li>
-                  </ul>
-                  <p>You can get the Event ID from the <abbr
-                    title="Uniform Resource Locator (web address)">URL</abbr> of an
-                    <a href="https://earthquake.usgs.gov/earthquakes/eventpage/nc72282711">Event
-                    Page</a> for a specific earthquake. For example:</p>
-                  <img src="img/eventid.png" alt="image showing the URL"
-                    class="eventid" />
-                </li>
-                <li>
-                  <h3>Tweak the parameters for <strong>Aftershocks</strong>,
-                    <strong>Foreshocks</strong> or <strong>Historical
-                      Seismicity</strong> (optional)</h3>
-                  <p>Initial parameter values are set automatically based on the
-                    mainshock’s magnitude and estimated rupture length.</p>
-                  <p>When you customize the parameters, the URL is automatically
-                    updated to reflect the new value(s), making it easy to share
-                    or bookmark your settings.</p>
-                </li>
-                <li>
-                  <h3>Select the ‘<em class="navbutton">Map</em>’,
-                    ‘<em class="navbutton">Plots</em>’ or
-                    ‘<em class="navbutton">Summary</em>’ tab</h3>
-                </li>
-              </ol>
-            </div>
-            <div class="column legend">
-              <h2>Legend</h2>
-              <ul>
-                <li class="mainshock">Mainshock</li>
-                <li class="aftershocks">Aftershocks
-                  <ul>
-                    <li class="asHour">Past hour</li>
-                    <li class="asDay">Past day</li>
-                    <li class="asWeek">Past week</li>
-                    <li class="asOlder">Older</li>
-                  </ul>
-                </li>
-                <li class="foreshocks">Foreshocks</li>
-                <li class="historical">Historical Seismicity</li>
-                <li class="magnitude">Magnitude</li>
-                <li class="fieldnotes">FieldNotes
-                  <img src="img/pin-s-star+c0f@2x.png" alt="fieldnotes icon" />
-                </li>
-                <li class="faults">Faults / Plate Boundaries</li>
-                <li class="shakemap">ShakeMap Stations</li>
-                <li class="intensity">Intensity
-                  <img src="img/legend-intensity.png" alt="intensity scale" />
-                </li>
-              </ul>
-            </div>
-            <div class="column tips">
-              <h2>Tips</h2>
-              <ol class="iconlist">
-                <li>Click on an earthquake in the summary list or on a (2d) plot
-                  to view the earthquake and additional details on the map.
-                </li>
-                <li>Scroll using the left / right edges of the page when viewing
-                  plots to avoid unintentionally interacting with them. Use the
-                  ‘control’ key to pan a 3d plot.
-                </li>
-              </ol>
-            </div>
+      <section id="sel-mainshock">
+        <h2>No Mainshock</h2>
+        <p><a href="#mapPane" class="select">Select an earthquake</a></p>
+      </section>
+    </main>
+    <aside id="sideBar">
+      <form>
+        <section id="selectBar" class="bar hide">
+          <div class="content">
+            <h2>Select an Earthquake</h2>
+            <p>Select an earthquake from the list or on the <a href="#mapPane">map</a>,
+              or <a href="#" class="search">search</a> the catalog for an
+              earthquake. You can also enter an Event ID manually below.</p>
+            <h3>Significant Earthquakes <span>Past Month</span></h3>
+            <div id="significantEqs"><div class="spinner"></div></div>
+            <h3>Mainshock</h3>
+            <label for="eqid">Event ID</label>
+            <input type="text" id="eqid" value="" required="required"
+              pattern="^[^/\\:]+$" tabindex="1" />
+            <div class="hide details"></div>
+            <button type="reset" class="reset">Reset</button>
           </div>
-          <h2>Contacts</h2>
+        </section>
+        <section id="searchBar" class="bar hide">
+          <div class="content">
+            <h2>Search the Catalog</h2>
+          </div>
+        </section>
+        <section id="settingsBar" class="bar hide">
+          <div class="content">
+            <h2>Settings</h2>
+            <div class="aftershocks">
+              <h3>Aftershocks
+                <span class="hide breather"></span>
+                <span class="hide count"></span>
+              </h3>
+              <label for="as-mag">Min magnitude</label>
+              <input type="number" id="as-mag" value="0" min="0" max="9"
+                step="0.1" autocomplete="off" required="required" tabindex="2" />
+              <label for="as-dist">Max distance from mainshock (km)</label>
+              <input type="number" id="as-dist" value="" min="1" step="1"
+                autocomplete="off" required="required" tabindex="3" />
+            </div>
+            <div class="foreshocks">
+              <h3>Foreshocks
+                <span class="hide breather"></span>
+                <span class="hide count"></span>
+              </h3>
+              <label for="fs-mag">Min magnitude</label>
+              <input type="number" id="fs-mag" value="1" min="0" max="9"
+                step="0.1" autocomplete="off" required="required" tabindex="4" />
+              <label for="fs-dist">Max distance from mainshock (km)</label>
+              <input type="number" id="fs-dist" value="" min="1" step="1"
+                autocomplete="off" required="required" tabindex="5" />
+              <label for="fs-days">Max days before mainshock</label>
+              <input type="number" id="fs-days" value="30" min="1" step="1"
+                autocomplete="off" required="required" tabindex="6" />
+            </div>
+            <div class="historical">
+              <h3>Historical Seismicity
+                <span class="hide breather"></span>
+                <span class="hide count"></span>
+              </h3>
+              <label for="hs-mag">Min magnitude</label>
+              <input type="number" id="hs-mag" value="" min="0" max="9"
+                step="0.1" autocomplete="off" required="required" tabindex="7" />
+              <label for="hs-dist">Max distance from mainshock (km)</label>
+              <input type="number" id="hs-dist" value="" min="1" step="1"
+                autocomplete="off" required="required" tabindex="8" />
+              <label for="hs-years">Max years before mainshock</label>
+              <input type="number" id="hs-years" value="10" min="1" step="1"
+                autocomplete="off" required="required" tabindex="9" />
+            </div>
+            <p>Initial parameter values are set automatically based on the
+              Mainshock’s magnitude and estimated rupture length.</p>
+            <p>When you customize the parameters, the
+              <abbr title="Uniform Resource Locator (web address)">URL</abbr> is
+              automatically updated to reflect the new value(s), making it easy to
+              share or bookmark your settings.</p>
+            <p class="required">* All fields are required</p>
+          </div>
+        </section>
+      </form>
+      <section id="legendBar" class="bar hide">
+        <div class="content">
+          <h2>Legend</h2>
+          <ul>
+            <li class="mainshock">Mainshock</li>
+            <li class="aftershocks">Aftershocks
+              <ul>
+                <li class="asHour">Past hour</li>
+                <li class="asDay">Past day</li>
+                <li class="asWeek">Past week</li>
+                <li class="asOlder">Older</li>
+              </ul>
+            </li>
+            <li class="foreshocks">Foreshocks</li>
+            <li class="historical">Historical Seismicity</li>
+            <li class="magnitude">Magnitude</li>
+            <li class="fieldnotes">FieldNotes
+              <img src="img/pin-s-star+c0f@2x.png" alt="fieldnotes icon" />
+            </li>
+            <li class="faults">Faults / Plate Boundaries</li>
+            <li class="shakemap">ShakeMap Stations</li>
+            <li class="intensity">Intensity
+              <img src="img/legend-intensity.png" alt="intensity scale" />
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section id="infoBar" class="bar hide">
+        <div class="content">
+          <h2>Earthquake Response App</h2>
+          <p>This web application creates an interactive map, plots, and summary
+            for an earthquake using real-time data. It helps you visualize,
+            analyze, and collect information to use in talking points and
+            scientific response.</p>
+          <p class="comcat">Earthquake data is from
+            <a href="https://earthquake.usgs.gov/data/comcat/data-availability.php">ComCat</a>.
+          </p>
+          <h3>Tips</h3>
+          <ol class="iconlist">
+            <li>Click on an earthquake in the summary list or on a (2d) plot
+              to view the earthquake and additional details on the map.
+            </li>
+            <li>Scroll using the left / right edges of the page when viewing
+              plots to avoid unintentionally interacting with them. Use the
+              ‘control’ key to pan a 3d plot.
+            </li>
+          </ol>
+          <h3>Contacts</h3>
           <ul>
             <li><a href="mailto:shaefner@usgs.gov">Scott Haefner</a></li>
             <li><a href="mailto:baagaard@usgs.gov">Brad Aagaard</a></li>
@@ -217,27 +182,6 @@
               repository</a>
           </p>
         </div>
-      </section>
-      <section id="sel-mainshock">
-        <h2>No Mainshock Selected</h2>
-        <p><a href="#editPane">Select an earthquake</a></p>
-      </section>
-    </main>
-    <aside id="sideBar">
-      <section id="select" class="content hide">
-        <h3>Select an Earthquake</h3>
-      </section>
-      <section id="search" class="content hide">
-        <h3>Search the Catalog</h3>
-      </section>
-      <section id="settings" class="content hide">
-        <h3>Settings</h3>
-      </section>
-      <section id="legend" class="content hide">
-        <h3>Legend</h3>
-      </section>
-      <section id="info" class="content hide">
-        <h3>Earthquake Response App</h3>
       </section>
       <a class="icon-close">×</a>
     </aside>
