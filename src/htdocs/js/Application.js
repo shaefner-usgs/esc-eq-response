@@ -29,6 +29,7 @@ var AppUtil = require('util/AppUtil'),
  *     PlotsPane: {Element}
  *     SelectBar: {Element}
  *     SettingsBar: {Element}
+ *     SignificantEqs: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
  *     TitleBar: {Element}
