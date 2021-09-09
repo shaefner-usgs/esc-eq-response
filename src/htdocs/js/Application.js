@@ -61,6 +61,7 @@ var Application = function (options) {
       _initialize,
 
       _els,
+      _sidebar,
       _throttle,
 
       _addListeners,
@@ -74,12 +75,14 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _els = options || {};
+    _sidebar = document.getElementById('sideBar');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
     _redirect();
     AppUtil.setFieldValues();
+    _resetScrollPositions();
     _initClasses();
   };
 
@@ -87,9 +90,26 @@ var Application = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    // Save scroll position when user scrolls
+    var selects = document.querySelectorAll('.select');
+
+    // Save scroll position of panes
     window.addEventListener('scroll', () => {
-      _saveScrollPosition();
+      _saveScrollPosition('pane');
+    });
+
+    // Save scroll position of sidebars
+    _sidebar.addEventListener('scroll', () => {
+      _saveScrollPosition('sidebar');
+    });
+
+    // Show the selectBar when a 'select' link is clicked
+    selects.forEach(select => {
+      select.addEventListener('click', () => {
+        window.sessionStorage.setItem('selectBar', 0);
+
+        _this.NavBar.switchSideBars('selectBar');
+        _this.setScrollPosition('selectBar');
+      });
     });
   };
 
@@ -159,12 +179,12 @@ var Application = function (options) {
    */
   _resetScrollPositions = function () {
     var id,
-        panes;
+        sections;
 
-    panes = document.querySelectorAll('section.pane');
+    sections = document.querySelectorAll('section.bar, section.pane');
 
-    panes.forEach(pane => {
-      id = pane.getAttribute('id');
+    sections.forEach(section => {
+      id = section.getAttribute('id');
 
       window.sessionStorage.setItem(id, 0);
     });
@@ -172,13 +192,21 @@ var Application = function (options) {
 
   /**
    * Save the current scroll position in sessionStorage.
+   *
+   * @param type {String}
+   *     'pane' or 'sidebar'
    */
-  _saveScrollPosition = function () {
+  _saveScrollPosition = function (type) {
     var id,
         position;
 
-    id = _this.NavBar.getPaneId();
-    position = window.pageYOffset;
+    if (type === 'sidebar') {
+      id = AppUtil.getParam('sidebar');
+      position = _sidebar.scrollTop;
+    } else { // 'pane'
+      id = _this.NavBar.getPaneId();
+      position = window.pageYOffset;
+    }
 
     window.clearTimeout(_throttle);
 
@@ -210,15 +238,19 @@ var Application = function (options) {
   };
 
   /**
-   * Set the scroll position to the previous value.
+   * Set the scroll position of the pane or sidebar to the previous value.
    *
    * @param id {String}
    */
   _this.setScrollPosition = function (id) {
-    var position = window.sessionStorage.getItem(id);
+    var position = Number(window.sessionStorage.getItem(id));
 
-    if (position) {
-      window.scroll(0, position);
+    if (position !== null) {
+      if (/Pane$/.test(id)) { // pane
+        window.scroll(0, position);
+      } else { // sidebar
+        _sidebar.scrollTop = position;
+      }
     }
   };
 
