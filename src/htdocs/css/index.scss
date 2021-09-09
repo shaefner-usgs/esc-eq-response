@@ -1,17 +1,19 @@
 @use 'sass:color';
 
 @use 'controls';
-@use 'editPane';
 @use 'features/index' as features;
 @use 'header';
-@use 'helpPane';
 @use 'icons';
 @use 'impactBubbles';
+@use 'infoBar';
+@use 'legendBar';
 @use 'lightbox';
 @use 'loaders';
 @use 'mapPane';
 @use 'navBar';
 @use 'plotsPane';
+@use 'selectBar';
+@use 'settingsBar';
 @use 'sideBar';
 @use 'statusBar';
 @use 'summaryPane';
@@ -107,10 +109,12 @@ h2 {
 }
 h3 {
   font-size: 1.5rem;
+  line-height: 1.4;
   margin: 1rem 0;
 }
 h4 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  line-height: 1.4;
   margin: 0;
 }
 h5 {
@@ -169,11 +173,13 @@ tr {
   padding: var(--padding-header) 0 0;
   position: absolute;
   top: 0;
+  transition: padding $sidebar-duration ease;
   width: 100%;
 
   h2 {
     font-size: 1.75rem;
     margin: 0 0 1rem;
+    text-align: center;
   }
 
   p {
