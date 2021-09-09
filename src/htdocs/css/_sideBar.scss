@@ -1,3 +1,4 @@
+@use 'significantEqs';
 @use 'variables' as *;
 
 body.sidebar {
@@ -12,10 +13,10 @@ body.sidebar {
 
   #sideBar {
     border-left: 1px solid $border-color;
-    width: $sidebar-width;
+    margin-right: 0;
 
     .icon-close {
-      position: fixed;
+      right: 1rem;
     }
   }
 
@@ -36,12 +37,14 @@ body.sidebar {
 #sideBar {
   background: $bg-color;
   bottom: 0;
+  margin-right: $sidebar-width * -1;
   overflow: scroll;
   padding: 0;
   position: fixed;
   right: 0;
   top: var(--padding-header);
-  width: 0;
+  transition: margin $sidebar-duration ease;
+  width: $sidebar-width;
   z-index: 1000;
 
   /* hide scrollbars */
@@ -52,13 +55,28 @@ body.sidebar {
     display: none; /* Chrome, Safari, and Opera */
   }
 
+  h2 {
+    font-size: 1.75rem;
+    margin-top: 0;
+  }
+
+  label {
+    color: $text-color-lighter;
+    cursor: pointer;
+    display: block;
+    font-weight: 300;
+    letter-spacing: .015rem;
+    margin: 1rem 0 .25rem;
+  }
+
   section.hide {
     display: none;
   }
 
   .icon-close {
-    cursor: pointer;
+    position: fixed;
+    right: $sidebar-width * -1;
     top: 8rem;
-    right: 1rem;
+    transition: right $sidebar-duration ease;
   }
 }
