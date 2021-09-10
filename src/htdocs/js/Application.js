@@ -89,7 +89,7 @@ var Application = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var selects = document.querySelectorAll('.select');
+    var select = document.querySelector('.select');
 
     // Save scroll position of panes
     window.addEventListener('scroll', () => {
@@ -101,14 +101,12 @@ var Application = function (options) {
       _saveScrollPosition('sidebar');
     });
 
-    // Show the selectBar when a 'select' link is clicked
-    selects.forEach(select => {
-      select.addEventListener('click', () => {
-        window.sessionStorage.setItem('selectBar', 0);
+    // Show the SelectBar when the 'Select an earthquake' link is clicked
+    select.addEventListener('click', () => {
+      window.sessionStorage.setItem('selectBar', 0);
 
-        _this.NavBar.switchSideBars('selectBar');
-        _this.setScrollPosition('selectBar');
-      });
+      _this.NavBar.switchSideBars('selectBar');
+      _this.setScrollPosition('selectBar');
     });
   };
 
