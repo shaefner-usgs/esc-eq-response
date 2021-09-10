@@ -16,6 +16,8 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *   {
  *     fetch: {Function}
+ *     initThrottlers: {Function}
+ *     throttlers: {Object}
  *   }
  */
 var JsonFeed = function (options) {
@@ -33,6 +35,8 @@ var JsonFeed = function (options) {
     options = options || {};
 
     _app = options.app;
+
+    _this.throttlers = {};
   };
 
   /**
@@ -129,6 +133,25 @@ var JsonFeed = function (options) {
 
       console.error(error);
     }
+  };
+
+  /**
+   * Initialize throttlers that are used to minimize 'stacked' Fetch
+   * requests when loading Features.
+   *
+   * @param id {String}
+   *     Feature id
+   */
+  _this.initThrottlers = function (id) {
+    if (!Object.prototype.hasOwnProperty.call(_this.throttlers, id)) {
+      _this.throttlers[id] = [];
+    }
+
+    // Clear any previous throttled requests for this Feature
+    _this.throttlers[id].forEach(timer => {
+      window.clearTimeout(timer);
+      _this.throttlers[id].shift();
+    });
   };
 
 
