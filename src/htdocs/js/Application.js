@@ -67,7 +67,6 @@ var Application = function (options) {
 
       _addListeners,
       _initClasses,
-      _redirect,
       _resetScrollPositions,
       _saveScrollPosition;
 
@@ -81,7 +80,6 @@ var Application = function (options) {
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
-    _redirect();
     AppUtil.setFieldValues();
     _resetScrollPositions();
     _initClasses();
@@ -159,20 +157,6 @@ var Application = function (options) {
     postInits.forEach(name => {
       name.postInit();
     });
-  };
-
-  /**
-   * Redirect users using old (less succinct) parameter names.
-   */
-  _redirect = function () {
-    var url  = window.location.href;
-
-    url = url.replace(/aftershocks/g, 'as');
-    url = url.replace(/foreshocks/g, 'fs');
-    url = url.replace(/historical/g, 'hs');
-    url = url.replace(/minmag/g, 'mag');
-
-    history.replaceState(null, '', url);
   };
 
   /**
