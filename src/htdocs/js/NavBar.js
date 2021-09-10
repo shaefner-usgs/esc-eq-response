@@ -1,8 +1,12 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
- * Switch between panes (i.e. 'pages') of the app.
+ * Switch between panes (i.e. 'pages') of the app and toggle/switch between
+ * sidebars.
  *
  * Also mitigate issues where map/plots don't render correctly when they're
  * created while their respective pane is hidden.
@@ -18,6 +22,7 @@
  *     getPaneId: {Function}
  *     postInit: {Function}
  *     reset: {Function}
+ *     switchSideBars: {Function}
  *   }
  */
 var NavBar = function (options) {
@@ -25,14 +30,19 @@ var NavBar = function (options) {
       _initialize,
 
       _app,
+      _defaultPaneId,
       _el,
+      _panes,
+      _sideBars,
 
       _addListeners,
-      _hidePanes,
+      _hideAll,
       _renderPane,
       _renderPlots,
       _showPane,
-      _switchPanes;
+      _showSideBar,
+      _switchPanes,
+      _toggleSideBar;
 
 
   _this = {};
@@ -41,34 +51,69 @@ var NavBar = function (options) {
     options = options || {};
 
     _app = options.app;
+    _defaultPaneId = 'mapPane';
     _el = options.el || document.createElement('div');
+    _panes = document.querySelectorAll('section.pane');
+    _sideBars = document.querySelectorAll('section.bar');
 
-    _this.panes = document.querySelectorAll('section.pane');
+    _addListeners();
   };
 
   /**
    * Add event listeners.
    */
   _addListeners = function () {
-    // Update the UI when user switches panes
+    var close,
+        lis;
+
+    close = document.querySelector('aside .icon-close');
+    lis = _el.querySelectorAll('#navSub li');
+
+    // Switch between panes
     window.addEventListener('hashchange', () => {
       _switchPanes();
+    });
+
+    // Switch between sidebars
+    lis.forEach(li => {
+      li.addEventListener('click', function() {
+        var button,
+            id;
+
+        button = this.querySelector('i');
+        id = button.className.match(/icon-(\w+)/)[1];
+
+        _this.switchSideBars(id);
+      });
+    });
+
+    // Close the sidebar
+    close.addEventListener('click', () => {
+      _toggleSideBar('off');
     });
   };
 
   /**
-   * Hide all panes and unselect all nav buttons.
+   * Hide all panes or sidebars and unselect all of their nav buttons.
+   *
+   * @param els {Elements}
+   *     panes or sidebars
    */
-  _hidePanes = function () {
+  _hideAll = function (els) {
     var button,
         id;
 
-    _this.panes.forEach(pane => {
-      id = pane.getAttribute('id');
-      button = _el.querySelector('[href="#' + id + '"]');
+    els.forEach(el => {
+      id = el.getAttribute('id');
+
+      if (el.classList.contains('pane')) { // panes
+        button = _el.querySelector('[href="#' + id + '"]');
+      } else { // sidebars
+        button = _el.querySelector('.icon-' + id);
+      }
 
       button.classList.remove('selected');
-      pane.classList.add('hide');
+      el.classList.add('hide');
     });
   };
 
@@ -81,9 +126,7 @@ var NavBar = function (options) {
   _renderPane = function (id) {
     _app.setScrollPosition(id);
 
-    if (id === 'editPane') {
-      _app.EditPane.setFocusedField();
-    } else if (id === 'mapPane') {
+    if (id === 'mapPane') {
       _app.MapPane.render();
     } else if (id === 'plotsPane') {
       _renderPlots();
@@ -111,7 +154,7 @@ var NavBar = function (options) {
       }, 25);
     }
 
-    _app.PlotsPane.resize(); // in case user adjusted window size
+    _app.PlotsPane.resize(); // in case size of content area changed
   };
 
   /**
@@ -122,15 +165,43 @@ var NavBar = function (options) {
    */
   _showPane = function (id) {
     var button,
-        pane;
+        link,
+        selPane;
 
     button = _el.querySelector('[href="#' + id + '"]');
-    pane = document.getElementById(id);
+    link = document.querySelector('#selectBar a[href="#mapPane"]');
+    selPane = document.getElementById(id);
 
     button.classList.add('selected');
-    pane.classList.remove('hide');
+    selPane.classList.remove('hide');
+
+    // unlink 'map' text on selectBar when mapPane is visible
+    if (id === 'mapPane') {
+      link.classList.add('hide-link');
+    } else {
+      link.classList.remove('hide-link');
+    }
 
     _renderPane(id);
+  };
+
+  /**
+   * Show the sidebar matching the given id value, set the sidebar urlParam,
+   * and select the given nav button.
+   *
+   * @param id {String}
+   */
+  _showSideBar = function (id) {
+    var button,
+        selSideBar;
+
+    button = _el.querySelector('.icon-' + id);
+    selSideBar = document.getElementById(id);
+
+    button.classList.add('selected');
+    selSideBar.classList.remove('hide');
+
+    _toggleSideBar('on');
   };
 
   /**
@@ -139,8 +210,56 @@ var NavBar = function (options) {
   _switchPanes = function () {
     var id = _this.getPaneId();
 
-    _hidePanes();
+    _hideAll(_panes);
     _showPane(id);
+  };
+
+  /**
+   * Toggle the sidebar on/off and shift the map's center point. Also resize
+   * plots if they are visible and set the sidebar URLparam.
+   *
+   * @param status {String}
+   *     either 'on' or 'off'
+   */
+  _toggleSideBar = function (status) {
+    var button,
+        id,
+        selSideBar,
+        toggled;
+
+    button = _el.querySelector('#navSub .selected');
+    id = button.className.match(/icon-(\w+)/)[1];
+    selSideBar = document.getElementById(id);
+    toggled = true;
+
+    if (status === 'on') { // open
+      AppUtil.setParam('sidebar', id);
+      _app.setScrollPosition(id);
+
+      if (document.body.classList.contains('sidebar')) {
+        toggled = false; // already open
+      } else {
+        document.body.classList.add('sidebar');
+      }
+
+      if (id === 'settingsBar') {
+        _app.SettingsBar.setFocusedField();
+      }
+    } else { // close
+      AppUtil.setParam('sidebar', '');
+      _hideAll(_sideBars);
+
+      selSideBar.classList.remove('hide'); // keep visible for animation
+      document.body.classList.remove('sidebar');
+    }
+
+    if (toggled) {
+      _app.MapPane.shiftMap();
+
+      if (_this.getPaneId() === 'plotsPane') {
+        _app.PlotsPane.resize();
+      }
+    }
   };
 
   // ----------------------------------------------------------
@@ -158,7 +277,7 @@ var NavBar = function (options) {
         paneExists;
 
     hash = location.hash;
-    id = 'editPane'; // default
+    id = _defaultPaneId;
     paneExists = document.querySelector('section' + hash);
 
     if (hash && paneExists) {
@@ -172,15 +291,44 @@ var NavBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _addListeners();
-    _switchPanes();
+    var paneId,
+        sideBarId;
+
+    paneId = _this.getPaneId();
+    sideBarId = AppUtil.getParam('sidebar');
+
+    if (sideBarId === null) {
+      sideBarId = 'selectBar'; // default
+    }
+
+    if (sideBarId) {
+      _showSideBar(sideBarId);
+    }
+
+    _showPane(paneId);
   };
 
   /**
    * Reset to default state.
    */
   _this.reset = function () {
+    location.hash = _defaultPaneId;
 
+    _switchPanes();
+  };
+
+  /**
+   * Switch between sidebars.
+   *
+   * @param id {String}
+   */
+  _this.switchSideBars = function (id) {
+    if (id === AppUtil.getParam('sidebar')) {
+      window.sessionStorage.setItem(id, 0); // reset scroll position to top
+    }
+
+    _hideAll(_sideBars);
+    _showSideBar(id);
   };
 
 

@@ -1,6 +1,7 @@
 @use 'sass:color';
 
 @use 'svgUrl' as *;
+@use '../controls' as *;
 @use '../variables' as *;
 
 $separator-color: color.scale($accent-color, $lightness: 80%);
@@ -22,6 +23,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     overflow: hidden; /* Quell long attributions */
     padding: 2px 4px;
     text-overflow: ellipsis;
+    transition: margin $sidebar-duration ease;
     white-space: nowrap;
 
     a {
@@ -48,6 +50,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
   .leaflet-control-layers {
     font-family: $font-family-headers;
+    transition: margin $sidebar-duration ease;
 
     label {
       cursor: pointer;
@@ -136,27 +139,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-popup-close-button {
-    background: none;
-    border-radius: 50%;
-    color: $accent-color;
-    height: 23px;
-    line-height: 1.35;
-    padding: 0;
-    right: 2px;
-    top: 2px;
-    text-align: center;
-    transition: all $hover-off-duration ease-in;
-    width: 23px;
-
-    &:hover {
-      background: $accent-color-lightest;
-      transition: background $hover-on-duration ease-out;
-    }
-    &:active {
-      background: $accent-color;
-      color: $bg-color;
-      transition: all $hover-on-duration ease-out;
-    }
+    @include close;
   }
 
   .leaflet-popup-content {

@@ -82,7 +82,7 @@ var Features = function (options) {
 
   /**
    * Add the given Feature to Map/Plots/SummaryPanes; add the Feature's count to
-   * EditPane.
+   * SettingsBar.
    *
    * @param feature {Object}
    */
@@ -92,8 +92,8 @@ var Features = function (options) {
     try {
       _app.MapPane.addFeature(feature);
       _app.PlotsPane.addFeature(feature);
+      _app.SettingsBar.addCount(feature);
       _app.SummaryPane.addFeature(feature);
-      _app.EditPane.addCount(feature);
 
       if (status === 'complete') {
         _this.getFeature('mainshock').enableButton();
@@ -101,8 +101,8 @@ var Features = function (options) {
 
       if (feature.id === 'mainshock') {
         feature.addListener();
-        _app.EditPane.showMainshock();
-        _app.EditPane.setDefaults();
+        _app.SelectBar.showMainshock();
+        _app.SettingsBar.setDefaults();
 
         // Create the other Features now that the Mainshock is ready
         _createFeatures();
@@ -126,9 +126,9 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _addLoaders = function (feature) {
-    _app.EditPane.addLoader(feature);
     _app.MapPane.addLoader(feature);
     _app.PlotsPane.addLoader(feature);
+    _app.SettingsBar.addLoader(feature);
     _app.SummaryPane.addLoader(feature);
   };
 
@@ -256,15 +256,15 @@ var Features = function (options) {
 
   /**
    * Remove the given Feature from Map/Plots/SummaryPanes; remove the Feature's
-   * count from EditPane.
+   * count from SettingsBar.
    *
    * @param feature {Object}
    */
   _removeFeature = function (feature) {
     if (_this.isFeature(feature.id)) {
-      _app.EditPane.removeCount(feature);
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
+      _app.SettingsBar.removeCount(feature);
       _app.SummaryPane.removeFeature(feature);
     }
   };
@@ -412,7 +412,7 @@ var Features = function (options) {
 
       _this.createFeature(feature.id);
 
-      // Refresh FieldNotes when Aftershocks is refreshed (shares EditPane params)
+      // Refresh FieldNotes when Aftershocks is refreshed (shares SettingsBar params)
       if (feature.id === 'aftershocks') {
         _this.refreshFeature(_features.fieldnotes);
       }

@@ -1,14 +1,16 @@
 'use strict';
 
 
-var EditPane = require('EditPane'),
+var AppUtil = require('util/AppUtil'),
     Features = require('Features'),
     Feeds = require('Feeds'),
-    HelpPane = require('HelpPane'),
     JsonFeed = require('JsonFeed'),
+    LegendBar = require('LegendBar'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
+    SelectBar = require('SelectBar'),
+    SettingsBar = require('SettingsBar'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane'),
@@ -21,11 +23,13 @@ var EditPane = require('EditPane'),
  *
  * @param options {Object}
  *   {
- *     EditPane: {Element}
- *     HelpPane: {Element}
+ *     LegendBar: {Element}
  *     MapPane: {Element}
  *     NavBar: {Element}
  *     PlotsPane: {Element}
+ *     SelectBar: {Element}
+ *     SettingsBar: {Element}
+ *     SignificantEqs: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
  *     TitleBar: {Element}
@@ -33,21 +37,24 @@ var EditPane = require('EditPane'),
  *
  * @return _this {Object}
  *   {
- *     EditPane: {Object}
  *     Features: {Object}
  *     Feeds: {Object}
- *     HelpPane: {Object}
  *     JsonFeed: {Object}
+ *     LegendBar: {Object}
  *     MapPane: {Object}
  *     NavBar: {Object}
  *     PlotsPane: {Object}
+ *     SelectBar: {Object}
+ *     SettingsBar: {Object}
  *     SignificantEqs: {Object}
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     TitleBar: {Object}
+ *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
  *     setTitle: {Function}
+ *     sideBarWidth: {Number}
  *   }
  */
 var Application = function (options) {
@@ -55,6 +62,7 @@ var Application = function (options) {
       _initialize,
 
       _els,
+      _sidebar,
       _throttle,
 
       _addListeners,
@@ -68,8 +76,14 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _els = options || {};
+    _sidebar = document.getElementById('sideBar');
+
+    _this.headerHeight = document.querySelector('header').offsetHeight;
+    _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
     _redirect();
+    AppUtil.setFieldValues();
+    _resetScrollPositions();
     _initClasses();
   };
 
@@ -77,9 +91,26 @@ var Application = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    // Save scroll position when user scrolls
+    var selects = document.querySelectorAll('.select');
+
+    // Save scroll position of panes
     window.addEventListener('scroll', () => {
-      _saveScrollPosition();
+      _saveScrollPosition('pane');
+    });
+
+    // Save scroll position of sidebars
+    _sidebar.addEventListener('scroll', () => {
+      _saveScrollPosition('sidebar');
+    });
+
+    // Show the selectBar when a 'select' link is clicked
+    selects.forEach(select => {
+      select.addEventListener('click', () => {
+        window.sessionStorage.setItem('selectBar', 0);
+
+        _this.NavBar.switchSideBars('selectBar');
+        _this.setScrollPosition('selectBar');
+      });
     });
   };
 
@@ -94,13 +125,14 @@ var Application = function (options) {
 
     appClasses = [
       Features, // must be first
-      EditPane,
       Feeds,
-      HelpPane,
       JsonFeed,
+      LegendBar,
       MapPane,
       NavBar,
       PlotsPane,
+      SelectBar,
+      SettingsBar,
       SignificantEqs,
       StatusBar,
       SummaryPane,
@@ -147,10 +179,13 @@ var Application = function (options) {
    * Reset saved scroll positions.
    */
   _resetScrollPositions = function () {
-    var id;
+    var id,
+        sections;
 
-    _this.NavBar.panes.forEach(pane => {
-      id = pane.getAttribute('id');
+    sections = document.querySelectorAll('section.bar, section.pane');
+
+    sections.forEach(section => {
+      id = section.getAttribute('id');
 
       window.sessionStorage.setItem(id, 0);
     });
@@ -158,13 +193,21 @@ var Application = function (options) {
 
   /**
    * Save the current scroll position in sessionStorage.
+   *
+   * @param type {String}
+   *     'pane' or 'sidebar'
    */
-  _saveScrollPosition = function () {
+  _saveScrollPosition = function (type) {
     var id,
         position;
 
-    id = _this.NavBar.getPaneId();
-    position = window.pageYOffset;
+    if (type === 'sidebar') {
+      id = AppUtil.getParam('sidebar');
+      position = _sidebar.scrollTop;
+    } else { // 'pane'
+      id = _this.NavBar.getPaneId();
+      position = window.pageYOffset;
+    }
 
     window.clearTimeout(_throttle);
 
@@ -185,26 +228,30 @@ var Application = function (options) {
     _resetScrollPositions();
 
     _this.Features.reset(); // reset Features first
-    _this.EditPane.reset();
     _this.Feeds.reset();
     _this.MapPane.reset();
-    _this.NavBar.reset();
     _this.PlotsPane.reset();
+    _this.SelectBar.reset();
+    _this.SettingsBar.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
   };
 
   /**
-   * Set the scroll position to the previous value.
+   * Set the scroll position of the pane or sidebar to the previous value.
    *
    * @param id {String}
    */
   _this.setScrollPosition = function (id) {
-    var position = window.sessionStorage.getItem(id);
+    var position = Number(window.sessionStorage.getItem(id));
 
-    if (position) {
-      window.scroll(0, position);
+    if (position !== null) {
+      if (/Pane$/.test(id)) { // pane
+        window.scroll(0, position);
+      } else { // sidebar
+        _sidebar.scrollTop = position;
+      }
     }
   };
 

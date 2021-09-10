@@ -5,7 +5,7 @@ var Svg = require('util/Svg');
 
 
 /**
- * Add SVG elements to HelpPane.
+ * Add SVG elements to the LegendBar.
  *
  * @param options {Object}
  *   {
@@ -15,7 +15,7 @@ var Svg = require('util/Svg');
  *
  * @return _this {Object)
  */
-var HelpPane = function (options) {
+var LegendBar = function (options) {
   var _this,
       _initialize,
 
@@ -31,7 +31,7 @@ var HelpPane = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _el = options.el || document.createElement('div');
+    _el = options.el || document.createElement('section');
     _Svg = Svg();
 
     _addSvgElements();
@@ -43,13 +43,11 @@ var HelpPane = function (options) {
   _addSvgElements = function () {
     var circle,
         colors,
-        legend,
         line,
         range,
         triangle;
 
     colors = _getColors();
-    legend = _el.querySelector('.legend');
     line = _Svg.createLine({
       color: '#c00',
       opacity: '0.5'
@@ -60,16 +58,16 @@ var HelpPane = function (options) {
     Object.keys(colors).forEach(key => {
       circle = _Svg.createCircle(colors[key]);
 
-      legend.querySelector('.' + key).appendChild(circle);
+      _el.querySelector('.' + key).appendChild(circle);
     });
 
-    legend.querySelector('.faults').appendChild(line);
-    legend.querySelector('.magnitude').appendChild(range);
-    legend.querySelector('.shakemap').appendChild(triangle);
+    _el.querySelector('.faults').appendChild(line);
+    _el.querySelector('.magnitude').appendChild(range);
+    _el.querySelector('.shakemap').appendChild(triangle);
   };
 
   /**
-   * Get the colors of the circles.
+   * Get the colors of the earthquake circles.
    *
    * @return colors {Object}
    */
@@ -108,4 +106,4 @@ var HelpPane = function (options) {
 };
 
 
-module.exports = HelpPane;
+module.exports = LegendBar;

@@ -279,17 +279,22 @@ AppUtil.setParam = function (name, value) {
 AppUtil.setQueryString = function () {
   var fields,
       pairs,
+      params,
       queryString;
 
-  fields = document.querySelectorAll('#editPane input');
+  fields = document.querySelectorAll('#sideBar input');
   pairs = [];
-  queryString = '?';
+  params = new URLSearchParams(location.search);
 
   fields.forEach(field => {
     pairs.push(field.id + '=' + field.value);
   });
 
-  queryString += pairs.join('&');
+  if (params.has('sidebar')) { // preserve sidebar param
+    pairs.push('sidebar=' + params.get('sidebar'));
+  }
+
+  queryString = '?' + pairs.join('&');
 
   window.history.replaceState({}, '', queryString + location.hash);
 };

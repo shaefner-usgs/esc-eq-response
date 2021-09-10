@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -6,18 +7,18 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Fetch the significant earthquakes list and create/add a <select> menu to
- * EditPane.
+ * Fetch the significant earthquakes feed and add the list to the SelectBar.
  *
  * @param options {Object}
  *   {
  *     app: {Object} Application
+ *     el: {Element}
  *   }
  *
  * @return _this {Object}
  *   {
- *     addSelect: {Function}
  *     postInit: {Function}
+ *     unselectAll: {Function}
  *   }
  */
 var SignificantEqs = function (options) {
@@ -25,9 +26,10 @@ var SignificantEqs = function (options) {
       _initialize,
 
       _app,
-      _json,
+      _el,
 
-      _createSelect;
+      _createList,
+      _selectEq;
 
 
   _this = {};
@@ -36,51 +38,87 @@ var SignificantEqs = function (options) {
     options = options || {};
 
     _app = options.app;
+    _el = options.el || document.createElement('div');
   };
 
   /**
-   * Create the SignificantEqs <select> menu HTML.
+   * Create the SignificantEqs list HTML.
    *
-   * @return el {Element}
+   * @param json {Object} default is {}
+   *
+   * @return list {Element}
    */
-  _createSelect = function () {
-    var date,
-        el,
+  _createList = function (json = {}) {
+    var data,
+        li,
         list,
-        mag,
-        props,
-        selected,
-        selectedStatus;
+        props;
 
-    el = document.createElement('select');
-    list = '';
-    selected = ' selected="selected"';
+    list = document.createElement('h4'); // default
+    list.innerHTML = 'None';
 
-    if (_json.features) {
-      _json.features.forEach(feature => {
+    if (json.features) {
+      list = document.createElement('ul');
+
+      json.features.forEach(feature => {
         props = feature.properties;
-        date = Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d TT');
-        mag = AppUtil.round(props.mag, 1);
-        selectedStatus = '';
+        data = {
+          date: Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d, yyyy TT'),
+          mag: AppUtil.round(props.mag, 1),
+          place: props.place
+        };
+        li = document.createElement('li');
+
+        li.id = feature.id;
+        li.innerHTML = L.Util.template(
+          '<div>{mag}</div>' +
+          '<div>' +
+            '<h4>{place}</h4>' +
+            '<p>{date} UTC</p>' +
+          '</div>',
+          data
+        );
+
+        li.addEventListener('click', _selectEq);
 
         if (feature.id === AppUtil.getParam('eqid')) {
-          selectedStatus = selected;
-          selected = ''; // set default option to unselected since a match was found
+          li.classList.add('selected');
         }
 
-        list += `<option value="${feature.id}"${selectedStatus}>M ${mag} - ` +
-          `${props.place} (${date})</option>`;
+        list.appendChild(li);
       });
-
-      list = `<option value="" disabled="disabled"${selected}>` +
-        'Significant Earthquakes in the Past Month (UTC)</option>' + list;
-
-      el.classList.add('significantEqs');
-      el.innerHTML = list;
-      el.tabIndex = 1;
     }
 
-    return el;
+    list.id = 'significantEqs';
+
+    return list;
+  };
+
+  /**
+   * Event handler to select the earthquake the user clicked on.
+   */
+  _selectEq = function () {
+    var eqid,
+        lis;
+
+    eqid = document.getElementById('eqid');
+    lis = _el.querySelectorAll('li');
+
+    lis.forEach(li => {
+      if (li.id === this.id) {
+        if (eqid.value !== li.id) {
+          eqid.value = li.id;
+
+          // Input event is not triggered when it's changed programmatically
+          AppUtil.setQueryString();
+          _app.SelectBar.createMainshock();
+        }
+
+        li.classList.add('selected');
+      } else {
+        li.classList.remove('selected');
+      }
+    });
   };
 
   // ----------------------------------------------------------
@@ -88,35 +126,31 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add significant earthquakes <select> menu to EditPane.
-   */
-  _this.addSelect = function () {
-    var refNode,
-        select;
-
-    refNode = document.querySelector('label[for=eqid]');
-    select = _createSelect();
-
-    if (select) {
-      refNode.parentNode.insertBefore(select, refNode);
-      select.addEventListener('change', _app.EditPane.selSignificantEq);
-    }
-  };
-
-  /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
+    var list;
+
     _app.JsonFeed.fetch({
       id: 'significantEqs',
       name: 'Significant Earthquakes',
       url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
     }).then(json => {
-      if (json) {
-        _json = json;
+      list = _createList(json);
 
-        _this.addSelect();
-      }
+      _el.replaceWith(list);
+      _el = list;
+    });
+  };
+
+  /**
+   * Unselect all earthquakes in the list.
+   */
+  _this.unselectAll = function () {
+    var lis = _el.querySelectorAll('li');
+
+    lis.forEach(li => {
+      li.classList.remove('selected');
     });
   };
 

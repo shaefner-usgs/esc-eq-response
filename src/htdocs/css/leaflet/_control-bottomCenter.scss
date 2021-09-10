@@ -1,5 +1,9 @@
+@use '../variables' as *;
+
 .leaflet-center {
+  padding: 0;
   text-align: center;
+  transition: padding $sidebar-duration ease;
   width: 100%;
 
   div {

@@ -5,10 +5,9 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Handle form fields and set URL to match application state; display Mainshock
- * details.
- *
- * Also kicks off creation of Features.
+ * Refresh a Feature when the user tweaks its settings and set the URL to match
+ * the application's state. Also set the default parameter values based on the
+ * selected Mainshock.
  *
  * @param options {Object}
  *   {
@@ -20,36 +19,24 @@ var AppUtil = require('util/AppUtil');
  *   {
  *     addCount: {Function}
  *     addLoader: {Function}
- *     postInit: {Function}
  *     removeCount: {Function}
  *     reset: {Function}
- *     selSignificantEq: {Function}
  *     setDefaults: {Function}
  *     setFocusedField: {Function}
- *     showMainshock: {Function}
  *   }
  */
-var EditPane = function (options) {
+var SettingsBar = function (options) {
   var _this,
       _initialize,
 
       _app,
       _el,
-      _eqid,
       _focusedField,
       _initialLoad,
-      _timers,
 
       _addListeners,
-      _createMainshock,
       _getDefaults,
-      _handleMainshock,
-      _hideMainshock,
-      _initTimers,
-      _isEqidValid,
       _refreshFeature,
-      _resetCounts,
-      _resetForm,
       _saveFocusedField;
 
 
@@ -59,13 +46,10 @@ var EditPane = function (options) {
     options = options || {};
 
     _app = options.app;
-    _el = options.el || document.createElement('div');
-    _eqid = document.getElementById('eqid');
+    _el = options.el || document.createElement('section');
     _initialLoad = true;
-    _timers = {};
 
     _addListeners();
-    AppUtil.setFieldValues();
   };
 
   /**
@@ -73,16 +57,10 @@ var EditPane = function (options) {
    */
   _addListeners = function () {
     var features,
-        fields,
-        reset;
+        fields;
 
-    features = [
-      _el.querySelector('.aftershocks'),
-      _el.querySelector('.foreshocks'),
-      _el.querySelector('.historical')
-    ];
-    fields = _el.querySelectorAll('input'); // all form fields
-    reset = _el.querySelector('.reset');
+    features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
+    fields = _el.querySelectorAll('input');
 
     // Update Feature when its params are changed
     features.forEach(feature => {
@@ -94,23 +72,6 @@ var EditPane = function (options) {
       field.addEventListener('focus', _saveFocusedField);
       field.addEventListener('input', AppUtil.updateParam);
     });
-
-    // Reset app when the reset button is clicked
-    reset.addEventListener('click', _app.reset);
-
-    // Load a new set of Features when Mainshock eqid is changed
-    _eqid.addEventListener('input', _handleMainshock);
-  };
-
-  /**
-   * Create a new Mainshock (which subsequently creates the other Features).
-   */
-  _createMainshock = function () {
-    _app.reset();
-
-    if (_isEqidValid()) {
-      _app.Features.createFeature('mainshock');
-    }
   };
 
   /**
@@ -150,92 +111,17 @@ var EditPane = function (options) {
   };
 
   /**
-   * Handler for managing a new Mainshock. Triggered when the Event ID field is
-   * changed.
-   */
-  _handleMainshock = function () {
-    var id = 'mainshock';
-
-    if (_eqid.value) {
-      _initTimers(id);
-
-      // Immediately show loading status (don't wait for throttle timers)
-      _app.StatusBar.clearItems();
-      _app.StatusBar.addItem({
-        id: id,
-        name: 'Mainshock'
-      });
-
-      // Throttle requests
-      _timers[id].push(
-        window.setTimeout(function() {
-          _createMainshock();
-        }, 500)
-      );
-    } else {
-      _app.reset();
-    }
-  };
-
-  /**
-   * Hide Mainshock details.
-   */
-  _hideMainshock = function () {
-    _el.querySelector('.details').classList.add('hide');
-  };
-
-  /**
-   * Initialize throttle timers that are used to minimize 'stacked' Fetch
-   * requests when loading Features.
-   *
-   * @param id {String}
-   *     Feature id
-   */
-  _initTimers = function (id) {
-    if (!Object.prototype.hasOwnProperty.call(_timers, id)) {
-      _timers[id] = [];
-    }
-
-    // Clear any previous throttled requests for this Feature
-    _timers[id].forEach(timer => {
-      window.clearTimeout(timer);
-      _timers[id].shift();
-    });
-  };
-
-  /**
-   * Check if the current value entered in the Event ID field is valid and
-   * exists.
-   *
-   * @return isValid {Boolean}
-   */
-  _isEqidValid = function () {
-    var isValid,
-        regex;
-
-    isValid = false;
-    regex = /^[^/\\:]+$/; // no slashes or colons
-
-    // 404 error is logged if Event ID is not found
-    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
-      isValid = true;
-    }
-
-    return isValid;
-  };
-
-  /**
    * Refresh a Feature. Triggered when a Feature's parameter field is changed.
    */
   _refreshFeature = function () {
     var feature,
         id;
 
-    if (_isEqidValid()) {
+    if (_app.SelectBar.isEqidValid()) {
       id = this.className; // parent container of form field
       feature = _app.Features.getFeature(id);
 
-      _initTimers(id);
+      _app.JsonFeed.initThrottlers(id);
 
       // Immediately show loading status (don't wait for throttle timers)
       if (feature) {
@@ -246,7 +132,7 @@ var EditPane = function (options) {
       }
 
       // Throttle requests
-      _timers[id].push(
+      _app.JsonFeed.throttlers[id].push(
         window.setTimeout(function() {
           if (feature) {
             _app.Features.refreshFeature(feature);
@@ -258,38 +144,6 @@ var EditPane = function (options) {
         }, 500)
       );
     }
-  };
-
-  /**
-   * Reset Feature counts on form control headers.
-   */
-  _resetCounts = function () {
-    var counts = _el.querySelectorAll('.count');
-
-    counts.forEach(count => {
-      count.classList.add('hide');
-
-      count.textContent = '';
-    });
-  };
-
-  /**
-   * Reset significant earthquakes <select> menu and querystring (<input>s are
-   * cleared by the Reset button).
-   */
-  _resetForm = function () {
-    var select = _el.querySelector('.significantEqs');
-
-    // Add a slight delay so 'Reset' button can clear <input>s first
-    setTimeout(() => {
-      AppUtil.setQueryString(); // reset query string
-
-      // Rebuild <select> menu (sets selected item if applicable)
-      if (select) {
-        select.parentNode.removeChild(select);
-        _app.SignificantEqs.addSelect();
-      }
-    }, 25);
   };
 
   /**
@@ -357,16 +211,6 @@ var EditPane = function (options) {
   };
 
   /**
-   * Initialization that depends on other Classes being ready before running.
-   */
-  _this.postInit = function () {
-    // Get things rolling if an eqid is already set
-    if (AppUtil.getParam('eqid') !== '') {
-      _createMainshock();
-    }
-  };
-
-  /**
    * Hide the 'loader' and count value next to the Feature's name.
    *
    * @param feature {Object}
@@ -391,29 +235,16 @@ var EditPane = function (options) {
   };
 
   /**
-   * Reset to default state.
+   * Reset to default state (<input>s are cleared by the Reset button).
    */
   _this.reset = function () {
-    _hideMainshock();
-    _resetCounts();
-    _resetForm();
-  };
+    var counts = _el.querySelectorAll('.count');
 
-  /**
-   * Set the user selected significant earthquake as the Mainshock.
-   */
-  _this.selSignificantEq = function () {
-    var index,
-        significantEqs;
+    counts.forEach(count => {
+      count.classList.add('hide');
 
-    significantEqs = _el.querySelector('.significantEqs');
-    index = significantEqs.selectedIndex;
-
-    _eqid.value = significantEqs.options[index].value;
-
-    // Input event is not triggered when it's changed programmatically
-    AppUtil.setQueryString();
-    _createMainshock();
+      count.textContent = '';
+    });
   };
 
   /**
@@ -422,7 +253,7 @@ var EditPane = function (options) {
   _this.setDefaults = function () {
     var defaults = _getDefaults();
 
-    // Update URL params with defaults
+    // URL params
     Object.keys(defaults).forEach(key => {
       // Preserve user-set URL params on initial load
       if (!_initialLoad || AppUtil.getParam(key) === '') {
@@ -432,7 +263,7 @@ var EditPane = function (options) {
 
     _initialLoad = false;
 
-    // Update form fields to match URL params
+    // set form fields to match URL params
     AppUtil.setFieldValues();
   };
 
@@ -449,23 +280,6 @@ var EditPane = function (options) {
     document.getElementById(field).focus();
   };
 
-  /**
-   * Show the Mainshock's details.
-   */
-  _this.showMainshock = function () {
-    var details,
-        mainshock;
-
-    details = _el.querySelector('.details');
-    mainshock = _app.Features.getFeature('mainshock');
-    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
-
-    details.classList.remove('hide');
-    document.body.classList.remove('no-mainshock');
-
-    _app.setTitle(mainshock.details);
-  };
-
 
   _initialize(options);
   options = null;
@@ -473,4 +287,4 @@ var EditPane = function (options) {
 };
 
 
-module.exports = EditPane;
+module.exports = SettingsBar;

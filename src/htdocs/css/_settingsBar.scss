@@ -1,0 +1,18 @@
+@use 'variables' as *;
+
+#settingsBar {
+  h3 {
+    margin: 1.5rem 0 -.25rem;
+  }
+
+  .historical + p {
+    margin-top: 1.5rem;
+  }
+
+  .required {
+    border-top: 1px solid $border-color-lighter;
+    color: #c00;
+    margin: 2rem 0 0;
+    padding-top: 4px;
+  }
+}

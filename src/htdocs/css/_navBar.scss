@@ -1,18 +1,30 @@
+@use 'sass:color';
+
 @use 'variables' as *;
 
 #navBar {
+  align-items: flex-end;
   display: flex;
   justify-content: space-between;
 
-  #navMain {
+  ul {
     display: flex;
-    font: 700 1rem/1 $font-family-headers;
-    margin: 0 0 0 -.5rem;
+    margin: 0;
     padding: 0;
+  }
+
+  li {
+    list-style: none;
+    margin: 0;
+  }
+
+  #navMain {
+    font: 700 1rem/1 $font-family-headers;
+    margin-left: -.5rem;
 
     a {
       border: 1px solid transparent;
-      border-bottom-width: 0;
+      border-bottom: none;
       border-radius: 6px 6px 0 0;
       color: $link-color;
       display: block;
@@ -23,7 +35,7 @@
 
       &:hover {
         border-color: $accent-color;
-        transition: all $hover-on-duration ease-out;
+        transition: border $hover-on-duration ease-out;
       }
 
       &.selected {
@@ -36,9 +48,51 @@
     }
 
     li {
-      list-style: none;
-      margin: 0;
       padding: 0;
+    }
+  }
+
+  #navSub {
+    i {
+      color: $accent-color;
+      font-size: 20px;
+      padding: 0 8px 8px;
+
+      &:after {
+        border: 8px solid transparent;
+        bottom: 0;
+        content: '';
+        left: 10px;
+        position: absolute;
+        transition: border .15s ease-in;
+      }
+      &:hover:after {
+        border-bottom-color: color.scale($accent-color, $lightness: 90%);
+        transition: border $hover-on-duration ease-out;
+      }
+      &.selected:after {
+        border-bottom-color: $accent-color;
+        transition: border $hover-on-duration ease-out;
+      }
+
+      &:before {
+        margin: 0;
+      }
+    }
+
+    li {
+      cursor: pointer;
+      display: flex;
+      padding: 0;
+      position: relative;
+
+      &:first-child i:after { // select icon
+        left: 11px;
+      }
+
+      &:nth-child(4) i:before { // legend icon
+        transform: rotateX(180deg);
+      }
     }
   }
 }
