@@ -122,9 +122,9 @@ var Mainshock = function (options) {
       '</div>' +
       '<h3>Event Summary</h3>' +
       '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
-        'relevant details, images and plots plus placeholders for talking ' +
-        'points and analysis. Microsoft Word is recommended for viewing the ' +
-        'document.</p>' +
+        'earthquake details, images and plots, plus placeholders for adding ' +
+        'talking points and analysis. Microsoft Word is recommended for ' +
+        'viewing the document.</p>' +
       '<button class="event-summary" disabled="disabled" type="button" ' +
         'title="Download RTF Document">Download</button>',
       data
