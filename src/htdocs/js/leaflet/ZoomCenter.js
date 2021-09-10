@@ -6,7 +6,7 @@
  * Zoom map from center point of visible map area, which varies depending on
  * the header's height and whether or not the sidebar is toggled on.
  */
-L.Control.ZoomCenter = L.Control.Zoom.include({
+L.Control.ZoomCenter = L.Control.Zoom.extend({
   _getCenter: function () {
     var offsetX,
         offsetY,
