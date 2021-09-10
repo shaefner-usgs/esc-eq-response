@@ -11,6 +11,10 @@
  *   }
  *
  * @return _this {Object)
+ *   {
+ *     reset: {Function}
+ *     setTitle: {Function}
+ *   }
  */
 var TitleBar = function(options) {
   var _this,
