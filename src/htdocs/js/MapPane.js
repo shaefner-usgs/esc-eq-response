@@ -287,7 +287,7 @@ var MapPane = function (options) {
 
     _createPane('faults', 'tilePane');
     _addControls();
-    _map.setView([0, 0], 1); // set arbitrary view to appease Leaflet
+    _map.setView([0, 0], 1); // set arbitrary view for now
 
     // Hide zoom control on mobile (in favor of pinch-to-zoom)
     if (L.Browser.mobile) {
