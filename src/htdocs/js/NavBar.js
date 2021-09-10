@@ -124,11 +124,18 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _renderPane = function (id) {
+    var link = document.querySelector('#selectBar a[href="#mapPane"]');
+
     _app.setScrollPosition(id);
 
     if (id === 'mapPane') {
       _app.MapPane.render();
-    } else if (id === 'plotsPane') {
+      link.classList.add('hide-link'); // unlink 'map' text on selectBar
+    } else {
+      link.classList.remove('hide-link');
+    }
+
+    if (id === 'plotsPane') {
       _renderPlots();
     }
   };
@@ -165,22 +172,13 @@ var NavBar = function (options) {
    */
   _showPane = function (id) {
     var button,
-        link,
         selPane;
 
     button = _el.querySelector('[href="#' + id + '"]');
-    link = document.querySelector('#selectBar a[href="#mapPane"]');
     selPane = document.getElementById(id);
 
     button.classList.add('selected');
     selPane.classList.remove('hide');
-
-    // unlink 'map' text on selectBar when mapPane is visible
-    if (id === 'mapPane') {
-      link.classList.add('hide-link');
-    } else {
-      link.classList.remove('hide-link');
-    }
 
     _renderPane(id);
   };
@@ -300,7 +298,6 @@ var NavBar = function (options) {
     if (sideBarId === null) {
       sideBarId = 'selectBar'; // default
     }
-
     if (sideBarId) {
       _showSideBar(sideBarId);
     }
