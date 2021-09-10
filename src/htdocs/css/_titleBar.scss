@@ -1,7 +1,5 @@
 @use 'variables' as *;
 
-$open-link-color: #666;
-
 #titleBar {
   h1 {
     font-size: 1.75rem;
@@ -18,7 +16,7 @@ $open-link-color: #666;
 
       &:hover {
         color: $text-color-darker;
-        text-decoration-color: $open-link-color;
+        text-decoration-color: $text-color-lighter;
         transition: all $hover-on-duration ease-out;
 
         i {
@@ -29,7 +27,7 @@ $open-link-color: #666;
     }
 
     i {
-      color: $open-link-color;
+      color: $text-color-lighter;
       font-size: 1.25rem;
       opacity: 0;
       position: absolute;
