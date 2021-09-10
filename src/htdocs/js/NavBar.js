@@ -20,9 +20,9 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *   {
  *     getPaneId: {Function}
- *     panes: {Object}
  *     postInit: {Function}
  *     reset: {Function}
+ *     switchSideBars: {Function}
  *   }
  */
 var NavBar = function (options) {
@@ -30,7 +30,10 @@ var NavBar = function (options) {
       _initialize,
 
       _app,
+      _defaultPaneId,
       _el,
+      _panes,
+      _sideBars,
 
       _addListeners,
       _hideAll,
@@ -48,9 +51,12 @@ var NavBar = function (options) {
     options = options || {};
 
     _app = options.app;
+    _defaultPaneId = 'mapPane';
     _el = options.el || document.createElement('div');
+    _panes = document.querySelectorAll('section.pane');
+    _sideBars = document.querySelectorAll('section.bar');
 
-    _this.panes = document.querySelectorAll('section.pane');
+    _addListeners();
   };
 
   /**
@@ -68,22 +74,27 @@ var NavBar = function (options) {
       _switchPanes();
     });
 
-    // Toggle/switch between sidebars
+    // Switch between sidebars
     lis.forEach(li => {
       li.addEventListener('click', function() {
-        _toggleSideBar(this.querySelector('i'));
+        var button,
+            id;
+
+        button = this.querySelector('i');
+        id = button.className.match(/icon-(\w+)/)[1];
+
+        _this.switchSideBars(id);
       });
     });
 
     // Close the sidebar
-    close.addEventListener('click', (e) => {
-      _toggleSideBar(e.target);
+    close.addEventListener('click', () => {
+      _toggleSideBar('off');
     });
   };
 
   /**
-   * Hide all panes or sidebars and unselect all of their nav buttons. Also set
-   * the sidebar urlParam to an empty value.
+   * Hide all panes or sidebars and unselect all of their nav buttons.
    *
    * @param els {Elements}
    *     panes or sidebars
@@ -99,8 +110,6 @@ var NavBar = function (options) {
         button = _el.querySelector('[href="#' + id + '"]');
       } else { // sidebars
         button = _el.querySelector('.icon-' + id);
-
-        AppUtil.setParam('sidebar', '');
       }
 
       button.classList.remove('selected');
@@ -145,7 +154,7 @@ var NavBar = function (options) {
       }, 25);
     }
 
-    _app.PlotsPane.resize(); // in case user adjusted window size
+    _app.PlotsPane.resize(); // in case size of content area changed
   };
 
   /**
@@ -156,36 +165,43 @@ var NavBar = function (options) {
    */
   _showPane = function (id) {
     var button,
+        link,
         selPane;
 
     button = _el.querySelector('[href="#' + id + '"]');
+    link = document.querySelector('#selectBar a[href="#mapPane"]');
     selPane = document.getElementById(id);
 
     button.classList.add('selected');
     selPane.classList.remove('hide');
+
+    // unlink 'map' text on selectBar when mapPane is visible
+    if (id === 'mapPane') {
+      link.classList.add('hide-link');
+    } else {
+      link.classList.remove('hide-link');
+    }
 
     _renderPane(id);
   };
 
   /**
    * Show the sidebar matching the given id value, set the sidebar urlParam,
-   * and select the given nav button. Also set the sideBarWidth prop if it's not
-   * already set.
+   * and select the given nav button.
    *
    * @param id {String}
-   * @param button {Element}
    */
-  _showSideBar = function (id, button) {
-    var selSideBar = document.getElementById(id);
+  _showSideBar = function (id) {
+    var button,
+        selSideBar;
+
+    button = _el.querySelector('.icon-' + id);
+    selSideBar = document.getElementById(id);
 
     button.classList.add('selected');
     selSideBar.classList.remove('hide');
 
-    AppUtil.setParam('sidebar', id);
-
-    if (!_app.sideBarWidth) {
-      _app.sideBarWidth = document.querySelector('#sideBar').offsetWidth;
-    }
+    _toggleSideBar('on');
   };
 
   /**
@@ -194,47 +210,51 @@ var NavBar = function (options) {
   _switchPanes = function () {
     var id = _this.getPaneId();
 
-    _hideAll(_this.panes);
+    _hideAll(_panes);
     _showPane(id);
   };
 
   /**
-   * Toggle the sidebar on/off and switch between sidebars.
+   * Toggle the sidebar on/off and shift the map's center point. Also resize
+   * plots if they are visible and set the sidebar URLparam.
    *
-   * @param button {Element}
-   *     button (icon) user clicked on
+   * @param status {String}
+   *     either 'on' or 'off'
    */
-  _toggleSideBar = function (button) {
-    var id,
-        sideBars,
+  _toggleSideBar = function (status) {
+    var button,
+        id,
+        selSideBar,
         toggled;
 
-    if (button.classList.contains('selected')) { // nothing to do
-      return;
-    }
-
-    id = button.className.replace('icon-', '');
-    sideBars = document.querySelectorAll('aside section');
+    button = _el.querySelector('#navSub .selected');
+    id = button.className.match(/icon-(\w+)/)[1];
+    selSideBar = document.getElementById(id);
     toggled = true;
 
-    _hideAll(sideBars);
+    if (status === 'on') { // open
+      AppUtil.setParam('sidebar', id);
+      _app.setScrollPosition(id);
 
-    if (id === 'close') {
-      document.body.classList.remove('sidebar');
-    } else {
       if (document.body.classList.contains('sidebar')) {
-        toggled = false;
+        toggled = false; // already open
       } else {
         document.body.classList.add('sidebar');
       }
 
-      _showSideBar(id, button);
+      if (id === 'settingsBar') {
+        _app.SettingsBar.setFocusedField();
+      }
+    } else { // close
+      AppUtil.setParam('sidebar', '');
+      _hideAll(_sideBars);
+
+      selSideBar.classList.remove('hide'); // keep visible for animation
+      document.body.classList.remove('sidebar');
     }
 
     if (toggled) {
-      _app.MapPane.shiftMap({
-        sidebar: true
-      });
+      _app.MapPane.shiftMap();
 
       if (_this.getPaneId() === 'plotsPane') {
         _app.PlotsPane.resize();
@@ -257,7 +277,7 @@ var NavBar = function (options) {
         paneExists;
 
     hash = location.hash;
-    id = 'mapPane'; // default
+    id = _defaultPaneId;
     paneExists = document.querySelector('section' + hash);
 
     if (hash && paneExists) {
@@ -271,15 +291,44 @@ var NavBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _addListeners();
-    _switchPanes();
+    var paneId,
+        sideBarId;
+
+    paneId = _this.getPaneId();
+    sideBarId = AppUtil.getParam('sidebar');
+
+    if (sideBarId === null) {
+      sideBarId = 'selectBar'; // default
+    }
+
+    if (sideBarId) {
+      _showSideBar(sideBarId);
+    }
+
+    _showPane(paneId);
   };
 
   /**
    * Reset to default state.
    */
   _this.reset = function () {
+    location.hash = _defaultPaneId;
 
+    _switchPanes();
+  };
+
+  /**
+   * Switch between sidebars.
+   *
+   * @param id {String}
+   */
+  _this.switchSideBars = function (id) {
+    if (id === AppUtil.getParam('sidebar')) {
+      window.sessionStorage.setItem(id, 0); // reset scroll position to top
+    }
+
+    _hideAll(_sideBars);
+    _showSideBar(id);
   };
 
 
