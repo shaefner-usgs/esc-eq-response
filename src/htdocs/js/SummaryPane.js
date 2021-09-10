@@ -438,7 +438,7 @@ var SummaryPane = function (options) {
     var time,
         timestamp;
 
-    time = _el.querySelector('#updated');
+    time = document.getElementById('updated');
     timestamp = Luxon.DateTime.now().toFormat("ccc LLL d, yyyy 'at' tt") + // eslint-disable-line
       ' (' + _tz + ')';
     time.innerHTML = timestamp;
