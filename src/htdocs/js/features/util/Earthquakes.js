@@ -248,7 +248,8 @@ var Earthquakes = function (options) {
           'intensity ({felt} responses)">' +
           '<strong class="roman">{cdi}</strong>' +
           '<abbr title="Did You Feel It?">DYFI?</abbr>' +
-        '</a>', data);
+        '</a>', data
+      );
     }
 
     if (data.mmi) { // ShakeMap
@@ -256,7 +257,8 @@ var Earthquakes = function (options) {
         '<a href="{url}/shakemap" class="mmi{mmi}" title="Maximum estimated intensity">' +
           '<strong class="roman">{mmi}</strong>' +
           '<abbr title="ShakeMap">ShakeMap</abbr>' +
-        '</a>', data);
+        '</a>', data
+      );
     }
 
     if (data.alert) { // PAGER
@@ -265,7 +267,8 @@ var Earthquakes = function (options) {
           'Estimated impact alert level">' +
           '<strong class="roman">{alert}</strong>' +
           '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
-        '</a>', data);
+        '</a>', data
+      );
     }
 
     if (data.tsunami) {
@@ -274,7 +277,8 @@ var Earthquakes = function (options) {
           'Warning Center">' +
           '<span class="hover"></span>' +
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
-        '</a>', data);
+        '</a>', data
+      );
     }
 
     return bubbles;
