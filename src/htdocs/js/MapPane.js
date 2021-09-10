@@ -76,7 +76,7 @@ var MapPane = function (options) {
       [8, -143],
       [60, -48]
     ]);
-    _el = options.el || document.createElement('div');
+    _el = options.el || document.createElement('section');
     _initialView = true;
     _placeholders = {};
     _staticLayers = _getStaticLayers();

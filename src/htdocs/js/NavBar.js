@@ -52,7 +52,7 @@ var NavBar = function (options) {
 
     _app = options.app;
     _defaultPaneId = 'mapPane';
-    _el = options.el || document.createElement('div');
+    _el = options.el || document.createElement('nav');
     _panes = document.querySelectorAll('section.pane');
     _sideBars = document.querySelectorAll('section.bar');
 

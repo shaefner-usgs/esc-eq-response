@@ -53,7 +53,7 @@ var PlotsPane = function (options) {
     options = options || {};
 
     _app = options.app;
-    _el = options.el || document.createElement('div');
+    _el = options.el || document.createElement('section');
     _featuresEl = _el.querySelector('.features');
     _plots = {};
 
