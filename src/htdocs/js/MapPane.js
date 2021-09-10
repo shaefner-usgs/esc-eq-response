@@ -504,6 +504,8 @@ var MapPane = function (options) {
 
     // Set initial view (uses L.fitBounds, which only works when map is visible)
     if (_initialView) {
+      _initialView = false;
+
       if (status === 'complete') {
         bounds = _bounds;
       }
