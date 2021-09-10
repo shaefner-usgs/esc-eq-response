@@ -80,9 +80,9 @@ AppUtil.compose = function () {
  * @return {String}
  */
 AppUtil.getParam = function (name) {
-  var url = new URL(location);
+  var params = new URLSearchParams(location.search);
 
-  return url.searchParams.get(name);
+  return params.get(name);
 };
 
 /**
