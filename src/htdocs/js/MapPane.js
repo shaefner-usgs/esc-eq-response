@@ -193,9 +193,9 @@ var MapPane = function (options) {
         maxDistance;
 
     maxDistance = Math.max(
-      Number(document.querySelector('input#as-dist').value),
-      Number(document.querySelector('input#fs-dist').value),
-      Number(document.querySelector('input#hs-dist').value)
+      Number(document.getElementById('as-dist').value),
+      Number(document.getElementById('fs-dist').value),
+      Number(document.getElementById('hs-dist').value)
     );
     bounds = latLng.toBounds(maxDistance * 1000); // km -> meters
 
