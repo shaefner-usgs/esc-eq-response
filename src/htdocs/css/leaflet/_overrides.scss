@@ -19,7 +19,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-control-attribution {
     background: rgba(255, 255, 255, .5);
     color: $text-color-lighter;
-    max-width: 300px;
+    max-width: 200px;
     overflow: hidden; /* Quell long attributions */
     padding: 2px 4px;
     text-overflow: ellipsis;
