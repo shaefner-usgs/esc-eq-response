@@ -4,7 +4,7 @@
 var HistoricalEvents = require('feeds/HistoricalEvents'),
     NearbyCities = require('feeds/NearbyCities'),
     PagerComments = require('feeds/PagerComments'),
-    Rtf = require('Rtf'),
+    Rtf = require('util/Rtf'),
     ShakeMapInfo = require('feeds/ShakeMapInfo'),
     ShakeAlert = require('feeds/ShakeAlert');
 
