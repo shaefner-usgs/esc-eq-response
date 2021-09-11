@@ -5,8 +5,6 @@
 var AppUtil = require('util/AppUtil'),
     BeachBall = require('features/util/BeachBall');
 
-require('leaflet/CanvasMarker');
-
 
 /**
  * Create Moment Tensor Feature.

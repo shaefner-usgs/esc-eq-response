@@ -6,6 +6,7 @@ var AppUtil = require('util/AppUtil');
 
 
 // Leaflet plugins and layer factories (these get attached to the global L obj)
+require('leaflet/CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
 require('leaflet/Control-bottomCenter');
 require('leaflet/DarkLayer');
 require('leaflet/FaultsLayer');
