@@ -45,6 +45,3 @@ L.FaultsLayer = function () {
 L.faultsLayer = function () {
   return new L.FaultsLayer();
 };
-
-
-module.exports = L.FaultsLayer;

@@ -30,6 +30,3 @@ L.TerrainLayer = function (options) {
 L.terrainLayer = function () {
   return new L.TerrainLayer();
 };
-
-
-module.exports = L.TerrainLayer;

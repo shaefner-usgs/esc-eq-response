@@ -64,6 +64,3 @@ L.SatelliteLayer = function (provider, options) {
 L.satelliteLayer = function () {
   return new L.SatelliteLayer();
 };
-
-
-module.exports = L.SatelliteLayer;

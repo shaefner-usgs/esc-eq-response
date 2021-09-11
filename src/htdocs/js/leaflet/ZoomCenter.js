@@ -45,6 +45,3 @@ L.Control.ZoomCenter = L.Control.Zoom.extend({
 L.control.zoomCenter = function(opts) {
   return new L.Control.ZoomCenter(opts);
 };
-
-
-module.exports = L.Control.ZoomCenter;

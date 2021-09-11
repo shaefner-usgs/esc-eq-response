@@ -67,6 +67,3 @@ L.GreyscaleLayer = function (provider, options) {
 L.greyscaleLayer = function () {
   return new L.GreyscaleLayer();
 };
-
-
-module.exports = L.GreyscaleLayer;

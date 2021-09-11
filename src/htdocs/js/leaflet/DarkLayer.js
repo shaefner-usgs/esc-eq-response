@@ -59,6 +59,3 @@ L.DarkLayer = function (provider, options) {
 L.darkLayer = function () {
   return new L.DarkLayer();
 };
-
-
-module.exports = L.DarkLayer;

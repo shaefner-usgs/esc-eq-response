@@ -125,6 +125,3 @@ L.MouseOverLayer = L.LayerGroup.extend({
 L.mouseOverLayer = function (options) {
   return new L.MouseOverLayer(options);
 };
-
-
-module.exports = L.mouseOverLayer;
