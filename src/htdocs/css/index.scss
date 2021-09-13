@@ -73,7 +73,7 @@ body {
   &.no-mainshock {
     #plotsPane,
     #summaryPane {
-      &:not(.hide) ~ #sel-mainshock {
+      &:not(.hide) ~ #selMainshock {
         display: flex;
       }
 
@@ -164,7 +164,7 @@ tr {
   border-bottom: 1px solid $border-color-lighter;
 }
 
-#sel-mainshock {
+#selMainshock {
   align-items: center;
   display: none;
   flex-direction: column;
