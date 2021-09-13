@@ -1,6 +1,10 @@
 @use 'variables' as *;
 
 #selectBar {
+  button {
+    margin-bottom: 1.5rem; /* ensure StatusBar doesn't obscure button */
+  }
+
   p + h3 {
     margin: 1.25rem 0 .25rem;
 
