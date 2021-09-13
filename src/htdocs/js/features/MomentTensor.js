@@ -113,7 +113,7 @@ var MomentTensor = function (options) {
       // Render beachball (hidden by default) for use by CanvasMarker
       beachball.render(document.getElementById('mapPane'));
 
-      mapLayer = L.canvasMarker(coords, {
+      mapLayer = L.marker.canvas(coords, {
         icon: L.divIcon({
           className: _this.id,
           iconSize: L.point(size, size)
