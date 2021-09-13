@@ -97,7 +97,7 @@ var MapPane = function (options) {
     }).addTo(_map);
 
     L.control.scale().addTo(_map);
-    L.control.zoomCenter().addTo(_map);
+    L.control.zoom.center().addTo(_map);
   };
 
   /**
