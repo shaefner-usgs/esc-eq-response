@@ -16,7 +16,7 @@
  *     setTitle: {Function}
  *   }
  */
-var TitleBar = function(options) {
+var TitleBar = function (options) {
   var _this,
       _initialize,
 
@@ -69,7 +69,7 @@ var TitleBar = function(options) {
    *     url: {String} optional
    *   }
    */
-  _this.setTitle = function(opts = {}) {
+  _this.setTitle = function (opts = {}) {
     var h1,
         title;
 
