@@ -15,7 +15,7 @@ L.Marker.Canvas = L.Marker.extend({
     L.Marker.prototype.initialize.call(this, latlng, this.options);
   },
 
-  onAdd: function(map) {
+  onAdd: function (map) {
     var canvas,
         className,
         marker;
@@ -32,7 +32,7 @@ L.Marker.Canvas = L.Marker.extend({
     }
   },
 
-  onRemove: function(map) {
+  onRemove: function (map) {
     var canvas,
         className,
         mapPane;
@@ -49,6 +49,6 @@ L.Marker.Canvas = L.Marker.extend({
   }
 });
 
-L.marker.canvas = function(latlng, options) {
+L.marker.canvas = function (latlng, options) {
   return new L.Marker.Canvas(latlng, options);
 };
