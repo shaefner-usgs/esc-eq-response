@@ -3,8 +3,9 @@
 
 
 /**
- * Zoom map from center point of visible map area, which varies depending on
- * the header's height and whether or not the sidebar is toggled on.
+ * This class extends L.Control.Zoom to zoom from the center point of the
+ * visible map area, which varies depending on the header's height and whether
+ * or not the sidebar is toggled on.
  */
 L.Control.Zoom.Center = L.Control.Zoom.extend({
   _getCenter: function () {

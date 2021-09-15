@@ -6,7 +6,8 @@ require('utfgrid');
 
 
 /**
- * This class enables mouseover labels that track the cursor on UtfGrid.
+ * This class extends L.LayerGroup to enable mouseover labels to track the
+ * cursor on a UtfGrid layer.
  *
  * @param options {Object}
  *   {

@@ -3,7 +3,8 @@
 
 
 /**
- * This class displays geographic coordinates of the mouse pointer as it moves.
+ * This class extends L.Control to display the geographic coordinates of the
+ * mouse pointer as it is moved around the map.
  *
  * Copyright 2013 Ardhi Lukianto (https://github.com/ardhi/Leaflet.MousePosition)
  */
