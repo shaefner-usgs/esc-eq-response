@@ -72,6 +72,12 @@ body.sidebar {
     display: none;
   }
 
+  .hide-link {
+    color: $text-color;
+    cursor: text;
+    text-decoration: none;
+  }
+
   .icon-close {
     position: fixed;
     right: $sidebar-width * -1;
