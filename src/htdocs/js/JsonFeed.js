@@ -136,8 +136,8 @@ var JsonFeed = function (options) {
   };
 
   /**
-   * Initialize throttlers that are used to minimize 'stacked' Fetch
-   * requests when loading Features.
+   * Initialize throttlers that are used to minimize 'stacked' Fetch requests
+   * when loading Features.
    *
    * @param id {String}
    *     Feature id
