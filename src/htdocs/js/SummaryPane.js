@@ -33,7 +33,6 @@ var SummaryPane = function (options) {
       _el,
       _featuresEl,
       _filterProps,
-      _style,
       _tz,
 
       _addCount,
@@ -41,12 +40,10 @@ var SummaryPane = function (options) {
       _addTitleAttrs,
       _configTable,
       _filterList,
-      _getSliderValue,
       _hideMenu,
       _initTableSort,
       _openPopup,
       _renderEffects,
-      _setSliderStyles,
       _showMenu,
       _unselectRow,
       _updateTimestamp;
@@ -61,11 +58,7 @@ var SummaryPane = function (options) {
     _el = options.el || document.createElement('section');
     _featuresEl = _el.querySelector('.features');
     _filterProps = {};
-    _style = document.createElement('style');
     _tz = AppUtil.getTimeZone();
-
-    // Add <style> tag for dynamic range input (slider) styles
-    document.body.appendChild(_style);
   };
 
   /**
@@ -178,7 +171,7 @@ var SummaryPane = function (options) {
     table = div.querySelector('table.list');
 
     if (slider) {
-      _setSliderStyles(slider, id); // set range slider to initial value
+      _app.setSliderStyles(slider); // set range slider to initial value
     }
     if (table) {
       _addListeners(id);
@@ -216,29 +209,7 @@ var SummaryPane = function (options) {
 
     // Prevent page scrolling and update slider track
     window.scroll(0, scrollY);
-    _setSliderStyles(this);
-  };
-
-  /**
-   * Get the CSS value for the colored section of an <input> range slider.
-   *
-   * @param input {Element}
-   *
-   * @return value {String}
-   */
-  _getSliderValue = function (input) {
-    var min,
-        percentage,
-        value;
-
-    min = input.min || 0;
-    percentage = input.value;
-    if (input.max) {
-      percentage = Math.floor(100 * (input.value - min) / (input.max - min));
-    }
-    value = percentage + '% 100%';
-
-    return value;
+    _app.setSliderStyles(this);
   };
 
   /**
@@ -360,32 +331,6 @@ var SummaryPane = function (options) {
         this.classList.remove('hover');
       }
     }
-  };
-
-  /**
-   * Set dynamic, inline styles for colored section of input range sliders.
-   *
-   * @param input {Element}
-   */
-  _setSliderStyles = function (input) {
-    var newRules,
-        oldRules,
-        value,
-        vendorAttrs;
-
-    newRules = '';
-    oldRules = new RegExp('#' + input.id + '[^#]+', 'g');
-    value = _getSliderValue(input);
-    vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
-
-    vendorAttrs.forEach(attr => {
-      newRules += '#' + input.id + '::-' + attr + '-track {background-size:' + value
-        + ' !important}';
-    });
-
-    // Remove 'old' css rules first, then add new ones
-    _style.textContent = _style.textContent.replace(oldRules, '');
-    _style.appendChild(document.createTextNode(newRules));
   };
 
   /**
@@ -521,7 +466,6 @@ var SummaryPane = function (options) {
 
     time.innerHTML = '';
     _featuresEl.innerHTML = '';
-    _style.textContent = ''; // inline style for sliders
   };
 
 

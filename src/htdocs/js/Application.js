@@ -56,6 +56,7 @@ var AppUtil = require('util/AppUtil'),
  *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
+ *     setSliderStyles: {Function}
  *     setTitle: {Function}
  *     sideBarWidth: {Number}
  *   }
@@ -66,9 +67,11 @@ var Application = function (options) {
 
       _els,
       _sidebar,
+      _style,
       _throttle,
 
       _addListeners,
+      _getSliderValue,
       _initClasses,
       _resetScrollPositions,
       _saveScrollPosition;
@@ -79,6 +82,7 @@ var Application = function (options) {
   _initialize = function (options) {
     _els = options || {};
     _sidebar = document.getElementById('sideBar');
+    _style = document.createElement('style');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
@@ -86,6 +90,9 @@ var Application = function (options) {
     AppUtil.setFieldValues();
     _resetScrollPositions();
     _initClasses();
+
+    // Add <style> tag for dynamic range input (slider) styles
+    document.body.appendChild(_style);
   };
 
   /**
@@ -111,6 +118,28 @@ var Application = function (options) {
       _this.NavBar.switchSideBars('selectBar');
       _this.setScrollPosition('selectBar');
     });
+  };
+
+  /**
+   * Get the CSS value for the colored section of an <input> range slider.
+   *
+   * @param input {Element}
+   *
+   * @return value {String}
+   */
+  _getSliderValue = function (input) {
+    var min,
+        percentage,
+        value;
+
+    min = input.min || 0;
+    percentage = input.value;
+    if (input.max) {
+      percentage = Math.floor(100 * (input.value - min) / (input.max - min));
+    }
+    value = percentage + '% 100%';
+
+    return value;
   };
 
   /**
@@ -208,6 +237,8 @@ var Application = function (options) {
    * Reset app to default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
+    _style.textContent = ''; // inline styles for sliders
+
     _resetScrollPositions();
 
     _this.Features.reset(); // reset Features first
@@ -236,6 +267,32 @@ var Application = function (options) {
         _sidebar.scrollTop = position;
       }
     }
+  };
+
+  /**
+   * Set dynamic, inline styles for colored section of input range sliders.
+   *
+   * @param input {Element}
+   */
+  _this.setSliderStyles = function (input) {
+    var newRules,
+        oldRules,
+        value,
+        vendorAttrs;
+
+    newRules = '';
+    oldRules = new RegExp('#' + input.id + '[^#]+', 'g');
+    value = _getSliderValue(input);
+    vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
+
+    vendorAttrs.forEach(attr => {
+      newRules += '#' + input.id + '::-' + attr + '-track {background-size:' + value
+        + ' !important}';
+    });
+
+    // Remove 'old' css rules first, then add new ones
+    _style.textContent = _style.textContent.replace(oldRules, '');
+    _style.appendChild(document.createTextNode(newRules));
   };
 
   /**
