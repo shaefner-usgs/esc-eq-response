@@ -9,6 +9,7 @@ var AppUtil = require('util/AppUtil'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
+    SearchBar = require('SearchBar'),
     SelectBar = require('SelectBar'),
     SettingsBar = require('SettingsBar'),
     SignificantEqs = require('SignificantEqs'),
@@ -27,6 +28,7 @@ var AppUtil = require('util/AppUtil'),
  *     MapPane: {Element}
  *     NavBar: {Element}
  *     PlotsPane: {Element}
+ *     SearchBar: {Element}
  *     SelectBar: {Element}
  *     SettingsBar: {Element}
  *     SignificantEqs: {Element}
@@ -44,6 +46,7 @@ var AppUtil = require('util/AppUtil'),
  *     MapPane: {Object}
  *     NavBar: {Object}
  *     PlotsPane: {Object}
+ *     SearchBar: {Object}
  *     SelectBar: {Object}
  *     SettingsBar: {Object}
  *     SignificantEqs: {Object}
@@ -116,30 +119,28 @@ var Application = function (options) {
    */
   _initClasses = function () {
     var appClasses,
-        name,
         postInits;
 
-    appClasses = [
-      Features, // must be first
-      Feeds,
-      JsonFeed,
-      LegendBar,
-      MapPane,
-      NavBar,
-      PlotsPane,
-      SelectBar,
-      SettingsBar,
-      SignificantEqs,
-      StatusBar,
-      SummaryPane,
-      TitleBar
-    ];
+    appClasses = {
+      Features: Features, // must be first
+      Feeds: Feeds,
+      JsonFeed: JsonFeed,
+      LegendBar: LegendBar,
+      MapPane: MapPane,
+      NavBar: NavBar,
+      PlotsPane: PlotsPane,
+      SearchBar: SearchBar,
+      SelectBar: SelectBar,
+      SettingsBar: SettingsBar,
+      SignificantEqs: SignificantEqs,
+      StatusBar: StatusBar,
+      SummaryPane: SummaryPane,
+      TitleBar: TitleBar
+    };
     postInits = [];
 
-    appClasses.forEach(appClass => {
-      name = appClass.name; // name of Class
-
-      _this[name] = appClass({
+    Object.keys(appClasses).forEach(name => {
+      _this[name] = appClasses[name]({
         app: _this,
         el: _els[name] || null
       });
