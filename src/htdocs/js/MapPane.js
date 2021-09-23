@@ -6,6 +6,9 @@ var AppUtil = require('util/AppUtil');
 
 
 // Leaflet plugins and layer factories (these get attached to the global L obj)
+//   NOTE: Leaflet.Editable strips all custom props added to L => 1) add it
+//         first; 2) CanvasMarker must be added here (not in dependent Classes).
+require('leaflet-editable'); // used in SearchBar.js
 require('leaflet/CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
 require('leaflet/BottomCenter');
 require('leaflet/DarkLayer');
