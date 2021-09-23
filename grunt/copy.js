@@ -34,6 +34,17 @@ var copy = {
     ]
   },
 
+  flatpickr: {
+    cwd: 'node_modules/flatpickr/dist',
+    dest: config.build + '/' + config.src + '/htdocs/lib/flatpickr',
+    expand: true,
+    filter: 'isFile',
+    src: [
+      'flatpickr.css',
+      'flatpickr.js'
+    ]
+  },
+
   leaflet: {
     cwd: 'node_modules/leaflet/dist',
     dest: config.build + '/' + config.src + '/htdocs/lib/leaflet',

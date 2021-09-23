@@ -21,6 +21,7 @@ module.exports = function (grunt) {
     'sass',
     'postcss:build',
     'copy:build',
+    'copy:flatpickr',
     'copy:leaflet',
     'copy:phprtflite',
     'copy:plotly'
