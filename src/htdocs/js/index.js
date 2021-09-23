@@ -8,6 +8,7 @@ Application({
   MapPane: document.getElementById('mapPane'),
   NavBar: document.getElementById('navBar'),
   PlotsPane: document.getElementById('plotsPane'),
+  SearchBar: document.getElementById('searchBar'),
   SelectBar: document.getElementById('selectBar'),
   SettingsBar: document.getElementById('settingsBar'),
   SignificantEqs: document.getElementById('significantEqs'),
