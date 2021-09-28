@@ -16,6 +16,7 @@ body.sidebar {
 
     .icon-close {
       right: 1rem;
+      z-index: 10000;
     }
   }
 
@@ -65,7 +66,8 @@ body.sidebar {
     display: block;
     font-weight: 300;
     letter-spacing: .015rem;
-    margin: 1rem 0 .25rem;
+    line-height: 1;
+    margin: 1.25rem 0 .25rem;
   }
 
   section.hide {
