@@ -210,6 +210,12 @@ input[type="number"] {
   }
 }
 
+/* invalid Flatpickr inputs */
+.invalid > input[type="text"] {
+  border: 1px solid #c00;
+  box-shadow: 0 0 3px #c00;
+}
+
 /* Range inputs - adapted from:
    https://css-tricks.com/sliding-nightmare-understanding-range-input/
 --------------------------------------------- */
@@ -269,6 +275,10 @@ input[type="number"] {
     position: absolute;
     top: 0;
     transform: translate(calc((var(--val) - var(--min)) / (var(--max) - var(--min)) * #{$dist} - 50%));
+
+    &:after {
+      content: '+';
+    }
   }
 }
 
