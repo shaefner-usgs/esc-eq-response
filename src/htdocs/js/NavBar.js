@@ -240,7 +240,9 @@ var NavBar = function (options) {
         document.body.classList.add('sidebar');
       }
 
-      if (id === 'settingsBar') {
+      if (id === 'searchBar') {
+        _app.SearchBar.renderMap();
+      } else if (id === 'settingsBar') {
         _app.SettingsBar.setFocusedField();
       }
     } else { // close
