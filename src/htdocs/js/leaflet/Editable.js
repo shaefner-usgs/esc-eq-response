@@ -22,47 +22,51 @@ L.Control.Editable = L.Control.extend({
   },
 
   onAdd: function (map) {
-    var container,
+    var button,
+        container,
         instructions,
-        link,
         newRegion,
-        region;
+        region,
+        title;
 
     container = L.DomUtil.create('div', 'leaflet-control-edit leaflet-bar leaflet-control');
+    button = L.DomUtil.create('a', '', container);
     instructions = document.querySelector('#searchBar .instructions');
-    link = L.DomUtil.create('a', '', container);
     region = this.options.region;
 
-    link.href = '#';
-    link.innerHTML = '<div class="box"></div>';
-    link.title = 'Create a new custom region';
+    button.href = '#';
+    button.innerHTML = '<div class="box"></div>';
+    button.title = 'Create a new custom region';
 
-    map.on('editable:drawing:commit', function(e) {
+    map.on('editable:drawing:commit', e => {
       var classList = e.originalEvent.target.classList;
 
-      // Ignore control button click which also triggers a 'commit' event
+      // Ignore clicks on active control which also triggers a 'commit' event
       if (!classList.contains('box') && !classList.contains('selected')) {
         instructions.classList.add('hide');
-        link.classList.remove('selected');
+        button.classList.remove('selected');
 
         region = newRegion;
       }
     });
 
-    L.DomEvent.on(link, 'click', function(e) {
+    L.DomEvent.on(button, 'click', e => {
       L.DomEvent.stop(e);
 
       instructions.classList.toggle('hide');
-      link.classList.toggle('selected');
+      button.classList.toggle('selected');
 
-      if (link.classList.contains('selected')) {
-        map.removeLayer(region);
-
+      if (button.classList.contains('selected')) {
         newRegion = map.editTools.startRectangle();
+        title = button.getAttribute('title');
+
+        button.setAttribute('title', 'Cancel and restore previous region');
+        map.removeLayer(region);
       } else {
         // Recreate cached region Rectangle b/c it loses its dragging ability
         region = L.rectangle(region.getBounds());
 
+        button.setAttribute('title', title);
         map.editTools.stopDrawing();
         map.removeLayer(newRegion);
         map.addLayer(region);
