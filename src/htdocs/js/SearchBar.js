@@ -7,7 +7,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 // NOTE: the Leaflet.Editable plugin is included in MapPane.js
-require('leaflet/Editable'); // custom map control for Leaflet.Editable
+require('leaflet/EditableRectangle'); // custom map control for Leaflet.Editable
 
 
 /**
