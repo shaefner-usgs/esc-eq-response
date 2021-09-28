@@ -2,22 +2,11 @@
 
 @use 'variables' as *;
 
+/* Flatpickr overrides */
+
 .flatpickr-wrapper {
-  // Use the same border styles as form controls
-  .flatpickr-calendar {
-    border: 1px solid $accent-color;
-    border-radius: $button-border-radius;
-    box-shadow: 0 0 3px $accent-color;
-    z-index: 1001 !important; /* stack above map */
-
-    &.arrowBottom:before {
-      border-top-color: $accent-color;
-    }
-    &.arrowTop:before {
-      border-bottom-color: $accent-color;
-    }
-
-    &.invalid {
+  &.invalid {
+    .flatpickr-calendar {
       border-color: #c00;
       box-shadow: 0 0 3px #c00;
 
@@ -27,6 +16,26 @@
       &.arrowTop:before {
         border-bottom-color: #c00;
       }
+    }
+  }
+
+  .dayContainer {
+    padding-right: 2px;
+  }
+
+  // Use the same border styles as form controls
+  .flatpickr-calendar {
+    border: 1px solid $accent-color;
+    border-radius: $button-border-radius;
+    box-shadow: 0 0 3px $accent-color;
+    transition: all .25s ease-in-out;
+    z-index: 1001 !important; /* stack above map */
+
+    &.arrowBottom:before {
+      border-top-color: $accent-color;
+    }
+    &.arrowTop:before {
+      border-bottom-color: $accent-color;
     }
   }
 
@@ -45,7 +54,10 @@
   }
 
   .flatpickr-day {
+    align-items: center;
     color: $text-color;
+    display: flex;
+    justify-content: center;
     transition: all $hover-off-duration ease-in;
 
     &:hover,
@@ -53,6 +65,7 @@
     &.prevMonthDay:not(.flatpickr-disabled):hover {
       background: $accent-color-lightest;
       border-color: $accent-color-lighter;
+      color: color.adjust($text-color, $alpha: 0); /* alpha: 0 overrides alpha level set below */
       transition: all $hover-on-duration ease-out;
     }
     &.nextMonthDay,
