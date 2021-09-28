@@ -57,7 +57,6 @@ var AppUtil = require('util/AppUtil'),
  *     reset: {Function}
  *     setScrollPosition: {Function}
  *     setSliderStyles: {Function}
- *     setTitle: {Function}
  *     sideBarWidth: {Number}
  *   }
  */
@@ -293,30 +292,6 @@ var Application = function (options) {
     // Remove 'old' css rules first, then add new ones
     _style.textContent = _style.textContent.replace(oldRules, '');
     _style.appendChild(document.createTextNode(newRules));
-  };
-
-  /**
-   * Set the Document's title.
-   *
-   * @param opts {Object} optional; default is {}
-   *   {
-   *     title: {String} optional
-   *   }
-   */
-  _this.setTitle = function (opts = {}) {
-    var appName,
-        title;
-
-    appName = document.title.split(' | ')[1] || document.title; // initial <title>
-    title = appName; // default
-
-    if (opts.title) {
-      title = opts.title + ' | ' + appName;
-    }
-
-    document.title = title;
-
-    _this.TitleBar.setTitle(opts);
   };
 
 

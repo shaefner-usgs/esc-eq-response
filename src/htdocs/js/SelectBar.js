@@ -178,7 +178,7 @@ var SelectBar = function (options) {
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
     details.classList.remove('hide');
 
-    _app.setTitle(mainshock.details);
+    _app.TitleBar.setTitle(mainshock.details);
   };
 
 

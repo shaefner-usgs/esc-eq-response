@@ -6,7 +6,6 @@
  *
  * @param options {Object}
  *   {
- *     app: {Object} Application
  *     el: {Element}
  *   }
  *
@@ -20,9 +19,9 @@ var TitleBar = function (options) {
   var _this,
       _initialize,
 
-      _app,
       _el,
       _subTitle,
+      _title,
 
       _setSubTitle;
 
@@ -32,9 +31,9 @@ var TitleBar = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _app = options.app;
     _el = options.el;
     _subTitle = _el.querySelector('p').innerText;
+    _title = document.title;
   };
 
   /**
@@ -56,31 +55,50 @@ var TitleBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    _app.setTitle(); // resets Document title and calls TitleBar.setTitle()
+    _this.setTitle();
   };
 
   /**
-   * Set the TitleBar's title.
+   * Set the TitleBar's title (and the document's <title>).
    *
    * @param opts {Object} optional; default is {}
    *   {
-   *     htmlTime: {String} optional
-   *     title: {String} optional
-   *     url: {String} optional
+   *     htmlTime: {String}
+   *     title: {String}
+   *     type: {String}
+   *     url: {String}
    *   }
    */
   _this.setTitle = function (opts = {}) {
-    var h1,
+    var appName,
+        docTitle,
+        h1,
         title;
 
+    appName = document.title.split(' | ')[1] || document.title;
     h1 = _el.querySelector('h1');
-    title = opts.title || document.title;
+    title = _title;
+
+    if (opts.title) {
+      title = opts.title;
+
+      if (opts.type === 'search') {
+        _title = opts.title; // cache value
+
+        if (!document.body.classList.contains('no-mainshock')) {
+          return; // don't change title if a Mainshock is selected
+        }
+      }
+    }
+
+    docTitle = title + ' | ' + appName;
 
     if (opts.url) {
       title = `<a href="${opts.url}" target="new">${title}<i class="icon-link"></i></a>`;
     }
 
     h1.innerHTML = title;
+    document.title = docTitle;
 
     _setSubTitle(opts.htmlTime || '');
   };
