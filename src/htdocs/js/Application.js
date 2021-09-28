@@ -236,8 +236,6 @@ var Application = function (options) {
    * Reset app to default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
-    _style.textContent = ''; // inline styles for sliders
-
     _resetScrollPositions();
 
     _this.Features.reset(); // reset Features first
