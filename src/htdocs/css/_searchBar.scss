@@ -1,0 +1,118 @@
+@use 'flatpickr';
+@use 'leaflet/editable';
+@use 'leaflet/overrides';
+@use 'variables' as *;
+
+#searchBar {
+  button {
+    margin: 1rem 0 1.5rem;
+  }
+
+  div {
+    &.hide {
+      display: none;
+    }
+
+    &.region {
+      height: 300px;
+      margin: 1.25rem 0 0;
+    }
+  }
+
+  h3 {
+    margin: 1.25rem 0 .75rem;
+  }
+
+  li {
+    border-left: 1px solid $accent-color;
+    color: $accent-color;
+    cursor: pointer;
+    font: bold 13px $font-family-headers;
+    margin: 0;
+    padding: .25rem .5rem;
+    text-align: center;
+    text-transform: uppercase;
+    transition: background .15s ease-in;
+
+    &:hover {
+      background: $accent-color-lightest;
+      transition: background $hover-on-duration ease-out;
+    }
+
+    &:first-child {
+      border: none;
+      border-radius: $button-border-radius 0 0 $button-border-radius;
+    }
+    &:last-child {
+      border-radius: 0 $button-border-radius $button-border-radius 0;
+    }
+
+    &.selected {
+      background: $accent-color;
+      border-radius: 0;
+      color: $bg-color;
+      cursor: auto;
+      transition: background $hover-on-duration ease-out;
+    }
+  }
+
+  ul {
+    align-items: center;
+    border: 1px solid $accent-color;
+    border-radius: $button-border-radius;
+    display: inline-flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #end ~ .flatpickr-calendar {
+    right: 0; /* align end date calendar to right edge */
+  }
+
+  .content {
+    position: relative;
+  }
+
+  .dates {
+    align-items: center;
+    display: flex;
+    margin-top: 1rem;
+
+    label {
+      margin-top: .25rem;
+    }
+
+    > span {
+      display: block;
+      padding-top: 1.25rem;
+      text-align: center;
+      width: 2rem;
+    }
+  }
+
+  .instructions,
+  .utc {
+    color: $text-color-lighter;
+    font-size: .85rem;
+    margin: 0;
+    opacity: 1;
+    transition: opacity $hover-on-duration ease-out;
+
+    &.hide {
+      opacity: 0;
+      transition: all .15s ease-in;
+      visibility: hidden;
+    }
+  }
+
+  /* custom region Rectangle overlay */
+  .leaflet-path-draggable {
+    fill: $accent-color;
+    stroke: $accent-color;
+  }
+
+  .slider-container {
+    margin-bottom: -1rem;
+  }
+}

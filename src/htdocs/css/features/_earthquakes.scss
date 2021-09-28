@@ -171,9 +171,14 @@
     (also used for other (i.e. non-eq) Leaflet popups) */
 .earthquake,
 .leaflet-popup-content {
-  &.mainshock {
-    button,
+  &.mainshock,
+  &.search {
     .distance {
+      display: none;
+    }
+  }
+  &.mainshock {
+    button {
       display: none;
     }
   }

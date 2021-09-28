@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0,
       maximum-scale=1.0, user-scalable=0" />
     <title>Earthquake Response App</title>
+    <link rel="stylesheet" href="lib/flatpickr/flatpickr.css" />
     <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
     <link rel="stylesheet" href="css/index.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
@@ -65,11 +66,6 @@
             <button type="reset" class="reset">Reset</button>
           </div>
         </section>
-        <section id="searchBar" class="bar hide">
-          <div class="content">
-            <h2>Search the Catalog</h2>
-          </div>
-        </section>
         <section id="settingsBar" class="bar hide">
           <div class="content">
             <h2>Settings</h2>
@@ -80,10 +76,10 @@
               </h3>
               <label for="as-mag">Min magnitude</label>
               <input type="number" id="as-mag" value="0" min="0" max="9"
-                step="0.1" autocomplete="off" required="required" tabindex="2" />
+                step="0.1" autocomplete="off" required="required" tabindex="4" />
               <label for="as-dist">Max distance from mainshock (km)</label>
               <input type="number" id="as-dist" value="" min="1" step="1"
-                autocomplete="off" required="required" tabindex="3" />
+                autocomplete="off" required="required" tabindex="5" />
             </div>
             <div class="foreshocks">
               <h3>Foreshocks
@@ -92,13 +88,13 @@
               </h3>
               <label for="fs-mag">Min magnitude</label>
               <input type="number" id="fs-mag" value="1" min="0" max="9"
-                step="0.1" autocomplete="off" required="required" tabindex="4" />
+                step="0.1" autocomplete="off" required="required" tabindex="6" />
               <label for="fs-dist">Max distance from mainshock (km)</label>
               <input type="number" id="fs-dist" value="" min="1" step="1"
-                autocomplete="off" required="required" tabindex="5" />
+                autocomplete="off" required="required" tabindex="7" />
               <label for="fs-days">Max days before mainshock</label>
               <input type="number" id="fs-days" value="30" min="1" step="1"
-                autocomplete="off" required="required" tabindex="6" />
+                autocomplete="off" required="required" tabindex="8" />
             </div>
             <div class="historical">
               <h3>Historical Seismicity
@@ -107,13 +103,13 @@
               </h3>
               <label for="hs-mag">Min magnitude</label>
               <input type="number" id="hs-mag" value="" min="0" max="9"
-                step="0.1" autocomplete="off" required="required" tabindex="7" />
+                step="0.1" autocomplete="off" required="required" tabindex="9" />
               <label for="hs-dist">Max distance from mainshock (km)</label>
               <input type="number" id="hs-dist" value="" min="1" step="1"
-                autocomplete="off" required="required" tabindex="8" />
+                autocomplete="off" required="required" tabindex="10" />
               <label for="hs-years">Max years before mainshock</label>
               <input type="number" id="hs-years" value="10" min="1" step="1"
-                autocomplete="off" required="required" tabindex="9" />
+                autocomplete="off" required="required" tabindex="11" />
             </div>
             <p>Initial parameter values are set automatically based on the
               Mainshock’s magnitude and estimated rupture length.</p>
@@ -125,6 +121,54 @@
           </div>
         </section>
       </form>
+      <section id="searchBar" class="bar hide">
+        <div class="content">
+          <h2>Find an Earthquake</h2>
+          <p>Search the earthquake catalog and display the results on the
+            <a href="#mapPane">map</a>.</p>
+          <h3>Magnitude</h3>
+          <div class="slider-container">
+            <div class="min">0</div>
+            <div class="inverted slider" style="--min:0; --max:8; --val:3.5;">
+              <input id="mag" type="range" min="0" max="8" step="0.5"
+                value="3.5" autocomplete="off">
+              <output for="mag">3.5</output>
+            </div>
+            <div class="max">8</div>
+          </div>
+          <h3>Time Period</h3>
+          <ul class="period">
+            <li id="month" class="selected">Past Month</li>
+            <li id="week">Past Week</li>
+            <li id="day">Past Day</li>
+            <li id="customPeriod">Custom</li>
+          </ul>
+          <div class="period hide">
+            <div class="dates">
+              <div>
+                <label for="begin">Begin</label>
+                <input type="text" id="begin" required="required"
+                  placeholder="Select a date" tabindex="2">
+              </div>
+              <span>–</span>
+              <div>
+                <label for="end">End</label>
+                <input type="text" id="end" required="required"
+                  placeholder="Select a date" tabindex="3">
+              </div>
+            </div>
+            <p class="utc">Use UTC time for custom dates.</p>
+          </div>
+          <h3>Region</h3>
+          <ul class="region">
+            <li id="worldwide" class="selected">Worldwide</li>
+            <li id="customRegion">Custom</li>
+          </ul>
+          <div class="region hide"></div>
+          <p class="instructions hide">Click and drag to draw a new custom region.</p>
+          <button type="button" id="search">Search</button>
+        </div>
+      </section>
       <section id="legendBar" class="bar hide">
         <div class="content">
           <h2>Legend</h2>
@@ -192,6 +236,7 @@
         </div>
       </div>
     </footer>
+    <script src="lib/flatpickr/flatpickr.js"></script>
     <script src="lib/leaflet/leaflet.js"></script>
     <script src="lib/plotly/plotly-gl3d.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=AbortController"></script>

@@ -103,6 +103,10 @@ var Earthquakes = function (options) {
     _app = options.app;
     _featureId = options.id;
     _markerOptions = options.markerOptions;
+    _now = Luxon.DateTime.utc();
+    _pastDay = _now.minus({ days: 1 });
+    _pastHour = _now.minus({ hours: 1 });
+    _pastWeek = _now.minus({ weeks: 1 });
     _plotData = {
       color: [],
       date: [],
@@ -118,7 +122,7 @@ var Earthquakes = function (options) {
     };
     _sortByField = options.sortByField || '';
 
-    if (_featureId !== 'mainshock') {
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
@@ -126,10 +130,6 @@ var Earthquakes = function (options) {
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _mainshockTitle = mainshock.details.title;
       _minMag = AppUtil.getParam(AppUtil.getPrefix(_featureId) + '-mag');
-      _now = Luxon.DateTime.utc();
-      _pastDay = _now.minus({ days: 1 });
-      _pastHour = _now.minus({ hours: 1 });
-      _pastWeek = _now.minus({ weeks: 1 });
       _duration = _getDuration();
     }
 
@@ -213,9 +213,9 @@ var Earthquakes = function (options) {
     var age,
         eqTime;
 
-    age = _featureId; // everything but Aftershocks
+    age = _featureId; // everything but Aftershocks, Search
 
-    if (_featureId === 'aftershocks') {
+    if (_featureId === 'aftershocks' || _featureId === 'search') {
       eqTime = Luxon.DateTime.fromMillis(timestamp).toUTC();
 
       if (eqTime >= _pastHour) {
@@ -717,7 +717,8 @@ var Earthquakes = function (options) {
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    if (_featureId !== 'mainshock') { // calculate distance/direction from Mainshock
+    // Calculate distance/direction from Mainshock
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
       compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
       latlon = LatLon(coords[1], coords[0]);
       bearing = _mainshockLatlon.bearing(latlon);
@@ -994,10 +995,10 @@ var Earthquakes = function (options) {
       return array[0] === value; // all values are the same
     });
 
-    if (!singleMagBin) {
-      html = L.Util.template(_getTemplate('slider'), data); // includes subheader
-    } else {
+    if (singleMagBin) {
       html = L.Util.template(_getTemplate('subheader'), data);
+    } else {
+      html = L.Util.template(_getTemplate('slider'), data); // includes subheader
     }
 
     return html;
@@ -1029,7 +1030,7 @@ Earthquakes.getFeedUrl = function (params) {
     orderby: 'time-asc'
   };
   pairs = [];
-  params = Object.assign(defaults, params);
+  params = Object.assign({}, defaults, params);
 
   Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);

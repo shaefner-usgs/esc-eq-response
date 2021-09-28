@@ -1,0 +1,24 @@
+@use '../variables' as *;
+
+.leaflet-control-edit {
+  a {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    &:active, &.selected {
+      .box {
+        border-color: $bg-color;
+      }
+    }
+    &:hover {
+      display: flex; /* override Leaflet's display:block */
+    }
+  }
+
+  .box {
+    border: 2px solid $accent-color;
+    height: 14px;
+    width: 14px;
+  }
+}

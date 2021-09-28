@@ -282,7 +282,7 @@ AppUtil.setQueryString = function () {
       params,
       queryString;
 
-  fields = document.querySelectorAll('#sideBar input');
+  fields = document.querySelectorAll('#selectBar input, #settingsBar input');
   pairs = [];
   params = new URLSearchParams(location.search);
 

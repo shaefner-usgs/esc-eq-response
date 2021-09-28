@@ -198,7 +198,8 @@ input[type="number"] {
     background: none !important;
   }
 
-  &:focus {
+  &:focus,
+  &.active { /* .active is for flatpickr */
     border: 1px solid $accent-color;
     box-shadow: 0 0 3px $accent-color;
   }
@@ -207,6 +208,12 @@ input[type="number"] {
     border: 1px solid #c00;
     box-shadow: 0 0 3px #c00;
   }
+}
+
+/* invalid Flatpickr inputs */
+.invalid > input[type="text"] {
+  border: 1px solid #c00;
+  box-shadow: 0 0 3px #c00;
 }
 
 /* Range inputs - adapted from:
@@ -268,6 +275,10 @@ input[type="number"] {
     position: absolute;
     top: 0;
     transform: translate(calc((var(--val) - var(--min)) / (var(--max) - var(--min)) * #{$dist} - 50%));
+
+    &:after {
+      content: '+';
+    }
   }
 }
 

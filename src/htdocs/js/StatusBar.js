@@ -66,12 +66,17 @@ var StatusBar = function (options) {
       });
     }
 
-    // Reload a Feature
+    // Reload a Feature or catalog search
     if (reload) {
       reload.addEventListener('click', e => {
         e.preventDefault();
         _this.removeItem(id);
-        _app.Features.createFeature(id);
+
+        if (id === 'search') {
+          _app.SearchBar.searchCatalog();
+        } else { // Feature
+          _app.Features.createFeature(id);
+        }
       });
     }
   };
@@ -155,13 +160,15 @@ var StatusBar = function (options) {
   _this.addError = function (error) {
     var content,
         div,
-        isFeature;
+        isFeature,
+        isSearch;
 
     content = error.message;
     div = document.createElement('div');
     isFeature = _app.Features.isFeature(error.id);
+    isSearch = (error.id === 'search' ? true : false);
 
-    if (isFeature && error.status !== 400 && error.status !== 404) {
+    if ((isFeature || isSearch) && error.status !== 400 && error.status !== 404) {
       content += '<a href="#" class="reload"></a>';
     }
 

@@ -57,8 +57,11 @@
   .leaflet-fieldnotes-pane {
     z-index: 418;
   }
-  .leaflet-faults-pane {
+  .leaflet-search-pane {
     z-index: 417;
+  }
+  .leaflet-faults-pane {
+    z-index: 416;
   }
 
   /* Push top controls down to accommodate header */

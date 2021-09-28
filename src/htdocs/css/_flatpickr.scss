@@ -1,0 +1,193 @@
+@use 'sass:color';
+
+@use 'variables' as *;
+
+/* Flatpickr overrides */
+
+.flatpickr-wrapper {
+  &.invalid {
+    .flatpickr-calendar {
+      border-color: #c00;
+      box-shadow: 0 0 3px #c00;
+
+      &.arrowBottom:before {
+        border-top-color: #c00;
+      }
+      &.arrowTop:before {
+        border-bottom-color: #c00;
+      }
+    }
+  }
+
+  .dayContainer {
+    padding-right: 2px;
+  }
+
+  // Use the same border styles as form controls
+  .flatpickr-calendar {
+    border: 1px solid $accent-color;
+    border-radius: $button-border-radius;
+    box-shadow: 0 0 3px $accent-color;
+    transition: all .25s ease-in-out;
+    z-index: 1001 !important; /* stack above map */
+
+    &.arrowBottom:before {
+      border-top-color: $accent-color;
+    }
+    &.arrowTop:before {
+      border-bottom-color: $accent-color;
+    }
+  }
+
+  .flatpickr-current-month {
+    input.cur-year {
+      font-weight: 300;
+    }
+
+    span.cur-month {
+      font-weight: 500;
+
+      &:hover {
+        background: $bg-color;
+      }
+    }
+  }
+
+  .flatpickr-day {
+    align-items: center;
+    color: $text-color;
+    display: flex;
+    justify-content: center;
+    transition: all $hover-off-duration ease-in;
+
+    &:hover,
+    &.nextMonthDay:not(.flatpickr-disabled):hover,
+    &.prevMonthDay:not(.flatpickr-disabled):hover {
+      background: $accent-color-lightest;
+      border-color: $accent-color-lighter;
+      color: color.adjust($text-color, $alpha: 0); /* alpha: 0 overrides alpha level set below */
+      transition: all $hover-on-duration ease-out;
+    }
+    &.nextMonthDay,
+    &.prevMonthDay {
+      color: color.adjust($text-color-lightest, $alpha: -0.3);
+    }
+
+    &.flatpickr-disabled,
+    &.flatpickr-disabled:hover {
+      background: $bg-color;
+      border-color: $bg-color;
+      color: color.adjust($text-color-lightest, $alpha: -0.75);
+    }
+
+    &.selected,
+    &.selected:hover {
+      background: $accent-color !important;
+      border-color: $accent-color;
+      color: $bg-color !important;
+    }
+
+    &.today {
+      border-color: $accent-color;
+      transition-property: background, color;
+
+      &:hover {
+        border-color: $accent-color;
+
+        &:not(.flatpickr-disabled) {
+          background: $accent-color-lightest;
+          color: $text-color;
+        }
+      }
+    }
+  }
+
+  .flatpickr-months {
+    margin-bottom: .5rem;
+
+    .flatpickr-month {
+      color: $text-color;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg,
+    .flatpickr-prev-month:hover svg,
+    .flatpickr-next-month:hover svg {
+      fill: $accent-color;
+    }
+  }
+
+  .flatpickr-time {
+    border-color: $accent-color-lighter !important;
+
+    .flatpickr-am-pm {
+      border-radius: 0 0 $button-border-radius + 2px 0;
+      color: $text-color;
+
+      &:focus {
+        background: $bg-color;
+      }
+      &:hover {
+        background: $accent-color-lightest;
+      }
+    }
+
+    .numInputWrapper:first-child {
+      border-radius: 0 0 0 $button-border-radius + 2px;
+
+      .flatpickr-hour {
+        border-radius: 0 0 0 $button-border-radius + 2px;
+        font-weight: normal;
+      }
+    }
+  }
+
+  .flatpickr-weekday {
+    color: $text-color-lightest;
+  }
+
+  .numInputWrapper {
+    &:hover {
+      background: $accent-color-lightest;
+    }
+
+    input {
+      border: none;
+      box-shadow: none;
+      color: $text-color;
+
+      &:focus,
+      &:hover {
+        background: $accent-color-lightest;
+        border: none;
+        box-shadow: none;
+      }
+    }
+
+    span { // up, down arrows
+      border-color: $accent-color-lighter;
+
+      &:hover {
+        background: $accent-color-lighter;
+      }
+      &:active {
+        background: $accent-color;
+
+        &.arrowDown:after {
+          border-top-color: $bg-color;
+        }
+        &.arrowUp:after {
+          border-bottom-color: $bg-color;
+        }
+      }
+
+      &.arrowUp {
+        border-top: none;
+
+        &:after {
+          top: 35%;
+        }
+      }
+    }
+  }
+}

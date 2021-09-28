@@ -9,6 +9,7 @@ var AppUtil = require('util/AppUtil'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
     PlotsPane = require('PlotsPane'),
+    SearchBar = require('SearchBar'),
     SelectBar = require('SelectBar'),
     SettingsBar = require('SettingsBar'),
     SignificantEqs = require('SignificantEqs'),
@@ -27,6 +28,7 @@ var AppUtil = require('util/AppUtil'),
  *     MapPane: {Element}
  *     NavBar: {Element}
  *     PlotsPane: {Element}
+ *     SearchBar: {Element}
  *     SelectBar: {Element}
  *     SettingsBar: {Element}
  *     SignificantEqs: {Element}
@@ -44,6 +46,7 @@ var AppUtil = require('util/AppUtil'),
  *     MapPane: {Object}
  *     NavBar: {Object}
  *     PlotsPane: {Object}
+ *     SearchBar: {Object}
  *     SelectBar: {Object}
  *     SettingsBar: {Object}
  *     SignificantEqs: {Object}
@@ -53,7 +56,7 @@ var AppUtil = require('util/AppUtil'),
  *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
- *     setTitle: {Function}
+ *     setSliderStyles: {Function}
  *     sideBarWidth: {Number}
  *   }
  */
@@ -63,9 +66,11 @@ var Application = function (options) {
 
       _els,
       _sidebar,
+      _style,
       _throttle,
 
       _addListeners,
+      _getSliderValue,
       _initClasses,
       _resetScrollPositions,
       _saveScrollPosition;
@@ -76,6 +81,7 @@ var Application = function (options) {
   _initialize = function (options) {
     _els = options || {};
     _sidebar = document.getElementById('sideBar');
+    _style = document.createElement('style');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
@@ -83,6 +89,9 @@ var Application = function (options) {
     AppUtil.setFieldValues();
     _resetScrollPositions();
     _initClasses();
+
+    // Add <style> tag for dynamic range input (slider) styles
+    document.body.appendChild(_style);
   };
 
   /**
@@ -111,35 +120,55 @@ var Application = function (options) {
   };
 
   /**
+   * Get the CSS value for the colored section of an <input> range slider.
+   *
+   * @param input {Element}
+   *
+   * @return value {String}
+   */
+  _getSliderValue = function (input) {
+    var min,
+        percentage,
+        value;
+
+    min = input.min || 0;
+    percentage = input.value;
+    if (input.max) {
+      percentage = Math.floor(100 * (input.value - min) / (input.max - min));
+    }
+    value = percentage + '% 100%';
+
+    return value;
+  };
+
+  /**
    * Instantiate app's "primary" Classes and store/share them via the 'app'
    * property so their public methods/props are accessible to other Classes.
    */
   _initClasses = function () {
     var appClasses,
-        name,
         postInits;
 
-    appClasses = [
-      Features, // must be first
-      Feeds,
-      JsonFeed,
-      LegendBar,
-      MapPane,
-      NavBar,
-      PlotsPane,
-      SelectBar,
-      SettingsBar,
-      SignificantEqs,
-      StatusBar,
-      SummaryPane,
-      TitleBar
-    ];
+    appClasses = {
+      Features: Features, // must be first
+      Feeds: Feeds,
+      JsonFeed: JsonFeed,
+      LegendBar: LegendBar,
+      MapPane: MapPane,
+      NavBar: NavBar,
+      PlotsPane: PlotsPane,
+      SearchBar: SearchBar,
+      SelectBar: SelectBar,
+      SettingsBar: SettingsBar,
+      SignificantEqs: SignificantEqs,
+      StatusBar: StatusBar,
+      SummaryPane: SummaryPane,
+      TitleBar: TitleBar
+    };
     postInits = [];
 
-    appClasses.forEach(appClass => {
-      name = appClass.name; // name of Class
-
-      _this[name] = appClass({
+    Object.keys(appClasses).forEach(name => {
+      _this[name] = appClasses[name]({
         app: _this,
         el: _els[name] || null
       });
@@ -238,27 +267,29 @@ var Application = function (options) {
   };
 
   /**
-   * Set the Document's title.
+   * Set dynamic, inline styles for colored section of input range sliders.
    *
-   * @param opts {Object} optional; default is {}
-   *   {
-   *     title: {String} optional
-   *   }
+   * @param input {Element}
    */
-  _this.setTitle = function (opts = {}) {
-    var appName,
-        title;
+  _this.setSliderStyles = function (input) {
+    var newRules,
+        oldRules,
+        value,
+        vendorAttrs;
 
-    appName = document.title.split(' | ')[1] || document.title; // initial <title>
-    title = appName; // default
+    newRules = '';
+    oldRules = new RegExp('#' + input.id + '[^#]+', 'g');
+    value = _getSliderValue(input);
+    vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
-    if (opts.title) {
-      title = opts.title + ' | ' + appName;
-    }
+    vendorAttrs.forEach(attr => {
+      newRules += '#' + input.id + '::-' + attr + '-track {background-size:' + value
+        + ' !important}';
+    });
 
-    document.title = title;
-
-    _this.TitleBar.setTitle(opts);
+    // Remove 'old' css rules first, then add new ones
+    _style.textContent = _style.textContent.replace(oldRules, '');
+    _style.appendChild(document.createTextNode(newRules));
   };
 
 
