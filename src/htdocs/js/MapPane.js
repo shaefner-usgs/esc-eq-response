@@ -5,9 +5,10 @@
 var AppUtil = require('util/AppUtil');
 
 
-// Leaflet plugins and layer factories (these get attached to the global L obj)
-//   NOTE: Leaflet.Editable strips all custom props added to L => 1) add it
-//         first; 2) CanvasMarker must be added here (not in dependent Classes).
+/* Leaflet plugins and layer factories (these get attached to the global L obj)
+   NOTE: Leaflet.Editable strips all custom props added to L, therefore:
+   1) add leaflet-editable first;
+   2) CanvasMarker must be added here (not in dependent Classes). */
 require('leaflet-editable'); // used in SearchBar.js
 require('leaflet/CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
 require('leaflet/BottomCenter');
@@ -34,6 +35,7 @@ require('leaflet/ZoomCenter');
  * @return _this {Object}
  *   {
  *     addFeature: {Function}
+ *     addLayer: {Function}
  *     addLoader: {Function}
  *     openPopup: {Function}
  *     removeFeature: {Function}
@@ -109,9 +111,13 @@ var MapPane = function (options) {
    * @return control {L.Control}
    */
   _addLayerControl = function () {
-    var control = L.control.layers(
+    var control,
+        overlays;
+
+    overlays = Object.assign({}, _staticLayers.overlays, _staticLayers.search);
+    control = L.control.layers(
       _staticLayers.baseLayers,
-      _staticLayers.overlays, {
+      overlays, {
         sortFunction: _compareLayers,
         sortLayers: true
       }
@@ -234,7 +240,7 @@ var MapPane = function (options) {
 
   /**
    * Get 'static' map layers that are the same on all maps (i.e. base layers and
-   * faults overlay).
+   * overlays that are independent of the selected Mainshock).
    *
    * @return layers {Object}
    *    {
@@ -357,50 +363,30 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add a Feature layer to the map and remove the placeholder layer and
-   * 'loader'. Set the map extent after adding the last Feature.
+   * Add a Feature layer and set the map extent depending on the status.
    *
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var layer,
-        name,
-        placeholder,
+    var marker,
         status;
 
     status = _app.Features.getLoadingStatus();
 
     if (feature.mapLayer) {
-      layer = feature.mapLayer;
-      layer.id = feature.id; // add Feature's id to Leaflet layer
-      name = feature.name;
-      placeholder = _placeholders[feature.id]; // name and 'loader' in layer control
+      _this.addLayer(feature);
 
-      if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
-        name += '<span class="count">' + feature.count + '</span>';
-      }
-
-      if (placeholder) {
-        _layerControl.removeLayer(placeholder);
-        delete _placeholders[feature.id];
-      } else { // custom pane not created yet
-        _createPane(feature.id, 'overlayPane');
-      }
-
-      _layerControl.addOverlay(layer, name);
-
+      // Set initial map extent centered on Mainshock
       if (feature.id === 'mainshock') {
-        _bounds = _getBounds(layer.getLayers()[0].getLatLng());
+        marker = feature.mapLayer.getLayers()[0];
+        _bounds = _getBounds(marker.getLatLng());
 
-        _setView(_bounds); // set initial map extent centered on Mainshock
+        _setView(_bounds);
       }
 
-      // Turn layer "on" and set map bounds to contain Feature, if applicable
-      if (feature.showLayer) {
-        _map.addLayer(layer);
-      }
+      // Set map bounds to contain the Feature, if applicable
       if (feature.zoomToLayer && _initialView) {
-        _bounds.extend(layer.getBounds());
+        _bounds.extend(feature.mapLayer.getBounds());
       }
     }
 
@@ -411,22 +397,64 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add a Feature's name and 'loader' to the layer control.
+   * Add a layer to the map and layer control and remove the placeholder layer
+   * and 'loader'. When adding the SearchLayer, set the map extent if no
+   * Mainshock is selected and store the layer in _staticLayers.
    *
-   * @param feature {Object}
+   * @param item {Object}
+   *     Feature or catalog search results
    */
-  _this.addLoader = function (feature) {
+  _this.addLayer = function (item) {
+    var placeholder = _placeholders[item.id]; // name and 'loader' in layer control
+
+    item.mapLayer.id = item.id; // need access to Item's id from Leaflet layer
+
+    if (item.count) {
+      item.name += '<span class="count">' + item.count + '</span>';
+    }
+
+    if (item.id === 'search') {
+      _staticLayers.search = {};
+      _staticLayers.search[item.name] = item.mapLayer;
+
+      if (document.body.classList.contains('no-mainshock')) {
+        _setView();
+      }
+    }
+
+    if (placeholder) {
+      _layerControl.removeLayer(placeholder);
+
+      delete _placeholders[item.id];
+    } else { // custom pane not created yet
+      _createPane(item.id, 'overlayPane');
+    }
+
+    _layerControl.addOverlay(item.mapLayer, item.name);
+
+    if (item.showLayer) {
+      _map.addLayer(item.mapLayer);
+    }
+  };
+
+  /**
+   * Add an Item's name and 'loader' to the layer control.
+   *
+   * @param item {Object}
+   *     Feature or catalog search results
+   */
+  _this.addLoader = function (item) {
     var layer,
         name;
 
-    if (Object.prototype.hasOwnProperty.call(feature, 'mapLayer')) {
+    if (Object.prototype.hasOwnProperty.call(item, 'mapLayer')) {
       layer = L.featureGroup(); // empty placeholder layer
-      name = feature.name + '<span class="breather"><span></span></span>';
+      name = item.name + '<span class="breather"><span></span></span>';
 
-      layer.id = feature.id; // need access to Feature's id from Leaflet layer
-      _placeholders[feature.id] = layer; // cache placeholder layer
+      layer.id = item.id; // need access to Item's id from Leaflet layer
+      _placeholders[item.id] = layer; // cache placeholder layer
 
-      _createPane(feature.id, 'overlayPane');
+      _createPane(item.id, 'overlayPane');
       _layerControl.addOverlay(layer, name);
     }
   };
@@ -467,29 +495,28 @@ var MapPane = function (options) {
   };
 
   /**
-   * Remove a Feature layer from the map.
+   * Remove a layer from the map.
    *
-   * @param feature {Object}
+   * @param item {Object}
+   *     Feature or catalog search results
    */
-  _this.removeFeature = function (feature) {
-    var mapLayer,
-        placeholder,
+  _this.removeFeature = function (item) {
+    var placeholder,
         showLayer;
 
-    mapLayer = feature.mapLayer;
-    placeholder = _placeholders[feature.id]; // loading status in layer control
-    showLayer = feature.showLayer; // cache value
+    placeholder = _placeholders[item.id]; // loading status in layer control
+    showLayer = item.showLayer; // cache value
 
-    if (mapLayer) {
-      _map.removeLayer(mapLayer); // sets showLayer prop to false
-      _layerControl.removeLayer(mapLayer);
+    if (item.mapLayer) {
+      _map.removeLayer(item.mapLayer); // sets showLayer prop to false
+      _layerControl.removeLayer(item.mapLayer);
 
-      feature.showLayer = showLayer; // set back to cached value
+      item.showLayer = showLayer; // set back to cached value
     }
 
     if (placeholder) {
       _layerControl.removeLayer(placeholder);
-      delete _placeholders[feature.id];
+      delete _placeholders[item.id];
     }
   };
 
