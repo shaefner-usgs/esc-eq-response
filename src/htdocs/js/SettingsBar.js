@@ -133,7 +133,7 @@ var SettingsBar = function (options) {
 
       // Throttle requests
       _app.JsonFeed.throttlers[id].push(
-        window.setTimeout(function() {
+        setTimeout(() => {
           if (feature) {
             _app.Features.refreshFeature(feature);
           } else { // Feature never created (likely due to a bad Fetch request)

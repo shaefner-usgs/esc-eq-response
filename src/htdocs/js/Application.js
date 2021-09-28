@@ -223,7 +223,7 @@ var Application = function (options) {
     window.clearTimeout(_throttle);
 
     // Throttle scroll event
-    _throttle = window.setTimeout(function() {
+    _throttle = setTimeout(() => {
       window.sessionStorage.setItem(id, position);
     }, 50);
   };

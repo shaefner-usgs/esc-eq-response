@@ -45,7 +45,7 @@ L.GreyscaleLayer = function (provider, options) {
     }
   };
   provider = provider || 'cartodb';
-  options = Object.assign(providers[provider], options);
+  options = Object.assign({}, providers[provider], options);
   url = providers[provider].url;
   base = L.tileLayer(url, options);
 

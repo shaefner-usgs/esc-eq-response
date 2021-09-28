@@ -40,7 +40,7 @@ L.SatelliteLayer = function (provider, options) {
     }
   };
   provider = provider || 'esri';
-  options = Object.assign(providers[provider], options);
+  options = Object.assign({}, providers[provider], options);
   url = providers[provider].url;
   base = L.tileLayer(url, options);
 

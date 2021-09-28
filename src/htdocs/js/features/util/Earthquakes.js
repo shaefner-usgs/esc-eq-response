@@ -481,20 +481,20 @@ var Earthquakes = function (options) {
    * @return div {Element}
    */
   _getPopup = function (eq) {
-    var bubblesStr,
+    var bubbles,
         div,
         popup;
 
-    bubblesStr = '';
+    bubbles = '';
     div = L.DomUtil.create('div');
 
     Object.keys(eq.bubbles).forEach(type => {
-      bubblesStr += eq.bubbles[type];
+      bubbles += eq.bubbles[type];
     });
 
     popup = L.Util.template(_getTemplate('popup'),
       Object.assign({}, eq, {
-        bubblesStr: bubblesStr
+        bubbles: bubbles
       })
     );
     div.innerHTML = popup;
@@ -568,7 +568,7 @@ var Earthquakes = function (options) {
       template =
         '<div class="earthquake {className}">' +
           '<h4>{title}</h4>' +
-          '<div class="impact-bubbles">{bubblesStr}</div>' +
+          '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl>' +
             '<dt>Time</dt>' +
             '<dd>{htmlTime}</dd>' +
@@ -674,7 +674,7 @@ var Earthquakes = function (options) {
    *
    * @param feature {Object}
    *     geoJSON feature
-   * @param layer (L.Layer)
+   * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
     var bearing,
@@ -1031,6 +1031,8 @@ Earthquakes.getFeedUrl = function (params) {
   };
   pairs = [];
   params = Object.assign({}, defaults, params);
+
+  delete params.period; // internal property (search API rejects 'foreign' props)
 
   Object.keys(params).forEach(key => {
     pairs.push(key + '=' + params[key]);

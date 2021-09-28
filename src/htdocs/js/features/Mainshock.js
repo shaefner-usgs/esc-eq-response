@@ -285,9 +285,8 @@ var Mainshock = function (options) {
   _this.addListener = function () {
     var button = document.querySelector('.event-summary');
 
-    button.addEventListener('click', () => {
-      _app.Feeds.loadFeeds(); // load external feed data for RTF Summary
-    });
+    // Load external feed data for RTF Summary
+    button.addEventListener('click', _app.Feeds.loadFeeds);
   };
 
   /**

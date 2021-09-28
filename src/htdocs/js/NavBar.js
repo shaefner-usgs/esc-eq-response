@@ -42,6 +42,7 @@ var NavBar = function (options) {
       _showPane,
       _showSideBar,
       _switchPanes,
+      _toggleLinks,
       _toggleSideBar;
 
 
@@ -70,17 +71,15 @@ var NavBar = function (options) {
     lis = _el.querySelectorAll('#navSub li');
 
     // Switch between panes
-    window.addEventListener('hashchange', () => {
-      _switchPanes();
-    });
+    window.addEventListener('hashchange', _switchPanes);
 
     // Switch between sidebars
     lis.forEach(li => {
-      li.addEventListener('click', function() {
+      li.addEventListener('click', () => {
         var button,
             id;
 
-        button = this.querySelector('i');
+        button = li.querySelector('i');
         id = button.className.match(/icon-(\w+)/)[1];
 
         _this.switchSideBars(id);
@@ -124,20 +123,15 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _renderPane = function (id) {
-    var link = document.querySelector('#selectBar a[href="#mapPane"]');
-
     _app.setScrollPosition(id);
 
     if (id === 'mapPane') {
       _app.MapPane.render();
-      link.classList.add('hide-link'); // unlink 'map' text on selectBar
-    } else {
-      link.classList.remove('hide-link');
-    }
-
-    if (id === 'plotsPane') {
+    } else if (id === 'plotsPane') {
       _renderPlots();
     }
+
+    _toggleLinks(id);
   };
 
   /**
@@ -155,7 +149,7 @@ var NavBar = function (options) {
       });
 
       // Add a slight delay; otherwise rendering message does not display
-      window.setTimeout(function() {
+      setTimeout(() => {
         _app.PlotsPane.render();
         _app.StatusBar.removeItem('rendering');
       }, 25);
@@ -210,6 +204,23 @@ var NavBar = function (options) {
 
     _hideAll(_panes);
     _showPane(id);
+  };
+
+  /**
+   * Toggle the MapPane links depending on whether the pane is visible or not.
+   *
+   * @param id {String}
+   */
+  _toggleLinks = function (id) {
+    var links = document.querySelectorAll('#sideBar a[href="#mapPane"]');
+
+    links.forEach(link => {
+      if (id === 'mapPane') {
+        link.classList.add('hide-link');
+      } else {
+        link.classList.remove('hide-link');
+      }
+    });
   };
 
   /**

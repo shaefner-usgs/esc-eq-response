@@ -72,9 +72,9 @@ var JsonFeed = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     url: {String}
    *     id: {String}
    *     name: {String}
+   *     url: {String}
    *   }
    * @param fetchOpts {Object} optional; default is {}
    *     fetch() settings

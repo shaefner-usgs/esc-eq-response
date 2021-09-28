@@ -3,6 +3,7 @@
 
 var Application = require('Application');
 
+
 Application({
   LegendBar: document.getElementById('legendBar'),
   MapPane: document.getElementById('mapPane'),

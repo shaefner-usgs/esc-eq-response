@@ -271,7 +271,7 @@ var StatusBar = function (options) {
         _hide();
 
         // Don't remove node until CSS transition is complete
-        window.setTimeout(_removeNode, 500, item);
+        setTimeout(_removeNode, 500, item);
       } else {
         _removeNode(item);
       }

@@ -62,7 +62,7 @@ var Svg = function () {
 
     opts = Object.assign({}, _DEFAULTS, opts);
     size = Math.ceil(opts.radius * 2 + 2);
-    data = Object.assign(opts, {
+    data = Object.assign({}, opts, {
       origin: size / 2
     });
     svg = _createElement();

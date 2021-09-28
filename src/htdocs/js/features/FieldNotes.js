@@ -108,10 +108,10 @@ var FieldNotes = function (options) {
 
     // Show/hide additional props
     if (toggle) {
-      toggle.addEventListener('click', function(e) {
+      toggle.addEventListener('click', e => {
         e.preventDefault();
 
-        this.closest('.properties').classList.toggle('hide');
+        toggle.closest('.properties').classList.toggle('hide');
       });
     }
   };

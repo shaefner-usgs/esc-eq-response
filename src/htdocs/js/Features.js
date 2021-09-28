@@ -168,7 +168,7 @@ var Features = function (options) {
         if (dependency.isLoading) {
           status = 'loading';
 
-          window.setTimeout(function() {
+          setTimeout(() => {
             _this.createFeature(feature.id);
           }, 250);
         }

@@ -94,7 +94,7 @@ var SelectBar = function (options) {
 
       // Throttle requests
       _app.JsonFeed.throttlers[id].push(
-        window.setTimeout(function() {
+        setTimeout(() => {
           _this.createMainshock();
         }, 500)
       );

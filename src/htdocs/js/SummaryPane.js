@@ -186,24 +186,24 @@ var SummaryPane = function (options) {
   _filterList = function () {
     var feature,
         props,
-        threshold,
+        value,
         scrollY;
 
     feature = _app.Features.getFeature(this.id);
     props = _filterProps[this.id];
-    threshold = Number(this.value);
+    value = Number(this.value);
     scrollY = window.pageYOffset;
 
-    props.count.innerHTML = feature.bins.mag[threshold];
-    props.mag.innerHTML = threshold;
-    props.output.value = threshold;
+    props.count.innerHTML = feature.bins.mag[value];
+    props.mag.innerHTML = value;
+    props.output.value = value;
 
-    props.slider.style.setProperty('--val', threshold);
+    props.slider.style.setProperty('--val', value);
 
-    for (var i = threshold; i <= this.getAttribute('max'); i ++) {
+    for (var i = value; i <= this.getAttribute('max'); i ++) {
       props.table.classList.add('m' + i); // show eqs at/above threshold
     }
-    for (var j = threshold; j >= this.getAttribute('min'); j --) {
+    for (var j = value; j >= this.getAttribute('min'); j --) {
       props.table.classList.remove('m' + (j - 1)); // hide eqs below threshold
     }
 
