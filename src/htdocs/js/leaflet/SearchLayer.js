@@ -6,17 +6,18 @@ var Earthquakes = require('features/util/Earthquakes'),
 
 
 var _DEFAULTS = {
+  endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
   maxlatitude: 90,
   maxlongitude: 180,
   minlatitude: -90,
   minlongitude: -180,
   minmagnitude: 2.5,
-  period: 'month'
+  period: 'month' // internal property (not part of the search API)
 };
 
 
 /**
- * Create Catalog Search Leaflet layer.
+ * Create earthquake catalog Search layer.
  *
  * @param options {Object}
  *   {
@@ -27,22 +28,24 @@ var _DEFAULTS = {
  *   {
  *     count: {Integer}
  *     create: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
+ *     title: {String}
+ *     url: {String}
  *   }
  */
-var CatalogSearch = function (options) {
+var SearchLayer = function (options) {
   var _this,
       _initialize,
 
       _app,
       _Earthquakes,
 
-      _setName;
+      _getTitle;
 
 
   _this = {};
@@ -56,30 +59,32 @@ var CatalogSearch = function (options) {
   };
 
   /**
-   * Set the name of the feed.
+   * Get the feed's title for the TitleBar and <title>.
    *
    * @param params {Object}
+   *
+   * @return {String}
    */
-  _setName = function (params) {
-    var nameParts,
+  _getTitle = function (params) {
+    var parts,
         period;
 
-    nameParts = [
-      `M ${params.minmagnitude}+ Earthquakes`,
+    parts = [
+      _this.name,
       'Custom Search' // default
     ];
 
-    if (params.period !== 'custom' &&
+    if (params.period !== 'customPeriod' &&
         params.maxlatitude === _DEFAULTS.maxlatitude &&
         params.maxlongitude === _DEFAULTS.maxlongitude &&
         params.minlatitude === _DEFAULTS.minlatitude &&
         params.minlongitude === _DEFAULTS.minlongitude
     ) {
       period = params.period[0].toUpperCase() + params.period.slice(1);
-      nameParts[1] = `Past ${period}`;
+      parts[1] = `Past ${period}`;
     }
 
-    _this.name = nameParts.join(', ');
+    return parts.join(', ');
   };
 
   // ----------------------------------------------------------
@@ -104,25 +109,25 @@ var CatalogSearch = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.mapLayer = null;
+  };
+
+  /**
+   * Set the JSON feed's URL (and also the name and title props).
    *
    * @params {Object}
    *   {
    *     period {String <day|week|month|year>}
    *     ... (+ all API props, see: https://earthquake.usgs.gov/fdsnws/event/1/)
    *   }
-   *
-   * @return {String}
    */
-  _this.getFeedUrl = function (params) {
+  _this.setFeedUrl = function (params) {
     var minus = {};
 
-    params = Object.assign({
-      endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
-      starttime: Luxon.DateTime.now().minus({ days: 30 }).toUTC().toISO().slice(0, -5)
-    }, _DEFAULTS, params);
-
-    if (params.period !== 'custom') {
+    if (params.period !== 'customPeriod') {
       if (!params.period.match(/day|week|month|year/)) {
         params.period = _DEFAULTS.period;
       }
@@ -131,16 +136,11 @@ var CatalogSearch = function (options) {
       params.starttime = Luxon.DateTime.now().minus(minus).toUTC().toISO().slice(0, -5);
     }
 
-    _setName(params);
+    params = Object.assign(_DEFAULTS, params);
 
-    return Earthquakes.getFeedUrl(params);
-  };
-
-  /**
-   * Reset to initial state.
-   */
-  _this.reset = function () {
-    _this.mapLayer = null;
+    _this.name = `M ${params.minmagnitude}+ Earthquakes`;
+    _this.title = _getTitle(params);
+    _this.url = Earthquakes.getFeedUrl(params);
   };
 
 
@@ -150,4 +150,4 @@ var CatalogSearch = function (options) {
 };
 
 
-module.exports = CatalogSearch;
+module.exports = SearchLayer;
