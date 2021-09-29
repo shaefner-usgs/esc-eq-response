@@ -1,0 +1,26 @@
+@use 'variables' as *;
+
+@mixin close() {
+  background: $bg-color;
+  border-radius: 50%;
+  color: $accent-color;
+  cursor: pointer;
+  height: 23px;
+  line-height: 1.35;
+  padding: 0;
+  right: 2px;
+  top: 2px;
+  text-align: center;
+  transition: all $effect-off-duration ease-in;
+  width: 23px;
+
+  &:hover {
+    background: $accent-color-lightest;
+    transition: background $effect-on-duration ease-out;
+  }
+  &:active {
+    background: $accent-color;
+    color: $bg-color;
+    transition: all $effect-on-duration ease-out;
+  }
+}
