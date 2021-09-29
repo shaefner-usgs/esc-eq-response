@@ -205,15 +205,15 @@ input[type="number"] {
   }
 
   &:invalid {
-    border: 1px solid #c00;
-    box-shadow: 0 0 3px #c00;
+    border: 1px solid $invalid-color;
+    box-shadow: 0 0 3px $invalid-color;
   }
 }
 
 /* invalid Flatpickr inputs */
 .invalid > input[type="text"] {
-  border: 1px solid #c00;
-  box-shadow: 0 0 3px #c00;
+  border: 1px solid $invalid-color;
+  box-shadow: 0 0 3px $invalid-color;
 }
 
 /* Range inputs - adapted from:

@@ -11,7 +11,7 @@
 
   .required {
     border-top: 1px solid $border-color-lighter;
-    color: #c00;
+    color: $invalid-color;
     margin: 2rem 0 0;
     padding-top: 4px;
   }

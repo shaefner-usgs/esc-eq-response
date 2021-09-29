@@ -7,14 +7,14 @@
 .flatpickr-wrapper {
   &.invalid {
     .flatpickr-calendar {
-      border-color: #c00;
-      box-shadow: 0 0 3px #c00;
+      border-color: $invalid-color;
+      box-shadow: 0 0 3px $invalid-color;
 
       &.arrowBottom:before {
-        border-top-color: #c00;
+        border-top-color: $invalid-color;
       }
       &.arrowTop:before {
-        border-bottom-color: #c00;
+        border-bottom-color: $invalid-color;
       }
     }
   }
