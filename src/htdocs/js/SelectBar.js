@@ -54,7 +54,7 @@ var SelectBar = function (options) {
     var reset,
         search;
 
-    reset = _el.querySelector('.reset');
+    reset = document.getElementById('reset');
     search = _el.querySelector('.search');
 
     // Reset app when the reset button is clicked
