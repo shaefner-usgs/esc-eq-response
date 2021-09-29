@@ -14,8 +14,11 @@ var browserify = {
       ]
     },
     noParse: [
+      'leaflet-editable',
+      'leaflet.path.drag',
       'luxon',
-      'tablesort'
+      'tablesort',
+      'utfgrid'
     ],
     transform: [
       babelify.configure({
