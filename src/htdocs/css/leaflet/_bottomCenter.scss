@@ -3,7 +3,7 @@
 .leaflet-center {
   padding: 0;
   text-align: center;
-  transition: padding $sidebar-duration ease;
+  transition: padding $sidebar-toggle-duration ease;
   width: 100%;
 
   div {

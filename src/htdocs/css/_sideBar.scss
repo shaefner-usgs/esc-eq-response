@@ -43,7 +43,7 @@ body.sidebar {
   position: fixed;
   right: 0;
   top: var(--padding-header);
-  transition: margin $sidebar-duration ease;
+  transition: margin $sidebar-toggle-duration ease;
   width: $sidebar-width;
   z-index: 1000;
 
@@ -84,6 +84,6 @@ body.sidebar {
     position: fixed;
     right: $sidebar-width * -1;
     top: 8rem;
-    transition: right $sidebar-duration ease;
+    transition: right $sidebar-toggle-duration ease;
   }
 }

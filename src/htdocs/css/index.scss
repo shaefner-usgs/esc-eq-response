@@ -175,7 +175,7 @@ tr {
   padding: var(--padding-header) 0 0;
   position: absolute;
   top: 0;
-  transition: padding $sidebar-duration ease;
+  transition: padding $sidebar-toggle-duration ease;
   width: 100%;
 
   h2 {
