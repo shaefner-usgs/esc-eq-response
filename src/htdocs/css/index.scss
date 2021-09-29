@@ -35,14 +35,14 @@ a {
   text-decoration-skip-ink: none;
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
-  transition: text-decoration-color $hover-off-duration ease-in;
+  transition: text-decoration-color $effect-off-duration ease-in;
 
   &:active {
     color: $link-color-active;
   }
   &:hover {
     text-decoration-color: color.scale($link-color, $lightness: 25%);
-    transition: text-decoration-color $hover-on-duration ease-out;
+    transition: text-decoration-color $effect-on-duration ease-out;
   }
   &:visited {
     color: $link-color-visited;

@@ -21,17 +21,17 @@ $dist: $track-w - $thumb-d;
   right: 2px;
   top: 2px;
   text-align: center;
-  transition: all $hover-off-duration ease-in;
+  transition: all $effect-off-duration ease-in;
   width: 23px;
 
   &:hover {
     background: $accent-color-lightest;
-    transition: background $hover-on-duration ease-out;
+    transition: background $effect-on-duration ease-out;
   }
   &:active {
     background: $accent-color;
     color: $bg-color;
-    transition: all $hover-on-duration ease-out;
+    transition: all $effect-on-duration ease-out;
   }
 }
 
@@ -70,7 +70,7 @@ button {
   padding: 5px 12px;
   text-align: center;
   text-transform: uppercase;
-  transition: all $hover-off-duration ease-in;
+  transition: all $effect-off-duration ease-in;
   user-select: none;
   white-space: nowrap;
 
@@ -96,7 +96,7 @@ button {
   &:focus,
   &:hover {
     background: $accent-color-lightest;
-    transition: all $hover-on-duration ease-out;
+    transition: all $effect-on-duration ease-out;
   }
   &:active {
     background: $accent-color;

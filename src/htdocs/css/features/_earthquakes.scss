@@ -145,14 +145,14 @@
     }
 
     tr {
-      transition: all $hover-off-duration ease-in;
+      transition: all $effect-off-duration ease-in;
 
       &.selected,
       &:hover:not(.no-sort) {
         background: $accent-color-lightest;
         color: $text-color-darker;
         cursor: pointer;
-        transition: all $hover-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
       }
 
       &:active td {
@@ -370,7 +370,7 @@ and (max-width: $breakpoint-phone-width) {
             padding: .5rem 1.5rem;
             position: relative;
             text-align: left;
-            transition: none $hover-off-duration ease-in;
+            transition: none $effect-off-duration ease-in;
             transition-property: background, color;
 
             &.distance {
@@ -394,7 +394,7 @@ and (max-width: $breakpoint-phone-width) {
             &:hover {
               background: $accent-color-lightest;
               color: $text-color-darker;
-              transition: none $hover-on-duration ease-out;
+              transition: none $effect-on-duration ease-out;
               transition-property: background, color;
 
               span:before {
@@ -405,7 +405,7 @@ and (max-width: $breakpoint-phone-width) {
             &:active {
               background: $accent-color;
               color: #fff;
-              transition: all $hover-on-duration ease-out;
+              transition: all $effect-on-duration ease-out;
 
               span{
                 &:after {
@@ -436,13 +436,13 @@ and (max-width: $breakpoint-phone-width) {
 
             &.hover:after {
               background: $accent-color-lightest;
-              transition: all $hover-on-duration ease-out;
+              transition: all $effect-on-duration ease-out;
             }
 
             &.active:after {
               background: $accent-color;
               color: #fff;
-              transition: all $hover-on-duration ease-out;
+              transition: all $effect-on-duration ease-out;
             }
 
             &:after {
@@ -457,7 +457,7 @@ and (max-width: $breakpoint-phone-width) {
               right: 2px;
               text-align: center;
               top: 2px;
-              transition: all $hover-off-duration ease-in;
+              transition: all $effect-off-duration ease-in;
               width: 23px;
             }
 

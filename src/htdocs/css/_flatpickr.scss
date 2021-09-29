@@ -58,7 +58,7 @@
     color: $text-color;
     display: flex;
     justify-content: center;
-    transition: all $hover-off-duration ease-in;
+    transition: all $effect-off-duration ease-in;
 
     &:hover,
     &.nextMonthDay:not(.flatpickr-disabled):hover,
@@ -66,7 +66,7 @@
       background: $accent-color-lightest;
       border-color: $accent-color-lighter;
       color: color.adjust($text-color, $alpha: 0); /* alpha: 0 overrides alpha level set below */
-      transition: all $hover-on-duration ease-out;
+      transition: all $effect-on-duration ease-out;
     }
     &.nextMonthDay,
     &.prevMonthDay {

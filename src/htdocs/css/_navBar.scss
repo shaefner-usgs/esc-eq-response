@@ -35,7 +35,7 @@
 
       &:hover {
         border-color: $accent-color;
-        transition: border $hover-on-duration ease-out;
+        transition: border $effect-on-duration ease-out;
       }
 
       &.selected {
@@ -43,7 +43,7 @@
         border-color: $accent-color;
         color: #fff;
         text-shadow: $button-text-shadow;
-        transition: all $hover-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
       }
     }
 
@@ -68,11 +68,11 @@
       }
       &:hover:after {
         border-bottom-color: color.scale($accent-color, $lightness: 90%);
-        transition: border $hover-on-duration ease-out;
+        transition: border $effect-on-duration ease-out;
       }
       &.selected:after {
         border-bottom-color: $accent-color;
-        transition: border $hover-on-duration ease-out;
+        transition: border $effect-on-duration ease-out;
       }
 
       &:before {

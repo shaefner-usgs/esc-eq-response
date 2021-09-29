@@ -28,12 +28,12 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
     a {
       color: $text-color-lighter;
-      transition: color $hover-off-duration ease-in;
+      transition: color $effect-off-duration ease-in;
 
       &:hover {
         color: $text-color;
         text-decoration: none;
-        transition: color $hover-on-duration ease-out;
+        transition: color $effect-on-duration ease-out;
       }
     }
   }
@@ -56,12 +56,12 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
     &:hover {
       background: $accent-color-lightest;
-      transition: all $hover-on-duration ease-out;
+      transition: all $effect-on-duration ease-out;
     }
     &:active, &.selected {
       background: $accent-color;
       border-radius: 0 !important; /* clean up rendering issue */
-      transition: all $hover-on-duration ease-out;
+      transition: all $effect-on-duration ease-out;
     }
   }
   .leaflet-control-zoom a {

@@ -33,19 +33,19 @@ ul#significantEqs { /* list */
     display: flex;
     margin: 0;
     padding: .5rem 0;
-    transition: all $hover-off-duration ease-in;
+    transition: all $effect-off-duration ease-in;
 
     &:hover {
       background: $accent-color-lightest;
       color: $text-color-darker;
       cursor: pointer;
-      transition: all $hover-on-duration ease-out;
+      transition: all $effect-on-duration ease-out;
     }
 
     &.selected {
       background: $accent-color;
       color: #fff;
-      transition: all $hover-on-duration ease-out;
+      transition: all $effect-on-duration ease-out;
 
       &:hover {
         cursor: auto;
@@ -53,7 +53,7 @@ ul#significantEqs { /* list */
 
       p {
         color: #fff;
-        transition: color $hover-on-duration ease-out;
+        transition: color $effect-on-duration ease-out;
       }
     }
 
@@ -71,6 +71,6 @@ ul#significantEqs { /* list */
   p {
     color: $text-color-lighter;
     margin: 0;
-    transition: color $hover-off-duration ease-in;
+    transition: color $effect-off-duration ease-in;
   }
 }

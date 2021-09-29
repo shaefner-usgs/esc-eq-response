@@ -12,16 +12,16 @@
       text-decoration-skip-ink: none;
       text-decoration-thickness: 2px;
       text-underline-offset: 2px;
-      transition: all $hover-off-duration ease-in;
+      transition: all $effect-off-duration ease-in;
 
       &:hover {
         color: $text-color-darker;
         text-decoration-color: $text-color-lighter;
-        transition: all $hover-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
 
         i {
           opacity: 1;
-          transition: all $hover-on-duration ease-out;
+          transition: all $effect-on-duration ease-out;
         }
       }
     }
@@ -33,7 +33,7 @@
       position: absolute;
       right: -1.75rem;
       top: .5rem;
-      transition: all $hover-off-duration ease-in;
+      transition: all $effect-off-duration ease-in;
     }
   }
 

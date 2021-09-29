@@ -15,24 +15,24 @@
       margin-right: 1rem;
       text-align: center;
       text-decoration: none;
-      transition: all $hover-off-duration ease-in;
+      transition: all $effect-off-duration ease-in;
       width: 6rem;
 
       &:hover {
         border-color: $accent-color;
         color: $text-color-darker;
-        transition: all $hover-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
 
         abbr {
           border-color: color.scale($text-color-lightest, $lightness: -5%);
           color: color.scale($text-color-lightest, $lightness: -15%);
-          transition: all $hover-on-duration ease-out;
+          transition: all $effect-on-duration ease-out;
         }
 
         h4 {
           background: $accent-color-lightest;
           color: $text-color-darker;
-          transition: all $hover-on-duration ease-out;
+          transition: all $effect-on-duration ease-out;
         }
       }
 
@@ -52,7 +52,7 @@
         display: inline-block;
         font-size: .8rem;
         margin-top: 5px;
-        transition: all $hover-off-duration ease-in;
+        transition: all $effect-off-duration ease-in;
       }
 
       h4 {
@@ -60,7 +60,7 @@
         border-radius: $button-border-radius $button-border-radius 0 0;
         color: $text-color;
         padding: 4px 0;
-        transition: all $hover-off-duration ease-in;
+        transition: all $effect-off-duration ease-in;
       }
 
       ul {

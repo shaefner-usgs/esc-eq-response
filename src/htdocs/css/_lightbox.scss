@@ -31,13 +31,13 @@
     right: 10px;
     text-align: center;
     top: 10px;
-    transition: background $hover-off-duration ease-in;
+    transition: background $effect-off-duration ease-in;
     width: 25px;
   }
 
   &:hover:after {
     background: #eee;
-    transition: background $hover-on-duration ease-out;
+    transition: background $effect-on-duration ease-out;
   }
   &:active:after {
     background: #fff;

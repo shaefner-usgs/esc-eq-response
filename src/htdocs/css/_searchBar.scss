@@ -36,7 +36,7 @@
 
     &:hover {
       background: $accent-color-lightest;
-      transition: background $hover-on-duration ease-out;
+      transition: background $effect-on-duration ease-out;
     }
 
     &:first-child {
@@ -52,7 +52,7 @@
       border-radius: 0;
       color: $bg-color;
       cursor: auto;
-      transition: background $hover-on-duration ease-out;
+      transition: background $effect-on-duration ease-out;
     }
   }
 
@@ -97,7 +97,7 @@
     font-size: .85rem;
     margin: 0;
     opacity: 1;
-    transition: opacity $hover-on-duration ease-out;
+    transition: opacity $effect-on-duration ease-out;
 
     &.hide {
       opacity: 0;
