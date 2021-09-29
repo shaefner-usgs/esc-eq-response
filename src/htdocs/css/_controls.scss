@@ -1,5 +1,6 @@
 @use 'sass:color';
 
+@use 'mixins' as *;
 @use 'variables' as *;
 
 $reset-button-color: #efefef;
@@ -9,31 +10,6 @@ $track-c: $accent-color;
 $track-h: .25rem;
 $track-w: 18rem;
 $dist: $track-w - $thumb-d;
-
-@mixin close() { /* Note: used externally for Leaflet's close button */
-  background: $bg-color;
-  border-radius: 50%;
-  color: $accent-color;
-  cursor: pointer;
-  height: 23px;
-  line-height: 1.35;
-  padding: 0;
-  right: 2px;
-  top: 2px;
-  text-align: center;
-  transition: all $effect-off-duration ease-in;
-  width: 23px;
-
-  &:hover {
-    background: $accent-color-lightest;
-    transition: background $effect-on-duration ease-out;
-  }
-  &:active {
-    background: $accent-color;
-    color: $bg-color;
-    transition: all $effect-on-duration ease-out;
-  }
-}
 
 @mixin thumb() {
   background: $bg-color;

@@ -2,15 +2,18 @@
 
 @use 'controls';
 @use 'features/index' as features;
+@use 'flatpickr';
 @use 'header';
 @use 'icons';
 @use 'impactBubbles';
 @use 'infoBar';
+@use 'leaflet/index' as leaflet;
 @use 'legendBar';
 @use 'lightbox';
 @use 'loaders';
 @use 'mapPane';
 @use 'navBar';
+@use 'plotly';
 @use 'plotsPane';
 @use 'searchBar';
 @use 'selectBar';
