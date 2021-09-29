@@ -18,7 +18,7 @@ _COLORS = {
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  older: '#ffb'
+  older: '#ffc'
 };
 _MARKER_DEFAULTS = {
   color: '#000',
