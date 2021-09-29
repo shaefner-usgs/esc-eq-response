@@ -1,19 +1,13 @@
 @use '../variables' as *;
 
 #summaryPane {
-  button {
+  #download {
     margin-top: .5rem;
     padding-bottom: 3px;
     padding-top: 3px;
 
     &:after {
       content: 'Event Summary';
-    }
-
-    img {
-      left: 12px;
-      position: absolute;
-      top: 8px;
     }
   }
 

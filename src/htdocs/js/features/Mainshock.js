@@ -125,7 +125,7 @@ var Mainshock = function (options) {
         'earthquake details, images and plots, plus placeholders for adding ' +
         'talking points and analysis. Microsoft Word is recommended for ' +
         'viewing the document.</p>' +
-      '<button class="event-summary" disabled="disabled" type="button" ' +
+      '<button id="download" disabled="disabled" type="button" ' +
         'title="Download RTF Document">Download</button>',
       data
     );
@@ -283,7 +283,7 @@ var Mainshock = function (options) {
    * Add event listener for download button.
    */
   _this.addListener = function () {
-    var button = document.querySelector('.event-summary');
+    var button = document.getElementById('download');
 
     // Load external feed data for RTF Summary
     button.addEventListener('click', _app.Feeds.loadFeeds);
@@ -328,7 +328,7 @@ var Mainshock = function (options) {
    * Disable download RTF button.
    */
   _this.disableButton = function () {
-    var button = document.querySelector('.event-summary');
+    var button = document.getElementById('download');
 
     button.setAttribute('disabled', 'disabled');
   };
@@ -337,7 +337,7 @@ var Mainshock = function (options) {
    * Enable download RTF button.
    */
   _this.enableButton = function () {
-    var button = document.querySelector('.event-summary');
+    var button = document.getElementById('download');
 
     button.removeAttribute('disabled');
   };
