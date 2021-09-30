@@ -110,8 +110,7 @@ var SignificantEqs = function (options) {
           eqid.value = eq.id; // set the value of the eqid <input>
 
           // Input event is not triggered when it's changed programmatically
-          AppUtil.setQueryString();
-          _app.SelectBar.createMainshock();
+          _app.SelectBar.handleMainshock();
         }
 
         eq.classList.add('selected');
