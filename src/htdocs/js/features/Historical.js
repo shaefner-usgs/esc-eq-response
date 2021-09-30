@@ -21,16 +21,17 @@ var AppUtil = require('util/AppUtil'),
  *     create: {Function}
  *     description: {String}
  *     destroy: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     list: {Array}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     plotTraces: {Object}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
  *     sortByField: {String}
  *     summary: {String}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -120,11 +121,9 @@ var Historical = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     var mainshock,
         urlParams;
 
@@ -141,7 +140,7 @@ var Historical = function (options) {
         .slice(0, -5)
     };
 
-    return Earthquakes.getFeedUrl(urlParams);
+    _this.url = Earthquakes.getFeedUrl(urlParams);
   };
 
   /**

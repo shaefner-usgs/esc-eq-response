@@ -19,11 +19,12 @@ var AppUtil = require('util/AppUtil');
  *     dependencies: {Array}
  *     destroy: {Function}
  *     exposures: {Object}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     name: {String)
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     summary: {String}
+ *     url: {String}
  *   }
  */
 var PagerExposures = function (options) {
@@ -50,6 +51,7 @@ var PagerExposures = function (options) {
     _this.id = 'pager-exposures';
     _this.name = 'PAGER Exposures';
     _this.summary = null;
+    _this.url = '';
   };
 
   /**
@@ -196,29 +198,23 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return url {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     var contents,
         mainshock,
-        products,
-        url;
+        products;
 
     mainshock = _app.Features.getFeature('mainshock');
     products = mainshock.json.properties.products;
-    url = '';
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
 
       if (contents['json/exposures.json']) {
-        url = contents['json/exposures.json'].url;
+        _this.url = contents['json/exposures.json'].url;
       }
     }
-
-    return url;
   };
 
   /**

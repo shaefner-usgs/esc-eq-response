@@ -39,12 +39,13 @@ _DEFAULTS = {
  *     count: {Integer}
  *     create: {Function}
  *     destroy: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -82,6 +83,7 @@ var ShakeMapStations = function (options) {
     _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
     _this.showLayer = false;
+    _this.url = '';
     _this.zoomToLayer = false;
   };
 
@@ -435,15 +437,10 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return url {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
-    var contents,
-        url;
-
-    url = '';
+  _this.setFeedUrl = function () {
+    var contents;
 
     _shakemap = _mainshock.json.properties.products.shakemap;
 
@@ -451,11 +448,9 @@ var ShakeMapStations = function (options) {
       contents = _shakemap[0].contents;
 
       if (contents['download/stationlist.json']) {
-        url = contents['download/stationlist.json'].url;
+        _this.url = contents['download/stationlist.json'].url;
       }
     }
-
-    return url;
   };
 
   /**

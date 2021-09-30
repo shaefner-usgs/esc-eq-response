@@ -14,9 +14,10 @@
  *     cities: {Object}
  *     create: {Function}
  *     destroy: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     name: {String)
+ *     setFeedUrl: {Function}
+ *     url: {String}
  *   }
  */
 var PagerCities = function (options) {
@@ -37,6 +38,7 @@ var PagerCities = function (options) {
 
     _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
+    _this.url = '';
   };
 
   /**
@@ -91,29 +93,23 @@ var PagerCities = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return url {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     var contents,
         mainshock,
-        products,
-        url;
+        products;
 
     mainshock = _app.Features.getFeature('mainshock');
     products = mainshock.json.properties.products;
-    url = '';
 
     if (products.losspager) {
       contents = products.losspager[0].contents;
 
       if (contents['json/cities.json']) {
-        url = contents['json/cities.json'].url;
+        _this.url = contents['json/cities.json'].url;
       }
     }
-
-    return url;
   };
 
 

@@ -292,9 +292,8 @@ var Features = function (options) {
         return; // dependencies are not ready
       }
 
-      if (feature.getFeedUrl) {
-        feature.url = feature.getFeedUrl();
-
+      if (feature.setFeedUrl) {
+        feature.setFeedUrl();
         _loadFeature(feature); // creates Feature after loading data
       } else { // data feed not required
         feature.isLoading = false;

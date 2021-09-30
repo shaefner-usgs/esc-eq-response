@@ -40,12 +40,13 @@ _DEFAULTS = {
  *     count: {Integer}
  *     create: {Function}
  *     destroy: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -305,11 +306,9 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     var after,
         before,
         mainshock,
@@ -333,7 +332,7 @@ var FieldNotes = function (options) {
       pairs.push(key + '=' + urlParams[key]);
     });
 
-    return 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
+    _this.url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
       pairs.join('&');
   };
 

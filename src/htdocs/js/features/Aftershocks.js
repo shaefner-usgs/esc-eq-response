@@ -23,7 +23,6 @@ var AppUtil = require('util/AppUtil'),
  *     description: {String}
  *     destroy: {Function}
  *     forecast: {Array}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     list: {Array}
  *     mapLayer: {L.Layer}
@@ -31,9 +30,11 @@ var AppUtil = require('util/AppUtil'),
  *     name: {String}
  *     plotTraces: {Object}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
  *     sortByField: {String}
  *     summary: {String}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -276,11 +277,9 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     var urlParams = {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
@@ -290,7 +289,7 @@ var Aftershocks = function (options) {
         .toUTC().toISO().slice(0, -5)
     };
 
-    return Earthquakes.getFeedUrl(urlParams);
+    _this.url = Earthquakes.getFeedUrl(urlParams);
   };
 
   /**

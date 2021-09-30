@@ -23,15 +23,16 @@ var AppUtil = require('util/AppUtil'),
  *     destroy: {Function}
  *     disableButton: {Function}
  *     enableButton: {Function}
- *     getFeedUrl: {Function}
  *     id: {String}
  *     json: {Object}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     plotTraces: {Object}
  *     reset: {Function}
+ *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
  *     summary: {String}
+ *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
  */
@@ -343,14 +344,12 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the JSON feed's URL.
-   *
-   * @return {String}
+   * Set the JSON feed's URL.
    */
-  _this.getFeedUrl = function () {
+  _this.setFeedUrl = function () {
     _eqid = AppUtil.getParam('eqid');
 
-    return `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${_eqid}.geojson`;
+    _this.url = `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${_eqid}.geojson`;
   };
 
   /**
