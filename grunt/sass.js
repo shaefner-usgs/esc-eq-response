@@ -11,7 +11,8 @@ var sass = {
       'node_modules'
     ],
     outputStyle: 'expanded',
-    sourceMap: config.build + '/' + config.src + '/htdocs/css/index.css.map'
+    sourceMap: config.build + '/' + config.src + '/htdocs/css/index.css.map',
+    sourceMapContents: true
   },
 
   build: {
