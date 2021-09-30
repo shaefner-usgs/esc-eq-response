@@ -4,6 +4,14 @@
 var AppUtil = require('util/AppUtil');
 
 
+var _STATIC_DEFAULTS = {
+  'as-mag': 0,
+  'fs-days': 30,
+  'fs-mag': 1,
+  'hs-years': 10
+};
+
+
 /**
  * Refresh a Feature when the user tweaks its settings and set the URL to match
  * the application's state. Also set the default parameter values based on the
@@ -19,6 +27,7 @@ var AppUtil = require('util/AppUtil');
  *   {
  *     addCount: {Function}
  *     addLoader: {Function}
+ *     getDefaults: {Function}
  *     removeCount: {Function}
  *     reset: {Function}
  *     setDefaults: {Function}
@@ -35,7 +44,6 @@ var SettingsBar = function (options) {
       _initialLoad,
 
       _addListeners,
-      _getDefaults,
       _refreshFeature,
       _saveFocusedField;
 
@@ -75,50 +83,15 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get default values for form fields that depend on the selected Mainshock.
-   *
-   * Default values for distances are based on rupture length, which we estimate
-   * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
-   * 10km.
-   *
-   * ruptureArea (A) = 10 ** (M - 4)
-   * ruptureLength (approx) = A ** 0.7
-   *
-   * Aftershock, Foreshock distance = ruptureLength,
-   * Historical distance = 1.5 * ruptureLength
-   *
-   * @return {Object}
-   */
-  _getDefaults = function () {
-    var mag,
-        ruptureArea,
-        ruptureLength;
-
-    mag = _app.Features.getFeature('mainshock').json.properties.mag;
-    ruptureArea = Math.pow(10, mag - 4);
-    ruptureLength = Math.pow(ruptureArea, 0.7);
-
-    return {
-      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'as-mag': 0,
-      'fs-days': 30,
-      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'fs-mag': 1,
-      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
-      'hs-mag': Math.round(Math.max(4, mag - 2)),
-      'hs-years': 10
-    };
-  };
-
-  /**
-   * Refresh a Feature. Triggered when a Feature's parameter field is changed.
+   * Refresh a Feature. Triggered when a parameter setting for a given Feature
+   * is changed by user.
    */
   _refreshFeature = function () {
     var feature,
         id;
 
     if (_app.SelectBar.isEqidValid()) {
-      id = this.className; // parent container of form field
+      id = this.className; // css class of form field's parent container
       feature = _app.Features.getFeature(id);
 
       _app.JsonFeed.initThrottlers(id);
@@ -211,6 +184,38 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Get default values for form fields that depend on the selected Mainshock.
+   *
+   * Default values for distances are based on rupture length, which we estimate
+   * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
+   * 10km.
+   *
+   * ruptureArea (A) = 10 ** (M - 4)
+   * ruptureLength (approx) = A ** 0.7
+   *
+   * Aftershock, Foreshock distance = ruptureLength,
+   * Historical distance = 1.5 * ruptureLength
+   *
+   * @return {Object}
+   */
+  _this.getDefaults = function () {
+    var mag,
+        ruptureArea,
+        ruptureLength;
+
+    mag = _app.Features.getFeature('mainshock').json.properties.mag;
+    ruptureArea = Math.pow(10, mag - 4);
+    ruptureLength = Math.pow(ruptureArea, 0.7);
+
+    return Object.assign({}, _STATIC_DEFAULTS, {
+      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'hs-mag': Math.round(Math.max(4, mag - 2)),
+    });
+  };
+
+  /**
    * Hide the 'loader' and count value next to the Feature's name.
    *
    * @param feature {Object}
@@ -251,7 +256,7 @@ var SettingsBar = function (options) {
    * Set the form field values and URL params based on the Mainshock's details.
    */
   _this.setDefaults = function () {
-    var defaults = _getDefaults();
+    var defaults = _this.getDefaults();
 
     // URL params
     Object.keys(defaults).forEach(key => {
