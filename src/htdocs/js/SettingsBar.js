@@ -240,15 +240,14 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Reset to default state (<input>s are cleared by the Reset button).
+   * Reset to default state. Note: Feature counts are removed separately via
+   * _this.removeCount().
    */
   _this.reset = function () {
-    var counts = _el.querySelectorAll('.count');
+    var inputs = _el.querySelectorAll('input');
 
-    counts.forEach(count => {
-      count.classList.add('hide');
-
-      count.textContent = '';
+    inputs.forEach(input => {
+      input.value = '';
     });
   };
 
