@@ -244,6 +244,7 @@ var Application = function (options) {
     _this.PlotsPane.reset();
     _this.SelectBar.reset();
     _this.SettingsBar.reset();
+    _this.SignificantEqs.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();

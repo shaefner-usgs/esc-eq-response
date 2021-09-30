@@ -18,7 +18,7 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *   {
  *     postInit: {Function}
- *     unselectAll: {Function}
+ *     reset: {Function}
  *   }
  */
 var SignificantEqs = function (options) {
@@ -146,7 +146,7 @@ var SignificantEqs = function (options) {
   /**
    * Unselect all earthquakes in the list.
    */
-  _this.unselectAll = function () {
+  _this.reset = function () {
     var lis = _el.querySelectorAll('li');
 
     lis.forEach(li => {

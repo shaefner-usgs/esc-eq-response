@@ -157,8 +157,6 @@ var SelectBar = function (options) {
   _this.reset = function () {
     _el.querySelector('.details').classList.add('hide'); // Mainshock details
 
-    _app.SignificantEqs.unselectAll();
-
     // Add a slight delay so 'Reset' button can clear <input>s first
     setTimeout(() => {
       AppUtil.setQueryString(); // reset query string
