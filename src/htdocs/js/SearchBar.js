@@ -120,7 +120,16 @@ var SearchBar = function (options) {
     });
 
     // Search the catalog when the user clicks the 'Search' button
-    search.addEventListener('click', _this.searchCatalog);
+    search.addEventListener('click', () => {
+      var period = _el.querySelector('ul.period .selected').id;
+
+      // Check that dates are valid if applicable
+      if (period !== 'customPeriod' || _isValid()) {
+        window.location.href = '#mapPane';
+
+        _this.searchCatalog();
+      }
+    });
 
     // Update the range slider
     slider.addEventListener('input', _updateSlider);
@@ -452,48 +461,40 @@ var SearchBar = function (options) {
    */
   _this.searchCatalog = function () {
     var control,
-        params,
-        period;
+        params;
 
     control = _el.querySelector('.leaflet-control-edit a');
-    period = _el.querySelector('ul.period .selected').id;
 
     if (control.classList.contains('selected')) {
       control.click(); // exit custom region edit mode first
     }
 
-    // First check that dates are valid if applicable
-    if (period !== 'customPeriod' || _isValid()) {
-      params = _getSearchParams();
+    params = _getSearchParams();
 
-      _app.MapPane.removeFeature(_search);
-      _search.reset();
-      _search.setFeedUrl(params);
-      _app.MapPane.addLoader(_search);
+    _app.MapPane.removeFeature(_search);
+    _search.reset();
+    _search.setFeedUrl(params);
+    _app.MapPane.addLoader(_search);
 
-      _app.JsonFeed.fetch(_search).then(json => {
-        if (json) {
-          _search.create(json);
-          _app.MapPane.addLayer(_search);
-
-          window.location.href = '#mapPane';
-
-          _app.TitleBar.setTitle({
-            title: _search.title,
-            type: 'search'
-          });
-        } else {
-          _app.MapPane.removeFeature(_search);
-        }
-      }).catch(error => {
-        _app.StatusBar.addError({
-          id: _search.id,
-          message: `<h4>Error Adding ${_search.name}</h4><ul><li>${error}</li></ul>`
+    _app.JsonFeed.fetch(_search).then(json => {
+      if (json) {
+        _search.create(json);
+        _app.MapPane.addLayer(_search);
+        _app.TitleBar.setTitle({
+          title: _search.title,
+          type: 'search'
         });
-
-        console.error(error);
+      } else {
+        _app.MapPane.removeFeature(_search);
+      }
+    }).catch(error => {
+      _app.StatusBar.addError({
+        id: _search.id,
+        message: `<h4>Error Adding ${_search.name}</h4><ul><li>${error}</li></ul>`
       });
-    }
+
+      console.error(error);
+    });
   };
 
 
