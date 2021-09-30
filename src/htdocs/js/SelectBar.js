@@ -16,7 +16,7 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *   {
- *     createMainshock: {Function}
+ *     handleMainshock: {Function}
  *     isEqidValid: {Function}
  *     postInit: {Function}
  *     reset: {Function}
@@ -32,7 +32,7 @@ var SelectBar = function (options) {
       _eqid,
 
       _addListeners,
-      _handleMainshock;
+      _createMainshock;
 
 
   _this = {};
@@ -58,7 +58,13 @@ var SelectBar = function (options) {
     search = _el.querySelector('.search');
 
     // Reset app when the reset button is clicked
-    reset.addEventListener('click', () => {
+    reset.addEventListener('click', e => {
+      var input = _el.querySelector('input');
+
+      input.value = '';
+
+      e.preventDefault();
+
       _app.NavBar.reset();
       _app.reset();
       _app.setScrollPosition('selectBar'); // scroll to top
@@ -72,15 +78,34 @@ var SelectBar = function (options) {
     });
 
     // Load a new set of Features when the Mainshock <input> is changed
-    _eqid.addEventListener('input', _handleMainshock);
+    _eqid.addEventListener('input', _this.handleMainshock);
   };
+
+  /**
+   * Create a new Mainshock (which subsequently creates all other Features).
+   */
+  _createMainshock = function () {
+    AppUtil.setQueryString();
+
+    if (_this.isEqidValid()) {
+      document.body.classList.remove('no-mainshock');
+
+      _app.Features.createFeature('mainshock');
+    }
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
 
   /**
    * Handler for managing a new Mainshock. Triggered when the Event ID <input>
    * is changed.
    */
-  _handleMainshock = function () {
+  _this.handleMainshock = function () {
     var id = 'mainshock';
+
+    _app.reset();
 
     if (_eqid.value) {
       _app.JsonFeed.initThrottlers(id);
@@ -95,28 +120,9 @@ var SelectBar = function (options) {
       // Throttle requests
       _app.JsonFeed.throttlers[id].push(
         setTimeout(() => {
-          _this.createMainshock();
+          _createMainshock();
         }, 500)
       );
-    } else {
-      _app.reset();
-    }
-  };
-
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
-  /**
-   * Create a new Mainshock (which subsequently creates all other Features).
-   */
-  _this.createMainshock = function () {
-    _app.reset();
-
-    if (_this.isEqidValid()) {
-      document.body.classList.remove('no-mainshock');
-
-      _app.Features.createFeature('mainshock');
     }
   };
 
@@ -147,7 +153,7 @@ var SelectBar = function (options) {
   _this.postInit = function () {
     // Get things rolling if an eqid is already set
     if (AppUtil.getParam('eqid')) {
-      _this.createMainshock();
+      _createMainshock();
     }
   };
 
@@ -155,12 +161,11 @@ var SelectBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    _el.querySelector('.details').classList.add('hide'); // Mainshock details
+    var details = _el.querySelector('.details');
 
-    // Add a slight delay so 'Reset' button can clear <input>s first
-    setTimeout(() => {
-      AppUtil.setQueryString(); // reset query string
-    }, 25);
+    details.classList.add('hide'); // previously selected Mainshock's details
+
+    AppUtil.setQueryString(); // reset query string
   };
 
   /**
