@@ -99,24 +99,24 @@ var SignificantEqs = function (options) {
    */
   _selectEq = function () {
     var eqid,
-        lis;
+        eqs;
 
     eqid = document.getElementById('eqid');
-    lis = _el.querySelectorAll('li');
+    eqs = _el.querySelectorAll('li');
 
-    lis.forEach(li => {
-      if (li.id === this.id) {
-        if (eqid.value !== li.id) {
-          eqid.value = li.id;
+    eqs.forEach(eq => {
+      if (eq.id === this.id) {
+        if (eqid.value !== eq.id) { // eq not already selected
+          eqid.value = eq.id; // set the value of the eqid <input>
 
           // Input event is not triggered when it's changed programmatically
           AppUtil.setQueryString();
           _app.SelectBar.createMainshock();
         }
 
-        li.classList.add('selected');
+        eq.classList.add('selected');
       } else {
-        li.classList.remove('selected');
+        eq.classList.remove('selected');
       }
     });
   };
