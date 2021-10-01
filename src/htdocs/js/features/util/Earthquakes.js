@@ -199,10 +199,17 @@ var Earthquakes = function (options) {
    * @param eqid {String}
    */
   _addListeners = function(el, eqid) {
-    var button = el.querySelector('button');
+    var button,
+        input;
+
+    button = el.querySelector('button');
+    input = document.getElementById('eqid');
 
     button.addEventListener('click', () => {
-      location.assign(`/response/?eqid=${eqid}#mapPane`);
+      input.value = eqid;
+
+      // Input event is not triggered when it's changed programmatically
+      _app.SelectBar.handleMainshock();
     });
   };
 
