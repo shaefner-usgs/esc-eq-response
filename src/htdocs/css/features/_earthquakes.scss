@@ -167,8 +167,8 @@
   }
 }
 
-/* Earthquake details shown on edit, map (popup), and summary panes
-    (also used for other (i.e. non-eq) Leaflet popups) */
+/* Earthquake details in map popups and SelectBar. Styles are also applied to
+   other (i.e. non-eq) Leaflet popups. */
 .earthquake,
 .leaflet-popup-content {
   &.mainshock,
@@ -191,6 +191,7 @@
     }
 
     bottom: .45rem;
+    margin: 0;
     padding-bottom: 2px;
     padding-top: 2px;
     position: absolute;
@@ -370,7 +371,7 @@ and (max-width: $breakpoint-phone-width) {
             padding: .5rem 1.5rem;
             position: relative;
             text-align: left;
-            transition: none $effect-off-duration ease-in;
+            transition: $effect-off-duration ease-in;
             transition-property: background, color;
 
             &.distance {
@@ -394,7 +395,7 @@ and (max-width: $breakpoint-phone-width) {
             &:hover {
               background: $accent-color-lightest;
               color: $text-color-darker;
-              transition: none $effect-on-duration ease-out;
+              transition: $effect-on-duration ease-out;
               transition-property: background, color;
 
               span:before {
