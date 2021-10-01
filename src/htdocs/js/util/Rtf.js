@@ -260,7 +260,7 @@ var Rtf = function (options) {
       },
       title: props.title,
       urls: {
-        app: window.location.href,
+        app: location.href,
         eventPage: props.url
       }
     };

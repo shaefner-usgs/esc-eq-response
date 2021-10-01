@@ -125,7 +125,7 @@ var SearchBar = function (options) {
 
       // Check that dates are valid if applicable
       if (period !== 'customPeriod' || _isValid()) {
-        window.location.href = '#mapPane';
+        location.href = '#mapPane';
 
         _this.searchCatalog();
       }

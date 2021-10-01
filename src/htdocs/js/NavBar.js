@@ -334,7 +334,7 @@ var NavBar = function (options) {
    */
   _this.switchSideBars = function (id) {
     if (id === AppUtil.getParam('sidebar')) {
-      window.sessionStorage.setItem(id, 0); // reset scroll position to top
+      sessionStorage.setItem(id, 0); // reset scroll position to top
     }
 
     _hideAll(_sideBars);

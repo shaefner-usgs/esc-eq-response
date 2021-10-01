@@ -484,7 +484,7 @@ var MapPane = function (options) {
       _map.off('visible'); // remove listener
     });
 
-    window.location.href = '#mapPane';
+    location.href = '#mapPane';
 
     // Turn on Feature layer so its popup can be displayed
     if (!_map.hasLayer(layer)) {

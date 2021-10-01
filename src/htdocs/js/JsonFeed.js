@@ -149,7 +149,7 @@ var JsonFeed = function (options) {
 
     // Clear any previous throttled requests for this Feature
     _this.throttlers[id].forEach(timer => {
-      window.clearTimeout(timer);
+      clearTimeout(timer);
       _this.throttlers[id].shift();
     });
   };

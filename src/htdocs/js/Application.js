@@ -113,7 +113,7 @@ var Application = function (options) {
 
     // Show the SelectBar when the 'Select an earthquake' link is clicked
     select.addEventListener('click', () => {
-      window.sessionStorage.setItem('selectBar', 0);
+      sessionStorage.setItem('selectBar', 0);
 
       _this.NavBar.switchSideBars('selectBar');
       _this.setScrollPosition('selectBar');
@@ -199,7 +199,7 @@ var Application = function (options) {
     sections.forEach(section => {
       id = section.getAttribute('id');
 
-      window.sessionStorage.setItem(id, 0);
+      sessionStorage.setItem(id, 0);
     });
   };
 
@@ -221,11 +221,11 @@ var Application = function (options) {
       position = window.pageYOffset;
     }
 
-    window.clearTimeout(_throttle);
+    clearTimeout(_throttle);
 
     // Throttle scroll event
     _throttle = setTimeout(() => {
-      window.sessionStorage.setItem(id, position);
+      sessionStorage.setItem(id, position);
     }, 50);
   };
 
@@ -263,7 +263,7 @@ var Application = function (options) {
    * @param id {String}
    */
   _this.setScrollPosition = function (id) {
-    var position = Number(window.sessionStorage.getItem(id));
+    var position = Number(sessionStorage.getItem(id));
 
     if (position !== null) {
       if (/Pane$/.test(id)) { // pane
