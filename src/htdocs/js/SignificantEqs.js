@@ -106,8 +106,8 @@ var SignificantEqs = function (options) {
 
     eqs.forEach(eq => {
       if (eq.id === this.id) {
-        if (eqid.value !== eq.id) { // eq not already selected
-          eqid.value = eq.id; // set the value of the eqid <input>
+        if (eqid.value !== eq.id) { // eq is not already selected
+          eqid.value = eq.id; // set eqid <input> value
 
           // Input event is not triggered when it's changed programmatically
           _app.SelectBar.handleMainshock();
