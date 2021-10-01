@@ -98,16 +98,16 @@ var SignificantEqs = function (options) {
    * Event handler to select the earthquake the user clicked on.
    */
   _selectEq = function () {
-    var eqid,
-        eqs;
+    var eqs,
+        input;
 
-    eqid = document.getElementById('eqid');
     eqs = _el.querySelectorAll('li');
+    input = document.getElementById('eqid');
 
     eqs.forEach(eq => {
       if (eq.id === this.id) {
-        if (eqid.value !== eq.id) { // eq is not already selected
-          eqid.value = eq.id; // set eqid <input> value
+        if (input.value !== eq.id) { // eq is not already selected
+          input.value = eq.id;
 
           // Input event is not triggered when it's changed programmatically
           _app.SelectBar.handleMainshock();
