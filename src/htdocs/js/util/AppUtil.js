@@ -77,7 +77,8 @@ AppUtil.compose = function () {
  *
  * @param name {String}
  *
- * @return {String}
+ * @return {String | null}
+ *     returns null when the URL param is not set
  */
 AppUtil.getParam = function (name) {
   var params = new URLSearchParams(location.search);
@@ -247,19 +248,6 @@ AppUtil.round = function (num, precision = 0, empty = '–') {
 };
 
 /**
- * Set all form field values to match the values in the querystring.
- */
-AppUtil.setFieldValues = function () {
-  var params = new URLSearchParams(location.search);
-
-  params.forEach((value, name) => {
-    if (document.getElementById(name)) {
-      document.getElementById(name).value = value;
-    }
-  });
-};
-
-/**
  * Set the given URL parameter to the given value and update the URL.
  *
  * @param name {String}
@@ -270,33 +258,37 @@ AppUtil.setParam = function (name, value) {
 
   params.set(name, value);
 
-  window.history.replaceState({}, '', '?' + params.toString() + location.hash);
+  history.replaceState({}, '', '?' + params.toString() + location.hash);
 };
 
 /**
- * Set the querystring to match the values in the form fields.
+ * Reset the queryString, keeping only the non-Mainshock specific parameters.
  */
-AppUtil.setQueryString = function () {
-  var fields,
+AppUtil.resetQueryString = function () {
+  var inputs,
+      msParams,
       pairs,
       params,
       queryString;
 
-  fields = document.querySelectorAll('#selectBar input, #settingsBar input');
+  inputs = document.querySelectorAll('#selectBar input, #settingsBar input');
+  msParams = [];
   pairs = [];
   params = new URLSearchParams(location.search);
 
-  fields.forEach(field => {
-    pairs.push(field.id + '=' + field.value);
+  inputs.forEach(input => {
+    msParams.push(input.id);
   });
 
-  if (params.has('sidebar')) { // preserve sidebar param
-    pairs.push('sidebar=' + params.get('sidebar'));
-  }
+  params.forEach((value, name) => {
+    if (!msParams.includes(name)) { // skip Mainshock params
+      pairs.push(`${name}=${value}`);
+    }
+  });
 
   queryString = '?' + pairs.join('&');
 
-  window.history.replaceState({}, '', queryString + location.hash);
+  history.replaceState({}, '', queryString + location.hash);
 };
 
 /**

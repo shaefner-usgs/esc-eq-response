@@ -313,6 +313,7 @@ var FieldNotes = function (options) {
         before,
         mainshock,
         pairs,
+        radius,
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
@@ -321,11 +322,12 @@ var FieldNotes = function (options) {
     before = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC()
       .plus({ days: 30 }).toSeconds();
     pairs = [];
+    radius = document.getElementById('as-dist').value;
     urlParams = {
       between: after + ',' + before,
       lat: mainshock.json.geometry.coordinates[1],
       lon: mainshock.json.geometry.coordinates[0],
-      radius: AppUtil.getParam('as-dist') // use aftershocks radius
+      radius: radius // use aftershocks radius
     };
 
     Object.keys(urlParams).forEach(key => {

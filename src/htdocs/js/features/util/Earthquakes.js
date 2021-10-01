@@ -96,9 +96,12 @@ var Earthquakes = function (options) {
 
   _initialize = function (options) {
     var coords,
-        mainshock;
+        inputId,
+        mainshock,
+        type;
 
     options = Object.assign({}, _DEFAULTS, options);
+    type = options.type;
 
     _app = options.app;
     _featureId = options.id;
@@ -122,14 +125,15 @@ var Earthquakes = function (options) {
     };
     _sortByField = options.sortByField || '';
 
-    if (_featureId !== 'mainshock' && _featureId !== 'search') {
+    if (_featureId !== 'mainshock' && type !== 'search') {
+      inputId = AppUtil.getPrefix(_featureId) + '-mag';
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _mainshockTitle = mainshock.details.title;
-      _minMag = AppUtil.getParam(AppUtil.getPrefix(_featureId) + '-mag');
+      _minMag = document.getElementById(inputId).value;
       _duration = _getDuration();
     }
 
@@ -291,6 +295,8 @@ var Earthquakes = function (options) {
    */
   _getDuration = function () {
     var duration,
+        fsInputId,
+        hsInputId,
         interval;
 
     if (_featureId === 'aftershocks') {
@@ -299,12 +305,14 @@ var Earthquakes = function (options) {
         days: Number(AppUtil.round(interval, 1))
       };
     } else if (_featureId === 'foreshocks') {
+      fsInputId = AppUtil.getPrefix(_featureId) + '-days';
       duration = {
-        days: Number(AppUtil.getParam('fs-days'))
+        days: Number(document.getElementById(fsInputId).value)
       };
     } else if (_featureId === 'historical') {
+      hsInputId = AppUtil.getPrefix(_featureId) + '-years';
       duration = {
-        years: Number(AppUtil.getParam('hs-years'))
+        years: Number(document.getElementById(hsInputId).value)
       };
     }
 
@@ -882,10 +890,14 @@ var Earthquakes = function (options) {
    */
   _this.createDescription = function () {
     var data,
+        distance,
         ending,
+        inputId,
         interval,
         length;
 
+    inputId = AppUtil.getPrefix(_featureId) + '-dist';
+    distance = document.getElementById(inputId).value;
     interval = Object.keys(_duration)[0];
     length = _duration[interval];
 
@@ -898,7 +910,7 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      distance: AppUtil.getParam(AppUtil.getPrefix(_featureId) + '-dist'),
+      distance: distance,
       ending: ending,
       mag: _minMag
     };

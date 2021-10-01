@@ -280,16 +280,25 @@ var Aftershocks = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var urlParams = {
+    var params,
+        starttime,
+        urlParams;
+
+    starttime = Luxon.DateTime.fromMillis(_mainshock.json.properties.time + 1000)
+      .toUTC().toISO().slice(0, -5);
+    urlParams = {
+      asDist: document.getElementById('as-dist').value,
+      asMag: document.getElementById('as-mag').value
+    };
+    params = {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(AppUtil.getParam('as-dist')),
-      minmagnitude: Number(AppUtil.getParam('as-mag')) - 0.05, // account for rounding to tenths
-      starttime: Luxon.DateTime.fromMillis(_mainshock.json.properties.time + 1000)
-        .toUTC().toISO().slice(0, -5)
+      maxradiuskm: Number(urlParams.asDist),
+      minmagnitude: Number(urlParams.asMag) - 0.05, // account for rounding to tenths
+      starttime: starttime
     };
 
-    _this.url = Earthquakes.getFeedUrl(urlParams);
+    _this.url = Earthquakes.getFeedUrl(params);
   };
 
   /**

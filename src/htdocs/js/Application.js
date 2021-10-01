@@ -65,6 +65,7 @@ var Application = function (options) {
       _initialize,
 
       _els,
+      _initialLoad,
       _sidebar,
       _style,
       _throttle,
@@ -80,13 +81,13 @@ var Application = function (options) {
 
   _initialize = function (options) {
     _els = options || {};
+    _initialLoad = true;
     _sidebar = document.getElementById('sideBar');
     _style = document.createElement('style');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
-    AppUtil.setFieldValues();
     _resetScrollPositions();
     _initClasses();
 
@@ -236,9 +237,7 @@ var Application = function (options) {
    * Reset app to default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
-    _resetScrollPositions();
-
-    _this.Features.reset(); // reset Features first
+    _this.Features.reset(); // must be first
     _this.Feeds.reset();
     _this.MapPane.reset();
     _this.PlotsPane.reset();
@@ -248,6 +247,14 @@ var Application = function (options) {
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
+
+    if (!_initialLoad) {
+      _resetScrollPositions();
+
+      AppUtil.resetQueryString();
+    }
+
+    _initialLoad = false;
   };
 
   /**

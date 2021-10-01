@@ -27,7 +27,6 @@ var _STATIC_DEFAULTS = {
  *   {
  *     addCount: {Function}
  *     addLoader: {Function}
- *     getDefaults: {Function}
  *     removeCount: {Function}
  *     reset: {Function}
  *     setDefaults: {Function}
@@ -41,9 +40,9 @@ var SettingsBar = function (options) {
       _app,
       _el,
       _focusedField,
-      _initialLoad,
 
       _addListeners,
+      _getDefaults,
       _refreshFeature,
       _saveFocusedField;
 
@@ -55,7 +54,6 @@ var SettingsBar = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _initialLoad = true;
 
     _addListeners();
   };
@@ -75,10 +73,43 @@ var SettingsBar = function (options) {
       feature.addEventListener('input', _refreshFeature);
     });
 
-    // Update querystring when a form field is changed; remember focused field
+    // Update queryString when a form field is changed; remember focused field
     fields.forEach(field => {
       field.addEventListener('focus', _saveFocusedField);
       field.addEventListener('input', AppUtil.updateParam);
+    });
+  };
+
+  /**
+   * Get the default values for form fields that depend on the selected
+   * Mainshock and combine them with 'static' default values.
+   *
+   * Default values for distances are based on rupture length, which we estimate
+   * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
+   * 10km.
+   *
+   * ruptureArea (A) = 10 ** (M - 4)
+   * ruptureLength (approx) = A ** 0.7
+   *
+   * Aftershock, Foreshock distance = ruptureLength,
+   * Historical distance = 1.5 * ruptureLength
+   *
+   * @return {Object}
+   */
+  _getDefaults = function () {
+    var mag,
+        ruptureArea,
+        ruptureLength;
+
+    mag = _app.Features.getFeature('mainshock').json.properties.mag;
+    ruptureArea = Math.pow(10, mag - 4);
+    ruptureLength = Math.pow(ruptureArea, 0.7);
+
+    return Object.assign({}, _STATIC_DEFAULTS, {
+      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'hs-mag': Math.round(Math.max(4, mag - 2)),
     });
   };
 
@@ -184,38 +215,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get default values for form fields that depend on the selected Mainshock.
-   *
-   * Default values for distances are based on rupture length, which we estimate
-   * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
-   * 10km.
-   *
-   * ruptureArea (A) = 10 ** (M - 4)
-   * ruptureLength (approx) = A ** 0.7
-   *
-   * Aftershock, Foreshock distance = ruptureLength,
-   * Historical distance = 1.5 * ruptureLength
-   *
-   * @return {Object}
-   */
-  _this.getDefaults = function () {
-    var mag,
-        ruptureArea,
-        ruptureLength;
-
-    mag = _app.Features.getFeature('mainshock').json.properties.mag;
-    ruptureArea = Math.pow(10, mag - 4);
-    ruptureLength = Math.pow(ruptureArea, 0.7);
-
-    return Object.assign({}, _STATIC_DEFAULTS, {
-      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
-      'hs-mag': Math.round(Math.max(4, mag - 2)),
-    });
-  };
-
-  /**
    * Hide the 'loader' and count value next to the Feature's name.
    *
    * @param feature {Object}
@@ -252,23 +251,26 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the form field values and URL params based on the Mainshock's details.
+   * Set the default form field values based on the Mainshock's details, which
+   * are overridden by queryString values when present.
    */
   _this.setDefaults = function () {
-    var defaults = _this.getDefaults();
+    var defaults,
+        input,
+        param;
 
-    // URL params
+    defaults = _getDefaults();
+
     Object.keys(defaults).forEach(key => {
-      // Preserve user-set URL params on initial load
-      if (!_initialLoad || AppUtil.getParam(key) === '') {
-        AppUtil.setParam(key, defaults[key]);
+      input = document.getElementById(key);
+      param = AppUtil.getParam(key);
+
+      if (param) {
+        input.value = param;
+      } else {
+        input.value = defaults[key];
       }
     });
-
-    _initialLoad = false;
-
-    // set form fields to match URL params
-    AppUtil.setFieldValues();
   };
 
   /**

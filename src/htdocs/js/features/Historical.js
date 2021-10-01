@@ -1,8 +1,7 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    Earthquakes = require('features/util/Earthquakes'),
+var Earthquakes = require('features/util/Earthquakes'),
     Luxon = require('luxon');
 
 
@@ -124,23 +123,32 @@ var Historical = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var mainshock,
+    var endtime,
+        mainshock,
+        params,
+        starttime,
         urlParams;
 
     mainshock = _app.Features.getFeature('mainshock');
+    endtime = Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
+      .toUTC().toISO().slice(0, -5);
     urlParams = {
-      endtime: Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
-        .toUTC().toISO().slice(0, -5),
+      hsDist: document.getElementById('hs-dist').value,
+      hsMag: document.getElementById('hs-mag').value,
+      hsYears: document.getElementById('hs-years').value
+    };
+    starttime = Luxon.DateTime.fromMillis(mainshock.json.properties.time)
+      .toUTC().minus({ years: urlParams.hsYears }).toISO().slice(0, -5);
+    params = {
+      endtime: endtime,
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(AppUtil.getParam('hs-dist')),
-      minmagnitude: Number(AppUtil.getParam('hs-mag')) - 0.05, // account for rounding to tenths
-      starttime: Luxon.DateTime.fromMillis(mainshock.json.properties.time)
-        .toUTC().minus({ years: AppUtil.getParam('hs-years') }).toISO()
-        .slice(0, -5)
+      maxradiuskm: Number(urlParams.hsDist),
+      minmagnitude: Number(urlParams.hsMag) - 0.05, // account for rounding to tenths
+      starttime: starttime
     };
 
-    _this.url = Earthquakes.getFeedUrl(urlParams);
+    _this.url = Earthquakes.getFeedUrl(params);
   };
 
   /**

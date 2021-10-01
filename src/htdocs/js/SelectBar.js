@@ -44,6 +44,9 @@ var SelectBar = function (options) {
     _el = options.el || document.createElement('section');
     _eqid = document.getElementById('eqid');
 
+    // set eqid <input>'s value
+    _eqid.value = AppUtil.getParam('eqid');
+
     _addListeners();
   };
 
@@ -85,11 +88,10 @@ var SelectBar = function (options) {
    * Create a new Mainshock (which subsequently creates all other Features).
    */
   _createMainshock = function () {
-    AppUtil.setQueryString();
-
     if (_this.isEqidValid()) {
       document.body.classList.remove('no-mainshock');
 
+      AppUtil.setParam('eqid', _eqid.value);
       _app.Features.createFeature('mainshock');
     }
   };
@@ -100,7 +102,7 @@ var SelectBar = function (options) {
 
   /**
    * Handler for managing a new Mainshock. Triggered when the Event ID <input>
-   * is changed.
+   * is changed (or manually when the Event ID is changed programmatically).
    */
   _this.handleMainshock = function () {
     var id = 'mainshock';
@@ -153,7 +155,7 @@ var SelectBar = function (options) {
   _this.postInit = function () {
     // Get things rolling if an eqid is already set
     if (AppUtil.getParam('eqid')) {
-      _createMainshock();
+      _this.handleMainshock();
     }
   };
 
@@ -164,8 +166,6 @@ var SelectBar = function (options) {
     var details = _el.querySelector('.details');
 
     details.classList.add('hide'); // previously selected Mainshock's details
-
-    AppUtil.setQueryString(); // reset query string
   };
 
   /**
