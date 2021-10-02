@@ -1,3 +1,4 @@
+@use '../mixins' as *;
 @use '../variables' as *;
 
 #summaryPane {
@@ -219,9 +220,9 @@
       }
 
       > strong {
-        font: 700 .95rem $font-family-headers;
+        @include labels;
+
         padding-bottom: .25rem;
-        text-transform: uppercase;
       }
     }
 

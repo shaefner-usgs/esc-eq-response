@@ -1,3 +1,4 @@
+@use '../mixins' as *;
 @use '../variables' as *;
 
 #plotsPane {
@@ -207,15 +208,15 @@
     margin-left: 5rem;
   }
   dt {
+    @include labels;
+
     clear: left;
-    color: $text-color-lighter;
     display: inline-block;
     float: left;
-    font-weight: 300;
-    letter-spacing: .015rem;
+    line-height: 1.8; /* accommodate smaller font-size of labels */
     margin-right: .75rem;
     text-align: right;
-    width: 4.25rem;
+    width: 4.75rem;
   }
 
   dl {

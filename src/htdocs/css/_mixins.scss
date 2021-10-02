@@ -24,3 +24,9 @@
     transition: all $effect-on-duration ease-out;
   }
 }
+
+@mixin labels() {
+  color: $text-color-lighter;
+  font: 700 .95rem $font-family-headers;
+  text-transform: uppercase;
+}

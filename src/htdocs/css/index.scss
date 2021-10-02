@@ -12,6 +12,7 @@
 @use 'lightbox';
 @use 'loaders';
 @use 'mapPane';
+@use 'mixins' as *;
 @use 'navBar';
 @use 'plotly';
 @use 'plotsPane';
@@ -158,10 +159,10 @@ th {
 }
 
 th {
-  font: 700 .95rem $font-family-headers;
+  @include labels;
+
   padding-bottom: .3rem;
   text-align: center;
-  text-transform: uppercase;
 }
 
 tr {
