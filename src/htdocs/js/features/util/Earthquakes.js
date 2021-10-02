@@ -596,7 +596,7 @@ var Earthquakes = function (options) {
             '</dt>' +
             '<dd class="distance">{distanceDisplay}</dd>' +
             '<dt>Status</dt>' +
-            '<dd class="status">{status}</dd>' +
+            '<dd class="status">{status}{statusIcon}</dd>' +
           '</dl>' +
           '<button type="button">Select</button>' +
         '</div>';
@@ -709,6 +709,7 @@ var Earthquakes = function (options) {
         magDisplay,
         magType,
         props,
+        statusIcon,
         template,
         tooltip,
         utcTime;
@@ -720,9 +721,14 @@ var Earthquakes = function (options) {
     magDisplay = AppUtil.round(props.mag, 1);
     mag = parseFloat(magDisplay);
     magType = props.magType || 'M';
+    statusIcon = '';
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
     tooltip = magType + ' ' + magDisplay + ' - ' + utcTime;
+
+    if (props.status === 'reviewed') {
+      statusIcon += '<i class="icon-check"></i>';
+    }
 
     // Add local time if tz prop is included in feed
     if (props.tz) {
@@ -762,6 +768,7 @@ var Earthquakes = function (options) {
       magType: magType,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status,
+      statusIcon: statusIcon,
       title: magType + ' ' + magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
       url: props.url,

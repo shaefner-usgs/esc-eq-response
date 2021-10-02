@@ -229,6 +229,10 @@
 
   .status {
     text-transform: capitalize;
+
+    i {
+      color: green;
+    }
   }
 }
 
