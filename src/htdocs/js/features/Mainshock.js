@@ -195,10 +195,18 @@ var Mainshock = function (options) {
     var data,
         eqTime,
         mmiInt,
-        products;
+        products,
+        statusIcon;
 
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
+    products = _this.json.properties.products;
+    statusIcon = '';
+
+    if (_this.details.status === 'reviewed') {
+      statusIcon = '<i class="icon-check"></i>';
+    }
+
     data = Object.assign({}, _this.details, {
       date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
       dayofweek: eqTime.toFormat('cccc'),
@@ -208,19 +216,14 @@ var Mainshock = function (options) {
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
-      statusIcon: '', // default value
+      statusIcon: statusIcon,
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       tsunamiBubble: _this.details.bubbles.tsunami || ''
     });
-    products = _this.json.properties.products;
 
     // Add DYFI, ShakeMap props to data
     _setDyfiProps(data, products.dyfi);
     _setShakeMapProps(data, products.shakemap);
-
-    if (_this.details.status === 'reviewed') {
-      data.statusIcon = '<i class="icon-check"></i>';
-    }
 
     return data;
   };
