@@ -86,6 +86,7 @@ var Mainshock = function (options) {
           '<span>{magDisplay}</span>' +
           '<small>{magType}</small>' +
         '</li>' +
+        bubbles +
         '<li class="date">' +
           '<strong>Date</strong>' +
           '<span>{date}</span>' +
@@ -96,7 +97,6 @@ var Mainshock = function (options) {
           '<span>{time}</span>' +
           '<small>UTC</small>' +
         '</li>' +
-        bubbles +
         '<li class="depth">' +
           '<strong>Depth</strong>' +
           '<span>{depthDisplay}</span>' +

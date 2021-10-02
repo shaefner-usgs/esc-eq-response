@@ -587,10 +587,10 @@ var Earthquakes = function (options) {
           '<dl>' +
             '<dt>Time</dt>' +
             '<dd>{htmlTime}</dd>' +
-            '<dt>Location</dt>' +
-            '<dd>{location}</dd>' +
             '<dt>Depth</dt>' +
             '<dd>{depthDisplay}</dd>' +
+            '<dt>Location</dt>' +
+            '<dd>{location}</dd>' +
             '<dt class="distance">' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</dt>' +
