@@ -21,11 +21,13 @@
   .modebar-btn {
     path {
       fill: color.scale($accent-color, $alpha: -4%, $lightness: 75%) !important;
+      transition: fill $effect-off-duration ease-in;
     }
 
-    &.active path,
-    &:hover path {
+    &:hover path,
+    &.active path {
       fill: $accent-color !important;
+      transition: fill $effect-on-duration ease-out;
     }
   }
 
