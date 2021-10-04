@@ -138,7 +138,17 @@
     }
 
     th {
+      color: $text-color-lighter;
       position: relative;
+
+      &.sort-header:hover {
+        color: $text-color;
+
+        span:after,
+        span:before {
+          border-color: $text-color transparent;
+        }
+      }
     }
 
     thead tr {
@@ -165,11 +175,16 @@
         }
       }
     }
+
+    .sort-header span:after,
+    .sort-header span:before {
+      border-color: $text-color-lighter transparent;
+    }
   }
 }
 
-/* Earthquake details in map popups and SelectBar. Styles are also applied to
-   other (i.e. non-eq) Leaflet popups. */
+/* Earthquake details in map popups and the SelectBar. Some styles are also
+   applied to other (i.e. non-eq) Leaflet popups. */
 .earthquake,
 .leaflet-popup-content {
   &.mainshock,
@@ -205,15 +220,14 @@
   }
   dd {
     color: $text-color;
-    margin-left: 5rem;
   }
   dt {
     @include labels;
 
     clear: left;
-    display: inline-block;
+    display: block;
     float: left;
-    line-height: 1.8; /* accommodate smaller font-size of labels */
+    line-height: 1.75; /* accommodate smaller font-size of labels */
     margin-right: .5rem;
     text-align: right;
     width: 6rem;
