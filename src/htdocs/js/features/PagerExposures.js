@@ -82,8 +82,10 @@ var PagerExposures = function (options) {
         };
         html += L.Util.template(
           '<tr>' +
-            '<td class="impact-bubbles"><span class="mmi{intensity}">' +
-              '<strong class="roman">{intensity}</strong></span>' +
+            '<td>' +
+              '<span class="impact-bubble mmi{intensity}">' +
+                '<strong class="roman">{intensity}</strong>' +
+              '</span>' +
             '</td>' +
             '<td>{level}</td>' +
             '<td>{population}</td>' +
