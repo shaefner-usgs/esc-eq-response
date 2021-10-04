@@ -586,7 +586,7 @@ var Earthquakes = function (options) {
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl>' +
-            '<dt>Time</dt>' +
+            '<dt>Date & Time</dt>' +
             '<dd>{htmlTime}</dd>' +
             '<dt>Depth</dt>' +
             '<dd>{depthDisplay}</dd>' +
