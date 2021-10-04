@@ -4,119 +4,83 @@
   background-image: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
 }
 
-.earthquake {
-  .impact-bubbles {
-    margin: 1rem 0;
-
-    > a,
-    > span {
-      width: 25%;
-    }
-  }
+a.impact-bubble:hover {
+  @include hover;
 }
 
-.impact-bubbles {
+.impact-bubble {
+  align-items: center;
+  background: #fff;
+  border-radius: $button-border-radius;
+  color: $text-color-darker !important;
   display: flex;
+  flex-direction: column;
+  letter-spacing: .03rem;
+  line-height: 1rem;
+  max-width: 6rem;
+  min-width: 3.5rem;
+  overflow: hidden;
+  padding: 6px 0;
+  text-align: center;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .2);
 
-  > a,
-  > span,
-  > .impact-bubble {
-    align-items: center;
-    background: #fff;
-    border-radius: $button-border-radius;
-    color: $text-color-darker !important;
-    display: flex;
-    flex-direction: column;
-    letter-spacing: .03rem;
-    line-height: 1rem;
-    max-width: 6rem;
-    min-width: 3.5rem;
-    overflow: hidden;
-    padding: 6px 0;
-    text-align: center;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .2);
-
-    > abbr {
-      border-bottom: 1px dotted #222;
-      font-size: .6875rem;
-    }
-
-    > strong {
-      font-size: .8125rem;
-      white-space: nowrap;
-    }
-
-    + a {
-      margin-left: 5px;
-    }
-  }
-
-  > a:hover {
-    @include hover;
-  }
-
-  .mmiI {
+  &.mmiI {
     background: $mmiI-color;
-    border: 1px solid $border-color-lightest;
+    border: 1px solid $border-color-lighter;
   }
-  .mmiII {
+  &.mmiII {
     background: $mmiII-color;
   }
-  .mmiIII  {
+  &.mmiIII  {
     background: $mmiIII-color;
   }
-  .mmiIV {
+  &.mmiIV {
     background: $mmiIV-color;
   }
-  .mmiV {
+  &.mmiV {
     background: $mmiV-color;
   }
-  .mmiVI {
+  &.mmiVI {
     background: $mmiVI-color;
   }
-  .mmiVII {
+  &.mmiVII {
     background: $mmiVII-color;
   }
-  .mmiVIII {
+  &.mmiVIII {
     background: $mmiVIII-color;
   }
-  .mmiIX {
+  &.mmiIX {
     background: $mmiIX-color;
   }
-  .mmiX {
+  &.mmiX {
     background: $mmiX-color;
   }
-  .mmiXI {
+  &.mmiXI {
     background: $mmiXI-color;
   }
-  .mmiXII {
+  &.mmiXII {
     background: $mmiXII-color;
   }
 
-  .pager-alertlevel-green {
+  &.pager-alertlevel-green {
     background: $pager-green-color;
   }
-  .pager-alertlevel-orange {
+  &.pager-alertlevel-orange {
     background: $pager-orange-color;
   }
-  .pager-alertlevel-pending {
+  &.pager-alertlevel-pending {
     background: $pager-pending-color;
   }
-  .pager-alertlevel-red {
+  &.pager-alertlevel-red {
     background: $pager-red-color;
   }
-  .pager-alertlevel-yellow {
+  &.pager-alertlevel-yellow {
     background: $pager-yellow-color;
   }
 
-  .roman {
-    font-family: $font-family-mmi;
-    text-transform: uppercase;
-  }
-
-  .tsunami {
+  &.tsunami {
     padding: 0;
     position: relative;
 
@@ -138,5 +102,34 @@
         @include hover;
       }
     }
+  }
+
+  + a {
+    margin-left: 5px;
+  }
+
+  > abbr {
+    border-bottom: 1px dotted #222;
+    font-size: .6875rem;
+  }
+
+  > strong {
+    font-size: .8125rem;
+    white-space: nowrap;
+  }
+
+  .roman {
+    font-family: $font-family-mmi;
+    text-transform: uppercase;
+  }
+}
+
+.impact-bubbles {
+  display: flex;
+  margin: 1rem 0;
+
+  > a,
+  > span {
+    width: 25%;
   }
 }

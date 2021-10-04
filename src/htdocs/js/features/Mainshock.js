@@ -146,40 +146,40 @@ var Mainshock = function (options) {
 
     if (data.cdi) {
       bubbles +=
-        '<li class="bubble">' +
+        '<li>' +
           '<strong>' +
             '<abbr title="Did You Feel It?">DYFI?</abbr>' +
           '</strong>' +
-          '<div class="impact-bubbles">{dyfiBubble}</div>' +
+          '{dyfiBubble}' +
           '<small>{felt} responses</small>' +
         '</li>';
     }
 
     if (data.mmi) {
       bubbles +=
-        '<li class="bubble">' +
+        '<li>' +
           '<strong>ShakeMap</strong>' +
-          '<div class="impact-bubbles">{shakemapBubble}</div>' +
+          '{shakemapBubble}' +
           '<small>{level}</small>' +
         '</li>';
     }
 
     if (data.alert) {
       bubbles +=
-        '<li class="bubble">' +
+        '<li>' +
           '<strong>' +
             '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
           '</strong>' +
-          '<div class="impact-bubbles">{pagerBubble}</div>' +
+          '{pagerBubble}' +
           '<small>Impact</small>' +
         '</li>';
     }
 
     if (data.tsunami) {
       bubbles +=
-        '<li class="bubble">' +
+        '<li>' +
           '<strong>Tsunami</strong>' +
-          '<div class="impact-bubbles">{tsunamiBubble}</div>' +
+          '{tsunamiBubble}' +
         '</li>';
     }
 

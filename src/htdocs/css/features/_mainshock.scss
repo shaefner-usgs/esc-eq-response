@@ -195,16 +195,6 @@
         padding-right: 0;
       }
 
-      &:nth-of-type(7) { /* tsunami button */
-        position: relative;
-
-        .impact-bubbles {
-          height: 2.25rem;
-          position: absolute;
-          top: 1.75rem;
-        }
-      }
-
       > small,
       > span {
         white-space: nowrap;
@@ -226,13 +216,11 @@
       }
     }
 
-    .bubble {
-      a {
-        width: 4.25rem;
+    .impact-bubble {
+      width: 4.25rem;
 
-        abbr {
-          display: none;
-        }
+      abbr {
+        display: none;
       }
     }
 
@@ -262,6 +250,15 @@
 
       span {
         color: green;
+      }
+    }
+
+    .tsunami {
+      height: 2.25rem;
+      top: -.75rem;
+
+      img {
+        border-radius: $button-border-radius;
       }
     }
   }
