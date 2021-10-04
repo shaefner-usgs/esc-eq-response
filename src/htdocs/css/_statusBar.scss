@@ -25,6 +25,10 @@
     text-shadow: 1px 1px 3px #fffec6;
     width: 100%;
 
+    &:first-child {
+      display: block; /* only display one item (first) at a time */
+    }
+
     &.error {
       background: rgba(223, 62, 62, .92);
       border-color: rgb(195, 0, 0);
@@ -34,10 +38,6 @@
       h4 {
         color: #fff;
       }
-    }
-
-    &:first-child {
-      display: block; /* only display one item (first) at a time */
     }
   }
 

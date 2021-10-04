@@ -204,16 +204,16 @@ tr {
   opacity: 1;
   transition: opacity .25s ease-out;
 
-  &.hide {
-    opacity: 0;
-    transition: none;
-  }
-
   &:after {
     content: ")";
   }
   &:before {
     content: "(";
+  }
+
+  &.hide {
+    opacity: 0;
+    transition: none;
   }
 }
 

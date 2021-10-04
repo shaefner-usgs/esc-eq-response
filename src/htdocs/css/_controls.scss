@@ -50,24 +50,6 @@ button {
   user-select: none;
   white-space: nowrap;
 
-  &#reset {
-    background: $reset-button-color;
-    border-color: color.scale($reset-button-color, $blackness: 15%);
-    color: $text-color-lighter;
-
-    &:active,
-    &:focus,
-    &:hover {
-      background: color.scale($reset-button-color, $lightness: 40%);
-      border-color: color.scale($reset-button-color, $blackness: 25%);
-      color: $text-color;
-      text-shadow: none;
-    }
-    &:active {
-      box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
-    }
-  }
-
   &:active,
   &:focus,
   &:hover {
@@ -99,6 +81,24 @@ button {
     cursor: not-allowed;
     opacity: .3;
     text-shadow: none;
+  }
+
+  &#reset {
+    background: $reset-button-color;
+    border-color: color.scale($reset-button-color, $blackness: 15%);
+    color: $text-color-lighter;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background: color.scale($reset-button-color, $lightness: 40%);
+      border-color: color.scale($reset-button-color, $blackness: 25%);
+      color: $text-color;
+      text-shadow: none;
+    }
+    &:active {
+      box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
+    }
   }
 }
 
