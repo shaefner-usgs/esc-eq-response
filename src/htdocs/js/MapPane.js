@@ -409,7 +409,7 @@ var MapPane = function (options) {
 
     item.mapLayer.id = item.id; // need access to Item's id from Leaflet layer
 
-    if (item.count) {
+    if (Object.prototype.hasOwnProperty.call(item, 'count')) {
       item.name += '<span class="count">' + item.count + '</span>';
     }
 
