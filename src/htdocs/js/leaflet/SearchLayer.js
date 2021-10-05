@@ -137,7 +137,7 @@ var SearchLayer = function (options) {
       params.starttime = Luxon.DateTime.now().minus(minus).toUTC().toISO().slice(0, -5);
     }
 
-    params = Object.assign(_DEFAULTS, params);
+    params = Object.assign({}, _DEFAULTS, params);
 
     _this.name = `M ${params.minmagnitude}+ Earthquakes`;
     _this.title = _getTitle(params);
