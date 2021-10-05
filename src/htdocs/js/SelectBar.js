@@ -44,7 +44,7 @@ var SelectBar = function (options) {
     _el = options.el || document.createElement('section');
     _eqid = document.getElementById('eqid');
 
-    // set eqid <input>'s value
+    // Set the Event ID <input>'s value
     _eqid.value = AppUtil.getParam('eqid');
 
     _addListeners();
@@ -64,16 +64,16 @@ var SelectBar = function (options) {
     reset.addEventListener('click', e => {
       var input = _el.querySelector('input');
 
-      input.value = '';
-
       e.preventDefault();
+
+      input.value = '';
 
       _app.NavBar.reset();
       _app.reset();
       _app.setScrollPosition('selectBar'); // scroll to top
     });
 
-    // Show the searchBar when the 'search' link is clicked
+    // Show the SearchBar when the 'search' link is clicked
     search.addEventListener('click', e => {
       e.preventDefault();
 
@@ -101,8 +101,10 @@ var SelectBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Handler for managing a new Mainshock. Triggered when the Event ID <input>
-   * is changed (or manually when the Event ID is changed programmatically).
+   * Handler for creating a new Mainshock - triggered when the Event ID <input>
+   * is changed.
+   *
+   * Note: must be called manually when the Event ID is changed programmatically.
    */
   _this.handleMainshock = function () {
     var id = 'mainshock';
@@ -130,7 +132,7 @@ var SelectBar = function (options) {
 
   /**
    * Check if the current value entered in the Event ID field is valid and
-   * exists.
+   * the earthquake exists in the catalog.
    *
    * @return isValid {Boolean}
    */
@@ -141,7 +143,7 @@ var SelectBar = function (options) {
     isValid = false;
     regex = /^[^/\\:]+$/; // no slashes or colons
 
-    // 404 error is logged if Event ID is not found
+    // 404 error is logged if the Event ID is not found
     if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
       isValid = true;
     }
@@ -153,7 +155,7 @@ var SelectBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    // Get things rolling if an eqid is already set
+    // Get things rolling if an Event ID is already set
     if (AppUtil.getParam('eqid')) {
       _this.handleMainshock();
     }
