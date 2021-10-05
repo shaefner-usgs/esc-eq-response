@@ -42,7 +42,7 @@ var SearchBar = function (options) {
       _getSearchParams,
       _initFlatpickr,
       _initMap,
-      _isValid,
+      _isValidPeriod,
       _setMinutes,
       _setToday,
       _setValidity,
@@ -65,7 +65,7 @@ var SearchBar = function (options) {
       app: _app
     });
 
-    // Set range slider to initial value
+    // Set the initial value of the range slider
     _app.setSliderStyles(_el.querySelector('.slider input'));
 
     _initFlatpickr();
@@ -105,7 +105,7 @@ var SearchBar = function (options) {
       arrow.addEventListener('click', _setMinutes);
     });
 
-    // Show the selected option when the user clicks a nav 'strip' button
+    // Show the selected option when the user clicks a 'nav-strip' button
     buttons.forEach(button => {
       button.addEventListener('click', _showSelected);
     });
@@ -124,7 +124,7 @@ var SearchBar = function (options) {
       var period = _el.querySelector('ul.period .selected').id;
 
       // Check that dates are valid if applicable
-      if (period !== 'customPeriod' || _isValid()) {
+      if (period !== 'customPeriod' || _isValidPeriod()) {
         location.href = '#mapPane';
 
         _this.searchCatalog();
@@ -136,7 +136,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Get the query parameters for a catalog search.
+   * Get the parameters for a catalog search.
    *
    * @return params {Object}
    */
@@ -161,9 +161,8 @@ var SearchBar = function (options) {
     }
 
     if (region === 'customRegion') {
-      // Get the custom region layer's bounds (no other map layers have bounds)
       _map.eachLayer(layer => {
-        if (layer.getBounds) {
+        if (layer.getBounds) { // only the region layer has bounds
           bounds = layer.getBounds();
         }
       });
@@ -180,10 +179,10 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Create the Flatpickr calendar instances.
+   * Create the Flatpickr (date picker) calendar instances.
    */
   _initFlatpickr = function () {
-    var opts = {
+    var opts = { // shared options for begin/end date pickers
       altFormat: 'M j, Y H:i',
       altInput: true,
       dateFormat: 'Y-m-d\\TH:i:S',
@@ -234,16 +233,16 @@ var SearchBar = function (options) {
         Object.assign({}, opts, {
           altInputClass: 'end-alt',
           onOpen: function() {
-            var beginDate,
-                maxDate,
+            var maxDate,
+                minDate,
                 now;
 
-            beginDate = _flatpickrs.begin.selectedDates[0];
             now = new Date();
             maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
+            minDate = _flatpickrs.begin.selectedDates[0];
 
-            this.set('minDate', beginDate);
             this.set('maxDate', maxDate);
+            this.set('minDate', minDate);
             _setToday(this.days);
           },
           position: 'auto right'
@@ -285,7 +284,7 @@ var SearchBar = function (options) {
    *
    * @return isValid {Boolean}
    */
-  _isValid = function () {
+  _isValidPeriod = function () {
     var begin,
         end,
         isValid;
@@ -295,15 +294,15 @@ var SearchBar = function (options) {
     isValid = _setValidity(begin) && _setValidity(end);
 
     if (!isValid) {
-      _setValidity(end); // be certain that invalid end field is flagged
+      _setValidity(end); // be certain that invalid end field is also flagged
     }
 
     return isValid;
   };
 
   /**
-   * Ensure minutes value is a multiple of 5. It gets out of sync (e.g.) when
-   * the max time allowed is not a multiple of 5.
+   * Ensure minutes value is a multiple of 5. It gets out of sync when the max
+   * time allowed is not a multiple of 5.
    */
   _setMinutes = function () {
     var input,
@@ -382,18 +381,16 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Show the selected option for the nav 'strips'.
+   * Show the selected option for the 'nav-strips'.
    */
   _showSelected = function () {
-    var className,
-        customDiv,
+    var customDiv,
         parent,
         regex,
         sibling;
 
     parent = this.parentNode;
-    className = parent.className;
-    customDiv = _el.querySelector('div.' + className);
+    customDiv = _el.querySelector('div.' + parent.className);
     regex = /^custom/;
     sibling = parent.firstElementChild;
 
