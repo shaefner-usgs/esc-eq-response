@@ -24,19 +24,26 @@ L.Control.Editable = L.Control.extend({
   onAdd: function (map) {
     var button,
         container,
+        defaultTitle,
+        divClasses,
         instructions,
         newRegion,
-        region,
-        title;
+        region;
 
-    container = L.DomUtil.create('div', 'leaflet-control-edit leaflet-bar leaflet-control');
+    defaultTitle = 'Create a new custom region';
+    divClasses = [
+      'leaflet-bar',
+      'leaflet-control',
+      'leaflet-control-edit'
+    ];
+    container = L.DomUtil.create('div', divClasses.join(' '));
     button = L.DomUtil.create('a', '', container);
     instructions = document.querySelector('#searchBar .instructions');
     region = this.options.region;
 
     button.href = '#';
     button.innerHTML = '<div class="box"></div>';
-    button.title = 'Create a new custom region';
+    button.title = defaultTitle;
 
     map.on('editable:drawing:commit', e => {
       var classList = e.originalEvent.target.classList;
@@ -47,6 +54,7 @@ L.Control.Editable = L.Control.extend({
         button.classList.remove('selected');
 
         region = newRegion;
+        button.title = defaultTitle;
       }
     });
 
@@ -58,15 +66,14 @@ L.Control.Editable = L.Control.extend({
 
       if (button.classList.contains('selected')) {
         newRegion = map.editTools.startRectangle();
-        title = button.getAttribute('title');
+        button.title = 'Cancel and restore previous region';
 
-        button.setAttribute('title', 'Cancel and restore previous region');
         map.removeLayer(region);
       } else {
         // Recreate cached region Rectangle b/c it loses its dragging ability
         region = L.rectangle(region.getBounds());
+        button.title = defaultTitle;
 
-        button.setAttribute('title', title);
         map.editTools.stopDrawing();
         map.removeLayer(newRegion);
         map.addLayer(region);
