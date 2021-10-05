@@ -32,7 +32,7 @@ ul#significantEqs { /* list */
     border-bottom: 1px solid $border-color-lighter;
     display: flex;
     margin: 0;
-    padding: .5rem 0;
+    padding: .5rem .25rem;
     transition: all $effect-off-duration ease-in;
 
     &:hover {
@@ -40,6 +40,15 @@ ul#significantEqs { /* list */
       color: $text-color-darker;
       cursor: pointer;
       transition: all $effect-on-duration ease-out;
+
+      p {
+        color: $text-color;
+        transition: color $effect-on-duration ease-out;
+      }
+    }
+
+    &:last-child {
+      border: none;
     }
 
     &.selected {
@@ -57,14 +66,21 @@ ul#significantEqs { /* list */
       }
     }
 
-    &:last-child {
-      border: none;
+    > div:first-of-type {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      margin-right: .75rem;
     }
 
-    div:first-of-type { /* mag */
+    .impact-bubble {
+      min-width: 3rem;
+    }
+
+    .mag {
       font-size: 1.25rem;
-      min-width: 4rem;
-      text-align: center;
+      line-height: 1;
+      padding-bottom: .25rem;
     }
   }
 

@@ -64,6 +64,7 @@ var SignificantEqs = function (options) {
         props = feature.properties;
         data = {
           date: Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d, yyyy TT'),
+          mmi: AppUtil.romanize(props.mmi),
           mag: AppUtil.round(props.mag, 1),
           place: props.place
         };
@@ -71,7 +72,12 @@ var SignificantEqs = function (options) {
 
         li.id = feature.id;
         li.innerHTML = L.Util.template(
-          '<div>{mag}</div>' +
+          '<div>' +
+            '<span class="mag">{mag}</span>' +
+            '<span class="impact-bubble mmi{mmi}">' +
+              '<strong class="roman">{mmi}</strong>' +
+            '</span>' +
+          '</div>' +
           '<div>' +
             '<h4>{place}</h4>' +
             '<p>{date} UTC</p>' +
