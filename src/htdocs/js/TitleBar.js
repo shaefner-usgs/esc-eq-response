@@ -37,7 +37,7 @@ var TitleBar = function (options) {
   };
 
   /**
-   * Set the TitleBar's sub title.
+   * Set the TitleBar's subtitle.
    *
    * @param subTitle {String}
    */
@@ -86,7 +86,7 @@ var TitleBar = function (options) {
         _title = opts.title; // cache value
 
         if (!document.body.classList.contains('no-mainshock')) {
-          return; // don't change title if a Mainshock is selected
+          return; // don't change the title if a Mainshock is selected
         }
       }
     }
