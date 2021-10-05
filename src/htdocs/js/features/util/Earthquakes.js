@@ -197,8 +197,9 @@ var Earthquakes = function (options) {
    *
    * @param el {Element}
    * @param eqid {String}
+   * @param layer {L.layer}
    */
-  _addListeners = function(el, eqid) {
+  _addListeners = function(el, eqid, layer) {
     var button,
         input;
 
@@ -207,6 +208,8 @@ var Earthquakes = function (options) {
 
     button.addEventListener('click', () => {
       input.value = eqid;
+
+      layer.closePopup();
 
       // Input event is not triggered when it's changed programmatically
       _app.SelectBar.handleMainshock();
@@ -493,10 +496,11 @@ var Earthquakes = function (options) {
    * Get the Leaflet popup content for a given earthquake.
    *
    * @param eq {Object}
+   * @param layer {L.layer}
    *
    * @return div {Element}
    */
-  _getPopup = function (eq) {
+  _getPopup = function (eq, layer) {
     var bubbles,
         div,
         popup;
@@ -515,7 +519,7 @@ var Earthquakes = function (options) {
     );
     div.innerHTML = popup;
 
-    _addListeners(div, eq.eqid);
+    _addListeners(div, eq.eqid, layer);
 
     return div;
   };
@@ -782,7 +786,7 @@ var Earthquakes = function (options) {
 
     _this.list.push(eq);
 
-    layer.bindPopup(_getPopup(eq), {
+    layer.bindPopup(_getPopup(eq, layer), {
       autoPanPaddingTopLeft: L.point(50, 130),
       autoPanPaddingBottomRight: L.point(50, 50),
       maxWidth: 375,
