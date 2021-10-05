@@ -68,31 +68,31 @@ var SettingsBar = function (options) {
     features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
     fields = _el.querySelectorAll('input');
 
-    // Update Feature when its params are changed
+    // Update a Feature when its params are changed
     features.forEach(feature => {
       feature.addEventListener('input', _refreshFeature);
     });
 
-    // Update queryString when a form field is changed; remember focused field
+    // Update the queryString when a form field is changed
     fields.forEach(field => {
-      field.addEventListener('focus', _saveFocusedField);
+      field.addEventListener('focus', _saveFocusedField); // remember focused field
       field.addEventListener('input', AppUtil.updateParam);
     });
   };
 
   /**
-   * Get the default values for form fields that depend on the selected
-   * Mainshock and combine them with 'static' default values.
+   * Get the default values for form fields that depend on the currently
+   * selected Mainshock and combine them with the 'static' defaults.
    *
    * Default values for distances are based on rupture length, which we estimate
    * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
    * 10km.
    *
    * ruptureArea (A) = 10 ** (M - 4)
-   * ruptureLength (approx) = A ** 0.7
+   * ruptureLength = A ** 0.7 (approx)
    *
-   * Aftershock, Foreshock distance = ruptureLength,
-   * Historical distance = 1.5 * ruptureLength
+   * Aftershock, Foreshock distance = ruptureLength (km, min 5)
+   * Historical distance = 1.5 * ruptureLength (km, min 20)
    *
    * @return {Object}
    */
@@ -115,7 +115,7 @@ var SettingsBar = function (options) {
 
   /**
    * Refresh a Feature. Triggered when a parameter setting for a given Feature
-   * is changed by user.
+   * is changed by the user.
    */
   _refreshFeature = function () {
     var feature,
@@ -184,13 +184,14 @@ var SettingsBar = function (options) {
       // Add/show count if applicable
       if (count && Object.prototype.hasOwnProperty.call(feature, 'count')) {
         count.textContent = feature.count;
+
         count.classList.remove('hide');
       }
     }
   };
 
   /**
-   * Show a 'loader' next to the Feature's name and hide the count value.
+   * Show the 'loader' next to the Feature's name and hide the count value.
    *
    * @param feature {Object}
    */
@@ -239,11 +240,20 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Reset to default state. Note: Feature counts are removed separately via
-   * _this.removeCount().
+   * Reset to default state.
+   *
+   * Note: Feature counts are removed separately via _this.removeCount().
    */
   _this.reset = function () {
-    var inputs = _el.querySelectorAll('input');
+    var inputs,
+        selectors;
+
+    selectors = [
+      '.aftershocks input',
+      '.foreshocks input',
+      '.historical input'
+    ];
+    inputs = _el.querySelectorAll(selectors.join(','));
 
     inputs.forEach(input => {
       input.value = '';
@@ -252,7 +262,7 @@ var SettingsBar = function (options) {
 
   /**
    * Set the default form field values based on the Mainshock's details, which
-   * are overridden by queryString values when present.
+   * are overridden by existing queryString values when present.
    */
   _this.setDefaults = function () {
     var defaults,
