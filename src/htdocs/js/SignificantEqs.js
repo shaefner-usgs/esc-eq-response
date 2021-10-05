@@ -74,7 +74,7 @@ var SignificantEqs = function (options) {
         li.innerHTML = L.Util.template(
           '<div>' +
             '<span class="mag">{mag}</span>' +
-            '<span class="impact-bubble mmi{mmi}">' +
+            '<span class="impact-bubble mmi{mmi}" title="ShakeMap maximum estimated intensity">' +
               '<strong class="roman">{mmi}</strong>' +
             '</span>' +
           '</div>' +
