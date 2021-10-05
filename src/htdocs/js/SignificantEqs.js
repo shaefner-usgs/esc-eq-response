@@ -42,9 +42,9 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Create the SignificantEqs list HTML.
+   * Create the SignificantEqs HTML list.
    *
-   * @param json {Object} default is {}
+   * @param json {Object} optional; default is {}
    *
    * @return list {Element}
    */
@@ -54,18 +54,20 @@ var SignificantEqs = function (options) {
         list,
         props;
 
-    list = document.createElement('h4'); // default
+    // Default
+    list = document.createElement('h4');
     list.innerHTML = 'None';
 
     if (json.features) {
       list = document.createElement('ul');
+      list.id = 'significantEqs';
 
       json.features.forEach(feature => {
         props = feature.properties;
         data = {
           date: Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d, yyyy TT'),
-          mmi: AppUtil.romanize(props.mmi),
           mag: AppUtil.round(props.mag, 1),
+          mmi: AppUtil.romanize(props.mmi),
           place: props.place
         };
         li = document.createElement('li');
@@ -94,8 +96,6 @@ var SignificantEqs = function (options) {
         list.appendChild(li);
       });
     }
-
-    list.id = 'significantEqs';
 
     return list;
   };
@@ -144,6 +144,7 @@ var SignificantEqs = function (options) {
       list = _createList(json);
 
       _el.replaceWith(list);
+
       _el = list;
     });
   };
