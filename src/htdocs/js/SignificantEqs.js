@@ -18,6 +18,7 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *   {
  *     postInit: {Function}
+ *     replaceList: {Function}
  *     reset: {Function}
  *   }
  */
@@ -27,6 +28,7 @@ var SignificantEqs = function (options) {
 
       _app,
       _el,
+      _json,
 
       _createList,
       _selectEq;
@@ -44,11 +46,9 @@ var SignificantEqs = function (options) {
   /**
    * Create the SignificantEqs HTML list.
    *
-   * @param json {Object} optional; default is {}
-   *
    * @return list {Element}
    */
-  _createList = function (json = {}) {
+  _createList = function () {
     var data,
         li,
         list,
@@ -58,11 +58,11 @@ var SignificantEqs = function (options) {
     list = document.createElement('h4');
     list.innerHTML = 'None';
 
-    if (json.features) {
+    if (_json.features) {
       list = document.createElement('ul');
       list.id = 'significantEqs';
 
-      json.features.forEach(feature => {
+      _json.features.forEach(feature => {
         props = feature.properties;
         data = {
           date: Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d, yyyy TT'),
@@ -134,19 +134,27 @@ var SignificantEqs = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    var list;
-
     _app.JsonFeed.fetch({
       id: 'significantEqs',
       name: 'Significant Earthquakes',
       url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
     }).then(json => {
-      list = _createList(json);
+      _json = json; // cache feed data
 
-      _el.replaceWith(list);
-
-      _el = list;
+      _this.replaceList();
     });
+  };
+
+  /**
+   * Show the list of significant earthquakes (replaces the current list or the
+   * loader on initial load).
+   */
+  _this.replaceList = function () {
+    var list = _createList();
+
+    _el.replaceWith(list);
+
+    _el = list;
   };
 
   /**
