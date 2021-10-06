@@ -43,6 +43,7 @@ var SearchBar = function (options) {
       _initFlatpickr,
       _initMap,
       _isValidPeriod,
+      _loadFeed,
       _setMinutes,
       _setToday,
       _setValidity,
@@ -301,6 +302,31 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Fetch the earthquakes and display them on the map.
+   */
+  _loadFeed = function () {
+    _app.JsonFeed.fetch(_search).then(json => {
+      if (json) {
+        _search.create(json);
+        _app.MapPane.addLayer(_search);
+        _app.TitleBar.setTitle({
+          title: _search.title,
+          type: 'search'
+        });
+      } else {
+        _app.MapPane.removeFeature(_search);
+      }
+    }).catch(error => {
+      _app.StatusBar.addError({
+        id: _search.id,
+        message: `<h4>Error Adding ${_search.name}</h4><ul><li>${error}</li></ul>`
+      });
+
+      console.error(error);
+    });
+  };
+
+  /**
    * Ensure minutes value is a multiple of 5. It gets out of sync when the max
    * time allowed is not a multiple of 5.
    */
@@ -454,7 +480,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Search the earthquake catalog and display the results on the map.
+   * Search the earthquake catalog.
    */
   _this.searchCatalog = function () {
     var control,
@@ -472,26 +498,7 @@ var SearchBar = function (options) {
     _search.reset();
     _search.setFeedUrl(params);
     _app.MapPane.addLoader(_search);
-
-    _app.JsonFeed.fetch(_search).then(json => {
-      if (json) {
-        _search.create(json);
-        _app.MapPane.addLayer(_search);
-        _app.TitleBar.setTitle({
-          title: _search.title,
-          type: 'search'
-        });
-      } else {
-        _app.MapPane.removeFeature(_search);
-      }
-    }).catch(error => {
-      _app.StatusBar.addError({
-        id: _search.id,
-        message: `<h4>Error Adding ${_search.name}</h4><ul><li>${error}</li></ul>`
-      });
-
-      console.error(error);
-    });
+    _loadFeed();
   };
 
 
