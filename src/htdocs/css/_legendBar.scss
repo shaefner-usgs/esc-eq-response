@@ -37,9 +37,10 @@
   }
   .aftershocks {
     ul {
-      color: $text-color-lighter;
+      color: $text-color-darker;
       font-family: $font-family;
       font-weight: 300;
+      letter-spacing: 0.015rem;
       margin-top: .25rem;
     }
   }
