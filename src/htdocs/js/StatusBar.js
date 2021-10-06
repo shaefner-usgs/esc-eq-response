@@ -74,6 +74,8 @@ var StatusBar = function (options) {
 
         if (id === 'search') {
           _app.SearchBar.searchCatalog();
+        } else if (id === 'significantEqs') {
+          _app.SignificantEqs.loadFeed();
         } else { // Feature
           _app.Features.createFeature(id);
         }
@@ -161,14 +163,20 @@ var StatusBar = function (options) {
     var content,
         div,
         isFeature,
-        isSearch;
+        isSearch,
+        isSignificantEqs;
 
     content = error.message;
     div = document.createElement('div');
     isFeature = _app.Features.isFeature(error.id);
     isSearch = (error.id === 'search' ? true : false);
+    isSignificantEqs = (error.id === 'significantEqs' ? true : false);
 
-    if ((isFeature || isSearch) && error.status !== 400 && error.status !== 404) {
+    if (
+      (isFeature || isSearch || isSignificantEqs) &&
+      error.status !== 400 &&
+      error.status !== 404
+    ) {
       content += '<a href="#" class="reload"></a>';
     }
 
