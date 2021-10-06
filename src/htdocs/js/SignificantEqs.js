@@ -42,6 +42,7 @@ var SignificantEqs = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('div');
+    _json = {};
   };
 
   /**
