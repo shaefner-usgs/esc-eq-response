@@ -258,7 +258,7 @@ var Earthquakes = function (options) {
 
     if (data.cdi) { // DYFI
       bubbles.dyfi = L.Util.template(
-        '<a href="{url}/dyfi" class="impact-bubble mmi{cdi}" ' +
+        '<a href="{url}/dyfi" class="impact-bubble mmi{cdi}" target="new" ' +
           'title="Maximum reported intensity ({felt} responses)">' +
           '<strong class="roman">{cdi}</strong>' +
           '<abbr title="Did You Feel It?">DYFI?</abbr>' +
@@ -268,7 +268,7 @@ var Earthquakes = function (options) {
 
     if (data.mmi) { // ShakeMap
       bubbles.shakemap = L.Util.template(
-        '<a href="{url}/shakemap" class="impact-bubble mmi{mmi}" ' +
+        '<a href="{url}/shakemap" class="impact-bubble mmi{mmi}" target="new" ' +
           'title="Maximum estimated intensity">' +
           '<strong class="roman">{mmi}</strong>' +
           '<abbr title="ShakeMap">ShakeMap</abbr>' +
@@ -279,7 +279,7 @@ var Earthquakes = function (options) {
     if (data.alert) { // PAGER
       bubbles.pager = L.Util.template(
         '<a href="{url}/pager" class="impact-bubble pager-alertlevel-{alert}" ' +
-          'title="Estimated impact alert level">' +
+          'target="new" title="Estimated impact alert level">' +
           '<strong class="roman">{alert}</strong>' +
           '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
         '</a>', data
@@ -289,7 +289,7 @@ var Earthquakes = function (options) {
     if (data.tsunami) {
       bubbles.tsunami = L.Util.template(
         '<a href="http://www.tsunami.gov/" class="impact-bubble tsunami" ' +
-          'title="Tsunami Warning Center">' +
+          'target="new" title="Tsunami Warning Center">' +
           '<span class="hover"></span>' +
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
         '</a>', data
