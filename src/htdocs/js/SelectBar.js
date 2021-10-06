@@ -68,6 +68,7 @@ var SelectBar = function (options) {
 
       input.value = '';
 
+      _app.MapPane.showSearchLayer();
       _app.NavBar.reset();
       _app.reset();
       _app.setScrollPosition('selectBar'); // scroll to top

@@ -42,6 +42,7 @@ require('leaflet/ZoomCenter');
  *     render: {Function}
  *     reset: {Function}
  *     shiftMap: {Function}
+ *     showSearchLayer: {Function}
  *   }
  */
 var MapPane = function (options) {
@@ -585,6 +586,15 @@ var MapPane = function (options) {
     }
 
     _map.panBy([x, 0]);
+  };
+
+  /**
+   * Turn on the search layer.
+   */
+  _this.showSearchLayer = function () {
+    var layerName = Object.keys(_staticLayers.search)[0];
+
+    _map.addLayer(_staticLayers.search[layerName]);
   };
 
 
