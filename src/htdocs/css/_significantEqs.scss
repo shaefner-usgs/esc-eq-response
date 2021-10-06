@@ -33,7 +33,7 @@ ul#significantEqs { /* list */
     display: flex;
     margin: 0;
     padding: .5rem .25rem;
-    transition: all $effect-off-duration ease-in;
+    transition: all $effect-off-duration + .15s ease-in;
 
     &:hover {
       background: $accent-color-lightest;
