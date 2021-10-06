@@ -94,7 +94,10 @@ var TitleBar = function (options) {
     docTitle = title + ' | ' + appName;
 
     if (opts.url) {
-      title = `<a href="${opts.url}" target="new">${title}<i class="icon-link"></i></a>`;
+      title = '' +
+        `<a href="${opts.url}" target="new" title="USGS Event Page">` +
+          `${title}<i class="icon-link"></i>` +
+        '</a>';
     }
 
     h1.innerHTML = title;
