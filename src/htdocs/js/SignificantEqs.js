@@ -17,6 +17,7 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
+ *     loadFeed: {Function}
  *     postInit: {Function}
  *     replaceList: {Function}
  *     reset: {Function}
@@ -131,9 +132,9 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Initialization that depends on other Classes being ready before running.
+   * Load the feed data and display the list of earthquakes.
    */
-  _this.postInit = function () {
+  _this.loadFeed = function () {
     _app.JsonFeed.fetch({
       id: 'significantEqs',
       name: 'Significant Earthquakes',
@@ -143,6 +144,13 @@ var SignificantEqs = function (options) {
 
       _this.replaceList();
     });
+  };
+
+  /**
+   * Initialization that depends on other Classes being ready before running.
+   */
+  _this.postInit = function () {
+    _this.loadFeed();
   };
 
   /**
