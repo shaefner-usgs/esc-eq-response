@@ -592,9 +592,13 @@ var MapPane = function (options) {
    * Turn on the search layer.
    */
   _this.showSearchLayer = function () {
-    var layerName = Object.keys(_staticLayers.search)[0];
+    var layerName;
 
-    _map.addLayer(_staticLayers.search[layerName]);
+    if (_staticLayers.search) {
+      layerName = Object.keys(_staticLayers.search)[0];
+
+      _map.addLayer(_staticLayers.search[layerName]);
+    }
   };
 
 
