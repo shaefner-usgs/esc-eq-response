@@ -144,6 +144,12 @@ var Mainshock = function (options) {
   _getBubbles = function (data) {
     var bubbles = '';
 
+    data.plural = 's';
+
+    if (Number(data.felt) === 1) {
+      data.plural = '';
+    }
+
     if (data.cdi) {
       bubbles +=
         '<li>' +
@@ -151,7 +157,7 @@ var Mainshock = function (options) {
             '<abbr title="Did You Feel It?">DYFI?</abbr>' +
           '</strong>' +
           '{dyfiBubble}' +
-          '<small>{felt} responses</small>' +
+          '<small>{felt} response{plural}</small>' +
         '</li>';
     }
 
