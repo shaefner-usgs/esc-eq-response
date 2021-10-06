@@ -405,17 +405,21 @@ var MapPane = function (options) {
    *     Feature or catalog search results
    */
   _this.addLayer = function (item) {
-    var placeholder = _placeholders[item.id]; // name and 'loader' in layer control
+    var name,
+        placeholder;
+
+    name = item.name;
+    placeholder = _placeholders[item.id]; // name and 'loader' in layer control
 
     item.mapLayer.id = item.id; // need access to Item's id from Leaflet layer
 
     if (Object.prototype.hasOwnProperty.call(item, 'count')) {
-      item.name += '<span class="count">' + item.count + '</span>';
+      name += '<span class="count">' + item.count + '</span>';
     }
 
     if (item.id === 'search') {
       _staticLayers.search = {};
-      _staticLayers.search[item.name] = item.mapLayer;
+      _staticLayers.search[name] = item.mapLayer;
 
       if (document.body.classList.contains('no-mainshock')) {
         _setView();
@@ -430,7 +434,7 @@ var MapPane = function (options) {
       _createPane(item.id, 'overlayPane');
     }
 
-    _layerControl.addOverlay(item.mapLayer, item.name);
+    _layerControl.addOverlay(item.mapLayer, name);
 
     if (item.showLayer) {
       _map.addLayer(item.mapLayer);
