@@ -94,7 +94,7 @@ var SelectBar = function (options) {
 
       AppUtil.setParam('eqid', _eqid.value);
       _app.Features.createFeature('mainshock');
-      _app.SignificantEqs.replaceList();
+      _app.SignificantEqs.replaceList(); // select Mainshock if it exists
     }
   };
 
