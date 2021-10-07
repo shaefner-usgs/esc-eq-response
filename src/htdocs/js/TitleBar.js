@@ -85,7 +85,7 @@ var TitleBar = function (options) {
       if (opts.type === 'search') {
         _title = opts.title; // cache value
 
-        if (!document.body.classList.contains('no-mainshock')) {
+        if (document.body.classList.contains('mainshock')) {
           return; // don't change the title if a Mainshock is selected
         }
       }

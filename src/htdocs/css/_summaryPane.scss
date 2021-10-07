@@ -14,7 +14,7 @@
   #updated {
     background: #f8f8f8;
     border-top: 1px solid $border-color;
-    display: block;
+    display: none;
     margin-top: 2rem;
     padding: 1rem var(--padding-gutter);
 
@@ -35,5 +35,11 @@
   }
   .historical {
     order: 3;
+  }
+}
+
+body.mainshock {
+  #updated {
+    display: block !important;
   }
 }

@@ -95,17 +95,20 @@ var Features = function (options) {
       _app.SettingsBar.addCount(feature);
       _app.SummaryPane.addFeature(feature);
 
-      if (status === 'complete') {
-        _this.getFeature('mainshock').enableButton();
-      }
-
       if (feature.id === 'mainshock') {
         feature.addListener();
         _app.SelectBar.showMainshock();
         _app.SettingsBar.setDefaults();
+        _app.SignificantEqs.replaceList(); // select the Mainshock if it exists
+
+        document.body.classList.add('mainshock');
 
         // Create the other Features now that the Mainshock is ready
         _createFeatures();
+      }
+
+      if (status === 'complete') {
+        _this.getFeature('mainshock').enableButton();
       }
     } catch (error) {
       _app.StatusBar.addError({
@@ -251,7 +254,7 @@ var Features = function (options) {
       });
     }
 
-    document.body.classList.add('no-mainshock');
+    document.body.classList.remove('mainshock');
   };
 
   /**

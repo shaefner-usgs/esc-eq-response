@@ -156,7 +156,7 @@ var StatusBar = function (options) {
    *   {
    *     id: {String} Feature id
    *     message: {String} error message
-   *     status: {Number} optional; status code
+   *     status: {Number|String} optional; status code or 'invalid'
    *   }
    */
   _this.addError = function (error) {
@@ -175,7 +175,8 @@ var StatusBar = function (options) {
     if (
       (isFeature || isSearch || isSignificantEqs) &&
       error.status !== 400 &&
-      error.status !== 404
+      error.status !== 404 &&
+      error.status !== 'invalid'
     ) {
       content += '<a href="#" class="reload"></a>';
     }

@@ -422,7 +422,7 @@ var MapPane = function (options) {
       _staticLayers.search = {};
       _staticLayers.search[name] = item.mapLayer;
 
-      if (document.body.classList.contains('no-mainshock')) {
+      if (!document.body.classList.contains('mainshock')) {
         _setView();
       }
     }

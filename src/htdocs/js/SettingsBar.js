@@ -121,7 +121,7 @@ var SettingsBar = function (options) {
     var feature,
         id;
 
-    if (_app.SelectBar.isEqidValid()) {
+    if (document.body.classList.contains('mainshock')) {
       id = this.className; // css class of form field's parent container
       feature = _app.Features.getFeature(id);
 

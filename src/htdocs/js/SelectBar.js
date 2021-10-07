@@ -17,7 +17,6 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *   {
  *     handleMainshock: {Function}
- *     isEqidValid: {Function}
  *     postInit: {Function}
  *     reset: {Function}
  *     showMainshock: {Function}
@@ -32,7 +31,8 @@ var SelectBar = function (options) {
       _eqid,
 
       _addListeners,
-      _createMainshock;
+      _createMainshock,
+      _isEqidValid;
 
 
   _this = {};
@@ -89,13 +89,43 @@ var SelectBar = function (options) {
    * Create a new Mainshock (which subsequently creates all other Features).
    */
   _createMainshock = function () {
-    if (_this.isEqidValid()) {
-      document.body.classList.remove('no-mainshock');
+    var message;
 
+    if (_isEqidValid()) {
       AppUtil.setParam('eqid', _eqid.value);
       _app.Features.createFeature('mainshock');
-      _app.SignificantEqs.replaceList(); // select Mainshock if it exists
+    } else {
+      message = '' +
+        '<h4>Error Loading Mainshock</h4>' +
+        '<ul>' +
+          `<li>Event ID (${_eqid.value}) is invalid</li>` +
+        '</ul>';
+
+      _app.StatusBar.addError({
+        id: 'mainshock',
+        message: message,
+        status: 'invalid'
+      });
     }
+  };
+
+  /**
+   * Check if the current value entered in the Event ID field is valid.
+   *
+   * @return isValid {Boolean}
+   */
+  _isEqidValid = function () {
+    var isValid,
+        regex;
+
+    isValid = false;
+    regex = /^[^/\\:]+$/; // no slashes or colons
+
+    if (regex.test(_eqid.value)) {
+      isValid = true;
+    }
+
+    return isValid;
   };
 
   // ----------------------------------------------------------
@@ -130,27 +160,6 @@ var SelectBar = function (options) {
         }, 500)
       );
     }
-  };
-
-  /**
-   * Check if the current value entered in the Event ID field is valid and
-   * the earthquake exists in the catalog.
-   *
-   * @return isValid {Boolean}
-   */
-  _this.isEqidValid = function () {
-    var isValid,
-        regex;
-
-    isValid = false;
-    regex = /^[^/\\:]+$/; // no slashes or colons
-
-    // 404 error is logged if the Event ID is not found
-    if (regex.test(_eqid.value) && !_app.StatusBar.hasError('mainshock')) {
-      isValid = true;
-    }
-
-    return isValid;
   };
 
   /**
