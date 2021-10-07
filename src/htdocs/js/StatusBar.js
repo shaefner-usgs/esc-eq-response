@@ -156,7 +156,7 @@ var StatusBar = function (options) {
    *   {
    *     id: {String} Feature id
    *     message: {String} error message
-   *     status: {Number|String} optional; status code or 'timeout'
+   *     status: {Number} optional; status code
    *   }
    */
   _this.addError = function (error) {

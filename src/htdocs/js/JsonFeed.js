@@ -128,7 +128,7 @@ var JsonFeed = function (options) {
       _app.StatusBar.addError({
         id: opts.id,
         message: errorMsg,
-        status: response.status || 'timeout'
+        status: response.status
       });
 
       console.error(error);
