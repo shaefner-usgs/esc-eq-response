@@ -23,6 +23,7 @@ var TitleBar = function (options) {
       _subTitle,
       _title,
 
+      _repaint,
       _setSubTitle;
 
 
@@ -34,6 +35,17 @@ var TitleBar = function (options) {
     _el = options.el;
     _subTitle = _el.querySelector('p').innerText;
     _title = document.title;
+  };
+
+  /**
+   * "Repaint" to fix a rendering bug in Safari 15.
+   *
+   * @param el {Element}
+   */
+  _repaint = function (el) {
+    el.style.display='none';
+    el.offsetHeight;
+    el.style.display='block';
   };
 
   /**
@@ -103,6 +115,7 @@ var TitleBar = function (options) {
     h1.innerHTML = title;
     document.title = docTitle;
 
+    _repaint(h1);
     _setSubTitle(opts.htmlTime || '');
   };
 
