@@ -242,7 +242,7 @@ input[type="number"] {
   }
 
   ~ output {
-    background: $bg-color;
+    background: none;
     color: $text-color;
     display: block;
     left: .5 * $thumb-d;
