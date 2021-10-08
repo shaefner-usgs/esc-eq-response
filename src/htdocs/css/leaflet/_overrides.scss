@@ -48,7 +48,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-control-edit a,
   .leaflet-control-layers,
   .leaflet-control-zoom a {
-    background: rgba(255, 255, 255, .95);
+    background: $bg-color-alpha;
   }
   .leaflet-control-edit a,
   .leaflet-control-zoom a {
