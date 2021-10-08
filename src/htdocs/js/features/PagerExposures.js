@@ -137,7 +137,7 @@ var PagerExposures = function (options) {
         '<h4><a href="{url}">Population Exposure</a></h4>' +
         '<table>' +
           '<tr>' +
-            '<th>MMI</th><th>Shaking / Selected Cities</th><th>Population</th>' +
+            '<th>MMI</th><th>Selected Cities</th><th>Population</th>' +
           '<tr>' +
           '{rows}' +
         '</table>',
