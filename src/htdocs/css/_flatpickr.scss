@@ -121,7 +121,7 @@
     border-color: $accent-color-lighter !important;
 
     .flatpickr-am-pm {
-      border-radius: 0 0 $button-border-radius + 2px 0;
+      border-radius: 0 0 $button-border-radius + 1 0;
       color: $text-color;
 
       &:focus {
@@ -130,15 +130,24 @@
       &:hover {
         background: $accent-color-lightest;
       }
+      &:active {
+        background: $accent-color;
+        border-radius: 0;
+        color: $bg-color;
+      }
+    }
+
+    .flatpickr-hour {
+      border-radius: 0 0 0 $button-border-radius + 2px;
+      font-weight: normal;
+    }
+
+    .flatpickr-minute {
+      border-radius: 0;
     }
 
     .numInputWrapper:first-child {
       border-radius: 0 0 0 $button-border-radius + 2px;
-
-      .flatpickr-hour {
-        border-radius: 0 0 0 $button-border-radius + 2px;
-        font-weight: normal;
-      }
     }
   }
 
