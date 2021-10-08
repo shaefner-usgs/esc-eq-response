@@ -1,41 +1,7 @@
 @use 'variables' as *;
 
-body.sidebar {
-  #plotsPane,
-  #summaryPane {
-    margin-right: $sidebar-width;
-  }
-
-  #selectPane {
-    padding-right: $sidebar-width;
-  }
-
-  #sideBar {
-    border-left: 1px solid $border-color;
-    margin-right: 0;
-
-    .icon-close {
-      right: 1rem;
-      z-index: 10000;
-    }
-  }
-
-  .leaflet-center {
-    padding-right: $sidebar-width;
-  }
-
-  .leaflet-right {
-    .leaflet-control-attribution {
-      margin-right: $sidebar-width;
-    }
-    .leaflet-control-layers {
-      margin-right: $sidebar-width + 10px;
-    }
-  }
-}
-
 #sideBar {
-  background: $bg-color;
+  background: $bg-color-alpha;
   bottom: 0;
   margin-right: $sidebar-width * -1;
   overflow: scroll;
@@ -85,5 +51,39 @@ body.sidebar {
     right: $sidebar-width * -1;
     top: 8rem;
     transition: right $sidebar-toggle-duration ease;
+  }
+}
+
+body.sidebar {
+  #plotsPane,
+  #summaryPane {
+    margin-right: $sidebar-width;
+  }
+
+  #selectPane {
+    padding-right: $sidebar-width;
+  }
+
+  #sideBar {
+    border-left: 1px solid $border-color;
+    margin-right: 0;
+
+    .icon-close {
+      right: 1rem;
+      z-index: 10000;
+    }
+  }
+
+  .leaflet-center {
+    padding-right: $sidebar-width;
+  }
+
+  .leaflet-right {
+    .leaflet-control-attribution {
+      margin-right: $sidebar-width;
+    }
+    .leaflet-control-layers {
+      margin-right: $sidebar-width + 10px;
+    }
   }
 }
