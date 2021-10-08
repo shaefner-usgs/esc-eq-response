@@ -25,7 +25,7 @@
 
       &:before {
         background: rgba(19, 173, 16, 0.8);
-        border: 1px solid rgba(19, 173, 16);
+        border: 2px solid #42e43f;
         border-radius: 50%;
         color: $bg-color;
         content: counter(item);
@@ -33,7 +33,7 @@
         height: 1.75rem;
         left: 0;
         line-height: 1;
-        padding-top: .3rem;
+        padding-top: .25rem;
         position: absolute;
         text-align: center;
         top: 0;
