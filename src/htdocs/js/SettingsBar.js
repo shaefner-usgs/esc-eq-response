@@ -78,6 +78,15 @@ var SettingsBar = function (options) {
       field.addEventListener('focus', _saveFocusedField); // remember focused field
       field.addEventListener('input', AppUtil.updateParam);
     });
+
+    // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
+    window.addEventListener('pageshow', () => {
+      if (document.body.classList.contains('mainshock')) {
+        setTimeout(() => {
+          _this.setDefaults();
+        }, 25); // slight delay so browser doesn't wipe out new values
+      }
+    });
   };
 
   /**
