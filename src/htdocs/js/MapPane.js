@@ -330,7 +330,7 @@ var MapPane = function (options) {
   /**
    * Set the map extent to contain an L.LatLngBounds instance.
    *
-   * Note: _bounds can be passed to include all Features that have the
+   * Note: setting bounds to _bounds will include all Features that have their
    *       'zoomToLayer' property set to true.
    *
    * @param bounds {L.bounds} default is _defaultBounds
