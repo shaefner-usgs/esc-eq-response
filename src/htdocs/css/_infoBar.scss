@@ -24,19 +24,20 @@
       position: relative;
 
       &:before {
-        background: #13ad10;
+        background: rgba(19, 173, 16, 0.8);
+        border: 1px solid rgba(19, 173, 16);
         border-radius: 50%;
         color: $bg-color;
         content: counter(item);
-        font-size: 1.15rem;
-        height: 1.7rem;
+        font: bold 1rem "Open Sans";
+        height: 1.75rem;
         left: 0;
         line-height: 1;
         padding-top: .3rem;
         position: absolute;
         text-align: center;
         top: 0;
-        width: 1.7rem;
+        width: 1.75rem;
       }
     }
   }
