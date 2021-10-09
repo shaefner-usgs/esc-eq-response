@@ -1,109 +1,111 @@
 @use '../variables' as *;
 
-.station-channels-map {
-  td,
-  th {
-    padding-left: .5rem;
-    padding-right: .5rem;
-    text-align: center;
+#mapPane {
+  .station-channels-map {
+    td,
+    th {
+      padding-left: .5rem;
+      padding-right: .5rem;
+      text-align: center;
+    }
+
+    tr {
+      white-space: nowrap;
+    }
+
+    .station-channel-name {
+      border-color: $border-color-lighter;
+    }
   }
 
-  tr {
-    white-space: nowrap;
-  }
-
-  .station-channel-name {
-    border-color: $border-color-lighter;
-  }
-}
-
-.station-layer-icon {
-  opacity: 0.85;
-  position: absolute;
-
-  &:after {
-    border: 12px solid transparent;
-    border-bottom-color: rgba(0, 0, 0, .6);
-    border-left-width: 8px;
-    border-right-width: 8px;
-    content: ' ';
-    display: block;
-    left: -1px;
+  .station-layer-icon {
+    opacity: 0.85;
     position: absolute;
-    top: -13px;
-    z-index: 1;
+
+    &:after {
+      border: 12px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, .6);
+      border-left-width: 8px;
+      border-right-width: 8px;
+      content: ' ';
+      display: block;
+      left: -1px;
+      position: absolute;
+      top: -13px;
+      z-index: 1;
+    }
+    &:before {
+      border: 10px solid transparent;
+      border-left-width: 6px;
+      border-right-width: 6px;
+      content: ' ';
+      display: block;
+      left: 1px;
+      position: absolute;
+      top: -10px;
+      z-index: 2;
+    }
   }
-  &:before {
-    border: 10px solid transparent;
-    border-left-width: 6px;
-    border-right-width: 6px;
-    content: ' ';
-    display: block;
-    left: 1px;
-    position: absolute;
-    top: -10px;
-    z-index: 2;
+
+  /* Leaflet marker colors */
+  .station-mmiI:before {
+    border-bottom-color: $mmiI-color;
   }
-}
+  .station-mmiII:before {
+    border-bottom-color: $mmiII-color;
+  }
+  .station-mmiIII:before {
+    border-bottom-color: $mmiIII-color;
+  }
+  .station-mmiIV:before {
+    border-bottom-color: $mmiIV-color;
+  }
+  .station-mmiV:before {
+    border-bottom-color: $mmiV-color;
+  }
+  .station-mmiVI:before {
+    border-bottom-color: $mmiVI-color;
+  }
+  .station-mmiVII:before {
+    border-bottom-color: $mmiVII-color;
+  }
+  .station-mmiVIII:before {
+    border-bottom-color: $mmiVIII-color;
+  }
+  .station-mmiIX:before {
+    border-bottom-color: $mmiIX-color;
+  }
+  .station-mmiX:before {
+    border-bottom-color: $mmiX-color;
+  }
+  .station-mmiXI:before {
+    border-bottom-color: $mmiXI-color;
+  }
+  .station-mmiXII:before {
+    border-bottom-color: $mmiXII-color;
+  }
 
-/* Leaflet marker colors */
-.station-mmiI:before {
-  border-bottom-color: $mmiI-color;
-}
-.station-mmiII:before {
-  border-bottom-color: $mmiII-color;
-}
-.station-mmiIII:before {
-  border-bottom-color: $mmiIII-color;
-}
-.station-mmiIV:before {
-  border-bottom-color: $mmiIV-color;
-}
-.station-mmiV:before {
-  border-bottom-color: $mmiV-color;
-}
-.station-mmiVI:before {
-  border-bottom-color: $mmiVI-color;
-}
-.station-mmiVII:before {
-  border-bottom-color: $mmiVII-color;
-}
-.station-mmiVIII:before {
-  border-bottom-color: $mmiVIII-color;
-}
-.station-mmiIX:before {
-  border-bottom-color: $mmiIX-color;
-}
-.station-mmiX:before {
-  border-bottom-color: $mmiX-color;
-}
-.station-mmiXI:before {
-  border-bottom-color: $mmiXI-color;
-}
-.station-mmiXII:before {
-  border-bottom-color: $mmiXII-color;
-}
+  .station-summary {
+    display: flex;
+    list-style: none;
+    margin: 1rem 0;
+    padding: 0;
 
-.station-summary {
-  display: flex;
-  list-style: none;
-  margin: 1rem 0;
-  padding: 0;
+    li {
+      width: 25%;
 
-  li {
-    width: 25%;
+      &:not(.impact-bubble) {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        line-height: 1rem;
+        padding: .25rem 0;
 
-    &:not(.impact-bubble) {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      line-height: 1rem;
-      padding: .25rem 0;
-
-      abbr {
-        color: $text-color-lightest;
-        font-size: .6875rem;
-        margin-top: .15rem;
+        abbr {
+          color: $text-color-lightest;
+          font-size: .6875rem;
+          margin-top: .15rem;
+        }
       }
     }
   }
