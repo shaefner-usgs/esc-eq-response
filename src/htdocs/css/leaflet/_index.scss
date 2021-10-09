@@ -1,9 +1,11 @@
 @use '../mixins' as *;
+@use '../variables' as *;
 @use 'bottomCenter';
 @use 'editable';
 @use 'mousePosition';
 @use 'overrides';
 
+.earthquake, /* Earthquake details on SelectBar */
 .leaflet-popup-content {
   dd,
   dt {

@@ -182,8 +182,7 @@
   }
 }
 
-/* Earthquake details in map popups and the SelectBar. Some styles are also
-   applied to other (i.e. non-eq) Leaflet popups. */
+/* Earthquake details in map popups and the SelectBar. */
 .earthquake {
   &.mainshock,
   &.search {
