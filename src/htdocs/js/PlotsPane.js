@@ -32,8 +32,8 @@ var PlotsPane = function (options) {
       _initialize,
 
       _app,
+      _contentEl,
       _el,
-      _featuresEl,
       _plots,
 
       _addCount,
@@ -54,7 +54,7 @@ var PlotsPane = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _featuresEl = _el.querySelector('.features');
+    _contentEl = _el.querySelector('.content');
     _plots = {};
 
     _this.rendered = false;
@@ -144,7 +144,7 @@ var PlotsPane = function (options) {
       hypocenters: '3D Hypocenters',
       magtime: 'Magnitude vs. Time'
     };
-    parent = _featuresEl.querySelector('.' + featureId);
+    parent = _contentEl.querySelector('.' + featureId);
 
     h3.innerHTML = names[plotId];
 
@@ -456,9 +456,9 @@ var PlotsPane = function (options) {
       div.innerHTML = '<h2>' + feature.name + '<span class="breather">' +
         '<span></span></span></h2>';
 
-      div.classList.add('content', 'feature', feature.id);
+      div.classList.add('feature', feature.id);
 
-      _featuresEl.appendChild(div);
+      _contentEl.appendChild(div);
     }
   };
 
@@ -552,7 +552,7 @@ var PlotsPane = function (options) {
   _this.reset = function () {
     _plots = {};
 
-    _featuresEl.innerHTML = '';
+    _contentEl.innerHTML = '';
     _this.rendered = false;
   };
 

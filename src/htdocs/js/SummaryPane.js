@@ -30,8 +30,8 @@ var SummaryPane = function (options) {
       _initialize,
 
       _app,
+      _contentEl,
       _el,
-      _featuresEl,
       _filterProps,
       _tz,
 
@@ -56,7 +56,7 @@ var SummaryPane = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _featuresEl = _el.querySelector('.features');
+    _contentEl = _el.querySelector('.content');
     _filterProps = {};
     _tz = AppUtil.getTimeZone();
   };
@@ -437,9 +437,9 @@ var SummaryPane = function (options) {
       div.innerHTML = '<h2>' + feature.name + '<span class="breather">' +
         '<span></span></span></h2>';
 
-      div.classList.add('content', 'feature', feature.id);
+      div.classList.add('feature', feature.id);
 
-      _featuresEl.appendChild(div);
+      _contentEl.appendChild(div);
     }
   };
 
@@ -465,7 +465,7 @@ var SummaryPane = function (options) {
     var time = _el.querySelector('time');
 
     time.innerHTML = '';
-    _featuresEl.innerHTML = '';
+    _contentEl.innerHTML = '';
   };
 
 
