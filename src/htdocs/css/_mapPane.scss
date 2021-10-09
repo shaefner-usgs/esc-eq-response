@@ -11,9 +11,6 @@
   canvas {
     width: 40px;
   }
-  > canvas { /* beachball that is turned off in layer controller */
-    display: none;
-  }
 
   .breather { /* loader */
     width: 1.5em;
@@ -23,6 +20,10 @@
       top: -.75em;
       width: .9em;
     }
+  }
+
+  .content { /* contains beachballs that are turned off in layer controller */
+    display: none;
   }
 
   /*

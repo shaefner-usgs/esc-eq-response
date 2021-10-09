@@ -111,7 +111,7 @@ var FocalMechanism = function (options) {
       });
 
       // Render beachball (hidden by default) for use by CanvasMarker
-      beachball.render(document.getElementById('mapPane'));
+      beachball.render(document.querySelector('#mapPane .content'));
 
       mapLayer = L.marker.canvas(coords, {
         icon: L.divIcon({

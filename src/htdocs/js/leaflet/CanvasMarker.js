@@ -21,7 +21,7 @@ L.Marker.Canvas = L.Marker.extend({
         marker;
 
     className = this.id;
-    canvas = document.querySelector('#mapPane > canvas.' + className);
+    canvas = document.querySelector('#mapPane canvas.' + className);
 
     L.Marker.prototype.onAdd.call(this, map);
 
@@ -35,14 +35,14 @@ L.Marker.Canvas = L.Marker.extend({
   onRemove: function (map) {
     var canvas,
         className,
-        mapPane;
+        contentEl;
 
     className = this.options.icon.options.className;
     canvas = document.querySelector('.map canvas.' + className);
-    mapPane = document.getElementById('mapPane');
+    contentEl = document.querySelector('#mapPane .content');
 
     if (canvas) {
-      mapPane.appendChild(canvas); // put <canvas> back
+      contentEl.appendChild(canvas); // put <canvas> back
     }
 
     L.Marker.prototype.onRemove.call(this, map);

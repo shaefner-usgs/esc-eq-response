@@ -554,7 +554,7 @@ var MapPane = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var canvasEls = document.querySelectorAll('#mapPane > canvas');
+    var canvasEls = document.querySelectorAll('#mapPane .content canvas');
 
     _bounds = L.latLngBounds();
     _initialView = true;
@@ -562,7 +562,7 @@ var MapPane = function (options) {
 
     // Purge canvas elements (FM, MT beachballs)
     canvasEls.forEach(el => {
-      _el.removeChild(el);
+      el.remove();
     });
 
     // Reset layer controller
