@@ -1,4 +1,3 @@
-@use '../mixins' as *;
 @use '../variables' as *;
 
 #plotsPane {
@@ -185,8 +184,7 @@
 
 /* Earthquake details in map popups and the SelectBar. Some styles are also
    applied to other (i.e. non-eq) Leaflet popups. */
-.earthquake,
-.leaflet-popup-content {
+.earthquake {
   &.mainshock,
   &.search {
     .distance {
@@ -212,29 +210,6 @@
     padding-top: 2px;
     position: absolute;
     right: -.5rem;
-  }
-
-  dd,
-  dt {
-    line-height: 1.7;
-  }
-  dd {
-    color: $text-color;
-  }
-  dt {
-    @include labels;
-
-    clear: left;
-    display: block;
-    float: left;
-    line-height: 1.75; /* accommodate smaller font-size of labels */
-    margin-right: .5rem;
-    text-align: right;
-    width: 6rem;
-  }
-
-  dl {
-    margin-bottom: 0;
   }
 
   time {
