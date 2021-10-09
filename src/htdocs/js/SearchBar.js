@@ -39,6 +39,7 @@ var SearchBar = function (options) {
 
       _addControl,
       _addListeners,
+      _checkControl,
       _getSearchParams,
       _initFlatpickr,
       _initMap,
@@ -128,12 +129,24 @@ var SearchBar = function (options) {
       if (period !== 'customPeriod' || _isValidPeriod()) {
         location.href = '#mapPane';
 
+        _checkControl();
         _this.searchCatalog();
       }
     });
 
     // Update the range slider
     slider.addEventListener('input', _updateSlider);
+  };
+
+  /**
+   * Check if the custom region rectangle control is active and deactivate it.
+   */
+  _checkControl = function () {
+    var control = _el.querySelector('.leaflet-control-edit a');
+
+    if (control.classList.contains('selected')) {
+      control.click(); // exit custom region edit mode
+    }
   };
 
   /**
@@ -431,6 +444,10 @@ var SearchBar = function (options) {
       sibling = sibling.nextElementSibling;
     }
 
+    if (this.id === 'worldwide') {
+      _checkControl(); // Exit edit mode if it's active
+    }
+
     // Show/hide the custom options
     if (regex.test(this.id)) {
       customDiv.classList.remove('hide');
@@ -483,16 +500,7 @@ var SearchBar = function (options) {
    * Search the earthquake catalog.
    */
   _this.searchCatalog = function () {
-    var control,
-        params;
-
-    control = _el.querySelector('.leaflet-control-edit a');
-
-    if (control.classList.contains('selected')) {
-      control.click(); // exit custom region edit mode first
-    }
-
-    params = _getSearchParams();
+    var params = _getSearchParams();
 
     _app.MapPane.removeFeature(_search);
     _search.reset();
