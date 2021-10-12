@@ -152,7 +152,7 @@ var NavBar = function (options) {
       setTimeout(() => {
         _app.PlotsPane.render();
         _app.StatusBar.removeItem('rendering');
-      }, 25);
+      }, 50);
     }
 
     _app.PlotsPane.resize(); // in case size of content area changed
