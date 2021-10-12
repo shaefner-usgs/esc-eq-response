@@ -1,4 +1,4 @@
-@use '../mixins' as *;
+10@use '../mixins' as *;
 @use '../variables' as *;
 @use 'bottomCenter';
 @use 'editable';
@@ -20,7 +20,7 @@
     clear: left;
     display: block;
     float: left;
-    line-height: 1.75; /* accommodate smaller font-size of labels */
+    line-height: 1.625; /* accommodate smaller font-size of labels */
     margin-right: .5rem;
     text-align: right;
     width: 6rem;
