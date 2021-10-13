@@ -72,7 +72,7 @@ main {
   padding: 0;
 }
 body {
-  background: $bg-color;
+  background: $bg-color-darker;
   color: $text-color;
   position: relative;
 }
@@ -99,7 +99,7 @@ h1 {
 }
 h2 {
   font-size: 2rem;
-  margin: 1rem 0;
+  margin: 1.75rem 0 .25rem;
 }
 h3 {
   font-size: 1.5rem;
@@ -157,6 +157,12 @@ tr {
   border-bottom: 1px solid $border-color-lighter;
 }
 
+.bubble {
+  background: $bg-color;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
 .content {
   line-height: 1.625;
   padding: 1rem var(--padding-gutter);
@@ -179,6 +185,10 @@ tr {
     opacity: 0;
     transition: none;
   }
+}
+
+.description {
+  margin: .5rem 0;
 }
 
 .feature {
