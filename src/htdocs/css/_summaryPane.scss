@@ -12,15 +12,16 @@
   }
 
   #updated {
-    background: #f8f8f8;
-    border-top: 1px solid $border-color;
     display: none;
-    margin-top: 2rem;
     padding: 1rem var(--padding-gutter);
 
     &:before {
       content: 'Updated: ';
     }
+  }
+
+  .bubble {
+    display: inline-block;
   }
 
   /* Rendering order of features */
