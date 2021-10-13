@@ -80,54 +80,58 @@ var Mainshock = function (options) {
     data = _getData();
     bubbles = _getBubbles(data);
     html = L.Util.template(
-      '<ul class="strip">' +
-        '<li class="mag">' +
-          '<strong>Mag</strong>' +
-          '<span>{magDisplay}</span>' +
-          '<small>{magType}</small>' +
-        '</li>' +
-        bubbles +
-        '<li class="date">' +
-          '<strong>Date</strong>' +
-          '<span>{date}</span>' +
-          '<small>{dayofweek}</small>' +
-        '</li>' +
-        '<li class="time">' +
-          '<strong>Time</strong>' +
-          '<span>{time}</span>' +
-          '<small>UTC</small>' +
-        '</li>' +
-        '<li class="depth">' +
-          '<strong>Depth</strong>' +
-          '<span>{depthDisplay}</span>' +
-          '<small>km</small>' +
-        '</li>' +
-        '<li class="location">' +
-          '<strong>Location</strong>' +
-          '<span>{locationDisplay}</span>' +
-        '</li>' +
-        '<li class="status">' +
-          '<strong>Status</strong>' +
-          '<span>{statusIcon}</span>' +
-          '<small>{status}</small>' +
-        '</li>' +
-      '</ul>' +
-      '<div>' +
-        '<div class="products">' +
+      '<div class="details bubble">' +
+        '<ul>' +
+          '<li class="mag">' +
+            '<strong>Mag</strong>' +
+            '<span>{magDisplay}</span>' +
+            '<small>{magType}</small>' +
+          '</li>' +
+          bubbles +
+          '<li class="date">' +
+            '<strong>Date</strong>' +
+            '<span>{date}</span>' +
+            '<small>{dayofweek}</small>' +
+          '</li>' +
+          '<li class="time">' +
+            '<strong>Time</strong>' +
+            '<span>{time}</span>' +
+            '<small>UTC</small>' +
+          '</li>' +
+          '<li class="depth">' +
+            '<strong>Depth</strong>' +
+            '<span>{depthDisplay}</span>' +
+            '<small>km</small>' +
+          '</li>' +
+          '<li class="location">' +
+            '<strong>Location</strong>' +
+            '<span>{locationDisplay}</span>' +
+          '</li>' +
+          '<li class="status">' +
+            '<strong>Status</strong>' +
+            '<span>{statusIcon}</span>' +
+            '<small>{status}</small>' +
+          '</li>' +
+        '</ul>' +
+      '</div>' +
+      '<div class="products">' +
+        '<div class="thumbs bubble">' +
           '{dyfi}' +
           '{shakemap}' +
-          '<div class="focal-mechanism placeholder hide two-up"></div>' +
-          '<div class="moment-tensor placeholder hide two-up"></div>' +
+          '<div class="focal-mechanism placeholder hide"></div>' +
+          '<div class="moment-tensor placeholder hide"></div>' +
         '</div>' +
-        '<div class="pager-exposures placeholder hide"></div>' +
-      '</div>' +
-      '<h3>Event Summary</h3>' +
-      '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
-        'earthquake details, images, plots and placeholders for adding ' +
-        'talking points and analysis. Microsoft Word is recommended for ' +
-        'viewing the document.</p>' +
-      '<button id="download" disabled="disabled" type="button" ' +
-        'title="Download RTF Document">Download</button>',
+        '<div class="pager-exposures bubble placeholder hide"></div>' +
+        '<div class="summary bubble">' +
+          '<h3>Event Summary</h3>' +
+          '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
+            'earthquake details, images, plots and placeholders for talking ' +
+            'points and analysis. Microsoft Word is recommended for viewing ' +
+            'the document.</p>' +
+          '<button id="download" disabled="disabled" type="button" ' +
+            'title="Download RTF Document">Download</button>' +
+        '</div>' +
+      '</div>',
       data
     );
 
@@ -244,9 +248,9 @@ var Mainshock = function (options) {
     if (dyfi) {
       data.dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
       data.dyfi = L.Util.template(
-        '<div class="dyfi two-up">' +
-          '<a href="{url}/dyfi">' +
-            '<h4>Did You Feel It?</h4>' +
+        '<div class="dyfi">' +
+          '<h4>Did You Feel It?</h4>' +
+          '<a href="{dyfiImg}">' +
             '<img src="{dyfiImg}" class="mmi{cdi}" />' +
           '</a>' +
         '</div>',
@@ -272,9 +276,9 @@ var Mainshock = function (options) {
       }
 
       data.shakemap = L.Util.template(
-        '<div class="shakemap two-up">' +
-          '<a href="{url}/shakemap">' +
-            '<h4>ShakeMap</h4>' +
+        '<div class="shakemap">' +
+          '<h4>ShakeMap</h4>' +
+          '<a href="{shakemapImg}">' +
             '<img src="{shakemapImg}" class="mmi{mmi}" />' +
           '</a>' +
         '</div>',
