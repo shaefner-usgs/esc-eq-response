@@ -147,7 +147,7 @@ var MomentTensor = function (options) {
 
     if (_this.beachball) {
       url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/moment-tensor`;
-      html = `<a href="${url}"><h4>${_this.name}</h4></a>`;
+      html = `<h4>${_this.name}</h4><a href="${url}"></a>`;
     }
 
     return html;
