@@ -175,7 +175,8 @@ var Aftershocks = function (options) {
         interval,
         mostRecentEq;
 
-    html = _Earthquakes.createDescription();
+    html = '<div class="bubble">';
+    html += _Earthquakes.createDescription();
 
     if (_this.count > 0) {
       mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
@@ -200,6 +201,8 @@ var Aftershocks = function (options) {
       html += _Earthquakes.createSlider();
       html += _Earthquakes.createListTable('all');
     }
+
+    html += '</div>';
 
     return html;
   };
