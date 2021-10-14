@@ -47,6 +47,7 @@ var Mainshock = function (options) {
       _createSummary,
       _getBubbles,
       _getData,
+      _getShakeAlert,
       _setDyfiProps,
       _setShakeMapProps;
 
@@ -75,10 +76,12 @@ var Mainshock = function (options) {
   _createSummary = function () {
     var bubbles,
         data,
-        html;
+        html,
+        shakeAlert;
 
     data = _getData();
     bubbles = _getBubbles(data);
+    shakeAlert = _getShakeAlert(data);
     html = L.Util.template(
       '<div class="details bubble">' +
         '<ul>' +
@@ -107,6 +110,7 @@ var Mainshock = function (options) {
             '<strong>Location</strong>' +
             '<span>{locationDisplay}</span>' +
           '</li>' +
+          shakeAlert +
           '<li class="status">' +
             '<strong>Status</strong>' +
             '<span>{statusIcon}</span>' +
@@ -206,13 +210,16 @@ var Mainshock = function (options) {
         eqTime,
         mmiInt,
         products,
+        shakeAlert,
         statusIcon;
 
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
     products = _this.json.properties.products;
-    statusIcon = '';
 
+    if (Array.isArray(products['shake-alert'])) {
+      shakeAlert = products['shake-alert'][0].status.toLowerCase();
+    }
     if (_this.details.status === 'reviewed') {
       statusIcon = '<i class="icon-check"></i>';
     }
@@ -225,10 +232,12 @@ var Mainshock = function (options) {
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
+      shakeAlert: shakeAlert || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
-      statusIcon: statusIcon,
+      statusIcon: statusIcon || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
-      tsunamiBubble: _this.details.bubbles.tsunami || ''
+      tsunamiBubble: _this.details.bubbles.tsunami || '',
+      url: _this.json.properties.url
     });
 
     // Add DYFI, ShakeMap props to data
@@ -236,6 +245,30 @@ var Mainshock = function (options) {
     _setShakeMapProps(data, products.shakemap);
 
     return data;
+  };
+
+  /**
+   * Get the ShakeAlert list item template.
+   *
+   * @param data {Object}
+   *
+   * @return item {String}
+   */
+  _getShakeAlert = function (data) {
+    var item = '';
+
+    if (data.shakeAlert) {
+      item =
+        '<li class="shake-alert">' +
+          '<strong>ShakeAlert<sup>®</sup></strong>' +
+          '<a href="{url}/shake-alert">' +
+            '<img src="img/shake-alert.png" alt="ShakeAlert logo" />' +
+          '</a>' +
+          '<small>{shakeAlert}</small>' +
+        '</li>';
+    }
+
+    return item;
   };
 
   /**

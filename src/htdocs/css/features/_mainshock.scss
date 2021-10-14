@@ -94,6 +94,31 @@
       }
     }
 
+    .shake-alert {
+      a {
+        line-height: 1;
+      }
+
+      img {
+        width: 28px;
+      }
+
+      small {
+        text-transform: capitalize;
+      }
+
+      strong {
+        position: relative;
+      }
+
+      sup {
+        color: $text-color-lightest;
+        font-size: .75rem;
+        position: absolute;
+        right: -.75rem;
+      }
+    }
+
     .status {
       small {
         text-transform: capitalize;
