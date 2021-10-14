@@ -47,9 +47,9 @@ var Mainshock = function (options) {
       _createSummary,
       _getBubbles,
       _getData,
+      _getDyfi,
       _getShakeAlert,
-      _setDyfiProps,
-      _setShakeMapProps;
+      _getShakeMap;
 
 
   _this = {};
@@ -76,12 +76,16 @@ var Mainshock = function (options) {
   _createSummary = function () {
     var bubbles,
         data,
+        dyfi,
         html,
-        shakeAlert;
+        shakeAlert,
+        shakemap;
 
     data = _getData();
     bubbles = _getBubbles(data);
+    dyfi = _getDyfi(data);
     shakeAlert = _getShakeAlert(data);
+    shakemap = _getShakeMap(data);
     html = L.Util.template(
       '<div class="details bubble">' +
         '<ul>' +
@@ -120,8 +124,8 @@ var Mainshock = function (options) {
       '</div>' +
       '<div class="products">' +
         '<div class="thumbs bubble">' +
-          '{dyfi}' +
-          '{shakemap}' +
+          dyfi +
+          shakemap +
           '<div class="focal-mechanism placeholder hide"></div>' +
           '<div class="moment-tensor placeholder hide"></div>' +
         '</div>' +
@@ -207,21 +211,33 @@ var Mainshock = function (options) {
    */
   _getData = function () {
     var data,
+        dyfi,
+        dyfiImg,
         eqTime,
         mmiInt,
         products,
         shakeAlert,
-        statusIcon;
+        shakemap,
+        shakemapImg;
 
+    products = _this.json.properties.products;
+    dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
-    products = _this.json.properties.products;
+    shakemap = products.shakemap;
 
+    if (Array.isArray(dyfi)) {
+      dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
+    }
     if (Array.isArray(products['shake-alert'])) {
       shakeAlert = products['shake-alert'][0].status.toLowerCase();
     }
-    if (_this.details.status === 'reviewed') {
-      statusIcon = '<i class="icon-check"></i>';
+    if (Array.isArray(shakemap)) {
+      if (shakemap[0].contents['download/tvmap.jpg']) {
+        shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
+      } else if (shakemap[0].contents['download/intensity.jpg'].url) {
+        shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
+      }
     }
 
     data = Object.assign({}, _this.details, {
@@ -229,26 +245,45 @@ var Mainshock = function (options) {
       dayofweek: eqTime.toFormat('cccc'),
       depthDisplay: AppUtil.round(_this.details.depth, 1),
       dyfiBubble: _this.details.bubbles.dyfi || '',
+      dyfiImg: dyfiImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
       shakeAlert: shakeAlert || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
-      statusIcon: statusIcon || '',
+      shakemapImg: shakemapImg || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
-      tsunamiBubble: _this.details.bubbles.tsunami || '',
-      url: _this.json.properties.url
+      tsunamiBubble: _this.details.bubbles.tsunami || ''
     });
-
-    // Add DYFI, ShakeMap props to data
-    _setDyfiProps(data, products.dyfi);
-    _setShakeMapProps(data, products.shakemap);
 
     return data;
   };
 
   /**
-   * Get the ShakeAlert list item template.
+   * Get the Did You Feel It? product HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return product {String}
+   */
+  _getDyfi = function (data) {
+    var product = '';
+
+    if (data.dyfiImg) {
+      product =
+        '<div class="dyfi">' +
+          '<h4>Did You Feel It?</h4>' +
+          '<a href="{dyfiImg}">' +
+            '<img src="{dyfiImg}" class="mmi{cdi}" />' +
+          '</a>' +
+        '</div>';
+    }
+
+    return product;
+  };
+
+  /**
+   * Get the ShakeAlert list item HTML template.
    *
    * @param data {Object}
    *
@@ -261,7 +296,7 @@ var Mainshock = function (options) {
       item =
         '<li class="shake-alert">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
-          '<a href="{url}/shake-alert">' +
+          '<a href="{url}/shake-alert" target="new">' +
             '<img src="img/shake-alert.png" alt="ShakeAlert logo" />' +
           '</a>' +
           '<small>{shakeAlert}</small>' +
@@ -272,54 +307,26 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Set Did You Feel It? properties for summary HTML.
+   * Get the ShakeMap product HTML template.
    *
    * @param data {Object}
-   * @param dyfi {Array}
-   */
-  _setDyfiProps = function (data, dyfi) {
-    if (dyfi) {
-      data.dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
-      data.dyfi = L.Util.template(
-        '<div class="dyfi">' +
-          '<h4>Did You Feel It?</h4>' +
-          '<a href="{dyfiImg}">' +
-            '<img src="{dyfiImg}" class="mmi{cdi}" />' +
-          '</a>' +
-        '</div>',
-        data
-      );
-    } else {
-      data.dyfi = '';
-    }
-  };
-
-  /**
-   * Set ShakeMap properties for summary HTML.
    *
-   * @param data {Object}
-   * @param shakemap {Array}
+   * @return product {String}
    */
-  _setShakeMapProps = function (data, shakemap) {
-    if (shakemap) {
-      if (shakemap[0].contents['download/tvmap.jpg']) {
-        data.shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (shakemap[0].contents['download/intensity.jpg'].url) {
-        data.shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
-      }
+  _getShakeMap = function (data) {
+    var product = '';
 
-      data.shakemap = L.Util.template(
+    if (data.shakemapImg) {
+      product =
         '<div class="shakemap">' +
           '<h4>ShakeMap</h4>' +
           '<a href="{shakemapImg}">' +
             '<img src="{shakemapImg}" class="mmi{mmi}" />' +
           '</a>' +
-        '</div>',
-        data
-      );
-    } else {
-      data.shakemap = '';
+        '</div>';
     }
+
+    return product;
   };
 
   // ----------------------------------------------------------
