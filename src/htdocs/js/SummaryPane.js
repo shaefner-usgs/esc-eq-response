@@ -409,6 +409,7 @@ var SummaryPane = function (options) {
 
       if (Object.prototype.hasOwnProperty.call(feature, 'beachball')) {
         feature.beachball.render(_el.querySelector('.' + feature.id + ' a'));
+        div.parentNode.classList.remove('hide'); // hidden if no ShakeMap, DYFI products
       }
       if (div.classList.contains('placeholder')) {
         div.classList.remove('hide'); // show content added to Mainshock

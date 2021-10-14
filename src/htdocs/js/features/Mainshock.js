@@ -123,7 +123,7 @@ var Mainshock = function (options) {
         '</ul>' +
       '</div>' +
       '<div class="products">' +
-        '<div class="thumbs bubble">' +
+        '<div class="thumbs bubble {visibility}">' +
           dyfi +
           shakemap +
           '<div class="focal-mechanism placeholder hide"></div>' +
@@ -217,22 +217,29 @@ var Mainshock = function (options) {
         mmiInt,
         products,
         shakeAlert,
+        shakeAlertStatus,
         shakemap,
-        shakemapImg;
+        shakemapImg,
+        visibility;
 
     products = _this.json.properties.products;
     dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
+    shakeAlert = products['shake-alert'];
     shakemap = products.shakemap;
+    visibility = 'hide'; // default - product thumbs container
 
     if (Array.isArray(dyfi)) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
+      visibility = 'show';
     }
-    if (Array.isArray(products['shake-alert'])) {
-      shakeAlert = products['shake-alert'][0].status.toLowerCase();
+    if (Array.isArray(shakeAlert)) {
+      shakeAlertStatus = shakeAlert[0].status.toLowerCase();
     }
     if (Array.isArray(shakemap)) {
+      visibility = 'show';
+
       if (shakemap[0].contents['download/tvmap.jpg']) {
         shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
       } else if (shakemap[0].contents['download/intensity.jpg'].url) {
@@ -249,11 +256,12 @@ var Mainshock = function (options) {
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
-      shakeAlert: shakeAlert || '',
+      shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
-      tsunamiBubble: _this.details.bubbles.tsunami || ''
+      tsunamiBubble: _this.details.bubbles.tsunami || '',
+      visibility: visibility
     });
 
     return data;
@@ -292,14 +300,14 @@ var Mainshock = function (options) {
   _getShakeAlert = function (data) {
     var item = '';
 
-    if (data.shakeAlert) {
+    if (data.shakeAlertStatus) {
       item =
         '<li class="shake-alert">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
           '<a href="{url}/shake-alert" target="new">' +
             '<img src="img/shake-alert.png" alt="ShakeAlert logo" />' +
           '</a>' +
-          '<small>{shakeAlert}</small>' +
+          '<small>{shakeAlertStatus}</small>' +
         '</li>';
     }
 

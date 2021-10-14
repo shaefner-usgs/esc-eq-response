@@ -208,7 +208,7 @@
     }
 
     .hide { /* missing product */
-      display: none;
+      display: none !important;
     }
   }
 
@@ -219,9 +219,12 @@
   }
 
   .thumbs {
-    display: flex !important;
     flex-wrap: wrap;
     padding: 1rem .5rem 0;
+
+    &.bubble {
+      display: flex;
+    }
 
     a {
       display: block;
