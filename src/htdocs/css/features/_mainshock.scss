@@ -153,10 +153,16 @@
 
     td,
     th {
-      padding: 0.25rem;
+      padding: 0.25rem .375rem;
     }
-    td:nth-child(3) {
-      text-align: right;
+    td {
+      &:nth-child(1) {
+        padding-left: .25rem
+      }
+      &:nth-child(3) {
+        padding-right: .25rem;
+        text-align: right;
+      }
     }
 
     tr {
@@ -179,7 +185,7 @@
     .city td {
       color: $text-color-lighter;
       font-weight: 300;
-      padding: 0 .25rem .3rem;
+      padding-top: 0;
     }
 
     .impact-bubble {
