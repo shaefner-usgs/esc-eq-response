@@ -135,6 +135,10 @@
   }
 
   .mainshock {
+    h4 {
+      text-align: center;
+    }
+
     .bubble {
       margin: 1rem .5rem 0;
 
@@ -142,6 +146,20 @@
         margin: 0 0 -.4375rem 0 ;
         padding-right: 0;
       }
+    }
+  }
+
+  .pager {
+    h4 {
+      margin-top: 1rem;
+
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+
+    img {
+      max-width: 100%;
     }
   }
 
@@ -278,10 +296,6 @@
     div {
       padding: 0 .5rem;
       width: 50%;
-    }
-
-    h4 {
-      text-align: center;
     }
   }
 }

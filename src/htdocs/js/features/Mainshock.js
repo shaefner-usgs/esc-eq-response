@@ -48,6 +48,7 @@ var Mainshock = function (options) {
       _getBubbles,
       _getData,
       _getDyfi,
+      _getPager,
       _getShakeAlert,
       _getShakeMap;
 
@@ -78,12 +79,14 @@ var Mainshock = function (options) {
         data,
         dyfi,
         html,
+        pager,
         shakeAlert,
         shakemap;
 
     data = _getData();
     bubbles = _getBubbles(data);
     dyfi = _getDyfi(data);
+    pager = _getPager(data);
     shakeAlert = _getShakeAlert(data);
     shakemap = _getShakeMap(data);
     html = L.Util.template(
@@ -130,6 +133,7 @@ var Mainshock = function (options) {
           '<div class="moment-tensor placeholder hide"></div>' +
         '</div>' +
         '<div class="pager-exposures bubble placeholder hide"></div>' +
+        pager +
         '<div class="summary bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
@@ -147,7 +151,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the 'impact bubbles' HTML templates.
+   * Get the 'impact bubbles' list items HTML template.
    *
    * @param data {Object}
    *
@@ -205,7 +209,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the data used to create the details strip.
+   * Get the data used to create the details strip and certain products.
    *
    * @return data {Object}
    */
@@ -213,8 +217,11 @@ var Mainshock = function (options) {
     var data,
         dyfi,
         dyfiImg,
+        econImg,
         eqTime,
+        fatalImg,
         mmiInt,
+        pager,
         products,
         shakeAlert,
         shakeAlertStatus,
@@ -226,6 +233,7 @@ var Mainshock = function (options) {
     dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
+    pager = products.losspager;
     shakeAlert = products['shake-alert'];
     shakemap = products.shakemap;
     visibility = 'hide'; // default - product thumbs container
@@ -233,6 +241,10 @@ var Mainshock = function (options) {
     if (Array.isArray(dyfi)) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
       visibility = 'show';
+    }
+    if (Array.isArray(pager)) {
+      econImg = pager[0].contents['alertecon.png'].url;
+      fatalImg = pager[0].contents['alertfatal.png'].url;
     }
     if (Array.isArray(shakeAlert)) {
       shakeAlertStatus = shakeAlert[0].status.toLowerCase();
@@ -253,6 +265,8 @@ var Mainshock = function (options) {
       depthDisplay: AppUtil.round(_this.details.depth, 1),
       dyfiBubble: _this.details.bubbles.dyfi || '',
       dyfiImg: dyfiImg || '',
+      econImg: econImg || '',
+      fatalImg: fatalImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
@@ -284,6 +298,29 @@ var Mainshock = function (options) {
           '<a href="{dyfiImg}">' +
             '<img src="{dyfiImg}" class="mmi{cdi}" />' +
           '</a>' +
+        '</div>';
+    }
+
+    return product;
+  };
+
+  /**
+   * Get the PAGER fatalities and economic losses product HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return product {String}
+   */
+  _getPager = function (data) {
+    var product = '';
+
+    if (data.econImg) {
+      product =
+        '<div class="pager bubble">' +
+          '<h4>Estimated Fatalities</h4>' +
+          '<img src="{econImg}" alt="Estimated economic losses histogram" />' +
+          '<h4>Estimated Economic Losses</h4>' +
+          '<img src="{fatalImg}" alt="Estimated fatalities histogram" />' +
         '</div>';
     }
 
