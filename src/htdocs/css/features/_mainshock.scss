@@ -147,7 +147,7 @@
 
   .pager-exposures {
     table {
-      margin: .5rem 0;
+      margin: .5rem 0 0;
       width: 100%;
     }
 
@@ -176,9 +176,6 @@
       &:first-child {
         border-bottom: 1px solid $border-color;
         border-top: none;
-      }
-      &:last-child {
-        border-bottom: 1px solid $border-color-lighter;
       }
     }
 
