@@ -16,11 +16,6 @@
     max-width: 100%;
     overflow: scroll;
 
-    &.bubble {
-      margin: 0 0 -.5rem 0 !important;
-      padding-right: 0;
-    }
-
     li {
       align-items: center;
       border-right: 1px solid $border-color-lighter;
@@ -142,6 +137,11 @@
   .mainshock {
     .bubble {
       margin: 1rem .5rem 0;
+
+      &.details {
+        margin: 0 0 -.5rem 0 ;
+        padding-right: 0;
+      }
     }
   }
 
