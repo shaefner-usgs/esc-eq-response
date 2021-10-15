@@ -1,6 +1,6 @@
 <?php
 
-// Load php RTF library/API (https://github.com/phprtflite/PHPRtfLite)
+// Load the PHP RTF library/API (https://github.com/phprtflite/PHPRtfLite)
 include_once '../../lib/PHPRtfLite.php';
 PHPRtfLite::registerAutoloader();
 
@@ -8,7 +8,7 @@ date_default_timezone_set('America/Los_Angeles');
 
 /**
  * Using the PHPRtfLite library, create an Event Summary RTF file and save it
- *   to a local (temp) directory
+ * to a local (temp) directory for downloading to the user's device.
  *
  * @param $data {Object}
  *     key-value pairs for populating content of RTF document
@@ -47,7 +47,7 @@ class Rtf {
   }
 
   /**
-  * Add commas to large numbers
+  * Add commas to large numbers.
   *
   * @param $num {Number}
   *
@@ -72,7 +72,7 @@ class Rtf {
   }
 
   /**
-   * Sanitize data from external JSON feeds for known issues
+   * Sanitize data from external JSON feeds for known issues.
    */
   private function _cleanData() {
     // Strip HTML tags, extra whitespace from summary
@@ -109,7 +109,7 @@ class Rtf {
   }
 
   /**
-   * Create the RTF document
+   * Create the RTF document.
    */
   private function _createRtf() {
     $this->_setMargins();
@@ -127,7 +127,7 @@ class Rtf {
   }
 
   /**
-   * Create a local (temporary) image from a data URI
+   * Create a local (temporary) image from a data URI.
    *
    * @param $data {String}
    *     image data URI base 64 encoded in .png format
@@ -148,7 +148,7 @@ class Rtf {
   }
 
   /**
-   * Get alert location relative to ANSS location
+   * Get the alert location relative to the ANSS location.
    *
    * @param $azimuth {Number} degrees
    * @param $distance {Number} km
@@ -167,7 +167,7 @@ class Rtf {
   }
 
   /**
-   * Create a unique filename (full path) for attachments based on the eqid
+   * Create a unique filename (full path) for attachments based on the eqid.
    *
    * @param $extension {String}
    *
@@ -181,7 +181,7 @@ class Rtf {
   }
 
   /**
-   * Create a local (temporary) copy of an image from a remote image
+   * Create a local (temporary) copy of an image from a remote image.
    *
    * @param $url {String}
    *     URL of remote image
@@ -208,7 +208,7 @@ class Rtf {
   }
 
   /**
-   * Get a roman numeral from number
+   * Get a roman numeral from number.
    *
    * @param $number {Number}
    *
@@ -235,7 +235,7 @@ class Rtf {
   }
 
   /**
-   * Save a local (temporary) copy of the RTF file and store its path in $file
+   * Save a local (temporary) copy of the RTF file and store its path in $file.
    */
   private function _saveFile() {
     $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
@@ -244,12 +244,12 @@ class Rtf {
     $this->_rtf->save($this->file);
   }
 
-  // ---------------------------------------------------------------------
-  // Utility methods for creating RTF file using PHPRtfLite library follow
-  // ---------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Utility methods for creating the RTF file using PHPRtfLite library
+  // ------------------------------------------------------------------
 
   /**
-   * RTF Document, Section 1: Basic earthquake details
+   * Section 1: Basic earthquake details.
    */
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
@@ -356,7 +356,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 2: Talking Points
+   * Section 2: Talking Points.
    */
   private function _createSection2() {
     $section2 = $this->_rtf->addSection();
@@ -455,7 +455,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 3: Impact
+   * Section 3: Impact.
    */
   private function _createSection3() {
     if (!empty(get_object_vars($this->_data->pager))) {
@@ -552,7 +552,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 4: Mechanism and Fault
+   * Section 4: Mechanism and Fault.
    */
   private function _createSection4() {
     $section4 = $this->_rtf->addSection();
@@ -619,7 +619,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 5: Ground Shaking
+   * Section 5: Ground Shaking.
    */
   private function _createSection5() {
     $section5 = $this->_rtf->addSection();
@@ -763,7 +763,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 6: Aftershocks
+   * Section 6: Aftershocks.
    */
   private function _createSection6() {
     $aftershocks = $this->_data->aftershocks;
@@ -873,7 +873,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 7: Foreshocks
+   * Section 7: Foreshocks.
    */
   private function _createSection7() {
     $foreshocks = $this->_data->foreshocks;
@@ -920,7 +920,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 8: Historical Seismicity
+   * Section 8: Historical Seismicity.
    */
   private function _createSection8() {
     $historical = $this->_data->historical;
@@ -1050,7 +1050,7 @@ class Rtf {
   }
 
   /**
-   * RTF Document, Section 9: ShakeAlert
+   * Section 9: ShakeAlert.
    */
   private function _createSection9() {
     $section9 = $this->_rtf->addSection();
@@ -1195,7 +1195,7 @@ class Rtf {
   }
 
   /**
-   * Create binned data table
+   * Create a binned earthquakes table for a given Feature.
    *
    * @param $section {Object}
    *     RTF Document section
@@ -1277,7 +1277,7 @@ class Rtf {
   }
 
   /**
-   * Create earthquake list table
+   * Create the earthquake list table for a given Feature.
    *
    * @param $section {Object}
    *     RTF Document section
@@ -1353,7 +1353,7 @@ class Rtf {
   }
 
   /**
-   * Create population exposure table
+   * Create the population exposure table.
    *
    * @param $section {Object}
    *     RTF Document section
@@ -1459,7 +1459,7 @@ class Rtf {
   }
 
   /**
-   * Create Aftershocks forecast table
+   * Create the Aftershocks forecast table.
    *
    * @param $section {Object}
    *     RTF Document section
@@ -1541,7 +1541,7 @@ class Rtf {
   }
 
   /**
-   * Create ShakeAlert cities table
+   * Create the ShakeAlert cities table.
    *
    * @param $section {Object}
    *     RTF Document section
@@ -1604,7 +1604,7 @@ class Rtf {
   }
 
   /**
-   * Set RTF Document page margins (unit is centimeters)
+   * Set the page margins (unit is centimeters).
    */
   private function _setMargins() {
     $this->_rtf->setMarginBottom(2);
@@ -1614,7 +1614,7 @@ class Rtf {
   }
 
   /**
-   * Set styles for text, images, etc. in RTF Document
+   * Set the styles for text, images, etc.
    */
   private function _setStyles() {
     $this->_font->body = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
