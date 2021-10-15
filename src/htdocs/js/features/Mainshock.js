@@ -318,9 +318,9 @@ var Mainshock = function (options) {
       product =
         '<div class="pager bubble">' +
           '<h4>Estimated Fatalities</h4>' +
-          '<img src="{econImg}" alt="Estimated economic losses histogram" />' +
-          '<h4>Estimated Economic Losses</h4>' +
           '<img src="{fatalImg}" alt="Estimated fatalities histogram" />' +
+          '<h4>Estimated Economic Losses</h4>' +
+          '<img src="{econImg}" alt="Estimated economic losses histogram" />' +
         '</div>';
     }
 
