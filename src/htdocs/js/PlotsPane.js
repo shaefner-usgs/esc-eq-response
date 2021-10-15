@@ -249,7 +249,7 @@ var PlotsPane = function (options) {
       },
       showlegend: false
     };
-    spikecolor = '#7234dc'; // accent-color
+    spikecolor = '#4440CC'; // accent-color
 
     if (plotId === 'hypocenters') {
       layout.scene = {
