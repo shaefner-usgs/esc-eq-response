@@ -134,7 +134,11 @@ var PagerExposures = function (options) {
         '<h3>Population Exposure</h3>' +
         '<table>' +
           '<tr>' +
-            '<th>MMI</th><th>Selected Cities</th><th>Population</th>' +
+            '<th>' +
+              '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
+            '</th>' +
+            '<th>Selected Cities</th>' +
+            '<th>Population</th>' +
           '<tr>' +
           '{rows}' +
         '</table>',
