@@ -1,0 +1,49 @@
+@use '../variables' as *;
+
+#summaryPane {
+  .pager-exposures {
+    table {
+      margin: .5rem 0 0;
+      width: 100%;
+    }
+
+    td,
+    th {
+      padding: 0.25rem .375rem;
+    }
+    td {
+      &:nth-child(1) {
+        max-width: 3.25rem;
+        padding-left: .25rem
+      }
+      &:nth-child(3) {
+        padding-right: .25rem;
+        text-align: right;
+      }
+    }
+
+    tr {
+      border: none; /* override general table border styles */
+      border-top: 1px solid $border-color-lighter;
+
+      &.city {
+        border: none;
+      }
+
+      &:first-child {
+        border-bottom: 1px solid $border-color;
+        border-top: none;
+      }
+    }
+
+    .city td {
+      color: $text-color-lighter;
+      font-weight: 300;
+      padding-top: 0;
+    }
+
+    .impact-bubble {
+      max-width: 3.5rem;
+    }
+  }
+}
