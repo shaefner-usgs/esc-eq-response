@@ -82,7 +82,7 @@ var Features = function (options) {
 
   /**
    * Add the given Feature to Map/Plots/SummaryPanes; add the Feature's count to
-   * SettingsBar.
+   * SettingsBar. Also add event listeners if present.
    *
    * @param feature {Object}
    */
@@ -96,7 +96,6 @@ var Features = function (options) {
       _app.SummaryPane.addFeature(feature);
 
       if (feature.id === 'mainshock') {
-        feature.addListeners();
         _app.SelectBar.showMainshock();
         _app.SettingsBar.setDefaults();
         _app.SignificantEqs.replaceList(); // select the Mainshock if it exists
@@ -105,6 +104,11 @@ var Features = function (options) {
 
         // Create the other Features now that the Mainshock is ready
         _createFeatures();
+      }
+
+      // Add listeners that depend on Feature being added first
+      if (feature.addListeners) {
+        feature.addListeners();
       }
 
       if (status === 'complete') {
