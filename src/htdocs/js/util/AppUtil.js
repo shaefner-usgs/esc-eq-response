@@ -43,6 +43,21 @@ AppUtil.addCommas = function (num) {
 };
 
 /**
+ * Capitalize a string.
+ *
+ * @param str {String}
+ *
+ * @return {String}
+ */
+AppUtil.capitalize = function (str) {
+  if (typeof str !== 'string') {
+    return '';
+  }
+
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/**
  * Create a function that is a composition of other functions.
  *
  * For example:

@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Earthquakes = require('features/util/Earthquakes'),
+var AppUtil = require('util/AppUtil'),
+    Earthquakes = require('features/util/Earthquakes'),
     Luxon = require('luxon');
 
 
@@ -80,7 +81,7 @@ var SearchLayer = function (options) {
         params.minlatitude === _DEFAULTS.minlatitude &&
         params.minlongitude === _DEFAULTS.minlongitude
     ) {
-      period = params.period[0].toUpperCase() + params.period.slice(1);
+      period = AppUtil.capitalize(params.period);
       parts[1] = `Past ${period}`;
     }
 
