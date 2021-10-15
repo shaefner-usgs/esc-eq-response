@@ -96,7 +96,7 @@ var Features = function (options) {
       _app.SummaryPane.addFeature(feature);
 
       if (feature.id === 'mainshock') {
-        feature.addListener();
+        feature.addListeners();
         _app.SelectBar.showMainshock();
         _app.SettingsBar.setDefaults();
         _app.SignificantEqs.replaceList(); // select the Mainshock if it exists
