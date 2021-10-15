@@ -39,11 +39,11 @@ var SearchBar = function (options) {
 
       _addControl,
       _addListeners,
-      _checkControl,
+      _cancelEdit,
       _getSearchParams,
       _initFlatpickr,
       _initMap,
-      _isValidPeriod,
+      _isValid,
       _loadFeed,
       _setMinutes,
       _setToday,
@@ -126,10 +126,10 @@ var SearchBar = function (options) {
       var period = _el.querySelector('ul.period .selected').id;
 
       // Check that dates are valid if applicable
-      if (period !== 'customPeriod' || _isValidPeriod()) {
+      if (period !== 'customPeriod' || _isValid()) {
         location.href = '#mapPane';
 
-        _checkControl();
+        _cancelEdit();
         _this.searchCatalog();
       }
     });
@@ -139,9 +139,9 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Check if the custom region rectangle control is active and deactivate it.
+   * Cancel edit mode for custom region Leaflet control if it's active.
    */
-  _checkControl = function () {
+  _cancelEdit = function () {
     var control = _el.querySelector('.leaflet-control-edit a');
 
     if (control.classList.contains('selected')) {
@@ -298,7 +298,7 @@ var SearchBar = function (options) {
    *
    * @return isValid {Boolean}
    */
-  _isValidPeriod = function () {
+  _isValid = function () {
     var begin,
         end,
         isValid;
@@ -318,6 +318,7 @@ var SearchBar = function (options) {
    * Fetch the earthquakes and display them on the map.
    */
   _loadFeed = function () {
+    _app.MapPane.addLoader(_search);
     _app.JsonFeed.fetch(_search).then(json => {
       if (json) {
         _search.create(json);
@@ -445,7 +446,7 @@ var SearchBar = function (options) {
     }
 
     if (this.id === 'worldwide') {
-      _checkControl(); // Exit edit mode if it's active
+      _cancelEdit();
     }
 
     // Show/hide the custom options
@@ -490,7 +491,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Render the map so it displays correctly.
+   * Render the Region map so it displays correctly.
    */
   _this.renderMap = function () {
     _map.invalidateSize();
@@ -505,7 +506,6 @@ var SearchBar = function (options) {
     _app.MapPane.removeFeature(_search);
     _search.reset();
     _search.setFeedUrl(params);
-    _app.MapPane.addLoader(_search);
     _loadFeed();
   };
 
