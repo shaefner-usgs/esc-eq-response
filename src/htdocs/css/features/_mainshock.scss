@@ -175,6 +175,7 @@
     }
     td {
       &:nth-child(1) {
+        max-width: 3.25rem;
         padding-left: .25rem
       }
       &:nth-child(3) {
@@ -204,7 +205,7 @@
     }
 
     .impact-bubble {
-      min-width: 3rem;
+      max-width: 3.5rem;
     }
   }
 
@@ -215,7 +216,7 @@
     margin: 0 -.5rem;
 
     div {
-      max-width: 400px;
+      width: 400px;
     }
 
     h3 {
