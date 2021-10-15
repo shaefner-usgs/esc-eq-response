@@ -122,19 +122,16 @@ var PagerExposures = function (options) {
    */
   _createSummary = function () {
     var data,
-        eqid,
         html;
 
-    eqid = AppUtil.getParam('eqid');
     data = {
-      rows: _createRows(),
-      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/pager`
+      rows: _createRows()
     };
     html = '';
 
     if (data.rows) {
       html = L.Util.template(
-        '<h4><a href="{url}">Population Exposure</a></h4>' +
+        '<h3>Population Exposure</h3>' +
         '<table>' +
           '<tr>' +
             '<th>MMI</th><th>Selected Cities</th><th>Population</th>' +

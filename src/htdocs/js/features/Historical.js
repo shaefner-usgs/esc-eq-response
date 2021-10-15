@@ -67,13 +67,17 @@ var Historical = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var html = _Earthquakes.createDescription();
+    var html = '<div class="bubble">';
+
+    html += _Earthquakes.createDescription();
 
     if (_this.count > 0) {
       html += _Earthquakes.createBinTable('prior');
       html += _Earthquakes.createSlider();
       html += _Earthquakes.createListTable('all');
     }
+
+    html += '</div>';
 
     return html;
   };

@@ -144,7 +144,7 @@ var PlotsPane = function (options) {
       hypocenters: '3D Hypocenters',
       magtime: 'Magnitude vs. Time'
     };
-    parent = _contentEl.querySelector('.' + featureId);
+    parent = _contentEl.querySelector('.' + featureId + ' .bubble');
 
     h3.innerHTML = names[plotId];
 
@@ -409,15 +409,17 @@ var PlotsPane = function (options) {
    */
   _this.addFeature = function (feature) {
     var div,
+        html,
         params;
 
     // Skip Mainshock (it's included in other Features' plots)
     if (feature.plotTraces && feature.id !== 'mainshock') {
       div = _el.querySelector('div.' + feature.id);
+      html = `<div class="bubble">${feature.description}</div>`;
       params = {};
 
       // Inserting node this way preserves CSS transitions
-      div.insertAdjacentHTML('beforeend', feature.description);
+      div.insertAdjacentHTML('beforeend', html);
 
       Object.keys(feature.plotTraces).forEach(plotId => {
         if (feature.plotTraces[plotId]) { // null if no data

@@ -12,173 +12,9 @@
     }
   }
 
-  .dyfi img,
-  .shakemap img {
-    border: 2px solid #ccc;
-    border-radius: $button-border-radius;
-    padding: 2px;
-
-    &.mmiI {
-      border-color: $border-color-lighter; /* add subtle grey border so it shows up */
-    }
-    &.mmiII {
-      border-color: $mmiII-color;
-    }
-    &.mmiIII {
-      border-color: $mmiIII-color;
-    }
-    &.mmiIV {
-      border-color: $mmiIV-color;
-    }
-    &.mmiV {
-      border-color: $mmiV-color;
-    }
-    &.mmiVI {
-      border-color: $mmiVI-color;
-    }
-    &.mmiVII {
-      border-color: $mmiVII-color;
-    }
-    &.mmiVIII {
-      border-color: $mmiVIII-color;
-    }
-    &.mmiIX {
-      border-color: $mmiIX-color;
-    }
-    &.mmiX {
-      border-color: $mmiX-color;
-    }
-    &.mmiXI {
-      border-color: $mmiXI-color;
-    }
-    &.mmiXII {
-      border-color: $mmiXII-color;
-    }
-  }
-
-  .hide { /* missing product */
-    display: none;
-  }
-
-  .mainshock {
-    > div {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-
-    h3 {
-      margin-top: 1rem;
-    }
-  }
-
-  .pager-exposures,
-  .products {
-    margin: 0 0 1rem 0;
+  .details {
     max-width: 100%;
-    width: 420px;
-  }
-
-  .pager-exposures {
-    border-left: 1px solid $border-color-lightest;
-    margin-top: 1rem;
-    padding-left: 40px;
-
-    table {
-      margin-top: .5rem;
-      width: 100%;
-    }
-
-    td,
-    th {
-      padding: 0.25rem;
-    }
-
-    td:nth-child(3) {
-      text-align: right;
-    }
-
-    tr {
-      border: none; /* override general table border styles */
-      border-top: 1px solid $border-color-lighter;
-
-      &.city {
-        border: none;
-      }
-
-      &:first-child {
-        border-bottom: 1px solid $border-color;
-        border-top: none;
-      }
-      &:last-child {
-        border-bottom: 1px solid $border-color-lighter;
-      }
-    }
-
-    .city td {
-      color: $text-color-lighter;
-      font-weight: 300;
-      padding: 0 .25rem .3rem .25rem;
-    }
-
-    .impact-bubble {
-      min-width: 2.5rem;
-    }
-  }
-
-  .products {
-    align-content: flex-start;
-    display: flex;
-    flex-wrap: wrap;
-    padding-right: 40px;
-
-    > div { /* covers implicit ".one-up" (one product per row) scenario */
-      width: 100%;
-    }
-
-    h4 {
-      text-align: center;
-
-      &+canvas,
-      &+img {
-        margin-top: .5rem;
-      }
-    }
-
-    .two-up { /* two products per row */
-      max-width: 190px;
-      width: 50%;
-
-      /* special case where odd product is missing */
-      &.hide + .two-up:nth-child(even) a {
-        margin-left: 0;
-        margin-right: .75rem;
-      }
-
-      &:nth-child(odd) a {
-        margin-left: 0;
-      }
-      &:nth-child(even) a {
-        margin-right: 0;
-      }
-
-      a {
-        display: block;
-        margin: 1rem .75rem 0 .75rem;
-      }
-
-      canvas,
-      img {
-        width: 100%;
-      }
-    }
-  }
-
-  .strip {
-    display: flex;
-    margin: 0;
     overflow: scroll;
-    padding: 0;
 
     li {
       align-items: center;
@@ -196,7 +32,6 @@
 
       &:last-child {
         border: none;
-        padding-right: 0;
       }
 
       > small,
@@ -219,6 +54,12 @@
 
         padding-bottom: .25rem;
       }
+    }
+
+    ul {
+      display: flex;
+      margin: 0;
+      padding: 0;
     }
 
     .impact-bubble {
@@ -248,6 +89,31 @@
       }
     }
 
+    .shake-alert {
+      a {
+        line-height: 1;
+      }
+
+      img {
+        width: 28px;
+      }
+
+      small {
+        text-transform: capitalize;
+      }
+
+      strong {
+        position: relative;
+      }
+
+      sup {
+        color: $text-color-lightest;
+        font-size: .75rem;
+        position: absolute;
+        right: -.75rem;
+      }
+    }
+
     .status {
       small {
         text-transform: capitalize;
@@ -267,20 +133,174 @@
       }
     }
   }
-}
 
-@media only screen
-  and (max-width: 890px) {
-    #summaryPane {
-      .mainshock > div {
-        display: block;
-      }
+  .mainshock {
+    h4 {
+      text-align: center;
+    }
 
-      .pager-exposures,
-      .products {
-        border: none;
-        padding: 0;
-        width: 380px; /* accounts for loss of 40px padding */
+    .bubble {
+      margin: 1rem .5rem 0;
+
+      &.details {
+        margin: 0 0 -.4375rem 0 ;
+        padding-right: 0;
       }
     }
+  }
+
+  .pager {
+    h4 {
+      margin-top: 1rem;
+
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+
+    img {
+      max-width: 100%;
+    }
+  }
+
+  .pager-exposures {
+    table {
+      margin: .5rem 0 0;
+      width: 100%;
+    }
+
+    td,
+    th {
+      padding: 0.25rem .375rem;
+    }
+    td {
+      &:nth-child(1) {
+        max-width: 3.25rem;
+        padding-left: .25rem
+      }
+      &:nth-child(3) {
+        padding-right: .25rem;
+        text-align: right;
+      }
+    }
+
+    tr {
+      border: none; /* override general table border styles */
+      border-top: 1px solid $border-color-lighter;
+
+      &.city {
+        border: none;
+      }
+
+      &:first-child {
+        border-bottom: 1px solid $border-color;
+        border-top: none;
+      }
+    }
+
+    .city td {
+      color: $text-color-lighter;
+      font-weight: 300;
+      padding-top: 0;
+    }
+
+    .impact-bubble {
+      max-width: 3.5rem;
+    }
+  }
+
+  .products {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -.5rem;
+
+    div {
+      width: 400px;
+    }
+
+    h3 {
+      margin-top: 0;
+    }
+
+    .hide { /* missing product */
+      display: none !important;
+    }
+  }
+
+  .summary {
+    button {
+      margin-bottom: .5rem;
+    }
+  }
+
+  .thumbs {
+    flex-wrap: wrap;
+    padding: 1rem .5rem 0;
+
+    &.bubble {
+      display: flex;
+    }
+
+    a {
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    canvas,
+    img {
+      max-width: 100%;
+    }
+    img {
+      border: 2px solid #ccc;
+      border-radius: $button-border-radius;
+      padding: 2px;
+
+      &.mmiI {
+        border-color: $border-color-lighter; /* add subtle grey border so it shows up */
+      }
+      &.mmiII {
+        border-color: $mmiII-color;
+      }
+      &.mmiIII {
+        border-color: $mmiIII-color;
+      }
+      &.mmiIV {
+        border-color: $mmiIV-color;
+      }
+      &.mmiV {
+        border-color: $mmiV-color;
+      }
+      &.mmiVI {
+        border-color: $mmiVI-color;
+      }
+      &.mmiVII {
+        border-color: $mmiVII-color;
+      }
+      &.mmiVIII {
+        border-color: $mmiVIII-color;
+      }
+      &.mmiIX {
+        border-color: $mmiIX-color;
+      }
+      &.mmiX {
+        border-color: $mmiX-color;
+      }
+      &.mmiXI {
+        border-color: $mmiXI-color;
+      }
+      &.mmiXII {
+        border-color: $mmiXII-color;
+      }
+    }
+
+    div {
+      padding: 0 .5rem;
+      width: 50%;
+    }
+  }
 }
+
+// @media only screen
+//   and (max-width: 890px) {
+// }

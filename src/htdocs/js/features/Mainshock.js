@@ -47,8 +47,10 @@ var Mainshock = function (options) {
       _createSummary,
       _getBubbles,
       _getData,
-      _setDyfiProps,
-      _setShakeMapProps;
+      _getDyfi,
+      _getPager,
+      _getShakeAlert,
+      _getShakeMap;
 
 
   _this = {};
@@ -75,59 +77,73 @@ var Mainshock = function (options) {
   _createSummary = function () {
     var bubbles,
         data,
-        html;
+        dyfi,
+        html,
+        pager,
+        shakeAlert,
+        shakemap;
 
     data = _getData();
     bubbles = _getBubbles(data);
+    dyfi = _getDyfi(data);
+    pager = _getPager(data);
+    shakeAlert = _getShakeAlert(data);
+    shakemap = _getShakeMap(data);
     html = L.Util.template(
-      '<ul class="strip">' +
-        '<li class="mag">' +
-          '<strong>Mag</strong>' +
-          '<span>{magDisplay}</span>' +
-          '<small>{magType}</small>' +
-        '</li>' +
-        bubbles +
-        '<li class="date">' +
-          '<strong>Date</strong>' +
-          '<span>{date}</span>' +
-          '<small>{dayofweek}</small>' +
-        '</li>' +
-        '<li class="time">' +
-          '<strong>Time</strong>' +
-          '<span>{time}</span>' +
-          '<small>UTC</small>' +
-        '</li>' +
-        '<li class="depth">' +
-          '<strong>Depth</strong>' +
-          '<span>{depthDisplay}</span>' +
-          '<small>km</small>' +
-        '</li>' +
-        '<li class="location">' +
-          '<strong>Location</strong>' +
-          '<span>{locationDisplay}</span>' +
-        '</li>' +
-        '<li class="status">' +
-          '<strong>Status</strong>' +
-          '<span>{statusIcon}</span>' +
-          '<small>{status}</small>' +
-        '</li>' +
-      '</ul>' +
-      '<div>' +
-        '<div class="products">' +
-          '{dyfi}' +
-          '{shakemap}' +
-          '<div class="focal-mechanism placeholder hide two-up"></div>' +
-          '<div class="moment-tensor placeholder hide two-up"></div>' +
-        '</div>' +
-        '<div class="pager-exposures placeholder hide"></div>' +
+      '<div class="details bubble">' +
+        '<ul>' +
+          '<li class="mag">' +
+            '<strong>Mag</strong>' +
+            '<span>{magDisplay}</span>' +
+            '<small>{magType}</small>' +
+          '</li>' +
+          bubbles +
+          '<li class="date">' +
+            '<strong>Date</strong>' +
+            '<span>{date}</span>' +
+            '<small>{dayofweek}</small>' +
+          '</li>' +
+          '<li class="time">' +
+            '<strong>Time</strong>' +
+            '<span>{time}</span>' +
+            '<small>UTC</small>' +
+          '</li>' +
+          '<li class="depth">' +
+            '<strong>Depth</strong>' +
+            '<span>{depthDisplay}</span>' +
+            '<small>km</small>' +
+          '</li>' +
+          '<li class="location">' +
+            '<strong>Location</strong>' +
+            '<span>{locationDisplay}</span>' +
+          '</li>' +
+          shakeAlert +
+          '<li class="status">' +
+            '<strong>Status</strong>' +
+            '<span>{statusIcon}</span>' +
+            '<small>{status}</small>' +
+          '</li>' +
+        '</ul>' +
       '</div>' +
-      '<h3>Event Summary</h3>' +
-      '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
-        'earthquake details, images, plots and placeholders for adding ' +
-        'talking points and analysis. Microsoft Word is recommended for ' +
-        'viewing the document.</p>' +
-      '<button id="download" disabled="disabled" type="button" ' +
-        'title="Download RTF Document">Download</button>',
+      '<div class="products">' +
+        '<div class="thumbs bubble {visibility}">' +
+          dyfi +
+          shakemap +
+          '<div class="focal-mechanism placeholder hide"></div>' +
+          '<div class="moment-tensor placeholder hide"></div>' +
+        '</div>' +
+        '<div class="pager-exposures bubble placeholder hide"></div>' +
+        pager +
+        '<div class="summary bubble">' +
+          '<h3>Event Summary</h3>' +
+          '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
+            'earthquake details, images, plots and placeholders for talking ' +
+            'points and analysis. Microsoft Word is recommended for viewing ' +
+            'the document.</p>' +
+          '<button id="download" disabled="disabled" type="button" ' +
+            'title="Download RTF Document">Download</button>' +
+        '</div>' +
+      '</div>',
       data
     );
 
@@ -135,7 +151,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the 'impact bubbles' HTML templates.
+   * Get the 'impact bubbles' list items HTML template.
    *
    * @param data {Object}
    *
@@ -193,24 +209,54 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the data used to create the details strip.
+   * Get the data used to create the details strip and certain products.
    *
    * @return data {Object}
    */
   _getData = function () {
     var data,
+        dyfi,
+        dyfiImg,
+        econImg,
         eqTime,
+        fatalImg,
         mmiInt,
+        pager,
         products,
-        statusIcon;
+        shakeAlert,
+        shakeAlertStatus,
+        shakemap,
+        shakemapImg,
+        visibility;
 
+    products = _this.json.properties.products;
+    dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
-    products = _this.json.properties.products;
-    statusIcon = '';
+    pager = products.losspager;
+    shakeAlert = products['shake-alert'];
+    shakemap = products.shakemap;
+    visibility = 'hide'; // default - product thumbs container
 
-    if (_this.details.status === 'reviewed') {
-      statusIcon = '<i class="icon-check"></i>';
+    if (Array.isArray(dyfi)) {
+      dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
+      visibility = 'show';
+    }
+    if (Array.isArray(pager)) {
+      econImg = pager[0].contents['alertecon.png'].url;
+      fatalImg = pager[0].contents['alertfatal.png'].url;
+    }
+    if (Array.isArray(shakeAlert)) {
+      shakeAlertStatus = shakeAlert[0].status.toLowerCase();
+    }
+    if (Array.isArray(shakemap)) {
+      visibility = 'show';
+
+      if (shakemap[0].contents['download/tvmap.jpg']) {
+        shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
+      } else if (shakemap[0].contents['download/intensity.jpg'].url) {
+        shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
+      }
     }
 
     data = Object.assign({}, _this.details, {
@@ -218,71 +264,114 @@ var Mainshock = function (options) {
       dayofweek: eqTime.toFormat('cccc'),
       depthDisplay: AppUtil.round(_this.details.depth, 1),
       dyfiBubble: _this.details.bubbles.dyfi || '',
+      dyfiImg: dyfiImg || '',
+      econImg: econImg || '',
+      fatalImg: fatalImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
       locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
+      shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
-      statusIcon: statusIcon,
+      shakemapImg: shakemapImg || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
-      tsunamiBubble: _this.details.bubbles.tsunami || ''
+      tsunamiBubble: _this.details.bubbles.tsunami || '',
+      visibility: visibility
     });
-
-    // Add DYFI, ShakeMap props to data
-    _setDyfiProps(data, products.dyfi);
-    _setShakeMapProps(data, products.shakemap);
 
     return data;
   };
 
   /**
-   * Set Did You Feel It? properties for summary HTML.
+   * Get the Did You Feel It? product HTML template.
    *
    * @param data {Object}
-   * @param dyfi {Array}
+   *
+   * @return product {String}
    */
-  _setDyfiProps = function (data, dyfi) {
-    if (dyfi) {
-      data.dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
-      data.dyfi = L.Util.template(
-        '<div class="dyfi two-up">' +
-          '<a href="{url}/dyfi">' +
-            '<h4>Did You Feel It?</h4>' +
+  _getDyfi = function (data) {
+    var product = '';
+
+    if (data.dyfiImg) {
+      product =
+        '<div class="dyfi">' +
+          '<h4>Did You Feel It?</h4>' +
+          '<a href="{dyfiImg}">' +
             '<img src="{dyfiImg}" class="mmi{cdi}" />' +
           '</a>' +
-        '</div>',
-        data
-      );
-    } else {
-      data.dyfi = '';
+        '</div>';
     }
+
+    return product;
   };
 
   /**
-   * Set ShakeMap properties for summary HTML.
+   * Get the PAGER fatalities and economic losses product HTML template.
    *
    * @param data {Object}
-   * @param shakemap {Array}
+   *
+   * @return product {String}
    */
-  _setShakeMapProps = function (data, shakemap) {
-    if (shakemap) {
-      if (shakemap[0].contents['download/tvmap.jpg']) {
-        data.shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (shakemap[0].contents['download/intensity.jpg'].url) {
-        data.shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
-      }
+  _getPager = function (data) {
+    var product = '';
 
-      data.shakemap = L.Util.template(
-        '<div class="shakemap two-up">' +
-          '<a href="{url}/shakemap">' +
-            '<h4>ShakeMap</h4>' +
+    if (data.econImg) {
+      product =
+        '<div class="pager bubble">' +
+          '<h4>Estimated Fatalities</h4>' +
+          '<img src="{fatalImg}" alt="Estimated fatalities histogram" />' +
+          '<h4>Estimated Economic Losses</h4>' +
+          '<img src="{econImg}" alt="Estimated economic losses histogram" />' +
+        '</div>';
+    }
+
+    return product;
+  };
+
+  /**
+   * Get the ShakeAlert list item HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return item {String}
+   */
+  _getShakeAlert = function (data) {
+    var item = '';
+
+    if (data.shakeAlertStatus) {
+      item =
+        '<li class="shake-alert">' +
+          '<strong>ShakeAlert<sup>®</sup></strong>' +
+          '<a href="{url}/shake-alert" target="new">' +
+            '<img src="img/shake-alert.png" alt="ShakeAlert logo" />' +
+          '</a>' +
+          '<small>{shakeAlertStatus}</small>' +
+        '</li>';
+    }
+
+    return item;
+  };
+
+  /**
+   * Get the ShakeMap product HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return product {String}
+   */
+  _getShakeMap = function (data) {
+    var product = '';
+
+    if (data.shakemapImg) {
+      product =
+        '<div class="shakemap">' +
+          '<h4>ShakeMap</h4>' +
+          '<a href="{shakemapImg}">' +
             '<img src="{shakemapImg}" class="mmi{mmi}" />' +
           '</a>' +
-        '</div>',
-        data
-      );
-    } else {
-      data.shakemap = '';
+        '</div>';
     }
+
+    return product;
   };
 
   // ----------------------------------------------------------
