@@ -5,8 +5,8 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Fetch a JSON feed. Add timeout support to fetch() and show the loading
- * status and any errors encountered in the StatusBar.
+ * Fetch a JSON feed with timeout support and show the loading status and any
+ * errors encountered in the StatusBar.
  *
  * @param options {Object}
  *   {
@@ -24,9 +24,7 @@ var JsonFeed = function (options) {
   var _this,
       _initialize,
 
-      _app,
-
-      _fetchWithTimeout;
+      _app;
 
 
   _this = {};
@@ -37,30 +35,6 @@ var JsonFeed = function (options) {
     _app = options.app;
 
     _this.throttlers = {};
-  };
-
-  /**
-   * Add timeout support to a fetch() request.
-   *
-   * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
-   *
-   * @param resource {String}
-   * @param options {Object} optional; default is {}
-   *     fetch() settings, with an additional prop for timeout in milliseconds
-   */
-  _fetchWithTimeout = async function (resource, options = {}) {
-    const { timeout = 10000 } = options;
-
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-
-    const response = await fetch(resource, {
-      ...options,
-      signal: controller.signal
-    });
-    clearTimeout(id);
-
-    return response;
   };
 
   // ----------------------------------------------------------
@@ -97,7 +71,7 @@ var JsonFeed = function (options) {
     _app.StatusBar.addItem(opts);
 
     try {
-      response = await _fetchWithTimeout(url.href, fetchOpts);
+      response = await AppUtil.fetchWithTimeout(url.href, fetchOpts);
       json = await response.clone().json();
 
       _app.StatusBar.removeItem(opts.id);

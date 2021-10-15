@@ -88,6 +88,30 @@ AppUtil.compose = function () {
 };
 
 /**
+ * Add timeout support to a fetch() request.
+ *
+ * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
+ *
+ * @param resource {String}
+ * @param options {Object} optional; default is {}
+ *     fetch() settings, with an additional prop for timeout in milliseconds
+ */
+AppUtil.fetchWithTimeout = async function (resource, options = {}) {
+  const { timeout = 10000 } = options;
+
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  const response = await fetch(resource, {
+    ...options,
+    signal: controller.signal
+  });
+  clearTimeout(id);
+
+  return response;
+};
+
+/**
  * Get the value of a given URL parameter.
  *
  * @param name {String}
