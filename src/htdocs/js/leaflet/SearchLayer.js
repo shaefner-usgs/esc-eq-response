@@ -44,7 +44,6 @@ var SearchLayer = function (options) {
       _initialize,
 
       _app,
-      _Earthquakes,
 
       _getTitle;
 
@@ -99,7 +98,7 @@ var SearchLayer = function (options) {
    *     feed data for Feature
    */
   _this.create = function (json) {
-    _Earthquakes = Earthquakes({
+    var earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
       json: json,
@@ -107,7 +106,7 @@ var SearchLayer = function (options) {
     });
 
     _this.count = json.metadata.count;
-    _this.mapLayer = _Earthquakes.mapLayer;
+    _this.mapLayer = earthquakes.mapLayer;
   };
 
   /**

@@ -44,7 +44,6 @@ var Mainshock = function (options) {
       _app,
       _dyfiLightbox,
       _eqid,
-      _Earthquakes,
       _smLightbox,
 
       _createSummary,
@@ -425,16 +424,16 @@ var Mainshock = function (options) {
    *     feed data for Feature
    */
   _this.create = function (json) {
-    _Earthquakes = Earthquakes({
+    var earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
       json: json
     });
 
-    _this.details = _Earthquakes.list[0];
+    _this.details = earthquakes.list[0];
     _this.json = json; // used by other Features
-    _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotTraces = _Earthquakes.plotTraces;
+    _this.mapLayer = earthquakes.mapLayer;
+    _this.plotTraces = earthquakes.plotTraces;
     _this.summary = _createSummary();
   };
 
@@ -448,7 +447,6 @@ var Mainshock = function (options) {
     _dyfiLightbox = null;
     _eqid = null;
     _smLightbox = null;
-    _Earthquakes = null;
 
     _createSummary = null;
 
