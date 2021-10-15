@@ -55,8 +55,8 @@ var FieldNotes = function (options) {
       _initialize,
 
       _app,
+      _lightbox,
       _markerOptions,
-      _Lightbox,
 
       _addListeners,
       _createList,
@@ -72,7 +72,7 @@ var FieldNotes = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
-    _Lightbox = Lightbox();
+    _lightbox = Lightbox({id: 'fieldnotes'});
 
     _this.id = 'fieldnotes';
     _this.mapLayer = null;
@@ -103,7 +103,7 @@ var FieldNotes = function (options) {
     if (photo) {
       photo.addEventListener('click', e => {
         e.preventDefault();
-        _Lightbox.show();
+        _lightbox.show();
       });
     }
 
@@ -263,7 +263,7 @@ var FieldNotes = function (options) {
         popup.update(); // pan map to contain popup after image loads
       };
 
-      _Lightbox.add(`<img src="${image.src}" alt="enlarged photo" />`);
+      _lightbox.add(`<img src="${image.src}" alt="enlarged photo" />`);
     }
   };
 
@@ -292,8 +292,8 @@ var FieldNotes = function (options) {
     _initialize = null;
 
     _app = null;
+    _lightbox = null;
     _markerOptions = null;
-    _Lightbox = null;
 
     _addListeners = null;
     _createList = null;
