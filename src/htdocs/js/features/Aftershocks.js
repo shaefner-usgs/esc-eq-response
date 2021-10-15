@@ -46,7 +46,7 @@ var Aftershocks = function (options) {
       _forecast,
       _mainshock,
       _model,
-      _Earthquakes,
+      _earthquakes,
 
       _createForecast,
       _createProbabilities,
@@ -176,10 +176,10 @@ var Aftershocks = function (options) {
         mostRecentEq;
 
     html = '<div class="bubble">';
-    html += _Earthquakes.createDescription();
+    html += _earthquakes.createDescription();
 
     if (_this.count > 0) {
-      mostRecentEq = _Earthquakes.list[_Earthquakes.list.length - 1];
+      mostRecentEq = _earthquakes.list[_earthquakes.list.length - 1];
       interval = Luxon.Interval.fromDateTimes(
         Luxon.DateTime.fromISO(mostRecentEq.isoTime),
         Luxon.DateTime.utc()
@@ -187,19 +187,19 @@ var Aftershocks = function (options) {
       duration = AppUtil.round(interval, 1) + ' days';
 
       html += '<div class="bins">';
-      html += _Earthquakes.createBinTable('first');
-      html += _Earthquakes.createBinTable('past');
+      html += _earthquakes.createBinTable('first');
+      html += _earthquakes.createBinTable('past');
       html += '</div>';
       html += _createForecast();
 
       if (_this.count > 1) {
         html += '<h3>Most Recent Aftershock</h3>';
         html += `<p>The most recent aftershock was <strong>${duration} ago</strong>.</p>`;
-        html += _Earthquakes.createListTable('mostRecent');
+        html += _earthquakes.createListTable('mostRecent');
       }
 
-      html += _Earthquakes.createSlider();
-      html += _Earthquakes.createListTable('all');
+      html += _earthquakes.createSlider();
+      html += _earthquakes.createListTable('all');
     }
 
     html += '</div>';
@@ -239,19 +239,19 @@ var Aftershocks = function (options) {
    *     feed data for Feature
    */
   _this.create = function (json) {
-    _Earthquakes = Earthquakes({
+    _earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
       json: json,
       sortByField: _this.sortByField
     });
 
-    _this.bins = _Earthquakes.bins;
+    _this.bins = _earthquakes.bins;
     _this.count = json.metadata.count;
-    _this.description = _Earthquakes.createDescription();
-    _this.list = _Earthquakes.list;
-    _this.mapLayer = _Earthquakes.mapLayer;
-    _this.plotTraces = _Earthquakes.plotTraces;
+    _this.description = _earthquakes.createDescription();
+    _this.list = _earthquakes.list;
+    _this.mapLayer = _earthquakes.mapLayer;
+    _this.plotTraces = _earthquakes.plotTraces;
     _this.summary = _createSummary();
 
     // The following props depend on summary being created first
@@ -266,10 +266,10 @@ var Aftershocks = function (options) {
     _initialize = null;
 
     _app = null;
+    _earthquakes = null;
     _forecast = null;
     _mainshock = null;
     _model = null;
-    _Earthquakes = null;
 
     _createForecast = null;
     _createProbabilities = null;
