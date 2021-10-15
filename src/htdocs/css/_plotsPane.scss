@@ -5,9 +5,18 @@
     margin-bottom: 2rem;
   }
 
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Rendering order of features */
   .aftershocks {
     order: 0;
+
+    h2 {
+      margin-top: .25rem;
+    }
   }
   .foreshocks {
     order: 1;

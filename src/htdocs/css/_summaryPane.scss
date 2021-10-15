@@ -24,9 +24,18 @@
     display: inline-block;
   }
 
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Rendering order of features */
   .mainshock {
     order: 0;
+
+    h2 {
+      margin-top: .25rem;
+    }
   }
   .aftershocks {
     order: 1;
