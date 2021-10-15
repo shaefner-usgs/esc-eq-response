@@ -75,7 +75,6 @@ var PlotsPane = function (options) {
     var count,
         loader;
 
-    count = document.createElement('span');
     loader = div.querySelector('.breather');
 
     if (loader) {
@@ -83,6 +82,8 @@ var PlotsPane = function (options) {
     }
 
     if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
+      count = document.createElement('span');
+
       count.classList.add('count', 'hide');
       count.textContent = feature.count;
 

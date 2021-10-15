@@ -71,7 +71,6 @@ var SummaryPane = function (options) {
     var count,
         loader;
 
-    count = document.createElement('span');
     loader = div.querySelector('.breather');
 
     if (loader) {
@@ -79,6 +78,8 @@ var SummaryPane = function (options) {
     }
 
     if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
+      count = document.createElement('span');
+
       count.classList.add('count', 'hide');
       count.textContent = feature.count;
 
@@ -407,12 +408,15 @@ var SummaryPane = function (options) {
       // Inserting node this way preserves CSS transitions
       div.insertAdjacentHTML('beforeend', feature.summary);
 
+      // Render beachballs for FM, MT products
       if (Object.prototype.hasOwnProperty.call(feature, 'beachball')) {
         feature.beachball.render(_el.querySelector('.' + feature.id + ' a'));
         div.parentNode.classList.remove('hide'); // hidden if no ShakeMap, DYFI products
       }
+
+      // Show content added to Mainshock section (i.e. not a "stand-alone" Feature)
       if (div.classList.contains('placeholder')) {
-        div.classList.remove('hide'); // show content added to Mainshock
+        div.classList.remove('hide');
       }
 
       _addCount(feature, div);
