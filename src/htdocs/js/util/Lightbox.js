@@ -1,8 +1,16 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
- * Create a Lightbox overlay.
+ * Create a Lightbox overlay instance.
+ *
+ * @param options {Object}
+ *   {
+ *     id: {String}
+ *   }
  *
  * @return _this {Object}
  *   {
@@ -12,14 +20,23 @@
  *     show: {Function}
  *   }
  */
-var Lightbox = function () {
+var Lightbox = function (options) {
   var _this,
+      _initialize,
+
+      _id,
 
       _addListeners,
       _handleEscapeKey;
 
 
   _this = {};
+
+  _initialize = function (options) {
+    options = options || {};
+
+    _id = 'lightbox' + AppUtil.capitalize(options.id);
+  };
 
   /**
    * Add listener for close button.
@@ -49,7 +66,7 @@ var Lightbox = function () {
   // ----------------------------------------------------------
 
   /**
-   * Add Lightbox to document.
+   * Add the Lightbox to the document.
    *
    * @param html {String}
    *     Lightbox content (typically an <img> element)
@@ -58,6 +75,7 @@ var Lightbox = function () {
     var div = document.createElement('div');
 
     div.classList.add('lightbox', 'hide');
+    div.id = _id;
     div.innerHTML = html;
 
     _this.remove(); // first remove any existing Lightbox
@@ -67,10 +85,10 @@ var Lightbox = function () {
   };
 
   /**
-   * Hide Lightbox.
+   * Hide the Lightbox.
    */
   _this.hide = function () {
-    var div = document.querySelector('body > .lightbox');
+    var div = document.getElementById(_id);
 
     if (div) {
       div.classList.add('hide');
@@ -81,10 +99,10 @@ var Lightbox = function () {
   };
 
   /**
-   * Remove Lightbox from document.
+   * Remove the Lightbox from the document.
    */
   _this.remove = function () {
-    var div = document.querySelector('body > .lightbox');
+    var div = document.getElementById(_id);
 
     if (div) {
       div.parentNode.removeChild(div);
@@ -92,10 +110,10 @@ var Lightbox = function () {
   };
 
   /**
-   * Show Lightbox.
+   * Show the Lightbox.
    */
   _this.show = function () {
-    var div = document.querySelector('body > .lightbox');
+    var div = document.getElementById(_id);
 
     if (div) {
       div.classList.remove('hide');
@@ -105,6 +123,9 @@ var Lightbox = function () {
     document.addEventListener('keydown', _handleEscapeKey);
   };
 
+
+  _initialize(options);
+  options = null;
   return _this;
 };
 
