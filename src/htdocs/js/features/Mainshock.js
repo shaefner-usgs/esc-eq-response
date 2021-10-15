@@ -4,6 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/Earthquakes'),
+    Lightbox = require('util/Lightbox'),
     Luxon = require('luxon');
 
 
@@ -17,7 +18,7 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
- *     addListener: {Function}
+ *     addListeners: {Function}
  *     create: {Function}
  *     details: {Object}
  *     destroy: {Function}
@@ -41,8 +42,10 @@ var Mainshock = function (options) {
       _initialize,
 
       _app,
+      _dyfiLightbox,
       _eqid,
       _Earthquakes,
+      _smLightbox,
 
       _createSummary,
       _getBubbles,
@@ -59,6 +62,8 @@ var Mainshock = function (options) {
     options = options || {};
 
     _app = options.app;
+    _dyfiLightbox = Lightbox({id: 'dyfi'});
+    _smLightbox = Lightbox({id: 'shakemap'});
 
     _this.id = 'mainshock';
     _this.mapLayer = null;
@@ -146,6 +151,9 @@ var Mainshock = function (options) {
       '</div>',
       data
     );
+
+    _dyfiLightbox.add(`<img src="${data.dyfiImg}" alt="enlarged photo" />`);
+    _smLightbox.add(`<img src="${data.shakemapImg}" alt="enlarged photo" />`);
 
     return html;
   };
@@ -296,7 +304,7 @@ var Mainshock = function (options) {
         '<div class="dyfi">' +
           '<h4>Did You Feel It?</h4>' +
           '<a href="{dyfiImg}">' +
-            '<img src="{dyfiImg}" class="mmi{cdi}" />' +
+            '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity" />' +
           '</a>' +
         '</div>';
     }
@@ -366,7 +374,7 @@ var Mainshock = function (options) {
         '<div class="shakemap">' +
           '<h4>ShakeMap</h4>' +
           '<a href="{shakemapImg}">' +
-            '<img src="{shakemapImg}" class="mmi{mmi}" />' +
+            '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity" />' +
           '</a>' +
         '</div>';
     }
@@ -379,13 +387,35 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add event listener for download button.
+   * Add event listeners.
    */
-  _this.addListener = function () {
-    var button = document.getElementById('download');
+  _this.addListeners = function () {
+    var button,
+        div,
+        dyfi,
+        shakemap;
+
+    button = document.getElementById('download');
+    div = document.querySelector('.mainshock .thumbs');
+    dyfi = div.querySelector('.dyfi a');
+    shakemap = div.querySelector('.shakemap a');
 
     // Load external feed data for RTF Summary
     button.addEventListener('click', _app.Feeds.loadFeeds);
+
+    // Show full-size images in a Lightbox
+    if (dyfi) {
+      dyfi.addEventListener('click', e => {
+        e.preventDefault();
+        _dyfiLightbox.show();
+      });
+    }
+    if (shakemap) {
+      shakemap.addEventListener('click', e => {
+        e.preventDefault();
+        _smLightbox.show();
+      });
+    }
   };
 
   /**
@@ -415,7 +445,9 @@ var Mainshock = function (options) {
     _initialize = null;
 
     _app = null;
+    _dyfiLightbox = null;
     _eqid = null;
+    _smLightbox = null;
     _Earthquakes = null;
 
     _createSummary = null;
