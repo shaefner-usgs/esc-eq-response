@@ -150,6 +150,10 @@
   }
 
   .pager {
+    &.bubble {
+      padding: 1rem 0;
+    }
+
     h4 {
       margin-top: 1rem;
 
