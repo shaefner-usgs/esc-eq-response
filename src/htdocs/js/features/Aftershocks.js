@@ -43,10 +43,10 @@ var Aftershocks = function (options) {
       _initialize,
 
       _app,
+      _earthquakes,
       _forecast,
       _mainshock,
       _model,
-      _earthquakes,
 
       _createForecast,
       _createProbabilities,
