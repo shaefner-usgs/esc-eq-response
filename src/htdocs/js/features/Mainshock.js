@@ -449,6 +449,12 @@ var Mainshock = function (options) {
     _smLightbox = null;
 
     _createSummary = null;
+    _getBubbles = null;
+    _getData = null;
+    _getDyfi = null;
+    _getPager = null;
+    _getShakeAlert = null;
+    _getShakeMap = null;
 
     _this = null;
   };
