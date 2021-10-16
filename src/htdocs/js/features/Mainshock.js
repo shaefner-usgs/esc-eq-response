@@ -151,8 +151,8 @@ var Mainshock = function (options) {
       data
     );
 
-    _dyfiLightbox.add(`<img src="${data.dyfiImg}" alt="enlarged photo" />`);
-    _smLightbox.add(`<img src="${data.shakemapImg}" alt="enlarged photo" />`);
+    _dyfiLightbox.add(`<img src="${data.dyfiImg}" alt="DYFI" />`);
+    _smLightbox.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
 
     return html;
   };
@@ -395,7 +395,7 @@ var Mainshock = function (options) {
         shakemap;
 
     button = document.getElementById('download');
-    div = document.querySelector('.mainshock .thumbs');
+    div = document.querySelector('#summaryPane .thumbs');
     dyfi = div.querySelector('.dyfi a');
     shakemap = div.querySelector('.shakemap a');
 
