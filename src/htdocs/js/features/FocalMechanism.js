@@ -142,12 +142,12 @@ var FocalMechanism = function (options) {
         html,
         url;
 
-    eqid = AppUtil.getParam('eqid');
     html = '';
 
     if (_this.beachball) {
+      eqid = AppUtil.getParam('eqid');
       url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/focal-mechanism`;
-      html = `<h4>${_this.name}</h4><a href="${url}"></a>`;
+      html = `<h4>${_this.name}</h4><a href="${url}" target="new"></a>`;
     }
 
     return html;
