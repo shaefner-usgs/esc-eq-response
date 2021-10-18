@@ -182,9 +182,9 @@ AppUtil.getShakingValues = function (mmis) {
   ];
   values = [];
 
-  mmis.forEach(val => {
-    values.push(shaking[val]);
-  });
+  mmis.forEach(val =>
+    values.push(shaking[val])
+  );
 
   return values;
 };
@@ -237,9 +237,9 @@ AppUtil.resetQueryString = function () {
   pairs = [];
   params = new URLSearchParams(location.search);
 
-  inputs.forEach(input => {
-    msParams.push(input.id);
-  });
+  inputs.forEach(input =>
+    msParams.push(input.id)
+  );
 
   params.forEach((value, name) => {
     if (!msParams.includes(name)) { // skip Mainshock params

@@ -102,14 +102,14 @@ var Application = function (options) {
     var select = document.querySelector('.select');
 
     // Save scroll position of panes
-    window.addEventListener('scroll', () => {
-      _saveScrollPosition('pane');
-    });
+    window.addEventListener('scroll', () =>
+      _saveScrollPosition('pane')
+    );
 
     // Save scroll position of sidebars
-    _sidebar.addEventListener('scroll', () => {
-      _saveScrollPosition('sidebar');
-    });
+    _sidebar.addEventListener('scroll', () =>
+      _saveScrollPosition('sidebar')
+    );
 
     // Show the SelectBar when the 'Select an earthquake' link is clicked
     select.addEventListener('click', () => {
@@ -182,9 +182,9 @@ var Application = function (options) {
     _addListeners();
 
     // Run post-initialization code now that all Classes are ready
-    postInits.forEach(name => {
-      name.postInit();
-    });
+    postInits.forEach(name =>
+      name.postInit()
+    );
   };
 
   /**
@@ -224,9 +224,9 @@ var Application = function (options) {
     clearTimeout(_throttle);
 
     // Throttle scroll event
-    _throttle = setTimeout(() => {
-      sessionStorage.setItem(id, position);
-    }, 50);
+    _throttle = setTimeout(() =>
+      sessionStorage.setItem(id, position), 50
+    );
   };
 
   // ----------------------------------------------------------
@@ -290,10 +290,9 @@ var Application = function (options) {
     value = _getSliderValue(input);
     vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
-    vendorAttrs.forEach(attr => {
-      newRules += '#' + input.id + '::-' + attr + '-track {background-size:' + value
-        + ' !important}';
-    });
+    vendorAttrs.forEach(attr =>
+      newRules += `#${input.id}::-${attr}-track {background-size:${value} !important}`
+    );
 
     // Remove 'old' css rules first, then add new ones
     _style.textContent = _style.textContent.replace(oldRules, '');

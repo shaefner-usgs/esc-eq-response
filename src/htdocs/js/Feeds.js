@@ -156,9 +156,9 @@ var Feeds = function (options) {
    * Reset to initial state; destroy Feeds.
    */
   _this.reset = function () {
-    Object.keys(_feeds).forEach(id => {
-      _feeds[id].destroy();
-    });
+    Object.keys(_feeds).forEach(id =>
+      _feeds[id].destroy()
+    );
 
     _feeds = {};
   };

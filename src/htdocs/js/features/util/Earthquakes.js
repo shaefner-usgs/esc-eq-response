@@ -397,9 +397,10 @@ var Earthquakes = function (options) {
       x = _plotData.time.slice();
 
       // Fill y with values from 1 to length of x and date field
-      y = Array.from(new Array(x.length), (val, i) => {
-        return i + 1;
-      });
+      y = Array.from(
+        new Array(x.length),
+        (val, i) => i + 1
+      );
 
       // Add origin point (Mainshock) to beginning of Aftershocks trace
       if (_featureId === 'aftershocks') {
@@ -508,9 +509,9 @@ var Earthquakes = function (options) {
     bubbles = '';
     div = L.DomUtil.create('div');
 
-    Object.keys(eq.bubbles).forEach(type => {
-      bubbles += eq.bubbles[type];
-    });
+    Object.keys(eq.bubbles).forEach(type =>
+      bubbles += eq.bubbles[type]
+    );
 
     popup = L.Util.template(_getTemplate('popup'),
       Object.assign({}, eq, {
@@ -1022,9 +1023,9 @@ var Earthquakes = function (options) {
       min: Math.floor(_minMag)
     };
     html = '';
-    singleMagBin = _this.bins.mag.every((value, i, array) => {
-      return array[0] === value; // all values are the same
-    });
+    singleMagBin = _this.bins.mag.every(
+      (value, i, array) => array[0] === value // all values are the same
+    );
 
     if (singleMagBin) {
       html = L.Util.template(_getTemplate('subheader'), data);
@@ -1065,9 +1066,9 @@ Earthquakes.getFeedUrl = function (params) {
 
   delete params.period; // internal property (search API rejects 'foreign' props)
 
-  Object.keys(params).forEach(key => {
-    pairs.push(key + '=' + params[key]);
-  });
+  Object.keys(params).forEach(key =>
+    pairs.push(key + '=' + params[key])
+  );
 
   return baseUri + '?' + pairs.join('&');
 };

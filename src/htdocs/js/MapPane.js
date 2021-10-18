@@ -561,9 +561,7 @@ var MapPane = function (options) {
     _placeholders = {};
 
     // Purge canvas elements (FM, MT beachballs)
-    canvasEls.forEach(el => {
-      el.remove();
-    });
+    canvasEls.forEach(el => el.remove());
 
     // Reset layer controller
     if (_layerControl) {

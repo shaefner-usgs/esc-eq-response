@@ -175,9 +175,9 @@ var Features = function (options) {
         if (dependency.isLoading) {
           status = 'loading';
 
-          setTimeout(() => {
-            _this.createFeature(feature.id);
-          }, 250);
+          setTimeout(() =>
+            _this.createFeature(feature.id), 250
+          );
         }
       });
     }

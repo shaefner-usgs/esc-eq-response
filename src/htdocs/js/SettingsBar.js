@@ -69,9 +69,9 @@ var SettingsBar = function (options) {
     fields = _el.querySelectorAll('input');
 
     // Update a Feature when its params are changed
-    features.forEach(feature => {
-      feature.addEventListener('input', _refreshFeature);
-    });
+    features.forEach(feature =>
+      feature.addEventListener('input', _refreshFeature)
+    );
 
     // Update the queryString when a form field is changed
     fields.forEach(field => {
@@ -82,9 +82,9 @@ var SettingsBar = function (options) {
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
       if (document.body.classList.contains('mainshock')) {
-        setTimeout(() => {
-          _this.setDefaults();
-        }, 25); // slight delay so browser doesn't wipe out new values
+        setTimeout(() => // set a slight delay so browser doesn't wipe out values
+          _this.setDefaults(), 25
+        );
       }
     });
   };
@@ -264,9 +264,9 @@ var SettingsBar = function (options) {
     ];
     inputs = _el.querySelectorAll(selectors.join(','));
 
-    inputs.forEach(input => {
-      input.value = '';
-    });
+    inputs.forEach(input =>
+      input.value = ''
+    );
   };
 
   /**

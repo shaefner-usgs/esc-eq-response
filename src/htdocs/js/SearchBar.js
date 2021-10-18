@@ -103,14 +103,14 @@ var SearchBar = function (options) {
     slider = _el.querySelector('.slider input');
 
     // Set the minutes value when the user clicks an arrow button
-    arrows.forEach(arrow => {
-      arrow.addEventListener('click', _setMinutes);
-    });
+    arrows.forEach(arrow =>
+      arrow.addEventListener('click', _setMinutes)
+    );
 
     // Show the selected option when the user clicks a 'nav-strip' button
-    buttons.forEach(button => {
-      button.addEventListener('click', _showSelected);
-    });
+    buttons.forEach(button =>
+      button.addEventListener('click', _showSelected)
+    );
 
     // Open the associated date picker when the user clicks a label
     labels.forEach(label => {
@@ -391,9 +391,9 @@ var SearchBar = function (options) {
         today.classList.remove('today');
         tomorrow.classList.add('today');
 
-        setTimeout(() => { // restore transitions
-          today.style.transitionProperty = 'background, color';
-        }, 500);
+        setTimeout(() =>  // restore transitions
+          today.style.transitionProperty = 'background, color', 500
+        );
       }
     }
   };

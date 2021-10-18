@@ -127,9 +127,9 @@ var SummaryPane = function (options) {
         trs = table.querySelectorAll('tr');
 
         // Show the sort menu when the user clicks on the current sorted by option
-        ths.forEach(th => {
-          th.addEventListener('click', _showMenu);
-        });
+        ths.forEach(th =>
+          th.addEventListener('click', _showMenu)
+        );
 
         // Show the map and open a popup when the user clicks on an earthquake
         trs.forEach(tr => {
@@ -150,9 +150,9 @@ var SummaryPane = function (options) {
   _addTitleAttrs = function (table) {
     var ths = table.querySelectorAll('th');
 
-    ths.forEach(th => {
-      th.setAttribute('title', 'Sort by ' + th.textContent);
-    });
+    ths.forEach(th =>
+      th.setAttribute('title', 'Sort by ' + th.textContent)
+    );
   };
 
   /**
@@ -263,9 +263,9 @@ var SummaryPane = function (options) {
     table = _el.querySelector('.' + id + ' .sortable');
 
     Tablesort.extend('number', item => {
-      return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-        item.match(/^-?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
-        item.match(/^-?(\d)*-?([,.]){0,1}-?(\d)+([E,e][-+][\d]+)?%?$/); // Number
+      item.match(/^-?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
+      item.match(/^-?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+      item.match(/^-?(\d)*-?([,.]){0,1}-?(\d)+([E,e][-+][\d]+)?%?$/); // Number
     }, (a, b) => {
       a = cleanNumber(a);
       b = cleanNumber(b);

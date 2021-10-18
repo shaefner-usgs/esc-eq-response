@@ -208,9 +208,9 @@ var FieldNotes = function (options) {
     var props = feature.properties;
 
     // Strip slashes from JSON encoded values
-    Object.keys(props).forEach(key => {
-      props[key] = AppUtil.stripslashes(props[key]);
-    });
+    Object.keys(props).forEach(key =>
+      props[key] = AppUtil.stripslashes(props[key])
+    );
 
     props.title = props.form;
     if (props.site) {
@@ -330,9 +330,9 @@ var FieldNotes = function (options) {
       radius: radius // use aftershocks radius
     };
 
-    Object.keys(urlParams).forEach(key => {
-      pairs.push(key + '=' + urlParams[key]);
-    });
+    Object.keys(urlParams).forEach(key =>
+      pairs.push(key + '=' + urlParams[key])
+    );
 
     _this.url = 'https://bayquakealliance.org/fieldnotes/features.json.php?' +
       pairs.join('&');

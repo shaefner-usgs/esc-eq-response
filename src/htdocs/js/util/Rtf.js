@@ -113,9 +113,9 @@ var Rtf = function (options) {
 
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
-      list = feature.list.filter(eq => {
-        return eq.mag >= _magThreshold;
-      });
+      list = feature.list.filter(eq =>
+        eq.mag >= _magThreshold
+      );
     }
 
     // Set sort key, order here (not in _compare) so it only gets set once/Feature
@@ -352,9 +352,9 @@ var Rtf = function (options) {
       format: 'png',
       height: 300,
       width: 800
-    }).then(dataUrl => {
-      _plots[id][type] = dataUrl;
-    });
+    }).then(dataUrl =>
+      _plots[id][type] = dataUrl
+    );
 
     return promise;
   };
@@ -375,17 +375,17 @@ var Rtf = function (options) {
     Object.keys(plotDivs).forEach(id => {
       _plots[id] = {};
 
-      plotDivs[id].forEach(div => {
-        promises.push(_getPromise(div, id));
-      });
+      plotDivs[id].forEach(div =>
+        promises.push(_getPromise(div, id))
+      );
     });
 
     return promises;
   };
 
   /**
-   * Get the current sort key (set as a CSS class on a <th>) and sort order for
-   * an earthquake list.
+   * Get the current sort key (which is set as a CSS class on the <th>) and sort
+   * order for an earthquake list.
    *
    * @param id {String}
    *     Feature id
@@ -420,9 +420,10 @@ var Rtf = function (options) {
       });
     });
 
-    key = Array.from(el.classList).filter(className => {
-      return !regex2.test(className); // weeds out sorting algorithm CSS classes
-    });
+    // Weed out sorting algorithm CSS classes
+    key = Array.from(el.classList).filter(className =>
+      !regex2.test(className)
+    );
 
     return {
       key: key[0],

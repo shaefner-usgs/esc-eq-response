@@ -488,9 +488,9 @@ var PlotsPane = function (options) {
     if (el) {
       plots = el.querySelectorAll('.js-plotly-plot');
 
-      plots.forEach(plot => {
-        Plotly.purge(plot);
-      });
+      plots.forEach(plot =>
+        Plotly.purge(plot)
+      );
 
       el.parentNode.removeChild(el);
     }
@@ -566,9 +566,9 @@ var PlotsPane = function (options) {
     var plots = _el.querySelectorAll('.js-plotly-plot');
 
     if (_isActive()) {
-      plots.forEach(plot => {
-        Plotly.Plots.resize(plot);
-      });
+      plots.forEach(plot =>
+        Plotly.Plots.resize(plot)
+      );
     }
   };
 

@@ -172,9 +172,9 @@ var SignificantEqs = function (options) {
   _this.reset = function () {
     var lis = _el.querySelectorAll('li');
 
-    lis.forEach(li => {
-      li.classList.remove('selected');
-    });
+    lis.forEach(li =>
+      li.classList.remove('selected')
+    );
   };
 
 

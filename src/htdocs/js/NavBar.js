@@ -87,9 +87,9 @@ var NavBar = function (options) {
     });
 
     // Close the sidebar
-    close.addEventListener('click', () => {
-      _toggleSideBar('off');
-    });
+    close.addEventListener('click', () =>
+      _toggleSideBar('off')
+    );
   };
 
   /**
