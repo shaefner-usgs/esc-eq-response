@@ -162,7 +162,7 @@ var SearchBar = function (options) {
 
     period = _el.querySelector('ul.period .selected').id;
     params = {
-      minmagnitude: document.getElementById('mag').value,
+      minmagnitude: document.getElementById('catalog').value,
       period: period,
     };
     region = _el.querySelector('ul.region .selected').id;
