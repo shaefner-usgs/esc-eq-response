@@ -424,13 +424,15 @@ var SearchBar = function (options) {
    * Show the selected option for the 'nav-strips'.
    */
   _showSelected = function () {
-    var customDiv,
+    var className,
+        customDiv,
         parent,
         regex,
         sibling;
 
     parent = this.parentNode;
-    customDiv = _el.querySelector('div.' + parent.className);
+    className = parent.className.replace(/\s?options\s?/, '');
+    customDiv = _el.querySelector('div.' + className);
     regex = /^custom/;
     sibling = parent.firstElementChild;
 
