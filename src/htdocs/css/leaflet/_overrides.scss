@@ -152,6 +152,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
   .leaflet-popup-content {
     color: $text-color;
+    margin: .75rem 1rem;
 
     a {
       color: $link-color;
