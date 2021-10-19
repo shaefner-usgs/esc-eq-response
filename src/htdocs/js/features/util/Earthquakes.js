@@ -1054,7 +1054,8 @@ var Earthquakes = function (options) {
 Earthquakes.getFeedUrl = function (params) {
   var baseUri,
       defaults,
-      pairs;
+      pairs,
+      value;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
   defaults = {
@@ -1066,9 +1067,15 @@ Earthquakes.getFeedUrl = function (params) {
 
   delete params.period; // internal property (search API rejects 'foreign' props)
 
-  Object.keys(params).forEach(key =>
-    pairs.push(key + '=' + params[key])
-  );
+  Object.keys(params).forEach(key => {
+    value = params[key];
+
+    if (key === 'latitude' || key === 'longitude') {
+      value = AppUtil.round(value, 3);
+    }
+
+    pairs.push(key + '=' + value);
+  });
 
   return baseUri + '?' + pairs.join('&');
 };
