@@ -436,7 +436,7 @@ var SearchBar = function (options) {
     regex = /^custom/;
     sibling = parent.firstElementChild;
 
-    // Select the appropriate nav button and unselect all others
+    // Highlight the selected nav button and unselect all others
     this.classList.add('selected');
 
     while (sibling) {
