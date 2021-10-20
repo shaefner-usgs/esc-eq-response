@@ -9,7 +9,7 @@ create();
  * Create the RTF file.
  */
 function create() {
-  $jsonParams = [
+  $response = [
     'error' => '',
     'file' => ''
   ];
@@ -21,13 +21,13 @@ function create() {
     $data = json_decode(file_get_contents('php://input'));
 
     $rtf = new Rtf($data);
-    $jsonParams['file'] = $rtf->file;
+    $response['file'] = $rtf->file;
   } catch (Exception $e) {
-    $jsonParams['error'] = $e->getMessage();
+    $response['error'] = $e->getMessage();
 
     setHeaders('HTTP/1.0 500 Internal Server Error');
   } finally {
-    sendResponse($jsonParams);
+    sendResponse($response);
   }
 }
 
@@ -35,10 +35,10 @@ function create() {
  * Return the JSON response, which contains the path to the temporary RTF file
  * upon success.
  *
- * @param $params {Array}
+ * @param $response {Array}
  */
-function sendResponse($params) {
-  $json = json_encode($params, JSON_UNESCAPED_SLASHES);
+function sendResponse($response) {
+  $json = json_encode($response, JSON_UNESCAPED_SLASHES);
 
   print $json;
 }
