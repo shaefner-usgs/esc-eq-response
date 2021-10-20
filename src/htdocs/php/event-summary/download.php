@@ -2,15 +2,16 @@
 
 date_default_timezone_set('America/Los_Angeles');
 
-downloadFile($_GET['file']);
+download($_GET['file']);
+
 
 /**
- * Trigger download of the (temporary) RTF file created by Rtf.php.
+ * Trigger a download of the (temporary) RTF file created by Rtf.php.
  *
  * @param file {String}
  *     full path of RTF file
  */
-function downloadFile($file) {
+function download($file) {
   $filename = preg_replace('/-\d+/', '', basename($file)); // strip path/timestamp
 
   header('Cache-control: no-cache, must-revalidate');
