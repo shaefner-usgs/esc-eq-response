@@ -1,5 +1,6 @@
 <?php
 
+include_once '../_functions.inc.php';
 include_once 'Rtf.class.php';
 
 create();
@@ -41,20 +42,4 @@ function sendResponse($response) {
   $json = json_encode($response, JSON_UNESCAPED_SLASHES);
 
   print $json;
-}
-
-/**
- * Set HTTP Headers.
- *
- * @param $header {String}
- *     optional header to set
- */
-function setHeaders($header = '') {
-  if ($header) {
-    header($header);
-  } else { // default headers (for all responses)
-    header('Cache-control: no-cache, must-revalidate');
-    header('Content-Type: application/json');
-    header('Expires: ' . date(DATE_RFC2822));
-  }
 }
