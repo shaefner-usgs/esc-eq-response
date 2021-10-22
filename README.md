@@ -1,7 +1,7 @@
 Earthquake Response App
 =======================
 
-Web application that creates an interactive map, plots and summary for an earthquake to help collect and digest information used in talking points and scientific response.
+Web application that creates an interactive Map, Plots, and Summary of any earthquake using real-time data. It helps you visualize, analyze, and collect information to use in talking points and scientific response.
 
 ## Installation
 
