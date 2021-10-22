@@ -101,13 +101,15 @@ var Aftershocks = function (options) {
         data.timeFrame = content.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
 
         html = L.Util.template(
-          '<h3>Aftershock Forecast</h3>' +
-          '<p>The probability of one or more aftershocks in the specified ' +
-            'magnitude range during the <strong>next {timeFrame}</strong>. ' +
-            'The likely number of aftershocks (95% confidence range) is also ' +
-            'included.</p>' +
-          '<div class="probabilities">{probabilities}</div>' +
-          '<p class="model"><strong>Model</strong>: {model}</p>',
+          '<div class="bubble forecast">' +
+            '<h3>Forecast</h3>' +
+            '<p>Probability of one or more aftershocks in the specified ' +
+              'magnitude range during the <strong>next {timeFrame}</strong>.</p>' +
+            '<div class="probabilities">{probabilities}</div>' +
+            '<p>The likely number of aftershocks (95% confidence range) is ' +
+              'listed below the probability.</p>' +
+            '<p class="model"><strong>Model</strong>: {model}</p>' +
+          '</div>',
           data
         );
       }
@@ -146,7 +148,7 @@ var Aftershocks = function (options) {
           }
 
           html += L.Util.template(
-            '<a href="{url}">' +
+            '<a href="{url}" target="new">' +
               '<h4>M {mag}+</h4>' +
               '<ul>' +
                 '<li class="probability">{probability}</li>' +
@@ -175,24 +177,24 @@ var Aftershocks = function (options) {
         interval,
         mostRecentEq;
 
-    html = '<div class="bubble">';
+    html = _createForecast();
+    html += '<div class="bubble">';
     html += _earthquakes.createDescription();
 
     if (_this.count > 0) {
-      mostRecentEq = _earthquakes.list[_earthquakes.list.length - 1];
-      interval = Luxon.Interval.fromDateTimes(
-        Luxon.DateTime.fromISO(mostRecentEq.isoTime),
-        Luxon.DateTime.utc()
-      ).length('days');
-      duration = AppUtil.round(interval, 1) + ' days';
-
       html += '<div class="bins">';
       html += _earthquakes.createBinTable('first');
       html += _earthquakes.createBinTable('past');
       html += '</div>';
-      html += _createForecast();
 
       if (_this.count > 1) {
+        mostRecentEq = _earthquakes.list[_earthquakes.list.length - 1];
+        interval = Luxon.Interval.fromDateTimes(
+          Luxon.DateTime.fromISO(mostRecentEq.isoTime),
+          Luxon.DateTime.utc()
+        ).length('days');
+        duration = AppUtil.round(interval, 1) + ' days';
+
         html += '<h3>Most Recent Aftershock</h3>';
         html += `<p>The most recent aftershock was <strong>${duration} ago</strong>.</p>`;
         html += _earthquakes.createListTable('mostRecent');
