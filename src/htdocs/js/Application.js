@@ -12,6 +12,7 @@ var AppUtil = require('util/AppUtil'),
     SearchBar = require('SearchBar'),
     SelectBar = require('SelectBar'),
     SettingsBar = require('SettingsBar'),
+    SideBar = require('SideBar'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane'),
@@ -31,6 +32,7 @@ var AppUtil = require('util/AppUtil'),
  *     SearchBar: {Element}
  *     SelectBar: {Element}
  *     SettingsBar: {Element}
+ *     SideBar: {Element}
  *     SignificantEqs: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
@@ -49,6 +51,7 @@ var AppUtil = require('util/AppUtil'),
  *     SearchBar: {Object}
  *     SelectBar: {Object}
  *     SettingsBar: {Object}
+ *     SideBar: {Object}
  *     SignificantEqs: {Object}
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
@@ -161,6 +164,7 @@ var Application = function (options) {
       SearchBar: SearchBar,
       SelectBar: SelectBar,
       SettingsBar: SettingsBar,
+      SideBar: SideBar,
       SignificantEqs: SignificantEqs,
       StatusBar: StatusBar,
       SummaryPane: SummaryPane,
