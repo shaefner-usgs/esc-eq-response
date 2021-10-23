@@ -48,7 +48,6 @@ var SearchBar = function (options) {
       _setMinutes,
       _setToday,
       _setValidity,
-      _showSelected,
       _updateSlider;
 
 
@@ -107,19 +106,27 @@ var SearchBar = function (options) {
       arrow.addEventListener('click', _setMinutes)
     );
 
-    // Show the selected option when the user clicks a 'nav-strip' button
+    // Show the selected option when the user clicks a 'radio-bar' button
     buttons.forEach(button =>
-      button.addEventListener('click', _showSelected)
+      button.addEventListener('click', function() {
+        _app.SideBar.showOption.call(this);
+
+        if (this.id === 'customRegion') {
+          _this.renderMap();
+        } else if (this.id === 'worldwide') {
+          _cancelEdit();
+        }
+      })
     );
 
     // Open the associated date picker when the user clicks a label
-    labels.forEach(label => {
+    labels.forEach(label =>
       label.addEventListener('click', () => {
         var id = label.getAttribute('for');
 
         _flatpickrs[id].open();
-      });
-    });
+      })
+    );
 
     // Search the catalog when the user clicks the 'Search' button
     search.addEventListener('click', () => {
@@ -271,7 +278,7 @@ var SearchBar = function (options) {
   _initMap = function () {
     var zoomControl;
 
-    _map = L.map(_el.querySelector('div.region'), {
+    _map = L.map(_el.querySelector('.customRegion'), {
       center: [38, -96],
       editable: true,
       layers: [
@@ -417,49 +424,6 @@ var SearchBar = function (options) {
       div.classList.add('invalid');
 
       return false;
-    }
-  };
-
-  /**
-   * Show the selected option for the 'nav-strips'.
-   */
-  _showSelected = function () {
-    var className,
-        customDiv,
-        parent,
-        regex,
-        sibling;
-
-    parent = this.parentNode;
-    className = parent.className.replace(/\s?options\s?/, '');
-    customDiv = _el.querySelector('div.' + className);
-    regex = /^custom/;
-    sibling = parent.firstElementChild;
-
-    // Highlight the selected nav button and unselect all others
-    this.classList.add('selected');
-
-    while (sibling) {
-      if (sibling !== this) {
-        sibling.classList.remove('selected');
-      }
-
-      sibling = sibling.nextElementSibling;
-    }
-
-    if (this.id === 'worldwide') {
-      _cancelEdit();
-    }
-
-    // Show/hide the custom options
-    if (regex.test(this.id)) {
-      customDiv.classList.remove('hide');
-
-      if (this.id === 'customRegion') {
-        _this.renderMap();
-      }
-    } else {
-      customDiv.classList.add('hide');
     }
   };
 
