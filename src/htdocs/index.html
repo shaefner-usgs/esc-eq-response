@@ -70,6 +70,8 @@
         <section id="settingsBar" class="bar hide">
           <div class="content">
             <h2>Settings</h2>
+            <p>Initial values are set automatically based on the selected
+              Mainshock’s magnitude and estimated rupture length.</p>
             <div class="aftershocks">
               <h3>Aftershocks
                 <span class="hide breather"></span>
@@ -112,9 +114,12 @@
               <input type="number" id="hs-years" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="11" />
             </div>
-            <p>Initial parameter values are set automatically based on the
-              Mainshock’s magnitude and estimated rupture length.</p>
-            <p>When you customize the parameters, the
+            <h3>Earthquake Catalog</h3>
+            <ul class="options catalog">
+              <li id="comcat" class="selected">ComCat</li>
+              <li id="dd">Double Difference</li>
+            </ul>
+            <p>When you customize the settings, the
               <abbr title="Uniform Resource Locator (web address)">URL</abbr> is
               automatically updated to reflect the new values, making it easy
               to share or bookmark your settings.</p>
@@ -203,7 +208,8 @@
             analyze, and collect information to use in talking points and
             scientific response.</p>
           <p>Earthquake data is from
-            <a href="https://earthquake.usgs.gov/data/comcat/">ComCat</a>.
+            <a href="https://earthquake.usgs.gov/data/comcat/">ComCat</a> and/or
+            <a href="https://service.ncedc.org/fdsnws/event/1/">NCEDC</a>.
           </p>
           <h3>Tips</h3>
           <ol class="iconlist">
