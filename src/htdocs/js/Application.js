@@ -56,6 +56,8 @@ var AppUtil = require('util/AppUtil'),
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     TitleBar: {Object}
+ *     defaultPaneId: {String}
+ *     getPaneId: {Function}
  *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
@@ -88,6 +90,7 @@ var Application = function (options) {
     _sidebar = document.getElementById('sideBar');
     _style = document.createElement('style');
 
+    _this.defaultPaneId = 'mapPane';
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
@@ -221,7 +224,7 @@ var Application = function (options) {
       id = AppUtil.getParam('sidebar');
       position = _sidebar.scrollTop;
     } else { // 'pane'
-      id = _this.NavBar.getPaneId();
+      id = _this.getPaneId();
       position = window.pageYOffset;
     }
 
@@ -236,6 +239,27 @@ var Application = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Get the id value of the selected pane from the URL.
+   *
+   * @return id {String}
+   */
+  _this.getPaneId = function () {
+    var hash,
+        id,
+        paneExists;
+
+    hash = location.hash;
+    id = _this.defaultPaneId;
+    paneExists = document.querySelector('section' + hash);
+
+    if (hash && paneExists) {
+      id = hash.substr(1);
+    }
+
+    return id;
+  };
 
   /**
    * Reset app to default state (i.e. no Mainshock selected).
