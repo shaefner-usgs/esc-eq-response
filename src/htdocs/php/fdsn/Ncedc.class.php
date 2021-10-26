@@ -4,6 +4,9 @@
  * Search the NCEDC double difference catalog and convert the results from CSV
  * to GeoJSON. See: http://service.ncedc.org/fdsnws/event/1/
  *
+ * ¹ the minmag param appears to ignore hundredths values, leading to unexpected
+ *   results. For ex, a minmag value of 0.95 still selects M 0.9 eqs.
+ *
  * @param $params {Array}
  *     ComCat API query parameters (https://earthquake.usgs.gov/fdsnws/event/1/)
  * @param $url {String}
@@ -72,6 +75,10 @@ class Ncedc {
         $name = $rename[$name];
       } else if (!in_array($name, $keep)) {
         continue; // only keep compatible params
+      }
+
+      if ($name === 'minmag') {
+        $value += .05; // 'undo' rounding down for ComCat (also preempts a bug¹)
       }
 
       if ($value === 'geojson') { // no support for GeoJSON output
