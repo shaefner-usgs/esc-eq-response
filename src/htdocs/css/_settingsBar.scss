@@ -6,7 +6,19 @@
   }
 
   .catalog {
-    margin: 1.25rem 0 .75rem !important;
+    margin-top: 1.25rem !important;
+  }
+
+  .dd {
+    color: $text-color-lighter;
+    font-size: .875rem;
+    margin: .25rem 0 -.25rem;
+    opacity: 1;
+    transition: opacity $effect-on-duration ease-out;
+
+    &.hide {
+      opacity: 0;
+    }
   }
 
   .historical + p {

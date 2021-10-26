@@ -186,7 +186,8 @@ var SettingsBar = function (options) {
    */
   _setCatalogOption = function () {
     var catalog,
-        lis;
+        lis,
+        note;
 
     catalog = AppUtil.getParam('catalog');
 
@@ -200,6 +201,12 @@ var SettingsBar = function (options) {
           li.classList.remove('selected');
         }
       });
+
+      if (catalog === 'dd') {
+        note = _el.querySelector('.dd');
+
+        note.classList.remove('hide');
+      }
     }
   };
 
