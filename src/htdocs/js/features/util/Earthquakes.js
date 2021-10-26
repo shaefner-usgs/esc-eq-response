@@ -62,13 +62,15 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
+      _catalog,
+      _distanceParam,
       _duration,
       _featureId,
       _mainshockLatlon,
       _mainshockTime,
       _mainshockTitle,
       _markerOptions,
-      _minMag,
+      _minMagParam,
       _now,
       _pastDay,
       _pastHour,
@@ -96,7 +98,8 @@ var Earthquakes = function (options) {
 
   _initialize = function (options) {
     var coords,
-        inputId,
+        inputIdDist,
+        inputIdMag,
         mainshock,
         type;
 
@@ -104,6 +107,7 @@ var Earthquakes = function (options) {
     type = options.type;
 
     _app = options.app;
+    _catalog = AppUtil.getParam('catalog') || 'comcat';
     _featureId = options.id;
     _markerOptions = options.markerOptions;
     _now = Luxon.DateTime.utc();
@@ -125,15 +129,21 @@ var Earthquakes = function (options) {
     };
     _sortByField = options.sortByField || '';
 
+    if (type === 'search') {
+      _catalog = 'comcat'; // search layer is always from ComCat
+    }
+
     if (_featureId !== 'mainshock' && type !== 'search') {
-      inputId = AppUtil.getPrefix(_featureId) + '-mag';
+      inputIdDist = AppUtil.getPrefix(_featureId) + '-dist';
+      inputIdMag = AppUtil.getPrefix(_featureId) + '-mag';
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
+      _distanceParam = document.getElementById(inputIdDist).value;
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _mainshockTitle = mainshock.details.title;
-      _minMag = document.getElementById(inputId).value;
+      _minMagParam = document.getElementById(inputIdMag).value;
       _duration = _getDuration();
     }
 
@@ -587,7 +597,7 @@ var Earthquakes = function (options) {
         '</div>';
     } else if (type === 'popup') {
       template =
-        '<div class="earthquake {className}">' +
+        '<div class="earthquake {catalog} {layerType}">' +
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl>' +
@@ -601,7 +611,7 @@ var Earthquakes = function (options) {
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</dt>' +
             '<dd class="distance">{distanceDisplay}</dd>' +
-            '<dt>Status</dt>' +
+            '<dt class="status">Status</dt>' +
             '<dd class="status">{status}{statusIcon}</dd>' +
           '</dl>' +
           '<button type="button">Select</button>' +
@@ -654,8 +664,8 @@ var Earthquakes = function (options) {
       }
     });
 
-    if (threshold < _minMag) { // happens when there's no smaller mag eqs
-      threshold = Math.floor(_minMag);
+    if (threshold < _minMagParam) { // happens when there's no smaller mag eqs
+      threshold = Math.floor(_minMagParam);
     }
 
     return threshold;
@@ -700,7 +710,6 @@ var Earthquakes = function (options) {
   _onEachFeature = function (feature, layer) {
     var bearing,
         bearingString,
-        className,
         compassPoints,
         coords,
         days,
@@ -710,6 +719,7 @@ var Earthquakes = function (options) {
         eqTime,
         eqTimeLocal,
         latlon,
+        layerType,
         localTime,
         mag,
         magDisplay,
@@ -720,10 +730,10 @@ var Earthquakes = function (options) {
         tooltip,
         utcTime;
 
-    className = _featureId;
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
+    layerType = _featureId;
     magDisplay = AppUtil.round(props.mag, 1);
     mag = parseFloat(magDisplay);
     magType = props.magType || 'M';
@@ -757,8 +767,8 @@ var Earthquakes = function (options) {
 
     eq = {
       alert: props.alert || '', // PAGER
+      catalog: _catalog,
       cdi: AppUtil.romanize(props.cdi), // DYFI
-      className: className,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
       distance: distance || '',
@@ -766,6 +776,7 @@ var Earthquakes = function (options) {
       eqid: feature.id,
       felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
+      layerType: layerType,
       location: _getLocation(coords),
       localTime: localTime || '',
       mag: mag,
@@ -773,7 +784,7 @@ var Earthquakes = function (options) {
       magDisplay: magDisplay,
       magType: magType,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
-      status: props.status,
+      status: props.status || '',
       statusIcon: statusIcon,
       title: magType + ' ' + magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
@@ -910,14 +921,10 @@ var Earthquakes = function (options) {
    */
   _this.createDescription = function () {
     var data,
-        distance,
         ending,
-        inputId,
         interval,
         length;
 
-    inputId = AppUtil.getPrefix(_featureId) + '-dist';
-    distance = document.getElementById(inputId).value;
     interval = Object.keys(_duration)[0];
     length = _duration[interval];
 
@@ -930,9 +937,9 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      distance: distance,
+      distance: _distanceParam,
       ending: ending,
-      mag: _minMag
+      mag: _minMagParam
     };
 
     return L.Util.template(_getTemplate('description'), data);
@@ -1020,7 +1027,7 @@ var Earthquakes = function (options) {
       id: _featureId,
       mag: magThreshold,
       max: _this.bins.mag.length - 1,
-      min: Math.floor(_minMag)
+      min: Math.floor(_minMagParam)
     };
     html = '';
     singleMagBin = _this.bins.mag.every(
@@ -1053,17 +1060,23 @@ var Earthquakes = function (options) {
  */
 Earthquakes.getFeedUrl = function (params) {
   var baseUri,
+      dd,
       defaults,
       pairs,
       value;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
+  dd = document.getElementById(('dd')); // double difference catalog option
   defaults = {
     format: 'geojson',
     orderby: 'time-asc'
   };
   pairs = [];
   params = Object.assign({}, defaults, params);
+
+  if (dd.classList.contains('selected')) {
+    baseUri = location.origin + '/php/fdsn/search.json.php';
+  }
 
   delete params.period; // internal property (search API rejects 'foreign' props)
 
