@@ -154,7 +154,7 @@ class Ncedc {
 
     return [
       'depth' => floatval($eq[4]),
-      'id' => $eq[0],
+      'id' => strtolower($eq[5]) . $eq[0],
       'lat' => floatval($eq[2]),
       'lon' => floatval($eq[3]),
       'mag' => floatval($eq[10]),
