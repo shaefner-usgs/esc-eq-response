@@ -2,6 +2,7 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
+    AppUtil = require('util/AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
@@ -219,9 +220,15 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _loadFeature = function (feature) {
+    var fetchOpts = {};
+
+    if (AppUtil.getParam('catalog') === 'dd') {
+      fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
+    }
+
     if (feature.url) {
       _addLoaders(feature);
-      _app.JsonFeed.fetch(feature).then(json => {
+      _app.JsonFeed.fetch(feature, fetchOpts).then(json => {
         if (json) {
           feature.isLoading = false;
 
