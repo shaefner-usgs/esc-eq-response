@@ -44,7 +44,8 @@ var SettingsBar = function (options) {
       _addListeners,
       _getDefaults,
       _refreshFeature,
-      _saveFocusedField;
+      _saveFocusedField,
+      _setCatalogOption;
 
 
   _this = {};
@@ -62,13 +63,23 @@ var SettingsBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var features,
+    var buttons,
+        features,
         fields;
 
+    buttons = _el.querySelectorAll('.catalog li');
     features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
     fields = _el.querySelectorAll('input');
 
-    // Update a Feature when its params are changed
+    // Show the selected option when the user clicks a 'radio-bar' button
+    buttons.forEach(button =>
+      button.addEventListener('click', function() {
+        _app.SideBar.showOption.call(this);
+        AppUtil.setParam('catalog', this.id);
+      })
+    );
+
+    // Refresh a Feature when its params are changed
     features.forEach(feature =>
       feature.addEventListener('input', _refreshFeature)
     );
@@ -78,6 +89,8 @@ var SettingsBar = function (options) {
       field.addEventListener('focus', _saveFocusedField); // remember focused field
       field.addEventListener('input', AppUtil.updateParam);
     });
+
+    window.addEventListener('load', _setCatalogOption);
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
@@ -166,6 +179,28 @@ var SettingsBar = function (options) {
    */
   _saveFocusedField = function (e) {
     _focusedField = e.target.id;
+  };
+
+  /**
+   * Set the catalog option to match the 'catalog' URL parameter if it is set.
+   */
+  _setCatalogOption = function () {
+    var catalog,
+        lis;
+
+    catalog = AppUtil.getParam('catalog');
+
+    if (catalog) {
+      lis = _el.querySelectorAll('.catalog li');
+
+      lis.forEach(li => {
+        if (li.id === catalog) {
+          li.classList.add('selected');
+        } else {
+          li.classList.remove('selected');
+        }
+      });
+    }
   };
 
   // ----------------------------------------------------------
