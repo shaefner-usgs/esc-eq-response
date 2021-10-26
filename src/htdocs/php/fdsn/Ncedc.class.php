@@ -2,7 +2,7 @@
 
 /**
  * Search the NCEDC double difference catalog and convert the results from CSV
- * to GeoJSON. See: https://www.ncedc.org/ncedc/catalog-search.html
+ * to GeoJSON. See: http://service.ncedc.org/fdsnws/event/1/
  *
  * @param $params {Array}
  *     ComCat API query parameters (https://earthquake.usgs.gov/fdsnws/event/1/)
