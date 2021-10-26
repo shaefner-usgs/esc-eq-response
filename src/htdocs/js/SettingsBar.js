@@ -45,7 +45,8 @@ var SettingsBar = function (options) {
       _getDefaults,
       _refreshFeature,
       _saveFocusedField,
-      _setCatalogOption;
+      _setCatalogOption,
+      _showOption;
 
 
   _this = {};
@@ -71,15 +72,12 @@ var SettingsBar = function (options) {
     features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
     fields = _el.querySelectorAll('input');
 
-    // Show the selected option when the user clicks a 'radio-bar' button
+    // Show the selected option
     buttons.forEach(button =>
-      button.addEventListener('click', function() {
-        _app.SideBar.showOption.call(this);
-        AppUtil.setParam('catalog', this.id);
-      })
+      button.addEventListener('click', _showOption)
     );
 
-    // Refresh a Feature when its params are changed
+    // Refresh a Feature
     features.forEach(feature =>
       feature.addEventListener('input', _refreshFeature)
     );
@@ -90,6 +88,7 @@ var SettingsBar = function (options) {
       field.addEventListener('input', AppUtil.updateParam);
     });
 
+    // Set the selected catalog
     window.addEventListener('load', _setCatalogOption);
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
@@ -193,6 +192,7 @@ var SettingsBar = function (options) {
 
     if (catalog) {
       lis = _el.querySelectorAll('.catalog li');
+      note = _el.querySelector('.dd');
 
       lis.forEach(li => {
         if (li.id === catalog) {
@@ -203,11 +203,17 @@ var SettingsBar = function (options) {
       });
 
       if (catalog === 'dd') {
-        note = _el.querySelector('.dd');
-
         note.classList.remove('hide');
       }
     }
+  };
+
+  /**
+   * Show the selected option when the user clicks a 'radio-bar' button.
+   */
+  _showOption = function () {
+    _app.SideBar.showOption.call(this);
+    AppUtil.setParam('catalog', this.id);
   };
 
   // ----------------------------------------------------------
