@@ -48,6 +48,7 @@ _DEFAULTS = {
  * @return _this {Object}
  *   {
  *     bins: {Object}
+ *     count: {Integer}
  *     createBinTable: {Function}
  *     createDescription: {Function}
  *     createListTable: {Function}
@@ -77,9 +78,11 @@ var Earthquakes = function (options) {
       _pastWeek,
       _plotData,
       _sortByField,
+      _vectors,
 
       _addEqToBin,
       _addListeners,
+      _filter,
       _getAge,
       _getBubbles,
       _getDuration,
@@ -126,6 +129,7 @@ var Earthquakes = function (options) {
       time: []
     };
     _sortByField = options.sortByField || '';
+    _vectors = {};
 
     if (_featureId === 'search') {
       _catalog = 'comcat'; // search layer is always from ComCat
@@ -146,8 +150,10 @@ var Earthquakes = function (options) {
     }
 
     _this.bins = {};
+    _this.count = 0;
     _this.list = [];
     _this.mapLayer = L.geoJson(options.json, {
+      filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
@@ -222,6 +228,49 @@ var Earthquakes = function (options) {
       // Input event is not triggered when it's changed programmatically
       _app.SelectBar.handleMainshock();
     });
+  };
+
+  /**
+   * Filter out earthquakes that are outside the search radius.
+   *
+   * The NCEDC catalog does not support radius values specified in km for
+   * limiting search results, so a rectangle is used instead as a proxy.
+   *
+   * @param feature {Object}
+   *     geoJSON feature
+   */
+  _filter = function (feature) {
+    var bearing,
+        compassPoints,
+        coords,
+        distance,
+        latlon,
+        octant;
+
+    if (_featureId === 'mainshock' || _featureId === 'search') {
+      _this.count ++;
+
+      return true;
+    }
+
+    // Calculate distance/direction from Mainshock
+    compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+    coords = feature.geometry.coordinates;
+    latlon = LatLon(coords[1], coords[0]);
+    bearing = _mainshockLatlon.bearing(latlon);
+    distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+    octant = Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0);
+
+    _vectors[feature.id] = { // cache values
+      direction: compassPoints[octant],
+      distance: distance
+    };
+
+    if (distance <= _distanceParam) {
+      _this.count ++;
+
+      return true;
+    }
   };
 
   /**
@@ -706,17 +755,13 @@ var Earthquakes = function (options) {
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var bearing,
-        bearingString,
-        compassPoints,
-        coords,
+    var coords,
         days,
         distance,
         distanceDisplay,
         eq,
         eqTime,
         eqTimeLocal,
-        latlon,
         layerType,
         localTime,
         mag,
@@ -740,6 +785,12 @@ var Earthquakes = function (options) {
     utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
     tooltip = magType + ' ' + magDisplay + ' - ' + utcTime;
 
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
+      distance = _vectors[feature.id].distance;
+      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
+        _vectors[feature.id].direction + '</span>';
+    }
+
     if (props.status === 'reviewed') {
       statusIcon += '<i class="icon-check"></i>';
     }
@@ -750,17 +801,6 @@ var Earthquakes = function (options) {
       localTime = eqTimeLocal.toFormat('LLL d, yyyy tt') +
         ' <span class="tz">at the epicenter</span>';
       template += '<time datetime="{isoTime}">{localTime}</time>';
-    }
-
-    // Calculate distance/direction from Mainshock
-    if (_featureId !== 'mainshock' && _featureId !== 'search') {
-      compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-      latlon = LatLon(coords[1], coords[0]);
-      bearing = _mainshockLatlon.bearing(latlon);
-      bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
-      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
-        bearingString + '</span>';
     }
 
     eq = {
