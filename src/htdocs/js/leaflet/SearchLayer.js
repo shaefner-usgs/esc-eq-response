@@ -141,7 +141,7 @@ var SearchLayer = function (options) {
 
     _this.name = `M ${params.minmagnitude}+ Earthquakes`;
     _this.title = _getTitle(params);
-    _this.url = Earthquakes.getFeedUrl(params);
+    _this.url = Earthquakes.getFeedUrl(params, 'search');
   };
 
 
