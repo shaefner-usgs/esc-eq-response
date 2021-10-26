@@ -100,11 +100,9 @@ var Earthquakes = function (options) {
     var coords,
         inputIdDist,
         inputIdMag,
-        mainshock,
-        type;
+        mainshock;
 
     options = Object.assign({}, _DEFAULTS, options);
-    type = options.type;
 
     _app = options.app;
     _catalog = AppUtil.getParam('catalog') || 'comcat';
@@ -129,11 +127,11 @@ var Earthquakes = function (options) {
     };
     _sortByField = options.sortByField || '';
 
-    if (type === 'search') {
+    if (_featureId === 'search') {
       _catalog = 'comcat'; // search layer is always from ComCat
     }
 
-    if (_featureId !== 'mainshock' && type !== 'search') {
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
       inputIdDist = AppUtil.getPrefix(_featureId) + '-dist';
       inputIdMag = AppUtil.getPrefix(_featureId) + '-mag';
       mainshock = _app.Features.getFeature('mainshock');

@@ -101,8 +101,7 @@ var SearchLayer = function (options) {
     var earthquakes = Earthquakes({
       app: _app,
       id: _this.id,
-      json: json,
-      type: 'search'
+      json: json
     });
 
     _this.count = json.metadata.count;
