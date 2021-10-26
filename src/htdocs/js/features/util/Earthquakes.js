@@ -1055,18 +1055,17 @@ var Earthquakes = function (options) {
  *
  * @param params {Object}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
+ * @param type {String} default is 'feature'
  *
  * @return {String}
  */
-Earthquakes.getFeedUrl = function (params) {
+Earthquakes.getFeedUrl = function (params, type='feature') {
   var baseUri,
-      dd,
       defaults,
       pairs,
       value;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-  dd = document.getElementById(('dd')); // double difference catalog option
   defaults = {
     format: 'geojson',
     orderby: 'time-asc'
@@ -1074,7 +1073,7 @@ Earthquakes.getFeedUrl = function (params) {
   pairs = [];
   params = Object.assign({}, defaults, params);
 
-  if (dd.classList.contains('selected')) {
+  if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') {
     baseUri = location.origin + '/php/fdsn/search.json.php';
   }
 
