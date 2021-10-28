@@ -814,9 +814,11 @@ var Earthquakes = function (options) {
       eqid: feature.id,
       felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
+      lat: coords[1],
       layerType: layerType,
       location: _getLocation(coords),
       localTime: localTime || '',
+      lon: coords[0],
       mag: mag,
       magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
@@ -845,7 +847,7 @@ var Earthquakes = function (options) {
 
     // Note: additional plotData props are added in _pointToLayer()
     _plotData.date.push(eq.utcTime);
-    _plotData.depth.push(coords[2] * -1); // set to negative for 3d plots
+    _plotData.depth.push(coords[2] * -1); // set to negative value for 3d plots
     _plotData.eqid.push(eq.eqid);
     _plotData.lat.push(coords[1]);
     _plotData.lon.push(coords[0]);
