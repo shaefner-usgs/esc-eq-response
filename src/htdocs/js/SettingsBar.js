@@ -366,11 +366,13 @@ var SettingsBar = function (options) {
    */
   _this.reset = function () {
     var button,
+        catalog,
         inputs,
         selectors,
         swap;
 
-    button = document.getElementById(AppUtil.getParam('catalog'));
+    catalog = AppUtil.getParam('catalog') || 'comcat';
+    button = document.getElementById(catalog);
     selectors = [
       '.aftershocks input',
       '.foreshocks input',
@@ -383,7 +385,7 @@ var SettingsBar = function (options) {
       input.value = ''
     );
 
-    button.click(); // simulate 'radio-bar' button click to select approp. catalog
+    button.click(); // simulate 'radio-bar' button click to select catalog
     swap.classList.add('hide');
   };
 
