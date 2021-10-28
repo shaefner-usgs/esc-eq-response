@@ -2,7 +2,7 @@
 
 /**
  * Search the NCEDC double difference catalog and convert the results from CSV
- * to GeoJSON. See: http://service.ncedc.org/fdsnws/event/1/
+ * to GeoJSON. See: https://service.ncedc.org/fdsnws/event/1/
  *
  * ¹ the minmag param appears to ignore hundredths values, leading to unexpected
  *   results. For ex, a minmag value of 0.95 still selects M 0.9 eqs.
@@ -39,18 +39,20 @@ class Ncedc {
    * @param $params {Array} Note: passed by reference
    */
   private function _addBoundingBox(&$params) {
-    $diameter = 6378.1 * 2; // Earth (km, approx)
-    $radians = 2 * M_PI * $this->_params['latitude'] / 360;
+    if (array_key_exists('maxradiuskm', $this->_params)) {
+      $diameter = 6378.1 * 2; // Earth (km, approx)
+      $radians = 2 * M_PI * $this->_params['latitude'] / 360;
 
-    $latDistance = M_PI * $diameter / 360; // distance (km) of 1 degree
-    $latDegrees = $this->_params['maxradiuskm'] / $latDistance;
-    $lonDistance = M_PI * $diameter / 360 * cos($radians); // 1 degree at given lat
-    $lonDegrees = $this->_params['maxradiuskm'] / $lonDistance;
+      $latDistance = M_PI * $diameter / 360; // distance (km) of 1 degree
+      $latDegrees = $this->_params['maxradiuskm'] / $latDistance;
+      $lonDistance = M_PI * $diameter / 360 * cos($radians); // 1 degree at given lat
+      $lonDegrees = $this->_params['maxradiuskm'] / $lonDistance;
 
-    $params['maxlat'] = $this->_params['latitude'] + $latDegrees;
-    $params['maxlon'] = $this->_params['longitude'] + $lonDegrees;
-    $params['minlat'] = $this->_params['latitude'] - $latDegrees;
-    $params['minlon'] = $this->_params['longitude'] - $lonDegrees;
+      $params['maxlat'] = $this->_params['latitude'] + $latDegrees;
+      $params['maxlon'] = $this->_params['longitude'] + $lonDegrees;
+      $params['minlat'] = $this->_params['latitude'] - $latDegrees;
+      $params['minlon'] = $this->_params['longitude'] - $lonDegrees;
+    }
   }
 
   /**
@@ -60,6 +62,7 @@ class Ncedc {
    */
   private function _convertParams() {
     $keep = [
+      'eventid',
       'format',
       'orderby'
     ];
