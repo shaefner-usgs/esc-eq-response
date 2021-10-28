@@ -255,8 +255,7 @@ var SettingsBar = function (options) {
   /**
    * Toggle the option to swap catalogs on/off depending on the current state.
    *
-   * @param catalog {String}
-   *     id of the selected catalog on the 'radio-bar'
+   * @param catalog {String <comcat|dd>}
    */
   _toggleSwap = function (catalog) {
     var names,
