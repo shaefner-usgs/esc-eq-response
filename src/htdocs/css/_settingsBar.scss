@@ -1,6 +1,10 @@
 @use 'variables' as *;
 
 #settingsBar {
+  button {
+    margin-top: .25rem;
+  }
+
   h3 {
     margin: 1.5rem 0 -.25rem;
   }
@@ -12,13 +16,20 @@
   .dd {
     color: $text-color-lighter;
     font-size: .875rem;
-    margin: .25rem 0 -.25rem;
+    margin: .25rem 0 0;
     opacity: 1;
+    padding-bottom: .5rem;
     transition: opacity $effect-on-duration ease-out;
 
     &.hide {
       opacity: 0;
+      transition: all .15s ease-in;
+      visibility: hidden;
     }
+  }
+
+  .hide + .swap {
+    margin-top: -.75rem;
   }
 
   .historical + p {
@@ -30,5 +41,17 @@
     color: $invalid-color;
     margin: 2rem 0 0;
     padding-top: 4px;
+  }
+
+  .swap {
+    margin: .25rem 0 2.5rem;
+
+    &.hide {
+      display: none;
+    }
+
+    p {
+      margin: 0;
+    }
   }
 }
