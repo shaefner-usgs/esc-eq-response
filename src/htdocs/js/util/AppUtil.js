@@ -112,6 +112,23 @@ AppUtil.fetchWithTimeout = async function (resource, options = {}) {
 };
 
 /**
+ * Get a formatted lat/lng coordinate pair.
+ *
+ * @param coords {Array}
+ *
+ * @return {String}
+ */
+AppUtil.formatLatLng = function (coords) {
+  var lat,
+      lng;
+
+  lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
+  lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
+
+  return lat + ', ' + lng;
+};
+
+/**
  * Get the value of a given URL parameter.
  *
  * @param name {String}
