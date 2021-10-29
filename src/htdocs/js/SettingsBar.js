@@ -158,8 +158,6 @@ var SettingsBar = function (options) {
       }
       feature = _app.Features.getFeature(id);
 
-      _app.JsonFeed.initThrottlers(id);
-
       // Immediately show loading status (don't wait for throttle timers)
       if (feature) {
         _app.StatusBar.addItem({
@@ -169,6 +167,7 @@ var SettingsBar = function (options) {
       }
 
       if (throttle) {
+        _app.JsonFeed.initThrottlers(id);
         _app.JsonFeed.throttlers[id].push(
           setTimeout(() => {
             if (feature) {
@@ -365,27 +364,29 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via _this.removeCount().
    */
   _this.reset = function () {
-    var button,
-        catalog,
+    var catalog,
         inputs,
+        selCatalog,
         selectors,
         swap;
 
     catalog = AppUtil.getParam('catalog') || 'comcat';
-    button = document.getElementById(catalog);
     selectors = [
       '.aftershocks input',
       '.foreshocks input',
       '.historical input'
     ];
     inputs = _el.querySelectorAll(selectors.join(','));
+    selCatalog = _el.querySelector('.catalog .selected').id;
     swap = _el.querySelector('.swap');
 
     inputs.forEach(input =>
       input.value = ''
     );
 
-    button.click(); // simulate 'radio-bar' button click to select catalog
+    if (catalog !== selCatalog) {
+      AppUtil.setParam('catalog', selCatalog);
+    }
     swap.classList.add('hide');
   };
 
