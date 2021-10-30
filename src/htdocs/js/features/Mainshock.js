@@ -611,6 +611,7 @@ var Mainshock = function (options) {
       url = `${location.origin}/php/fdsn/search.json.php?eventid=${id}&format=text`;
 
       _app.JsonFeed.fetch({
+        host: 'ncedc.org',
         id: 'dd-mainshock',
         name: 'Double Difference Mainshock',
         url: url

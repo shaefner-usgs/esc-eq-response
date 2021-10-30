@@ -46,6 +46,7 @@ var JsonFeed = function (options) {
    *
    * @param opts {Object}
    *   {
+   *     host: {String} optional
    *     id: {String}
    *     name: {String}
    *     url: {String}
@@ -57,6 +58,7 @@ var JsonFeed = function (options) {
    */
   _this.fetch = async function (opts, fetchOpts = {}) {
     var errorMsg,
+        host,
         json,
         response,
         text,
@@ -64,8 +66,9 @@ var JsonFeed = function (options) {
 
     opts = opts || {};
     errorMsg = `<h4>Error Loading ${opts.name}</h4>`;
-    response = {};
     url = new URL(opts.url);
+    host = opts.host || url.hostname;
+    response = {};
 
     // Alert user that the feed is loading
     _app.StatusBar.addItem(opts);
@@ -81,7 +84,7 @@ var JsonFeed = function (options) {
       errorMsg += '<ul>';
 
       if (error.name === 'AbortError') { // timeout
-        errorMsg += `<li>Request timed out (can’t connect to ${url.hostname})</li>`;
+        errorMsg += `<li>Request timed out (can’t connect to ${host})</li>`;
       } else if (response.status === 404 && opts.id === 'mainshock') {
         errorMsg += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
       } else {
