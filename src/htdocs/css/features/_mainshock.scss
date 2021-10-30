@@ -135,6 +135,12 @@
     }
   }
 
+  .download {
+    button {
+      margin-bottom: .5rem;
+    }
+  }
+
   .mainshock {
     h4 {
       text-align: center;
@@ -175,7 +181,23 @@
     margin: 0 -.5rem;
 
     div {
+      max-width: 100%;
       width: 400px;
+
+      &.summary {
+        max-width: 100%;
+        width: 816px;
+
+        h2 { /* match <h3> styles since <h2> is already set in JSON feed */
+          font-size: 1.5rem;
+          line-height: 1.4;
+          margin-top: 0;
+        }
+
+        p:last-child {
+          margin-bottom: .25rem;
+        }
+      }
     }
 
     h3 {
@@ -184,12 +206,6 @@
 
     .hide { /* missing product */
       display: none !important;
-    }
-  }
-
-  .summary {
-    button {
-      margin-bottom: .5rem;
     }
   }
 

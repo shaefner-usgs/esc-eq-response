@@ -56,6 +56,7 @@ var Mainshock = function (options) {
       _getPager,
       _getShakeAlert,
       _getShakeMap,
+      _getSummary,
       _refreshBeachBalls,
       _renderUpdate,
       _setJson;
@@ -91,7 +92,8 @@ var Mainshock = function (options) {
         html,
         pager,
         shakeAlert,
-        shakemap;
+        shakemap,
+        summary;
 
     data = _getData();
     bubbles = _getBubbles(data);
@@ -99,6 +101,7 @@ var Mainshock = function (options) {
     pager = _getPager(data);
     shakeAlert = _getShakeAlert(data);
     shakemap = _getShakeMap(data);
+    summary = _getSummary(data);
     html = L.Util.template(
       '<div class="details bubble">' +
         '<ul>' +
@@ -144,7 +147,7 @@ var Mainshock = function (options) {
         '</div>' +
         '<div class="pager-exposures bubble placeholder hide"></div>' +
         pager +
-        '<div class="summary bubble">' +
+        '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
             'earthquake details, images, plots and placeholders for talking ' +
@@ -153,6 +156,7 @@ var Mainshock = function (options) {
           '<button id="download" disabled="disabled" type="button" ' +
             'title="Download RTF Document">Download</button>' +
         '</div>' +
+        summary + // tectonic summary
       '</div>',
       data
     );
@@ -240,6 +244,8 @@ var Mainshock = function (options) {
         shakeAlertStatus,
         shakemap,
         shakemapImg,
+        summary,
+        text,
         visibility;
 
     products = _this.json.properties.products;
@@ -249,11 +255,15 @@ var Mainshock = function (options) {
     pager = products.losspager;
     shakeAlert = products['shake-alert'];
     shakemap = products.shakemap;
+    text = products['general-text'];
     visibility = 'hide'; // default - product thumbs container
 
     if (Array.isArray(dyfi)) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
       visibility = 'show';
+    }
+    if (Array.isArray(text)) {
+      summary = text[0].contents[''].bytes;
     }
     if (Array.isArray(pager)) {
       econImg = pager[0].contents['alertecon.png'].url;
@@ -285,6 +295,7 @@ var Mainshock = function (options) {
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.data.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
+      summary: summary || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
@@ -387,6 +398,23 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Get the tectonic summary product HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return product {String}
+   */
+  _getSummary = function (data) {
+    var product = '';
+
+    if (data.summary) {
+      product = '<div class="summary bubble">{summary}</div>';
+    }
+
+    return product;
+  };
+
+  /**
    * Refresh FM, MT beachballs.
    */
   _refreshBeachBalls = function () {
@@ -417,9 +445,9 @@ var Mainshock = function (options) {
       json = _json;
     }
 
-    _app.MapPane.removeFeature(_this); // remove 'old' Mainshock
+    _app.MapPane.removeFeature(_this);
     _this.create(json); // recreate Mainshock
-    _app.MapPane.addLayer(_this); // add 'new' Mainshock
+    _app.MapPane.addLayer(_this);
     _app.SelectBar.showMainshock();
     _app.SummaryPane.updateMainshock();
     _refreshBeachBalls();
