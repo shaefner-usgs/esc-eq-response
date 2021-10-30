@@ -87,7 +87,6 @@ var Earthquakes = function (options) {
       _getBubbles,
       _getDuration,
       _getIntervals,
-      _getLocation,
       _getPlotlyTrace,
       _getPopup,
       _getTemplate,
@@ -401,23 +400,6 @@ var Earthquakes = function (options) {
       year: 0,
       total: 0
     };
-  };
-
-  /**
-   * Get a formatted lat/lng coordinate pair.
-   *
-   * @param coords {Array}
-   *
-   * @return {String}
-   */
-  _getLocation = function (coords) {
-    var lat,
-        lng;
-
-    lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
-    lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
-
-    return lat + ', ' + lng;
   };
 
   /**
@@ -813,7 +795,7 @@ var Earthquakes = function (options) {
       felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
       layerType: _featureId,
-      location: _getLocation(coords),
+      location: AppUtil.formatLatLon(coords),
       localTime: localTime || '',
       mag: mag,
       magInt: Math.floor(mag, 1),

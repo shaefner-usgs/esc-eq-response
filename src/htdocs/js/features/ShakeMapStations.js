@@ -64,7 +64,6 @@ var ShakeMapStations = function (options) {
       _createTable,
       _filter,
       _getAmplitudes,
-      _getLocation,
       _getTitle,
       _onEachFeature,
       _pointToLayer;
@@ -153,10 +152,12 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _createPopup = function (station) {
-    var data,
+    var coords,
+        data,
         html,
         props;
 
+    coords = station.geometry.coordinates;
     props = station.properties;
     data = {
       channels: _createTable(props.channels),
@@ -165,7 +166,7 @@ var ShakeMapStations = function (options) {
       distance: AppUtil.round(props.distance, 1),
       intensity: AppUtil.round(props.intensity, 1),
       network: props.network || '–',
-      location: _getLocation(station),
+      location: AppUtil.formatLatLon(coords),
       romanIntensity: AppUtil.romanize(props.intensity) || 'I',
       source: props.source || '–',
       title: _getTitle(station)
@@ -319,25 +320,6 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get station's location as a formatted lat/lng coordinate pair.
-   *
-   * @param station {Object}
-   *
-   * @return {String}
-   */
-  _getLocation = function (station) {
-    var coords,
-        lat,
-        lng;
-
-    coords = station.geometry.coordinates;
-    lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
-    lng = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
-
-    return station.properties.location || lat + ', ' + lng;
-  };
-
-  /**
    * Get station's title.
    *
    * @param station {Object}
@@ -428,7 +410,6 @@ var ShakeMapStations = function (options) {
     _createTable = null;
     _filter = null;
     _getAmplitudes = null;
-    _getLocation = null;
     _getTitle = null;
     _onEachFeature = null;
     _pointToLayer = null;
