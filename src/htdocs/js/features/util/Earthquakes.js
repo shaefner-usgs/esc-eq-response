@@ -143,7 +143,7 @@ var Earthquakes = function (options) {
       _distanceParam = document.getElementById(inputIdDist).value;
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
-      _mainshockTitle = mainshock.details.title;
+      _mainshockTitle = mainshock.data.title;
       _minMagParam = document.getElementById(inputIdMag).value;
       _duration = _getDuration();
     }

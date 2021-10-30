@@ -488,9 +488,9 @@ var SummaryPane = function (options) {
     mag = _el.querySelector('.details .mag span');
     mainshock = _app.Features.getFeature('mainshock');
 
-    depth.textContent = mainshock.details.depthDisplay;
-    location.textContent = mainshock.details.location;
-    mag.textContent = mainshock.details.magDisplay;
+    depth.textContent = mainshock.data.depthDisplay;
+    location.textContent = mainshock.data.location;
+    mag.textContent = mainshock.data.magDisplay;
   };
 
 

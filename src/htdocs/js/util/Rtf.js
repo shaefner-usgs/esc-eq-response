@@ -241,21 +241,21 @@ var Rtf = function (options) {
         magThreshold: _magThreshold || 0,
         plots: _plots.historical
       },
-      magDisplay: mainshock.details.magDisplay,
-      magType: mainshock.details.magType,
+      magDisplay: mainshock.data.magDisplay,
+      magType: mainshock.data.magType,
       pager: products.pager || {},
       'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
       shakemap: products.shakemap || '',
       summary: products.summary || '',
       time: {
-        local: mainshock.details.localTime,
-        utc: mainshock.details.utcTime
+        local: mainshock.data.localTime,
+        utc: mainshock.data.utcTime
       },
-      title: mainshock.details.title,
+      title: mainshock.data.title,
       urls: {
         app: location.href,
-        eventPage: mainshock.details.url
+        eventPage: mainshock.data.url
       }
     };
 

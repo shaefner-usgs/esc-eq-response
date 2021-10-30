@@ -20,7 +20,7 @@ var AppUtil = require('util/AppUtil'),
  *   {
  *     addListeners: {Function}
  *     create: {Function}
- *     details: {Object}
+ *     data: {Object}
  *     destroy: {Function}
  *     disableButton: {Function}
  *     enableButton: {Function}
@@ -244,7 +244,7 @@ var Mainshock = function (options) {
 
     products = _this.json.properties.products;
     dyfi = products.dyfi;
-    eqTime = Luxon.DateTime.fromISO(_this.details.isoTime).toUTC();
+    eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC();
     mmiInt = Math.round(_this.json.properties.mmi);
     pager = products.losspager;
     shakeAlert = products['shake-alert'];
@@ -272,21 +272,21 @@ var Mainshock = function (options) {
       }
     }
 
-    data = Object.assign({}, _this.details, {
+    data = Object.assign({}, _this.data, {
       date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
       dayofweek: eqTime.toFormat('cccc'),
-      depthDisplay: AppUtil.round(_this.details.depth, 1),
-      dyfiBubble: _this.details.bubbles.dyfi || '',
+      depthDisplay: AppUtil.round(_this.data.depth, 1),
+      dyfiBubble: _this.data.bubbles.dyfi || '',
       dyfiImg: dyfiImg || '',
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
-      pagerBubble: _this.details.bubbles.pager || '',
+      pagerBubble: _this.data.bubbles.pager || '',
       shakeAlertStatus: shakeAlertStatus || '',
-      shakemapBubble: _this.details.bubbles.shakemap || '',
+      shakemapBubble: _this.data.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
-      tsunamiBubble: _this.details.bubbles.tsunami || '',
+      tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
     });
 
@@ -491,7 +491,7 @@ var Mainshock = function (options) {
       json: json
     });
 
-    _this.details = earthquakes.list[0];
+    _this.data = earthquakes.list[0];
     _this.json = json; // used by other Features
     _this.mapLayer = earthquakes.mapLayer;
     _this.plotTraces = earthquakes.plotTraces;
@@ -551,7 +551,7 @@ var Mainshock = function (options) {
     _eqid = null;
     _json = null;
 
-    _this.details = null;
+    _this.data = null;
     _this.json = null;
     _this.mapLayer = null;
     _this.plotTraces = null;
