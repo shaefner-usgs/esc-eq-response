@@ -71,7 +71,7 @@
       padding: .25rem .5rem;
       text-align: center;
       text-transform: uppercase;
-      transition: background .15s ease-in;
+      transition: all .15s ease-in;
 
       &:hover {
         background: $accent-color-lightest;
@@ -91,7 +91,7 @@
         border-radius: 0;
         color: $bg-color;
         cursor: auto;
-        transition: background $effect-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
       }
     }
   }
@@ -108,7 +108,7 @@ body.sidebar {
   }
 
   #sideBar {
-    border-left: 1px solid $border-color;
+    border-left: 1px solid $border-color-lighter;
     margin-right: 0;
 
     .icon-close {
