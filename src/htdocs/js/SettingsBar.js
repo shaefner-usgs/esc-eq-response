@@ -389,7 +389,8 @@ var SettingsBar = function (options) {
       input.value = ''
     );
 
-    if (catalog !== selCatalog) {
+    // Set catalog param when user changes setting but doesn't complete swap
+    if (catalog !== selCatalog && !swap.classList.contains('hide')) {
       AppUtil.setParam('catalog', selCatalog);
     }
     swap.classList.add('hide');
