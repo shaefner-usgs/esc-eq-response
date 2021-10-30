@@ -36,9 +36,9 @@ var PlotsPane = function (options) {
       _el,
       _plots,
 
+      _addContainer,
       _addCount,
       _addListeners,
-      _addContainer,
       _getPlotlyConfig,
       _getPlotlyData,
       _getPlotlyLayout,
@@ -63,6 +63,38 @@ var PlotsPane = function (options) {
     window.onresize = function () {
       _this.resize();
     };
+  };
+
+  /**
+   * Add a plot's container and name to the DOM.
+   *
+   * @param featureId {String}
+   * @param plotId {String <cumulative|hypocenters|magtime>}
+   *
+   * @return container {Element}
+   */
+  _addContainer = function (featureId, plotId) {
+    var container,
+        h3,
+        names,
+        parent;
+
+    container = document.createElement('div');
+    h3 = document.createElement('h3');
+    names = {
+      cumulative: 'Cumulative Earthquakes',
+      hypocenters: '3D Hypocenters',
+      magtime: 'Magnitude vs. Time'
+    };
+    parent = _contentEl.querySelector('.' + featureId + ' .bubble');
+
+    h3.innerHTML = names[plotId];
+
+    container.classList.add(plotId);
+    parent.appendChild(h3);
+    parent.appendChild(container);
+
+    return container;
   };
 
   /**
@@ -122,38 +154,6 @@ var PlotsPane = function (options) {
 
       _app.MapPane.openPopup(eqids[index], featureId);
     });
-  };
-
-  /**
-   * Add a plot's container and name to the DOM.
-   *
-   * @param featureId {String}
-   * @param plotId {String <cumulative|hypocenters|magtime>}
-   *
-   * @return container {Element}
-   */
-  _addContainer = function (featureId, plotId) {
-    var container,
-        h3,
-        names,
-        parent;
-
-    container = document.createElement('div');
-    h3 = document.createElement('h3');
-    names = {
-      cumulative: 'Cumulative Earthquakes',
-      hypocenters: '3D Hypocenters',
-      magtime: 'Magnitude vs. Time'
-    };
-    parent = _contentEl.querySelector('.' + featureId + ' .bubble');
-
-    h3.innerHTML = names[plotId];
-
-    container.classList.add(plotId);
-    parent.appendChild(h3);
-    parent.appendChild(container);
-
-    return container;
   };
 
   /**
@@ -507,13 +507,13 @@ var PlotsPane = function (options) {
         rendered,
         resetButton;
 
-    // Loop thru Features
+    // Loop thru plots by Feature
     Object.keys(_plots).forEach(id => {
       params = _plots[id].params;
       rendered = _plots[id].rendered;
 
       if (!rendered) {
-        // Loop thru plot types for Feature
+        // Loop thru plot types
         Object.keys(params).forEach(plotId => {
           graphDiv = params[plotId].graphDiv;
           options = params[plotId].options;
@@ -527,7 +527,7 @@ var PlotsPane = function (options) {
 
         _plots[id].rendered = true;
 
-        // Change 'reset camera' button to 'autoscale' for consistency w/ other plots
+        // Change 'reset camera' button -> 'autoscale' for consistency w/ other plots
         if (params.hypocenters) {
           resetButton = params.hypocenters.graphDiv.querySelector(
             '[data-attr="resetLastSave"]'
