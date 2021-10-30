@@ -240,12 +240,17 @@ var SettingsBar = function (options) {
    * Historical Seismicity Features.
    */
   _swapCatalog = function () {
-    var catalog = _el.querySelector('.catalog .selected').id;
+    var catalog,
+        mainshock;
+
+    catalog = _el.querySelector('.catalog .selected').id;
+    mainshock = _app.Features.getFeature('mainshock');
 
     AppUtil.setParam('catalog', catalog);
 
     _toggleSwap(catalog);
 
+    mainshock.update(catalog);
     _refreshFeature(null, 'aftershocks', false);
     _refreshFeature(null, 'foreshocks', false);
     _refreshFeature(null, 'historical', false);

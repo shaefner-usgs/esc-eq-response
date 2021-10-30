@@ -99,12 +99,16 @@ var Features = function (options) {
       if (feature.id === 'mainshock') {
         _app.SelectBar.showMainshock();
         _app.SettingsBar.setDefaults();
-        _app.SignificantEqs.replaceList(); // select the Mainshock if it exists
+        _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
 
         document.body.classList.add('mainshock');
 
         // Create the other Features now that the Mainshock is ready
         _createFeatures();
+
+        if (AppUtil.getParam('catalog') === 'dd') {
+          feature.update('dd'); // show Double Difference properties
+        }
       }
 
       // Add listeners that depend on Feature being added first

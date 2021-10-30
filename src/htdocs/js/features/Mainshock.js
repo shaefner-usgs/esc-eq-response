@@ -33,6 +33,7 @@ var AppUtil = require('util/AppUtil'),
  *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
  *     summary: {String}
+ *     update: {Function}
  *     url: {String}
  *     zoomToLayer: {Boolean}
  *   }
@@ -42,8 +43,10 @@ var Mainshock = function (options) {
       _initialize,
 
       _app,
+      _ddJson,
       _dyfiLightbox,
       _eqid,
+      _json,
       _smLightbox,
 
       _createSummary,
@@ -52,7 +55,10 @@ var Mainshock = function (options) {
       _getDyfi,
       _getPager,
       _getShakeAlert,
-      _getShakeMap;
+      _getShakeMap,
+      _refreshBeachBalls,
+      _renderUpdate,
+      _setJson;
 
 
   _this = {};
@@ -119,7 +125,7 @@ var Mainshock = function (options) {
           '</li>' +
           '<li class="location">' +
             '<strong>Location</strong>' +
-            '<span>{locationDisplay}</span>' +
+            '<span>{location}</span>' +
           '</li>' +
           shakeAlert +
           '<li class="status">' +
@@ -275,7 +281,6 @@ var Mainshock = function (options) {
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
-      locationDisplay: _this.details.location.replace(/(.*),(.*)/, '$1,<br>$2'),
       pagerBubble: _this.details.bubbles.pager || '',
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.details.bubbles.shakemap || '',
@@ -381,6 +386,62 @@ var Mainshock = function (options) {
     return product;
   };
 
+  /**
+   * Refresh FM, MT beachballs.
+   */
+  _refreshBeachBalls = function () {
+    var fm,
+        mt;
+
+    fm = _app.Features.getFeature('focal-mechanism');
+    mt = _app.Features.getFeature('moment-tensor');
+
+    _app.MapPane.removeFeature(fm);
+    fm.create();
+    _app.MapPane.addLayer(fm);
+
+    _app.MapPane.removeFeature(mt);
+    mt.create();
+    _app.MapPane.addLayer(mt);
+  };
+
+  /**
+   * Render an update to apply either ComCat or Double Difference parameters.
+   *
+   * @param catalog {String <comcat|dd>}
+   */
+  _renderUpdate = function (catalog) {
+    var json = _ddJson; // default
+
+    if (catalog === 'comcat') {
+      json = _json;
+    }
+
+    _app.MapPane.removeFeature(_this); // remove 'old' Mainshock
+    _this.create(json); // recreate Mainshock
+    _app.MapPane.addLayer(_this); // add 'new' Mainshock
+    _app.SelectBar.showMainshock();
+    _app.SummaryPane.updateMainshock();
+    _refreshBeachBalls();
+  };
+
+  /**
+   * Set Double Difference catalog-specific json properties and store them in a
+   * new (cloned) Object. Also clone the ComCat json and cache it.
+   *
+   * @param json {Object}
+   *     Double Difference catalog GeoJSON
+   */
+  _setJson = function (json) {
+    // Clone two instances of Mainshock's json
+    _json = JSON.parse(JSON.stringify(_this.json));
+    _ddJson = JSON.parse(JSON.stringify(_this.json));
+
+    // Replace location and mag values with Double Difference data
+    _ddJson.geometry.coordinates = json.geometry.coordinates;
+    _ddJson.properties.mag = json.properties.mag;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -444,8 +505,10 @@ var Mainshock = function (options) {
     _initialize = null;
 
     _app = null;
+    _ddJson = null;
     _dyfiLightbox = null;
     _eqid = null;
+    _json = null;
     _smLightbox = null;
 
     _createSummary = null;
@@ -455,6 +518,9 @@ var Mainshock = function (options) {
     _getPager = null;
     _getShakeAlert = null;
     _getShakeMap = null;
+    _refreshBeachBalls = null;
+    _renderUpdate = null;
+    _setJson = null;
 
     _this = null;
   };
@@ -478,6 +544,21 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _ddJson = null;
+    _eqid = null;
+    _json = null;
+
+    _this.details = null;
+    _this.json = null;
+    _this.mapLayer = null;
+    _this.plotTraces = null;
+    _this.summary = null;
+  };
+
+  /**
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
@@ -487,12 +568,35 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Reset to initial state.
+   * Update the location and magnitude to match the given catalog.
+   *
+   * @param catalog {String <comcat|dd>}
    */
-  _this.reset = function () {
-    _this.mapLayer = null;
-    _this.plotTraces = null;
-    _this.summary = null;
+  _this.update = function (catalog) {
+    var id,
+        mainshock,
+        url;
+
+    // Set the Double Difference catalog props if necessary; render the update
+    if (!_ddJson) {
+      id = AppUtil.getParam('eqid').replace(/[A-Za-z]{0,2}(\d+)/, '$1');
+      url = `${location.origin}/php/fdsn/search.json.php?eventid=${id}&format=text`;
+
+      _app.JsonFeed.fetch({
+        id: 'dd-mainshock',
+        name: 'Double Difference Mainshock',
+        url: url
+      }).then(json => {
+        mainshock = json.features[0];
+
+        if (mainshock) {
+          _setJson(mainshock);
+          _renderUpdate(catalog);
+        }
+      });
+    } else {
+      _renderUpdate(catalog);
+    }
   };
 
 
