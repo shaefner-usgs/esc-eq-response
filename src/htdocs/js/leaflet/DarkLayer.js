@@ -19,8 +19,8 @@ L.DarkLayer = function (provider, options) {
 
   providers = {
     cartodb: {
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">' +
-        'OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">' +
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">' +
+        'OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">' +
         'CartoDB</a>',
       maxZoom: 19,
       subdomains: 'abcd',

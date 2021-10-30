@@ -345,7 +345,7 @@ var Earthquakes = function (options) {
 
     if (data.tsunami) {
       bubbles.tsunami = L.Util.template(
-        '<a href="http://www.tsunami.gov/" class="impact-bubble tsunami" ' +
+        '<a href="https://www.tsunami.gov/" class="impact-bubble tsunami" ' +
           'target="new" title="Tsunami Warning Center">' +
           '<span class="hover"></span>' +
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +

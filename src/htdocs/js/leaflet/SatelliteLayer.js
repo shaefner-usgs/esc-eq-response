@@ -32,11 +32,11 @@ L.SatelliteLayer = function (provider, options) {
       url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
     },
     mapquest: {
-      attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> ' +
+      attribution: 'Tiles Courtesy of <a href="https://www.mapquest.com/">MapQuest</a> ' +
         '— Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of ' +
         'Agriculture, Farm Service Agency',
       subdomains: '1234',
-      url: 'http://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg'
+      url: 'https://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg'
     }
   };
   provider = provider || 'esri';
