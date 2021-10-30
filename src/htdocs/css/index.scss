@@ -131,7 +131,7 @@ p {
 
 table {
   border-collapse: collapse;
-  margin: 0 0 1rem;
+  margin: 0 0 .75rem;
 }
 
 td,
@@ -160,6 +160,7 @@ tr {
 .bubble {
   background: $bg-color;
   border-radius: 12px;
+  box-shadow: 0 3px 14px 0 rgba(102 ,102, 102, 0.1);
   padding: 1rem;
 }
 
