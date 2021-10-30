@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Create an Event Summary RTF document using a JSON string that is sent as a
  * POST data Blob to a PHP script that generates the binary file.
@@ -201,8 +198,7 @@ var Rtf = function (options) {
         mainshock,
         pagerCities,
         pagerExposures,
-        products,
-        props;
+        products;
 
     aftershocks = _app.Features.getFeature('aftershocks');
     beachballs = _getBeachBalls();
@@ -213,7 +209,6 @@ var Rtf = function (options) {
     pagerCities = _app.Features.getFeature('pager-cities');
     pagerExposures = _app.Features.getFeature('pager-exposures');
     products = _getProducts(mainshock.json.properties.products);
-    props = mainshock.json.properties;
 
     // IMPORTANT: Set appropriate types for 'empty' values (i.e. not undefined)
     data = {
@@ -246,22 +241,21 @@ var Rtf = function (options) {
         magThreshold: _magThreshold || 0,
         plots: _plots.historical
       },
-      mag: AppUtil.round(props.mag, 1),
-      magType: props.magType || 'M',
+      magDisplay: mainshock.details.magDisplay,
+      magType: mainshock.details.magType,
       pager: products.pager || {},
       'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
-      place: props.place,
       shakemap: products.shakemap || '',
       summary: products.summary || '',
       time: {
         local: mainshock.details.localTime,
         utc: mainshock.details.utcTime
       },
-      title: props.title,
+      title: mainshock.details.title,
       urls: {
         app: location.href,
-        eventPage: props.url
+        eventPage: mainshock.details.url
       }
     };
 

@@ -296,7 +296,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->magType . ' ' . $this->_data->mag,
+      $this->_data->magType . ' ' . $this->_data->magDisplay,
       $this->_font->body,
       $this->_format->body
     );
@@ -1126,7 +1126,7 @@ class Rtf {
         $this->_format->body
       );
       $section9->writeText(
-        'ANSS report: M ' . round($this->_data->mag, 1),
+        'ANSS report: M ' . $this->_data->magDisplay,
         $this->_font->body,
         $this->_format->body
       );
