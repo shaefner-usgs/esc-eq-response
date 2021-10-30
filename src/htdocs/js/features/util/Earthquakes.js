@@ -762,7 +762,6 @@ var Earthquakes = function (options) {
         eq,
         eqTime,
         eqTimeLocal,
-        layerType,
         localTime,
         mag,
         magDisplay,
@@ -776,7 +775,6 @@ var Earthquakes = function (options) {
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
-    layerType = _featureId;
     magDisplay = AppUtil.round(props.mag, 1);
     mag = parseFloat(magDisplay);
     magType = props.magType || 'M';
@@ -814,11 +812,9 @@ var Earthquakes = function (options) {
       eqid: feature.id,
       felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
-      lat: coords[1],
-      layerType: layerType,
+      layerType: _featureId,
       location: _getLocation(coords),
       localTime: localTime || '',
-      lon: coords[0],
       mag: mag,
       magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
