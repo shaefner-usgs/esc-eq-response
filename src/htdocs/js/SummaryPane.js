@@ -23,6 +23,7 @@ var AppUtil = require('util/AppUtil'),
  *     addLoader: {Function}
  *     removeFeature: {Function}
  *     reset: {Function}
+ *     updateMainshock: {Function}
  *   }
  */
 var SummaryPane = function (options) {
@@ -471,6 +472,25 @@ var SummaryPane = function (options) {
 
     time.innerHTML = '';
     _contentEl.innerHTML = '';
+  };
+
+  /**
+   * Update the Mainshock's catalog-specific details.
+   */
+  _this.updateMainshock = function() {
+    var depth,
+        location,
+        mag,
+        mainshock;
+
+    depth = _el.querySelector('.details .depth span');
+    location = _el.querySelector('.details .location span');
+    mag = _el.querySelector('.details .mag span');
+    mainshock = _app.Features.getFeature('mainshock');
+
+    depth.textContent = mainshock.details.depthDisplay;
+    location.textContent = mainshock.details.location;
+    mag.textContent = mainshock.details.magDisplay;
   };
 
 

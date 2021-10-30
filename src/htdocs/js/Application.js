@@ -12,6 +12,7 @@ var AppUtil = require('util/AppUtil'),
     SearchBar = require('SearchBar'),
     SelectBar = require('SelectBar'),
     SettingsBar = require('SettingsBar'),
+    SideBar = require('SideBar'),
     SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane'),
@@ -31,6 +32,7 @@ var AppUtil = require('util/AppUtil'),
  *     SearchBar: {Element}
  *     SelectBar: {Element}
  *     SettingsBar: {Element}
+ *     SideBar: {Element}
  *     SignificantEqs: {Element}
  *     StatusBar: {Element}
  *     SummaryPane: {Element}
@@ -49,10 +51,13 @@ var AppUtil = require('util/AppUtil'),
  *     SearchBar: {Object}
  *     SelectBar: {Object}
  *     SettingsBar: {Object}
+ *     SideBar: {Object}
  *     SignificantEqs: {Object}
  *     StatusBar: {Object}
  *     SummaryPane: {Object}
  *     TitleBar: {Object}
+ *     defaultPaneId: {String}
+ *     getPaneId: {Function}
  *     headerHeight: {Number}
  *     reset: {Function}
  *     setScrollPosition: {Function}
@@ -85,6 +90,7 @@ var Application = function (options) {
     _sidebar = document.getElementById('sideBar');
     _style = document.createElement('style');
 
+    _this.defaultPaneId = 'mapPane';
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 
@@ -161,6 +167,7 @@ var Application = function (options) {
       SearchBar: SearchBar,
       SelectBar: SelectBar,
       SettingsBar: SettingsBar,
+      SideBar: SideBar,
       SignificantEqs: SignificantEqs,
       StatusBar: StatusBar,
       SummaryPane: SummaryPane,
@@ -217,7 +224,7 @@ var Application = function (options) {
       id = AppUtil.getParam('sidebar');
       position = _sidebar.scrollTop;
     } else { // 'pane'
-      id = _this.NavBar.getPaneId();
+      id = _this.getPaneId();
       position = window.pageYOffset;
     }
 
@@ -232,6 +239,27 @@ var Application = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Get the id value of the selected pane from the URL.
+   *
+   * @return id {String}
+   */
+  _this.getPaneId = function () {
+    var hash,
+        id,
+        paneExists;
+
+    hash = location.hash;
+    id = _this.defaultPaneId;
+    paneExists = document.querySelector('section' + hash);
+
+    if (hash && paneExists) {
+      id = hash.substr(1);
+    }
+
+    return id;
+  };
 
   /**
    * Reset app to default state (i.e. no Mainshock selected).

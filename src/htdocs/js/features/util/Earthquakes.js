@@ -48,6 +48,7 @@ _DEFAULTS = {
  * @return _this {Object}
  *   {
  *     bins: {Object}
+ *     count: {Integer}
  *     createBinTable: {Function}
  *     createDescription: {Function}
  *     createListTable: {Function}
@@ -62,22 +63,26 @@ var Earthquakes = function (options) {
       _initialize,
 
       _app,
+      _catalog,
+      _distanceParam,
       _duration,
       _featureId,
       _mainshockLatlon,
       _mainshockTime,
       _mainshockTitle,
       _markerOptions,
-      _minMag,
+      _minMagParam,
       _now,
       _pastDay,
       _pastHour,
       _pastWeek,
       _plotData,
       _sortByField,
+      _vectors,
 
       _addEqToBin,
       _addListeners,
+      _filter,
       _getAge,
       _getBubbles,
       _getDuration,
@@ -96,14 +101,14 @@ var Earthquakes = function (options) {
 
   _initialize = function (options) {
     var coords,
-        inputId,
-        mainshock,
-        type;
+        inputIdDist,
+        inputIdMag,
+        mainshock;
 
     options = Object.assign({}, _DEFAULTS, options);
-    type = options.type;
 
     _app = options.app;
+    _catalog = AppUtil.getParam('catalog') || 'comcat';
     _featureId = options.id;
     _markerOptions = options.markerOptions;
     _now = Luxon.DateTime.utc();
@@ -124,22 +129,31 @@ var Earthquakes = function (options) {
       time: []
     };
     _sortByField = options.sortByField || '';
+    _vectors = {};
 
-    if (_featureId !== 'mainshock' && type !== 'search') {
-      inputId = AppUtil.getPrefix(_featureId) + '-mag';
+    if (_featureId === 'search') {
+      _catalog = 'comcat'; // search layer is always from ComCat
+    }
+
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
+      inputIdDist = AppUtil.getPrefix(_featureId) + '-dist';
+      inputIdMag = AppUtil.getPrefix(_featureId) + '-mag';
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
+      _distanceParam = document.getElementById(inputIdDist).value;
       _mainshockLatlon = LatLon(coords[1], coords[0]);
       _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
       _mainshockTitle = mainshock.details.title;
-      _minMag = document.getElementById(inputId).value;
+      _minMagParam = document.getElementById(inputIdMag).value;
       _duration = _getDuration();
     }
 
     _this.bins = {};
+    _this.count = 0;
     _this.list = [];
     _this.mapLayer = L.geoJson(options.json, {
+      filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
@@ -214,6 +228,49 @@ var Earthquakes = function (options) {
       // Input event is not triggered when it's changed programmatically
       _app.SelectBar.handleMainshock();
     });
+  };
+
+  /**
+   * Filter out earthquakes that are outside the search radius.
+   *
+   * The NCEDC catalog does not support radius values specified in km for
+   * limiting search results, so a rectangle is used instead as a proxy.
+   *
+   * @param feature {Object}
+   *     geoJSON feature
+   */
+  _filter = function (feature) {
+    var bearing,
+        compassPoints,
+        coords,
+        distance,
+        latlon,
+        octant;
+
+    if (_featureId === 'mainshock' || _featureId === 'search') {
+      _this.count ++;
+
+      return true;
+    }
+
+    // Calculate distance/direction from Mainshock
+    compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+    coords = feature.geometry.coordinates;
+    latlon = LatLon(coords[1], coords[0]);
+    bearing = _mainshockLatlon.bearing(latlon);
+    distance = _mainshockLatlon.distanceTo(latlon) / 1000;
+    octant = Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0);
+
+    _vectors[feature.id] = { // cache values
+      direction: compassPoints[octant],
+      distance: distance
+    };
+
+    if (distance <= _distanceParam) {
+      _this.count ++;
+
+      return true;
+    }
   };
 
   /**
@@ -587,7 +644,7 @@ var Earthquakes = function (options) {
         '</div>';
     } else if (type === 'popup') {
       template =
-        '<div class="earthquake {className}">' +
+        '<div class="earthquake {catalog} {layerType}">' +
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl>' +
@@ -601,7 +658,7 @@ var Earthquakes = function (options) {
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</dt>' +
             '<dd class="distance">{distanceDisplay}</dd>' +
-            '<dt>Status</dt>' +
+            '<dt class="status">Status</dt>' +
             '<dd class="status">{status}{statusIcon}</dd>' +
           '</dl>' +
           '<button type="button">Select</button>' +
@@ -654,8 +711,8 @@ var Earthquakes = function (options) {
       }
     });
 
-    if (threshold < _minMag) { // happens when there's no smaller mag eqs
-      threshold = Math.floor(_minMag);
+    if (threshold < _minMagParam) { // happens when there's no smaller mag eqs
+      threshold = Math.floor(_minMagParam);
     }
 
     return threshold;
@@ -698,18 +755,14 @@ var Earthquakes = function (options) {
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var bearing,
-        bearingString,
-        className,
-        compassPoints,
-        coords,
+    var coords,
         days,
         distance,
         distanceDisplay,
         eq,
         eqTime,
         eqTimeLocal,
-        latlon,
+        layerType,
         localTime,
         mag,
         magDisplay,
@@ -720,10 +773,10 @@ var Earthquakes = function (options) {
         tooltip,
         utcTime;
 
-    className = _featureId;
     coords = feature.geometry.coordinates;
     props = feature.properties;
     eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
+    layerType = _featureId;
     magDisplay = AppUtil.round(props.mag, 1);
     mag = parseFloat(magDisplay);
     magType = props.magType || 'M';
@@ -731,6 +784,12 @@ var Earthquakes = function (options) {
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
     tooltip = magType + ' ' + magDisplay + ' - ' + utcTime;
+
+    if (_featureId !== 'mainshock' && _featureId !== 'search') {
+      distance = _vectors[feature.id].distance;
+      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
+        _vectors[feature.id].direction + '</span>';
+    }
 
     if (props.status === 'reviewed') {
       statusIcon += '<i class="icon-check"></i>';
@@ -744,21 +803,10 @@ var Earthquakes = function (options) {
       template += '<time datetime="{isoTime}">{localTime}</time>';
     }
 
-    // Calculate distance/direction from Mainshock
-    if (_featureId !== 'mainshock' && _featureId !== 'search') {
-      compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-      latlon = LatLon(coords[1], coords[0]);
-      bearing = _mainshockLatlon.bearing(latlon);
-      bearingString = compassPoints[Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0)];
-      distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
-        bearingString + '</span>';
-    }
-
     eq = {
       alert: props.alert || '', // PAGER
+      catalog: _catalog,
       cdi: AppUtil.romanize(props.cdi), // DYFI
-      className: className,
       depth: coords[2],
       depthDisplay: AppUtil.round(coords[2], 1) + ' km',
       distance: distance || '',
@@ -766,14 +814,17 @@ var Earthquakes = function (options) {
       eqid: feature.id,
       felt: AppUtil.addCommas(props.felt), // DYFI felt reports
       isoTime: eqTime.toISO(),
+      lat: coords[1],
+      layerType: layerType,
       location: _getLocation(coords),
       localTime: localTime || '',
+      lon: coords[0],
       mag: mag,
       magInt: Math.floor(mag, 1),
       magDisplay: magDisplay,
       magType: magType,
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
-      status: props.status,
+      status: props.status || '',
       statusIcon: statusIcon,
       title: magType + ' ' + magDisplay + ' - ' + props.place,
       tsunami: props.tsunami,
@@ -796,7 +847,7 @@ var Earthquakes = function (options) {
 
     // Note: additional plotData props are added in _pointToLayer()
     _plotData.date.push(eq.utcTime);
-    _plotData.depth.push(coords[2] * -1); // set to negative for 3d plots
+    _plotData.depth.push(coords[2] * -1); // set to negative value for 3d plots
     _plotData.eqid.push(eq.eqid);
     _plotData.lat.push(coords[1]);
     _plotData.lon.push(coords[0]);
@@ -910,14 +961,10 @@ var Earthquakes = function (options) {
    */
   _this.createDescription = function () {
     var data,
-        distance,
         ending,
-        inputId,
         interval,
         length;
 
-    inputId = AppUtil.getPrefix(_featureId) + '-dist';
-    distance = document.getElementById(inputId).value;
     interval = Object.keys(_duration)[0];
     length = _duration[interval];
 
@@ -930,9 +977,9 @@ var Earthquakes = function (options) {
     }
 
     data = {
-      distance: distance,
+      distance: _distanceParam,
       ending: ending,
-      mag: _minMag
+      mag: _minMagParam
     };
 
     return L.Util.template(_getTemplate('description'), data);
@@ -1020,7 +1067,7 @@ var Earthquakes = function (options) {
       id: _featureId,
       mag: magThreshold,
       max: _this.bins.mag.length - 1,
-      min: Math.floor(_minMag)
+      min: Math.floor(_minMagParam)
     };
     html = '';
     singleMagBin = _this.bins.mag.every(
@@ -1048,10 +1095,11 @@ var Earthquakes = function (options) {
  *
  * @param params {Object}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
+ * @param type {String} default is 'feature'
  *
  * @return {String}
  */
-Earthquakes.getFeedUrl = function (params) {
+Earthquakes.getFeedUrl = function (params, type='feature') {
   var baseUri,
       defaults,
       pairs,
@@ -1064,6 +1112,10 @@ Earthquakes.getFeedUrl = function (params) {
   };
   pairs = [];
   params = Object.assign({}, defaults, params);
+
+  if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') {
+    baseUri = location.origin + '/php/fdsn/search.json.php';
+  }
 
   delete params.period; // internal property (search API rejects 'foreign' props)
 

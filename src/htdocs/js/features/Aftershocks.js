@@ -249,7 +249,7 @@ var Aftershocks = function (options) {
     });
 
     _this.bins = _earthquakes.bins;
-    _this.count = json.metadata.count;
+    _this.count = _earthquakes.count;
     _this.description = _earthquakes.createDescription();
     _this.list = _earthquakes.list;
     _this.mapLayer = _earthquakes.mapLayer;

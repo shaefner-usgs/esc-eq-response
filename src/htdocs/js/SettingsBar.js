@@ -44,7 +44,11 @@ var SettingsBar = function (options) {
       _addListeners,
       _getDefaults,
       _refreshFeature,
-      _saveFocusedField;
+      _saveFocusedField,
+      _setCatalogOption,
+      _showOption,
+      _swapCatalog,
+      _toggleSwap;
 
 
   _this = {};
@@ -62,13 +66,22 @@ var SettingsBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var features,
-        fields;
+    var buttons,
+        features,
+        fields,
+        swap;
 
+    buttons = _el.querySelectorAll('.catalog li');
     features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
     fields = _el.querySelectorAll('input');
+    swap = document.getElementById('swap');
 
-    // Update a Feature when its params are changed
+    // Show the selected option
+    buttons.forEach(button =>
+      button.addEventListener('click', _showOption)
+    );
+
+    // Refresh a Feature
     features.forEach(feature =>
       feature.addEventListener('input', _refreshFeature)
     );
@@ -78,6 +91,12 @@ var SettingsBar = function (options) {
       field.addEventListener('focus', _saveFocusedField); // remember focused field
       field.addEventListener('input', AppUtil.updateParam);
     });
+
+    // Refresh Features using data from an alternative catalog
+    swap.addEventListener('click', _swapCatalog);
+
+    // Set the selected catalog
+    window.addEventListener('load', _setCatalogOption);
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
@@ -123,18 +142,21 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Refresh a Feature. Triggered when a parameter setting for a given Feature
-   * is changed by the user.
+   * Refresh a Feature, throttling repeated requests. Triggered when the user
+   * changes a Feature's setting(s) and when the earthquake catalog is swapped.
+   *
+   * @param e {Event}
+   * @param id {String} optional; default is ''
+   * @param throttle {Boolean} optional; default is true
    */
-  _refreshFeature = function () {
-    var feature,
-        id;
+  _refreshFeature = function (e, id = '', throttle = true) {
+    var feature;
 
     if (document.body.classList.contains('mainshock')) {
-      id = this.className; // css class of form field's parent container
+      if (!id) {
+        id = this.className; // CSS class of the form field's parent container
+      }
       feature = _app.Features.getFeature(id);
-
-      _app.JsonFeed.initThrottlers(id);
 
       // Immediately show loading status (don't wait for throttle timers)
       if (feature) {
@@ -144,18 +166,22 @@ var SettingsBar = function (options) {
         });
       }
 
-      // Throttle requests
-      _app.JsonFeed.throttlers[id].push(
-        setTimeout(() => {
-          if (feature) {
-            _app.Features.refreshFeature(feature);
-          } else { // Feature never created (likely due to a bad Fetch request)
-            _app.Features.createFeature(id);
-          }
+      if (throttle) {
+        _app.JsonFeed.initThrottlers(id);
+        _app.JsonFeed.throttlers[id].push(
+          setTimeout(() => {
+            if (feature) {
+              _app.Features.refreshFeature(feature);
+            } else { // Feature never created (likely due to a bad Fetch request)
+              _app.Features.createFeature(id);
+            }
+          }, 500)
+        );
+      } else {
+        _app.Features.refreshFeature(feature); // refresh immediately
+      }
 
-          _app.PlotsPane.rendered = false; // flag to (re-)render plots
-        }, 500)
-      );
+      _app.PlotsPane.rendered = false; // flag to (re-)render plots
     }
   };
 
@@ -166,6 +192,95 @@ var SettingsBar = function (options) {
    */
   _saveFocusedField = function (e) {
     _focusedField = e.target.id;
+  };
+
+  /**
+   * Set the catalog option to match the 'catalog' URL parameter if it is set.
+   */
+  _setCatalogOption = function () {
+    var catalog,
+        lis,
+        note;
+
+    catalog = AppUtil.getParam('catalog');
+
+    if (catalog) {
+      lis = _el.querySelectorAll('.catalog li');
+      note = _el.querySelector('.dd');
+
+      lis.forEach(li => {
+        if (li.id === catalog) {
+          li.classList.add('selected');
+        } else {
+          li.classList.remove('selected');
+        }
+      });
+
+      if (catalog === 'dd') {
+        note.classList.remove('hide');
+      }
+    }
+  };
+
+  /**
+   * Show the selected option when the user clicks a 'radio-bar' button.
+   */
+  _showOption = function () {
+    _app.SideBar.showOption.call(this);
+
+    if (document.body.classList.contains('mainshock')) {
+      _toggleSwap(this.id);
+    } else {
+      AppUtil.setParam('catalog', this.id);
+    }
+  };
+
+  /**
+   * Swap the earthquake catalog (source data) for Aftershocks, Foreshocks and
+   * Historical Seismicity Features.
+   */
+  _swapCatalog = function () {
+    var catalog,
+        mainshock;
+
+    catalog = _el.querySelector('.catalog .selected').id;
+    mainshock = _app.Features.getFeature('mainshock');
+
+    AppUtil.setParam('catalog', catalog);
+
+    _toggleSwap(catalog);
+
+    mainshock.update(catalog);
+    _refreshFeature(null, 'aftershocks', false);
+    _refreshFeature(null, 'foreshocks', false);
+    _refreshFeature(null, 'historical', false);
+  };
+
+  /**
+   * Toggle the option to swap catalogs on/off depending on the current state.
+   *
+   * @param catalog {String <comcat|dd>}
+   */
+  _toggleSwap = function (catalog) {
+    var names,
+        prevCatalog,
+        span,
+        swap;
+
+    names = {
+      comcat: 'ComCat',
+      dd: 'Double Difference'
+    };
+    prevCatalog = AppUtil.getParam('catalog');
+    swap = _el.querySelector('.swap');
+    span = swap.querySelector('span');
+
+    if (catalog === prevCatalog) {
+      swap.classList.add('hide');
+    } else {
+      swap.classList.remove('hide');
+      span.textContent = names[prevCatalog];
+    }
   };
 
   // ----------------------------------------------------------
@@ -254,19 +369,31 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via _this.removeCount().
    */
   _this.reset = function () {
-    var inputs,
-        selectors;
+    var catalog,
+        inputs,
+        selCatalog,
+        selectors,
+        swap;
 
+    catalog = AppUtil.getParam('catalog') || 'comcat';
     selectors = [
       '.aftershocks input',
       '.foreshocks input',
       '.historical input'
     ];
     inputs = _el.querySelectorAll(selectors.join(','));
+    selCatalog = _el.querySelector('.catalog .selected').id;
+    swap = _el.querySelector('.swap');
 
     inputs.forEach(input =>
       input.value = ''
     );
+
+    // Set catalog param when user changes setting but doesn't complete swap
+    if (catalog !== selCatalog && !swap.classList.contains('hide')) {
+      AppUtil.setParam('catalog', selCatalog);
+    }
+    swap.classList.add('hide');
   };
 
   /**

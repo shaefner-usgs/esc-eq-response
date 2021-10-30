@@ -353,7 +353,7 @@ var MapPane = function (options) {
         paddingTopLeft: L.point(x, _app.headerHeight) // accommodate sidebar, header
       });
 
-      if (status === 'complete' && _app.NavBar.getPaneId() === 'mapPane') {
+      if (status === 'complete' && _app.getPaneId() === 'mapPane') {
         _initialView = false;
       }
     }

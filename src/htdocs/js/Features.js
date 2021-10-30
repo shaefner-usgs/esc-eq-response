@@ -2,6 +2,7 @@
 
 
 var Aftershocks = require('features/Aftershocks'),
+    AppUtil = require('util/AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
     Foreshocks = require('features/Foreshocks'),
@@ -98,12 +99,16 @@ var Features = function (options) {
       if (feature.id === 'mainshock') {
         _app.SelectBar.showMainshock();
         _app.SettingsBar.setDefaults();
-        _app.SignificantEqs.replaceList(); // select the Mainshock if it exists
+        _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
 
         document.body.classList.add('mainshock');
 
         // Create the other Features now that the Mainshock is ready
         _createFeatures();
+
+        if (AppUtil.getParam('catalog') === 'dd') {
+          feature.update('dd'); // show Double Difference properties
+        }
       }
 
       // Add listeners that depend on Feature being added first
@@ -219,9 +224,15 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _loadFeature = function (feature) {
+    var fetchOpts = {};
+
+    if (AppUtil.getParam('catalog') === 'dd') {
+      fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
+    }
+
     if (feature.url) {
       _addLoaders(feature);
-      _app.JsonFeed.fetch(feature).then(json => {
+      _app.JsonFeed.fetch(feature, fetchOpts).then(json => {
         if (json) {
           feature.isLoading = false;
 

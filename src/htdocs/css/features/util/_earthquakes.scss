@@ -186,6 +186,12 @@
 
 /* Earthquake details in map popups and the SelectBar. */
 .earthquake {
+  &.dd:not(.mainshock) {
+    .status {
+      display: none;
+    }
+  }
+
   &.mainshock,
   &.search {
     .distance {
@@ -213,16 +219,16 @@
     right: -.25rem;
   }
 
-  time {
-    display: block;
-  }
-
-  .status {
+  dd.status {
     text-transform: capitalize;
 
     i {
       color: green;
     }
+  }
+
+  time {
+    display: block;
   }
 }
 
