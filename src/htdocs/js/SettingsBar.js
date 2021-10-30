@@ -385,6 +385,8 @@ var SettingsBar = function (options) {
     selCatalog = _el.querySelector('.catalog .selected').id;
     swap = _el.querySelector('.swap');
 
+    _focusedField = null;
+
     inputs.forEach(input =>
       input.value = ''
     );
