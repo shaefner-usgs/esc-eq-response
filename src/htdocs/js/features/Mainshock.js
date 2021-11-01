@@ -461,7 +461,7 @@ var Mainshock = function (options) {
    * Set Double Difference catalog-specific json properties and store them in a
    * new (cloned) Object. Also clone the ComCat json and cache it.
    *
-   * @param json {Object}
+   * @param json {Object || null}
    *     Double Difference catalog GeoJSON
    */
   _setJson = function (json) {
@@ -469,9 +469,10 @@ var Mainshock = function (options) {
     _json = JSON.parse(JSON.stringify(_this.json));
     _ddJson = JSON.parse(JSON.stringify(_this.json));
 
-    // Replace location and mag values with Double Difference data
-    _ddJson.geometry.coordinates = json.geometry.coordinates;
-    _ddJson.properties.mag = json.properties.mag;
+    if (json) { // replace location, mag values with Double Difference data
+      _ddJson.geometry.coordinates = json.geometry.coordinates;
+      _ddJson.properties.mag = json.properties.mag;
+    }
   };
 
   // ----------------------------------------------------------
@@ -625,6 +626,8 @@ var Mainshock = function (options) {
         if (mainshock) {
           _setJson(mainshock);
           _renderUpdate(catalog);
+        } else {
+          _setJson(null);
         }
       });
     } else {
