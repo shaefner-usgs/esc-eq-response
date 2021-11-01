@@ -1095,8 +1095,6 @@ Earthquakes.getFeedUrl = function (params, type='feature') {
     baseUri = location.origin + '/php/fdsn/search.json.php';
   }
 
-  delete params.period; // internal property (search API rejects 'foreign' props)
-
   Object.keys(params).forEach(key => {
     value = params[key];
 
