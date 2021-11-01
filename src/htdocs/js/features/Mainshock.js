@@ -621,7 +621,7 @@ var Mainshock = function (options) {
       _app.JsonFeed.fetch({
         host: 'ncedc.org',
         id: 'mainshock',
-        name: 'Double Difference Mainshock',
+        name: 'DD Mainshock',
         url: url
       }).then(json => {
         mainshock = json.features[0];

@@ -1,6 +1,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
  * Show the loading state of app and external feed data and log errors.
  *
@@ -100,6 +103,13 @@ var StatusBar = function (options) {
 
     if (item.name) {
       msg += item.name;
+    }
+    if (AppUtil.getParam('catalog') === 'dd' && (
+      item.id === 'aftershocks' ||
+      item.id === 'foreshocks' ||
+      item.id === 'historical'
+    )) {
+      msg = 'DD ' + msg;
     }
     if (opts.append) {
       msg += ' ' + opts.append;
