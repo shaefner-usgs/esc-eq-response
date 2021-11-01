@@ -224,7 +224,11 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _loadFeature = function (feature) {
-    var fetchOpts = {};
+    var fetchOpts,
+        resource;
+
+    fetchOpts = {};
+    resource = feature;
 
     if (AppUtil.getParam('catalog') === 'dd' && (
       feature.id === 'aftershocks' ||
@@ -232,11 +236,14 @@ var Features = function (options) {
       feature.id === 'historical'
     )) {
       fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
+      resource = Object.assign({}, feature, {
+        name: 'DD ' + feature.name // prepend 'DD' to name shown in StatusBar
+      });
     }
 
     if (feature.url) {
       _addLoaders(feature);
-      _app.JsonFeed.fetch(feature, fetchOpts).then(json => {
+      _app.JsonFeed.fetch(resource, fetchOpts).then(json => {
         if (json) {
           feature.isLoading = false;
 
