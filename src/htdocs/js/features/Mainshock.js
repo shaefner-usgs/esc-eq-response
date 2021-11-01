@@ -428,13 +428,16 @@ var Mainshock = function (options) {
     fm = _app.Features.getFeature('focal-mechanism');
     mt = _app.Features.getFeature('moment-tensor');
 
-    _app.MapPane.removeFeature(fm);
-    fm.create();
-    _app.MapPane.addLayer(fm);
-
-    _app.MapPane.removeFeature(mt);
-    mt.create();
-    _app.MapPane.addLayer(mt);
+    if (fm.mapLayer) {
+      _app.MapPane.removeFeature(fm);
+      fm.create();
+      _app.MapPane.addLayer(fm);
+    }
+    if (mt.mapLayer) {
+      _app.MapPane.removeFeature(mt);
+      mt.create();
+      _app.MapPane.addLayer(mt);
+    }
   };
 
   /**
