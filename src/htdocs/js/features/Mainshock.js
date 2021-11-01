@@ -56,7 +56,7 @@ var Mainshock = function (options) {
       _getPager,
       _getShakeAlert,
       _getShakeMap,
-      _getSummary,
+      _getTectonic,
       _refreshBeachBalls,
       _renderUpdate,
       _setJson;
@@ -93,7 +93,7 @@ var Mainshock = function (options) {
         pager,
         shakeAlert,
         shakemap,
-        summary;
+        tectonic;
 
     data = _getData();
     bubbles = _getBubbles(data);
@@ -101,7 +101,7 @@ var Mainshock = function (options) {
     pager = _getPager(data);
     shakeAlert = _getShakeAlert(data);
     shakemap = _getShakeMap(data);
-    summary = _getSummary(data);
+    tectonic = _getTectonic(data);
     html = L.Util.template(
       '<div class="details bubble">' +
         '<ul>' +
@@ -156,7 +156,7 @@ var Mainshock = function (options) {
           '<button id="download" disabled="disabled" type="button" ' +
             'title="Download RTF Document">Download</button>' +
         '</div>' +
-        summary + // tectonic summary
+        tectonic +
       '</div>',
       data
     );
@@ -244,7 +244,7 @@ var Mainshock = function (options) {
         shakeAlertStatus,
         shakemap,
         shakemapImg,
-        summary,
+        tectonic,
         text,
         visibility;
 
@@ -263,7 +263,7 @@ var Mainshock = function (options) {
       visibility = 'show';
     }
     if (Array.isArray(text)) {
-      summary = text[0].contents[''].bytes;
+      tectonic = text[0].contents[''].bytes;
     }
     if (Array.isArray(pager)) {
       econImg = pager[0].contents['alertecon.png'].url;
@@ -295,7 +295,7 @@ var Mainshock = function (options) {
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.data.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
-      summary: summary || '',
+      tectonic: tectonic || '',
       time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
@@ -404,11 +404,11 @@ var Mainshock = function (options) {
    *
    * @return product {String}
    */
-  _getSummary = function (data) {
+  _getTectonic = function (data) {
     var product = '';
 
-    if (data.summary) {
-      product = '<div class="summary bubble">{summary}</div>';
+    if (data.tectonic) {
+      product = '<div class="tectonic bubble">{tectonic}</div>';
     }
 
     return product;
@@ -612,7 +612,7 @@ var Mainshock = function (options) {
 
       _app.JsonFeed.fetch({
         host: 'ncedc.org',
-        id: 'dd-mainshock',
+        id: 'mainshock',
         name: 'Double Difference Mainshock',
         url: url
       }).then(json => {
