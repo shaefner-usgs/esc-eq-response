@@ -408,7 +408,11 @@ var Mainshock = function (options) {
     var product = '';
 
     if (data.tectonic) {
-      product = '<div class="tectonic bubble">{tectonic}</div>';
+      product =
+        '<div class="tectonic bubble">' +
+          '<h3>Tectonic Summary</h3>' +
+          '{tectonic}' +
+        '</div>';
     }
 
     return product;
