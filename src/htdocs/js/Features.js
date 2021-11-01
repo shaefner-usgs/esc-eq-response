@@ -226,7 +226,11 @@ var Features = function (options) {
   _loadFeature = function (feature) {
     var fetchOpts = {};
 
-    if (AppUtil.getParam('catalog') === 'dd') {
+    if (AppUtil.getParam('catalog') === 'dd' && (
+      feature.id === 'aftershocks' ||
+      feature.id === 'foreshocks' ||
+      feature.id === 'historical'
+    )) {
       fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
     }
 
