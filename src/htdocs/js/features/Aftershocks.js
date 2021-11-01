@@ -101,7 +101,7 @@ var Aftershocks = function (options) {
         data.timeFrame = content.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
 
         html = L.Util.template(
-          '<div class="bubble forecast">' +
+          '<div class="forecast bubble">' +
             '<h3>Forecast</h3>' +
             '<p>Probability of one or more aftershocks in the specified ' +
               'magnitude range during the <strong>next {timeFrame}</strong>.</p>' +

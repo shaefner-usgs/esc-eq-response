@@ -314,7 +314,7 @@ var Earthquakes = function (options) {
 
     if (data.cdi) { // DYFI
       bubbles.dyfi = L.Util.template(
-        '<a href="{url}/dyfi" class="impact-bubble mmi{cdi}" target="new" ' +
+        '<a href="{url}/dyfi" class="mmi{cdi} impact-bubble" target="new" ' +
           'title="Maximum reported intensity ({felt} responses)">' +
           '<strong class="roman">{cdi}</strong>' +
           '<abbr title="Did You Feel It?">DYFI?</abbr>' +
@@ -324,7 +324,7 @@ var Earthquakes = function (options) {
 
     if (data.mmi) { // ShakeMap
       bubbles.shakemap = L.Util.template(
-        '<a href="{url}/shakemap" class="impact-bubble mmi{mmi}" target="new" ' +
+        '<a href="{url}/shakemap" class="mmi{mmi} impact-bubble" target="new" ' +
           'title="Maximum estimated intensity">' +
           '<strong class="roman">{mmi}</strong>' +
           '<abbr title="ShakeMap">ShakeMap</abbr>' +
@@ -334,7 +334,7 @@ var Earthquakes = function (options) {
 
     if (data.alert) { // PAGER
       bubbles.pager = L.Util.template(
-        '<a href="{url}/pager" class="impact-bubble pager-alertlevel-{alert}" ' +
+        '<a href="{url}/pager" class="pager-alertlevel-{alert} impact-bubble" ' +
           'target="new" title="Estimated impact alert level">' +
           '<strong class="roman">{alert}</strong>' +
           '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
@@ -344,7 +344,7 @@ var Earthquakes = function (options) {
 
     if (data.tsunami) {
       bubbles.tsunami = L.Util.template(
-        '<a href="https://www.tsunami.gov/" class="impact-bubble tsunami" ' +
+        '<a href="https://www.tsunami.gov/" class="tsunami impact-bubble" ' +
           'target="new" title="Tsunami Warning Center">' +
           '<span class="hover"></span>' +
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
@@ -626,7 +626,7 @@ var Earthquakes = function (options) {
         '</div>';
     } else if (type === 'popup') {
       template =
-        '<div class="earthquake {catalog} {layerType}">' +
+        '<div class="{layerType} {catalog} earthquake">' +
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl>' +
@@ -651,7 +651,7 @@ var Earthquakes = function (options) {
           '<label for="{id}">Filter by magnitude</label>' +
           '<div class="slider-container">' +
             '<div class="min">{min}</div>' +
-            '<div class="inverted slider" style="--min:{min}; --max:{max}; --val:{mag};">' +
+            '<div class="slider inverted" style="--min:{min}; --max:{max}; --val:{mag};">' +
               '<input id="{id}" type="range" min="{min}" max="{max}" value="{mag}"/>' +
               '<output for="{id}">{mag}</output>' +
             '</div>' +

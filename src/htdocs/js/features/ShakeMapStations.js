@@ -175,7 +175,7 @@ var ShakeMapStations = function (options) {
       '<div class="shakemap-stations">' +
         '<h4>{title}</h4>' +
         '<ul class="station-summary impact-bubbles">' +
-          '<li class="station-summary-intensity impact-bubble mmi{romanIntensity}">' +
+          '<li class="station-summary-intensity mmi{romanIntensity} impact-bubble">' +
             '<strong class="roman">{romanIntensity}</strong>' +
             '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
           '</li>' +

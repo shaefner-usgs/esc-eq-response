@@ -443,7 +443,7 @@ var SummaryPane = function (options) {
       div.innerHTML = '<h2>' + feature.name + '<span class="breather">' +
         '<span></span></span></h2>';
 
-      div.classList.add('feature', feature.id);
+      div.classList.add(feature.id, 'feature');
 
       _contentEl.appendChild(div);
     }

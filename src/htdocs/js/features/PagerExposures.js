@@ -83,7 +83,7 @@ var PagerExposures = function (options) {
         html += L.Util.template(
           '<tr>' +
             '<td>' +
-              '<span class="impact-bubble mmi{intensity}">' +
+              '<span class="mmi{intensity} impact-bubble">' +
                 '<strong class="roman">{intensity}</strong>' +
               '</span>' +
             '</td>' +
