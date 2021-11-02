@@ -228,11 +228,10 @@ var Mainshock = function (options) {
   /**
    * Get the data used to create the details strip and certain products.
    *
-   * @return data {Object}
+   * @return {Object}
    */
   _getData = function () {
-    var data,
-        dyfi,
+    var dyfi,
         dyfiImg,
         econImg,
         eqTime,
@@ -282,7 +281,7 @@ var Mainshock = function (options) {
       }
     }
 
-    data = Object.assign({}, _this.data, {
+    return Object.assign({}, _this.data, {
       date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
       dayofweek: eqTime.toFormat('cccc'),
       depthDisplay: AppUtil.round(_this.data.depth, 1),
@@ -300,8 +299,6 @@ var Mainshock = function (options) {
       tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
     });
-
-    return data;
   };
 
   /**

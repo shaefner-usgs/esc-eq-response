@@ -55,22 +55,22 @@ var Svg = function () {
    * @return svg {Element}
    */
   _this.createCircle = function (opts) {
-    var data,
-        size,
+    var size,
         svg,
         template;
 
     opts = Object.assign({}, _DEFAULTS, opts);
     size = Math.ceil(opts.radius * 2 + 2);
-    data = Object.assign({}, opts, {
-      origin: size / 2
-    });
     svg = _createElement();
     template = '<circle cx="{origin}" cy="{origin}" r="{radius}" ' +
       'fill="{fillColor}" fill-opacity="{fillOpacity}" stroke="{color}" ' +
       'stroke-opacity="{opacity}" stroke-width="1" />';
 
-    svg.innerHTML = L.Util.template(template, data);
+    Object.assign(opts, {
+      origin: size / 2
+    });
+
+    svg.innerHTML = L.Util.template(template, opts);
     svg.setAttribute('height', size);
     svg.setAttribute('width', size);
 

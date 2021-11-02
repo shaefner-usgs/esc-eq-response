@@ -208,16 +208,14 @@ var StatusBar = function (options) {
    *   }
    */
   _this.addItem = function (item, opts) {
-    var defaults,
-        div,
+    var div,
         message;
 
-    defaults = {
+    div = document.createElement('div');
+    opts = Object.assign({
       append: '',
       prepend: 'Loading'
-    };
-    div = document.createElement('div');
-    opts = Object.assign({}, defaults, opts);
+    }, opts);
     message = _getMessage(item, opts);
 
     div.innerHTML = '<h4>' + message + '</h4>';

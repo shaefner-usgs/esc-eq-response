@@ -1079,17 +1079,15 @@ var Earthquakes = function (options) {
  */
 Earthquakes.getFeedUrl = function (params, type='feature') {
   var baseUri,
-      defaults,
       pairs,
       value;
 
   baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-  defaults = {
+  pairs = [];
+  params = Object.assign({
     format: 'geojson',
     orderby: 'time-asc'
-  };
-  pairs = [];
-  params = Object.assign({}, defaults, params);
+  }, params);
 
   if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') {
     baseUri = location.origin + '/php/fdsn/search.json.php';
