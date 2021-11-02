@@ -60,6 +60,7 @@ var SettingsBar = function (options) {
     _el = options.el || document.createElement('section');
 
     _addListeners();
+    _setCatalogOption();
   };
 
   /**
@@ -94,9 +95,6 @@ var SettingsBar = function (options) {
 
     // Refresh Features using data from an alternative catalog
     swap.addEventListener('click', _swapCatalog);
-
-    // Set the selected catalog
-    window.addEventListener('load', _setCatalogOption);
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
