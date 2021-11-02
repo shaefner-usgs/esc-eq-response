@@ -10,11 +10,10 @@
     td,
     th {
       padding: 0.25rem .375rem;
-    }
-    td {
+
       &:nth-child(1) {
-        max-width: 3.25rem;
-        padding-left: .25rem
+        max-width: 3.5rem;
+        padding-left: .25rem;
       }
       &:nth-child(3) {
         padding-right: .25rem;
