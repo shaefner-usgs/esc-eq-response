@@ -314,6 +314,35 @@ AppUtil.setParam = function (name, value) {
 };
 
 /**
+ * Check if two (shallow) objects are equal.
+ *
+ * @param obj1 {Object}
+ * @param obj2 {Object}
+ *
+ * @return {Boolean}
+ */
+AppUtil.shallowEqual = function (obj1, obj2) {
+  var key,
+      keys1,
+      keys2;
+
+  keys1 = Object.keys(obj1);
+  keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
  * Strip backslashes from an escaped string.
  *
  * Taken from: https://locutus.io/php/strings/stripslashes/
