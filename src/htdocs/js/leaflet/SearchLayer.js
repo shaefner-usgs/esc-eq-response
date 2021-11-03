@@ -127,6 +127,8 @@ var SearchLayer = function (options) {
   _this.setFeedUrl = function (params) {
     var minus = {};
 
+    params = Object.assign({}, _DEFAULTS, params);
+
     if (params.period !== 'customPeriod') {
       if (!params.period.match(/day|week|month|year/)) {
         params.period = _DEFAULTS.period;
@@ -135,8 +137,6 @@ var SearchLayer = function (options) {
       minus[params.period + 's'] = 1;
       params.starttime = Luxon.DateTime.now().minus(minus).toUTC().toISO().slice(0, -5);
     }
-
-    params = Object.assign({}, _DEFAULTS, params);
 
     _this.name = `M ${params.minmagnitude}+ Earthquakes`;
     _this.title = _getTitle(params);
