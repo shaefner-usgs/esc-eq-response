@@ -78,6 +78,7 @@ var Application = function (options) {
       _addListeners,
       _getSliderValue,
       _initClasses,
+      _resetQueryString,
       _resetScrollPositions,
       _saveScrollPosition;
 
@@ -195,6 +196,36 @@ var Application = function (options) {
   };
 
   /**
+   * Reset the queryString, keeping only the non-Mainshock specific parameters.
+   */
+  _resetQueryString = function () {
+    var inputs,
+        msParams,
+        pairs,
+        params,
+        queryString;
+
+    inputs = document.querySelectorAll('#selectBar input, #settingsBar input');
+    msParams = [];
+    pairs = [];
+    params = new URLSearchParams(location.search);
+
+    inputs.forEach(input =>
+      msParams.push(input.id)
+    );
+
+    params.forEach((value, name) => {
+      if (!msParams.includes(name)) { // skip Mainshock params
+        pairs.push(`${name}=${value}`);
+      }
+    });
+
+    queryString = '?' + pairs.join('&');
+
+    history.replaceState({}, '', queryString + location.hash);
+  };
+
+  /**
    * Reset saved scroll positions.
    */
   _resetScrollPositions = function () {
@@ -277,9 +308,8 @@ var Application = function (options) {
     _this.TitleBar.reset();
 
     if (!_initialLoad) {
+      _resetQueryString();
       _resetScrollPositions();
-
-      AppUtil.resetQueryString();
     }
 
     _initialLoad = false;

@@ -236,36 +236,6 @@ AppUtil.getTimeZone = function () {
 };
 
 /**
- * Reset the queryString, keeping only the non-Mainshock specific parameters.
- */
-AppUtil.resetQueryString = function () {
-  var inputs,
-      msParams,
-      pairs,
-      params,
-      queryString;
-
-  inputs = document.querySelectorAll('#selectBar input, #settingsBar input');
-  msParams = [];
-  pairs = [];
-  params = new URLSearchParams(location.search);
-
-  inputs.forEach(input =>
-    msParams.push(input.id)
-  );
-
-  params.forEach((value, name) => {
-    if (!msParams.includes(name)) { // skip Mainshock params
-      pairs.push(`${name}=${value}`);
-    }
-  });
-
-  queryString = '?' + pairs.join('&');
-
-  history.replaceState({}, '', queryString + location.hash);
-};
-
-/**
  * Convert a number to a roman numeral.
  *
  * @param num {Number}
