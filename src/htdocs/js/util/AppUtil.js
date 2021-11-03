@@ -156,23 +156,6 @@ AppUtil.getParam = function (name) {
 };
 
 /**
- * Get the URL parameter prefix for a given Feature id.
- *
- * @param id {String}
- *
- * @return {String}
- */
-AppUtil.getPrefix = function (id) {
-  var lookup = {
-    aftershocks: 'as',
-    foreshocks: 'fs',
-    historical: 'hs'
-  };
-
-  return lookup[id] || '';
-};
-
-/**
  * Get the circle marker radius for a given eq magnitude, rounded to the nearest
  * tenth.
  *

@@ -89,6 +89,7 @@ var Earthquakes = function (options) {
       _getIntervals,
       _getPlotlyTrace,
       _getPopup,
+      _getPrefix,
       _getTemplate,
       _getThreshold,
       _initBins,
@@ -135,8 +136,8 @@ var Earthquakes = function (options) {
     }
 
     if (_featureId !== 'mainshock' && _featureId !== 'search') {
-      inputIdDist = AppUtil.getPrefix(_featureId) + '-dist';
-      inputIdMag = AppUtil.getPrefix(_featureId) + '-mag';
+      inputIdDist = _getPrefix(_featureId) + '-dist';
+      inputIdMag = _getPrefix(_featureId) + '-mag';
       mainshock = _app.Features.getFeature('mainshock');
       coords = mainshock.json.geometry.coordinates;
 
@@ -372,12 +373,12 @@ var Earthquakes = function (options) {
         days: Number(AppUtil.round(interval, 1))
       };
     } else if (_featureId === 'foreshocks') {
-      fsInputId = AppUtil.getPrefix(_featureId) + '-days';
+      fsInputId = _getPrefix(_featureId) + '-days';
       duration = {
         days: Number(document.getElementById(fsInputId).value)
       };
     } else if (_featureId === 'historical') {
-      hsInputId = AppUtil.getPrefix(_featureId) + '-years';
+      hsInputId = _getPrefix(_featureId) + '-years';
       duration = {
         years: Number(document.getElementById(hsInputId).value)
       };
@@ -562,6 +563,23 @@ var Earthquakes = function (options) {
     _addListeners(div, eq.eqid, layer);
 
     return div;
+  };
+
+  /**
+   * Get the URL parameter prefix for a given Feature id.
+   *
+   * @param id {String}
+   *
+   * @return {String}
+   */
+  _getPrefix = function (id) {
+    var lookup = {
+      aftershocks: 'as',
+      foreshocks: 'fs',
+      historical: 'hs'
+    };
+
+    return lookup[id] || '';
   };
 
   /**
