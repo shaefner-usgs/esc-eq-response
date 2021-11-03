@@ -128,17 +128,7 @@ var SearchBar = function (options) {
     );
 
     // Search the catalog when the user clicks the 'Search' button
-    search.addEventListener('click', () => {
-      var period = _el.querySelector('ul.period .selected').id;
-
-      // Check that dates are valid if applicable
-      if (period !== 'customPeriod' || _isValid()) {
-        location.href = '#mapPane';
-
-        _cancelEdit();
-        _this.searchCatalog();
-      }
-    });
+    search.addEventListener('click', _this.searchCatalog);
 
     // Update the range slider
     slider.addEventListener('input', _updateSlider);
@@ -182,6 +172,8 @@ var SearchBar = function (options) {
     }
 
     if (region === 'customRegion') {
+      _cancelEdit();
+
       _map.eachLayer(layer => {
         if (layer.getBounds) { // only the region layer has bounds
           bounds = layer.getBounds();
@@ -301,7 +293,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Check if begin/end dates are both valid or not.
+   * Check if begin/end dates are both valid (i.e. not empty) or not.
    *
    * @return isValid {Boolean}
    */
@@ -550,13 +542,22 @@ var SearchBar = function (options) {
    * Search the earthquake catalog.
    */
   _this.searchCatalog = function () {
-    var params = _getParams();
+    var params,
+        period;
 
-    _setParams(params);
-    _app.MapPane.removeFeature(_searchLayer);
-    _searchLayer.reset();
-    _searchLayer.setFeedUrl(params);
-    _loadFeed();
+    params = _getParams();
+    period = _el.querySelector('ul.period .selected').id;
+
+    // Check that custom dates are valid if applicable
+    if (period !== 'customPeriod' || _isValid()) {
+      location.href = '#mapPane';
+
+      _setParams(params);
+      _app.MapPane.removeFeature(_searchLayer);
+      _searchLayer.reset();
+      _searchLayer.setFeedUrl(params);
+      _loadFeed();
+    }
   };
 
 
