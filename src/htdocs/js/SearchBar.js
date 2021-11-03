@@ -10,7 +10,7 @@ require('leaflet/EditableRectangle'); // custom map control for Leaflet.Editable
 
 
 var _DEFAULTS = {
-  minmagnitude: 3.5,
+  minmagnitude: '3.5', // URL params are Strings
   period: 'month',
   region: 'worldwide'
 };
@@ -428,10 +428,6 @@ var SearchBar = function (options) {
     Object.keys(params).forEach(name => {
       var value = params[name];
 
-      if (name === 'minmagnitude') {
-        value = Number(value);
-      }
-
       if (value === _DEFAULTS[name]) {
         AppUtil.deleteParam(name);
       } else {
@@ -501,8 +497,8 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Wrapper method to show the selected 'radio bar' option and also render
-   * map/cancel edit depending on the current state.
+   * Wrapper method to show the selected 'radio bar' option and also render the
+   * map/cancel the edit depending on the current state.
    */
   _showOption = function() {
     _app.SideBar.showOption.call(this);
