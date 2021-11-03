@@ -41,7 +41,7 @@ var SideBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Highlight and show the selected option in a 'radio-bar'; un-highlight and
+   * Highlight and show the selected option on a 'radio-bar'; un-highlight and
    * hide all other options.
    */
   _this.setOption = function () {
