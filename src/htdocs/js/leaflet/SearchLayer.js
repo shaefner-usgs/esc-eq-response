@@ -12,7 +12,7 @@ var _DEFAULTS = {
   maxlongitude: 180,
   minlatitude: -90,
   minlongitude: -180,
-  minmagnitude: 2.5,
+  minmagnitude: 3.5,
   period: 'month' // 'internal' property (not part of the search API)
 };
 
@@ -141,7 +141,9 @@ var SearchLayer = function (options) {
     _this.name = `M ${params.minmagnitude}+ Earthquakes`;
     _this.title = _getTitle(params);
 
-    delete params.period; // remove prop (search API rejects 'foreign' props)
+    // Search API rejects 'foreign' props - remove them
+    delete params.period;
+    delete params.region;
 
     _this.url = Earthquakes.getFeedUrl(params, 'search');
   };
