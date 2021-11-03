@@ -46,7 +46,7 @@ var SettingsBar = function (options) {
       _refreshFeature,
       _saveFocusedField,
       _setCatalogOption,
-      _showOption,
+      _setOption,
       _swapCatalog,
       _toggleSwap;
 
@@ -77,9 +77,9 @@ var SettingsBar = function (options) {
     fields = _el.querySelectorAll('input');
     swap = document.getElementById('swap');
 
-    // Show the selected option
+    // Set the selected option on the 'radio-bar'
     buttons.forEach(button =>
-      button.addEventListener('click', _showOption)
+      button.addEventListener('click', _setOption)
     );
 
     // Refresh a Feature
@@ -221,10 +221,11 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Show the selected option when the user clicks a 'radio-bar' button.
+   * Wrapper method to set the selected 'radio bar' option and also show/hide
+   * the 'Swap' catalogs button/set the catalog param.
    */
-  _showOption = function () {
-    _app.SideBar.showOption.call(this);
+  _setOption = function () {
+    _app.SideBar.setOption.call(this);
 
     if (document.body.classList.contains('mainshock')) {
       _toggleSwap(this.id);

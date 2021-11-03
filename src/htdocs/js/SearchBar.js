@@ -53,10 +53,10 @@ var SearchBar = function (options) {
       _loadFeed,
       _setControls,
       _setMinutes,
+      _setOption,
       _setParams,
       _setToday,
       _setValidity,
-      _showOption,
       _updateSlider;
 
 
@@ -113,9 +113,9 @@ var SearchBar = function (options) {
       arrow.addEventListener('click', _setMinutes)
     );
 
-    // Show the selected option on a 'radio-bar'
+    // Set the selected option on a 'radio-bar'
     buttons.forEach(button =>
-      button.addEventListener('click', _showOption)
+      button.addEventListener('click', _setOption)
     );
 
     // Open the associated date picker when the user clicks a label
@@ -402,6 +402,20 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Wrapper method to set the selected 'radio bar' option and also render the
+   * map/cancel the edit depending on the current state.
+   */
+  _setOption = function() {
+    _app.SideBar.setOption.call(this);
+
+    if (this.id === 'customRegion') {
+      _this.renderMap();
+    } else if (this.id === 'worldwide') {
+      _cancelEdit();
+    }
+  };
+
+  /**
    * Set the URL params to match the UI controls. Only set a param if the
    * control is not set to its default value and also delete optional params.
    *
@@ -485,20 +499,6 @@ var SearchBar = function (options) {
       div.classList.add('invalid');
 
       return false;
-    }
-  };
-
-  /**
-   * Wrapper method to show the selected 'radio bar' option and also render the
-   * map/cancel the edit depending on the current state.
-   */
-  _showOption = function() {
-    _app.SideBar.showOption.call(this);
-
-    if (this.id === 'customRegion') {
-      _this.renderMap();
-    } else if (this.id === 'worldwide') {
-      _cancelEdit();
     }
   };
 

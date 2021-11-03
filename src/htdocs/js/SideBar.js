@@ -14,7 +14,7 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *   {
- *     showOption: {Function}
+ *     setOption: {Function}
  *     toggle: {Function}
  *     toggleMapLinks: {Function}
  *   }
@@ -44,7 +44,7 @@ var SideBar = function (options) {
    * Highlight and show the selected option in a 'radio-bar'; un-highlight and
    * hide all other options.
    */
-  _this.showOption = function () {
+  _this.setOption = function () {
     var option,
         sibling;
 
