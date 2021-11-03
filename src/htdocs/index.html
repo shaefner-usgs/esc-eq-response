@@ -142,15 +142,15 @@
           <div class="slider-container">
             <div class="min">0</div>
             <div class="slider inverted" style="--min:0; --max:8; --val:3.5;">
-              <input id="catalog" type="range" min="0" max="8" step="0.5"
+              <input id="magnitude" type="range" min="0" max="8" step="0.5"
                 value="3.5" autocomplete="off">
-              <output for="catalog">3.5</output>
+              <output for="magnitude">3.5</output>
             </div>
             <div class="max">8</div>
           </div>
           <h3>Time Period</h3>
           <ul class="period options">
-            <li id="month" class="selected">Past Month</li>
+            <li id="month">Past Month</li>
             <li id="week">Past Week</li>
             <li id="day">Past Day</li>
             <li id="customPeriod">Custom</li>
@@ -171,12 +171,16 @@
           </div>
           <h3>Region</h3>
           <ul class="region options">
-            <li id="worldwide" class="selected">Worldwide</li>
+            <li id="worldwide">Worldwide</li>
             <li id="customRegion">Custom</li>
           </ul>
           <div class="customRegion option hide"></div>
           <p class="instructions hide">Click and drag to draw a new custom region.</p>
           <button type="button" id="search">Search</button>
+          <p>When you search the earthquake catalog, the
+            <abbr title="Uniform Resource Locator (web address)">URL</abbr> is
+            automatically updated, making it easy to share or bookmark your
+            settings.</p>
         </div>
       </section>
       <section id="legendBar" class="bar hide">
