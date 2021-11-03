@@ -88,6 +88,19 @@ AppUtil.compose = function () {
 };
 
 /**
+ * Delete the given URL parameter and update the URL.
+ *
+ * @param name {String}
+ */
+AppUtil.deleteParam = function (name) {
+  var params = new URLSearchParams(location.search);
+
+  params.delete(name);
+
+  history.replaceState({}, '', '?' + params.toString() + location.hash);
+};
+
+/**
  * Add timeout support to a fetch() request.
  *
  * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
