@@ -5,9 +5,15 @@
 var AppUtil = require('util/AppUtil'),
     SearchLayer = require('leaflet/SearchLayer');
 
-
 // NOTE: the Leaflet.Editable plugin is included in MapPane.js
 require('leaflet/EditableRectangle'); // custom map control for Leaflet.Editable
+
+
+var _DEFAULTS = {
+  minmagnitude: 3.5,
+  period: 'month',
+  region: 'worldwide'
+};
 
 
 /**
@@ -35,19 +41,22 @@ var SearchBar = function (options) {
       _flatpickrs,
       _map,
       _region,
-      _search,
+      _searchLayer,
 
       _addControl,
       _addListeners,
       _cancelEdit,
-      _getSearchParams,
+      _getParams,
       _initFlatpickr,
       _initMap,
       _isValid,
       _loadFeed,
+      _setControls,
       _setMinutes,
+      _setParams,
       _setToday,
       _setValidity,
+      _showOption,
       _updateSlider;
 
 
@@ -62,16 +71,14 @@ var SearchBar = function (options) {
       [49.5, -66],
       [24.5, -125]
     ]);
-    _search = SearchLayer({
+    _searchLayer = SearchLayer({
       app: _app
     });
-
-    // Set the initial value of the range slider
-    _app.setSliderStyles(_el.querySelector('.slider input'));
 
     _initFlatpickr();
     _initMap();
     _addListeners();
+    _setControls();
   };
 
   /**
@@ -106,17 +113,9 @@ var SearchBar = function (options) {
       arrow.addEventListener('click', _setMinutes)
     );
 
-    // Show the selected option when the user clicks a 'radio-bar' button
+    // Show the selected option on a 'radio-bar'
     buttons.forEach(button =>
-      button.addEventListener('click', function() {
-        _app.SideBar.showOption.call(this);
-
-        if (this.id === 'customRegion') {
-          _this.renderMap();
-        } else if (this.id === 'worldwide') {
-          _cancelEdit();
-        }
-      })
+      button.addEventListener('click', _showOption)
     );
 
     // Open the associated date picker when the user clicks a label
@@ -157,25 +156,26 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Get the parameters for a catalog search.
+   * Get the parameters for a catalog search from the UI controls.
    *
    * @return params {Object}
    */
-  _getSearchParams = function () {
+  _getParams = function () {
     var bounds,
         params,
         period,
         region;
 
     period = _el.querySelector('ul.period .selected').id;
-    params = {
-      minmagnitude: document.getElementById('catalog').value,
-      period: period,
-    };
     region = _el.querySelector('ul.region .selected').id;
+    params = {
+      minmagnitude: document.getElementById('magnitude').value,
+      period: period,
+      region: region
+    };
 
     if (period === 'customPeriod') {
-      params = Object.assign(params, {
+      Object.assign(params, {
         endtime: document.getElementById('end').value,
         starttime: document.getElementById('begin').value
       });
@@ -188,7 +188,7 @@ var SearchBar = function (options) {
         }
       });
 
-      params = Object.assign(params, {
+      Object.assign(params, {
         maxlatitude: AppUtil.round(bounds.getNorth(), 2),
         maxlongitude: AppUtil.round(bounds.getEast(), 2),
         minlatitude: AppUtil.round(bounds.getSouth(), 2),
@@ -325,26 +325,59 @@ var SearchBar = function (options) {
    * Fetch the earthquakes and display them on the map.
    */
   _loadFeed = function () {
-    _app.MapPane.addLoader(_search);
-    _app.JsonFeed.fetch(_search).then(json => {
+    _app.MapPane.addLoader(_searchLayer);
+    _app.JsonFeed.fetch(_searchLayer).then(json => {
       if (json) {
-        _search.create(json);
-        _app.MapPane.addLayer(_search);
+        _searchLayer.create(json);
+        _app.MapPane.addLayer(_searchLayer);
         _app.TitleBar.setTitle({
-          title: _search.title,
+          title: _searchLayer.title,
           type: 'search'
         });
       } else {
-        _app.MapPane.removeFeature(_search);
+        _app.MapPane.removeFeature(_searchLayer);
       }
     }).catch(error => {
       _app.StatusBar.addError({
-        id: _search.id,
-        message: `<h4>Error Adding ${_search.name}</h4><ul><li>${error}</li></ul>`
+        id: _searchLayer.id,
+        message: `<h4>Error Adding ${_searchLayer.name}</h4><ul><li>${error}</li></ul>`
       });
 
       console.error(error);
     });
+  };
+
+  /**
+   * Set the UI controls to match values of the URL params (or to the default
+   * value if a param is not set).
+   */
+  _setControls = function () {
+    var magnitude,
+        output,
+        period,
+        region,
+        slider,
+        vals;
+
+    magnitude = document.getElementById('magnitude');
+    output = magnitude.nextElementSibling,
+    vals = {
+      minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
+      period: AppUtil.getParam('period') || _DEFAULTS.period,
+      region: AppUtil.getParam('region') || _DEFAULTS.region
+    };
+    period = document.getElementById(vals.period);
+    region = document.getElementById(vals.region);
+    slider = magnitude.parentNode;
+
+    magnitude.value = vals.minmagnitude;
+    output.value = vals.minmagnitude;
+    slider.style.setProperty('--val', vals.minmagnitude);
+
+    _app.setSliderStyles(magnitude);
+
+    period.classList.add('selected');
+    region.classList.add('selected');
   };
 
   /**
@@ -374,6 +407,46 @@ var SearchBar = function (options) {
 
       input.value = minutes;
     }
+  };
+
+  /**
+   * Set the URL params to match the UI controls. Only set a param if the
+   * control is not set to its default value and also delete optional params.
+   *
+   * @param params {Object}
+   */
+  _setParams = function (params) {
+    var optionalParams = [
+      'endtime',
+      'maxlatitude',
+      'maxlongitude',
+      'minlatitude',
+      'minlongitude',
+      'starttime'
+    ];
+
+    Object.keys(params).forEach(name => {
+      var value = params[name];
+
+      if (name === 'minmagnitude') {
+        value = Number(value);
+      }
+
+      if (value === _DEFAULTS[name]) {
+        AppUtil.deleteParam(name);
+      } else {
+        AppUtil.setParam(name, value);
+      }
+    });
+
+    // Optional params are only needed for a custom period or region
+    optionalParams.forEach(name => {
+      if (!Object.prototype.hasOwnProperty.call(params, name)) {
+        if (AppUtil.getParam(name)) {
+          AppUtil.deleteParam(name);
+        }
+      }
+    });
   };
 
   /**
@@ -428,6 +501,20 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Wrapper method to show the selected 'radio bar' option and also render
+   * map/cancel edit depending on the current state.
+   */
+  _showOption = function() {
+    _app.SideBar.showOption.call(this);
+
+    if (this.id === 'customRegion') {
+      _this.renderMap();
+    } else if (this.id === 'worldwide') {
+      _cancelEdit();
+    }
+  };
+
+  /**
    * Display the <input> range slider's current value.
    */
   _updateSlider = function () {
@@ -467,11 +554,12 @@ var SearchBar = function (options) {
    * Search the earthquake catalog.
    */
   _this.searchCatalog = function () {
-    var params = _getSearchParams();
+    var params = _getParams();
 
-    _app.MapPane.removeFeature(_search);
-    _search.reset();
-    _search.setFeedUrl(params);
+    _setParams(params);
+    _app.MapPane.removeFeature(_searchLayer);
+    _searchLayer.reset();
+    _searchLayer.setFeedUrl(params);
     _loadFeed();
   };
 
