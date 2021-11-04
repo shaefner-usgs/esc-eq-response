@@ -270,7 +270,7 @@ var SettingsBar = function (options) {
       comcat: 'ComCat',
       dd: 'Double Difference'
     };
-    prevCatalog = AppUtil.getParam('catalog');
+    prevCatalog = AppUtil.getParam('catalog') || 'comcat';
     swap = _el.querySelector('.swap');
     span = swap.querySelector('span');
 
