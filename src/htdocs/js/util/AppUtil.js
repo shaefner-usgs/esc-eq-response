@@ -95,9 +95,10 @@ AppUtil.compose = function () {
 AppUtil.deleteParam = function (name) {
   var params = new URLSearchParams(location.search);
 
-  params.delete(name);
-
-  history.replaceState({}, '', '?' + params.toString() + location.hash);
+  if (AppUtil.getParam(name)) {
+    params.delete(name);
+    history.replaceState({}, '', '?' + params.toString() + location.hash);
+  }
 };
 
 /**
