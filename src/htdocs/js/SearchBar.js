@@ -135,7 +135,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Cancel edit mode for custom region Leaflet control if it's active.
+   * Cancel edit mode for the custom region Leaflet control if it's active.
    */
   _cancelEdit = function () {
     var control = _el.querySelector('.leaflet-control-edit a');
@@ -417,12 +417,14 @@ var SearchBar = function (options) {
 
   /**
    * Set the URL params to match the UI controls. Only set a param if the
-   * control is not set to its default value and also delete optional params.
+   * control is not set to its default value and also delete custom search
+   * params if their corresponding 'custom' option is not selected.
    *
    * @param params {Object}
+   *    current UI control settings
    */
   _setParams = function (params) {
-    var optionalParams = [
+    var customParams = [
       'endtime',
       'maxlatitude',
       'maxlongitude',
@@ -441,12 +443,10 @@ var SearchBar = function (options) {
       }
     });
 
-    // Optional params are only needed for a custom period or region
-    optionalParams.forEach(name => {
+    // These params are only needed when a custom period or region is set
+    customParams.forEach(name => {
       if (!Object.prototype.hasOwnProperty.call(params, name)) {
-        if (AppUtil.getParam(name)) {
-          AppUtil.deleteParam(name);
-        }
+        AppUtil.deleteParam(name);
       }
     });
   };
