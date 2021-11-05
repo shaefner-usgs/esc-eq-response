@@ -99,9 +99,8 @@ var SettingsBar = function (options) {
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
       if (document.body.classList.contains('mainshock')) {
-        setTimeout(() => // set a slight delay so browser doesn't wipe out values
-          _this.setDefaults(), 25
-        );
+        // Set a slight delay so browser doesn't wipe out values
+        setTimeout(_this.setDefaults, 25);
       }
     });
   };
