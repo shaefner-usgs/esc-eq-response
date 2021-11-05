@@ -57,8 +57,8 @@ var SearchBar = function (options) {
       _setControls,
       _setMinutes,
       _setOption,
-      _setUrlParams,
       _setToday,
+      _setUrlParams,
       _setValidity,
       _updateSlider;
 
@@ -439,6 +439,35 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Set the highlighted calendar day to the current UTC day (the local day is
+   * highlighted by default).
+   *
+   * @param days {Element}
+   *     div container with the calendar days of the selected month
+   */
+  _setToday = function (days) {
+    var today,
+        tomorrow;
+
+    today = days.querySelector('.today');
+
+    if (today) { // selected calendar is the current month
+      tomorrow = today.nextElementSibling;
+
+      if (tomorrow && !tomorrow.classList.contains('flatpickr-disabled')) {
+        today.style.transitionProperty = 'none'; // disable transitions
+
+        today.classList.remove('today');
+        tomorrow.classList.add('today');
+
+        setTimeout(() =>  // restore transitions
+          today.style.transitionProperty = 'background, color', 500
+        );
+      }
+    }
+  };
+
+  /**
    * Set the URL params to match the UI controls. Only set a param if the
    * control is not set to its default value and also delete custom search
    * params if their corresponding 'custom' option is not selected.
@@ -472,35 +501,6 @@ var SearchBar = function (options) {
         AppUtil.deleteParam(name);
       }
     });
-  };
-
-  /**
-   * Set the highlighted calendar day to the current UTC day (the local day is
-   * highlighted by default).
-   *
-   * @param days {Element}
-   *     div container with the calendar days of the selected month
-   */
-  _setToday = function (days) {
-    var today,
-        tomorrow;
-
-    today = days.querySelector('.today');
-
-    if (today) { // selected calendar is the current month
-      tomorrow = today.nextElementSibling;
-
-      if (tomorrow && !tomorrow.classList.contains('flatpickr-disabled')) {
-        today.style.transitionProperty = 'none'; // disable transitions
-
-        today.classList.remove('today');
-        tomorrow.classList.add('today');
-
-        setTimeout(() =>  // restore transitions
-          today.style.transitionProperty = 'background, color', 500
-        );
-      }
-    }
   };
 
   /**
