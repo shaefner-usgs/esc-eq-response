@@ -13,6 +13,7 @@ require('leaflet.path.drag'); // add path dragging to Leaflet.Editable
  */
 L.Control.Editable = L.Control.extend({
   options: {
+    app: {},
     position: 'topleft',
     region: null
   },
@@ -45,16 +46,23 @@ L.Control.Editable = L.Control.extend({
     button.innerHTML = '<div class="box"></div>';
     button.title = defaultTitle;
 
+    map.on('editable:dragend, editable:drawing:move', () => {
+      // Set a slight delay so Leaflet.Editable can update the bounds first
+      setTimeout(this.options.app.SearchBar.setSearchStatus, 500);
+    });
+
     map.on('editable:drawing:commit', e => {
       var classList = e.originalEvent.target.classList;
 
       // Ignore clicks on active control which also triggers a 'commit' event
       if (!classList.contains('box') && !classList.contains('selected')) {
+        region = newRegion;
+        button.title = defaultTitle;
+
         instructions.classList.add('hide');
         button.classList.remove('selected');
 
-        region = newRegion;
-        button.title = defaultTitle;
+        this.options.app.SearchBar.setSearchStatus();
       }
     });
 

@@ -30,6 +30,7 @@ var _DEFAULTS = {
  *     postInit: {Function}
  *     renderMap: {Function}
  *     searchCatalog: {Function}
+ *     setSearchStatus: {Function}
  *   }
  */
 var SearchBar = function (options) {
@@ -48,7 +49,7 @@ var SearchBar = function (options) {
       _addControl,
       _addListeners,
       _cancelEdit,
-      _getParams,
+      _getControlParams,
       _initFlatpickr,
       _initMap,
       _isValid,
@@ -56,8 +57,8 @@ var SearchBar = function (options) {
       _setControls,
       _setMinutes,
       _setOption,
-      _setParams,
       _setToday,
+      _setUrlParams,
       _setValidity,
       _updateSlider;
 
@@ -88,6 +89,7 @@ var SearchBar = function (options) {
    */
   _addControl = function () {
     var control = L.control.editable({
+      app: _app,
       region: _regionLayer
     });
 
@@ -117,7 +119,10 @@ var SearchBar = function (options) {
 
     // Set the selected option on a 'radio-bar'
     buttons.forEach(button =>
-      button.addEventListener('click', _setOption)
+      button.addEventListener('click', function () {
+        _setOption.call(this);
+        _this.setSearchStatus();
+      })
     );
 
     // Open the associated date picker when the user clicks a label
@@ -152,7 +157,7 @@ var SearchBar = function (options) {
    *
    * @return params {Object}
    */
-  _getParams = function () {
+  _getControlParams = function () {
     var bounds,
         params,
         period,
@@ -205,6 +210,7 @@ var SearchBar = function (options) {
       enableTime: true,
       monthSelectorType: 'static',
       onChange: function() {
+        _this.setSearchStatus();
         _setToday(this.days);
         _setValidity(this.input);
       },
@@ -433,42 +439,6 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the URL params to match the UI controls. Only set a param if the
-   * control is not set to its default value and also delete custom search
-   * params if their corresponding 'custom' option is not selected.
-   *
-   * @param params {Object}
-   *    current UI control settings
-   */
-  _setParams = function (params) {
-    var customParams = [
-      'endtime',
-      'maxlatitude',
-      'maxlongitude',
-      'minlatitude',
-      'minlongitude',
-      'starttime'
-    ];
-
-    Object.keys(params).forEach(name => {
-      var value = params[name];
-
-      if (value === _DEFAULTS[name]) {
-        AppUtil.deleteParam(name);
-      } else {
-        AppUtil.setParam(name, value);
-      }
-    });
-
-    // Delete unneeded custom params (control is not set to 'custom')
-    customParams.forEach(name => {
-      if (!Object.prototype.hasOwnProperty.call(params, name)) {
-        AppUtil.deleteParam(name);
-      }
-    });
-  };
-
-  /**
    * Set the highlighted calendar day to the current UTC day (the local day is
    * highlighted by default).
    *
@@ -495,6 +465,42 @@ var SearchBar = function (options) {
         );
       }
     }
+  };
+
+  /**
+   * Set the URL params to match the UI controls. Only set a param if the
+   * control is not set to its default value and also delete custom search
+   * params if their corresponding 'custom' option is not selected.
+   *
+   * @param params {Object}
+   *    current UI control settings
+   */
+  _setUrlParams = function (params) {
+    var customParams = [
+      'endtime',
+      'maxlatitude',
+      'maxlongitude',
+      'minlatitude',
+      'minlongitude',
+      'starttime'
+    ];
+
+    Object.keys(params).forEach(name => {
+      var value = params[name];
+
+      if (value === _DEFAULTS[name]) {
+        AppUtil.deleteParam(name);
+      } else {
+        AppUtil.setParam(name, value);
+      }
+    });
+
+    // Delete unneeded custom params (control is not set to 'custom')
+    customParams.forEach(name => {
+      if (!Object.prototype.hasOwnProperty.call(params, name)) {
+        AppUtil.deleteParam(name);
+      }
+    });
   };
 
   /**
@@ -535,6 +541,7 @@ var SearchBar = function (options) {
     slider.style.setProperty('--val', value);
 
     _app.setSliderStyles(this);
+    _this.setSearchStatus();
   };
 
   // ----------------------------------------------------------
@@ -562,20 +569,65 @@ var SearchBar = function (options) {
    */
   _this.searchCatalog = function () {
     var params,
-        period;
+        period,
+        search;
 
-    params = _getParams();
+    params = _getControlParams();
     period = _el.querySelector('ul.period .selected').id;
+    search = document.getElementById('search');
 
     // Check that custom dates are valid if applicable
     if (period !== 'customPeriod' || _isValid()) {
       location.href = '#mapPane';
 
-      _setParams(params);
+      _setUrlParams(params);
       _app.MapPane.removeFeature(_searchLayer);
       _searchLayer.reset();
       _searchLayer.setFeedUrl(params);
       _loadFeed();
+    }
+
+    search.classList.add('dim');
+  };
+
+  /**
+   * Dim the 'Search' button when all controls match the current search params.
+   */
+  _this.setSearchStatus = function () {
+    var currentParams,
+        newParams,
+        paramNames,
+        search;
+
+    currentParams = {};
+    newParams = _getControlParams();
+    paramNames = [
+      'endtime',
+      'maxlatitude',
+      'maxlongitude',
+      'minlatitude',
+      'minlongitude',
+      'minmagnitude',
+      'period',
+      'region',
+      'starttime'
+    ];
+    search = document.getElementById('search');
+
+    paramNames.forEach(name => {
+      var value = AppUtil.getParam(name);
+
+      if (value) {
+        currentParams[name] = value;
+      } else if (Object.prototype.hasOwnProperty.call(_DEFAULTS, name)) {
+        currentParams[name] = _DEFAULTS[name];
+      }
+    });
+
+    if (AppUtil.shallowEqual(currentParams, newParams)) {
+      search.classList.add('dim');
+    } else {
+      search.classList.remove('dim');
     }
   };
 
