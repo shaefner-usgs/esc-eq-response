@@ -67,6 +67,7 @@ var SelectBar = function (options) {
       e.preventDefault();
 
       input.value = '';
+      reset.classList.add('dim');
 
       _app.MapPane.showSearchLayer();
       _app.NavBar.reset();
@@ -139,7 +140,11 @@ var SelectBar = function (options) {
    * Note: must be called manually when the Event ID is changed programmatically.
    */
   _this.handleMainshock = function () {
-    var id = 'mainshock';
+    var id,
+        reset;
+
+    id = 'mainshock';
+    reset = document.getElementById('reset');
 
     _app.reset();
 
@@ -157,6 +162,8 @@ var SelectBar = function (options) {
       _app.JsonFeed.throttlers[id].push(
         setTimeout(_createMainshock, 500)
       );
+
+      reset.classList.remove('dim');
     }
   };
 
