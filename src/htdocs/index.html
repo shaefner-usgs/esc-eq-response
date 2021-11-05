@@ -141,9 +141,9 @@
           <div class="slider-container">
             <div class="min">0</div>
             <div class="slider inverted" style="--min:0; --max:8; --val:3.5;">
-              <input id="magnitude" type="range" min="0" max="8" step="0.5"
+              <input id="minmagnitude" type="range" min="0" max="8" step="0.5"
                 value="3.5" autocomplete="off">
-              <output for="magnitude">3.5</output>
+              <output for="minmagnitude">3.5</output>
             </div>
             <div class="max">8</div>
           </div>
@@ -157,13 +157,13 @@
           <div class="customPeriod option hide">
             <div class="dates">
               <div>
-                <label for="begin">Begin</label>
-                <input type="text" id="begin" required="required" tabindex="2">
+                <label for="starttime">Begin</label>
+                <input type="text" id="starttime" required="required" tabindex="2">
               </div>
               <span>–</span>
               <div>
-                <label for="end">End</label>
-                <input type="text" id="end" required="required" tabindex="3">
+                <label for="endtime">End</label>
+                <input type="text" id="endtime" required="required" tabindex="3">
               </div>
             </div>
             <p class="utc">Use UTC time for custom dates.</p>

@@ -161,15 +161,15 @@ var SearchBar = function (options) {
     period = _el.querySelector('ul.period .selected').id;
     region = _el.querySelector('ul.region .selected').id;
     params = {
-      minmagnitude: document.getElementById('magnitude').value,
+      minmagnitude: document.getElementById('minmagnitude').value,
       period: period,
       region: region
     };
 
     if (period === 'customPeriod') {
       Object.assign(params, {
-        endtime: document.getElementById('end').value,
-        starttime: document.getElementById('begin').value
+        endtime: document.getElementById('endtime').value,
+        starttime: document.getElementById('starttime').value
       });
     }
 
@@ -221,15 +221,34 @@ var SearchBar = function (options) {
     };
 
     _flatpickrs = {
-      begin: flatpickr('#begin',
+      endtime: flatpickr('#endtime',
         Object.assign({}, opts, {
-          altInputClass: 'begin-alt',
+          altInputClass: 'endtime-alt',
+          onOpen: function() {
+            var maxDate,
+                minDate,
+                now;
+
+            now = new Date();
+            maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
+            minDate = _flatpickrs.starttime.selectedDates[0];
+
+            this.set('maxDate', maxDate);
+            this.set('minDate', minDate);
+            _setToday(this.days);
+          },
+          position: 'auto right'
+        })
+      ),
+      starttime: flatpickr('#starttime',
+        Object.assign({}, opts, {
+          altInputClass: 'starttime-alt',
           onOpen: function() {
             var endDate,
                 maxDate,
                 now;
 
-            endDate = _flatpickrs.end.selectedDates[0];
+            endDate = _flatpickrs.endtime.selectedDates[0];
 
             if (endDate) {
               maxDate = endDate;
@@ -242,25 +261,6 @@ var SearchBar = function (options) {
             _setToday(this.days);
           },
           position: 'auto left'
-        })
-      ),
-      end: flatpickr('#end',
-        Object.assign({}, opts, {
-          altInputClass: 'end-alt',
-          onOpen: function() {
-            var maxDate,
-                minDate,
-                now;
-
-            now = new Date();
-            maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
-            minDate = _flatpickrs.begin.selectedDates[0];
-
-            this.set('maxDate', maxDate);
-            this.set('minDate', minDate);
-            _setToday(this.days);
-          },
-          position: 'auto right'
         })
       )
     };
@@ -300,16 +300,16 @@ var SearchBar = function (options) {
    * @return isValid {Boolean}
    */
   _isValid = function () {
-    var begin,
-        end,
-        isValid;
+    var endtime,
+        isValid,
+        starttime;
 
-    begin = document.getElementById('begin');
-    end = document.getElementById('end');
-    isValid = _setValidity(begin) && _setValidity(end);
+    endtime = document.getElementById('endtime');
+    starttime = document.getElementById('starttime');
+    isValid = _setValidity(starttime) && _setValidity(endtime);
 
     if (!isValid) {
-      _setValidity(end); // be certain that invalid end field is also flagged
+      _setValidity(endtime); // be certain that invalid endtime is also flagged
     }
 
     return isValid;
@@ -347,14 +347,14 @@ var SearchBar = function (options) {
    * set in _this.postInit.
    */
   _setControls = function () {
-    var magnitude,
+    var minmagnitude,
         output,
         slider,
         vals;
 
-    magnitude = document.getElementById('magnitude');
-    output = magnitude.nextElementSibling,
-    slider = magnitude.parentNode;
+    minmagnitude = document.getElementById('minmagnitude');
+    output = minmagnitude.nextElementSibling,
+    slider = minmagnitude.parentNode;
     vals = {
       minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
       period: AppUtil.getParam('period') || _DEFAULTS.period,
@@ -364,15 +364,15 @@ var SearchBar = function (options) {
     _period = document.getElementById(vals.period);
     _region = document.getElementById(vals.region);
 
-    magnitude.value = vals.minmagnitude;
+    minmagnitude.value = vals.minmagnitude;
     output.value = vals.minmagnitude;
     slider.style.setProperty('--val', vals.minmagnitude);
 
-    _app.setSliderStyles(magnitude);
+    _app.setSliderStyles(minmagnitude);
 
     if (_period.id === 'customPeriod') {
-      _flatpickrs.begin.setDate(AppUtil.getParam('starttime'));
-      _flatpickrs.end.setDate(AppUtil.getParam('endtime'));
+      _flatpickrs.endtime.setDate(AppUtil.getParam('endtime'));
+      _flatpickrs.starttime.setDate(AppUtil.getParam('starttime'));
     }
 
     if (_region.id === 'customRegion') {
