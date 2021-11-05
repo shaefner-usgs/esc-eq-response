@@ -40,7 +40,9 @@ var SearchBar = function (options) {
       _el,
       _flatpickrs,
       _map,
+      _period,
       _region,
+      _regionLayer,
       _searchLayer,
 
       _addControl,
@@ -67,7 +69,7 @@ var SearchBar = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _region = L.rectangle([ // default - Conterminous U.S.
+    _regionLayer = L.rectangle([ // default - Conterminous U.S.
       [49.5, -66],
       [24.5, -125]
     ]);
@@ -76,9 +78,9 @@ var SearchBar = function (options) {
     });
 
     _initFlatpickr();
+    _setControls();
     _initMap();
     _addListeners();
-    _setControls();
   };
 
   /**
@@ -86,7 +88,7 @@ var SearchBar = function (options) {
    */
   _addControl = function () {
     var control = L.control.editable({
-      region: _region
+      region: _regionLayer
     });
 
     _map.addControl(control);
@@ -275,13 +277,13 @@ var SearchBar = function (options) {
       editable: true,
       layers: [
         L.greyscaleLayer(),
-        _region
+        _regionLayer
       ],
       scrollWheelZoom: false,
       zoom: 2
     });
 
-    _region.enableEdit();
+    _regionLayer.enableEdit();
     _addControl();
 
     // Hide the zoom control on mobile (in favor of pinch-to-zoom)
@@ -340,27 +342,27 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the UI controls to match values of the URL params (or to the default
-   * value if a param is not set).
+   * Set the UI controls to match the values of the URL params (or to the
+   * default value if a param is not set). The selected 'radio-bar' options are
+   * set in _this.postInit.
    */
   _setControls = function () {
     var magnitude,
         output,
-        period,
-        region,
         slider,
         vals;
 
     magnitude = document.getElementById('magnitude');
     output = magnitude.nextElementSibling,
+    slider = magnitude.parentNode;
     vals = {
       minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
       period: AppUtil.getParam('period') || _DEFAULTS.period,
       region: AppUtil.getParam('region') || _DEFAULTS.region
     };
-    period = document.getElementById(vals.period);
-    region = document.getElementById(vals.region);
-    slider = magnitude.parentNode;
+
+    _period = document.getElementById(vals.period);
+    _region = document.getElementById(vals.region);
 
     magnitude.value = vals.minmagnitude;
     output.value = vals.minmagnitude;
@@ -368,8 +370,23 @@ var SearchBar = function (options) {
 
     _app.setSliderStyles(magnitude);
 
-    period.classList.add('selected');
-    region.classList.add('selected');
+    if (_period.id === 'customPeriod') {
+      _flatpickrs.begin.setDate(AppUtil.getParam('starttime'));
+      _flatpickrs.end.setDate(AppUtil.getParam('endtime'));
+    }
+
+    if (_region.id === 'customRegion') {
+      _regionLayer = L.rectangle([
+        [
+          AppUtil.getParam('maxlatitude'),
+          AppUtil.getParam('maxlongitude')
+        ],
+        [
+          AppUtil.getParam('minlatitude'),
+          AppUtil.getParam('minlongitude')
+        ]
+      ]);
+    }
   };
 
   /**
@@ -443,7 +460,7 @@ var SearchBar = function (options) {
       }
     });
 
-    // These params are only needed when a custom period or region is set
+    // Delete unneeded custom params (control is not set to 'custom')
     customParams.forEach(name => {
       if (!Object.prototype.hasOwnProperty.call(params, name)) {
         AppUtil.deleteParam(name);
@@ -528,6 +545,8 @@ var SearchBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
+    _setOption.call(_period);
+    _setOption.call(_region);
     _this.searchCatalog();
   };
 
