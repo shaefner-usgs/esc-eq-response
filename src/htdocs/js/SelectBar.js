@@ -32,6 +32,7 @@ var SelectBar = function (options) {
 
       _addListeners,
       _createMainshock,
+      _hardReset,
       _isEqidValid;
 
 
@@ -60,29 +61,17 @@ var SelectBar = function (options) {
     reset = document.getElementById('reset');
     search = _el.querySelector('.search');
 
-    // Reset app when the reset button is clicked
-    reset.addEventListener('click', e => {
-      var input = _el.querySelector('input');
+    // Reset the app
+    reset.addEventListener('click', _hardReset);
 
-      e.preventDefault();
-
-      input.value = '';
-      reset.classList.add('dim');
-
-      _app.MapPane.showSearchLayer();
-      _app.NavBar.reset();
-      _app.reset();
-      _app.setScrollPosition('selectBar'); // scroll to top
-    });
-
-    // Show the SearchBar when the 'search' link is clicked
+    // Show the SearchBar
     search.addEventListener('click', e => {
       e.preventDefault();
 
       _app.NavBar.switchSideBars('searchBar');
     });
 
-    // Load a new set of Features when the Mainshock <input> is changed
+    // Create a new Mainshock and load its Features
     _eqid.addEventListener('input', _this.handleMainshock);
   };
 
@@ -108,6 +97,23 @@ var SelectBar = function (options) {
         status: 'invalid'
       });
     }
+  };
+
+  /**
+   * Do a 'hard' reset when the 'Reset Mainshock' button is clicked.
+   */
+  _hardReset = function (e) {
+    var input = _el.querySelector('input');
+
+    e.preventDefault();
+    this.classList.add('dim');
+
+    input.value = '';
+
+    _app.reset();
+    _app.setScrollPosition('selectBar'); // scroll to top
+    _app.MapPane.showSearchLayer();
+    _app.NavBar.reset();
   };
 
   /**
