@@ -29,7 +29,7 @@
     border-radius: $button-border-radius;
     box-shadow: 0 0 3px $accent-color;
     transition: all .25s ease-in-out;
-    z-index: 1001 !important; /* stack above map */
+    z-index: 1001 !important; // stack above map
 
     &.arrowBottom:before {
       border-top-color: $accent-color;
@@ -65,7 +65,7 @@
     &.prevMonthDay:not(.flatpickr-disabled):hover {
       background: $accent-color-lightest;
       border-color: $accent-color-lighter;
-      color: color.adjust($text-color, $alpha: 0); /* alpha: 0 overrides alpha level set below */
+      color: color.adjust($text-color, $alpha: 0); // alpha: 0 overrides level set below
       transition: all $effect-on-duration ease-out;
     }
     &.nextMonthDay,

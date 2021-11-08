@@ -115,7 +115,8 @@ button {
   font-weight: bold;
 }
 
-/* Check boxes / radio inputs (customized to Leaflet's html rendering)
+/* Check boxes / radio inputs
+   (customized to Leaflet's html rendering)
 --------------------------------------------- */
 
 input[type="checkbox"],
@@ -179,7 +180,7 @@ input[type="number"] {
   }
 
   &:focus,
-  &.active { /* .active is for flatpickr */
+  &.active { // for Flatpickr inputs
     border: 1px solid $accent-color;
     box-shadow: 0 0 3px $accent-color;
   }
@@ -190,7 +191,7 @@ input[type="number"] {
   }
 }
 
-/* invalid Flatpickr inputs */
+// Invalid Flatpickr inputs
 .invalid > input[type="text"] {
   border: 1px solid $invalid-color;
   box-shadow: 0 0 3px $invalid-color;

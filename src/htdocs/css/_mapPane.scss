@@ -12,7 +12,7 @@
     width: 40px;
   }
 
-  .breather { /* loader */
+  .breather { // loader
     width: 1.5em;
 
     span {
@@ -22,7 +22,7 @@
     }
   }
 
-  .content { /* contains beachballs that are turned off in layer controller */
+  .content { // contains beachballs that are turned off in layer controller
     display: none;
   }
 
@@ -62,12 +62,12 @@
     z-index: 416;
   }
 
-  /* Push top controls down to accommodate header */
+  // Push top controls down to accommodate header
   .leaflet-top .leaflet-control {
     margin-top: 7.75rem;
   }
 
-  /* Scroll wide tables in Leaflet popups elegantly */
+  // Scroll wide tables in Leaflet popups elegantly
   .scroll-wrapper {
     overflow: auto;
 
@@ -78,7 +78,7 @@
     }
   }
 
-  /* Hide attribution text on (small screen) mobile devices */
+  // Hide attribution text on (small screen) mobile devices
   @media only screen
     and (max-width: $breakpoint-tablet-width) {
       .leaflet-control-attribution {

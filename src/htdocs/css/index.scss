@@ -57,10 +57,10 @@ a {
 abbr {
   border-bottom: 1px dotted #bbb;
   cursor: help;
-  font-variant: none; /* avoid browser-default small caps */
+  font-variant: none; // avoid browser-default small caps
 
   &[title] {
-    text-decoration: none; /* clean up default styling in Chrome */
+    text-decoration: none; // clean up default styling in Chrome
   }
 }
 

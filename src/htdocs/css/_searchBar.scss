@@ -14,7 +14,7 @@
   }
 
   #endtime ~ .flatpickr-calendar {
-    right: 0; /* align end date calendar to right edge */
+    right: 0; // align end date calendar to right edge
   }
 
   .customRegion {
@@ -54,7 +54,7 @@
     }
   }
 
-  /* custom region Rectangle overlay */
+  // Custom region Rectangle overlay
   .leaflet-path-draggable {
     fill: $accent-color;
     stroke: $accent-color;

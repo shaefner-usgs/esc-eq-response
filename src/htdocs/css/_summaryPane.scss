@@ -29,7 +29,8 @@
     flex-direction: column;
   }
 
-  /* Rendering order of features */
+  /* Rendering order of Features */
+
   .mainshock {
     order: 0;
 
@@ -37,12 +38,15 @@
       margin-top: .25rem;
     }
   }
+
   .aftershocks {
     order: 1;
   }
+
   .foreshocks {
     order: 2
   }
+
   .historical {
     order: 3;
   }
