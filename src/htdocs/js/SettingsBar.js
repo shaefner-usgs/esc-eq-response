@@ -84,7 +84,11 @@ var SettingsBar = function (options) {
 
     // Refresh a Feature
     features.forEach(feature =>
-      feature.addEventListener('input', _refreshFeature)
+      feature.addEventListener('input', function(e) {
+        if (e.target.value !== '') {
+          _refreshFeature.call(this);
+        }
+      })
     );
 
     // Update the queryString when a form field is changed
