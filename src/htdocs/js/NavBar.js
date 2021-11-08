@@ -229,7 +229,7 @@ var NavBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    location.hash = _app.defaultPaneId;
+    location.hash = '#' + _app.defaultPaneId;
 
     _switchPanes();
   };
