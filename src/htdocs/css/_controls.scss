@@ -108,6 +108,7 @@ button {
 
 /* Close buttons
 --------------------------------------------- */
+
 .icon-close {
   @include close;
 
@@ -184,17 +185,21 @@ input[type="number"] {
     border: 1px solid $accent-color;
     box-shadow: 0 0 3px $accent-color;
   }
-
-  &:invalid {
-    border: 1px solid $invalid-color;
-    box-shadow: 0 0 3px $invalid-color;
-  }
 }
 
 // Invalid Flatpickr inputs
 .invalid > input[type="text"] {
   border: 1px solid $invalid-color;
   box-shadow: 0 0 3px $invalid-color;
+}
+
+// Only flag invalid fields when a Mainshock is selected
+.mainshock {
+  input[type="text"]:invalid,
+  input[type="number"]:invalid {
+    border: 1px solid $invalid-color;
+    box-shadow: 0 0 3px $invalid-color;
+  }
 }
 
 /* Range inputs - adapted from:
