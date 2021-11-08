@@ -135,7 +135,11 @@ var SearchBar = function (options) {
     );
 
     // Search the catalog when the user clicks the 'Search' button
-    search.addEventListener('click', _this.searchCatalog);
+    search.addEventListener('click', () => {
+      location.href = '#mapPane';
+
+      _this.searchCatalog();
+    });
 
     // Update the range slider
     slider.addEventListener('input', _updateSlider);
@@ -578,8 +582,6 @@ var SearchBar = function (options) {
 
     // Check that custom dates are valid if applicable
     if (period !== 'customPeriod' || _isValid()) {
-      location.href = '#mapPane';
-
       _setUrlParams(params);
       _app.MapPane.removeFeature(_searchLayer);
       _searchLayer.reset();
