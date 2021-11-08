@@ -45,7 +45,7 @@ var SettingsBar = function (options) {
       _getDefaults,
       _refreshFeature,
       _saveFocusedField,
-      _setCatalogOption,
+      _setCatalog,
       _setOption,
       _swapCatalog,
       _toggleSwap,
@@ -61,7 +61,7 @@ var SettingsBar = function (options) {
     _el = options.el || document.createElement('section');
 
     _addListeners();
-    _setCatalogOption();
+    _setCatalog();
   };
 
   /**
@@ -184,7 +184,7 @@ var SettingsBar = function (options) {
   /**
    * Set the catalog option to match the 'catalog' URL parameter if it is set.
    */
-  _setCatalogOption = function () {
+  _setCatalog = function () {
     var catalog,
         lis,
         note;
