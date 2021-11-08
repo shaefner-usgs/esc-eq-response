@@ -368,21 +368,18 @@ AppUtil.stripslashes = function (str) {
 };
 
 /**
- * Update the URL parameter for a form field when its value is changed.
+ * Update the given URL parameter with the corresponding input field's value.
  *
- * @param e {Event}
- *     change Event
+ * @param name {String}
  */
-AppUtil.updateParam = function (e) {
-  var el,
-      name,
+AppUtil.updateParam = function (name) {
+  var input,
       value;
 
-  name = e.target.id;
-  el = document.getElementById(name);
-  value = el.value.replace(/\s+/g, ''); // strip whitespace
+  input = document.getElementById(name);
+  value = input.value.replace(/\s+/g, ''); // strip whitespace
 
-  el.value = value;
+  input.value = value;
 
   AppUtil.setParam(name, value);
 };

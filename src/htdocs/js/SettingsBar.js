@@ -48,7 +48,8 @@ var SettingsBar = function (options) {
       _setCatalogOption,
       _setOption,
       _swapCatalog,
-      _toggleSwap;
+      _toggleSwap,
+      _trackChanges;
 
 
   _this = {};
@@ -68,12 +69,10 @@ var SettingsBar = function (options) {
    */
   _addListeners = function () {
     var buttons,
-        features,
         fields,
         swap;
 
     buttons = _el.querySelectorAll('.catalog li');
-    features = _el.querySelectorAll('.aftershocks, .foreshocks, .historical');
     fields = _el.querySelectorAll('input');
     swap = document.getElementById('swap');
 
@@ -82,19 +81,10 @@ var SettingsBar = function (options) {
       button.addEventListener('click', _setOption)
     );
 
-    // Refresh a Feature
-    features.forEach(feature =>
-      feature.addEventListener('input', function(e) {
-        if (e.target.value !== '') {
-          _refreshFeature.call(this);
-        }
-      })
-    );
-
-    // Update the queryString when a form field is changed
+    // Track changes to input fields
     fields.forEach(field => {
-      field.addEventListener('focus', _saveFocusedField); // remember focused field
-      field.addEventListener('input', AppUtil.updateParam);
+      field.addEventListener('focus', _saveFocusedField);
+      field.addEventListener('input', _trackChanges);
     });
 
     // Refresh Features using data from an alternative catalog
@@ -144,19 +134,15 @@ var SettingsBar = function (options) {
 
   /**
    * Refresh a Feature, throttling repeated requests. Triggered when the user
-   * changes a Feature's setting(s) and when the earthquake catalog is swapped.
+   * tweaks the settings and when the earthquake catalog is swapped.
    *
-   * @param e {Event}
-   * @param id {String} optional; default is ''
+   * @param id {String}
    * @param throttle {Boolean} optional; default is true
    */
-  _refreshFeature = function (e, id = '', throttle = true) {
+  _refreshFeature = function (id, throttle = true) {
     var feature;
 
     if (document.body.classList.contains('mainshock')) {
-      if (!id) {
-        id = this.className; // CSS class of the form field's parent container
-      }
       feature = _app.Features.getFeature(id);
 
       // Immediately show loading status (don't wait for throttle timers)
@@ -253,9 +239,9 @@ var SettingsBar = function (options) {
     _toggleSwap(catalog);
 
     mainshock.update(catalog);
-    _refreshFeature(null, 'aftershocks', false);
-    _refreshFeature(null, 'foreshocks', false);
-    _refreshFeature(null, 'historical', false);
+    _refreshFeature('aftershocks', false);
+    _refreshFeature('foreshocks', false);
+    _refreshFeature('historical', false);
   };
 
   /**
@@ -283,6 +269,19 @@ var SettingsBar = function (options) {
       swap.classList.remove('hide');
       span.textContent = names[prevCatalog];
     }
+  };
+
+  /**
+   * Refresh a Feature and update the URL when its settings are changed.
+   */
+  _trackChanges = function () {
+    var featureId = this.closest('div').className;
+
+    if (this.value !== '') {
+      _refreshFeature(featureId);
+    }
+
+    AppUtil.updateParam(this.id);
   };
 
   // ----------------------------------------------------------
