@@ -5,7 +5,7 @@
 @use 'mousePosition';
 @use 'overrides';
 
-.earthquake, /* Earthquake details on SelectBar */
+.earthquake, // earthquake details on SelectBar
 .leaflet-popup-content {
   dd,
   dt {
@@ -20,7 +20,7 @@
     clear: left;
     display: block;
     float: left;
-    line-height: 27px; /* accommodate smaller font-size of labels */
+    line-height: 27px; // accommodate smaller font-size of labels
     margin-right: .5rem;
     text-align: right;
     width: 6rem;

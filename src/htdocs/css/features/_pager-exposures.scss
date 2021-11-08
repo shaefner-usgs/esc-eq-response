@@ -22,7 +22,7 @@
     }
 
     tr {
-      border: none; /* override general table border styles */
+      border: none; // override general table border styles
       border-top: 1px solid $border-color-lighter;
 
       &.city {

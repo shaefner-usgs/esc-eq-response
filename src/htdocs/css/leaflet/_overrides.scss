@@ -20,7 +20,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     background: rgba(255, 255, 255, .5);
     color: $text-color-lighter;
     max-width: 200px;
-    overflow: hidden; /* Quell long attributions */
+    overflow: hidden; // quell long attributions
     padding: 2px 4px;
     text-overflow: ellipsis;
     transition: margin $sidebar-toggle-duration ease;
@@ -60,7 +60,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
     &:active, &.selected {
       background: $accent-color;
-      border-radius: 0 !important; /* clean up rendering issue */
+      border-radius: 0 !important; // clean up rendering issue
       transition: all $effect-on-duration ease-out;
     }
   }
@@ -105,7 +105,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-layers-overlays {
-    div > span { /* contains Feature count */
+    div > span { // contains Feature count
       align-items: baseline;
       display: flex;
     }
@@ -116,7 +116,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     margin: 5px -10px;
   }
 
-  /* Use $accent-color colored SVG image for Leaflet layers toggle control */
+  // Use $accent-color SVG image for Leaflet layers toggle control
   .leaflet-control-layers-toggle {
     background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" ' +
       'height="26" width="26" viewBox="0 0 26 26">' +
@@ -159,7 +159,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
 
     [datetime] {
-      min-width: 20rem; /* Prevent datetime from wrapping */
+      min-width: 20rem; // prevent datetime from wrapping
     }
   }
 }

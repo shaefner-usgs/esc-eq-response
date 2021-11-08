@@ -21,7 +21,7 @@
 #summaryPane {
   h3 {
     .mag {
-      margin-left: .25em; /* account for collapse of whitespace by display:flex */
+      margin-left: .25em; // account for collapse of whitespace by display:flex
     }
   }
 
@@ -112,7 +112,7 @@
   }
 
   .hide-year .year {
-    display: none; /* hide year column when duration is 30 days or less */
+    display: none; // hide year column when duration is 30 days or less
   }
 
   .list {
@@ -184,7 +184,7 @@
   }
 }
 
-/* Earthquake details in map popups and the SelectBar. */
+// Earthquake details in map popups and on the SelectBar
 .earthquake {
   &.dd:not(.mainshock) {
     .status {
@@ -265,7 +265,7 @@ and (max-width: $breakpoint-phone-width) {
         display: none;
       }
 
-      /* Reflow table content */
+      // Reflow table content
       tbody {
         border-top: 1px solid $border-color-lighter;
 
@@ -323,7 +323,7 @@ and (max-width: $breakpoint-phone-width) {
         }
       }
 
-      /* Sort options menu */
+      // Sort options menu
       th {
         font-size: 1rem;
         font-weight: 400;
@@ -338,14 +338,14 @@ and (max-width: $breakpoint-phone-width) {
         transition: none;
       }
 
-      /* Unexpanded sort options select menu */
+      // Unexpanded sort options select menu
       th {
         display: none;
         margin-top: -.25rem;
         padding: 0;
 
         &.sort-down,
-        &.sort-up { /* show current sorted-by field */
+        &.sort-up { // show current sorted-by field
           border-bottom: 1px solid $accent-color;
           display: inline-block;
 
@@ -358,11 +358,11 @@ and (max-width: $breakpoint-phone-width) {
         }
 
         span:before {
-          display: none; /* hide sort order arrow's hover state */
+          display: none; // hide sort order arrow's hover state
         }
       }
 
-      /* Expanded sort options select menu */
+      // Expanded sort options select menu
       &.show-menu {
         thead {
           th {

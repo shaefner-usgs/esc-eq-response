@@ -202,7 +202,7 @@
       margin-top: 0;
     }
 
-    .hide { /* missing product */
+    .hide { // missing product
       display: none !important;
     }
   }
@@ -230,7 +230,7 @@
       padding: 2px;
 
       &.mmiI {
-        border-color: $border-color-lighter; /* add subtle grey border so it shows up */
+        border-color: $border-color-lighter; // add subtle grey border so button shows up
       }
       &.mmiII {
         border-color: $mmiII-color;
