@@ -376,9 +376,9 @@ var PlotsPane = function (options) {
         latRange,
         ratio;
 
-    depthExtent = Plotly.d3.extent(trace.z);
+    depthExtent = AppUtil.extent(trace.z);
     depthRange = depthExtent[1] - depthExtent[0];
-    latExtent = Plotly.d3.extent(trace.y);
+    latExtent = AppUtil.extent(trace.y);
     latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
     ratio = depthRange / latRange;
 
