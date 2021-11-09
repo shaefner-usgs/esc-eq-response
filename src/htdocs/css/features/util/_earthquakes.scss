@@ -219,11 +219,15 @@
     right: -.25rem;
   }
 
-  dd.status {
-    text-transform: capitalize;
+  dd {
+    margin-left: 6.5rem;
 
-    i {
-      color: green;
+    &.status {
+      text-transform: capitalize;
+
+      i {
+        color: green;
+      }
     }
   }
 
