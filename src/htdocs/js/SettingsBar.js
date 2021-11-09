@@ -44,8 +44,8 @@ var SettingsBar = function (options) {
       _addListeners,
       _getDefaults,
       _refreshFeature,
-      _saveFocusedField,
       _setCatalog,
+      _setField,
       _setOption,
       _swapCatalog,
       _toggleSwap,
@@ -83,7 +83,7 @@ var SettingsBar = function (options) {
 
     // Track changes to input fields
     fields.forEach(field => {
-      field.addEventListener('focus', _saveFocusedField);
+      field.addEventListener('focus', _setField);
       field.addEventListener('input', _trackChanges);
     });
 
@@ -173,15 +173,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Save the id value of the form field selected (focused) by the user.
-   *
-   * @param e {Event}
-   */
-  _saveFocusedField = function (e) {
-    _focusedField = e.target.id;
-  };
-
-  /**
    * Set the catalog option to match the 'catalog' URL parameter if it is set.
    */
   _setCatalog = function () {
@@ -207,6 +198,20 @@ var SettingsBar = function (options) {
         note.classList.remove('hide');
       }
     }
+  };
+
+  /**
+   * Save the id of the last focused field and select the text in the field.
+   *
+   * @param e {Event}
+   */
+  _setField = function (e) {
+    var input = e.target;
+
+    _focusedField = input.id;
+
+    input.select();
+    input.addEventListener('mouseup', e => e.preventDefault());
   };
 
   /**
