@@ -38,6 +38,7 @@ var SearchBar = function (options) {
       _initialize,
 
       _app,
+      _customParams,
       _el,
       _flatpickrs,
       _map,
@@ -69,6 +70,14 @@ var SearchBar = function (options) {
     options = options || {};
 
     _app = options.app;
+    _customParams = [
+      'endtime',
+      'maxlatitude',
+      'maxlongitude',
+      'minlatitude',
+      'minlongitude',
+      'starttime'
+    ];
     _el = options.el || document.createElement('section');
     _regionLayer = L.rectangle([ // default - Conterminous U.S.
       [49.5, -66],
@@ -480,15 +489,6 @@ var SearchBar = function (options) {
    *    current UI control settings
    */
   _setUrlParams = function (params) {
-    var customParams = [
-      'endtime',
-      'maxlatitude',
-      'maxlongitude',
-      'minlatitude',
-      'minlongitude',
-      'starttime'
-    ];
-
     Object.keys(params).forEach(name => {
       var value = params[name];
 
@@ -499,8 +499,8 @@ var SearchBar = function (options) {
       }
     });
 
-    // Delete unneeded custom params (control is not set to 'custom')
-    customParams.forEach(name => {
+    // Delete unneeded custom params (when control is not set to 'custom')
+    _customParams.forEach(name => {
       if (!Object.prototype.hasOwnProperty.call(params, name)) {
         AppUtil.deleteParam(name);
       }
@@ -603,17 +603,7 @@ var SearchBar = function (options) {
 
     currentParams = {};
     newParams = _getControlParams();
-    paramNames = [
-      'endtime',
-      'maxlatitude',
-      'maxlongitude',
-      'minlatitude',
-      'minlongitude',
-      'minmagnitude',
-      'period',
-      'region',
-      'starttime'
-    ];
+    paramNames = _customParams.concat(Object.keys(_DEFAULTS));
     search = document.getElementById('search');
 
     paramNames.forEach(name => {
