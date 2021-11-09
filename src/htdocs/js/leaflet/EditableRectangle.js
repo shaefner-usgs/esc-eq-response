@@ -46,7 +46,7 @@ L.Control.Editable = L.Control.extend({
     button.innerHTML = '<div class="box"></div>';
     button.title = defaultTitle;
 
-    map.on('editable:dragend, editable:drawing:move', () => {
+    map.on('editable:dragend editable:vertex:mousedown', () => {
       // Set a slight delay so Leaflet.Editable can update the bounds first
       setTimeout(this.options.app.SearchBar.setSearchStatus, 500);
     });
