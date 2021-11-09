@@ -102,6 +102,34 @@ AppUtil.deleteParam = function (name) {
 };
 
 /**
+ * Get the min and max values from an Array.
+ *
+ * Taken from D3: https://github.com/d3/d3-array/blob/main/src/extent.js
+ *
+ * @param values {Array}
+ *
+ * @return {Array}
+ */
+AppUtil.extent = function (values) {
+  var min,
+      max,
+      value;
+
+  for (value of values) {
+    if (value != null) {
+      if (min === undefined) {
+        if (value >= value) min = max = value;
+      } else {
+        if (min > value) min = value;
+        if (max < value) max = value;
+      }
+    }
+  }
+
+  return [min, max];
+};
+
+/**
  * Add timeout support to a fetch() request.
  *
  * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
