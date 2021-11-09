@@ -795,7 +795,8 @@ var Earthquakes = function (options) {
 
     // Add local time if tz prop is included in feed
     if (props.tz) {
-      eqTimeLocal = eqTime().toUTC(props.tz);
+      console.log(props);
+      eqTimeLocal = eqTime.toUTC(props.tz);
       localTime = eqTimeLocal.toFormat('LLL d, yyyy tt') +
         ' <span class="tz">at the epicenter</span>';
       template += '<time datetime="{isoTime}">{localTime}</time>';
