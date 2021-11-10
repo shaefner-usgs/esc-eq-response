@@ -41,6 +41,7 @@ require('leaflet/ZoomCenter');
  *     removeFeature: {Function}
  *     render: {Function}
  *     reset: {Function}
+ *     setView: {Function}
  *     shiftMap: {Function}
  *     showSearchLayer: {Function}
  *   }
@@ -68,8 +69,7 @@ var MapPane = function (options) {
       _getSortValue,
       _getStaticLayers,
       _initMap,
-      _isBaseLayer,
-      _setView;
+      _isBaseLayer;
 
 
   _this = {};
@@ -327,38 +327,6 @@ var MapPane = function (options) {
     return isBaseLayer;
   };
 
-  /**
-   * Set the map extent to contain an L.LatLngBounds instance.
-   *
-   * Note: setting bounds to _bounds will include all Features that have their
-   *       'zoomToLayer' property set to true.
-   *
-   * @param bounds {L.bounds} default is _defaultBounds
-   * @param animate {Boolean} default is false
-   */
-  _setView = function (bounds = _defaultBounds, animate = false) {
-    var status,
-        x;
-
-    status = _app.Features.getLoadingStatus();
-    x = 0;
-
-    if (AppUtil.getParam('sidebar')) {
-      x = -_app.sideBarWidth;
-    }
-
-    if (bounds.isValid()) {
-      _map.fitBounds(bounds, {
-        animate: animate,
-        paddingTopLeft: L.point(x, _app.headerHeight) // accommodate sidebar, header
-      });
-
-      if (status === 'complete' && _app.getPaneId() === 'mapPane') {
-        _initialView = false;
-      }
-    }
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -382,7 +350,7 @@ var MapPane = function (options) {
         marker = feature.mapLayer.getLayers()[0];
         _bounds = _getBounds(marker.getLatLng());
 
-        _setView(_bounds);
+        _this.setView(_bounds);
       }
 
       // Set map bounds to contain the Feature, if applicable
@@ -393,7 +361,7 @@ var MapPane = function (options) {
 
     // Set final map extent once all Features are loaded
     if (status === 'complete') {
-      _setView(_bounds, true);
+      _this.setView(_bounds, true);
     }
   };
 
@@ -423,7 +391,7 @@ var MapPane = function (options) {
       _staticLayers.search[name] = item.mapLayer;
 
       if (!document.body.classList.contains('mainshock')) {
-        _setView();
+        _this.setView();
       }
     }
 
@@ -546,7 +514,7 @@ var MapPane = function (options) {
         bounds = _bounds;
       }
 
-      _setView(bounds);
+      _this.setView(bounds);
     }
   };
 
@@ -570,7 +538,39 @@ var MapPane = function (options) {
       _layerControl = _addLayerControl();
     }
 
-    _setView();
+    _this.setView();
+  };
+
+  /**
+   * Set the map extent to contain an L.LatLngBounds instance.
+   *
+   * Note: setting bounds to _bounds will include all Features that have their
+   *       'zoomToLayer' property set to true.
+   *
+   * @param bounds {L.bounds} default is _defaultBounds
+   * @param animate {Boolean} default is false
+   */
+  _this.setView = function (bounds = _defaultBounds, animate = false) {
+    var status,
+        x;
+
+    status = _app.Features.getLoadingStatus();
+    x = 0;
+
+    if (AppUtil.getParam('sidebar')) {
+      x = -_app.sideBarWidth;
+    }
+
+    if (bounds.isValid()) {
+      _map.fitBounds(bounds, {
+        animate: animate,
+        paddingTopLeft: L.point(x, _app.headerHeight) // accommodate sidebar, header
+      });
+
+      if (status === 'complete' && _app.getPaneId() === 'mapPane') {
+        _initialView = false;
+      }
+    }
   };
 
   /**
