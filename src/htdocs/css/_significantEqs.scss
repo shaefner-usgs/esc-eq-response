@@ -75,6 +75,10 @@ ul#significantEqs { // list
       margin-right: .75rem;
     }
 
+    span.mmi {
+      visibility: hidden; /* hide empty (no MMI assigned) bubbles */
+    }
+
     .mag {
       font-size: 1.25rem;
       line-height: 1;
