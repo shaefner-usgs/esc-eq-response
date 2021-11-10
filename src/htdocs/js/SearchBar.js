@@ -41,6 +41,7 @@ var SearchBar = function (options) {
       _customParams,
       _el,
       _flatpickrs,
+      _initialView,
       _map,
       _period,
       _region,
@@ -79,6 +80,7 @@ var SearchBar = function (options) {
       'starttime'
     ];
     _el = options.el || document.createElement('section');
+    _initialView = true;
     _regionLayer = L.rectangle([ // default - Conterminous U.S.
       [49.5, -66],
       [24.5, -125]
@@ -292,16 +294,15 @@ var SearchBar = function (options) {
     var zoomControl;
 
     _map = L.map(_el.querySelector('.customRegion'), {
-      center: [38, -96],
       editable: true,
       layers: [
         L.greyscaleLayer(),
         _regionLayer
       ],
-      scrollWheelZoom: false,
-      zoom: 2
+      scrollWheelZoom: false
     });
 
+    _map.setView([0, 0], 1); // set arbitrary view for now
     _regionLayer.enableEdit();
     _addControl();
 
@@ -446,6 +447,16 @@ var SearchBar = function (options) {
 
     if (this.id === 'customRegion') {
       _this.renderMap();
+
+      // Set the initial view to contain the search region's bounds
+      if (_initialView) {
+        _map.fitBounds(_regionLayer.getBounds(), {
+          animate: false,
+          padding: [32, 0]
+        });
+
+        _initialView = false;
+      }
     } else if (this.id === 'worldwide') {
       _cancelEdit();
     }
