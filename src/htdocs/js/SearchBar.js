@@ -30,7 +30,7 @@ var _DEFAULTS = {
  *     postInit: {Function}
  *     renderMap: {Function}
  *     searchCatalog: {Function}
- *     setSearchStatus: {Function}
+ *     setStatus: {Function}
  *   }
  */
 var SearchBar = function (options) {
@@ -132,7 +132,7 @@ var SearchBar = function (options) {
     buttons.forEach(button =>
       button.addEventListener('click', function () {
         _setOption.call(this);
-        _this.setSearchStatus();
+        _this.setStatus();
       })
     );
 
@@ -225,7 +225,7 @@ var SearchBar = function (options) {
       enableTime: true,
       monthSelectorType: 'static',
       onChange: function() {
-        _this.setSearchStatus();
+        _this.setStatus();
         _setToday(this.days);
         _setValidity(this.input);
       },
@@ -556,7 +556,7 @@ var SearchBar = function (options) {
     slider.style.setProperty('--val', value);
 
     _app.setSliderStyles(this);
-    _this.setSearchStatus();
+    _this.setStatus();
   };
 
   // ----------------------------------------------------------
@@ -606,7 +606,7 @@ var SearchBar = function (options) {
   /**
    * Dim the 'Search' button when all controls match the current search params.
    */
-  _this.setSearchStatus = function () {
+  _this.setStatus = function () {
     var currentParams,
         newParams,
         paramNames,

@@ -48,7 +48,7 @@ L.Control.Editable = L.Control.extend({
 
     map.on('editable:dragend editable:vertex:mousedown', () => {
       // Set a slight delay so Leaflet.Editable can update the bounds first
-      setTimeout(this.options.app.SearchBar.setSearchStatus, 500);
+      setTimeout(this.options.app.SearchBar.setStatus, 500);
     });
 
     map.on('editable:drawing:commit', e => {
@@ -62,7 +62,7 @@ L.Control.Editable = L.Control.extend({
         instructions.classList.add('hide');
         button.classList.remove('selected');
 
-        this.options.app.SearchBar.setSearchStatus();
+        this.options.app.SearchBar.setStatus();
       }
     });
 
