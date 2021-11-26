@@ -81,7 +81,7 @@ var SearchBar = function (options) {
     ];
     _el = options.el || document.createElement('section');
     _initialView = true;
-    _regionLayer = L.rectangle([ // default - Conterminous U.S.
+    _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
       [24.5, -125]
     ]);
