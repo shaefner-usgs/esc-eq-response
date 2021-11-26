@@ -322,14 +322,20 @@ var SearchBar = function (options) {
   _isValid = function () {
     var endtime,
         isValid,
+        period,
         starttime;
 
     endtime = document.getElementById('endtime');
+    isValid = true; // default
+    period = _el.querySelector('ul.period .selected').id;
     starttime = document.getElementById('starttime');
-    isValid = _setValidity(starttime) && _setValidity(endtime);
 
-    if (!isValid) {
-      _setValidity(endtime); // be certain that invalid endtime is also flagged
+    if (period === 'customPeriod') {
+      isValid = _setValidity(starttime) && _setValidity(endtime);
+
+      if (!isValid) {
+        _setValidity(endtime); // be certain that invalid endtime is also flagged
+      }
     }
 
     return isValid;
@@ -584,15 +590,13 @@ var SearchBar = function (options) {
    */
   _this.searchCatalog = function () {
     var params,
-        period,
         search;
 
     params = _getControlParams();
-    period = _el.querySelector('ul.period .selected').id;
     search = document.getElementById('search');
 
     // Check that custom dates are valid if applicable
-    if (period !== 'customPeriod' || _isValid()) {
+    if (_isValid()) {
       _setUrlParams(params);
       _app.MapPane.removeFeature(_searchLayer);
       _searchLayer.reset();
