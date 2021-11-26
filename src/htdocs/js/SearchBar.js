@@ -62,6 +62,7 @@ var SearchBar = function (options) {
       _setToday,
       _setUrlParams,
       _setValidity,
+      _setView,
       _updateSlider;
 
 
@@ -453,16 +454,6 @@ var SearchBar = function (options) {
 
     if (this.id === 'customRegion') {
       _this.renderMap();
-
-      // Set the initial view to contain the search region's bounds
-      if (_initialView) {
-        _map.fitBounds(_regionLayer.getBounds(), {
-          animate: false,
-          padding: [32, 0]
-        });
-
-        _initialView = false;
-      }
     } else if (this.id === 'worldwide') {
       _cancelEdit();
     }
@@ -547,6 +538,29 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Set the initial view of the custom region map to contain the search
+   * region's bounds.
+   */
+  _setView = function () {
+    var map,
+        sidebar;
+
+    map = _el.querySelector('.customRegion');
+    sidebar = AppUtil.getParam('sidebar');
+
+    if (map.classList.contains('hide')) return; // map not visible
+
+    if (sidebar === 'searchBar' && _initialView) {
+      _map.fitBounds(_regionLayer.getBounds(), {
+        animate: false,
+        padding: [32, 0]
+      });
+
+      _initialView = false;
+    }
+  };
+
+  /**
    * Display the <input> range slider's current value.
    */
   _updateSlider = function () {
@@ -583,6 +597,7 @@ var SearchBar = function (options) {
    */
   _this.renderMap = function () {
     _map.invalidateSize();
+    _setView();
   };
 
   /**
