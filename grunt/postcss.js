@@ -1,14 +1,16 @@
 'use strict';
 
 
-var config = require('./config');
+var autoprefixer = require('autoprefixer'),
+    config = require('./config'),
+    cssnano = require('cssnano');
 
 var postcss = {
   build: {
     options: {
       map: true,
       processors: [
-        require('autoprefixer')(),
+        autoprefixer()
       ]
     },
     files: [{
@@ -24,7 +26,7 @@ var postcss = {
   dist: {
     options: {
       processors: [
-        require('cssnano')() // minify
+        cssnano() // minify
       ]
     },
     files: [{
