@@ -430,14 +430,16 @@ var Rtf = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create the Event Summary RTF and trigger a download of the file.
+   * Create the Event Summary RTF and download the file.
    */
   _this.create = function () {
     var data,
+        l,
         url;
 
     // PHP file that creates the Summary RTF and returns a JSON response
-    url = `${location.protocol}//${location.host}/php/event-summary/create.php`;
+    l = location;
+    url = `${l.protocol}//${l.host}${l.pathname}php/event-summary/create.php`;
 
     // Render plots so that their images can be captured
     if (!_app.PlotsPane.rendered) {
