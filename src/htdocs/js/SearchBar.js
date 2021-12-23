@@ -51,7 +51,7 @@ var SearchBar = function (options) {
       _addControl,
       _addListeners,
       _cancelEdit,
-      _getControlParams,
+      _getParams,
       _initFlatpickr,
       _initMap,
       _isValid,
@@ -59,8 +59,8 @@ var SearchBar = function (options) {
       _setControls,
       _setMinutes,
       _setOption,
+      _setParams,
       _setToday,
-      _setUrlParams,
       _setValidity,
       _setView,
       _updateSlider;
@@ -173,7 +173,7 @@ var SearchBar = function (options) {
    *
    * @return params {Object}
    */
-  _getControlParams = function () {
+  _getParams = function () {
     var bounds,
         params,
         period,
@@ -460,6 +460,33 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Set the URL params to match the UI controls. Only set a param if the
+   * control is not set to its default value and also delete custom search
+   * params if their corresponding 'custom' option is not selected.
+   *
+   * @param params {Object}
+   *    current UI control settings
+   */
+  _setParams = function (params) {
+    Object.keys(params).forEach(name => {
+      var value = params[name];
+
+      if (value === _DEFAULTS[name]) {
+        AppUtil.deleteParam(name);
+      } else {
+        AppUtil.setParam(name, value);
+      }
+    });
+
+    // Delete unneeded custom params (when control is not set to 'custom')
+    _customParams.forEach(name => {
+      if (!Object.prototype.hasOwnProperty.call(params, name)) {
+        AppUtil.deleteParam(name);
+      }
+    });
+  };
+
+  /**
    * Set the highlighted calendar day to the current UTC day (the local day is
    * highlighted by default).
    *
@@ -486,33 +513,6 @@ var SearchBar = function (options) {
         );
       }
     }
-  };
-
-  /**
-   * Set the URL params to match the UI controls. Only set a param if the
-   * control is not set to its default value and also delete custom search
-   * params if their corresponding 'custom' option is not selected.
-   *
-   * @param params {Object}
-   *    current UI control settings
-   */
-  _setUrlParams = function (params) {
-    Object.keys(params).forEach(name => {
-      var value = params[name];
-
-      if (value === _DEFAULTS[name]) {
-        AppUtil.deleteParam(name);
-      } else {
-        AppUtil.setParam(name, value);
-      }
-    });
-
-    // Delete unneeded custom params (when control is not set to 'custom')
-    _customParams.forEach(name => {
-      if (!Object.prototype.hasOwnProperty.call(params, name)) {
-        AppUtil.deleteParam(name);
-      }
-    });
   };
 
   /**
@@ -593,7 +593,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Render the Region map so it displays correctly.
+   * Render the region map so it displays correctly.
    */
   _this.renderMap = function () {
     _map.invalidateSize();
@@ -607,12 +607,12 @@ var SearchBar = function (options) {
     var params,
         search;
 
-    params = _getControlParams();
+    params = _getParams();
     search = document.getElementById('search');
 
     // Check that custom dates are valid if applicable
     if (_isValid()) {
-      _setUrlParams(params);
+      _setParams(params);
       _app.MapPane.removeFeature(_searchLayer);
       _searchLayer.reset();
       _searchLayer.setFeedUrl(params);
@@ -632,7 +632,7 @@ var SearchBar = function (options) {
         search;
 
     currentParams = {};
-    newParams = _getControlParams();
+    newParams = _getParams();
     paramNames = _customParams.concat(Object.keys(_DEFAULTS));
     search = document.getElementById('search');
 
