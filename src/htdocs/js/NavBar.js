@@ -5,11 +5,11 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Switch between panes (i.e. 'pages') of the app and toggle/switch between
- * sidebars.
+ * Switch between Panes (i.e. 'pages') of the app and toggle/switch between
+ * SideBars.
  *
- * Also mitigate issues where map/plots don't render correctly when they're
- * created while their respective pane is hidden.
+ * Also mitigate issues where the map/plots don't render correctly when they're
+ * created while their respective Pane is hidden.
  *
  * @param options {Object}
  *   {
@@ -84,8 +84,8 @@ var NavBar = function (options) {
   };
 
   /**
-   * Render the pane matching the given id value. These are extra steps that
-   * are necessary to render the pane correctly when it is unhidden.
+   * Render the Pane matching the given 'id' value. These are extra steps that
+   * are necessary to render the Pane correctly when it is unhidden.
    *
    * @param id {String}
    */
@@ -127,7 +127,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Show the pane matching the given id value and select the appropriate nav
+   * Show the Pane matching the given 'id' value and select the appropriate nav
    * button.
    *
    * @param id {String}
@@ -146,7 +146,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Show the sidebar matching the given id value, set the 'sidebar' URL
+   * Show the SideBar matching the given 'id' value, set the 'sidebar' URL
    * parameter, and select the given nav button.
    *
    * @param id {String}
@@ -179,7 +179,7 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Hide all panes or all sidebars and unselect all of their nav buttons.
+   * Hide all Panes or all SideBars and unselect all of their nav buttons.
    *
    * @param items {String}
    *     'panes' or 'sidebars'
@@ -235,7 +235,7 @@ var NavBar = function (options) {
   };
 
   /**
-   * Switch to the Sidebar matching the current 'sidebar' URL parameter.
+   * Switch to the SideBar matching the current 'sidebar' URL parameter.
    *
    * @param id {String}
    */

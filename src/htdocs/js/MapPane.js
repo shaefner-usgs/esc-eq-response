@@ -22,9 +22,10 @@ require('leaflet/ZoomCenter');
 
 
 /**
- * Create an interactive map using Leaflet and add 'static' (non-event-specific)
- * layers to the map. Also add/remove 'dynamic' (event-specific) Feature layers
- * as they are created/updated from external feed data.
+ * Create an interactive map using Leaflet and add 'static' layers to the map.
+ * Also add/remove 'dynamic' (event-specific) Feature layers when they are
+ * created/updated using external feed data and set the map extent to contain
+ * the added Features.
  *
  * @param options {Object}
  *   {
@@ -178,7 +179,7 @@ var MapPane = function (options) {
    * Create a custom Leaflet pane for a given map layer, which is used to
    * control the stacking order.
    *
-   * The pane option must be set to the layer's id value in the layer Factory.
+   * The 'pane' option must be set to the layer's id value in the layer Factory.
    *
    * @param id {String}
    *     Feature/layer id
@@ -411,7 +412,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add an Item's name and 'loader' to the layer control.
+   * Add an item's name and 'loader' to the layer control.
    *
    * @param item {Object}
    *     Feature or catalog search results
@@ -433,7 +434,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Open a map popup matching the given eqid in a given Feature layer when the
+   * Open a map popup matching the given 'eqid' in a given Feature layer when the
    * user selects an eq from Plot/SummaryPanes. Also switch to MapPane.
    *
    * @param eqid {String}
@@ -445,7 +446,7 @@ var MapPane = function (options) {
 
     layer = _app.Features.getFeature(featureId).mapLayer;
 
-    // Get the marker associated with the given eqid
+    // Get the marker associated with the given 'eqid'
     layer.eachLayer(eq => {
       if (eq.feature.id === eqid) {
         marker = eq;
@@ -587,7 +588,7 @@ var MapPane = function (options) {
   };
 
   /**
-   * Turn on the search layer.
+   * Turn on the SearchLayer.
    */
   _this.showSearchLayer = function () {
     var layerName;

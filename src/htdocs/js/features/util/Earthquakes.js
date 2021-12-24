@@ -33,9 +33,9 @@ _DEFAULTS = {
 
 
 /**
- * Parse a JSON feed containing a list of earthquakes and create a Leaflet map
- * layer, Plotly traces and components for creating the description,
- * range slider and tables).
+ * Parse an earthquake JSON feed and create the Leaflet map layer, Plotly traces
+ * and SummaryPane components for creating the description, range slider and
+ * list table.
  *
  * @param options {Object}
  *   {
@@ -566,7 +566,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the URL parameter prefix for a given Feature id.
+   * Get the URL parameter prefix for a given Feature 'id'.
    *
    * @param id {String}
    *
@@ -583,7 +583,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the template HTML for a given type of content.
+   * Get the template HTML for a given 'type' of content.
    *
    * @param type {String <binTable|description|listRow|listTable|popup|slider|subheader>}
    *

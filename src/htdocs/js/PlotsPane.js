@@ -7,7 +7,7 @@ var AppUtil = require('util/AppUtil');
 
 /**
  * Create interactive plots using Plotly. Add/remove/render a Feature's plots
- * as they are created/updated from external feed data.
+ * when they are created/updated using external feed data.
  *
  * @param options {Object}
  *   {

@@ -4,7 +4,7 @@
 var AppUtil = require('util/AppUtil');
 
 
-var _STATIC_DEFAULTS = {
+var _DEFAULTS = {
   'as-mag': 0,
   'fs-days': 30,
   'fs-mag': 1,
@@ -100,8 +100,8 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get the default values for form fields that depend on the currently
-   * selected Mainshock and combine them with the 'static' defaults.
+   * Get the default values for fields that depend on the currently selected
+   * Mainshock and merge them with the 'static' default values.
    *
    * Default values for distances are based on rupture length, which we estimate
    * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
@@ -124,7 +124,7 @@ var SettingsBar = function (options) {
     ruptureArea = Math.pow(10, mag - 4);
     ruptureLength = Math.pow(ruptureArea, 0.7);
 
-    return Object.assign({}, _STATIC_DEFAULTS, {
+    return Object.assign({}, _DEFAULTS, {
       'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),

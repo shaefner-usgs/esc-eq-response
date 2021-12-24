@@ -7,7 +7,8 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Fetch the significant earthquakes feed and add the list to the SelectBar.
+ * Fetch the Significant Earthquakes feed and add the list to the SelectBar.
+ * Also highlight the selected earthquake if it's in the list.
  *
  * @param options {Object}
  *   {
@@ -155,7 +156,7 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Show the list of significant earthquakes (replaces the current list or the
+   * Show the list of Significant Earthquakes (replaces the current list or the
    * loader on initial load).
    */
   _this.replaceList = function () {

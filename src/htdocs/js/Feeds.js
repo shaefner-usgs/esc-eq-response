@@ -121,7 +121,7 @@ var Feeds = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get all Feeds, keyed by their id value.
+   * Get all Feeds, keyed by their 'id' value.
    *
    * @return _feeds {Object}
    */

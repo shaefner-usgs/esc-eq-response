@@ -37,7 +37,7 @@ var LegendBar = function (options) {
   };
 
   /**
-   * Add the SVG elements to the legend.
+   * Add the SVG elements to the DOM.
    */
   _addSvgElements = function () {
     var circle,

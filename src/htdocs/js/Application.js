@@ -20,8 +20,10 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Earthquake Response Application - set up and configure app's "primary"
- * Classes.
+ * Earthquake Response Application.
+ *
+ * Instantiate the app's "primary" Classes and handle app resets. Also track/set
+ * saved scroll positions for Panes and SideBars.
  *
  * @param options {Object}
  *   {
@@ -113,12 +115,12 @@ var Application = function (options) {
       _saveScrollPosition('pane')
     );
 
-    // Save scroll position of sidebars
+    // Save scroll position of SideBars
     _sidebar.addEventListener('scroll', () =>
       _saveScrollPosition('sidebar')
     );
 
-    // Show the SelectBar when the 'Select an earthquake' link is clicked
+    // Show the SelectBar
     select.addEventListener('click', () => {
       sessionStorage.setItem('selectBar', 0);
 
@@ -272,7 +274,7 @@ var Application = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get the id value of the selected pane from the URL.
+   * Get the id value of the selected Pane from the URL.
    *
    * @return id {String}
    */
@@ -316,7 +318,7 @@ var Application = function (options) {
   };
 
   /**
-   * Set the scroll position of the pane or sidebar to the previous value.
+   * Set the scroll position of the Pane or SideBar to the previous value.
    *
    * @param id {String}
    */
@@ -333,7 +335,8 @@ var Application = function (options) {
   };
 
   /**
-   * Set dynamic, inline styles for colored section of input range sliders.
+   * Set the dynamic, inline styles for the colored section of an input range
+   * slider.
    *
    * @param input {Element}
    */

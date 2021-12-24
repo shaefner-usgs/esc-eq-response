@@ -601,7 +601,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Update the location and magnitude to match the given catalog.
+   * Update the location and magnitude to match the given 'catalog'.
    *
    * @param catalog {String <comcat|dd>}
    */

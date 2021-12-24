@@ -5,6 +5,7 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
+ * Toggle the SideBar and highlight the selected 'radio-bar' UI option.
  *
  * @param options {Object}
  *   {
@@ -75,7 +76,7 @@ var SideBar = function (options) {
   };
 
   /**
-   * Toggle the sidebar on/off and shift the map's center point. Also set the
+   * Toggle the SideBar on/off and shift the map's center point. Also set the
    * 'sidebar' URL parameter and resize the plots if they are visible.
    *
    * @param status {String}

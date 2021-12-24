@@ -131,8 +131,8 @@ var Features = function (options) {
   };
 
   /**
-   * Add a 'loader' on Edit/Map/Plots/SummaryPanes while fetching data for a
-   * Feature. Also adds the Feature's name in a container <div> on
+   * Add a 'loader' on Map/Plots/SummaryPanes and SettingsBar while fetching
+   * data for a Feature. Also add the Feature's name in a container <div> on
    * Plots/SummaryPanes and in the layer controller on MapPane.
    *
    * @param feature {Object}
@@ -303,7 +303,7 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create the Feature matching the given id value.
+   * Create the Feature matching the given 'id' value.
    *
    * @param id {String}
    *     Feature id
@@ -334,7 +334,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get the Feature matching the given id value.
+   * Get the Feature matching the given 'id' value.
    *
    * @param id {String}
    *     Feature id
@@ -366,7 +366,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get all Features, keyed by their id value.
+   * Get all Features, keyed by their 'id' value.
    *
    * @return _features {Object}
    */
@@ -375,7 +375,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get the loading status of Features.
+   * Get the loading status of the Features.
    *
    * @return status {String}
    */
@@ -392,7 +392,7 @@ var Features = function (options) {
   };
 
   /**
-   * Check if the given id matches an existing Feature's id value.
+   * Check if the given 'id' matches an existing Feature's 'id' value.
    *
    * @param id {String}
    *

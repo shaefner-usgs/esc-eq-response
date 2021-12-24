@@ -7,9 +7,9 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Add/remove summaries for a Feature when they are created/updated from
- * external feed data. Set up and configure the interactive components like
- * table sorting and filter sliders.
+ * Add/remove a Feature's summary when it is created/updated using external
+ * feed data. Set up and configure the interactive components such as table
+ * sorting and filter sliders.
  *
  * @param options {Object}
  *   {

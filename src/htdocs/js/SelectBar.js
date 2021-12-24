@@ -6,7 +6,7 @@ var AppUtil = require('util/AppUtil');
 
 /**
  * Kick off the creation of Features when the user selects a Mainshock and also
- * display its details below the Event ID <input>.
+ * display its details on the SelectBar.
  *
  * @param options {Object}
  *   {
@@ -140,7 +140,7 @@ var SelectBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Handler for creating a new Mainshock - triggered when the Event ID <input>
+   * Handler for creating a new Mainshock. Triggered when the Event ID <input>
    * is changed.
    *
    * Note: must be called manually when the Event ID is changed programmatically.

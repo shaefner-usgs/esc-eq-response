@@ -2,7 +2,7 @@
 
 
 /**
- * Show the loading state of app and external feed data and log errors.
+ * Show the loading status of the app and external feed data; log errors.
  *
  * @param options {Object}
  *   {
