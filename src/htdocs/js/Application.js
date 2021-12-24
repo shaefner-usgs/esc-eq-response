@@ -23,7 +23,8 @@ var AppUtil = require('util/AppUtil'),
  * Earthquake Response Application.
  *
  * Instantiate the app's "primary" Classes and handle app resets. Also track/set
- * saved scroll positions for Panes and SideBars.
+ * saved scroll positions for Panes and SideBars and set input range slider
+ * styles.
  *
  * @param options {Object}
  *   {
@@ -78,7 +79,6 @@ var Application = function (options) {
       _throttle,
 
       _addListeners,
-      _getSliderValue,
       _initClasses,
       _resetQueryString,
       _resetScrollPositions,
@@ -127,28 +127,6 @@ var Application = function (options) {
       _this.NavBar.switchSideBars('selectBar');
       _this.setScrollPosition('selectBar');
     });
-  };
-
-  /**
-   * Get the CSS value for the colored section of an <input> range slider.
-   *
-   * @param input {Element}
-   *
-   * @return value {String}
-   */
-  _getSliderValue = function (input) {
-    var min,
-        percentage,
-        value;
-
-    min = input.min || 0;
-    percentage = input.value;
-    if (input.max) {
-      percentage = Math.floor(100 * (input.value - min) / (input.max - min));
-    }
-    value = percentage + '% 100%';
-
-    return value;
   };
 
   /**
@@ -348,7 +326,7 @@ var Application = function (options) {
 
     newRules = '';
     oldRules = new RegExp('#' + input.id + '[^#]+', 'g');
-    value = _getSliderValue(input);
+    value = AppUtil.getSliderValue(input);
     vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
     vendorAttrs.forEach(attr =>

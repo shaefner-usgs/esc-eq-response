@@ -232,6 +232,28 @@ AppUtil.getShakingValues = function (mmis) {
 };
 
 /**
+ * Get the CSS value for the colored section of an <input> range slider.
+ *
+ * @param input {Element}
+ *
+ * @return value {String}
+ */
+AppUtil.getSliderValue = function (input) {
+  var min,
+      percentage,
+      value;
+
+  min = input.min || 0;
+  percentage = input.value;
+  if (input.max) {
+    percentage = Math.floor(100 * (input.value - min) / (input.max - min));
+  }
+  value = percentage + '% 100%';
+
+  return value;
+};
+
+/**
  * Get the timezone on the user's device.
  *
  * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-
