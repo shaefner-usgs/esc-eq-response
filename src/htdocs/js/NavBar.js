@@ -61,7 +61,7 @@ var NavBar = function (options) {
     close = document.querySelector('aside .icon-close');
     lis = _el.querySelectorAll('#navSub li');
 
-    // Switch between panes
+    // Switch between Panes
     window.addEventListener('hashchange', _switchPanes);
 
     // Switch between sidebars

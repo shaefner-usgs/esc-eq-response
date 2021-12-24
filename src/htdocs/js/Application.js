@@ -110,7 +110,7 @@ var Application = function (options) {
   _addListeners = function () {
     var select = document.querySelector('.select');
 
-    // Save scroll position of panes
+    // Save scroll position of Panes
     window.addEventListener('scroll', () =>
       _saveScrollPosition('pane')
     );
