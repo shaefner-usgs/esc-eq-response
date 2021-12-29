@@ -302,7 +302,10 @@ var MapPane = function (options) {
     _map.setView([0, 0], 1); // set arbitrary view for now
 
     // Hide zoom control on mobile (in favor of pinch-to-zoom)
-    if (L.Browser.mobile) {
+    if (
+      L.Browser.mobile &&
+      !(L.Browser.gecko || L.Browser.gecko3d) // Firefox identifies as mobile
+    ) {
       zoomControl = _el.querySelector('.leaflet-control-zoom');
 
       zoomControl.style.display = 'none';
