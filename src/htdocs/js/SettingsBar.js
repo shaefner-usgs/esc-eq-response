@@ -215,7 +215,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Wrapper method to set the selected 'radio bar' option and also show/hide
+   * Wrapper method to set the selected 'radio-bar' option and also show/hide
    * the 'Swap' catalogs button/set the catalog param.
    */
   _setOption = function () {

@@ -446,7 +446,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Wrapper method to set the selected 'radio bar' option and also render the
+   * Wrapper method to set the selected 'radio-bar' option and also render the
    * map/cancel the edit depending on the current state.
    */
   _setOption = function() {
