@@ -219,7 +219,7 @@ var SettingsBar = function (options) {
    * the 'Swap' catalogs button/set the catalog param.
    */
   _setOption = function () {
-    _app.SideBar.setOption.call(this);
+    _app.setOption.call(this);
 
     if (document.body.classList.contains('mainshock')) {
       _toggleSwap(this.id);
