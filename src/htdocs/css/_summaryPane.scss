@@ -7,6 +7,10 @@
     margin-top: 2.25rem;
   }
 
+  p {
+    max-width: 55rem;
+  }
+
   #updated {
     display: none;
     padding: 1rem var(--padding-gutter);
