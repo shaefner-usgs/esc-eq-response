@@ -371,7 +371,7 @@ var SummaryPane = function (options) {
    * Turn off 'selected' (previously clicked) row when user hovers over a table.
    */
   _unselectRow = function () {
-    var selected = _el.querySelector('.selected');
+    var selected = _el.querySelector('tr.selected');
 
     if (selected) {
       selected.classList.remove('selected');
