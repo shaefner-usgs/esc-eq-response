@@ -210,7 +210,7 @@ AppUtil.getShakingValues = function (mmis) {
       values;
 
   shaking = [
-    {}, // no zero-level values
+    {intensity: 'N/A',  level: '–'},
     {intensity: 'I',    level: 'Not felt'},
     {intensity: 'II',   level: 'Weak'},
     {intensity: 'III',  level: 'Weak'},
@@ -300,7 +300,9 @@ AppUtil.romanize = function (num) {
       roman;
 
   if (typeof num !== 'number') {
-    return ''; // ignore 'null' values
+    return ''; // ignore non-number values
+  } else if (num === 0) {
+    return 'N/A';
   }
 
   num = Math.round(num) || 1; // return 'I' for values less than 1

@@ -26,6 +26,9 @@ a.impact-bubble:hover {
   text-overflow: ellipsis;
   text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .2);
 
+  &.mmiN\/A {
+    background: $mmi-NAcolor;
+  }
   &.mmiI {
     background: $mmiI-color;
     border: 1px solid $border-color-lighter;
