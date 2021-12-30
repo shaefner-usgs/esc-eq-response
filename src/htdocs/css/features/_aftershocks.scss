@@ -16,15 +16,16 @@
   }
 
   .probabilities {
-    display: flex;
     line-height: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 
     a {
       border: 1px solid $border-color;
       border-radius: $button-border-radius;
       color: $text-color;
       display: block;
-      margin-right: 1rem;
       text-align: center;
       text-decoration: none;
       transition: all $effect-off-duration ease-in;
@@ -54,36 +55,55 @@
           color: #fff;
         }
       }
+    }
 
-      &:last-child {
-        margin-right: 0;
-      }
+    abbr {
+      color: $text-color-lightest;
+      display: inline-block;
+      font-size: .8rem;
+      margin-top: 5px;
+      transition: all $effect-off-duration ease-in;
+    }
 
-      abbr {
-        color: $text-color-lightest;
-        display: inline-block;
-        font-size: .8rem;
-        margin-top: 5px;
-        transition: all $effect-off-duration ease-in;
-      }
+    h4 {
+      background: $bg-color-darker;
+      border-radius: $button-border-radius $button-border-radius 0 0;
+      color: $text-color;
+      padding: 4px 0;
+      transition: all $effect-off-duration ease-in;
+    }
 
-      h4 {
-        background: $bg-color-darker;
-        border-radius: $button-border-radius $button-border-radius 0 0;
-        color: $text-color;
-        padding: 4px 0;
-        transition: all $effect-off-duration ease-in;
-      }
+    ol {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
 
-      ul {
-        list-style: none;
-        margin: .75rem 0 1rem;
-        padding: 0;
-      }
+      > li {
+        margin-right: 1rem;
 
-      .probability {
-        font: 1.25rem $font-family-mmi;
+        &:last-child {
+          margin: 0;
+        }
       }
     }
+
+    ul {
+      list-style: none;
+      margin: .75rem 0 1rem;
+      padding: 0;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .probability {
+      font: 1.25rem $font-family-mmi;
+    }
+  }
+
+  .timeframe {
+    margin-bottom: 1.5rem;
   }
 }

@@ -17,6 +17,7 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
+ *     addListeners: {Function}
  *     bins: {Object}
  *     count: {Integer}
  *     create: {Function}
@@ -73,7 +74,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Create aftershocks forecast HTML.
+   * Create Aftershocks forecast HTML.
    *
    * @return html {String}
    */
@@ -98,14 +99,13 @@ var Aftershocks = function (options) {
 
       if (data.probabilities) {
         data.model = content.model.name;
-        data.timeFrame = content.advisoryTimeFrame.toLowerCase().replace(/1\s+/, '');
 
         html = L.Util.template(
           '<div class="forecast bubble">' +
             '<h3>Forecast</h3>' +
-            '<p>Probability of one or more aftershocks in the specified ' +
-              'magnitude range during the <strong>next {timeFrame}</strong>.</p>' +
-            '<div class="probabilities">{probabilities}</div>' +
+            '<p>Probability of one or more aftershocks in the specified time ' +
+              'frame and magnitude range.</p>' +
+            '{probabilities}' +
             '<p>The likely number of aftershocks (95% confidence range) is ' +
               'listed below the probability.</p>' +
             '<p class="model"><strong>Model</strong>: {model}</p>' +
@@ -119,7 +119,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Create aftershocks probability buttons HTML.
+   * Create Aftershocks probabilities and 'radio-bar' HTML.
    *
    * @param oaf {Object}
    *
@@ -128,26 +128,46 @@ var Aftershocks = function (options) {
   _createProbabilities = function (oaf) {
     var data,
         eqid,
-        html;
+        html,
+        label,
+        probabilities,
+        radioBar,
+        state,
+        visibility;
 
     eqid = AppUtil.getParam('eqid');
     data = {
       url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
     };
     html = '';
+    probabilities = '';
+    radioBar = '';
 
-    oaf.forecast.forEach(period => {
-      if (period.label === oaf.advisoryTimeFrame) { // 'primary emphasis' period
-        period.bins.forEach(bin => {
-          data.mag = bin.magnitude;
-          data.probability = _getPercentage(bin.probability);
-          data.range = bin.p95minimum  + '–' + bin.p95maximum;
+    oaf.forecast.forEach(timeframe => {
+      label = timeframe.label.replace(/1\s+/, '');
+      state = '';
+      visibility = 'hide'; // default
 
-          if (bin.p95minimum === 0 && bin.p95maximum === 0) {
-            data.range = 0;
-          }
+      if (timeframe.label === oaf.advisoryTimeFrame) {
+        state = 'selected';
+        visibility = ''; // show
+      }
 
-          html += L.Util.template(
+      probabilities += `<li class="next${label} option ${visibility}">`;
+      probabilities += '<ol>';
+      radioBar += `<li id="next${label}" class="${state}">${timeframe.label}</li>`;
+
+      timeframe.bins.forEach(bin => {
+        data.mag = bin.magnitude;
+        data.probability = _getPercentage(bin.probability);
+        data.range = bin.p95minimum  + '–' + bin.p95maximum;
+
+        if (bin.p95minimum === 0 && bin.p95maximum === 0) {
+          data.range = 0;
+        }
+
+        probabilities += L.Util.template(
+          '<li>' +
             '<a href="{url}" target="new">' +
               '<h4>M {mag}+</h4>' +
               '<ul>' +
@@ -156,12 +176,19 @@ var Aftershocks = function (options) {
                   '<abbr title="Likely number of aftershocks">{range}</abbr>' +
                 '</li>' +
               '</ul>' +
-            '</a>',
-            data
-          );
-        });
-      }
+            '</a>' +
+          '</li>',
+          data
+        );
+      });
+
+      probabilities += '</ol></li>';
     });
+
+    if (probabilities) {
+      html += `<ul class="timeframe options">${radioBar}</ul>`;
+      html += `<ul class="probabilities">${probabilities}</ul>`;
+    }
 
     return html;
   };
@@ -210,7 +237,7 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Get probability as a percentage string.
+   * Get the probability as a percentage string.
    *
    * @param probability {Number}
    *
@@ -233,6 +260,18 @@ var Aftershocks = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    var buttons = document.querySelectorAll('.timeframe li');
+
+    // Set the selected option on the 'radio-bar'
+    buttons.forEach(button =>
+      button.addEventListener('click', _app.setOption)
+    );
+  };
 
   /**
    * Create Feature (set properties that depend on external feed data).
@@ -282,6 +321,15 @@ var Aftershocks = function (options) {
   };
 
   /**
+   * Reset to initial state.
+   */
+  _this.reset = function () {
+    _this.mapLayer = null;
+    _this.plotTraces = null;
+    _this.summary = null;
+  };
+
+  /**
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
@@ -304,15 +352,6 @@ var Aftershocks = function (options) {
     };
 
     _this.url = Earthquakes.getFeedUrl(params);
-  };
-
-  /**
-   * Reset to initial state.
-   */
-  _this.reset = function () {
-    _this.mapLayer = null;
-    _this.plotTraces = null;
-    _this.summary = null;
   };
 
 

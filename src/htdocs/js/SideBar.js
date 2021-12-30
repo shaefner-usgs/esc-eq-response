@@ -15,7 +15,6 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *   {
- *     setOption: {Function}
  *     toggle: {Function}
  *     toggleMapLinks: {Function}
  *   }
@@ -40,40 +39,6 @@ var SideBar = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
-
-  /**
-   * Highlight and show the selected option on a 'radio-bar'; un-highlight and
-   * hide all other options.
-   */
-  _this.setOption = function () {
-    var option,
-        sibling;
-
-    option = _el.querySelector('.option.' + this.id);
-    sibling = this.parentNode.firstElementChild;
-
-    // Highlight the selected button and show its options (if applicable)
-    this.classList.add('selected');
-
-    if (option) {
-      option.classList.remove('hide');
-    }
-
-    // Un-highlight all other buttons and hide their options
-    while (sibling) {
-      if (sibling !== this) {
-        option = _el.querySelector('.option.' + sibling.id);
-
-        sibling.classList.remove('selected');
-
-        if (option) {
-          option.classList.add('hide');
-        }
-      }
-
-      sibling = sibling.nextElementSibling;
-    }
-  };
 
   /**
    * Toggle the SideBar on/off and shift the map's center point. Also set the

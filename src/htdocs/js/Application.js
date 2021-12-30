@@ -63,6 +63,7 @@ var AppUtil = require('util/AppUtil'),
  *     getPaneId: {Function}
  *     headerHeight: {Number}
  *     reset: {Function}
+ *     setOption: {Function}
  *     setScrollPosition: {Function}
  *     setSliderStyles: {Function}
  *     sideBarWidth: {Number}
@@ -293,6 +294,40 @@ var Application = function (options) {
     }
 
     _initialLoad = false;
+  };
+
+  /**
+   * Highlight and show the selected option on a 'radio-bar'; un-highlight and
+   * hide all other options.
+   */
+  _this.setOption = function () {
+    var option,
+        sibling;
+
+    option = document.querySelector('.option.' + this.id);
+    sibling = this.parentNode.firstElementChild;
+
+    // Highlight the selected button and show its options (if applicable)
+    this.classList.add('selected');
+
+    if (option) {
+      option.classList.remove('hide');
+    }
+
+    // Un-highlight all other buttons and hide their options
+    while (sibling) {
+      if (sibling !== this) {
+        option = document.querySelector('.option.' + sibling.id);
+
+        sibling.classList.remove('selected');
+
+        if (option) {
+          option.classList.add('hide');
+        }
+      }
+
+      sibling = sibling.nextElementSibling;
+    }
   };
 
   /**

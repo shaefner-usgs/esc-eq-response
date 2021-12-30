@@ -450,7 +450,7 @@ var SearchBar = function (options) {
    * map/cancel the edit depending on the current state.
    */
   _setOption = function() {
-    _app.SideBar.setOption.call(this);
+    _app.setOption.call(this);
 
     if (this.id === 'customRegion') {
       _this.renderMap();
