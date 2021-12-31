@@ -68,7 +68,7 @@
         transition: border .15s ease-in;
       }
       &:hover:after {
-        border-bottom-color: color.scale($accent-color, $lightness: 90%);
+        border-bottom-color: color.scale($accent-color, $lightness: 85%);
         transition: border $effect-on-duration ease-out;
       }
       &.selected:after {
