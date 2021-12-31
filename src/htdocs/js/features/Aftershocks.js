@@ -99,12 +99,15 @@ var Aftershocks = function (options) {
 
       if (data.probabilities) {
         data.model = content.model.name;
+        data.timeStart = Luxon.DateTime.fromMillis(content.forecast[0].timeStart)
+          .toUTC().toFormat("ccc, LLL d, yyyy 'at' T"); // eslint-disable-line
 
         html = L.Util.template(
           '<h3>Forecast</h3>' +
           '<p>Probability of one or more aftershocks in the specified time ' +
-            'frame and magnitude range. The likely number of aftershocks ' +
-            '(95% confidence range) is listed below the probability.</p>' +
+            'frame and magnitude range starting on {timeStart} UTC. The ' +
+            'likely number of aftershocks (95% confidence range) is listed  ' +
+            'below the probability.</p>' +
           '{probabilities}' +
           '<p><strong>Model</strong>: {model}</p>',
           data
