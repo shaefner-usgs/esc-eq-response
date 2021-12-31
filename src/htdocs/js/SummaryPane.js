@@ -382,13 +382,13 @@ var SummaryPane = function (options) {
    * Update the timestamp.
    */
   _updateTimestamp = function () {
-    var time,
-        timestamp;
+    var el,
+        localtime;
 
-    time = document.getElementById('updated');
-    timestamp = Luxon.DateTime.now().toFormat("ccc LLL d, yyyy 'at' tt") + // eslint-disable-line
-      ' (' + _tz + ')';
-    time.innerHTML = timestamp;
+    el = document.getElementById('updated');
+    localtime = Luxon.DateTime.now().toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+
+    el.innerHTML = `${localtime} (${_tz})`;
   };
 
   // ----------------------------------------------------------
