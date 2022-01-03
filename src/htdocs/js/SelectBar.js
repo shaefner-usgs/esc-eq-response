@@ -158,6 +158,7 @@ var SelectBar = function (options) {
       _app.JsonFeed.initThrottlers(id);
 
       // Immediately show loading status (don't wait for throttle timers)
+      document.body.classList.add('loading');
       _app.StatusBar.clearItems();
       _app.StatusBar.addItem({
         id: id,

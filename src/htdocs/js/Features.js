@@ -101,6 +101,7 @@ var Features = function (options) {
         _app.SettingsBar.setDefaults();
         _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
 
+        document.body.classList.remove('loading');
         document.body.classList.add('mainshock');
 
         // Create the other Features now that the Mainshock is ready
@@ -280,7 +281,7 @@ var Features = function (options) {
       });
     }
 
-    document.body.classList.remove('mainshock');
+    document.body.classList.remove('loading', 'mainshock');
   };
 
   /**

@@ -24,7 +24,7 @@
   }
 }
 
-body:not(.mainshock) {
+body:not(.loading, .mainshock) {
   #plotsPane,
   #summaryPane {
     &:not(.hide) ~ #selectPane {
