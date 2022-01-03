@@ -122,6 +122,7 @@ html {
 }
 
 p {
+  line-height: 1.6;
   margin: 1rem 0;
 
   > strong {
@@ -189,6 +190,8 @@ tr {
 }
 
 .description {
+  font-size: 1.125rem;
+  line-height: 1.5;
   margin: .5rem 0;
 }
 
