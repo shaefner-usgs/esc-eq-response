@@ -3,14 +3,6 @@
 @use '../variables' as *;
 
 #summaryPane {
-  .forecast {
-    margin-bottom: 1rem;
-
-    h3 {
-      margin-top: 0;
-    }
-  }
-
   .probabilities {
     line-height: 1;
     list-style: none;
