@@ -3,6 +3,44 @@
 @use '../variables' as *;
 
 #summaryPane {
+  .aftershocks {
+    dd,
+    dt {
+      border-bottom: 1px solid $border-color-lightest;
+      margin: 0;
+      padding: 2px 0;
+    }
+
+    dd {
+      flex: 1 40%;
+    }
+
+    dl {
+      display: flex;
+      flex-flow: row wrap;
+      margin: .25rem 0 1.25rem;
+      max-width: 20rem;
+
+      &.hide {
+        display: none;
+      }
+    }
+
+    dt {
+      color: $text-color-lighter;
+      flex: 1 60%;
+    }
+
+    h4 {
+      margin-top: 1.25rem;
+
+      a {
+        font-size: .875rem;
+        margin-left: .25rem;
+      }
+    }
+  }
+
   .probabilities {
     line-height: 1;
     list-style: none;
@@ -57,6 +95,7 @@
       background: $bg-color-darker;
       border-radius: $button-border-radius $button-border-radius 0 0;
       color: $text-color;
+      margin: 0;
       padding: 4px 0;
       transition: all $effect-off-duration ease-in;
     }

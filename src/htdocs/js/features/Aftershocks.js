@@ -52,7 +52,9 @@ var Aftershocks = function (options) {
       _createForecast,
       _createProbabilities,
       _createSummary,
-      _getPercentage;
+      _getParameters,
+      _getPercentage,
+      _toggleParams;
 
 
   _this = {};
@@ -188,6 +190,7 @@ var Aftershocks = function (options) {
     if (probabilities) {
       html += `<ul class="timeframe options">${radioBar}</ul>`;
       html += `<ul class="probabilities">${probabilities}</ul>`;
+      html += _getParameters(oaf.model.parameters);
     }
 
     return html;
@@ -240,6 +243,27 @@ var Aftershocks = function (options) {
   };
 
   /**
+   * Get the aftershock forecast parameters as a <dl>.
+   *
+   * @param obj {Object}
+   *
+   * @return html {String}
+   */
+  _getParameters = function (obj) {
+    var html = '<h4>Parameters <a href="#">show</a></h4>';
+
+    html += '<dl class="parameters hide">';
+
+    Object.keys(obj).forEach(key => {
+      html += `<dt>${key}</dt><dd>${obj[key]}</dd>`;
+    });
+
+    html += '</dl>';
+
+    return html;
+  };
+
+  /**
    * Get the probability as a percentage string.
    *
    * @param probability {Number}
@@ -260,6 +284,23 @@ var Aftershocks = function (options) {
     return percentage;
   };
 
+  /**
+   * Toggle the visibility of the Aftershock forecast parameters.
+   *
+   * @param el {Element}
+   */
+  _toggleParams = function (el) {
+    var params = document.querySelector('#summaryPane .parameters');
+
+    params.classList.toggle('hide');
+
+    if (el.textContent === 'show') {
+      el.textContent = 'hide';
+    } else {
+      el.textContent = 'show';
+    }
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -268,12 +309,23 @@ var Aftershocks = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var buttons = document.querySelectorAll('.timeframe li');
+    var buttons,
+        el,
+        toggle;
+
+    el = document.querySelector('#summaryPane .aftershocks');
+    buttons = el.querySelectorAll('.timeframe li');
+    toggle = el.querySelector('h4 a');
 
     // Set the selected option on the 'radio-bar'
     buttons.forEach(button =>
       button.addEventListener('click', _app.setOption)
     );
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      _toggleParams(toggle);
+    });
   };
 
   /**
