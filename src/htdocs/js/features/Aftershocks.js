@@ -322,10 +322,12 @@ var Aftershocks = function (options) {
       button.addEventListener('click', _app.setOption)
     );
 
-    toggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      _toggleParams(toggle);
-    });
+    if (toggle) {
+      toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        _toggleParams(toggle);
+      });
+    }
   };
 
   /**
