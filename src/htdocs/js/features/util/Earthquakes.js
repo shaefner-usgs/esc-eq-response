@@ -781,7 +781,7 @@ var Earthquakes = function (options) {
     statusIcon = '';
     template = '<time datetime="{isoTime}">{utcTime}</time>';
     utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
-    tooltip = magType + ' ' + magDisplay + ' - ' + utcTime;
+    tooltip = magType + ' ' + magDisplay + '—' + utcTime;
 
     if (_featureId !== 'mainshock' && _featureId !== 'search') {
       distance = _vectors[feature.id].distance;
@@ -822,11 +822,15 @@ var Earthquakes = function (options) {
       mmi: AppUtil.romanize(props.mmi), // ShakeMap
       status: props.status || '',
       statusIcon: statusIcon,
-      title: magType + ' ' + magDisplay + ' - ' + props.place,
+      title: magType + ' ' + magDisplay,
       tsunami: props.tsunami,
       url: props.url,
       utcTime: utcTime
     };
+
+    if (props.place) {
+      eq.title += '—' + props.place;
+    }
 
     // Set additional props that depend on other eq props already being set
     eq.bubbles = _getBubbles(eq);
