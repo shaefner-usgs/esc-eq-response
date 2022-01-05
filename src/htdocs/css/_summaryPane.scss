@@ -12,10 +12,12 @@
   }
 
   #updated {
+    color: $text-color-darker;
     display: none;
     padding: 1rem var(--padding-gutter);
 
     &:before {
+      color: $text-color;
       content: 'Updated: ';
     }
   }
