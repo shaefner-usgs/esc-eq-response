@@ -2,15 +2,17 @@
 
 /**
  * Search the NCEDC double difference catalog and convert the results from CSV
- * to GeoJSON. See: https://service.ncedc.org/fdsnws/event/1/
+ * to GeoJSON conforming to ComCat's syntax.
+ *
+ * See: https://service.ncedc.org/fdsnws/event/1/
  *
  * ¹ the minmag param appears to ignore hundredths values, leading to unexpected
  *   results. For ex, a minmag value of 0.95 still selects M 0.9 eqs.
  *
  * @param $params {Array}
  *     ComCat API query parameters (https://earthquake.usgs.gov/fdsnws/event/1/)
- * @param $url {String}
- *     The URL of the search query
+ * @param $uri {String}
+ *     PHP's $_SERVER['REQUEST_URI'] for the search query
  *
  * @return {Object}
  *     {
@@ -23,9 +25,11 @@ class Ncedc {
 
   public $json;
 
-  public function __construct ($params, $url) {
+  public function __construct ($params, $uri) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+
     $this->_params = $params;
-    $this->_url = $url;
+    $this->_url = "$protocol://" . $_SERVER['HTTP_HOST'] . $uri;
   }
 
   /**

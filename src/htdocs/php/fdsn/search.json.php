@@ -7,13 +7,12 @@ search();
 
 
 /**
- * Get the (sanitized) URL parameters.
+ * Get the (sanitized) URL parameters from the query string.
  *
  * @return $params {Array}
  */
 function getParams() {
-  $queryString = $_SERVER['QUERY_STRING'];
-  $pairs = explode('&', $queryString);
+  $pairs = explode('&', $_SERVER['QUERY_STRING']);
   $params = [];
 
   foreach($pairs as $pair) {
@@ -26,18 +25,15 @@ function getParams() {
 }
 
 /**
- * Search the NCEDC catalog and output the results as GeoJSON conforming to
- * ComCat's syntax.
+ * Search the NCEDC catalog and output the results as GeoJSON.
  */
 function search() {
   $params = getParams();
-  $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
-  $url = "$protocol://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
   setHeaders();
 
   try {
-    $ncedc = new Ncedc($params, $url);
+    $ncedc = new Ncedc($params, $_SERVER['REQUEST_URI']);
 
     $ncedc->search();
 
