@@ -219,8 +219,6 @@ var FieldNotes = function (options) {
 
     layer
       .bindPopup(_createPopup(props), {
-        autoPanPaddingTopLeft: L.point(50, 130),
-        autoPanPaddingBottomRight: L.point(50, 50),
         className: 'fieldnotes',
         maxWidth: 398, // fits 4X3 images 'flush' in popup (max-height is 300px)
         minWidth: 320

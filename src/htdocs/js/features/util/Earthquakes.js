@@ -839,8 +839,6 @@ var Earthquakes = function (options) {
     _this.list.push(eq);
 
     layer.bindPopup(_getPopup(eq, layer), {
-      autoPanPaddingTopLeft: L.point(50, 130),
-      autoPanPaddingBottomRight: L.point(50, 50),
       maxWidth: 375,
       minWidth: 250
     }).bindTooltip(tooltip);
