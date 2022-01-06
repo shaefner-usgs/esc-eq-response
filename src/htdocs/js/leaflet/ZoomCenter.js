@@ -43,6 +43,6 @@ L.Control.Zoom.Center = L.Control.Zoom.extend({
   }
 });
 
-L.control.zoom.center = function (opts) {
-  return new L.Control.Zoom.Center(opts);
+L.control.zoom.center = function (options) {
+  return new L.Control.Zoom.Center(options);
 };
