@@ -11,7 +11,6 @@ var AppUtil = require('util/AppUtil');
    2) CanvasMarker must be added here (not in dependent Classes). */
 require('leaflet-editable'); // used in SearchBar.js
 require('leaflet/CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
-require('leaflet/BottomCenter');
 require('leaflet/DarkLayer');
 require('leaflet/FaultsLayer');
 require('leaflet/GreyscaleLayer');
@@ -99,10 +98,7 @@ var MapPane = function (options) {
   _addControls = function () {
     _layerControl = _addLayerControl();
 
-    L.control.mousePosition({
-      position: 'bottomcenter'
-    }).addTo(_map);
-
+    L.control.mousePosition().addTo(_map);
     L.control.scale().addTo(_map);
     L.control.zoom.center().addTo(_map);
   };

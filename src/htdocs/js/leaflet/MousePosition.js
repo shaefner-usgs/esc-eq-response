@@ -7,6 +7,7 @@
  * mouse pointer as it is moved around the map.
  *
  * Copyright 2013 Ardhi Lukianto (https://github.com/ardhi/Leaflet.MousePosition)
+ * with modifications.
  */
 L.Control.MousePosition = L.Control.extend({
   options: {
@@ -19,7 +20,7 @@ L.Control.MousePosition = L.Control.extend({
       return [Math.abs(n).toFixed(3), '°', (n<0?'W':'E')].join('');
     },
     numDigits: 3,
-    position: 'bottomleft',
+    position: 'bottomcenter',
     prefix: '',
     separator: ', '
   },
@@ -67,6 +68,22 @@ L.Map.addInitHook(function () {
     this.addControl(this.positionControl);
   }
 });
+
+/**
+ * Create a bottom-center control container.
+ */
+L.Map.prototype._initControlPos = (function (_initControlPos) {
+  return function () {
+    _initControlPos.apply(this, arguments); // original method
+
+    // Add new control-container
+    this._controlCorners.bottomcenter = L.DomUtil.create(
+      'div',
+      'leaflet-bottom leaflet-center',
+      this._controlContainer
+    );
+  };
+}(L.Map.prototype._initControlPos));
 
 L.control.mousePosition = function (options) {
   return new L.Control.MousePosition(options);
