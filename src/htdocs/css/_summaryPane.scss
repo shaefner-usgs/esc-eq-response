@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 @use 'variables' as *;
 
 #summaryPane {
@@ -17,8 +18,10 @@
     padding: 1rem var(--padding-gutter);
 
     &:before {
-      color: $text-color;
-      content: 'Updated: ';
+      @include labels;
+
+      content: 'Updated';
+      margin-right: .5rem;
     }
   }
 
