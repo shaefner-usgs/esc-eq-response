@@ -109,11 +109,32 @@
       color: $text-color;
     }
 
-    .flatpickr-prev-month svg,
-    .flatpickr-next-month svg,
-    .flatpickr-prev-month:hover svg,
-    .flatpickr-next-month:hover svg {
-      fill: $accent-color;
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+      height: 24px;
+      line-height: 19px;
+      padding: 5px;
+      top: 6px;
+
+      &:active {
+        background: $accent-color;
+        border-radius: 50%;
+
+        svg {
+          stroke: #fff;
+        }
+      }
+
+      svg {
+        stroke: $accent-color;
+        stroke-width: 1px;
+      }
+    }
+    .flatpickr-prev-month {
+      left: 5px;
+    }
+    .flatpickr-next-month {
+      right: 5px;
     }
   }
 
