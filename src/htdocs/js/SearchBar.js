@@ -60,7 +60,7 @@ var SearchBar = function (options) {
       _setMinutes,
       _setOption,
       _setParams,
-      _setToday,
+      _setUtcDay,
       _setValidity,
       _setView,
       _updateSlider;
@@ -227,17 +227,17 @@ var SearchBar = function (options) {
       monthSelectorType: 'static',
       onChange: function() {
         _this.setStatus();
-        _setToday(this.days);
+        _setUtcDay(this.days);
         _setValidity(this.input);
       },
       onClose: function () {
         _setValidity(this.input);
       },
       onMonthChange: function() {
-        _setToday(this.days);
+        _setUtcDay(this.days);
       },
       onYearChange: function() {
-        _setToday(this.days);
+        _setUtcDay(this.days);
       },
       static: true
     };
@@ -257,7 +257,7 @@ var SearchBar = function (options) {
 
             this.set('maxDate', maxDate);
             this.set('minDate', minDate);
-            _setToday(this.days);
+            _setUtcDay(this.days);
           },
           position: 'auto right'
         })
@@ -280,7 +280,7 @@ var SearchBar = function (options) {
             }
 
             this.set('maxDate', maxDate);
-            _setToday(this.days);
+            _setUtcDay(this.days);
           },
           position: 'auto left'
         })
@@ -493,7 +493,7 @@ var SearchBar = function (options) {
    * @param days {Element}
    *     div container with the calendar days of the selected month
    */
-  _setToday = function (days) {
+  _setUtcDay = function (days) {
     var today,
         tomorrow;
 
