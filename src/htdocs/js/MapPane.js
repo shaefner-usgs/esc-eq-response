@@ -15,6 +15,7 @@ require('leaflet/DarkLayer');
 require('leaflet/FaultsLayer');
 require('leaflet/GreyscaleLayer');
 require('leaflet/MousePosition');
+require('leaflet/Popup');
 require('leaflet/SatelliteLayer');
 require('leaflet/TerrainLayer');
 require('leaflet/ZoomCenter');
