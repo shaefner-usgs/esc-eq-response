@@ -18,7 +18,7 @@ var _DEFAULTS = {
 
 
 /**
- * Create earthquake catalog Search layer.
+ * Create the catalog Search overlay.
  *
  * @param options {Object}
  *   {
@@ -59,7 +59,7 @@ var SearchLayer = function (options) {
   };
 
   /**
-   * Get the feed's title for the TitleBar and <title>.
+   * Get the layer's title for the TitleBar and <title>.
    *
    * @param params {Object}
    *
