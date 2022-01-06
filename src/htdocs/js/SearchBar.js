@@ -100,7 +100,7 @@ var SearchBar = function (options) {
    * Add a control to the map for creating a custom region Rectangle.
    */
   _addControl = function () {
-    var control = L.control.editable({
+    var control = L.control.editableRectangle({
       app: _app,
       region: _regionLayer
     });
