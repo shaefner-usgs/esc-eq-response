@@ -49,7 +49,6 @@ var StatusBar = function (options) {
    *
    * @param div {Element}
    * @param id {String}
-   *     Feature id
    */
   _addListeners = function (div, id) {
     var close,
@@ -84,7 +83,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Get the loading message.
+   * Get the loading message, including the animated ellipsis.
    *
    * @param item {Object}
    * @param opts {Object}
@@ -119,7 +118,7 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove a StatusBar item (node) from the DOM.
+   * Remove a StatusBar item (i.e. node) from the DOM.
    *
    * @param el {Element}
    */
@@ -154,8 +153,8 @@ var StatusBar = function (options) {
    *
    * @param error {Object}
    *   {
-   *     id: {String} Feature id
-   *     message: {String} error message
+   *     id: {String}
+   *     message: {String}
    *     status: {Number|String} optional; status code or 'invalid'
    *   }
    */
@@ -198,7 +197,7 @@ var StatusBar = function (options) {
    *
    * @param item {Object}
    *   {
-   *     id: {String} Feature id
+   *     id: {String}
    *     name: {String} optional
    *   }
    * @param opts {Object}
@@ -240,10 +239,9 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Check if an error already exists for a given item.
+   * Check if an error exists for the item with the given id.
    *
    * @param id {String}
-   *     Feature id
    *
    * @return {Boolean}
    */
@@ -265,10 +263,10 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Remove an item from the StatusBar (and hide it if it's empty).
+   * Remove the item with the given id from the StatusBar (and hide it if it's
+   * empty).
    *
    * @param id {String}
-   *     Feature id
    */
   _this.removeItem = function (id) {
     var items = _el.querySelectorAll('.' + id);
@@ -278,7 +276,7 @@ var StatusBar = function (options) {
         _hide();
 
         // Don't remove node until CSS transition is complete
-        setTimeout(_removeNode, 500, item);
+        setTimeout(_removeNode, 1500, item);
       } else {
         _removeNode(item);
       }
