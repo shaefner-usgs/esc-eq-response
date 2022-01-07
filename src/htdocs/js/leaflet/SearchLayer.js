@@ -145,6 +145,8 @@ var SearchLayer = function (options) {
     delete params.period;
     delete params.region;
 
+    params.minmagnitude -= 0.05; // account for rounding to tenths
+
     _this.url = Earthquakes.getFeedUrl(params, 'search');
   };
 
