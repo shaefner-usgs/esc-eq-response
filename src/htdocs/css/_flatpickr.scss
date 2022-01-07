@@ -111,23 +111,28 @@
 
     .flatpickr-prev-month,
     .flatpickr-next-month {
+      background: $bg-color;
+      border-radius: 50%;
       height: 24px;
       line-height: 19px;
       padding: 5px;
       top: 6px;
+      transition: all $effect-off-duration ease-in;
 
       &:active {
         background: $accent-color;
-        border-radius: 50%;
+        transition: all $effect-on-duration ease-out;
 
         svg {
           stroke: #fff;
+          transition: all $effect-on-duration ease-out;
         }
       }
 
       svg {
         stroke: $accent-color;
         stroke-width: 1px;
+        transition: all $effect-off-duration ease-in;
       }
     }
     .flatpickr-prev-month {
@@ -196,13 +201,24 @@
 
     span { // up, down arrows
       border-color: $accent-color-lighter;
+      transition: all $effect-off-duration ease-in;
+
+      &.arrowDown:after,
+      &.arrowUp:after {
+        transition: all $effect-off-duration ease-in;
+      }
 
       &:hover {
         background: $accent-color-lighter;
       }
       &:active {
         background: $accent-color;
+        transition: all $effect-on-duration ease-out;
 
+        &.arrowDown:after,
+        &.arrowUp:after {
+          transition: all $effect-on-duration ease-out;
+        }
         &.arrowDown:after {
           border-top-color: $bg-color;
         }
