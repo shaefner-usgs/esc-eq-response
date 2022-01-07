@@ -145,7 +145,7 @@ var Foreshocks = function (options) {
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(urlParams.fsDist),
-      minmagnitude: Number(urlParams.fsMag) - 0.05, // account for rounding to tenths
+      minmagnitude: Number(urlParams.fsMag),
       starttime: starttime
     };
 

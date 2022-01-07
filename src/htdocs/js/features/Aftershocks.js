@@ -404,7 +404,7 @@ var Aftershocks = function (options) {
       latitude: _mainshock.json.geometry.coordinates[1],
       longitude: _mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(urlParams.asDist),
-      minmagnitude: Number(urlParams.asMag) - 0.05, // account for rounding to tenths
+      minmagnitude: Number(urlParams.asMag),
       starttime: starttime
     };
 

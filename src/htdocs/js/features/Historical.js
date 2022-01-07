@@ -148,7 +148,7 @@ var Historical = function (options) {
       latitude: mainshock.json.geometry.coordinates[1],
       longitude: mainshock.json.geometry.coordinates[0],
       maxradiuskm: Number(urlParams.hsDist),
-      minmagnitude: Number(urlParams.hsMag) - 0.05, // account for rounding to tenths
+      minmagnitude: Number(urlParams.hsMag),
       starttime: starttime
     };
 

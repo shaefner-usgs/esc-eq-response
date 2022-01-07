@@ -1116,7 +1116,9 @@ Earthquakes.getFeedUrl = function (params, type='feature') {
   Object.keys(params).forEach(key => {
     value = params[key];
 
-    if (key === 'latitude' || key === 'longitude') {
+    if (key === 'minmagnitude') {
+      value -= 0.05; // account for rounding to tenths
+    } else if (key === 'latitude' || key === 'longitude') {
       value = AppUtil.round(value, 3);
     }
 
