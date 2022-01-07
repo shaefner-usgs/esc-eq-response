@@ -1,6 +1,5 @@
 @use 'sass:color';
 
-@use 'mixins' as *;
 @use 'variables' as *;
 
 $thumb-d: 1.2rem;
@@ -103,16 +102,6 @@ button {
   &.dim {
     opacity: .5;
   }
-}
-
-/* Close buttons
---------------------------------------------- */
-
-.icon-close {
-  @include close;
-
-  font-family: Tahoma, Verdana, sans-serif;
-  font-weight: bold;
 }
 
 /* 'Radio-bar' options

@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 @use 'variables' as *;
 
 #sideBar {
@@ -46,10 +47,13 @@
   }
 
   .icon-close {
+    @include close;
+
     position: fixed;
     right: $sidebar-width * -1;
     top: 8rem;
     transition: right $sidebar-toggle-duration ease;
+    z-index: 10000;
   }
 }
 
@@ -69,7 +73,6 @@ body.sidebar {
 
     .icon-close {
       right: 1rem;
-      z-index: 10000;
     }
   }
 
