@@ -58,6 +58,7 @@ var MapPane = function (options) {
       _layerControl,
       _map,
       _placeholders,
+      _searchBounds,
       _staticLayers,
 
       _addControls,
@@ -87,6 +88,7 @@ var MapPane = function (options) {
     _el = options.el || document.createElement('section');
     _initialView = true;
     _placeholders = {};
+    _searchBounds = null;
     _staticLayers = _getStaticLayers();
 
     _initMap();
@@ -334,10 +336,10 @@ var MapPane = function (options) {
    * Note: setting bounds to _bounds will include all Features that have their
    *       'zoomToLayer' property set to true.
    *
-   * @param bounds {L.bounds} default is _defaultBounds
+   * @param bounds {L.bounds}
    * @param animate {Boolean} default is false
    */
-  _setView = function (bounds = _defaultBounds, animate = false) {
+  _setView = function (bounds, animate = false) {
     var status,
         x;
 
@@ -420,11 +422,17 @@ var MapPane = function (options) {
     }
 
     if (item.id === 'search') {
+      _searchBounds = _defaultBounds;
+
+      if (AppUtil.getParam('region') === 'customRegion') {
+        _searchBounds = item.mapLayer.getBounds();
+      }
+
       _staticLayers.search = {};
       _staticLayers.search[name] = item.mapLayer;
 
       if (!document.body.classList.contains('mainshock')) {
-        _setView();
+        _setView(_searchBounds);
       }
     }
 
@@ -533,7 +541,7 @@ var MapPane = function (options) {
     var bounds,
         status;
 
-    bounds = _defaultBounds;
+    bounds = _searchBounds || _defaultBounds;
     status = _app.Features.getLoadingStatus();
 
     _map.invalidateSize(); // updates map if its container size was changed
@@ -555,7 +563,11 @@ var MapPane = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var canvasEls = document.querySelectorAll('#mapPane .content canvas');
+    var bounds,
+        canvasEls;
+
+    bounds = _searchBounds || _defaultBounds;
+    canvasEls = document.querySelectorAll('#mapPane .content canvas');
 
     _bounds = L.latLngBounds();
     _initialView = true;
@@ -571,7 +583,7 @@ var MapPane = function (options) {
       _layerControl = _addLayerControl();
     }
 
-    _setView();
+    _setView(bounds);
   };
 
   /**
