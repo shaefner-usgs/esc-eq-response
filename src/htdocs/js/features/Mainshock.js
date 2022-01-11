@@ -44,10 +44,9 @@ var Mainshock = function (options) {
 
       _app,
       _ddJson,
-      _dyfiLightbox,
       _eqid,
       _json,
-      _smLightbox,
+      _lightboxes,
 
       _createSummary,
       _getBubbles,
@@ -68,8 +67,10 @@ var Mainshock = function (options) {
     options = options || {};
 
     _app = options.app;
-    _dyfiLightbox = Lightbox({id: 'dyfi'});
-    _smLightbox = Lightbox({id: 'shakemap'});
+    _lightboxes = {
+      'dyfi': Lightbox({id: 'dyfi'}),
+      'sm': Lightbox({id: 'sm'})
+    };
 
     _this.id = 'mainshock';
     _this.mapLayer = null;
@@ -160,9 +161,6 @@ var Mainshock = function (options) {
       '</div>',
       data
     );
-
-    _dyfiLightbox.add(`<img src="${data.dyfiImg}" alt="DYFI" />`);
-    _smLightbox.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
 
     return html;
   };
@@ -319,6 +317,8 @@ var Mainshock = function (options) {
             '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity" />' +
           '</a>' +
         '</div>';
+
+      _lightboxes.dyfi.add(`<img src="${data.dyfiImg}" alt="DYFI" />`);
     }
 
     return product;
@@ -389,6 +389,8 @@ var Mainshock = function (options) {
             '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity" />' +
           '</a>' +
         '</div>';
+
+      _lightboxes.sm.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
     }
 
     return product;
@@ -485,30 +487,30 @@ var Mainshock = function (options) {
   _this.addListeners = function () {
     var button,
         div,
-        dyfi,
-        shakemap;
+        product,
+        thumbs;
 
     button = document.getElementById('download');
     div = document.querySelector('#summaryPane .thumbs');
-    dyfi = div.querySelector('.dyfi a');
-    shakemap = div.querySelector('.shakemap a');
+    thumbs = {
+      dyfi: div.querySelector('.dyfi a'),
+      sm: div.querySelector('.shakemap a')
+    };
 
     // Load external feed data for RTF Summary
     button.addEventListener('click', _app.Feeds.loadFeeds);
 
-    // Show full-size images in a Lightbox
-    if (dyfi) {
-      dyfi.addEventListener('click', e => {
-        e.preventDefault();
-        _dyfiLightbox.show();
-      });
-    }
-    if (shakemap) {
-      shakemap.addEventListener('click', e => {
-        e.preventDefault();
-        _smLightbox.show();
-      });
-    }
+    // Show full-size images/details in a Lightbox
+    Object.keys(thumbs).forEach(key => {
+      product = thumbs[key];
+
+      if (product) {
+        product.addEventListener('click', e => {
+          e.preventDefault();
+          _lightboxes[key].show();
+        });
+      }
+    });
   };
 
   /**
@@ -539,10 +541,9 @@ var Mainshock = function (options) {
 
     _app = null;
     _ddJson = null;
-    _dyfiLightbox = null;
     _eqid = null;
     _json = null;
-    _smLightbox = null;
+    _lightboxes = null;
 
     _createSummary = null;
     _getBubbles = null;
