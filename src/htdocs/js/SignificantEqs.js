@@ -59,6 +59,7 @@ var SignificantEqs = function (options) {
 
     // Default
     list = document.createElement('h4');
+    list.id = 'significantEqs';
     list.innerHTML = 'None';
 
     if (_json.features) {
