@@ -252,7 +252,7 @@ var Aftershocks = function (options) {
   _getParameters = function (obj) {
     var html = '<h4>Parameters <a href="#">show</a></h4>';
 
-    html += '<dl class="parameters hide">';
+    html += '<dl class="params alt hide">';
 
     Object.keys(obj).forEach(key => {
       html += `<dt>${key}</dt><dd>${obj[key]}</dd>`;
@@ -290,7 +290,7 @@ var Aftershocks = function (options) {
    * @param el {Element}
    */
   _toggleParams = function (el) {
-    var params = document.querySelector('#summaryPane .parameters');
+    var params = document.querySelector('#summaryPane .params');
 
     params.classList.toggle('hide');
 

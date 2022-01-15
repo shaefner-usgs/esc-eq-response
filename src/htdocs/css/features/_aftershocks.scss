@@ -4,31 +4,12 @@
 
 #summaryPane {
   .aftershocks {
-    dd,
-    dt {
-      border-bottom: 1px solid $border-color-lightest;
-      margin: 0;
-      padding: 2px 0;
-    }
-
-    dd {
-      flex: 1 40%;
-    }
-
-    dl {
-      display: flex;
-      flex-flow: row wrap;
+    .params {
       margin: .25rem 0 1.25rem;
-      max-width: 20rem;
 
       &.hide {
         display: none;
       }
-    }
-
-    dt {
-      color: $text-color-lighter;
-      flex: 1 60%;
     }
 
     h4 {
