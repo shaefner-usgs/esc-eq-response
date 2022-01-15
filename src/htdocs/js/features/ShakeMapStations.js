@@ -192,7 +192,7 @@ var ShakeMapStations = function (options) {
             '<abbr title="Distance from mainshock (km)">Dist</abbr>' +
           '</li>' +
         '</ul>' +
-        '<dl class="station-metadata horizontal">' +
+        '<dl class="station-metadata horizontal params">' +
           '<dt>Network</dt>' +
           '<dd>{network}</dd>' +
           '<dt>Location</dt>' +

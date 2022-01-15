@@ -149,7 +149,7 @@ var FieldNotes = function (options) {
         '<p class="properties hide">' +
           '<a href="#" class="toggle">Additional properties</a>' +
         '</p>' +
-        `<dl class="custom">${list}</dl>`;
+        `<dl class="params">${list}</dl>`;
     }
 
     return html;

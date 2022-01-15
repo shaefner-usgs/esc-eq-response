@@ -12,11 +12,6 @@
     margin-top: .5rem;
   }
 
-  dt {
-    text-transform: capitalize;
-    width: 7.5rem;
-  }
-
   img {
     display: block;
     margin: 0 auto;
@@ -30,13 +25,13 @@
     margin-top: 4px;
   }
 
-  .custom {
+  .params {
     max-height: 400px;
     overflow: hidden;
     transition: max-height .3s ease-out;
   }
 
-  .hide + .custom {
+  .hide + .params {
     max-height: 0;
     transition: max-height .1s ease-in;
   }

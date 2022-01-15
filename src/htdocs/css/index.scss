@@ -209,3 +209,32 @@ tr {
     overflow: hidden;
   }
 }
+
+.params {
+  display: grid;
+  grid-template-columns: max-content auto;
+  margin-bottom: 0;
+
+  &.alt {
+    dt {
+      text-transform: none;
+    }
+  }
+
+  dd,
+  dt {
+    line-height: 1.7;
+  }
+  dd {
+    color: $text-color;
+    grid-column-start: 2;
+    margin-left: .5rem;
+  }
+  dt {
+    @include labels;
+
+    grid-column-start: 1;
+    line-height: 27px; // accommodate smaller font-size of labels
+    text-align: right;
+  }
+}

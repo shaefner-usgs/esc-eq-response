@@ -647,7 +647,7 @@ var Earthquakes = function (options) {
         '<div class="{layerType} {catalog} earthquake">' +
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
-          '<dl>' +
+          '<dl class="params">' +
             '<dt>Date & Time</dt>' +
             '<dd>{htmlTime}</dd>' +
             '<dt>Depth</dt>' +
