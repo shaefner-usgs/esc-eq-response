@@ -11,6 +11,10 @@
 
     tr {
       white-space: nowrap;
+
+      &:first-child {
+        border-bottom: 1px solid $border-color;
+      }
     }
 
     .station-channel-name {
