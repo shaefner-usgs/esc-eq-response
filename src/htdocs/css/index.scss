@@ -220,6 +220,12 @@ tr {
   margin-bottom: 0;
 
   &.alt {
+    dd,
+    dt {
+      border-bottom: 1px solid $border-color-lightest;
+      padding-bottom: 2px;
+      padding-top: 2px;
+    }
     dt {
       text-transform: none;
     }
@@ -232,7 +238,8 @@ tr {
   dd {
     color: $text-color;
     grid-column-start: 2;
-    margin-left: .5rem;
+    margin: 0;
+    padding-left: .75rem;
   }
   dt {
     @include labels;

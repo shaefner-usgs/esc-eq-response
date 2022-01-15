@@ -10,6 +10,10 @@
       &.hide {
         display: none;
       }
+
+      dd {
+        max-width: 7rem;
+      }
     }
 
     h4 {
