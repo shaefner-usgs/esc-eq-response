@@ -4,29 +4,3 @@
 @use 'editable';
 @use 'mousePosition';
 @use 'overrides';
-
-.earthquake, // earthquake details on SelectBar
-.leaflet-popup-content {
-  dd,
-  dt {
-    line-height: 1.7;
-  }
-  dd {
-    color: $text-color;
-  }
-  dt {
-    @include labels;
-
-    clear: left;
-    display: block;
-    float: left;
-    line-height: 27px; // accommodate smaller font-size of labels
-    margin-right: .5rem;
-    text-align: right;
-    width: 6rem;
-  }
-
-  dl {
-    margin-bottom: 0;
-  }
-}
