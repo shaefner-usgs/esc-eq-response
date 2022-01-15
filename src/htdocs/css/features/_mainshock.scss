@@ -27,11 +27,12 @@
       padding: 0 1rem;
 
       &:first-child {
-        padding-left: 0;
+        padding-left: .25rem;
       }
 
       &:last-child {
         border: none;
+        padding-right: 1.25rem;
       }
 
       > small,
@@ -84,8 +85,6 @@
     }
 
     .mag {
-      min-width: 4rem;
-
       span {
         font-size: 1.75rem;
         line-height: 1;
@@ -144,10 +143,6 @@
   }
 
   .mainshock {
-    h4 {
-      text-align: center;
-    }
-
     .bubble {
       margin: 1rem .5rem 0;
 
@@ -202,6 +197,11 @@
 
     h3 {
       margin-top: 0;
+    }
+
+    h4 {
+      margin-top: .125rem;
+      text-align: center;
     }
 
     .hide { // missing product

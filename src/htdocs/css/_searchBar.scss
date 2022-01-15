@@ -2,15 +2,15 @@
 
 #searchBar {
   button {
-    margin: 1rem 0 1.5rem;
+    margin: .75rem 0 1.5rem;
+
+    + p {
+      margin-bottom: 0;
+    }
   }
 
   div.hide {
     display: none;
-  }
-
-  h3 {
-    margin: 1.25rem 0 .75rem;
   }
 
   #endtime ~ .flatpickr-calendar {
@@ -61,6 +61,6 @@
   }
 
   .slider-container {
-    margin-bottom: -1rem;
+    margin: -.5rem 0 -1rem;
   }
 }

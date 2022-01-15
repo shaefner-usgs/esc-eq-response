@@ -4,10 +4,6 @@
 #summaryPane {
   transition: margin $sidebar-toggle-duration ease;
 
-  h3 {
-    margin-top: 2.25rem;
-  }
-
   p {
     max-width: 55rem;
   }
@@ -15,7 +11,7 @@
   #updated {
     color: $text-color-darker;
     display: none;
-    padding: 1rem var(--padding-gutter);
+    padding: .5rem var(--padding-gutter) 1rem;
 
     &:before {
       @include labels;
@@ -40,7 +36,7 @@
     order: 0;
 
     h2 {
-      margin-top: .25rem;
+      margin-top: 0;
     }
   }
 

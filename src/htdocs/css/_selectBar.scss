@@ -12,7 +12,7 @@
   }
 
   p + h3 {
-    margin: 1.5rem 0 .25rem;
+    margin-bottom: .25rem;
 
     span {
       color: $text-color-lighter;
@@ -26,10 +26,6 @@
         content: '(';
       }
     }
-  }
-
-  ul + h3 {
-    margin-top: 1.75rem;
   }
 
   .details {
