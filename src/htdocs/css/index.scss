@@ -158,6 +158,10 @@ th {
   text-align: center;
 }
 
+thead tr {
+  border-color: $border-color;
+}
+
 tr {
   border-bottom: 1px solid $border-color-lighter;
 }

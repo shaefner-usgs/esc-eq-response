@@ -7,6 +7,19 @@
       width: 100%;
     }
 
+    tbody tr { // override general table border styles
+      border-bottom: none;
+      border-top: 1px solid $border-color-lighter;
+
+      &:first-child {
+        border: none;
+      }
+
+      &.city {
+        border: none;
+      }
+    }
+
     td,
     th {
       padding: 0.25rem .375rem;
@@ -18,20 +31,6 @@
       &:nth-child(3) {
         padding-right: .25rem;
         text-align: right;
-      }
-    }
-
-    tr {
-      border: none; // override general table border styles
-      border-top: 1px solid $border-color-lighter;
-
-      &.city {
-        border: none;
-      }
-
-      &:first-child {
-        border-bottom: 1px solid $border-color;
-        border-top: none;
       }
     }
 

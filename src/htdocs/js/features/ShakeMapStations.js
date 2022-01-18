@@ -259,30 +259,33 @@ var ShakeMapStations = function (options) {
   _createTable = function (channels) {
     var html =
       '<table class="station-channels-map">' +
-        '<tr>' +
-          '<th scope="col" class="station-channels-map-name freeze">Name</th>' +
-          '<th scope="col" class="station-channels-map-pga">' +
-            '<abbr title="Peak Ground Acceleration (%g)">PGA</abbr>' +
-          '</th>' +
-          '<th scope="col" class="station-channels-map-pgv">' +
-            '<abbr title="Peak Ground Velocity (cm/s)">PGV</abbr>' +
-          '</th>' +
-          '<th scope="col" class="station-channels-map-psa03">' +
-            '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA(0.3)</abbr>' +
-          '</th>' +
-          '<th scope="col" class="station-channels-map-psa10">' +
-            '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA(1.0)</abbr>' +
-          '</th>' +
-          '<th scope="col" class="station-channels-map-psa30">' +
-            '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA(3.0)</abbr>' +
-          '</th>' +
-        '</tr>';
+        '<thead>' +
+          '<tr>' +
+            '<th scope="col" class="station-channels-map-name freeze">Name</th>' +
+            '<th scope="col" class="station-channels-map-pga">' +
+              '<abbr title="Peak Ground Acceleration (%g)">PGA</abbr>' +
+            '</th>' +
+            '<th scope="col" class="station-channels-map-pgv">' +
+              '<abbr title="Peak Ground Velocity (cm/s)">PGV</abbr>' +
+            '</th>' +
+            '<th scope="col" class="station-channels-map-psa03">' +
+              '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA(0.3)</abbr>' +
+            '</th>' +
+            '<th scope="col" class="station-channels-map-psa10">' +
+              '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA(1.0)</abbr>' +
+            '</th>' +
+            '<th scope="col" class="station-channels-map-psa30">' +
+              '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA(3.0)</abbr>' +
+            '</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>';
 
     channels.forEach(channel =>
       html += _createRow(channel)
     );
 
-    html += '</table>';
+    html += '</tbody></table>';
 
     return html;
   };

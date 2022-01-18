@@ -133,14 +133,18 @@ var PagerExposures = function (options) {
       html = L.Util.template(
         '<h3>Population Exposure</h3>' +
         '<table>' +
-          '<tr>' +
-            '<th>' +
-              '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
-            '</th>' +
-            '<th>Selected Cities</th>' +
-            '<th>Population</th>' +
-          '<tr>' +
-          '{rows}' +
+          '<thead>' +
+            '<tr>' +
+              '<th>' +
+                '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
+              '</th>' +
+              '<th>Selected Cities</th>' +
+              '<th>Population</th>' +
+            '<tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '{rows}' +
+          '</tbody>' +
         '</table>',
         data
       );
