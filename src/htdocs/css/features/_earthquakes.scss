@@ -186,7 +186,7 @@
 
 // Earthquake details in map popups and on the SelectBar
 .earthquake {
-  &.dd:not(.mainshock) {
+  &:not(.mainshock) {
     .status {
       display: none;
     }
