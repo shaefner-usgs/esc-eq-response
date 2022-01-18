@@ -8,12 +8,6 @@
     padding: 0;
   }
 
-  .github {
-    border-top: 1px solid $border-color-lighter;
-    margin: 2rem 0 0;
-    padding-top: 4px;
-  }
-
   .iconlist {
     counter-reset: item;
 
@@ -40,5 +34,10 @@
         width: 1.75rem;
       }
     }
+  }
+
+  .note {
+    margin-top: 2rem;
+    padding-top: .5rem !important;
   }
 }
