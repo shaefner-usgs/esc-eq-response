@@ -144,10 +144,10 @@ th {
   padding: .4rem .75rem;
 
   &:first-child {
-    padding-left: 5px;
+    padding-left: .375rem;
   }
   &:last-child {
-    padding-right: 5px;
+    padding-right: .375rem;
   }
 }
 
@@ -223,8 +223,11 @@ tr {
     dd,
     dt {
       border-bottom: 1px solid $border-color-lightest;
-      padding-bottom: 2px;
-      padding-top: 2px;
+      padding-bottom: .25rem;
+      padding-top: .25rem;
+    }
+    dd {
+      padding-left: .75rem;
     }
     dt {
       text-transform: none;
@@ -239,7 +242,7 @@ tr {
     color: $text-color;
     grid-column-start: 2;
     margin: 0;
-    padding-left: .75rem;
+    padding-left: .5rem;
   }
   dt {
     @include labels;
