@@ -7,15 +7,15 @@
       width: 100%;
     }
 
-    tbody tr { // override general table border styles
-      border-bottom: none;
+    tbody tr {
+      border-bottom: none; // override general table border styles
       border-top: 1px solid $border-color-lighter;
 
-      &:first-child {
+      &.city {
         border: none;
       }
 
-      &.city {
+      &:first-child {
         border: none;
       }
     }
