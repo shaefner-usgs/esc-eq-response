@@ -28,7 +28,8 @@ _MARKER_DEFAULTS = {
 };
 _DEFAULTS = {
   json: {},
-  markerOptions: _MARKER_DEFAULTS
+  markerOptions: _MARKER_DEFAULTS,
+  sortByField: ''
 };
 
 
@@ -42,7 +43,7 @@ _DEFAULTS = {
  *     app: {Object} Application
  *     id: {String} Feature's id
  *     json: {Object} Feature's JSON data
- *     sortByField: {String} initial sortby field for table - optional; default is ''
+ *     sortByField: {String} initial sortby field for table - optional
  *   }
  *
  * @return _this {Object}
@@ -128,7 +129,7 @@ var Earthquakes = function (options) {
       title: [],
       time: []
     };
-    _sortByField = options.sortByField || '';
+    _sortByField = options.sortByField;
     _vectors = {};
 
     if (_featureId === 'search') {
