@@ -25,7 +25,7 @@
       padding: 0.25rem .375rem;
 
       &:nth-child(1) {
-        max-width: 3.5rem;
+        width: 3.5rem;
         padding-left: .25rem;
       }
       &:nth-child(3) {
@@ -36,11 +36,9 @@
 
     .city td {
       color: $text-color-lighter;
-      padding-top: 0;
-    }
-
-    .impact-bubble {
-      max-width: 3.5rem;
+      line-height: 1.4;
+      padding-bottom: .375rem;
+      padding-top: .125rem;
     }
   }
 }
