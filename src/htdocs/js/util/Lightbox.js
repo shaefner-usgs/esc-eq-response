@@ -1,9 +1,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Create a Lightbox overlay instance.
  *
@@ -35,7 +32,7 @@ var Lightbox = function (options) {
   _initialize = function (options) {
     options = options || {};
 
-    _id = 'lightbox' + AppUtil.capitalize(options.id);
+    _id = options.id + 'Lightbox';
   };
 
   /**
