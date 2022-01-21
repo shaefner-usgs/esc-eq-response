@@ -362,7 +362,7 @@ var Mainshock = function (options) {
           '</a>' +
         '</div>';
 
-      _lightboxes.dyfi.add(`<img src="${data.dyfiImg}" alt="DYFI" />`);
+      _lightboxes.dyfi.add(`<img src="${data.dyfiImg}" class="mmi${data.cdi}" alt="DYFI" />`);
     }
 
     return product;
@@ -435,7 +435,7 @@ var Mainshock = function (options) {
           '</a>' +
         '</div>';
 
-      _lightboxes.shakemap.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
+      _lightboxes.shakemap.add(`<img src="${data.shakemapImg}" class="mmi${data.mmi}" alt="ShakeMap" />`);
     }
 
     return product;

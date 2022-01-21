@@ -1,6 +1,45 @@
 @use '../mixins' as *;
 @use '../variables' as *;
 
+img {
+  &.mmiI {
+    border-color: $border-color-lighter;
+  }
+  &.mmiII {
+    border-color: $mmiII-color;
+  }
+  &.mmiIII {
+    border-color: $mmiIII-color;
+  }
+  &.mmiIV {
+    border-color: $mmiIV-color;
+  }
+  &.mmiV {
+    border-color: $mmiV-color;
+  }
+  &.mmiVI {
+    border-color: $mmiVI-color;
+  }
+  &.mmiVII {
+    border-color: $mmiVII-color;
+  }
+  &.mmiVIII {
+    border-color: $mmiVIII-color;
+  }
+  &.mmiIX {
+    border-color: $mmiIX-color;
+  }
+  &.mmiX {
+    border-color: $mmiX-color;
+  }
+  &.mmiXI {
+    border-color: $mmiXI-color;
+  }
+  &.mmiXII {
+    border-color: $mmiXII-color;
+  }
+}
+
 #summaryPane {
   #download {
     margin-top: .5rem;
@@ -223,46 +262,10 @@
       max-width: 100%;
     }
     img {
-      border: 2px solid #ccc;
+      border-width: 2px;
+      border-style: solid;
       border-radius: $button-border-radius;
       padding: 2px;
-
-      &.mmiI {
-        border-color: $border-color-lighter; // add subtle grey border so button shows up
-      }
-      &.mmiII {
-        border-color: $mmiII-color;
-      }
-      &.mmiIII {
-        border-color: $mmiIII-color;
-      }
-      &.mmiIV {
-        border-color: $mmiIV-color;
-      }
-      &.mmiV {
-        border-color: $mmiV-color;
-      }
-      &.mmiVI {
-        border-color: $mmiVI-color;
-      }
-      &.mmiVII {
-        border-color: $mmiVII-color;
-      }
-      &.mmiVIII {
-        border-color: $mmiVIII-color;
-      }
-      &.mmiIX {
-        border-color: $mmiIX-color;
-      }
-      &.mmiX {
-        border-color: $mmiX-color;
-      }
-      &.mmiXI {
-        border-color: $mmiXI-color;
-      }
-      &.mmiXII {
-        border-color: $mmiXII-color;
-      }
     }
 
     div {
@@ -270,6 +273,12 @@
       width: 50%;
     }
   }
+}
+
+.lightbox > img {
+  border-width: 4px;
+  border-style: solid;
+  border-radius: 12px;
 }
 
 // @media only screen
