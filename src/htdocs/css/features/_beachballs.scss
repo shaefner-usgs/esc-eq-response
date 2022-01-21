@@ -1,0 +1,101 @@
+@use '../mixins' as *;
+@use '../variables' as *;
+
+#focal-mechanismLightbox,
+#moment-tensorLightbox {
+  canvas {
+    margin-top: 3.5rem;
+    max-width: 100%;
+    width: 350px;
+  }
+
+  dd {
+    max-width: 10rem;
+  }
+
+  h3 {
+    margin-top: 0;
+  }
+
+  h4 {
+    margin: 1.75rem 0 .75rem;
+  }
+
+  td {
+    text-align: right;
+  }
+
+  .axes {
+    td:nth-child(3),
+    td:nth-child(4) {
+      padding-right: 1.5rem;
+    }
+  }
+
+  .beachball {
+    margin-left: 1rem;
+  }
+
+  .catalog,
+  .contributor,
+  .source {
+    text-transform: uppercase;
+  }
+
+  .container {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  .planes {
+    td:nth-child(2) {
+      padding-right: 1.25rem;
+    }
+  }
+
+  .status {
+    margin-bottom: 0;
+
+    &:before {
+      @include labels;
+
+      content: 'Status';
+      margin-right: .5rem;
+    }
+
+    i {
+      margin-left: .25rem;
+    }
+
+    span { // nested (span) tag and inline-block are necessary for text-transform
+      display: inline-block;
+      text-transform: capitalize;
+    }
+  }
+}
+
+@media only screen
+and (max-width: $breakpoint-phone-width) {
+  #focal-mechanismLightbox,
+  #moment-tensorLightbox {
+    canvas {
+      display: block;
+      margin: 0 auto 2rem;
+    }
+
+    .beachball,
+    .details {
+      width: 100%;
+    }
+    .beachball {
+      order: 0;
+    }
+    .details {
+      order: 1;
+    }
+
+    .container {
+      flex-flow: row wrap;
+    }
+  }
+}

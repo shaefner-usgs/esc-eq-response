@@ -1,9 +1,7 @@
-/* global L */
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    BeachBall = require('features/util/BeachBall');
+var BeachBall = require('features/util/BeachBall');
 
 
 /**
@@ -16,12 +14,13 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *   {
- *     beachball: {Element}
  *     create: {Function}
  *     destroy: {Function}
  *     id: {String}
+ *     lightbox: {String}
  *     mapLayer: {L.Layer}
  *     name: {String}
+ *     render: {Function}
  *     reset: {Function}
  *     showLayer: {Boolean}
  *     summary: {String}
@@ -33,11 +32,7 @@ var MomentTensor = function (options) {
       _initialize,
 
       _app,
-      _mainshock,
-
-      _createBeachBall,
-      _createMapLayer,
-      _createSummary;
+      _mainshock;
 
 
   _this = {};
@@ -49,106 +44,13 @@ var MomentTensor = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
 
     _this.id = 'moment-tensor';
+    _this.lightbox = null;
     _this.mapLayer = null;
     _this.name = 'Moment Tensor';
+    _this.render = null;
     _this.showLayer = false;
     _this.summary = null;
     _this.zoomToLayer = false;
-  };
-
-  /**
-   * Create beachball.
-   *
-   * @param size {Number}
-   *
-   * @return beachball {Object || null}
-   */
-  _createBeachBall = function (size) {
-    var beachball,
-        momentTensor;
-
-    momentTensor = _mainshock.json.properties.products['moment-tensor'];
-
-    if (momentTensor) {
-      beachball = BeachBall({
-        className: _this.id,
-        data: momentTensor[0].properties,
-        fillColor: '#6ea8ff',
-        size: size,
-        type: _this.id
-      });
-    }
-
-    return beachball;
-  };
-
-  /**
-   * Create Leaflet map layer.
-   *
-   * @return mapLayer {L.layer}
-   */
-  _createMapLayer = function () {
-    var beachball,
-        coords,
-        mapLayer,
-        popup,
-        size,
-        tooltip;
-
-    size = 40;
-    beachball = _createBeachBall(size);
-
-    if (beachball) {
-      coords = [
-        _mainshock.json.geometry.coordinates[1],
-        _mainshock.json.geometry.coordinates[0]
-      ];
-
-      // Get popup, tooltip from Mainshock (a FeatureGroup with a single layer)
-      _mainshock.mapLayer.eachLayer(layer => {
-        popup = layer.getPopup().getContent();
-        tooltip = layer.getTooltip().getContent();
-      });
-
-      // Render beachball (hidden by default) for use by CanvasMarker
-      beachball.render(document.querySelector('#mapPane .content'));
-
-      mapLayer = L.marker.canvas(coords, {
-        icon: L.divIcon({
-          className: _this.id,
-          iconSize: L.point(size, size)
-        }),
-        pane: _this.id // put marker in custom Leaflet map pane
-      });
-
-      mapLayer.bindPopup(popup, {
-        maxWidth: 375,
-        minWidth: 250
-      }).bindTooltip(tooltip);
-    }
-
-    return mapLayer;
-  };
-
-  /**
-   * Create summary HTML.
-   *
-   * @return html {String}
-   */
-  _createSummary = function () {
-    var eqid,
-        html,
-        url;
-
-    html = '';
-
-    if (_this.beachball) {
-      eqid = AppUtil.getParam('eqid');
-      url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/moment-tensor`;
-      html = `<h4>${_this.name}</h4><a href="${url}" target="new"></a>`;
-    }
-
-    return html;
   };
 
   // ----------------------------------------------------------
@@ -159,9 +61,32 @@ var MomentTensor = function (options) {
    * Create Feature.
    */
   _this.create = function () {
-    _this.beachball = _createBeachBall(180);
-    _this.mapLayer = _createMapLayer();
-    _this.summary = _createSummary();
+    var beachball,
+        data,
+        mt;
+
+    mt = _mainshock.json.properties.products['moment-tensor'];
+
+    if (mt) {
+      data = Object.assign({}, mt[0].properties, {
+        source: mt[0].source
+      });
+      beachball = BeachBall({
+        coords: [
+          _mainshock.json.geometry.coordinates[1],
+          _mainshock.json.geometry.coordinates[0]
+        ],
+        data: data,
+        id: _this.id,
+        name: _this.name,
+        type: 'moment-tensor'
+      });
+
+      _this.lightbox = beachball.createLightbox();
+      _this.mapLayer = beachball.createMapLayer();
+      _this.render = beachball.render;
+      _this.summary = beachball.createSummary();
+    }
   };
 
   /**
@@ -173,10 +98,6 @@ var MomentTensor = function (options) {
     _app = null;
     _mainshock = null;
 
-    _createBeachBall = null;
-    _createMapLayer = null;
-    _createSummary = null;
-
     _this = null;
   };
 
@@ -184,7 +105,9 @@ var MomentTensor = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
+    _this.lightbox = null;
     _this.mapLayer = null;
+    _this.render = null;
     _this.summary = null;
   };
 
