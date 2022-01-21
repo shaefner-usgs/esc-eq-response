@@ -409,13 +409,7 @@ var SummaryPane = function (options) {
       // Inserting node this way preserves CSS transitions
       div.insertAdjacentHTML('beforeend', feature.summary);
 
-      // Render beachballs for FM, MT products
-      if (Object.prototype.hasOwnProperty.call(feature, 'beachball')) {
-        feature.beachball.render(_el.querySelector('.' + feature.id + ' a'));
-        div.parentNode.classList.remove('hide'); // hidden if no ShakeMap, DYFI products
-      }
-
-      // Show content added to Mainshock section (i.e. not a "stand-alone" Feature)
+      // If this is a "sub-Feature" of the Mainshock, toggle the visibility
       if (div.classList.contains('placeholder')) {
         div.classList.remove('hide');
       }
