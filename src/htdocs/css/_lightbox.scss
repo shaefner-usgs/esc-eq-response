@@ -20,7 +20,7 @@
   }
 
   &:after {
-    background: #ddd;
+    background: #eee;
     border-radius: 50%;
     color: #000;
     content: '\d7';
@@ -33,15 +33,6 @@
     top: 10px;
     transition: background $effect-off-duration ease-in;
     width: 25px;
-  }
-
-  &:hover:after {
-    background: #eee;
-    transition: background $effect-on-duration ease-out;
-  }
-  &:active:after {
-    background: #fff;
-    transition: background .05s ease-out;
   }
 
   img {
@@ -58,6 +49,10 @@
     max-width: 100%;
     overflow: scroll;
     padding: 1rem 1.5rem;
+  }
+
+  > * {
+    cursor: auto;
   }
 }
 

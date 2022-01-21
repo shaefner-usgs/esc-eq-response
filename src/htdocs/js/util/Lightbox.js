@@ -36,15 +36,21 @@ var Lightbox = function (options) {
   };
 
   /**
-   * Add listener for close button.
+   * Add listener for closing Lightbox.
    *
-   * @param div {Element}
+   * @param container {Element}
    */
-  _addListeners = function (div) {
-    div.addEventListener('click', e => {
-      e.preventDefault();
+  _addListeners = function (container) {
+    var content = container.querySelector(':scope > *');
+
+    container.addEventListener('click', () => {
       _this.hide();
     });
+
+    // Disable click to close on Lightbox content
+    if (content) {
+      content.addEventListener('click', e => e.stopPropagation());
+    }
   };
 
   /**
