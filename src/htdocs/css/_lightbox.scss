@@ -49,4 +49,23 @@
     max-height: 100%;
     max-width: 100%;
   }
+
+  .content {
+    background: $bg-color;
+    border-radius: 12px;
+    margin: auto;
+    max-height: 100%;
+    max-width: 100%;
+    overflow: scroll;
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media only screen
+and (max-width: $breakpoint-phone-width) {
+  .lightbox {
+    .content {
+      border-radius: 0;
+    }
+  }
 }
