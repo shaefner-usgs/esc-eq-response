@@ -48,6 +48,8 @@ var Mainshock = function (options) {
       _json,
       _lightboxes,
 
+      _addBeachBalls,
+      _addThumb,
       _createSummary,
       _getBubbles,
       _getData,
@@ -56,6 +58,7 @@ var Mainshock = function (options) {
       _getShakeAlert,
       _getShakeMap,
       _getTectonic,
+      _getThumbs,
       _refreshBeachBalls,
       _renderUpdate,
       _setJson;
@@ -68,8 +71,10 @@ var Mainshock = function (options) {
 
     _app = options.app;
     _lightboxes = {
-      'dyfi': Lightbox({id: 'dyfi'}),
-      'sm': Lightbox({id: 'sm'})
+      dyfi: Lightbox({id: 'dyfi'}),
+      'focal-mechanism': Lightbox({id: 'focal-mechanism'}),
+      'moment-tensor': Lightbox({id: 'moment-tensor'}),
+      shakemap: Lightbox({id: 'shakemap'})
     };
 
     _this.id = 'mainshock';
@@ -79,6 +84,37 @@ var Mainshock = function (options) {
     _this.showLayer = true;
     _this.summary = null;
     _this.zoomToLayer = true;
+  };
+
+  /**
+   * Render BeachBalls and add their Lightbox content to the DOM.
+   *
+   * @param id {String <focal-mechanism|moment-tensor>}
+   */
+  _addBeachBalls = function (id) {
+    var feature = _app.Features.getFeature(id);
+
+    if (feature.lightbox) {
+      _lightboxes[id].add(feature.lightbox);
+
+      feature.render(); // render the beachballs
+    }
+  };
+
+  /**
+   * Add a thumbnail Element to the Array of thumbnails with Lightbox content.
+   *
+   * @param thumbs {Array}
+   * @param id {String}
+   * @param el {Element}
+   */
+  _addThumb = function (thumbs, id, el) {
+    if (el) {
+      thumbs.push({
+        el: el,
+        id: id
+      });
+    }
   };
 
   /**
@@ -234,7 +270,9 @@ var Mainshock = function (options) {
         econImg,
         eqTime,
         fatalImg,
+        fm,
         mmiInt,
+        mt,
         pager,
         products,
         shakeAlert,
@@ -248,7 +286,9 @@ var Mainshock = function (options) {
     products = _this.json.properties.products;
     dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC();
+    fm = products['focal-mechanism'];
     mmiInt = Math.round(_this.json.properties.mmi);
+    mt = products['moment-tensor'];
     pager = products.losspager;
     shakeAlert = products['shake-alert'];
     shakemap = products.shakemap;
@@ -259,8 +299,8 @@ var Mainshock = function (options) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
       visibility = 'show';
     }
-    if (Array.isArray(text)) {
-      tectonic = text[0].contents[''].bytes;
+    if (Array.isArray(fm) || Array.isArray(mt)) {
+      visibility = 'show';
     }
     if (Array.isArray(pager)) {
       econImg = pager[0].contents['alertecon.png'].url;
@@ -277,6 +317,9 @@ var Mainshock = function (options) {
       } else if (shakemap[0].contents['download/intensity.jpg'].url) {
         shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
       }
+    }
+    if (Array.isArray(text)) {
+      tectonic = text[0].contents[''].bytes;
     }
 
     return Object.assign({}, _this.data, {
@@ -300,7 +343,8 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the Did You Feel It? product HTML template.
+   * Get the Did You Feel It? product HTML template and add its Lightbox content
+   * to the DOM.
    *
    * @param data {Object}
    *
@@ -372,7 +416,8 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the ShakeMap product HTML template.
+   * Get the ShakeMap product HTML template and add its Lightbox content to the
+   * DOM.
    *
    * @param data {Object}
    *
@@ -390,7 +435,7 @@ var Mainshock = function (options) {
           '</a>' +
         '</div>';
 
-      _lightboxes.sm.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
+      _lightboxes.shakemap.add(`<img src="${data.shakemapImg}" alt="ShakeMap" />`);
     }
 
     return product;
@@ -418,7 +463,31 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Refresh FM, MT beachballs.
+   * Get all thumbnail Elements that have Lightbox content.
+   *
+   * @return thumbs {Array}
+   */
+  _getThumbs = function () {
+    var div,
+        thumbs;
+
+    div = document.querySelector('#summaryPane .thumbs');
+    thumbs = [];
+
+    Object.keys(_lightboxes).forEach(id => {
+      _addThumb(thumbs, id, div.querySelector(`.${id} > a`));
+
+      if (id === 'focal-mechanism' || id === 'moment-tensor') {
+        _addBeachBalls(id);
+        _addThumb(thumbs, id, document.querySelector(`#mapPane canvas.${id}`));
+      }
+    });
+
+    return thumbs;
+  };
+
+  /**
+   * Refresh FM, MT BeachBalls.
    */
   _refreshBeachBalls = function () {
     var fm,
@@ -486,30 +555,20 @@ var Mainshock = function (options) {
    */
   _this.addListeners = function () {
     var button,
-        div,
-        product,
         thumbs;
 
     button = document.getElementById('download');
-    div = document.querySelector('#summaryPane .thumbs');
-    thumbs = {
-      dyfi: div.querySelector('.dyfi a'),
-      sm: div.querySelector('.shakemap a')
-    };
+    thumbs = _getThumbs();
 
-    // Load external feed data for RTF Summary
+    // Load external feed data and create RTF Summary
     button.addEventListener('click', _app.Feeds.loadFeeds);
 
-    // Show full-size images/details in a Lightbox
-    Object.keys(thumbs).forEach(key => {
-      product = thumbs[key];
-
-      if (product) {
-        product.addEventListener('click', e => {
-          e.preventDefault();
-          _lightboxes[key].show();
-        });
-      }
+    // Show Lightbox content
+    thumbs.forEach(thumb => {
+      thumb.el.addEventListener('click', e => {
+        e.preventDefault();
+        _lightboxes[thumb.id].show();
+      });
     });
   };
 
@@ -545,6 +604,8 @@ var Mainshock = function (options) {
     _json = null;
     _lightboxes = null;
 
+    _addBeachBalls = null;
+    _addThumb = null;
     _createSummary = null;
     _getBubbles = null;
     _getData = null;
@@ -552,6 +613,8 @@ var Mainshock = function (options) {
     _getPager = null;
     _getShakeAlert = null;
     _getShakeMap = null;
+    _getTectonic = null;
+    _getThumbs = null;
     _refreshBeachBalls = null;
     _renderUpdate = null;
     _setJson = null;
