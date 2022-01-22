@@ -168,7 +168,7 @@ tr {
 
 .bubble {
   background: $bg-color;
-  border-radius: 12px;
+  border-radius: $content-border-radius;
   box-shadow: 0 3px 14px 0 rgba(102 ,102, 102, 0.1);
   padding: 1rem;
 }

@@ -6,7 +6,8 @@
 
 $separator-color: color.scale($accent-color, $lightness: 80%);
 
-#mapPane, #searchBar {
+#mapPane,
+#searchBar {
   .leaflet-container {
     font: $font-size $font-family;
   }
@@ -161,5 +162,9 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     [datetime] {
       min-width: 20rem; // prevent datetime from wrapping
     }
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: $content-border-radius;
   }
 }
