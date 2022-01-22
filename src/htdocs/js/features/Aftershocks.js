@@ -250,7 +250,7 @@ var Aftershocks = function (options) {
    * @return html {String}
    */
   _getParameters = function (obj) {
-    var html = '<h4>Parameters <a href="#">show</a></h4>';
+    var html = '<h4>Parameters <a href="#" class="button">show</a></h4>';
 
     html += '<dl class="params alt hide">';
 
@@ -292,13 +292,8 @@ var Aftershocks = function (options) {
   _toggleParams = function (el) {
     var params = document.querySelector('#summaryPane .params');
 
+    el.classList.toggle('selected');
     params.classList.toggle('hide');
-
-    if (el.textContent === 'show') {
-      el.textContent = 'hide';
-    } else {
-      el.textContent = 'show';
-    }
   };
 
   // ----------------------------------------------------------
@@ -315,7 +310,7 @@ var Aftershocks = function (options) {
 
     el = document.querySelector('#summaryPane .aftershocks');
     buttons = el.querySelectorAll('.timeframe li');
-    toggle = el.querySelector('h4 a');
+    toggle = el.querySelector('a.button');
 
     // Set the selected option on the 'radio-bar'
     buttons.forEach(button =>

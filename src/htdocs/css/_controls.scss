@@ -29,8 +29,30 @@ $dist: $track-w - $thumb-d;
   width: $track-w;
 }
 
-/* Button els
+/* Buttons
 --------------------------------------------- */
+
+a.button {
+  border: 1px solid transparent;
+  border-radius: $button-border-radius;
+  font: bold .875rem $font-family-headers;
+  padding: .125rem .375rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all .15s ease-in;
+
+  &:hover {
+    background: $accent-color-lightest;
+    border-color: $accent-color;
+    transition: all $effect-on-duration ease-out;
+  }
+
+  &.selected {
+    background: $accent-color;
+    color: $bg-color;
+    transition: all $effect-on-duration ease-out;
+  }
+}
 
 button {
   appearance: none;
