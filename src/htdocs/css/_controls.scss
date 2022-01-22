@@ -41,7 +41,7 @@ button {
   cursor: pointer;
   font: 700 1.125rem $font-family-headers;
   margin: 1rem 0 0;
-  padding: 5px 12px;
+  padding: .3125rem .75rem;
   text-align: center;
   text-transform: uppercase;
   transition: all $effect-off-duration ease-in;
@@ -69,7 +69,7 @@ button {
     display: block;
     font-size: .75rem;
     font-weight: 400;
-    margin-top: -.15rem;
+    margin-top: -.125rem;
   }
 
   &[disabled] {

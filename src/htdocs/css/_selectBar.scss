@@ -3,8 +3,8 @@
 #selectBar {
   button {
     margin-bottom: 1.5rem; // ensure StatusBar doesn't obscure button
-    padding-bottom: 2px;
-    padding-top: 2px;
+    padding-bottom: .1875rem;
+    padding-top: .1875rem;
 
     &:after {
       content: 'Mainshock';
