@@ -1,45 +1,6 @@
 @use '../mixins' as *;
 @use '../variables' as *;
 
-img {
-  &.mmiI {
-    border-color: $border-color-lighter;
-  }
-  &.mmiII {
-    border-color: $mmiII-color;
-  }
-  &.mmiIII {
-    border-color: $mmiIII-color;
-  }
-  &.mmiIV {
-    border-color: $mmiIV-color;
-  }
-  &.mmiV {
-    border-color: $mmiV-color;
-  }
-  &.mmiVI {
-    border-color: $mmiVI-color;
-  }
-  &.mmiVII {
-    border-color: $mmiVII-color;
-  }
-  &.mmiVIII {
-    border-color: $mmiVIII-color;
-  }
-  &.mmiIX {
-    border-color: $mmiIX-color;
-  }
-  &.mmiX {
-    border-color: $mmiX-color;
-  }
-  &.mmiXI {
-    border-color: $mmiXI-color;
-  }
-  &.mmiXII {
-    border-color: $mmiXII-color;
-  }
-}
-
 #summaryPane {
   #download {
     margin-top: .5rem;
@@ -271,6 +232,48 @@ img {
     div {
       padding: 0 .5rem;
       width: 50%;
+    }
+  }
+}
+
+#summaryPane,
+.lightbox {
+  img {
+    &.mmiI {
+      border-color: $border-color-lighter;
+    }
+    &.mmiII {
+      border-color: $mmiII-color;
+    }
+    &.mmiIII {
+      border-color: $mmiIII-color;
+    }
+    &.mmiIV {
+      border-color: $mmiIV-color;
+    }
+    &.mmiV {
+      border-color: $mmiV-color;
+    }
+    &.mmiVI {
+      border-color: $mmiVI-color;
+    }
+    &.mmiVII {
+      border-color: $mmiVII-color;
+    }
+    &.mmiVIII {
+      border-color: $mmiVIII-color;
+    }
+    &.mmiIX {
+      border-color: $mmiIX-color;
+    }
+    &.mmiX {
+      border-color: $mmiX-color;
+    }
+    &.mmiXI {
+      border-color: $mmiXI-color;
+    }
+    &.mmiXII {
+      border-color: $mmiXII-color;
     }
   }
 }
