@@ -149,24 +149,6 @@
     }
   }
 
-  .pager {
-    &.bubble {
-      padding: 1rem .5rem;
-    }
-
-    h4 {
-      margin-top: 1rem;
-
-      &:first-of-type {
-        margin-top: 0;
-      }
-    }
-
-    img {
-      max-width: 100%;
-    }
-  }
-
   .products {
     align-items: flex-start;
     display: flex;
