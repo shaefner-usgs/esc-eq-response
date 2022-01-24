@@ -5,6 +5,11 @@
     margin-top: .25rem;
   }
 
+  label span {
+    font-weight: normal;
+    text-transform: none;
+  }
+
   .aftershocks,
   .foreshocks,
   .historical {

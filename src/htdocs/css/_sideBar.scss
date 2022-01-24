@@ -32,11 +32,10 @@
   }
 
   label {
-    color: $text-color-lighter;
+    @include labels;
+
     cursor: pointer;
     display: block;
-    letter-spacing: .015rem;
-    line-height: 1;
     margin: 1.25rem 0 .25rem;
   }
 
