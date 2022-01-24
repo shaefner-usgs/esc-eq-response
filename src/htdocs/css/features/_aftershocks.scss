@@ -5,7 +5,7 @@
 #summaryPane {
   .aftershocks {
     .params {
-      margin: .25rem 0 1.25rem;
+      margin: .25rem 0 1.5rem;
 
       &.hide {
         display: none;
@@ -15,10 +15,6 @@
         max-width: 7rem;
       }
     }
-
-    h4 {
-      margin-top: 1.25rem;
-    }
   }
 
   .probabilities {
@@ -26,6 +22,16 @@
     list-style: none;
     margin: 0;
     padding: 0;
+
+    &+ h4 {
+      align-items: baseline;
+      display: flex;
+      margin-top: 1.25rem;
+
+      a {
+        margin-left: .375rem;
+      }
+    }
 
     a {
       border: 1px solid $border-color;
