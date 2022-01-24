@@ -26,7 +26,7 @@
 
     &.hide {
       opacity: 0;
-      transition: all .15s ease-in;
+      transition: all $effect-off-duration-shorter ease-in;
       visibility: hidden;
     }
   }

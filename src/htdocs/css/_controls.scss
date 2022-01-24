@@ -39,7 +39,7 @@ a.button {
   padding: .125rem .375rem;
   text-decoration: none;
   text-transform: uppercase;
-  transition: all .15s ease-in;
+  transition: all $effect-off-duration-shorter ease-in;
 
   &:hover {
     background: $accent-color-lightest;
@@ -66,7 +66,7 @@ button {
   padding: .3125rem .75rem;
   text-align: center;
   text-transform: uppercase;
-  transition: all $effect-off-duration ease-in;
+  transition: all $effect-off-duration-shorter ease-in;
   user-select: none;
   white-space: nowrap;
 
@@ -147,7 +147,7 @@ button {
     padding: .25rem .5rem;
     text-align: center;
     text-transform: uppercase;
-    transition: all .15s ease-in;
+    transition: all $effect-off-duration-shorter ease-in;
 
     &:hover {
       background: $accent-color-lightest;

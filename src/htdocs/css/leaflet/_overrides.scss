@@ -53,7 +53,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
   .leaflet-control-edit a,
   .leaflet-control-zoom a {
-    transition: all .15s ease-in;
+    transition: all $effect-off-duration-shorter ease-in;
 
     &:hover {
       background: $accent-color-lightest;
