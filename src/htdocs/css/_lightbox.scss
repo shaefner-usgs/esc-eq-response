@@ -1,12 +1,13 @@
 @use 'variables' as *;
 
 .lightbox {
-  background: rgba(0, 0, 0, .9);
+  background: rgba(0, 0, 0, .93);
   bottom: 0;
   cursor: pointer;
   display: flex;
   left: 0;
   opacity: 1;
+  padding: 1rem;
   position: fixed;
   right: 0;
   top: 0;
@@ -60,6 +61,8 @@
 @media only screen
 and (max-width: $breakpoint-phone-width) {
   .lightbox {
+    padding: 0;
+
     .content {
       border-radius: 0;
     }
