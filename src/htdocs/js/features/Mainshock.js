@@ -54,6 +54,7 @@ var Mainshock = function (options) {
       _getBubbles,
       _getData,
       _getDyfi,
+      _getNotice,
       _getPager,
       _getShakeAlert,
       _getShakeMap,
@@ -127,6 +128,7 @@ var Mainshock = function (options) {
         data,
         dyfi,
         html,
+        notice,
         pager,
         shakeAlert,
         shakemap,
@@ -135,11 +137,13 @@ var Mainshock = function (options) {
     data = _getData();
     bubbles = _getBubbles(data);
     dyfi = _getDyfi(data);
+    notice = _getNotice(data);
     pager = _getPager(data);
     shakeAlert = _getShakeAlert(data);
     shakemap = _getShakeMap(data);
     tectonic = _getTectonic(data);
     html = L.Util.template(
+      notice +
       '<div class="details bubble">' +
         '<ul>' +
           '<li class="mag">' +
@@ -271,8 +275,10 @@ var Mainshock = function (options) {
         eqTime,
         fatalImg,
         fm,
+        header,
         mmiInt,
         mt,
+        notice,
         pager,
         products,
         shakeAlert,
@@ -287,6 +293,7 @@ var Mainshock = function (options) {
     dyfi = products.dyfi;
     eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC();
     fm = products['focal-mechanism'];
+    header = products['general-header'];
     mmiInt = Math.round(_this.json.properties.mmi);
     mt = products['moment-tensor'];
     pager = products.losspager;
@@ -301,6 +308,9 @@ var Mainshock = function (options) {
     }
     if (Array.isArray(fm) || Array.isArray(mt)) {
       visibility = 'show';
+    }
+    if (Array.isArray(header)) {
+      notice = header[0].contents[''].bytes;
     }
     if (Array.isArray(pager)) {
       econImg = pager[0].contents['alertecon.png'].url;
@@ -331,6 +341,7 @@ var Mainshock = function (options) {
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       level: AppUtil.getShakingValues([mmiInt])[0].level || '',
+      notice: notice || '',
       pagerBubble: _this.data.bubbles.pager || '',
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapBubble: _this.data.bubbles.shakemap || '',
@@ -366,6 +377,23 @@ var Mainshock = function (options) {
     }
 
     return product;
+  };
+
+  /**
+   * Get the "Notice" header HTML template.
+   *
+   * @param data {Object}
+   *
+   * @return item {String}
+   */
+  _getNotice = function (data) {
+    var item = '';
+
+    if (data.notice) {
+      item = '<p class="notice">{notice}</p>';
+    }
+
+    return item;
   };
 
   /**
