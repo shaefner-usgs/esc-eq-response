@@ -36,7 +36,8 @@
 
     cursor: pointer;
     display: block;
-    margin: 1.25rem 0 .25rem;
+    margin: 1.25rem 0 0;
+    padding-bottom: .25rem;
   }
 
   section.hide {
