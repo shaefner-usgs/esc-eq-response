@@ -81,10 +81,10 @@ var MapPane = function (options) {
 
     _app = options.app;
     _bounds = L.latLngBounds();
-    _defaultBounds = L.latLngBounds([ // centered on contiguous U.S.
+    _defaultBounds = L.latLngBounds( // centered on contiguous U.S.
       [8, -143],
       [60, -48]
-    ]);
+    );
     _el = options.el || document.createElement('section');
     _initialView = true;
     _placeholders = {};
@@ -425,7 +425,16 @@ var MapPane = function (options) {
       _searchBounds = _defaultBounds;
 
       if (AppUtil.getParam('region') === 'customRegion') {
-        _searchBounds = item.mapLayer.getBounds();
+        _searchBounds = L.latLngBounds(
+          [
+            Number(AppUtil.getParam('minlatitude')),
+            Number(AppUtil.getParam('minlongitude'))
+          ],
+          [
+            Number(AppUtil.getParam('maxlatitude')),
+            Number(AppUtil.getParam('maxlongitude'))
+          ]
+        );
       }
 
       _staticLayers.search = {};
