@@ -250,7 +250,7 @@ var Aftershocks = function (options) {
    * @return html {String}
    */
   _getParameters = function (obj) {
-    var html = '<h4>Parameters <a href="#" class="button">show</a></h4>';
+    var html = '<h4>Parameters <a class="button">Show</a></h4>';
 
     html += '<dl class="params alt hide">';
 
