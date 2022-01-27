@@ -2,7 +2,7 @@
 
 @use 'variables' as *;
 
-/* Flatpickr overrides */
+/* Flatpickr overrides and 'Now' button additions */
 
 .flatpickr-wrapper {
   &.invalid {
@@ -148,6 +148,17 @@
     .flatpickr-next-month {
       right: 5px;
     }
+  }
+
+  .flatpickr-next-month.flatpickr-disabled + .flatpickr-now {
+    display: inline; // show 'Now' button
+  }
+
+  .flatpickr-now {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 6px;
   }
 
   .flatpickr-time {
