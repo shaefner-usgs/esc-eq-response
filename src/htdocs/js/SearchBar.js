@@ -40,24 +40,33 @@ var SearchBar = function (options) {
       _app,
       _customParams,
       _el,
+      _endtime,
       _flatpickrs,
       _initialView,
       _map,
-      _period,
-      _region,
+      _nowButton,
       _regionLayer,
       _searchLayer,
+      _selPeriod,
+      _selRegion,
+      _starttime,
 
       _addControl,
       _addListeners,
+      _addNowButton,
       _cancelEdit,
       _getParams,
       _initFlatpickr,
       _initMap,
       _isValid,
       _loadFeed,
+      _onDateChange,
+      _onDateClose,
+      _onEndOpen,
+      _onStartOpen,
       _setControls,
       _setMinutes,
+      _setNow,
       _setOption,
       _setParams,
       _setUtcDay,
@@ -131,7 +140,7 @@ var SearchBar = function (options) {
 
     // Set the selected option on a 'radio-bar'
     buttons.forEach(button =>
-      button.addEventListener('click', function () {
+      button.addEventListener('click', function() {
         _setOption.call(this);
         _this.setStatus();
       })
@@ -146,6 +155,12 @@ var SearchBar = function (options) {
       })
     );
 
+    // Set the end time to 'Now' when the user clicks the 'Now' button
+    _nowButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      _setNow();
+    });
+
     // Search the catalog when the user clicks the 'Search' button
     search.addEventListener('click', () => {
       location.href = '#mapPane';
@@ -155,6 +170,23 @@ var SearchBar = function (options) {
 
     // Update the range slider
     slider.addEventListener('input', _updateSlider);
+  };
+
+  /**
+   * Add a 'Now' button to the endtime Flatpickr calendar.
+   */
+  _addNowButton = function () {
+    var button,
+        div;
+
+    button = document.createElement('a');
+    div = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-months');
+
+    button.classList.add('button', 'flatpickr-now');
+    button.textContent = 'Now';
+    div.appendChild(button);
+
+    _nowButton = _el.querySelector('.flatpickr-now');
   };
 
   /**
@@ -189,8 +221,8 @@ var SearchBar = function (options) {
 
     if (period === 'customPeriod') {
       Object.assign(params, {
-        endtime: document.getElementById('endtime').value,
-        starttime: document.getElementById('starttime').value
+        endtime: _endtime.value,
+        starttime: _starttime.value
       });
     }
 
@@ -225,67 +257,39 @@ var SearchBar = function (options) {
       defaultHour: 0,
       enableTime: true,
       monthSelectorType: 'static',
-      onChange: function() {
-        _this.setStatus();
-        _setUtcDay(this.days);
-        _setValidity(this.input);
-      },
-      onClose: function () {
-        _setValidity(this.input);
-      },
+      onChange: _onDateChange,
+      onClose: _onDateClose,
       onMonthChange: function() {
         _setUtcDay(this.days);
       },
       onYearChange: function() {
         _setUtcDay(this.days);
       },
-      static: true
+      static: true,
+      time_24hr: true
     };
 
     _flatpickrs = {
       endtime: flatpickr('#endtime',
         Object.assign({}, opts, {
           altInputClass: 'endtime-alt',
-          onOpen: function() {
-            var maxDate,
-                minDate,
-                now;
-
-            now = new Date();
-            maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
-            minDate = _flatpickrs.starttime.selectedDates[0];
-
-            this.set('maxDate', maxDate);
-            this.set('minDate', minDate);
-            _setUtcDay(this.days);
-          },
+          onOpen: _onEndOpen,
           position: 'auto right'
         })
       ),
       starttime: flatpickr('#starttime',
         Object.assign({}, opts, {
           altInputClass: 'starttime-alt',
-          onOpen: function() {
-            var endDate,
-                maxDate,
-                now;
-
-            endDate = _flatpickrs.endtime.selectedDates[0];
-
-            if (endDate) {
-              maxDate = endDate;
-            } else {
-              now = new Date();
-              maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
-            }
-
-            this.set('maxDate', maxDate);
-            _setUtcDay(this.days);
-          },
+          onOpen: _onStartOpen,
           position: 'auto left'
         })
       )
     };
+
+    _endtime = document.getElementById('endtime');
+    _starttime = document.getElementById('starttime');
+
+    _addNowButton();
   };
 
   /**
@@ -316,26 +320,22 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Check if begin/end dates are both valid (i.e. not empty) or not.
+   * Check if both the starttime and endtime values are valid or not.
    *
    * @return isValid {Boolean}
    */
   _isValid = function () {
-    var endtime,
-        isValid,
-        period,
-        starttime;
+    var isValid,
+        period;
 
-    endtime = document.getElementById('endtime');
     isValid = true; // default
     period = _el.querySelector('ul.period .selected').id;
-    starttime = document.getElementById('starttime');
 
     if (period === 'customPeriod') {
-      isValid = _setValidity(starttime) && _setValidity(endtime);
+      isValid = _setValidity(_starttime) && _setValidity(_endtime);
 
       if (!isValid) {
-        _setValidity(endtime); // be certain that invalid endtime is also flagged
+        _setValidity(_endtime); // be certain that invalid endtime is also flagged
       }
     }
 
@@ -369,12 +369,85 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Handler that is called when a Flatpickr calendar's date is changed.
+   */
+  _onDateChange = function (dates, dateStr) {
+    var datePicked = dates.length > 0 && dateStr;
+
+    _setUtcDay(this.days);
+    _setValidity(this.input);
+
+    // Unset 'Now' when a date is picked by user, but not when reverting in _onDateClose()
+    if (this.input.id === 'endtime' && datePicked) {
+      _nowButton.classList.remove('selected');
+    }
+  };
+
+  /**
+   * Handler that is called when a Flatpickr calendar is closed.
+   */
+  _onDateClose = function () {
+    _setValidity(this.input);
+
+    // Flatpickr lib overrides 'Now' with today's date; revert back to 'Now'
+    if (_nowButton.classList.contains('selected')) {
+      _setNow();
+    }
+
+    _this.setStatus();
+  };
+
+  /**
+   * Handler that is called when the endtime Flatpickr calendar is opened.
+   */
+  _onEndOpen = function () {
+    var maxDate,
+        minDate,
+        now;
+
+    now = new Date();
+    maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
+    minDate = _flatpickrs.starttime.selectedDates[0];
+
+    this.set('maxDate', maxDate);
+    this.set('minDate', minDate);
+    _setUtcDay(this.days);
+
+    // Flatpickr lib strips 'Now' from <input>; put it back
+    if (_nowButton.classList.contains('selected')) {
+      _setNow();
+    }
+  };
+
+  /**
+   * Handler that is called when the starttime Flatpickr calendar is opened.
+   */
+  _onStartOpen = function () {
+    var endDate,
+        maxDate,
+        now;
+
+    endDate = _flatpickrs.endtime.selectedDates[0];
+
+    if (endDate) {
+      maxDate = endDate;
+    } else {
+      now = new Date();
+      maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
+    }
+
+    this.set('maxDate', maxDate);
+    _setUtcDay(this.days);
+  };
+
+  /**
    * Set the UI controls to match the values of the URL params (or to the
    * default value if a param is not set). The selected 'radio-bar' options are
    * set in _this.postInit.
    */
   _setControls = function () {
-    var minmagnitude,
+    var endtime,
+        minmagnitude,
         output,
         slider,
         vals;
@@ -388,8 +461,8 @@ var SearchBar = function (options) {
       region: AppUtil.getParam('region') || _DEFAULTS.region
     };
 
-    _period = document.getElementById(vals.period);
-    _region = document.getElementById(vals.region);
+    _selPeriod = document.getElementById(vals.period);
+    _selRegion = document.getElementById(vals.region);
 
     minmagnitude.value = vals.minmagnitude;
     output.value = vals.minmagnitude;
@@ -397,12 +470,19 @@ var SearchBar = function (options) {
 
     _app.setSliderStyles(minmagnitude);
 
-    if (_period.id === 'customPeriod') {
-      _flatpickrs.endtime.setDate(AppUtil.getParam('endtime'));
+    if (_selPeriod.id === 'customPeriod') {
+      endtime = AppUtil.getParam('endtime');
+
+      if (endtime === 'now') {
+        _setNow();
+      } else {
+        _flatpickrs.endtime.setDate(endtime);
+      }
+
       _flatpickrs.starttime.setDate(AppUtil.getParam('starttime'));
     }
 
-    if (_region.id === 'customRegion') {
+    if (_selRegion.id === 'customRegion') {
       _regionLayer = L.rectangle([
         [
           AppUtil.getParam('maxlatitude'),
@@ -446,10 +526,35 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Set the endtime to 'Now' on the Flatpickr calendar and its <input> fields.
+   */
+  _setNow = function () {
+    var altInput,
+        flatpickr,
+        hour,
+        minute;
+
+    altInput = _el.querySelector('.endtime-alt');
+    flatpickr = _flatpickrs.endtime;
+    hour = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-hour');
+    minute = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-minute');
+
+    flatpickr.clear();
+
+    altInput.value = 'Now';
+    hour.value = '00';
+    minute.value = '00';
+    _endtime.value = 'now';
+
+    _nowButton.classList.add('selected');
+    _setValidity(_endtime);
+  };
+
+  /**
    * Wrapper method to set the selected 'radio-bar' option and also render the
    * map/cancel the edit depending on the current state.
    */
-  _setOption = function() {
+  _setOption = function () {
     _app.setOption.call(this);
 
     if (this.id === 'customRegion') {
@@ -516,17 +621,21 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Flag a date field as invalid when no date is set.
+   * Flag a date field when no date is set or the date is invalid.
    *
    * @param input {Element}
    *
    * @return {Boolean}
-   *     whether or not the input is marked as valid
+   *     whether or not the <input> is marked as valid
    */
   _setValidity = function (input) {
-    var div = input.closest('.flatpickr-wrapper');
+    var div,
+        isValid;
 
-    if (input.value) {
+    div = input.closest('.flatpickr-wrapper');
+    isValid = /(now|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/.test(input.value);
+
+    if (isValid) {
       div.classList.remove('invalid');
 
       return true;
@@ -587,8 +696,8 @@ var SearchBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _setOption.call(_period);
-    _setOption.call(_region);
+    _setOption.call(_selPeriod);
+    _setOption.call(_selRegion);
     _this.searchCatalog();
   };
 
