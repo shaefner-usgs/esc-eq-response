@@ -40,6 +40,8 @@
   }
 
   .flatpickr-current-month {
+    margin-left: .5rem;
+
     input.cur-year {
       font-weight: 300;
     }
@@ -119,20 +121,25 @@
       top: 6px;
       transition: all $effect-off-duration ease-in;
 
+      &:hover {
+        background: $accent-color-lightest;
+        transition: all $effect-on-duration ease-out;
+      }
+
       &:active {
         background: $accent-color;
         transition: all $effect-on-duration ease-out;
 
         svg {
           stroke: #fff;
-          transition: all $effect-on-duration ease-out;
+          transition: stroke $effect-on-duration ease-out;
         }
       }
 
       svg {
         stroke: $accent-color;
         stroke-width: 1px;
-        transition: all $effect-off-duration ease-in;
+        transition: none;
       }
     }
     .flatpickr-prev-month {
@@ -146,8 +153,16 @@
   .flatpickr-time {
     border-color: $accent-color-lighter !important;
 
+    &:last-child {
+      border-radius: 0 0 $button-border-radius 0;
+
+      .arrowUp,
+      .arrowDown {
+        border-right: 0;
+      }
+    }
+
     .flatpickr-am-pm {
-      border-radius: 0 0 $button-border-radius + 1 0;
       color: $text-color;
 
       &:focus {
