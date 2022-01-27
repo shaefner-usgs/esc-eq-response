@@ -226,7 +226,14 @@ var SearchBar = function (options) {
       });
     }
 
-    if (region === 'customRegion') {
+    if (region === 'ca-nv') {
+      Object.assign(params, {
+        maxlatitude: 42.10,
+        maxlongitude: -114.00,
+        minlatitude: 32.40,
+        minlongitude: -124.60
+      });
+    } else if (region === 'customRegion') {
       _cancelEdit();
 
       _map.eachLayer(layer => {

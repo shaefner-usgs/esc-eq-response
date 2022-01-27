@@ -429,10 +429,12 @@ var MapPane = function (options) {
    */
   _this.addLayer = function (item) {
     var name,
-        placeholder;
+        placeholder,
+        region;
 
     name = item.name;
     placeholder = _placeholders[item.id]; // name and 'loader' in layer control
+    region = AppUtil.getParam('region');
 
     item.mapLayer.id = item.id; // need access to Item's id from Leaflet layer
 
@@ -443,7 +445,7 @@ var MapPane = function (options) {
     if (item.id === 'search') {
       _searchBounds = _defaultBounds;
 
-      if (AppUtil.getParam('region') === 'customRegion') {
+      if (region && region !== 'worldwide') {
         _searchBounds = L.latLngBounds(
           [
             Number(AppUtil.getParam('minlatitude')),
