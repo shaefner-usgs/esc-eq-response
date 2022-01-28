@@ -340,8 +340,7 @@ var MapPane = function (options) {
    * @param animate {Boolean} default is false
    */
   _setView = function (bounds, animate = false) {
-    var nativeZoom,
-        point,
+    var point,
         status,
         x;
 
@@ -356,24 +355,9 @@ var MapPane = function (options) {
 
     if (bounds.isValid()) {
       _map.fitBounds(bounds, {
-        animate: false
-      });
-
-      nativeZoom = _map.getZoom(); // Zoom level w/o accounting for sidebar, header
-
-      _map.fitBounds(bounds, {
         animate: animate,
         paddingTopLeft: point // accommodate sidebar, header
       });
-
-      // Leaflet sometimes calculates the zoom level incorrectly - override it
-      if (_map.getZoom() > nativeZoom) {
-        _map.setZoom(nativeZoom, {
-          animate: false
-        }).panBy(L.point(-x/4, 0), { // accommodate sidebar
-          animate: false
-        });
-      }
 
       if (status === 'complete' && _app.getPaneId() === 'mapPane') {
         _initialView = false;
