@@ -353,6 +353,25 @@ AppUtil.round = function (num, precision = 0, empty = '–') {
 };
 
 /**
+ * Round numbers greater than 10,000 to thousands value w/ ' k' appended
+ * (i.e. '10 k'). For numbers less than 10,000, round to the nearest whole
+ * number.
+ *
+ * @param num {Number}
+ *
+ * @return {String}
+ */
+AppUtil.roundThousands = function (num) {
+  num = Number(num);
+
+  if (Math.round(num) < 10000) {
+    return num.toString();
+  }
+
+  return AppUtil.addCommas(Math.round(num / 1000)) + ' k';
+};
+
+/**
  * Set the given URL parameter to the given value and update the URL.
  *
  * @param name {String}
