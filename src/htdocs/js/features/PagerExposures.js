@@ -78,7 +78,7 @@ var PagerExposures = function (options) {
         data = {
           intensity: shaking[i].intensity,
           level: shaking[i].level,
-          population: AppUtil.addCommas(population[i])
+          population: AppUtil.roundThousands(population[i])
         };
         html += L.Util.template(
           '<tr>' +
@@ -97,7 +97,7 @@ var PagerExposures = function (options) {
           if (mmi === Number(AppUtil.round(city.mmi, 0))) {
             data = {
               name: city.name,
-              population: AppUtil.addCommas(city.pop)
+              population: AppUtil.roundThousands(city.pop)
             };
             html += L.Util.template(
               '<tr class="city">' +
