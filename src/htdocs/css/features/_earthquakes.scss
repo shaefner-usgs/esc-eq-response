@@ -57,6 +57,7 @@
     td {
       &.total {
         background: $bg-color-darker;
+        color: #222;
       }
 
       &:not(:first-child) {
@@ -150,6 +151,12 @@
         span:before {
           border-color: $text-color transparent;
         }
+      }
+
+      em {
+        font-family: $font-family-headers;
+        font-style: normal;
+        font-weight: normal;
       }
     }
 

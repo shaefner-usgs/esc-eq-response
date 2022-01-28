@@ -617,8 +617,8 @@ var Earthquakes = function (options) {
         '<tr class="m{magInt}" title="View earthquake on map">' +
           '<td class="mag" data-sort="{mag}"><span>{magType} </span>{magDisplay}</td>' +
           '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
-          '<td class="location">{location}</td>' +
           '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
+          '<td class="location">{location}</td>' +
           '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
           '<td class="eqid">{eqid}</td>' +
         '</tr>';
@@ -629,9 +629,9 @@ var Earthquakes = function (options) {
             '<thead>' +
               '<tr class="no-sort">' +
                 '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
-                '<th class="{utcTime}" data-sort-order="desc">Time (UTC)</th>' +
-                '<th class="{location}">Location</th>' +
+                '<th class="{utcTime}" data-sort-order="desc">Time <em>(UTC)</em></th>' +
                 '<th class="{depth}" data-sort-method="number">Depth</th>' +
+                '<th class="{location}">Location</th>' +
                 '<th class="{distance}" data-sort-method="number">' +
                   '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
                 '</th>' +
