@@ -90,6 +90,7 @@ var SearchBar = function (options) {
       'starttime'
     ];
     _el = options.el || document.createElement('section');
+    _endtime = document.getElementById('endtime');
     _initialView = true;
     _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
@@ -98,6 +99,7 @@ var SearchBar = function (options) {
     _searchLayer = SearchLayer({
       app: _app
     });
+    _starttime = document.getElementById('starttime');
 
     _initFlatpickr();
     _setControls();
@@ -292,9 +294,6 @@ var SearchBar = function (options) {
         })
       )
     };
-
-    _endtime = document.getElementById('endtime');
-    _starttime = document.getElementById('starttime');
 
     _addNowButton();
   };
