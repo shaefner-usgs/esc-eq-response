@@ -87,6 +87,7 @@
       background: $accent-color !important;
       border-color: $accent-color;
       color: $bg-color !important;
+      cursor: auto;
     }
 
     &.today {
@@ -159,6 +160,10 @@
     position: absolute;
     right: 5px;
     top: 6px;
+
+    &.selected:hover {
+      cursor: auto;
+    }
   }
 
   .flatpickr-time {
