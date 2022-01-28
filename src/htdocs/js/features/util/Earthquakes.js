@@ -921,6 +921,9 @@ var Earthquakes = function (options) {
     rows = '';
     tableClasses = ['bin'];
 
+    if (days <= 7) {
+      tableClasses.push('hide-month');
+    }
     if (days <= 30) {
       tableClasses.push('hide-year');
     }

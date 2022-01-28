@@ -113,8 +113,9 @@
     }
   }
 
+  .hide-month .month,
   .hide-year .year {
-    display: none; // hide year column when duration is 30 days or less
+    display: none; // hide column when duration is shorter than next smaller category
   }
 
   .list {
