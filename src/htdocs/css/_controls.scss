@@ -44,6 +44,7 @@ a.button {
   &:hover {
     background: $accent-color-lightest;
     border-color: $accent-color;
+    cursor: pointer;
     transition: all $effect-on-duration ease-out;
   }
 
