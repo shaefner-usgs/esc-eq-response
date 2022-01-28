@@ -29,7 +29,8 @@ L.Control.EditableRectangle = L.Control.extend({
         divClasses,
         instructions,
         newRegion,
-        region;
+        region,
+        status;
 
     defaultTitle = 'Create a new custom region';
     divClasses = [
@@ -68,6 +69,14 @@ L.Control.EditableRectangle = L.Control.extend({
 
     L.DomEvent.on(button, 'click', e => {
       L.DomEvent.stop(e);
+
+      // Stop Safari from registering two clicks, which effectively cancels button click
+      if (status === 'clicked') return;
+
+      status = 'clicked';
+      setTimeout(() => {
+        status = null;
+      }, 250);
 
       instructions.classList.toggle('hide');
       button.classList.toggle('selected');
