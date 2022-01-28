@@ -152,6 +152,7 @@ var Mainshock = function (options) {
             '<small>{magType}</small>' +
           '</li>' +
           bubbles +
+          shakeAlert +
           '<li class="date">' +
             '<strong>Date</strong>' +
             '<span>{date}</span>' +
@@ -171,7 +172,6 @@ var Mainshock = function (options) {
             '<strong>Location</strong>' +
             '<span>{location}</span>' +
           '</li>' +
-          shakeAlert +
           '<li class="status">' +
             '<strong>Status</strong>' +
             '<span>{statusIcon}</span>' +
