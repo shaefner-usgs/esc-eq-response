@@ -719,11 +719,7 @@ var SearchBar = function (options) {
    * Search the earthquake catalog.
    */
   _this.searchCatalog = function () {
-    var params,
-        search;
-
-    params = _getParams();
-    search = document.getElementById('search');
+    var params = _getParams();
 
     // Check that custom dates are valid if applicable
     if (_isValid()) {
@@ -734,7 +730,7 @@ var SearchBar = function (options) {
       _loadFeed();
     }
 
-    search.classList.add('dim');
+    _this.setStatus();
   };
 
   /**
@@ -762,9 +758,9 @@ var SearchBar = function (options) {
     });
 
     if (AppUtil.shallowEqual(currentParams, newParams)) {
-      search.classList.add('dim');
+      search.textContent = 'Refresh';
     } else {
-      search.classList.remove('dim');
+      search.textContent = 'Search';
     }
   };
 
