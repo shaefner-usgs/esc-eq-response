@@ -335,7 +335,6 @@ var Mainshock = function (options) {
     return Object.assign({}, _this.data, {
       date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
       dayofweek: eqTime.toFormat('cccc'),
-      depthDisplay: AppUtil.round(_this.data.depth, 1),
       dyfiBubble: _this.data.bubbles.dyfi || '',
       dyfiImg: dyfiImg || '',
       econImg: econImg || '',
