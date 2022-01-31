@@ -639,6 +639,7 @@ var Mainshock = function (options) {
     _getData = null;
     _getDyfi = null;
     _getPager = null;
+    _getNotice = null;
     _getShakeAlert = null;
     _getShakeMap = null;
     _getTectonic = null;
