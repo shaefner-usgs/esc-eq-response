@@ -243,11 +243,12 @@ var Rtf = function (options) {
       },
       magDisplay: mainshock.data.magDisplay,
       magType: mainshock.data.magType,
+      notice: products.notice || '',
       pager: products.pager || {},
       'pager-cities': pagerCities.cities || [],
       'pager-exposures': pagerExposures.exposures || {},
       shakemap: products.shakemap || '',
-      summary: products.summary || '',
+      tectonic: products.tectonic || '',
       time: {
         local: mainshock.data.localTime,
         utc: mainshock.data.utcTime
@@ -272,8 +273,8 @@ var Rtf = function (options) {
   };
 
   /**
-   * Check if DYFI, PAGER, ShakeMap and Summary products exist, and if they do,
-   * return select properties for each.
+   * Check if DYFI, Notice, PAGER, ShakeMap and Tectonic products exist, and if
+   * they do, return select properties for each.
    *
    * @param products {Object}
    *
@@ -282,9 +283,10 @@ var Rtf = function (options) {
   _getProducts = function (products) {
     var contents,
         dyfi,
+        notice,
         pager,
         shakemap,
-        summary;
+        tectonic;
 
     if (products.dyfi) {
       contents = products.dyfi[0].contents;
@@ -294,6 +296,10 @@ var Rtf = function (options) {
         maxmmi: Number(products.dyfi[0].properties.maxmmi),
         responses: Number(products.dyfi[0].properties.numResp)
       };
+    }
+
+    if (products['general-header']) {
+      notice = products['general-header'][0].contents[''].bytes;
     }
 
     if (products.losspager) {
@@ -317,14 +323,15 @@ var Rtf = function (options) {
     }
 
     if (products['general-text']) {
-      summary = products['general-text'][0].contents[''].bytes;
+      tectonic = products['general-text'][0].contents[''].bytes;
     }
 
     return {
       dyfi: dyfi,
+      notice: notice,
       pager: pager,
       shakemap: shakemap,
-      summary: summary
+      tectonic: tectonic
     };
   };
 

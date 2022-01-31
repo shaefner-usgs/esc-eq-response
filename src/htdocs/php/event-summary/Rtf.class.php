@@ -75,16 +75,22 @@ class Rtf {
    * Sanitize data from external JSON feeds for known issues.
    */
   private function _cleanData() {
-    // Strip HTML tags, extra whitespace from summary
-    $this->_data->summary = preg_replace('/\s+/', ' ',
-      strip_tags($this->_data->summary)
+    // Strip HTML tags, extra whitespace from tectonic summary
+    $this->_data->tectonic = preg_replace('/\s+/', ' ',
+      strip_tags($this->_data->tectonic)
     );
-    $this->_data->summary = trim($this->_data->summary);
+    $this->_data->tectonic = trim($this->_data->tectonic);
 
-    // Remove header from summary if it exists
-    $this->_data->summary = preg_replace('/^tectonic summary ?/i', '',
-      $this->_data->summary
+    // Remove header from tectonic summary if it exists
+    $this->_data->tectonic = preg_replace('/^tectonic summary ?/i', '',
+      $this->_data->tectonic
     );
+
+    // Strip HTML tags, extra whitespace from notice
+    $this->_data->notice = preg_replace('/\s+/', ' ',
+      strip_tags($this->_data->notice)
+    );
+    $this->_data->notice = trim($this->_data->notice);
 
     // Strip extra whitespace from PAGER summary
     if (property_exists($this->_data, 'pager-comments')) {
@@ -367,6 +373,14 @@ class Rtf {
       $this->_format->h2
     );
 
+    if ($this->_data->notice) {
+      $section2->writeText(
+        $this->_data->notice,
+        $this->_font->body,
+        $this->_format->body
+      );
+    }
+
     $section2->writeText(
       'Date, Time, Location',
       $this->_font->h4,
@@ -604,14 +618,14 @@ class Rtf {
       $this->_format->body
     );
 
-    if ($this->_data->summary) {
+    if ($this->_data->tectonic) {
       $section4->writeText(
         'Tectonic Summary',
         $this->_font->h4,
         $this->_format->h4
       );
       $section4->writeText(
-        $this->_data->summary,
+        $this->_data->tectonic,
         $this->_font->body,
         $this->_format->body
       );
