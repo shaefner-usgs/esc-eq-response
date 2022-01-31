@@ -1,6 +1,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
  * Create PAGER Cities list for PAGER Exposures Feature.
  *
@@ -77,6 +80,10 @@ var PagerCities = function (options) {
     } else if (Array.isArray(json)) { // sometimes data stored as top-level Array
       _this.cities = json.sort(_compare);
     }
+
+    _this.cities.forEach(city => {
+      city.pop = AppUtil.roundThousands(city.pop);
+    });
   };
 
   /**

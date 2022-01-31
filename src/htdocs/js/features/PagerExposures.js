@@ -74,11 +74,11 @@ var PagerExposures = function (options) {
     shaking = _this.exposures.shaking;
 
     mmis.forEach((mmi, i) => {
-      if (mmi >= 2 && population[i] > 0) { // skip mmi below 2 and when nobody affected
+      if (mmi >= 2 && Number(population[i]) !== 0) { // skip mmi below 2 and when nobody affected
         data = {
           intensity: shaking[i].intensity,
           level: shaking[i].level,
-          population: AppUtil.roundThousands(population[i])
+          population: population[i]
         };
         html += L.Util.template(
           '<tr>' +
@@ -97,7 +97,7 @@ var PagerExposures = function (options) {
           if (mmi === Number(AppUtil.round(city.mmi, 0))) {
             data = {
               name: city.name,
-              population: AppUtil.roundThousands(city.pop)
+              population: city.pop
             };
             html += L.Util.template(
               '<tr class="city">' +
@@ -162,12 +162,17 @@ var PagerExposures = function (options) {
    */
   _getExposures = function (json) {
     var exposures,
-        mmi;
+        mmi,
+        population;
 
     mmi = json.population_exposure.mmi;
+    population = json.population_exposure.aggregated_exposure.map(pop =>
+      AppUtil.roundThousands(pop)
+    );
+
     exposures = {
       mmi: mmi.reverse(),
-      population: json.population_exposure.aggregated_exposure.reverse(),
+      population: population.reverse(),
       shaking: AppUtil.getShakingValues(mmi)
     };
 
