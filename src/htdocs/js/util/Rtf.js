@@ -223,7 +223,7 @@ var Rtf = function (options) {
         plots: _plots.aftershocks
       },
       beachballs: beachballs,
-      depth: mainshock.json.geometry.coordinates[2],
+      depthDisplay: mainshock.data.depthDisplay,
       dyfi: products.dyfi || {},
       eqid: mainshock.json.id,
       foreshocks: {

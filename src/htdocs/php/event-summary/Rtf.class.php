@@ -261,7 +261,7 @@ class Rtf {
     $section1 = $this->_rtf->addSection();
 
     $datetime = strip_tags($this->_data->time->utc);
-    if (property_exists($this->_data->time, 'local')) {
+    if ($this->_data->time->local) {
       $datetime .= '<br>' . strip_tags($this->_data->time->local);
     }
 
@@ -313,7 +313,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->depth . ' km',
+      $this->_data->depthDisplay,
       $this->_font->body,
       $this->_format->body
     );
@@ -1438,7 +1438,7 @@ class Rtf {
           $tds = [
             $shaking[$i]->intensity,
             $shaking[$i]->level,
-            $this->_addCommas($population[$i])
+            $population[$i]
           ];
 
           foreach ($tds as $key => $td) {
@@ -1454,7 +1454,7 @@ class Rtf {
               $row ++;
               $tds = [
                 $city->name,
-                $this->_addCommas($city->pop)
+                $city->pop
               ];
 
               $table->getRow($row)->setFont($this->_font->tdLighter);
@@ -1657,7 +1657,7 @@ class Rtf {
 
     $this->_font->td = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#FFFFFF');
     $this->_font->tdBg = new PHPRtfLite_Font(12, 'Helvetica', '#000000', '#F7F7F7');
-    $this->_font->tdLighter = new PHPRtfLite_Font(12, 'Helvetica', '#999999', '#FFFFFF');
+    $this->_font->tdLighter = new PHPRtfLite_Font(12, 'Helvetica', '#666666', '#FFFFFF');
 
     $this->_font->th = new PHPRtfLite_Font(12, 'Helvetica', '#444444', '#FFFFFF');
     $this->_font->th->setBold();
