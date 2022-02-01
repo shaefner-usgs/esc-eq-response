@@ -176,13 +176,15 @@ var SearchBar = function (options) {
 
   /**
    * Add a 'Now' button to the endtime Flatpickr calendar.
+   *
+   * @param flatpickr {Object}
    */
-  _addNowButton = function () {
+  _addNowButton = function (flatpickr) {
     var button,
         div;
 
     button = document.createElement('a');
-    div = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-months');
+    div = flatpickr.calendarContainer.querySelector('.flatpickr-months');
 
     button.classList.add('button', 'flatpickr-now');
     button.textContent = 'Now';
@@ -295,7 +297,7 @@ var SearchBar = function (options) {
       )
     };
 
-    _addNowButton();
+    _addNowButton(_flatpickrs.endtime);
   };
 
   /**
@@ -535,19 +537,19 @@ var SearchBar = function (options) {
    * Set the endtime to 'Now' on the Flatpickr calendar and its <input> fields.
    */
   _setNow = function () {
-    var altInput,
+    var container,
         flatpickr,
         hour,
         minute;
 
-    altInput = _el.querySelector('.endtime-alt');
     flatpickr = _flatpickrs.endtime;
-    hour = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-hour');
-    minute = _el.querySelector('#endtime ~ .flatpickr-calendar .flatpickr-minute');
+    container = flatpickr.calendarContainer;
+    hour = container.querySelector('.flatpickr-hour');
+    minute = container.querySelector('.flatpickr-minute');
 
     flatpickr.clear();
 
-    altInput.value = 'Now';
+    flatpickr.altInput.value = 'Now';
     hour.value = '00';
     minute.value = '00';
     _endtime.value = 'now';
