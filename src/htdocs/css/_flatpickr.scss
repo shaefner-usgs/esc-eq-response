@@ -201,10 +201,11 @@
 
     .flatpickr-minute {
       border-radius: 0;
-    }
 
-    .numInputWrapper:first-child {
-      border-radius: 0 0 0 $button-border-radius + 2px;
+      &:invalid {
+        border: none;
+        box-shadow: none;
+      }
     }
   }
 
@@ -213,6 +214,10 @@
   }
 
   .numInputWrapper {
+    &:first-child {
+      border-radius: 0 0 0 $button-border-radius + 2px;
+    }
+
     &:hover {
       background: $accent-color-lightest;
     }
