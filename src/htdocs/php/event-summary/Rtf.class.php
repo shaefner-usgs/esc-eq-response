@@ -589,7 +589,7 @@ class Rtf {
       $section4->addImage(
         $this->_getImage($beachballs->fm),
         $this->_format->image,
-        6
+        10
       );
     }
 
@@ -603,7 +603,7 @@ class Rtf {
       $section4->addImage(
         $this->_getImage($beachballs->mt),
         $this->_format->image,
-        6
+        10
       );
     }
 

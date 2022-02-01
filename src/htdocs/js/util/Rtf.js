@@ -136,8 +136,8 @@ var Rtf = function (options) {
 
     beachballs = {};
     canvasEls = {
-      fm: document.querySelector('#summaryPane .focal-mechanism canvas'),
-      mt: document.querySelector('#summaryPane .moment-tensor canvas')
+      fm: document.querySelector('#focal-mechanismLightbox canvas'),
+      mt: document.querySelector('#moment-tensorLightbox canvas')
     };
 
     Object.keys(canvasEls).forEach(key => {
@@ -189,7 +189,6 @@ var Rtf = function (options) {
    */
   _getPostData = function () {
     var aftershocks,
-        beachballs,
         data,
         feedJson,
         feeds,
@@ -201,7 +200,6 @@ var Rtf = function (options) {
         products;
 
     aftershocks = _app.Features.getFeature('aftershocks');
-    beachballs = _getBeachBalls();
     feeds = _app.Feeds.getFeeds();
     foreshocks = _app.Features.getFeature('foreshocks');
     historical = _app.Features.getFeature('historical');
@@ -222,7 +220,7 @@ var Rtf = function (options) {
         model: aftershocks.model || {},
         plots: _plots.aftershocks
       },
-      beachballs: beachballs,
+      beachballs: _getBeachBalls(),
       depthDisplay: mainshock.data.depthDisplay,
       dyfi: products.dyfi || {},
       eqid: mainshock.json.id,
