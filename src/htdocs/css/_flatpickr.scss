@@ -85,7 +85,7 @@
     &.selected,
     &.selected:hover {
       background: $accent-color !important;
-      border-color: $accent-color;
+      border-color: $accent-color !important;
       color: $bg-color !important;
       cursor: auto;
     }
@@ -95,7 +95,7 @@
       transition-property: background, color;
 
       &:hover {
-        border-color: $accent-color;
+        border-color: $accent-color !important;
 
         &:not(.flatpickr-disabled) {
           background: $accent-color-lightest;
