@@ -70,6 +70,7 @@ var SearchBar = function (options) {
       _setOption,
       _setParams,
       _setUtcDay,
+      _setUtcMonth,
       _setValidity,
       _setView,
       _updateSlider;
@@ -158,7 +159,7 @@ var SearchBar = function (options) {
     );
 
     // Set the end time to 'Now' when the user clicks the 'Now' button
-    _nowButton.addEventListener('click', (e) => {
+    _nowButton.addEventListener('click', e => {
       e.preventDefault();
       _setNow();
     });
@@ -377,7 +378,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that is called when a Flatpickr calendar's date is changed.
+   * Handler that gets called when a Flatpickr calendar's date is changed.
    */
   _onDateChange = function (dates, dateStr) {
     var datePicked = dates.length > 0 && dateStr;
@@ -392,7 +393,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that is called when a Flatpickr calendar is closed.
+   * Handler that gets called when a Flatpickr calendar is closed.
    */
   _onDateClose = function () {
     _setValidity(this.input);
@@ -406,7 +407,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that is called when the endtime Flatpickr calendar is opened.
+   * Handler that gets called when the endtime Flatpickr calendar is opened.
    */
   _onEndOpen = function () {
     var maxDate,
@@ -420,6 +421,7 @@ var SearchBar = function (options) {
     this.set('maxDate', maxDate);
     this.set('minDate', minDate);
     _setUtcDay(this.days);
+    _setUtcMonth(this);
 
     // Flatpickr lib strips 'Now' from <input>; put it back
     if (_nowButton.classList.contains('selected')) {
@@ -428,7 +430,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that is called when the starttime Flatpickr calendar is opened.
+   * Handler that gets called when the starttime Flatpickr calendar is opened.
    */
   _onStartOpen = function () {
     var endDate,
@@ -450,8 +452,9 @@ var SearchBar = function (options) {
 
   /**
    * Set the UI controls to match the values of the URL params (or to the
-   * default value if a param is not set). The selected 'radio-bar' options are
-   * set in _this.postInit.
+   * default value if a param is not set).
+   *
+   * Note: The selected 'radio-bar' options are set in _this.postInit.
    */
   _setControls = function () {
     var endtime,
@@ -534,7 +537,8 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the endtime to 'Now' on the Flatpickr calendar and its <input> fields.
+   * Set the endtime to 'Now' on the endtime Flatpickr calendar and its <input>
+   * fields.
    */
   _setNow = function () {
     var container,
@@ -555,6 +559,7 @@ var SearchBar = function (options) {
     _endtime.value = 'now';
 
     _nowButton.classList.add('selected');
+    _setUtcMonth(flatpickr);
     _setValidity(_endtime);
   };
 
@@ -629,6 +634,26 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Set the given Flatpickr calendar to the current UTC month (which might be
+   * the following month in UTC time on the last day of a month).
+   *
+   * @param flatpickr {Object}
+   */
+  _setUtcMonth = function (flatpickr) {
+    var container,
+        selected,
+        today;
+
+    container = flatpickr.calendarContainer;
+    selected = container.querySelector('.flatpickr-day.selected');
+    today = container.querySelector('.today');
+
+    if (!selected && today.classList.contains('nextMonthDay')) {
+      flatpickr.changeMonth(1); // select the following month
+    }
+  };
+
+  /**
    * Flag a date field when no date is set or the date is invalid.
    *
    * @param input {Element}
@@ -655,8 +680,8 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the initial view of the custom region map to contain the search
-   * region's bounds.
+   * Set the initial view of the custom region map to contain the current search
+   * region's (or default) bounds.
    */
   _setView = function () {
     var map,
@@ -736,7 +761,8 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Dim the 'Search' button when all controls match the current search params.
+   * Set the 'Search' button text to 'Refresh' when all controls match the
+   * current search params.
    */
   _this.setStatus = function () {
     var currentParams,
