@@ -1691,13 +1691,13 @@ class Rtf {
     $this->_format->h4->setSpaceAfter(0);
     $this->_format->h4->setSpaceBefore(16);
 
-    $this->_format->image = new PHPRtfLite_ParFormat('left');
+    $this->_format->image = new PHPRtfLite_ParFormat('center');
 
     $this->_format->p = new PHPRtfLite_ParFormat('left'); // same as body but w/ bottom margin
     $this->_format->p->setSpaceAfter(12);
     $this->_format->p->setSpaceBefore(0);
     $this->_format->p->setSpaceBetweenLines(1.5);
 
-    $this->_format->table = new PHPRtfLite_ParFormat('left'); // attach to <br> before table
+    $this->_format->table = new PHPRtfLite_ParFormat('left');
   }
 }
