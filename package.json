@@ -23,7 +23,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "flatpickr": "^4.6.9",
+    "flatpickr": "4.6.9",
     "leaflet": "^1.7.1",
     "leaflet-editable": "^1.2.0",
     "leaflet.path.drag": "^0.0.6",
