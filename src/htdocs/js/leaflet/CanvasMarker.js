@@ -49,6 +49,7 @@ L.Marker.CanvasMarker = L.Marker.extend({
   }
 });
 
+
 L.marker.canvasMarker = function (latlng, options) {
   return new L.Marker.CanvasMarker(latlng, options);
 };

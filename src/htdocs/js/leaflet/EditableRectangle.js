@@ -102,6 +102,7 @@ L.Control.EditableRectangle = L.Control.extend({
   }
 });
 
+
 L.control.editableRectangle = function (options) {
   return new L.Control.EditableRectangle(options);
 };

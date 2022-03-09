@@ -8,7 +8,7 @@ require('leaflet/MouseOverLayer');
 /**
  * Factory for Faults overlay.
  *
- * @return {L.layerGroup}
+ * @return layer {L.layerGroup}
  */
 L.FaultsLayer = function () {
   var faults,
@@ -41,6 +41,7 @@ L.FaultsLayer = function () {
 
   return layer;
 };
+
 
 L.faultsLayer = function () {
   return new L.FaultsLayer();

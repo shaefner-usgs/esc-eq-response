@@ -85,6 +85,7 @@ L.Map.prototype._initControlPos = (function (_initControlPos) {
   };
 }(L.Map.prototype._initControlPos));
 
+
 L.control.mousePosition = function (options) {
   return new L.Control.MousePosition(options);
 };

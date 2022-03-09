@@ -56,6 +56,7 @@ L.DarkLayer = function (provider, options) {
   }
 };
 
+
 L.darkLayer = function () {
   return new L.DarkLayer();
 };

@@ -27,6 +27,7 @@ L.TerrainLayer = function (options) {
   );
 };
 
+
 L.terrainLayer = function () {
   return new L.TerrainLayer();
 };
