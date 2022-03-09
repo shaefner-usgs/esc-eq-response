@@ -46,7 +46,7 @@ var JsonFeed = function (options) {
    *
    * @param opts {Object}
    *   {
-   *     host: {String} optional
+   *     host: {String} optional; for DD eqs which use a local php script to fetch
    *     id: {String}
    *     name: {String}
    *     url: {String}
