@@ -208,6 +208,9 @@ var SearchBar = function (options) {
   /**
    * Get the parameters for a catalog search from the UI controls.
    *
+   * Note: explicitly return Strings for Number values since URLparams are
+   * always Strings, which allows comparison btwn. the two sets of values.
+   *
    * @return params {Object}
    */
   _getParams = function () {
@@ -233,10 +236,10 @@ var SearchBar = function (options) {
 
     if (region === 'ca-nv') {
       Object.assign(params, {
-        maxlatitude: 42.10,
-        maxlongitude: -114.00,
-        minlatitude: 32.40,
-        minlongitude: -124.60
+        maxlatitude: '42.10',
+        maxlongitude: '-114.00',
+        minlatitude: '32.40',
+        minlongitude: '-124.60'
       });
     } else if (region === 'customRegion') {
       _cancelEdit();
@@ -248,10 +251,10 @@ var SearchBar = function (options) {
       });
 
       Object.assign(params, {
-        maxlatitude: AppUtil.round(bounds.getNorth(), 2),
-        maxlongitude: AppUtil.round(bounds.getEast(), 2),
-        minlatitude: AppUtil.round(bounds.getSouth(), 2),
-        minlongitude: AppUtil.round(bounds.getWest(), 2)
+        maxlatitude: String(AppUtil.round(bounds.getNorth(), 2)),
+        maxlongitude: String(AppUtil.round(bounds.getEast(), 2)),
+        minlatitude: String(AppUtil.round(bounds.getSouth(), 2)),
+        minlongitude: String(AppUtil.round(bounds.getWest(), 2))
       });
     }
 
@@ -784,6 +787,8 @@ var SearchBar = function (options) {
         currentParams[name] = _DEFAULTS[name];
       }
     });
+
+    console.log(currentParams, newParams);
 
     if (AppUtil.shallowEqual(currentParams, newParams)) {
       search.textContent = 'Refresh';
