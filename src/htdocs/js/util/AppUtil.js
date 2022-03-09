@@ -135,6 +135,7 @@ AppUtil.extent = function (values) {
  * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
  *
  * @param resource {String}
+ *     URI
  * @param options {Object} optional; default is {}
  *     fetch() settings, with an additional prop for timeout in milliseconds
  */
