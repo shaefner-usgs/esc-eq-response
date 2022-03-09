@@ -788,8 +788,6 @@ var SearchBar = function (options) {
       }
     });
 
-    console.log(currentParams, newParams);
-
     if (AppUtil.shallowEqual(currentParams, newParams)) {
       search.textContent = 'Refresh';
     } else {
