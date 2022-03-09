@@ -143,7 +143,9 @@ var SignificantEqs = function (options) {
       name: 'Significant Earthquakes',
       url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
     }).then(json => {
-      _json = json; // cache feed data
+      if (json) {
+        _json = json; // cache feed data
+      }
 
       _this.replaceList();
     });
