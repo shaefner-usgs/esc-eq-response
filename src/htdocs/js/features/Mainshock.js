@@ -124,26 +124,12 @@ var Mainshock = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var bubbles,
-        data,
-        dyfi,
-        html,
-        notice,
-        pager,
-        shakeAlert,
-        shakemap,
-        tectonic;
+    var data,
+        html;
 
     data = _getData();
-    bubbles = _getBubbles(data);
-    dyfi = _getDyfi(data);
-    notice = _getNotice(data);
-    pager = _getPager(data);
-    shakeAlert = _getShakeAlert(data);
-    shakemap = _getShakeMap(data);
-    tectonic = _getTectonic(data);
     html = L.Util.template(
-      notice +
+      _getNotice(data) +
       '<div class="details bubble">' +
         '<ul>' +
           '<li class="mag">' +
@@ -151,8 +137,8 @@ var Mainshock = function (options) {
             '<span>{magDisplay}</span>' +
             '<small>{magType}</small>' +
           '</li>' +
-          bubbles +
-          shakeAlert +
+          _getBubbles(data) +
+          _getShakeAlert(data) +
           '<li class="date">' +
             '<strong>Date</strong>' +
             '<span>{date}</span>' +
@@ -165,7 +151,7 @@ var Mainshock = function (options) {
           '</li>' +
           '<li class="depth">' +
             '<strong>Depth</strong>' +
-            '<span>{depthDisplay}</span>' +
+            '<span>{depth}</span>' +
             '<small>km</small>' +
           '</li>' +
           '<li class="location">' +
@@ -181,13 +167,13 @@ var Mainshock = function (options) {
       '</div>' +
       '<div class="products">' +
         '<div class="thumbs bubble {visibility}">' +
-          dyfi +
-          shakemap +
+          _getDyfi(data) +
+          _getShakeMap(data) +
           '<div class="focal-mechanism placeholder hide"></div>' +
           '<div class="moment-tensor placeholder hide"></div>' +
         '</div>' +
         '<div class="pager-exposures bubble placeholder hide"></div>' +
-        pager +
+        _getPager(data) +
         '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
@@ -197,7 +183,7 @@ var Mainshock = function (options) {
           '<button id="download" disabled="disabled" type="button" ' +
             'title="Download RTF Document">Download</button>' +
         '</div>' +
-        tectonic +
+        _getTectonic(data) +
       '</div>',
       data
     );
