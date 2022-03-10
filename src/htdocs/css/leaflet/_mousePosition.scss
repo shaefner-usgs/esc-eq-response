@@ -1,5 +1,17 @@
 @use '../variables' as *;
 
+.leaflet-center {
+  padding: 0;
+  text-align: center;
+  transition: padding $sidebar-toggle-duration ease;
+  width: 100%;
+
+  div {
+    display: inline-block;
+    float: none;
+  }
+}
+
 .leaflet-control-mouseposition {
   background: rgba(255, 255, 255, .5);
   color: $text-color;
