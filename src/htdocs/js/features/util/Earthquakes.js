@@ -880,22 +880,24 @@ var Earthquakes = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     var fillColor,
+        options,
         props,
         radius;
 
     props = feature.properties;
     fillColor = _COLORS[_getAge(props.time)];
     radius = AppUtil.getRadius(AppUtil.round(props.mag, 1));
-
-    _markerOptions.fillColor = fillColor;
-    _markerOptions.pane = _featureId; // custom Leaflet pane to control stacking order
-    _markerOptions.radius = radius;
+    options = Object.assign({}, _markerOptions, {
+      fillColor: fillColor,
+      pane: _featureId, // controls stacking order
+      radius: radius
+    });
 
     // Note: additional plotData props are added in _onEachFeature
     _plotData.color.push(fillColor);
     _plotData.size.push(radius * 2); // Plotly uses diameter
 
-    return L.circleMarker(latlng, _markerOptions);
+    return L.circleMarker(latlng, options);
   };
 
   // ----------------------------------------------------------
