@@ -176,7 +176,7 @@ AppUtil.formatLatLon = function (coords) {
  *
  * @param name {String}
  *
- * @return {String | null}
+ * @return {Mixed <String|null>}
  *     returns null when the URL param is not set
  */
 AppUtil.getParam = function (name) {

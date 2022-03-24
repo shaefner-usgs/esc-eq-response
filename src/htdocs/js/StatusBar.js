@@ -155,7 +155,7 @@ var StatusBar = function (options) {
    *   {
    *     id: {String}
    *     message: {String}
-   *     status: {Number|String} optional; status code or 'invalid'
+   *     status: {Mixed <Number|String>} optional; status code or 'invalid'
    *   }
    */
   _this.addError = function (error) {

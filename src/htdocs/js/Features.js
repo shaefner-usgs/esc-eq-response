@@ -340,7 +340,7 @@ var Features = function (options) {
    * @param id {String}
    *     Feature id
    *
-   * @return feature {Object|undefined}
+   * @return feature {Mixed <Object|undefined>}
    *   {
    *     Required props
    *

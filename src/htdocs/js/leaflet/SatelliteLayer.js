@@ -9,7 +9,7 @@
  * @param options {Object}
  *     L.tileLayer options
  *
- * @return {L.tileLayer|L.layerGroup}
+ * @return {Object <L.layerGroup|L.tileLayer>}
  */
 L.SatelliteLayer = function (provider, options) {
   var base,

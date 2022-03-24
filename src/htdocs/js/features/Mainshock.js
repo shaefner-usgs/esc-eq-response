@@ -545,7 +545,7 @@ var Mainshock = function (options) {
    * Set Double Difference catalog-specific json properties and store them in a
    * new (cloned) Object. Also clone the ComCat json and cache it.
    *
-   * @param json {Object || null}
+   * @param json {Mixed <Object|null>}
    *     Double Difference catalog GeoJSON
    */
   _setJson = function (json) {
