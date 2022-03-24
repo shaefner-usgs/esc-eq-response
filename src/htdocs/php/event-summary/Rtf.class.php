@@ -99,7 +99,7 @@ class Rtf {
       );
     }
 
-    // Clean up / remove null values from historical events list
+    // Clean up / remove NULL values from historical events list
     if (property_exists($this->_data, 'historical-events')) {
       foreach ($this->_data->{'historical-events'} as $key => $event) {
         if (!$event) { // NULL
