@@ -1,100 +1,154 @@
 <?php
 
+// This configuration script should only be called from pre-install.php. The
+// calling script is responsible for defining $CONFIG_FILE_INI and calling
+// date_default_timezone_set prior to calling (i.e. including) this script.
 
-// This data structure allows for simple configuration prompts
-$PROMPTS = array(
-  // 'key' => array(
-  //  'prompt' => String,  // Prompt to request value from user
-  //  'default' => String, // Value to use if input is empty
-  //  'secure' => Boolean  // True if input should not be echo'd to console
-  // )
-
-  'MOUNT_PATH' => array(
+$PROMPTS = [
+  // 'key' => [
+  //   'prompt' => String,  // Prompt to request value from user
+  //   'default' => String, // Value to use if input is empty
+  //   'secure' => Boolean  // True if input should not be echo'd to console
+  // ]
+  'MOUNT_PATH' => [
     'prompt' => 'URL Path for application',
     'default' => '/response',
     'secure' => false
-  )
+  ],
+  'APP_DIR' => [
+    'prompt' => 'Absolute path to application root directory',
+    'default' => $APP_DIR,
+    'secure' => false
+  ]
+];
 
-);
+
+writeConfig($CONFIG_FILE_INI, $PROMPTS);
 
 
-if (!function_exists('configure')) {
-  function configure ($prompt, $default = null, $secure = false) {
-
-    echo $prompt;
-    if ($default != null) {
-      echo ' [' . $default . ']';
-    }
-    echo ': ';
-
-    if (NON_INTERACTIVE) {
-      // non-interactive
-      echo '(Non-interactive, using default)' . PHP_EOL;
-      return $default;
-    }
-
-    if ($secure) {
-      system('stty -echo');
-      $answer = trim(fgets(STDIN));
-      system('stty echo');
-      echo "\n";
-    } else {
-      $answer = trim(fgets(STDIN));
-    }
-
-    if ($answer == '') {
-      $answer = $default;
-    }
-
-    return $answer;
+/**
+ * Prompt the user to get the configuration value for the given option.
+ *
+ * @param $prompt {String}
+ * @param $default {String} default NULL
+ * @param $secure {Boolean} default false
+ *
+ * @return $answer {String}
+ */
+function configure ($prompt, $default=NULL, $secure=false) {
+  print $prompt;
+  if ($default !== NULL) {
+    print " [$default]";
   }
+  print ': ';
+
+  if (NON_INTERACTIVE) {
+    print '(Non-interactive, using default)' . PHP_EOL;
+
+    return $default;
+  }
+
+  if ($secure) {
+    system('stty -echo');
+    $answer = trim(fgets(STDIN));
+    system('stty echo');
+    print "\n";
+  } else {
+    $answer = trim(fgets(STDIN));
+  }
+
+  if ($answer === '') {
+    $answer = $default;
+  }
+
+  return $answer;
 }
 
-// This script should only be included by the pre-install.php script. The
-// calling script is responsible for defining the $CONFIG_FILE_INI and calling
-// date_default_timezone_set prior to including this configuration script.
+/**
+ * Get the previous config options or an empty Array (default). Optionally
+ * backup the previous config options.
+ *
+ * @param $CONFIG_FILE_INI {String}
+ *
+ * @return $config {Array}
+ */
+function getConfig ($CONFIG_FILE_INI) {
+  $config = [];
 
-$CONFIG = array();
-if (file_exists($CONFIG_FILE_INI)) {
-  $answer = configure('A previous configuration exists. ' .
-      'Would you like to use it as defaults?', 'Y|n', false);
+  if (file_exists($CONFIG_FILE_INI)) {
+    $prevConfig = parse_ini_file($CONFIG_FILE_INI);
 
-  if (strtoupper(substr($answer, 0, 1)) == 'Y') {
-    $CONFIG = parse_ini_file($CONFIG_FILE_INI);
-    print_r($CONFIG);
+    print "A previous configuration exists:\n\n";
+    print_r($prevConfig);
+
+    $answer = configure(
+      "\nWould you like to use it as defaults?",
+      'Y|n',
+      false
+    );
+
+    if (isYes($answer)) {
+      $config = $prevConfig;
+    }
+
+    $answer = configure(
+      'Would you like to save the old configuration file?',
+      'Y|n',
+      false
+    );
+
+    if (isYes($answer)) {
+      $backup = $CONFIG_FILE_INI . '.' . date('YmdHis');
+
+      rename($CONFIG_FILE_INI, $backup);
+
+      printf("Old configuration saved to file: %s\n", basename($backup));
+    }
   }
 
-  $answer = configure('Would you like to save the old configuration file?',
-      'Y|n', false);
-
-  if (strtoupper(substr($answer, 0, 1)) == 'Y') {
-    $BAK_CONFIG_FILE = $CONFIG_FILE_INI . '.' . date('YmdHis');
-    rename($CONFIG_FILE_INI, $BAK_CONFIG_FILE);
-    echo 'Old configuration saved to file: ' . basename($BAK_CONFIG_FILE) .
-        "\n";
-  }
+  return $config;
 }
 
-
-// write config
-$FP_CONFIG = fopen($CONFIG_FILE_INI, 'w');
-fwrite($FP_CONFIG, ';; auto generated: ' . date('r') . "\n\n");
-foreach ($PROMPTS as $key => $item) {
-  $default = null;
-  if (isset($CONFIG[$key])) {
-    $default = $CONFIG[$key];
-  } else if (isset($item['default'])) {
-    $default = $item['default'];
-  }
-
-  fwrite($FP_CONFIG, $key . ' = "' .
-      configure($item['prompt'], $default, isset($item['secure']) ? $item['secure'] : false) .
-      "\"\n");
+/**
+ * Determine if the user answered 'yes' or not.
+ *
+ * @param $answer {String}
+ *
+ * @return {Boolean}
+ */
+function isYes ($answer) {
+  return strtoupper(substr($answer, 0, 1)) === 'Y';
 }
 
+/**
+ * Write the config file.
+ *
+ * @param $CONFIG_FILE_INI {String}
+ * @param $PROMPTS {Array}
+ */
+function writeConfig ($CONFIG_FILE_INI, $PROMPTS) {
+  $CONFIG = getConfig($CONFIG_FILE_INI);
+  $FP_CONFIG = fopen($CONFIG_FILE_INI, 'w');
 
-// Do any custom prompting here
+  fwrite($FP_CONFIG, sprintf(";; auto generated: %s\n\n", date('r')));
 
+  foreach ($PROMPTS as $key => $item) {
+    $default = NULL;
 
-// Close the file
-fclose($FP_CONFIG);
+    if (isset($CONFIG[$key])) {
+      $default = $CONFIG[$key]; // prev config option's value
+    } else if (isset($item['default'])) {
+      $default = $item['default'];
+    }
+
+    $value = configure(
+      $item['prompt'],
+      $default,
+      isset($item['secure']) ? $item['secure'] : false
+    );
+
+    fwrite($FP_CONFIG, sprintf("%s = \"%s\"\n", $key, $value));
+  }
+
+  fclose($FP_CONFIG);
+}
