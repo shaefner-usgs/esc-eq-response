@@ -10,11 +10,11 @@ var AppUtil = require('util/AppUtil');
    1) add leaflet-editable first;
    2) CanvasMarker must be added here (not in dependent Classes). */
 require('leaflet-editable'); // used in SearchBar.js
+require('leaflet-mouse-position');
 require('leaflet/CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
 require('leaflet/DarkLayer');
 require('leaflet/FaultsLayer');
 require('leaflet/GreyscaleLayer');
-require('leaflet/MousePosition');
 require('leaflet/Popup');
 require('leaflet/SatelliteLayer');
 require('leaflet/TerrainLayer');

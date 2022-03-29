@@ -1,5 +1,5 @@
+@use 'node_modules/leaflet-mouse-position/src/L.Control.MousePosition.scss';
 @use '../mixins' as *;
 @use '../variables' as *;
 @use 'editable';
-@use 'mousePosition';
 @use 'overrides';
