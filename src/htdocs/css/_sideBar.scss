@@ -86,16 +86,8 @@ body.sidebar {
     }
   }
 
-  .leaflet-center {
-    padding-right: $sidebar-width;
-  }
-
+  .leaflet-center,
   .leaflet-right {
-    .leaflet-control-attribution {
-      margin-right: $sidebar-width;
-    }
-    .leaflet-control-layers {
-      margin-right: $sidebar-width + 10px;
-    }
+    padding-right: $sidebar-width;
   }
 }
