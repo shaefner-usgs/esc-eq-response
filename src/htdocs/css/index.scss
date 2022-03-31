@@ -1,13 +1,13 @@
 @use 'sass:color';
 
+@use 'features';
+@use 'leaflet';
 @use 'controls';
-@use 'features/index' as features;
 @use 'flatpickr';
 @use 'header';
 @use 'icons';
 @use 'impactBubbles';
 @use 'infoBar';
-@use 'leaflet/index' as leaflet;
 @use 'legendBar';
 @use 'lightbox';
 @use 'loaders';
@@ -25,7 +25,7 @@
 @use 'statusBar';
 @use 'summaryPane';
 @use 'titleBar';
-@use 'tablesort/src/tablesort';
+@use 'tablesort'; // located in node_modules/tablesort
 @use 'variables' as *;
 
 *,
