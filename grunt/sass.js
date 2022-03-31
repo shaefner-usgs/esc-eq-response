@@ -8,7 +8,8 @@ var sass = {
   options: {
     implementation: dartSass,
     includePaths: [
-      'node_modules'
+      'node_modules/leaflet-mouse-position/src',
+      'node_modules/tablesort/src',
     ],
     outputStyle: 'expanded',
     sourceMap: config.build + '/' + config.src + '/htdocs/css/index.css.map',
