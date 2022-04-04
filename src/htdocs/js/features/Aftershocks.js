@@ -1,4 +1,3 @@
-/* global L */
 'use strict';
 
 
@@ -21,13 +20,12 @@ var AppUtil = require('util/AppUtil'),
  *     bins: {Object}
  *     count: {Integer}
  *     create: {Function}
+ *     dependencies: {Array}
  *     description: {String}
  *     destroy: {Function}
- *     forecast: {Array}
  *     id: {String}
  *     list: {Array}
  *     mapLayer: {L.Layer}
- *     model: {Object}
  *     name: {String}
  *     plotTraces: {Object}
  *     reset: {Function}
@@ -45,15 +43,9 @@ var Aftershocks = function (options) {
 
       _app,
       _earthquakes,
-      _forecast,
       _mainshock,
-      _model,
 
-      _createForecast,
-      _createProbabilities,
       _createSummary,
-      _getParameters,
-      _getPercentage,
       _toggleParams;
 
 
@@ -65,6 +57,9 @@ var Aftershocks = function (options) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
 
+    _this.dependencies = [
+      'forecast'
+    ];
     _this.id = 'aftershocks';
     _this.mapLayer = null;
     _this.name = 'Aftershocks';
@@ -73,127 +68,6 @@ var Aftershocks = function (options) {
     _this.sortByField = 'utcTime';
     _this.summary = null;
     _this.zoomToLayer = true;
-  };
-
-  /**
-   * Create Aftershocks forecast HTML.
-   *
-   * @return html {String}
-   */
-  _createForecast = function () {
-    var content,
-        data,
-        html,
-        oaf;
-
-    oaf = _mainshock.json.properties.products.oaf;
-    html = '';
-
-    if (oaf) { // forecast exists
-      content = JSON.parse(oaf[0].contents[''].bytes);
-      data = {
-        probabilities: _createProbabilities(content),
-      };
-
-      // Store forecast and model to return as public props
-      _forecast = content.forecast;
-      _model = content.model;
-
-      if (data.probabilities) {
-        data.model = content.model.name;
-        data.timeStart = Luxon.DateTime.fromMillis(content.forecast[0].timeStart)
-          .toUTC().toFormat("ccc, LLL d, yyyy 'at' T"); // eslint-disable-line
-
-        html = L.Util.template(
-          '<h3>Forecast</h3>' +
-          '<p>Probability of one or more aftershocks in the specified time ' +
-            'frame and magnitude range starting on {timeStart} UTC. The ' +
-            'likely number of aftershocks (95% confidence range) is listed  ' +
-            'below the probability.</p>' +
-          '{probabilities}' +
-          '<p><strong>Model</strong>: {model}</p>',
-          data
-        );
-      }
-    }
-
-    return html;
-  };
-
-  /**
-   * Create Aftershocks probabilities and 'radio-bar' HTML.
-   *
-   * @param oaf {Object}
-   *
-   * @return html {String}
-   */
-  _createProbabilities = function (oaf) {
-    var data,
-        eqid,
-        html,
-        label,
-        probabilities,
-        radioBar,
-        state,
-        visibility;
-
-    eqid = AppUtil.getParam('eqid');
-    data = {
-      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
-    };
-    html = '';
-    probabilities = '';
-    radioBar = '';
-
-    oaf.forecast.forEach(timeframe => {
-      label = timeframe.label.replace(/1\s+/, '');
-      state = '';
-      visibility = 'hide'; // default
-
-      if (timeframe.label === oaf.advisoryTimeFrame) {
-        state = 'selected';
-        visibility = ''; // show
-      }
-
-      probabilities += `<li class="next${label} option ${visibility}">`;
-      probabilities += '<ol>';
-      radioBar += `<li id="next${label}" class="${state}">${timeframe.label}</li>`;
-
-      timeframe.bins.forEach(bin => {
-        data.mag = bin.magnitude;
-        data.probability = _getPercentage(bin.probability);
-        data.range = bin.p95minimum  + '–' + bin.p95maximum;
-
-        if (bin.p95minimum === 0 && bin.p95maximum === 0) {
-          data.range = 0;
-        }
-
-        probabilities += L.Util.template(
-          '<li>' +
-            '<a href="{url}" target="new">' +
-              '<h4>M {mag}+</h4>' +
-              '<ul>' +
-                '<li class="probability">{probability}</li>' +
-                '<li class="likely">' +
-                  '<abbr title="Likely number of aftershocks">{range}</abbr>' +
-                '</li>' +
-              '</ul>' +
-            '</a>' +
-          '</li>',
-          data
-        );
-      });
-
-      probabilities += '</ol></li>';
-    });
-
-    if (probabilities) {
-      html += `<ul class="timeframe options">${radioBar}</ul>`;
-      html += `<ul class="probabilities">${probabilities}</ul>`;
-      html += _getParameters(oaf.model.parameters);
-    }
-
-    return html;
   };
 
   /**
@@ -217,7 +91,7 @@ var Aftershocks = function (options) {
       html += '</div>';
     }
 
-    html += _createForecast();
+    html += _app.Features.getFeature('forecast').html;
 
     if (_this.count > 1) {
       mostRecentEq = _earthquakes.list[_earthquakes.list.length - 1];
@@ -240,48 +114,6 @@ var Aftershocks = function (options) {
     html += '</div>';
 
     return html;
-  };
-
-  /**
-   * Get the aftershock forecast parameters as a <dl>.
-   *
-   * @param obj {Object}
-   *
-   * @return html {String}
-   */
-  _getParameters = function (obj) {
-    var html = '<h4>Parameters <a class="button">Show</a></h4>';
-
-    html += '<dl class="params alt hide">';
-
-    Object.keys(obj).forEach(key => {
-      html += `<dt>${key}</dt><dd>${obj[key]}</dd>`;
-    });
-
-    html += '</dl>';
-
-    return html;
-  };
-
-  /**
-   * Get the probability as a percentage string.
-   *
-   * @param probability {Number}
-   *
-   * @return percentage {String}
-   */
-  _getPercentage = function (probability) {
-    var percentage;
-
-    if (probability < 0.01) {
-      percentage = '< 1%';
-    } else if (probability > 0.99) {
-      percentage = '> 99%';
-    } else {
-      percentage = AppUtil.round(100 * probability, 0) + '%';
-    }
-
-    return percentage;
   };
 
   /**
@@ -346,10 +178,6 @@ var Aftershocks = function (options) {
     _this.mapLayer = _earthquakes.mapLayer;
     _this.plotTraces = _earthquakes.plotTraces;
     _this.summary = _createSummary();
-
-    // The following props depend on summary being created first
-    _this.forecast = _forecast;
-    _this.model = _model;
   };
 
   /**
@@ -360,14 +188,10 @@ var Aftershocks = function (options) {
 
     _app = null;
     _earthquakes = null;
-    _forecast = null;
     _mainshock = null;
-    _model = null;
 
-    _createForecast = null;
-    _createProbabilities = null;
     _createSummary = null;
-    _getPercentage = null;
+    _toggleParams = null;
 
     _this = null;
   };
