@@ -5,6 +5,7 @@ var Aftershocks = require('features/Aftershocks'),
     AppUtil = require('util/AppUtil'),
     FieldNotes = require('features/FieldNotes'),
     FocalMechanism = require('features/FocalMechanism'),
+    Forecast = require('features/Forecast'),
     Foreshocks = require('features/Foreshocks'),
     Historical = require('features/Historical'),
     Mainshock = require('features/Mainshock'),
@@ -20,6 +21,7 @@ var Aftershocks = require('features/Aftershocks'),
  */
 var _FEATURECLASSES = [
   Mainshock,
+  Forecast, // load ASAP: dependency for Aftershocks
   PagerCities, // load ASAP: dependency for PagerExposures
   FocalMechanism,
   MomentTensor,
