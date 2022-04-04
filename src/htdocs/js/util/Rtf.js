@@ -192,6 +192,7 @@ var Rtf = function (options) {
         data,
         feedJson,
         feeds,
+        forecast,
         foreshocks,
         historical,
         mainshock,
@@ -201,6 +202,7 @@ var Rtf = function (options) {
 
     aftershocks = _app.Features.getFeature('aftershocks');
     feeds = _app.Feeds.getFeeds();
+    forecast = _app.Features.getFeature('forecast');
     foreshocks = _app.Features.getFeature('foreshocks');
     historical = _app.Features.getFeature('historical');
     mainshock = _app.Features.getFeature('mainshock');
@@ -215,9 +217,9 @@ var Rtf = function (options) {
         count: aftershocks.count,
         description: aftershocks.description,
         earthquakes: _filter(aftershocks).sort(_compare),
-        forecast: aftershocks.forecast || [],
+        forecast: forecast.forecast || [],
         magThreshold: _magThreshold || 0,
-        model: aftershocks.model || {},
+        model: forecast.model || {},
         plots: _plots.aftershocks
       },
       beachballs: _getBeachBalls(),
