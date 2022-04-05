@@ -355,21 +355,23 @@ AppUtil.round = function (num, precision = 0, empty = '–') {
 
 /**
  * Round numbers greater than 10,000 to thousands value w/ ' k' appended
- * (i.e. '10 k'). For numbers less than 10,000, round to the nearest whole
- * number.
+ * (i.e. '10 k') and numbers greater than 1,000,000 to e.g. 1.0 M. For numbers
+ * less than 10,000, round to the nearest whole number.
  *
  * @param num {Number}
  *
  * @return {String}
  */
 AppUtil.roundThousands = function (num) {
-  num = Number(num);
+  num = Math.round(Number(num));
 
-  if (Math.round(num) < 10000) {
+  if (num < 10000) {
     return num.toString();
+  } else if (num < 1000000) {
+    return Math.round(num / 1000) + ' k';
+  } else {
+    return Math.round(num / 1000000 * 10) / 10 + ' M';
   }
-
-  return AppUtil.addCommas(Math.round(num / 1000)) + ' k';
 };
 
 /**
