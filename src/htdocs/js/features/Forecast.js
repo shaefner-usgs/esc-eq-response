@@ -212,14 +212,16 @@ var Forecast = function (options) {
         .toUTC().toFormat("ccc, LLL d, yyyy 'at' T"); // eslint-disable-line
 
       _this.html = L.Util.template(
-        '<h3>Forecast</h3>' +
-        '<p>Probability of one or more aftershocks in the specified time ' +
-          'frame and magnitude range starting on {timeStart} UTC. The ' +
-          'likely number of aftershocks (95% confidence range) is listed  ' +
-          'below the probability.</p>' +
-        '{probabilities}' +
-        '{parameters}' +
-        '<p><strong>Model</strong>: {model}</p>',
+        '<div class="forecast">' +
+          '<h3>Forecast</h3>' +
+          '<p>Probability of one or more aftershocks in the specified time ' +
+            'frame and magnitude range starting on {timeStart} UTC. The ' +
+            'likely number of aftershocks (95% confidence range) is listed  ' +
+            'below the probability.</p>' +
+          '{probabilities}' +
+          '{parameters}' +
+          '<p><strong>Model</strong>: {model}</p>' +
+        '</div>',
         data
       );
     }

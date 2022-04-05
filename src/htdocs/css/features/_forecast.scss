@@ -3,120 +3,116 @@
 @use '../variables' as *;
 
 #summaryPane {
-  .aftershocks {
+  .forecast {
+    .hide {
+      display: none;
+    }
+
     .params {
       margin: .25rem 0 1.5rem;
-
-      &.hide {
-        display: none;
-      }
 
       dd {
         max-width: 7rem;
       }
     }
-  }
 
-  .probabilities {
-    line-height: 1;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    .probabilities {
+      line-height: 1;
+      list-style: none;
+      margin: 0;
+      padding: 0;
 
-    &+ h4 {
-      align-items: baseline;
-      display: flex;
-      margin-top: 1.25rem;
+      &+ h4 {
+        align-items: baseline;
+        display: flex;
+        margin-top: 1.25rem;
+
+        a {
+          margin-left: .375rem;
+        }
+      }
 
       a {
-        margin-left: .375rem;
-      }
-    }
+        border: 1px solid $border-color;
+        border-radius: $button-border-radius;
+        color: $text-color;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        transition: all $effect-off-duration ease-in;
+        width: 6rem;
 
-    a {
-      border: 1px solid $border-color;
-      border-radius: $button-border-radius;
-      color: $text-color;
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      transition: all $effect-off-duration ease-in;
-      width: 6rem;
-
-      &:hover {
-        border-color: $accent-color;
-        color: $text-color-darker;
-        transition: all $effect-on-duration ease-out;
-
-        abbr {
-          border-color: color.scale($text-color-lightest, $lightness: -5%);
-          color: color.scale($text-color-lightest, $lightness: -15%);
-          transition: all $effect-on-duration ease-out;
-        }
-
-        h4 {
-          background: $accent-color-lightest;
+        &:hover {
+          border-color: $accent-color;
           color: $text-color-darker;
           transition: all $effect-on-duration ease-out;
+
+          abbr {
+            border-color: color.scale($text-color-lightest, $lightness: -5%);
+            color: $text-color-darker;
+            transition: all $effect-on-duration ease-out;
+          }
+
+          h4 {
+            background: $accent-color-lightest;
+            color: $text-color-darker;
+            transition: all $effect-on-duration ease-out;
+          }
+        }
+
+        &:active {
+          h4 {
+            background: $accent-color;
+            color: #fff;
+          }
         }
       }
 
-      &:active {
-        h4 {
-          background: $accent-color;
-          color: #fff;
+      abbr {
+        display: inline-block;
+        font-size: .8125rem;
+        font-weight: 300;
+        margin-top: 5px;
+        transition: all $effect-off-duration ease-in;
+      }
+
+      h4 {
+        background: $bg-color-darker;
+        border-radius: $button-border-radius $button-border-radius 0 0;
+        color: $text-color;
+        margin: 0;
+        padding: 4px 0;
+        transition: all $effect-off-duration ease-in;
+      }
+
+      ol {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > li {
+          margin-right: 1rem;
+
+          &:last-child {
+            margin: 0;
+          }
         }
       }
-    }
 
-    abbr {
-      color: $text-color-lightest;
-      display: inline-block;
-      font-size: .8rem;
-      margin-top: 5px;
-      transition: all $effect-off-duration ease-in;
-    }
-
-    h4 {
-      background: $bg-color-darker;
-      border-radius: $button-border-radius $button-border-radius 0 0;
-      color: $text-color;
-      margin: 0;
-      padding: 4px 0;
-      transition: all $effect-off-duration ease-in;
-    }
-
-    ol {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-
-      > li {
-        margin-right: 1rem;
-
-        &:last-child {
-          margin: 0;
-        }
+      ul {
+        list-style: none;
+        margin: .75rem 0 1rem;
+        padding: 0;
       }
-    }
-
-    ul {
-      list-style: none;
-      margin: .75rem 0 1rem;
-      padding: 0;
-    }
-
-    .hide {
-      display: none;
     }
 
     .probability {
       font: 1.25rem $font-family-mmi;
     }
-  }
 
-  .timeframe {
-    margin-bottom: 1.5rem;
+    .timeframe {
+      margin-bottom: 1.5rem;
+    }
   }
 }
