@@ -240,6 +240,7 @@ var Features = function (options) {
     )) {
       fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
       resource = Object.assign({}, feature, {
+        host: 'ncedc.org',
         name: 'DD ' + feature.name // prepend 'DD' to name shown in StatusBar
       });
     }
