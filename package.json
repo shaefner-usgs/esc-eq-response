@@ -42,7 +42,7 @@
     "babelify": "^10.0.0",
     "cssnano": "^5.1.1",
     "gateway": "^1.0.0",
-    "grunt": "^1.4.1",
+    "grunt": "^1.5.2",
     "grunt-browserify": "^6.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-connect": "^3.0.0",
