@@ -28,8 +28,9 @@ L.FaultsLayer = function () {
     tiptext: '{NAME}'
   });
   plates = L.tileLayer(urlPrefix + 'plates/{z}/{x}/{y}.png', {
+    maxZoom: 5,
     minZoom: 0,
-    maxZoom: 5
+    pane: 'faults' // put map tiles in custom Leaflet map pane
   });
   layer = L.layerGroup([
     plates,
