@@ -20,10 +20,10 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-control-attribution,
   .leaflet-control-mouseposition,
   .leaflet-control-scale-line {
+    background: rgba(255, 255, 255, .75);
     font-size: .75rem;
   }
   .leaflet-control-attribution {
-    background: rgba(255, 255, 255, .5);
     color: $text-color-lighter;
     max-width: 200px;
     overflow: hidden; // quell long attributions
