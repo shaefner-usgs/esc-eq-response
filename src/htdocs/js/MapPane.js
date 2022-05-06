@@ -291,7 +291,6 @@ var MapPane = function (options) {
 
     _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
-      tap: false, // fix for popups not opening in Safari, see: https://github.com/Leaflet/Leaflet/issues/7255
       worldCopyJump: true,
       zoomControl: false // hide default control in favor of custom control
     });
