@@ -18,7 +18,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-attribution,
-  .leaflet-control-mouseposition
+  .leaflet-control-mouseposition,
   .leaflet-control-scale-line {
     font-size: .75rem;
   }
