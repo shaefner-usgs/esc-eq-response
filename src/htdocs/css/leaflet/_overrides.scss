@@ -95,7 +95,8 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
       line-height: 1.3;
       margin: 6px 0;
 
-      span {
+      > span,
+      > span span {
         align-items: center;
         display: flex;
       }
@@ -109,9 +110,8 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-layers-overlays {
-    div > span { // contains Feature count
+    label span > span { // contains Feature count
       align-items: baseline;
-      display: flex;
     }
   }
 

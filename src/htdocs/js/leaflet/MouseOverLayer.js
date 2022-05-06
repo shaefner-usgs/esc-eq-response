@@ -34,8 +34,8 @@ L.MouseOverLayer = L.LayerGroup.extend({
 
       this._tooltip.setAttribute('style', 'display: none'); // hide placeholder
 
-      this.on('mouseover', this._onMouseOver, this);
-      this.on('mouseout', this._onMouseOut, this);
+      this._on('mouseover', this._onMouseOver, this);
+      this._on('mouseout', this._onMouseOut, this);
     }
 
     L.LayerGroup.prototype.initialize.call(this);
@@ -44,18 +44,6 @@ L.MouseOverLayer = L.LayerGroup.extend({
     if (!L.Browser.mobile) {
       this.addLayer(this._dataLayer);
     }
-  },
-
-  // --------------------------------------------------
-  // Delegate event handling to the data layer
-  // --------------------------------------------------
-
-  on: function (/* types, fn, context */) {
-    L.UtfGrid.prototype.on.apply(this._dataLayer, arguments);
-  },
-
-  off: function (/* types, fn, context */) {
-    L.UtfGrid.prototype.off.apply(this._dataLayer, arguments);
   },
 
   // --------------------------------------------------
@@ -76,6 +64,14 @@ L.MouseOverLayer = L.LayerGroup.extend({
     if (this._tooltip) {
       L.DomUtil.remove(this._tooltip);
     }
+  },
+
+  // --------------------------------------------------
+  // Delegate event handling to the data layer
+  // --------------------------------------------------
+
+  _on: function (/* types, fn, context */) {
+    L.UtfGrid.prototype.on.apply(this._dataLayer, arguments);
   },
 
   // --------------------------------------------------
