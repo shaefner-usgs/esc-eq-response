@@ -6,7 +6,7 @@ require('utfgrid');
 
 
 /**
- * This class extends L.LayerGroup to enable mouseover labels to track the
+ * This class extends L.LayerGroup to enable mouseover tooltips to track the
  * cursor on a UtfGrid layer.
  *
  * @param options {Object}
@@ -20,22 +20,17 @@ require('utfgrid');
  */
 L.MouseOverLayer = L.LayerGroup.extend({
   initialize: function (options) {
-    var className;
+    var classNames = 'leaflet-tooltip leaflet-zoom-animated';
 
-    // Create the two layers
-    this._tileLayer = L.tileLayer(options.tileUrl, options.tileOpts);
+    // Create the data and tile layers
     this._dataLayer = L.utfGrid(options.dataUrl, options.dataOpts);
+    this._tileLayer = L.tileLayer(options.tileUrl, options.tileOpts);
 
     if (typeof options.tiptext === 'string') {
-      className = 'leaflet-tooltip leaflet-zoom-animated';
-
       this._tiptext = options.tiptext;
-      this._tooltip = L.DomUtil.create('div', className);
+      this._tooltip = L.DomUtil.create('div', classNames);
 
       this._tooltip.setAttribute('style', 'display: none'); // hide placeholder
-
-      this._on('mouseover', this._onMouseOver, this);
-      this._on('mouseout', this._onMouseOut, this);
     }
 
     L.LayerGroup.prototype.initialize.call(this);
@@ -47,7 +42,7 @@ L.MouseOverLayer = L.LayerGroup.extend({
   },
 
   // --------------------------------------------------
-  // Override these methods inherited from LayerGroup
+  // Override onAdd, onRemove methods from L.LayerGroup
   // --------------------------------------------------
 
   onAdd: function (map) {
@@ -55,6 +50,9 @@ L.MouseOverLayer = L.LayerGroup.extend({
 
     if (this._tooltip) {
       map.getPanes().tooltipPane.appendChild(this._tooltip);
+
+      this._dataLayer.on('mouseover', this._onMouseOver, this);
+      this._dataLayer.on('mouseout', this._onMouseOut, this);
     }
   },
 
@@ -63,57 +61,52 @@ L.MouseOverLayer = L.LayerGroup.extend({
 
     if (this._tooltip) {
       L.DomUtil.remove(this._tooltip);
+
+      this._dataLayer.off('mouseover', this._onMouseOver, this);
+      this._dataLayer.off('mouseout', this._onMouseOut, this);
     }
   },
 
-  // --------------------------------------------------
-  // Delegate event handling to the data layer
-  // --------------------------------------------------
-
-  _on: function (/* types, fn, context */) {
-    L.UtfGrid.prototype.on.apply(this._dataLayer, arguments);
-  },
-
-  // --------------------------------------------------
-  // Auto hover tooltip helper methods
-  // --------------------------------------------------
-
-  _onMouseOver: function (evt) {
+  /**
+   * Show the tooltip.
+   *
+   * @param e {Event}
+   */
+  _onMouseOver: function (e) {
     var centerPoint,
         direction,
-        map,
         pos,
-        tooltip,
         tooltipPoint;
 
-    map = this._map;
-    pos = map.latLngToLayerPoint(evt.latlng);
-    pos = pos.subtract(L.point(0, 10, true)); // shift tooltip up
-    tooltip = this._tooltip;
-
-    tooltip.innerHTML = L.Util.template(this._tiptext, evt.data);
-    tooltip.style.display = 'block';
-
-    L.DomUtil.setOpacity(tooltip, 0.9);
-
-    // Position tooltip to left / right of cursor depending on relative position
-    centerPoint = this._map.latLngToContainerPoint(map.getCenter());
+    centerPoint = this._map.latLngToContainerPoint(this._map.getCenter());
+    pos = this._map.latLngToLayerPoint(e.latlng)
+      .subtract(L.point(0, 10, true)); // shift tooltip up
     tooltipPoint = this._map.layerPointToContainerPoint(pos);
 
-    if (tooltipPoint.x < centerPoint.x) { // left side of map, shift right
-      direction = 'right';
-      pos = pos.add(L.point(10, 0, true));
-    } else { // right side of map, shift left
-      direction = 'left';
-      pos = pos.subtract(L.point(tooltip.offsetWidth + 5, 0, true));
+    if (document.body.classList.contains('sidebar')) {
+      centerPoint.x -= 200;
     }
 
-    L.DomUtil.addClass(tooltip, 'leaflet-tooltip-' + direction);
-    L.DomUtil.removeClass(tooltip, 'leaflet-tooltip-left');
-    L.DomUtil.removeClass(tooltip, 'leaflet-tooltip-right');
-    L.DomUtil.setPosition(tooltip, pos);
+    this._tooltip.innerHTML = L.Util.template(this._tiptext, e.data);
+    this._tooltip.style.display = 'block';
+
+    if (tooltipPoint.x < centerPoint.x) { // left side of map; show on right
+      direction = 'right';
+      pos = pos.add(L.point(10, 0, true));
+    } else { // right side of map; show on left
+      direction = 'left';
+      pos = pos.subtract(L.point(this._tooltip.offsetWidth + 5, 0, true));
+    }
+
+    L.DomUtil.removeClass(this._tooltip, 'leaflet-tooltip-left');
+    L.DomUtil.removeClass(this._tooltip, 'leaflet-tooltip-right');
+    L.DomUtil.addClass(this._tooltip, 'leaflet-tooltip-' + direction);
+    L.DomUtil.setPosition(this._tooltip, pos);
   },
 
+  /**
+   * Hide the tooltip.
+   */
   _onMouseOut: function () {
     this._tooltip.style.display = 'none';
   }
