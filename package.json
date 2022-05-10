@@ -26,13 +26,13 @@
     "flatpickr": "^4.6.11",
     "leaflet": "^1.8.0",
     "leaflet-editable": "^1.2.0",
-    "leaflet-mouseover-layer": "shaefner-usgs/Leaflet.mouseOverLayer",
     "leaflet-mouse-position": "shaefner-usgs/Leaflet.MousePosition",
+    "leaflet-mouseover-layer": "shaefner-usgs/Leaflet.mouseOverLayer",
     "leaflet.path.drag": "^0.0.6",
+    "leaflet.utfgrid": "github:danzel/Leaflet.utfgrid",
     "luxon": "^2.3.1",
-    "plotly.js": "^2.10.1",
-    "tablesort": "shaefner-usgs/tablesort",
-    "utfgrid": "danzel/Leaflet.utfgrid"
+    "plotly.js": "^2.12.1",
+    "tablesort": "shaefner-usgs/tablesort"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
