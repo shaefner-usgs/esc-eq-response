@@ -15,12 +15,12 @@ var browserify = {
     },
     noParse: [
       'leaflet-editable',
-      'leaflet-mouseover-layer',
       'leaflet-mouse-position',
+      'leaflet-mouseover-layer',
       'leaflet.path.drag',
+      'leaflet.utfgrid',
       'luxon',
-      'tablesort',
-      'utfgrid'
+      'tablesort'
     ],
     transform: [
       babelify.configure({
