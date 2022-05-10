@@ -18,10 +18,12 @@ L.Tooltip.include({
         tooltipWidth = container.offsetWidth,
         tooltipHeight = container.offsetHeight,
         offset = L.point(this.options.offset),
+        offsetX = document.getElementById('sideBar').offsetWidth / 2,
+        sidebar = document.body.classList.contains('sidebar'),
         anchor = this._getAnchor();
 
-    if (document.body.classList.contains('sidebar')) {
-      centerPoint.x -= 200;
+    if (sidebar) {
+      centerPoint.x -= offsetX;
     }
 
     if (direction === 'top') {
