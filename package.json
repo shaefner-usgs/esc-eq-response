@@ -26,6 +26,7 @@
     "flatpickr": "^4.6.11",
     "leaflet": "^1.8.0",
     "leaflet-editable": "^1.2.0",
+    "leaflet-mouseover-layer": "shaefner-usgs/Leaflet.mouseOverLayer",
     "leaflet-mouse-position": "shaefner-usgs/Leaflet.MousePosition",
     "leaflet.path.drag": "^0.0.6",
     "luxon": "^2.3.1",

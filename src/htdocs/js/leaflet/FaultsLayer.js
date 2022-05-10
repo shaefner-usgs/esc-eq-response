@@ -2,7 +2,7 @@
 'use strict';
 
 
-require('leaflet/MouseOverLayer');
+require('leaflet-mouseover-layer');
 
 
 /**
