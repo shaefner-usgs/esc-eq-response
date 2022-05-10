@@ -170,4 +170,12 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-popup-content-wrapper {
     border-radius: $content-border-radius;
   }
+
+  .leaflet-tooltip {
+    z-index: 10;
+
+    &.mouseoverlayer {
+      z-index: 1;
+    }
+  }
 }
