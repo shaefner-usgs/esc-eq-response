@@ -17,8 +17,8 @@ require('leaflet/FaultsLayer');
 require('leaflet/GreyscaleLayer');
 require('leaflet/Popup');
 require('leaflet/SatelliteLayer');
-require('leaflet/Tooltip');
 require('leaflet/TerrainLayer');
+require('leaflet/Tooltip');
 require('leaflet/ZoomCenter');
 
 
