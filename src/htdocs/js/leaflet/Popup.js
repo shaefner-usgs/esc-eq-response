@@ -21,13 +21,13 @@ L.Popup.include({
     layerPos._add(L.DomUtil.getPosition(this._container));
 
     if (Object.prototype.hasOwnProperty.call(this.options, 'autoPanPadding')) {
-      autoPanPadding = this._toPoint(this.options.autoPanPadding);
+      autoPanPadding = L.point(this.options.autoPanPadding);
     }
 
     var containerPos = map.layerPointToContainerPoint(layerPos),
         defaults = this._getDefaults(),
-        paddingTL = this._toPoint(this.options.autoPanPaddingTopLeft || autoPanPadding || defaults.topLeft),
-        paddingBR = this._toPoint(this.options.autoPanPaddingBottomRight || autoPanPadding || defaults.bottomRight),
+        paddingTL = L.point(this.options.autoPanPaddingTopLeft || autoPanPadding || defaults.topLeft),
+        paddingBR = L.point(this.options.autoPanPaddingBottomRight || autoPanPadding || defaults.bottomRight),
         size = map.getSize(),
         dx = 0,
         dy = 0;
@@ -54,20 +54,9 @@ L.Popup.include({
         .fire('autopanstart')
         .panBy([dx, dy], {animate: e && e.type === 'moveend'});
     }
-  }
-});
+  },
 
-/**
- * Add supporting methods to L.Popup.
- */
-L.Popup.addInitHook(function() {
-  /**
-   * Get the default pan padding for a popup, which is based on the size/status
-   * of the UI controls (map controls, sidebar open/closed, etc).
-   *
-   * @return {Object}
-   */
-  this._getDefaults = function () {
+  _getDefaults: function () {
     var bottom = document.querySelector('.leaflet-bottom.leaflet-left').offsetHeight + 10,
         left = document.querySelector('.leaflet-top.leaflet-left').offsetWidth + 10,
         right = document.querySelector('.leaflet-top.leaflet-right').offsetWidth + 10,
@@ -77,27 +66,5 @@ L.Popup.addInitHook(function() {
       topLeft: new L.Point(left, top),
       bottomRight: new L.Point(right, bottom),
     };
-  };
-
-  /**
-   * Leaflet's private toPoint method.
-   *
-   * @return L.Point {Object}
-   */
-  this._toPoint = function (x, y, round) {
-    if (x instanceof L.Point) {
-      return x;
-    }
-    if (L.Util.isArray(x)) {
-      return new L.Point(x[0], x[1]);
-    }
-    if (x === undefined || x === null) {
-      return x;
-    }
-    if (typeof x === 'object' && 'x' in x && 'y' in x) {
-      return new L.Point(x.x, x.y);
-    }
-
-    return new L.Point(x, y, round);
-  };
+  }
 });
