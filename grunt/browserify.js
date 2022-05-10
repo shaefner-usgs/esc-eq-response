@@ -15,8 +15,6 @@ var browserify = {
     },
     noParse: [
       'leaflet-editable',
-      'leaflet-mouse-position',
-      'leaflet-mouseover-layer',
       'leaflet.path.drag',
       'leaflet.utfgrid',
       'luxon',
