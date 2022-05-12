@@ -104,7 +104,7 @@ var MapPane = function (options) {
 
     L.control.mousePosition().addTo(_map);
     L.control.scale().addTo(_map);
-    L.control.zoom.zoomcenter().addTo(_map);
+    L.control.zoom.zoomCenter().addTo(_map);
   };
 
   /**

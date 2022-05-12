@@ -44,6 +44,6 @@ L.Control.Zoom.ZoomCenter = L.Control.Zoom.extend({
 });
 
 
-L.control.zoom.zoomcenter = function (options) {
+L.control.zoom.zoomCenter = function (options) {
   return new L.Control.Zoom.ZoomCenter(options);
 };
