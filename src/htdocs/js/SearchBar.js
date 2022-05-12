@@ -3,10 +3,10 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    SearchLayer = require('leaflet/SearchLayer');
+    CatalogSearch = require('leaflet/CatalogSearch');
 
 // NOTE: the Leaflet.Editable plugin is included in MapPane.js
-require('leaflet/EditableRectangle'); // custom map control for Leaflet.Editable
+require('leaflet/L.EditableRectangle'); // custom map control for Leaflet.Editable
 
 
 var _DEFAULTS = {
@@ -46,7 +46,7 @@ var SearchBar = function (options) {
       _map,
       _nowButton,
       _regionLayer,
-      _searchLayer,
+      _catalogSearch,
       _selPeriod,
       _selRegion,
       _starttime,
@@ -97,7 +97,7 @@ var SearchBar = function (options) {
       [49.5, -66],
       [24.5, -125]
     ]);
-    _searchLayer = SearchLayer({
+    _catalogSearch = CatalogSearch({
       app: _app
     });
     _starttime = document.getElementById('starttime');
@@ -358,22 +358,22 @@ var SearchBar = function (options) {
    * Fetch the earthquakes and display them on the map.
    */
   _loadFeed = function () {
-    _app.MapPane.addLoader(_searchLayer);
-    _app.JsonFeed.fetch(_searchLayer).then(json => {
+    _app.MapPane.addLoader(_catalogSearch);
+    _app.JsonFeed.fetch(_catalogSearch).then(json => {
       if (json) {
-        _searchLayer.create(json);
-        _app.MapPane.addLayer(_searchLayer);
+        _catalogSearch.create(json);
+        _app.MapPane.addLayer(_catalogSearch);
         _app.TitleBar.setTitle({
-          title: _searchLayer.title,
+          title: _catalogSearch.title,
           type: 'search'
         });
       } else {
-        _app.MapPane.removeFeature(_searchLayer);
+        _app.MapPane.removeFeature(_catalogSearch);
       }
     }).catch(error => {
       _app.StatusBar.addError({
-        id: _searchLayer.id,
-        message: `<h4>Error Adding ${_searchLayer.name}</h4><ul><li>${error}</li></ul>`
+        id: _catalogSearch.id,
+        message: `<h4>Error Adding ${_catalogSearch.name}</h4><ul><li>${error}</li></ul>`
       });
 
       console.error(error);
@@ -754,9 +754,9 @@ var SearchBar = function (options) {
     // Check that custom dates are valid if applicable
     if (_isValid()) {
       _setParams(params);
-      _app.MapPane.removeFeature(_searchLayer);
-      _searchLayer.reset();
-      _searchLayer.setFeedUrl(params);
+      _app.MapPane.removeFeature(_catalogSearch);
+      _catalogSearch.reset();
+      _catalogSearch.setFeedUrl(params);
       _loadFeed();
     }
 

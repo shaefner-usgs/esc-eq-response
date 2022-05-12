@@ -39,7 +39,7 @@ var _DEFAULTS = {
  *     url: {String}
  *   }
  */
-var SearchLayer = function (options) {
+var CatalogSearch = function (options) {
   var _this,
       _initialize,
 
@@ -159,4 +159,4 @@ var SearchLayer = function (options) {
 };
 
 
-module.exports = SearchLayer;
+module.exports = CatalogSearch;
