@@ -62,6 +62,7 @@ L.Popup.include({
         right = document.querySelector('.leaflet-top.leaflet-right').offsetWidth + 10,
         top = document.querySelector('header').offsetHeight + 10;
 
+    // Default values account for Header, SideBar and map controls
     return {
       topLeft: new L.Point(left, top),
       bottomRight: new L.Point(right, bottom),
