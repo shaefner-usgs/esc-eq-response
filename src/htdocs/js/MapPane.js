@@ -10,10 +10,12 @@ var AppUtil = require('util/AppUtil');
    1) add leaflet-editable first;
    2) CanvasMarker must be added here (not in dependent Classes). */
 require('leaflet-editable'); // used in SearchBar.js
+require('leaflet-geojson-dateline');
 require('leaflet-mouse-position');
 require('leaflet/L.CanvasMarker'); // used in FocalMechanism.js and MomentTensor.js
 require('leaflet/L.DarkLayer');
 require('leaflet/L.FaultsLayer');
+require('leaflet/L.GeoJSON.DateLine.Center');
 require('leaflet/L.GreyscaleLayer');
 require('leaflet/L.Popup');
 require('leaflet/L.SatelliteLayer');
@@ -292,7 +294,6 @@ var MapPane = function (options) {
 
     _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
-      worldCopyJump: true,
       zoomControl: false // hide default control in favor of custom control
     });
 
