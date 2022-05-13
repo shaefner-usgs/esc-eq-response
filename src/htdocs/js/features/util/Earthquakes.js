@@ -153,7 +153,7 @@ var Earthquakes = function (options) {
     _this.bins = {};
     _this.count = 0;
     _this.list = [];
-    _this.mapLayer = L.geoJson(options.json, {
+    _this.mapLayer = L.geoJSON.dateLine(options.json,{
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
