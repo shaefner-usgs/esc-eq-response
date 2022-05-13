@@ -279,7 +279,7 @@ var FieldNotes = function (options) {
    */
   _this.create = function (json) {
     _this.count = json.features.length;
-    _this.mapLayer = L.geoJson(json, {
+    _this.mapLayer = L.geoJSON.dateLine(json, {
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });

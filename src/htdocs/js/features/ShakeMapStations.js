@@ -134,7 +134,7 @@ var ShakeMapStations = function (options) {
     var mapLayer;
 
     if (_shakemap) {
-      mapLayer = L.geoJson(json, {
+      mapLayer = L.geoJSON.dateLine(json, {
         filter: _filter,
         onEachFeature: _onEachFeature,
         pointToLayer: _pointToLayer
