@@ -4,11 +4,12 @@
 
 /**
  * This class redefines L.Popup to set its default autoPanPadding options to
- * display popups next to (i.e. not under) the map controls, Header or SideBar.
+ * display just-opened popups next to (i.e. not under) the map controls, Header
+ * or SideBar.
  */
 L.Popup.include({
   _adjustPan: function (e) {
-    if (!this.options.autoPan) { return; }
+    if (!this.options.autoPan || this._rendered) { return; }
     if (this._map._panAnim) { this._map._panAnim.stop(); }
 
     var map = this._map,
@@ -54,6 +55,10 @@ L.Popup.include({
         .fire('autopanstart')
         .panBy([dx, dy], {animate: e && e.type === 'moveend'});
     }
+
+    // Flag that popup is already rendered to avoid autoPanning while it's open
+    this._rendered = true;
+    this._map.on('popupclose', this._setRendered, this);
   },
 
   _getDefaults: function () {
@@ -67,5 +72,10 @@ L.Popup.include({
       topLeft: new L.Point(left, top),
       bottomRight: new L.Point(right, bottom),
     };
+  },
+
+  _setRendered: function () {
+    this._rendered = false;
+    this._map.off('popupclose', this._setRendered, this);
   }
 });
