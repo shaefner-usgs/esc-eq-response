@@ -42,15 +42,19 @@ L.Control.EditableRectangle = L.Control.extend({
     this._button.innerHTML = '<div class="box"></div>';
     this._button.title = this._defaultTitle;
 
-    map.on('editable:dragend editable:vertex:mousedown', () => {
-      // Set a slight delay so Leaflet.Editable can update the bounds first
-      setTimeout(this.options.app.SearchBar.setStatus, 500);
-    });
+    map.on('editable:dragend editable:vertex:mousedown', this._setStatus, this);
     map.on('editable:drawing:commit', this._onCommit, this);
 
     L.DomEvent.on(this._button, 'click', this._onClick, this);
 
     return container;
+  },
+
+  onRemove: function (map) {
+    map.off('editable:dragend editable:vertex:mousedown', this._setStatus, this);
+    map.off('editable:drawing:commit', this._onCommit, this);
+
+    L.DomEvent.off(this._button, 'click', this._onClick, this);
   },
 
   _onClick: function () {
@@ -91,6 +95,11 @@ L.Control.EditableRectangle = L.Control.extend({
       this._instructions.classList.add('hide');
       this.options.app.SearchBar.setStatus();
     }
+  },
+
+  _setStatus: function () {
+    // Set a slight delay so Leaflet.Editable can update the bounds first
+    setTimeout(this.options.app.SearchBar.setStatus, 500);
   }
 });
 
