@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @use 'variables' as *;
 
 .lightbox {
@@ -7,7 +9,7 @@
   display: flex;
   left: 0;
   opacity: 1;
-  padding: 1rem;
+  padding: 1rem 2.5rem;
   position: fixed;
   right: 0;
   top: 0;
@@ -21,19 +23,14 @@
   }
 
   &:after {
-    background: #eee;
-    border-radius: 50%;
-    color: #000;
+    color: color.scale($accent-color, $lightness: 75%, $saturation: 90%);
     content: '\d7';
-    font-size: 20px;
-    height: 25px;
-    line-height: 1.05;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
     position: absolute;
-    right: 10px;
-    text-align: center;
-    top: 10px;
-    transition: background $effect-off-duration ease-in;
-    width: 25px;
+    right: 1rem;
+    top: .25rem;
   }
 
   > img,
