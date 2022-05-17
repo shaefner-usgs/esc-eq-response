@@ -23,6 +23,7 @@ $sidebar-width: 400px;
 /* Colors */
 
 $accent-color: #4440CC;
+$accent-color-disabled: color.scale($accent-color, $lightness: 75%);
 $accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 91%);
 $accent-color-lightest: color.scale($accent-color, $alpha: -4%, $lightness: 96%, $saturation: 25%);
 

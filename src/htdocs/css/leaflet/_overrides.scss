@@ -8,6 +8,13 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
 #mapPane,
 #searchBar {
+  .leaflet-bar a.leaflet-disabled,
+  .leaflet-bar a.leaflet-disabled:active,
+  .leaflet-bar a.leaflet-disabled:hover {
+    background: $bg-color-alpha;
+    color: $accent-color-disabled;
+  }
+
   .leaflet-center,
   .leaflet-right {
     transition: padding $sidebar-toggle-duration ease;
