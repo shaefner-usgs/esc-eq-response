@@ -294,6 +294,7 @@ var MapPane = function (options) {
 
     _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
+      minZoom: 1,
       zoomControl: false // hide default control in favor of custom control
     });
 
