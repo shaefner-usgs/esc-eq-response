@@ -38,14 +38,12 @@ var Lightbox = function (options) {
   /**
    * Add listener for closing Lightbox.
    *
-   * @param container {Element}
+   * @param lightbox {Element}
    */
-  _addListeners = function (container) {
-    var content = container.querySelector(':scope > *');
+  _addListeners = function (lightbox) {
+    var content = lightbox.querySelector(':scope > *');
 
-    container.addEventListener('click', () => {
-      _this.hide();
-    });
+    lightbox.addEventListener('click', _this.hide);
 
     // Disable click to close on Lightbox content
     if (content) {
@@ -72,7 +70,7 @@ var Lightbox = function (options) {
    * Add the Lightbox to the document.
    *
    * @param html {String}
-   *     Lightbox content (typically an <img> element)
+   *     Lightbox content
    */
   _this.add = function (html) {
     var div = document.createElement('div');

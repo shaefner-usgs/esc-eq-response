@@ -36,21 +36,17 @@
     width: 25px;
   }
 
-  img {
-    border-radius: $content-border-radius;
-    margin: auto;
-    max-height: 100%;
-    max-width: 100%;
-  }
-
+  > img,
   .content {
     background: $bg-color;
     border-radius: $content-border-radius;
     margin: auto;
     max-height: 100%;
     max-width: 100%;
-    overflow: scroll;
     padding: 1rem 1.5rem;
+  }
+  .content {
+    overflow: scroll;
   }
 
   > * {
