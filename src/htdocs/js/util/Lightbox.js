@@ -22,9 +22,9 @@ var Lightbox = function (options) {
       _initialize,
 
       _id,
+      _lightbox,
 
-      _addListeners,
-      _handleEscapeKey;
+      _onKeyDown;
 
 
   _this = {};
@@ -36,27 +36,11 @@ var Lightbox = function (options) {
   };
 
   /**
-   * Add listener for closing Lightbox.
-   *
-   * @param lightbox {Element}
-   */
-  _addListeners = function (lightbox) {
-    var content = lightbox.querySelector(':scope > *');
-
-    lightbox.addEventListener('click', _this.hide);
-
-    // Disable click to close on Lightbox content
-    if (content) {
-      content.addEventListener('click', e => e.stopPropagation());
-    }
-  };
-
-  /**
-   * Hide Lightbox when user hits the escape key.
+   * Hide the Lightbox when the user hits the escape key.
    *
    * @param e {Event}
    */
-  _handleEscapeKey = function (e) {
+  _onKeyDown = function (e) {
     if (e.key === 'Escape') {
       _this.hide();
     }
@@ -73,40 +57,44 @@ var Lightbox = function (options) {
    *     Lightbox content
    */
   _this.add = function (html) {
-    var div = document.createElement('div');
+    var content, div;
 
-    div.classList.add('lightbox', 'hide');
+    div = document.createElement('div');
+
     div.id = _id;
     div.innerHTML = html;
+    div.classList.add('lightbox', 'hide');
 
-    _this.remove(); // first remove any existing Lightbox
+    _this.remove(); // first remove any pre-existing Lightbox w/ this _id
     document.body.appendChild(div);
 
-    _addListeners(div);
+    _lightbox = div;
+    content = _lightbox.querySelector(':scope > *');
+
+    // Disable click to close on Lightbox content
+    if (content) {
+      content.addEventListener('click', e => e.stopPropagation());
+    }
   };
 
   /**
    * Hide the Lightbox.
    */
   _this.hide = function () {
-    var div = document.getElementById(_id);
-
-    if (div) {
-      div.classList.add('hide');
+    if (_lightbox) {
+      _lightbox.classList.add('hide');
+      _lightbox.removeEventListener('click', _this.hide);
     }
 
-    // Remove escape key listener
-    document.removeEventListener('keydown', _handleEscapeKey);
+    document.removeEventListener('keydown', _onKeyDown);
   };
 
   /**
    * Remove the Lightbox from the document.
    */
   _this.remove = function () {
-    var div = document.getElementById(_id);
-
-    if (div) {
-      div.parentNode.removeChild(div);
+    if (_lightbox) {
+      _lightbox.parentNode.removeChild(_lightbox);
     }
   };
 
@@ -114,14 +102,12 @@ var Lightbox = function (options) {
    * Show the Lightbox.
    */
   _this.show = function () {
-    var div = document.getElementById(_id);
-
-    if (div) {
-      div.classList.remove('hide');
+    if (_lightbox) {
+      _lightbox.classList.remove('hide');
+      _lightbox.addEventListener('click', _this.hide);
     }
 
-    // Add escape key listener
-    document.addEventListener('keydown', _handleEscapeKey);
+    document.addEventListener('keydown', _onKeyDown);
   };
 
 
