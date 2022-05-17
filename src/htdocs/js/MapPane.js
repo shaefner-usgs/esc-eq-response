@@ -2,13 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
-/* Leaflet plugins and layer factories (these get attached to the global L obj)
-   NOTE: Leaflet.Editable strips all custom props added to L, therefore:
-   1) add leaflet-editable first;
-   2) CanvasMarker must be added here (not in dependent Classes). */
+// Leaflet plugins and layer factories
 require('leaflet-mouse-position');
 require('leaflet/L.DarkLayer');
 require('leaflet/L.FaultsLayer');
@@ -18,6 +12,8 @@ require('leaflet/L.SatelliteLayer');
 require('leaflet/L.TerrainLayer');
 require('leaflet/L.Tooltip');
 require('leaflet/L.ZoomCenter');
+
+var AppUtil = require('util/AppUtil');
 
 
 /**
