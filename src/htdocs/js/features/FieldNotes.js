@@ -3,6 +3,7 @@
 
 
 require('leaflet');
+require('leaflet/L.GeoJSON.DateLine.Center');
 
 var AppUtil = require('util/AppUtil'),
     Lightbox = require('util/Lightbox'),

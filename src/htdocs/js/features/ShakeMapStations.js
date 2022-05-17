@@ -2,6 +2,8 @@
 'use strict';
 
 
+require('leaflet/L.GeoJSON.DateLine.Center');
+
 var AppUtil = require('util/AppUtil');
 
 

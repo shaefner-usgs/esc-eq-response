@@ -2,6 +2,9 @@
 'use strict';
 
 
+require('leaflet-geojson-dateline');
+
+
 /**
  * This class redefines L.GeoJSON.DateLine to calculate the center of the map
  * correctly when the SideBar is open.

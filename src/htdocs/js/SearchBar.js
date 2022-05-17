@@ -2,11 +2,11 @@
 'use strict';
 
 
+require('leaflet-editable');
+require('leaflet/L.EditableRectangle'); // custom map control for Leaflet.Editable
+
 var AppUtil = require('util/AppUtil'),
     CatalogSearch = require('leaflet/CatalogSearch');
-
-// NOTE: the Leaflet.Editable plugin is included in MapPane.js
-require('leaflet/L.EditableRectangle'); // custom map control for Leaflet.Editable
 
 
 var _DEFAULTS = {

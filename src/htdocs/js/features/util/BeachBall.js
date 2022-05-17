@@ -2,6 +2,8 @@
 'use strict';
 
 
+require('leaflet/L.CanvasMarker');
+
 var AppUtil = require('util/AppUtil'),
     BeachBallView = require('features/util/BeachBallView'),
     Tensor = require('features/util/Tensor');
