@@ -6,7 +6,7 @@ require('leaflet-editable');
 require('leaflet/L.EditableRectangle'); // custom map control for Leaflet.Editable
 
 var AppUtil = require('util/AppUtil'),
-    CatalogSearch = require('leaflet/CatalogSearch');
+    CatalogSearch = require('CatalogSearch');
 
 
 var _DEFAULTS = {
