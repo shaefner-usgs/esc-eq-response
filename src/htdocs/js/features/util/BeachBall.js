@@ -2,7 +2,7 @@
 'use strict';
 
 
-require('leaflet/L.CanvasMarker');
+require('leaflet/L.Marker.Canvas');
 
 var AppUtil = require('util/AppUtil'),
     BeachBallView = require('features/util/BeachBallView'),
@@ -326,12 +326,12 @@ var BeachBall = function (options) {
    * Create the Leaflet map layer.
    *
    * Note: the marker's beachball is moved from its placeholder in the DOM to
-   * the CanvasMarker when the layer is turned on.
+   * the Canvas Marker when the layer is turned on.
    *
    * @return {L.layer}
    */
   _this.createMapLayer = function () {
-    return L.marker.canvasMarker(_coords, {
+    return L.marker.canvas(_coords, {
       icon: L.divIcon({
         className: _className,
         iconSize: L.point(_markerSize, _markerSize)
@@ -387,7 +387,7 @@ var BeachBall = function (options) {
    * Create and render the beachballs.
    *
    * Note: the marker's beachball is rendered into a placeholder (and hidden by
-   * CSS) for use by CanvasMarker when the corresponding map layer is turned on.
+   * CSS) for use by Canvas Marker when the corresponding map layer is turned on.
    */
   _this.render = function () {
     var options = {

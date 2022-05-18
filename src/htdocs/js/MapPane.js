@@ -4,6 +4,7 @@
 
 // Leaflet plugins and layer factories
 require('leaflet-mouse-position');
+require('leaflet/L.Control.ZoomCenter');
 require('leaflet/L.DarkLayer');
 require('leaflet/L.FaultsLayer');
 require('leaflet/L.GreyscaleLayer');
@@ -11,7 +12,6 @@ require('leaflet/L.Popup');
 require('leaflet/L.SatelliteLayer');
 require('leaflet/L.TerrainLayer');
 require('leaflet/L.Tooltip');
-require('leaflet/L.ZoomCenter');
 
 var AppUtil = require('util/AppUtil');
 
@@ -98,7 +98,7 @@ var MapPane = function (options) {
 
     L.control.mousePosition().addTo(_map);
     L.control.scale().addTo(_map);
-    L.control.zoom.zoomCenter().addTo(_map);
+    L.control.zoomCenter().addTo(_map);
   };
 
   /**

@@ -11,7 +11,7 @@ require('leaflet.path.drag'); // add path dragging to Leaflet.Editable
  *
  * See: https://github.com/Leaflet/Leaflet.Editable
  */
-L.Control.EditableRectangle = L.Control.extend({
+L.Control.Rectangle = L.Control.extend({
   options: {
     app: {},
     position: 'topleft',
@@ -104,6 +104,6 @@ L.Control.EditableRectangle = L.Control.extend({
 });
 
 
-L.control.editableRectangle = function (options) {
-  return new L.Control.EditableRectangle(options);
+L.control.rectangle = function (options) {
+  return new L.Control.Rectangle(options);
 };

@@ -3,7 +3,7 @@
 
 
 require('leaflet-editable');
-require('leaflet/L.EditableRectangle'); // custom map control for Leaflet.Editable
+require('leaflet/L.Control.Rectangle'); // custom map control for Leaflet.Editable
 
 var AppUtil = require('util/AppUtil'),
     CatalogSearch = require('CatalogSearch');
@@ -112,7 +112,7 @@ var SearchBar = function (options) {
    * Add a control to the map for creating a custom region Rectangle.
    */
   _addControl = function () {
-    var control = L.control.editableRectangle({
+    var control = L.control.rectangle({
       app: _app,
       region: _regionLayer
     });

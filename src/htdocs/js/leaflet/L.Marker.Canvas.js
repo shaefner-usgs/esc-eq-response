@@ -9,7 +9,7 @@
  * This is necessary b/c Leaflet dynamically creates/destroys markers when they
  * are turned on/off in the layers control.
  */
-L.Marker.CanvasMarker = L.Marker.extend({
+L.Marker.Canvas = L.Marker.extend({
   onAdd: function (map) {
     var marker,
         className = this.id,
@@ -38,6 +38,6 @@ L.Marker.CanvasMarker = L.Marker.extend({
 });
 
 
-L.marker.canvasMarker = function (latlng, options) {
-  return new L.Marker.CanvasMarker(latlng, options);
+L.marker.canvas = function (latlng, options) {
+  return new L.Marker.Canvas(latlng, options);
 };

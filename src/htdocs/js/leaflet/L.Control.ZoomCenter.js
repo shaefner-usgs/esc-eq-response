@@ -7,7 +7,7 @@
  * visible map area, which varies depending on the header's height and whether
  * or not the sidebar is toggled on.
  */
-L.Control.Zoom.ZoomCenter = L.Control.Zoom.extend({
+L.Control.ZoomCenter = L.Control.Zoom.extend({
   _getCenter: function () {
     var offsetX,
         offsetY,
@@ -44,6 +44,6 @@ L.Control.Zoom.ZoomCenter = L.Control.Zoom.extend({
 });
 
 
-L.control.zoom.zoomCenter = function (options) {
-  return new L.Control.Zoom.ZoomCenter(options);
+L.control.zoomCenter = function (options) {
+  return new L.Control.ZoomCenter(options);
 };
