@@ -60,18 +60,12 @@ var PagerExposures = function (options) {
    * @return html {String}
    */
   _createRows = function () {
-    var cities,
-        data,
-        html,
-        mmis,
-        population,
-        shaking;
-
-    cities = _app.Features.getFeature('pager-cities').cities;
-    html = '';
-    mmis = _this.exposures.mmi;
-    population = _this.exposures.population;
-    shaking = _this.exposures.shaking;
+    var data,
+        cities = _app.Features.getFeature('pager-cities').cities,
+        html = '',
+        mmis = _this.exposures.mmi,
+        population = _this.exposures.population,
+        shaking = _this.exposures.shaking;
 
     mmis.forEach((mmi, i) => {
       if (mmi >= 2 && Number(population[i]) !== 0) { // skip mmi below 2 and when nobody affected
@@ -121,13 +115,10 @@ var PagerExposures = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var data,
-        html;
-
-    data = {
-      rows: _createRows()
-    };
-    html = '';
+    var data = {
+          rows: _createRows()
+        },
+        html = '';
 
     if (data.rows) {
       html = L.Util.template(
@@ -158,25 +149,19 @@ var PagerExposures = function (options) {
    *
    * @param json {Object}
    *
-   * @return exposures {Object}
+   * @return {Object}
    */
   _getExposures = function (json) {
-    var exposures,
-        mmi,
-        population;
+    var mmi = json.population_exposure.mmi,
+        population = json.population_exposure.aggregated_exposure.map(pop =>
+          AppUtil.roundThousands(pop)
+        );
 
-    mmi = json.population_exposure.mmi;
-    population = json.population_exposure.aggregated_exposure.map(pop =>
-      AppUtil.roundThousands(pop)
-    );
-
-    exposures = {
+    return {
       mmi: mmi.reverse(),
       population: population.reverse(),
       shaking: AppUtil.getShakingValues(mmi)
     };
-
-    return exposures;
   };
 
   // ----------------------------------------------------------
@@ -214,11 +199,8 @@ var PagerExposures = function (options) {
    */
   _this.setFeedUrl = function () {
     var contents,
-        mainshock,
-        products;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products;
 
     if (products.losspager) {
       contents = products.losspager[0].contents;

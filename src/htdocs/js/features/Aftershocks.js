@@ -76,12 +76,9 @@ var Aftershocks = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var duration,
-        html,
-        interval,
-        mostRecentEq;
+    var duration, interval, mostRecentEq,
+        html = '<div class="bubble">';
 
-    html = '<div class="bubble">';
     html += _earthquakes.createDescription();
 
     if (_this.count > 0) {
@@ -136,13 +133,9 @@ var Aftershocks = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var buttons,
-        el,
-        toggle;
-
-    el = document.querySelector('#summaryPane .aftershocks');
-    buttons = el.querySelectorAll('.timeframe li');
-    toggle = el.querySelector('a.button');
+    var el = document.querySelector('#summaryPane .aftershocks'),
+        buttons = el.querySelectorAll('.timeframe li'),
+        toggle = el.querySelector('a.button');
 
     // Set the selected option on the 'radio-bar'
     buttons.forEach(button =>
@@ -209,23 +202,19 @@ var Aftershocks = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var params,
-        starttime,
-        urlParams;
-
-    starttime = Luxon.DateTime.fromMillis(_mainshock.json.properties.time + 1000)
-      .toUTC().toISO().slice(0, -5);
-    urlParams = {
-      asDist: document.getElementById('as-dist').value,
-      asMag: document.getElementById('as-mag').value
-    };
-    params = {
-      latitude: _mainshock.json.geometry.coordinates[1],
-      longitude: _mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(urlParams.asDist),
-      minmagnitude: Number(urlParams.asMag),
-      starttime: starttime
-    };
+    var starttime = Luxon.DateTime.fromMillis(_mainshock.json.properties.time + 1000)
+          .toUTC().toISO().slice(0, -5),
+        urlParams = {
+          asDist: document.getElementById('as-dist').value,
+          asMag: document.getElementById('as-mag').value
+        },
+        params = {
+          latitude: _mainshock.json.geometry.coordinates[1],
+          longitude: _mainshock.json.geometry.coordinates[0],
+          maxradiuskm: Number(urlParams.asDist),
+          minmagnitude: Number(urlParams.asMag),
+          starttime: starttime
+        };
 
     _this.url = Earthquakes.getFeedUrl(params);
   };

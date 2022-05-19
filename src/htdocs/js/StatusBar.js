@@ -51,11 +51,8 @@ var StatusBar = function (options) {
    * @param id {String}
    */
   _addListeners = function (div, id) {
-    var close,
-        reload;
-
-    close = div.querySelector('.close');
-    reload = div.querySelector('.reload');
+    var close = div.querySelector('.close'),
+        reload = div.querySelector('.reload');
 
     // Remove StatusBar item
     if (close) {
@@ -91,11 +88,8 @@ var StatusBar = function (options) {
    * @return {String}
    */
   _getMessage = function (item, opts) {
-    var loader,
-        msg;
-
-    loader = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>';
-    msg = '';
+    var loader = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>',
+        msg = '';
 
     if (item.name) {
       msg += item.name;
@@ -159,17 +153,11 @@ var StatusBar = function (options) {
    *   }
    */
   _this.addError = function (error) {
-    var content,
-        div,
-        isFeature,
-        isSearch,
-        isSignificantEqs;
-
-    content = error.message;
-    div = document.createElement('div');
-    isFeature = _app.Features.isFeature(error.id);
-    isSearch = (error.id === 'search' ? true : false);
-    isSignificantEqs = (error.id === 'significantEqs' ? true : false);
+    var content = error.message,
+        div = document.createElement('div'),
+        isFeature = _app.Features.isFeature(error.id),
+        isSearch = (error.id === 'search' ? true : false),
+        isSignificantEqs = (error.id === 'significantEqs' ? true : false);
 
     if (
       (isFeature || isSearch || isSignificantEqs) &&
@@ -207,10 +195,9 @@ var StatusBar = function (options) {
    *   }
    */
   _this.addItem = function (item, opts) {
-    var div,
-        message;
+    var message,
+        div = document.createElement('div');
 
-    div = document.createElement('div');
     opts = Object.assign({
       append: '',
       prepend: 'Loading'

@@ -55,11 +55,8 @@ var NavBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var close,
-        lis;
-
-    close = document.querySelector('aside .icon-close');
-    lis = _el.querySelectorAll('#navSub li');
+    var close = document.querySelector('aside .icon-close'),
+        lis = _el.querySelectorAll('#navSub li');
 
     // Switch between Panes
     window.addEventListener('hashchange', _switchPanes);
@@ -133,11 +130,8 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _showPane = function (id) {
-    var button,
-        selPane;
-
-    button = _el.querySelector('[href="#' + id + '"]');
-    selPane = document.getElementById(id);
+    var button = _el.querySelector('[href="#' + id + '"]'),
+        selPane = document.getElementById(id);
 
     button.classList.add('selected');
     selPane.classList.remove('hide');
@@ -152,11 +146,8 @@ var NavBar = function (options) {
    * @param id {String}
    */
   _showSideBar = function (id) {
-    var button,
-        selSideBar;
-
-    button = _el.querySelector('.icon-' + id);
-    selSideBar = document.getElementById(id);
+    var button = _el.querySelector('.icon-' + id),
+        selSideBar = document.getElementById(id);
 
     button.classList.add('selected');
     selSideBar.classList.remove('hide');

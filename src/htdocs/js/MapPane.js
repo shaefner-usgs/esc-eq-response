@@ -107,17 +107,14 @@ var MapPane = function (options) {
    * @return control {L.Control}
    */
   _addLayerControl = function () {
-    var control,
-        overlays;
-
-    overlays = Object.assign({}, _staticLayers.overlays, _staticLayers.search);
-    control = L.control.layers(
-      _staticLayers.baseLayers,
-      overlays, {
-        sortFunction: _compareLayers,
-        sortLayers: true
-      }
-    ).addTo(_map);
+    var overlays = Object.assign({}, _staticLayers.overlays, _staticLayers.search),
+        control = L.control.layers(
+          _staticLayers.baseLayers,
+          overlays, {
+            sortFunction: _compareLayers,
+            sortLayers: true
+          }
+        ).addTo(_map);
 
     return control;
   };
@@ -192,20 +189,16 @@ var MapPane = function (options) {
    * @param latlng {L.LatLng}
    *     Mainshock's coords.
    *
-   * @return bounds {L.Bounds}
+   * @return {L.Bounds}
    */
   _getBounds = function (latLng) {
-    var bounds,
-        maxDistance;
-
-    maxDistance = Math.max(
+    var maxDistance = Math.max(
       Number(document.getElementById('as-dist').value),
       Number(document.getElementById('fs-dist').value),
       Number(document.getElementById('hs-dist').value)
     );
-    bounds = latLng.toBounds(maxDistance * 1000); // km -> meters
 
-    return bounds;
+    return latLng.toBounds(maxDistance * 1000); // km -> meters
   };
 
   /**
@@ -246,18 +239,12 @@ var MapPane = function (options) {
    *    }
    */
   _getStaticLayers = function () {
-    var dark,
-        faults,
-        greyscale,
-        layers,
-        satellite,
-        terrain;
-
-    dark = L.darkLayer();
-    faults = L.faultsLayer();
-    greyscale = L.greyscaleLayer();
-    satellite = L.satelliteLayer();
-    terrain = L.terrainLayer();
+    var layers,
+        dark = L.darkLayer(),
+        faults = L.faultsLayer(),
+        greyscale = L.greyscaleLayer(),
+        satellite = L.satelliteLayer(),
+        terrain = L.terrainLayer();
 
     layers = {
       baseLayers: {
@@ -332,11 +319,8 @@ var MapPane = function (options) {
    */
   _setView = function (bounds, animate = false) {
     var point,
-        status,
-        x;
-
-    status = _app.Features.getLoadingStatus();
-    x = 0;
+        status = _app.Features.getLoadingStatus(),
+        x = 0;
 
     if (AppUtil.getParam('sidebar')) {
       x = -_app.sideBarWidth;
@@ -367,9 +351,7 @@ var MapPane = function (options) {
    */
   _this.addFeature = function (feature) {
     var marker,
-        status;
-
-    status = _app.Features.getLoadingStatus();
+        status = _app.Features.getLoadingStatus();
 
     if (feature.mapLayer) {
       _this.addLayer(feature);
@@ -403,13 +385,9 @@ var MapPane = function (options) {
    *     Feature or catalog search results
    */
   _this.addLayer = function (item) {
-    var name,
-        placeholder,
-        region;
-
-    name = item.name;
-    placeholder = _placeholders[item.id]; // name and 'loader' in layer control
-    region = AppUtil.getParam('region');
+    var name = item.name,
+        placeholder = _placeholders[item.id], // name and 'loader' in layer control
+        region = AppUtil.getParam('region');
 
     item.mapLayer.id = item.id; // need access to Item's id from Leaflet layer
 
@@ -486,10 +464,8 @@ var MapPane = function (options) {
    * @param featureId {String}
    */
   _this.openPopup = function (eqid, featureId) {
-    var layer,
-        marker;
-
-    layer = _app.Features.getFeature(featureId).mapLayer;
+    var marker,
+        layer = _app.Features.getFeature(featureId).mapLayer;
 
     // Get the marker associated with the given 'eqid'
     layer.eachLayer(eq => {
@@ -520,11 +496,8 @@ var MapPane = function (options) {
    *     Feature or catalog search results
    */
   _this.removeFeature = function (item) {
-    var placeholder,
-        showLayer;
-
-    placeholder = _placeholders[item.id]; // loading status in layer control
-    showLayer = item.showLayer; // cache value
+    var placeholder = _placeholders[item.id], // loading status in layer control
+        showLayer = item.showLayer; // cache value
 
     if (item.mapLayer) {
       _map.removeLayer(item.mapLayer); // sets showLayer prop to false
@@ -543,11 +516,8 @@ var MapPane = function (options) {
    * Render the map correctly when the MapPane is activated.
    */
   _this.render = function () {
-    var bounds,
-        status;
-
-    bounds = _searchBounds || _defaultBounds;
-    status = _app.Features.getLoadingStatus();
+    var bounds = _searchBounds || _defaultBounds,
+        status = _app.Features.getLoadingStatus();
 
     _map.invalidateSize(); // updates map if its container size was changed
     _map.fire('visible'); // displays popups added when map was hidden
@@ -568,11 +538,8 @@ var MapPane = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var bounds,
-        canvasEls;
-
-    bounds = _searchBounds || _defaultBounds;
-    canvasEls = document.querySelectorAll('#mapPane .content canvas');
+    var bounds = _searchBounds || _defaultBounds,
+        canvasEls = document.querySelectorAll('#mapPane .content canvas');
 
     _bounds = L.latLngBounds();
     _initialView = true;

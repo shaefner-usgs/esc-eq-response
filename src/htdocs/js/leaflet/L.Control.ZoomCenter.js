@@ -9,15 +9,10 @@
  */
 L.Control.ZoomCenter = L.Control.Zoom.extend({
   _getCenter: function () {
-    var offsetX,
-        offsetY,
-        point,
-        sidebar;
-
-    offsetX = document.getElementById('sideBar').offsetWidth / 2;
-    offsetY = document.querySelector('header').offsetHeight / 2;
-    point = this._map.getSize().divideBy(2).add([0, offsetY]);
-    sidebar = document.body.classList.contains('sidebar');
+    var offsetX = document.getElementById('sideBar').offsetWidth / 2,
+        offsetY = document.querySelector('header').offsetHeight / 2,
+        point = this._map.getSize().divideBy(2).add([0, offsetY]),
+        sidebar = document.body.classList.contains('sidebar');
 
     if (sidebar) {
       point = point.subtract([offsetX, 0]);

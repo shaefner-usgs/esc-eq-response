@@ -172,9 +172,7 @@ var Features = function (options) {
    */
   _checkDependencies = function (feature) {
     var dependency,
-        status;
-
-    status = 'complete'; // default
+        status = 'complete'; // default
 
     if (Array.isArray(feature.dependencies)) { // load dependencies first
       feature.dependencies.forEach(id => {
@@ -227,11 +225,8 @@ var Features = function (options) {
    * @param feature {Object}
    */
   _loadFeature = function (feature) {
-    var fetchOpts,
-        resource;
-
-    fetchOpts = {};
-    resource = feature;
+    var fetchOpts = {},
+        resource = feature;
 
     if (AppUtil.getParam('catalog') === 'dd' && (
       feature.id === 'aftershocks' ||

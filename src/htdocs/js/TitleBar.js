@@ -82,14 +82,10 @@ var TitleBar = function (options) {
    *   }
    */
   _this.setTitle = function (opts = {}) {
-    var appName,
-        docTitle,
-        h1,
-        title;
-
-    appName = document.title.split(' | ')[1] || document.title;
-    h1 = _el.querySelector('h1');
-    title = _title;
+    var docTitle,
+        appName = document.title.split(' | ')[1] || document.title,
+        h1 = _el.querySelector('h1'),
+        title = _title;
 
     if (opts.title) {
       title = opts.title;

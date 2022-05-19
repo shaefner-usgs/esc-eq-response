@@ -74,19 +74,14 @@ var PlotsPane = function (options) {
    * @return container {Element}
    */
   _addContainer = function (featureId, plotId) {
-    var container,
-        h3,
-        names,
-        parent;
-
-    container = document.createElement('div');
-    h3 = document.createElement('h3');
-    names = {
-      cumulative: 'Cumulative Earthquakes',
-      hypocenters: '3D Hypocenters',
-      magtime: 'Magnitude vs. Time'
-    };
-    parent = _contentEl.querySelector('.' + featureId + ' .bubble');
+    var container = document.createElement('div'),
+        h3 = document.createElement('h3'),
+        names = {
+          cumulative: 'Cumulative Earthquakes',
+          hypocenters: '3D Hypocenters',
+          magtime: 'Magnitude vs. Time'
+        },
+        parent = _contentEl.querySelector('.' + featureId + ' .bubble');
 
     h3.innerHTML = names[plotId];
 
@@ -105,9 +100,7 @@ var PlotsPane = function (options) {
    */
   _addCount = function (feature, div) {
     var count,
-        loader;
-
-    loader = div.querySelector('.breather');
+        loader = div.querySelector('.breather');
 
     if (loader) {
       loader.classList.add('hide');
@@ -165,38 +158,35 @@ var PlotsPane = function (options) {
    * @return config {Object}
    */
   _getPlotlyConfig = function (featureId, plotId) {
-    var config,
-        eqid,
-        opts;
+    var eqid, opts,
+        config = {
+          displaylogo: false,
+          modeBarButtonsToAdd: [{
+            click: gd => {
+              eqid = AppUtil.getParam('eqid');
+              opts = {
+                filename: eqid + '-' + featureId + '-' + plotId,
+                format: 'svg',
+                height: 500,
+                width: 1200
+              };
 
-    config = {
-      displaylogo: false,
-      modeBarButtonsToAdd: [{
-        click: gd => {
-          eqid = AppUtil.getParam('eqid');
-          opts = {
-            filename: eqid + '-' + featureId + '-' + plotId,
-            format: 'svg',
-            height: 500,
-            width: 1200
-          };
+              if (gd.classList.contains('hypocenters')) {
+                opts.height = 1000;
+              }
 
-          if (gd.classList.contains('hypocenters')) {
-            opts.height = 1000;
-          }
-
-          Plotly.downloadImage(gd, opts);
-        },
-        icon: Plotly.Icons.camera,
-        name: 'toImage2',
-        title: 'Download plot (.svg)'
-      }],
-      modeBarButtonsToRemove: ['hoverClosest3d','hoverClosestCartesian',
-        'hoverCompareCartesian', 'lasso2d', 'resetCameraDefault3d',
-        'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines',
-        'toImage'
-      ]
-    };
+              Plotly.downloadImage(gd, opts);
+            },
+            icon: Plotly.Icons.camera,
+            name: 'toImage2',
+            title: 'Download plot (.svg)'
+          }],
+          modeBarButtonsToRemove: ['hoverClosest3d','hoverClosestCartesian',
+            'hoverCompareCartesian', 'lasso2d', 'resetCameraDefault3d',
+            'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines',
+            'toImage'
+          ]
+        };
 
     return config;
   };
@@ -232,25 +222,21 @@ var PlotsPane = function (options) {
    * @return layout {Object}
    */
   _getPlotlyLayout = function (plotId, zRatio) {
-    var color,
-        layout,
-        spikecolor;
-
-    color = '#555';
-    layout = {
-      font: {
-        family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
-      },
-      hovermode: 'closest',
-      margin: {
-        b: 50,
-        l: 50,
-        r: 50,
-        t: 0
-      },
-      showlegend: false
-    };
-    spikecolor = '#4440CC'; // accent-color
+    var color = '#555',
+        layout = {
+          font: {
+            family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
+          },
+          hovermode: 'closest',
+          margin: {
+            b: 50,
+            l: 50,
+            r: 50,
+            t: 0
+          },
+          showlegend: false
+        },
+        spikecolor = '#4440CC'; // accent-color
 
     if (plotId === 'hypocenters') {
       layout.scene = {
@@ -342,10 +328,8 @@ var PlotsPane = function (options) {
    *     Plotly.newPlot signature
    */
   _getPlotlyParams = function (feature, plotId) {
-    var container,
-        zRatio;
-
-    container = _addContainer(feature.id, plotId);
+    var zRatio,
+        container = _addContainer(feature.id, plotId);
 
     if (plotId === 'hypocenters') {
       zRatio = _getRatio(feature.plotTraces.hypocenters);
@@ -367,22 +351,15 @@ var PlotsPane = function (options) {
    * @param trace {Object}
    *     plot's data trace
    *
-   * @return ratio {Number}
+   * @return {Number}
    */
   _getRatio = function (trace) {
-    var depthExtent,
-        depthRange,
-        latExtent,
-        latRange,
-        ratio;
+    var depthExtent = AppUtil.extent(trace.z),
+        depthRange = depthExtent[1] - depthExtent[0],
+        latExtent = AppUtil.extent(trace.y),
+        latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
 
-    depthExtent = AppUtil.extent(trace.z);
-    depthRange = depthExtent[1] - depthExtent[0];
-    latExtent = AppUtil.extent(trace.y);
-    latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
-    ratio = depthRange / latRange;
-
-    return ratio;
+    return depthRange / latRange;
   };
 
   /**
@@ -480,10 +457,8 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
-    var el,
-        plots;
-
-    el = _el.querySelector('.' + feature.id);
+    var plots,
+        el = _el.querySelector('.' + feature.id);
 
     if (el) {
       plots = el.querySelectorAll('.js-plotly-plot');

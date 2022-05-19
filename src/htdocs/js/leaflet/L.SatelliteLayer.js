@@ -11,37 +11,30 @@
  *
  * @return {Object <L.layerGroup|L.tileLayer>}
  */
-L.SatelliteLayer = function (provider, options) {
-  var base,
-      places,
-      placesUrl,
-      providers,
-      transportation,
-      transportationUrl,
-      url;
+L.SatelliteLayer = function (provider = 'esri', options) {
+  var base, places, placesUrl, transportation, transportationUrl,
+      providers = {
+        esri: {
+          attribution: 'Tiles &copy; Esri — Source: Esri, i-cubed, USDA, ' +
+            'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the ' +
+            'GIS User Community',
+          subdomains: [
+            'server',
+            'services'
+          ],
+          url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        },
+        mapquest: {
+          attribution: 'Tiles Courtesy of <a href="https://www.mapquest.com/">MapQuest</a> ' +
+            '— Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of ' +
+            'Agriculture, Farm Service Agency',
+          subdomains: '1234',
+          url: 'https://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg'
+        }
+      },
+      url = providers[provider].url;
 
-  providers = {
-    esri: {
-      attribution: 'Tiles &copy; Esri — Source: Esri, i-cubed, USDA, ' +
-        'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the ' +
-        'GIS User Community',
-      subdomains: [
-        'server',
-        'services'
-      ],
-      url: 'https://{s}.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-    },
-    mapquest: {
-      attribution: 'Tiles Courtesy of <a href="https://www.mapquest.com/">MapQuest</a> ' +
-        '— Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of ' +
-        'Agriculture, Farm Service Agency',
-      subdomains: '1234',
-      url: 'https://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg'
-    }
-  };
-  provider = provider || 'esri';
   options = Object.assign({}, providers[provider], options);
-  url = providers[provider].url;
   base = L.tileLayer(url, options);
 
   // ESRI satellite layer doesn't include labels; add them

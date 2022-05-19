@@ -124,30 +124,24 @@ var Foreshocks = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var endtime,
-        mainshock,
-        params,
-        starttime,
-        urlParams;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    endtime = Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
-      .toUTC().toISO().slice(0, -5);
-    urlParams = {
-      fsDays: document.getElementById('fs-days').value,
-      fsDist: document.getElementById('fs-dist').value,
-      fsMag: document.getElementById('fs-mag').value
-    };
-    starttime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC()
-      .minus({ days: urlParams.fsDays }).toISO().slice(0, -5);
-    params = {
-      endtime: endtime,
-      latitude: mainshock.json.geometry.coordinates[1],
-      longitude: mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(urlParams.fsDist),
-      minmagnitude: Number(urlParams.fsMag),
-      starttime: starttime
-    };
+    var mainshock = _app.Features.getFeature('mainshock'),
+        endtime = Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
+          .toUTC().toISO().slice(0, -5),
+        urlParams = {
+          fsDays: document.getElementById('fs-days').value,
+          fsDist: document.getElementById('fs-dist').value,
+          fsMag: document.getElementById('fs-mag').value
+        },
+        starttime = Luxon.DateTime.fromMillis(mainshock.json.properties.time)
+          .toUTC().minus({ days: urlParams.fsDays }).toISO().slice(0, -5),
+        params = {
+          endtime: endtime,
+          latitude: mainshock.json.geometry.coordinates[1],
+          longitude: mainshock.json.geometry.coordinates[0],
+          maxradiuskm: Number(urlParams.fsDist),
+          minmagnitude: Number(urlParams.fsMag),
+          starttime: starttime
+        };
 
     _this.url = Earthquakes.getFeedUrl(params);
   };

@@ -56,12 +56,11 @@ var Rtf = function (options) {
   _compare = function (a, b) {
     var aValue,
         bValue,
-        comparison;
+        comparison = 0;
 
     if (_sortKey) { // not set for unsorted (i.e. single row) tables
       aValue = a[_sortKey];
       bValue = b[_sortKey];
-      comparison = 0;
 
       // Case insensitive sort for strings
       if (typeof a[_sortKey] === 'string') {
@@ -100,13 +99,9 @@ var Rtf = function (options) {
    * @return list {Array}
    */
   _filter = function (feature) {
-    var list,
-        slider,
-        sortValues;
-
-    list = feature.list;
-    slider = document.querySelector('.' + feature.id + ' .filter output');
-    sortValues = _getSortValues(feature.id);
+    var list = feature.list,
+        slider = document.querySelector('.' + feature.id + ' .filter output'),
+        sortValues = _getSortValues(feature.id);
 
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
@@ -131,14 +126,11 @@ var Rtf = function (options) {
    */
   _getBeachBalls = function () {
     var beachball,
-        beachballs,
-        canvasEls;
-
-    beachballs = {};
-    canvasEls = {
-      fm: document.querySelector('#focal-mechanismLightbox canvas'),
-      mt: document.querySelector('#moment-tensorLightbox canvas')
-    };
+        beachballs = {},
+        canvasEls = {
+          fm: document.querySelector('#focal-mechanismLightbox canvas'),
+          mt: document.querySelector('#moment-tensorLightbox canvas')
+        };
 
     Object.keys(canvasEls).forEach(key => {
       beachball = canvasEls[key];
@@ -161,12 +153,9 @@ var Rtf = function (options) {
    *   }
    */
   _getPlotDivs = function () {
-    var divs,
-        params,
-        plots;
-
-    divs = {};
-    plots = _app.PlotsPane.getPlots();
+    var params,
+        divs = {},
+        plots = _app.PlotsPane.getPlots();
 
     Object.keys(plots).forEach(featureId => {
       divs[featureId] = [];
@@ -188,27 +177,16 @@ var Rtf = function (options) {
    * @return data {Object}
    */
   _getPostData = function () {
-    var aftershocks,
-        data,
-        feedJson,
-        feeds,
-        forecast,
-        foreshocks,
-        historical,
-        mainshock,
-        pagerCities,
-        pagerExposures,
-        products;
-
-    aftershocks = _app.Features.getFeature('aftershocks');
-    feeds = _app.Feeds.getFeeds();
-    forecast = _app.Features.getFeature('forecast');
-    foreshocks = _app.Features.getFeature('foreshocks');
-    historical = _app.Features.getFeature('historical');
-    mainshock = _app.Features.getFeature('mainshock');
-    pagerCities = _app.Features.getFeature('pager-cities');
-    pagerExposures = _app.Features.getFeature('pager-exposures');
-    products = _getProducts(mainshock.json.properties.products);
+    var data, feedJson,
+        aftershocks = _app.Features.getFeature('aftershocks'),
+        feeds = _app.Feeds.getFeeds(),
+        forecast = _app.Features.getFeature('forecast'),
+        foreshocks = _app.Features.getFeature('foreshocks'),
+        historical = _app.Features.getFeature('historical'),
+        mainshock = _app.Features.getFeature('mainshock'),
+        pagerCities = _app.Features.getFeature('pager-cities'),
+        pagerExposures = _app.Features.getFeature('pager-exposures'),
+        products = _getProducts(mainshock.json.properties.products);
 
     // IMPORTANT: Set appropriate types for 'empty' values (i.e. not undefined)
     data = {
@@ -345,17 +323,14 @@ var Rtf = function (options) {
    * @return promise {Object}
    */
   _getPromise = function (div, id) {
-    var promise,
-        type;
-
-    type = div.classList.item(0); // plot type key
-    promise = Plotly.toImage(div, {
-      format: 'png',
-      height: 300,
-      width: 800
-    }).then(dataUrl =>
-      _plots[id][type] = dataUrl
-    );
+    var type = div.classList.item(0), // plot type key
+        promise = Plotly.toImage(div, {
+          format: 'png',
+          height: 300,
+          width: 800
+        }).then(dataUrl =>
+          _plots[id][type] = dataUrl
+        );
 
     return promise;
   };
@@ -366,11 +341,9 @@ var Rtf = function (options) {
    * @return promises {Array}
    */
   _getPromises = function () {
-    var plotDivs,
-        promises;
+    var plotDivs = _getPlotDivs(),
+        promises = [];
 
-    plotDivs = _getPlotDivs();
-    promises = [];
     _plots = {};
 
     Object.keys(plotDivs).forEach(id => {
@@ -394,17 +367,10 @@ var Rtf = function (options) {
    * @return {Object}
    */
   _getSortValues = function (id) {
-    var el,
-        key,
-        order,
-        regex1,
-        regex2,
-        result,
-        ths;
-
-    regex1 = /sort-(up|down)/; // finds current sorted-by th
-    regex2 = /sort-\w+/; // finds css classes associated with sorting algorithm
-    ths = document.querySelectorAll('.' + id + ' .list.sortable th');
+    var el, key, order, result,
+        regex1 = /sort-(up|down)/, // finds current sorted-by th
+        regex2 = /sort-\w+/, // finds css classes associated with sorting algorithm
+        ths = document.querySelectorAll('.' + id + ' .list.sortable th');
 
     if (ths.length === 0) { // non-sorted table (only 1 row)
       return;
@@ -441,12 +407,8 @@ var Rtf = function (options) {
    */
   _this.create = function () {
     var data,
-        l,
-        url;
-
-    // PHP file that creates the Summary RTF and returns a JSON response
-    l = location;
-    url = `${l.protocol}//${l.host}${l.pathname}php/event-summary/create.php`;
+        l  = location,
+        url = `${l.protocol}//${l.host}${l.pathname}php/event-summary/create.php`;
 
     // Render plots so that their images can be captured
     if (!_app.PlotsPane.rendered) {

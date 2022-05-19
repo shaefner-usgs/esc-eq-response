@@ -61,11 +61,8 @@ var FocalMechanism = function (options) {
    * Create Feature.
    */
   _this.create = function () {
-    var beachball,
-        data,
-        fm;
-
-    fm = _mainshock.json.properties.products['focal-mechanism'];
+    var beachball, data,
+        fm = _mainshock.json.properties.products['focal-mechanism'];
 
     if (fm) {
       data = Object.assign({}, fm[0].properties, {

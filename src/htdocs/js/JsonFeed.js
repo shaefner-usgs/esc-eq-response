@@ -57,18 +57,13 @@ var JsonFeed = function (options) {
    * @return json {Object}
    */
   _this.fetch = async function (opts, fetchOpts = {}) {
-    var errorMsg,
-        host,
-        json,
-        response,
-        text,
-        url;
+    var json, text,
+        errorMsg = `<h4>Error Loading ${opts.name}</h4>`,
+        url = new URL(opts.url),
+        host = opts.host || url.hostname,
+        response = {};
 
     opts = opts || {};
-    errorMsg = `<h4>Error Loading ${opts.name}</h4>`;
-    url = new URL(opts.url);
-    host = opts.host || url.hostname;
-    response = {};
 
     // Alert user that the feed is loading
     _app.StatusBar.addItem(opts);

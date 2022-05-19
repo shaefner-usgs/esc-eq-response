@@ -45,13 +45,9 @@ var ShakeMapInfo = function (options) {
    */
   _getFeedUrl = function () {
     var contents,
-        mainshock,
-        products,
-        url;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
-    url = '';
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products,
+        url = '';
 
     if (products.shakemap) {
       contents = products.shakemap[0].contents;

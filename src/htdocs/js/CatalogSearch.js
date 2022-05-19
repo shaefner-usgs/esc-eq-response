@@ -66,13 +66,11 @@ var CatalogSearch = function (options) {
    * @return {String}
    */
   _getTitle = function (params) {
-    var parts,
-        period;
-
-    parts = [
-      _this.name,
-      'Custom Search' // default
-    ];
+    var period,
+        parts = [
+          _this.name,
+          'Custom Search' // default
+        ];
 
     if (params.period !== 'customPeriod' &&
         params.maxlatitude === _DEFAULTS.maxlatitude &&

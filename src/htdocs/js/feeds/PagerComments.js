@@ -45,13 +45,9 @@ var PagerComments = function (options) {
    */
   _getFeedUrl = function () {
     var contents,
-        mainshock,
-        products,
-        url;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
-    url = '';
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products,
+        url = '';
 
     if (products.losspager) {
       contents = products.losspager[0].contents;

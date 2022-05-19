@@ -52,13 +52,9 @@ var SignificantEqs = function (options) {
    * @return list {Element}
    */
   _createList = function () {
-    var data,
-        li,
-        list,
-        props;
+    var data, li, props,
+        list = document.createElement('h4'); // default
 
-    // Default
-    list = document.createElement('h4');
     list.id = 'significantEqs';
     list.innerHTML = 'None';
 
@@ -108,11 +104,8 @@ var SignificantEqs = function (options) {
    * Event handler to select the earthquake the user clicked on.
    */
   _selectEq = function () {
-    var eqs,
-        input;
-
-    eqs = _el.querySelectorAll('li');
-    input = document.getElementById('eqid');
+    var eqs = _el.querySelectorAll('li'),
+        input = document.getElementById('eqid');
 
     eqs.forEach(eq => {
       if (eq.id === this.id) {

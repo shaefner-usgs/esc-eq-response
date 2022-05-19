@@ -61,11 +61,8 @@ var MomentTensor = function (options) {
    * Create Feature.
    */
   _this.create = function () {
-    var beachball,
-        data,
-        mt;
-
-    mt = _mainshock.json.properties.products['moment-tensor'];
+    var beachball, data,
+        mt = _mainshock.json.properties.products['moment-tensor'];
 
     if (mt) {
       data = Object.assign({}, mt[0].properties, {

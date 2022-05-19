@@ -57,9 +57,8 @@ var Lightbox = function (options) {
    *     Lightbox content
    */
   _this.add = function (html) {
-    var content, div;
-
-    div = document.createElement('div');
+    var content,
+        div = document.createElement('div');
 
     div.id = _id;
     div.innerHTML = html;

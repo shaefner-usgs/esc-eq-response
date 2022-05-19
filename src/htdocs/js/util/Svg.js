@@ -56,15 +56,13 @@ var Svg = function () {
    */
   _this.createCircle = function (opts) {
     var size,
-        svg,
-        template;
+        svg = _createElement(),
+        template = '<circle cx="{origin}" cy="{origin}" r="{radius}" ' +
+          'fill="{fillColor}" fill-opacity="{fillOpacity}" stroke="{color}" ' +
+          'stroke-opacity="{opacity}" stroke-width="1" />';
 
     opts = Object.assign({}, _DEFAULTS, opts);
     size = Math.ceil(opts.radius * 2 + 2);
-    svg = _createElement();
-    template = '<circle cx="{origin}" cy="{origin}" r="{radius}" ' +
-      'fill="{fillColor}" fill-opacity="{fillOpacity}" stroke="{color}" ' +
-      'stroke-opacity="{opacity}" stroke-width="1" />';
 
     Object.assign(opts, {
       origin: size / 2
@@ -85,11 +83,9 @@ var Svg = function () {
    * @return ol {Element}
    */
   _this.createCircleRange = function (opts) {
-    var circle,
-        li,
-        ol;
+    var circle, li,
+        ol = document.createElement('ol');
 
-    ol = document.createElement('ol');
     opts = Object.assign({
       max: 7,
       min: 0
@@ -118,14 +114,12 @@ var Svg = function () {
    * @return svg {Element}
    */
   _this.createLine = function (opts) {
-    var svg,
-        template;
+    var svg = _createElement(),
+        template = '<path fill="#fff" stroke="{color}" ' +
+          'stroke-opacity="{opacity}" stroke-width="2" stroke-linecap="round" ' +
+          'd="M1.5,1.5c2.6,0.4,5.9,1.3,8,4c1.4,1.8,1.5,3.4,2,5c0.9,3,3.1,6.9,9,11" />';
 
     opts = Object.assign({}, _DEFAULTS, opts);
-    svg = _createElement();
-    template = '<path fill="#fff" stroke="{color}" ' +
-      'stroke-opacity="{opacity}" stroke-width="2" stroke-linecap="round" ' +
-      'd="M1.5,1.5c2.6,0.4,5.9,1.3,8,4c1.4,1.8,1.5,3.4,2,5c0.9,3,3.1,6.9,9,11" />';
 
     svg.innerHTML = L.Util.template(template, opts);
     svg.setAttribute('height', opts.height);
@@ -143,14 +137,12 @@ var Svg = function () {
    * @return svg {Element}
    */
   _this.createTriangle = function (opts) {
-    var svg,
-        template;
+    var svg = _createElement(),
+        template = '<polygon points="10,3 19,18 1,18" fill="{fillColor}" ' +
+          'fill-opacity="{fillOpacity}" stroke="{color}" ' +
+          'stroke-opacity="{opacity}" stroke-width="1" />';
 
     opts = Object.assign({}, _DEFAULTS, opts);
-    svg = _createElement();
-    template = '<polygon points="10,3 19,18 1,18" fill="{fillColor}" ' +
-      'fill-opacity="{fillOpacity}" stroke="{color}" ' +
-      'stroke-opacity="{opacity}" stroke-width="1" />';
 
     svg.innerHTML = L.Util.template(template, opts);
     svg.setAttribute('height', opts.height);

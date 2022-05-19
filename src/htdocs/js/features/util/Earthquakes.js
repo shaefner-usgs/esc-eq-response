@@ -88,6 +88,7 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
+      _getDirection,
       _getDuration,
       _getIntervals,
       _getPlotlyTrace,
@@ -103,10 +104,7 @@ var Earthquakes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var coords,
-        inputIdDist,
-        inputIdMag,
-        mainshock;
+    var coords, inputIdDist, inputIdMag, mainshock;
 
     options = Object.assign({}, _DEFAULTS, options);
 
@@ -155,7 +153,7 @@ var Earthquakes = function (options) {
     _this.bins = {};
     _this.count = 0;
     _this.list = [];
-    _this.mapLayer = L.geoJSON.dateLine(options.json,{
+    _this.mapLayer = L.geoJSON.dateLine(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
@@ -217,11 +215,8 @@ var Earthquakes = function (options) {
    * @param layer {L.layer}
    */
   _addListeners = function(el, eqid, layer) {
-    var button,
-        input;
-
-    button = el.querySelector('button');
-    input = document.getElementById('eqid');
+    var button = el.querySelector('button'),
+        input = document.getElementById('eqid');
 
     button.addEventListener('click', () => {
       input.value = eqid;
@@ -234,7 +229,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Filter out earthquakes that are outside the search radius.
+   * Filter out earthquakes from NCEDC that are outside the search radius.
    *
    * The NCEDC catalog does not support radius values specified in km for
    * limiting search results, so a rectangle is used instead as a proxy.
@@ -243,34 +238,27 @@ var Earthquakes = function (options) {
    *     geoJSON feature
    */
   _filter = function (feature) {
-    var bearing,
-        compassPoints,
-        coords,
-        distance,
-        latlon,
-        octant;
+    var coords, distance, latlon;
 
+    // Search is always from ComCat, not NCEDC
     if (_featureId === 'mainshock' || _featureId === 'search') {
       _this.count ++;
 
       return true;
     }
 
-    // Calculate distance/direction from Mainshock
-    compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
     coords = feature.geometry.coordinates;
     latlon = LatLon(coords[1], coords[0]);
-    bearing = _mainshockLatlon.bearing(latlon);
     distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-    octant = Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0);
-
-    _vectors[feature.id] = { // cache values
-      direction: compassPoints[octant],
-      distance: distance
-    };
 
     if (distance <= _distanceParam) {
       _this.count ++;
+
+      // Cache distance/direction from Mainshock
+      _vectors[feature.id] = {
+        direction: _getDirection(latlon),
+        distance: distance
+      };
 
       return true;
     }
@@ -284,10 +272,8 @@ var Earthquakes = function (options) {
    * @return age {String}
    */
   _getAge = function (timestamp) {
-    var age,
-        eqTime;
-
-    age = _featureId; // everything but Aftershocks, Search
+    var eqTime,
+        age = _featureId; // everything but Aftershocks, Search
 
     if (_featureId === 'aftershocks' || _featureId === 'search') {
       eqTime = Luxon.DateTime.fromMillis(timestamp).toUTC();
@@ -360,15 +346,27 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Calculate the direction from the Mainshock.
+   *
+   * @param latlon {Object}
+   *
+   * @return {String}
+   */
+  _getDirection = function (latlon) {
+    var bearing = _mainshockLatlon.bearing(latlon),
+        compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
+        octant = Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0);
+
+    return compassPoints[octant];
+  };
+
+  /**
    * Get the duration of an earthquake sequence.
    *
    * @return duration {Object}
    */
   _getDuration = function () {
-    var duration,
-        fsInputId,
-        hsInputId,
-        interval;
+    var duration, fsInputId, hsInputId, interval;
 
     if (_featureId === 'aftershocks') {
       interval = Luxon.Interval.fromDateTimes(_mainshockTime, _now).length('days');
@@ -415,16 +413,7 @@ var Earthquakes = function (options) {
    * @return trace {Object} or undefined
    */
   _getPlotlyTrace = function (plotId, type) {
-    var date,
-        eqid,
-        mode,
-        sizeref,
-        text,
-        title,
-        trace,
-        x,
-        y,
-        z;
+    var date, eqid, mode, sizeref, text, title, trace, x, y, z;
 
     if (_plotData.date.length === 0) {
       return;
@@ -545,12 +534,9 @@ var Earthquakes = function (options) {
    * @return div {Element}
    */
   _getPopup = function (eq, layer) {
-    var bubbles,
-        div,
-        popup;
-
-    bubbles = '';
-    div = L.DomUtil.create('div');
+    var popup,
+        bubbles = '',
+        div = L.DomUtil.create('div');
 
     Object.keys(eq.bubbles).forEach(type =>
       bubbles += eq.bubbles[type]
@@ -696,15 +682,10 @@ var Earthquakes = function (options) {
    * @return threshold {Number}
    */
   _getThreshold = function () {
-    var magBins,
-        maxMag,
-        maxNumEqs,
-        threshold;
-
-    magBins = _this.bins.mag;
-    maxMag = magBins.length - 1; // 0-based Array
-    maxNumEqs = 25; // max number to display by default
-    threshold = maxMag; // default
+    var magBins = _this.bins.mag,
+        maxMag = magBins.length - 1, // 0-based Array
+        maxNumEqs = 25, // max number to display by default
+        threshold = maxMag; // default
 
     magBins.some((number, magInt) => {
       if (number <= maxNumEqs) {
@@ -758,33 +739,17 @@ var Earthquakes = function (options) {
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var coords,
-        days,
-        distance,
-        distanceDisplay,
-        eq,
-        eqTime,
-        eqTimeLocal,
-        localTime,
-        mag,
-        magDisplay,
-        magType,
-        props,
-        statusIcon,
-        template,
-        tooltip,
-        utcTime;
-
-    coords = feature.geometry.coordinates;
-    props = feature.properties;
-    eqTime = Luxon.DateTime.fromMillis(props.time).toUTC();
-    magDisplay = AppUtil.round(props.mag, 1);
-    mag = parseFloat(magDisplay);
-    magType = props.magType || 'M';
-    statusIcon = '';
-    template = '<time datetime="{isoTime}">{utcTime}</time>';
-    utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>';
-    tooltip = magType + ' ' + magDisplay + '—' + utcTime;
+    var days, distance, distanceDisplay, eq, eqTimeLocal, localTime,
+        coords = feature.geometry.coordinates,
+        props = feature.properties,
+        eqTime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+        magDisplay = AppUtil.round(props.mag, 1),
+        mag = parseFloat(magDisplay),
+        magType = props.magType || 'M',
+        statusIcon = '',
+        template = '<time datetime="{isoTime}">{utcTime}</time>',
+        utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>',
+        tooltip = magType + ' ' + magDisplay + '—' + utcTime;
 
     if (_featureId !== 'mainshock' && _featureId !== 'search') {
       distance = _vectors[feature.id].distance;
@@ -881,19 +846,14 @@ var Earthquakes = function (options) {
    * @return {L.CircleMarker}
    */
   _pointToLayer = function (feature, latlng) {
-    var fillColor,
-        options,
-        props,
-        radius;
-
-    props = feature.properties;
-    fillColor = _COLORS[_getAge(props.time)];
-    radius = AppUtil.getRadius(AppUtil.round(props.mag, 1));
-    options = Object.assign({}, _markerOptions, {
-      fillColor: fillColor,
-      pane: _featureId, // controls stacking order
-      radius: radius
-    });
+    var props = feature.properties,
+        fillColor = _COLORS[_getAge(props.time)],
+        radius = AppUtil.getRadius(AppUtil.round(props.mag, 1)),
+        options = Object.assign({}, _markerOptions, {
+          fillColor: fillColor,
+          pane: _featureId, // controls stacking order
+          radius: radius
+        });
 
     // Note: additional plotData props are added in _onEachFeature
     _plotData.color.push(fillColor);
@@ -914,16 +874,10 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _this.createBinTable = function (type) {
-    var data,
-        days,
-        rows,
-        tableClasses,
-        td,
-        tdClasses;
-
-    days = Luxon.Duration.fromObject(_duration).as('days');
-    rows = '';
-    tableClasses = ['bin'];
+    var data, td, tdClasses,
+        days = Luxon.Duration.fromObject(_duration).as('days'),
+        rows = '',
+        tableClasses = ['bin'];
 
     if (days <= 7) {
       tableClasses.push('hide-month');
@@ -966,13 +920,9 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _this.createDescription = function () {
-    var data,
-        ending,
-        interval,
-        length;
-
-    interval = Object.keys(_duration)[0];
-    length = _duration[interval];
+    var data, ending,
+        interval = Object.keys(_duration)[0],
+        length = _duration[interval];
 
     if (_featureId === 'aftershocks') {
       ending = '. The duration of the aftershock sequence is <strong>' +
@@ -999,25 +949,15 @@ var Earthquakes = function (options) {
    *
    * @return {String}
    */
-  _this.createListTable = function (type) {
-    var data,
-        eqs,
-        fields,
-        magInt,
-        magThreshold,
-        rows,
-        tableClasses,
-        thClasses,
-        tr;
-
-    data = {};
-    eqs = _this.list;
-    fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'];
-    magThreshold = _getThreshold();
-    rows = '';
-    tableClasses = ['list'];
-    thClasses = {};
-    type = type || 'all';
+  _this.createListTable = function (type = 'all') {
+    var magInt, tr,
+        data = {},
+        eqs = _this.list,
+        fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'],
+        magThreshold = _getThreshold(),
+        rows = '',
+        tableClasses = ['list'],
+        thClasses = {};
 
     if (type === 'mostRecent') {
       eqs = [_this.list[_this.list.length - 1]];
@@ -1062,23 +1002,18 @@ var Earthquakes = function (options) {
    * @return html {String}
    */
   _this.createSlider = function () {
-    var data,
-        html,
-        magThreshold,
-        singleMagBin;
-
-    magThreshold = _getThreshold();
-    data = {
-      count: _this.bins.mag[magThreshold],
-      id: _featureId,
-      mag: magThreshold,
-      max: _this.bins.mag.length - 1,
-      min: Math.floor(_minMagParam)
-    };
-    html = '';
-    singleMagBin = _this.bins.mag.every(
-      (value, i, array) => array[0] === value // all values are the same
-    );
+    var magThreshold = _getThreshold(),
+        data = {
+          count: _this.bins.mag[magThreshold],
+          id: _featureId,
+          mag: magThreshold,
+          max: _this.bins.mag.length - 1,
+          min: Math.floor(_minMagParam)
+        },
+        html = '',
+        singleMagBin = _this.bins.mag.every(
+          (value, i, array) => array[0] === value // all values are the same
+        );
 
     if (singleMagBin) {
       html = L.Util.template(_getTemplate('subheader'), data);
@@ -1105,13 +1040,11 @@ var Earthquakes = function (options) {
  *
  * @return {String}
  */
-Earthquakes.getFeedUrl = function (params, type='feature') {
-  var baseUri,
-      pairs,
-      value;
+Earthquakes.getFeedUrl = function (params, type = 'feature') {
+  var value,
+      baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query',
+      pairs = [];
 
-  baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-  pairs = [];
   params = Object.assign({
     format: 'geojson',
     orderby: 'time-asc'

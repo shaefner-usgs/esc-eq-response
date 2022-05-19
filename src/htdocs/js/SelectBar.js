@@ -55,11 +55,8 @@ var SelectBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var reset,
-        search;
-
-    reset = document.getElementById('reset');
-    search = _el.querySelector('.search');
+    var reset = document.getElementById('reset'),
+        search = _el.querySelector('.search');
 
     // Reset the app
     reset.addEventListener('click', _hardReset);
@@ -122,11 +119,8 @@ var SelectBar = function (options) {
    * @return isValid {Boolean}
    */
   _isEqidValid = function () {
-    var isValid,
-        regex;
-
-    isValid = false;
-    regex = /^[^/\\:]+$/; // no slashes or colons
+    var isValid = false,
+        regex = /^[^/\\:]+$/; // no slashes or colons
 
     if (regex.test(_eqid.value)) {
       isValid = true;
@@ -146,11 +140,8 @@ var SelectBar = function (options) {
    * Note: must be called manually when the Event ID is changed programmatically.
    */
   _this.handleMainshock = function () {
-    var id,
-        reset;
-
-    id = 'mainshock';
-    reset = document.getElementById('reset');
+    var id = 'mainshock',
+        reset = document.getElementById('reset');
 
     _app.reset();
 
@@ -197,11 +188,8 @@ var SelectBar = function (options) {
    * Show the Mainshock's details.
    */
   _this.showMainshock = function () {
-    var details,
-        mainshock;
-
-    details = _el.querySelector('.details');
-    mainshock = _app.Features.getFeature('mainshock');
+    var details = _el.querySelector('.details'),
+        mainshock = _app.Features.getFeature('mainshock');
 
     details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
     details.classList.remove('hide');

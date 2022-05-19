@@ -124,17 +124,11 @@ var SearchBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var arrows,
-        buttons,
-        labels,
-        search,
-        slider;
-
-    arrows = _el.querySelectorAll('.flatpickr-minute ~ span');
-    buttons = _el.querySelectorAll('.period li, .region li');
-    labels = _el.querySelectorAll('label');
-    search = document.getElementById('search');
-    slider = _el.querySelector('.slider input');
+    var arrows = _el.querySelectorAll('.flatpickr-minute ~ span'),
+        buttons = _el.querySelectorAll('.period li, .region li'),
+        labels = _el.querySelectorAll('label'),
+        search = document.getElementById('search'),
+        slider = _el.querySelector('.slider input');
 
     // Set the minutes value when the user clicks an arrow button
     arrows.forEach(arrow =>
@@ -181,11 +175,8 @@ var SearchBar = function (options) {
    * @param flatpickr {Object}
    */
   _addNowButton = function (flatpickr) {
-    var button,
-        div;
-
-    button = document.createElement('a');
-    div = flatpickr.calendarContainer.querySelector('.flatpickr-months');
+    var button = document.createElement('a'),
+        div = flatpickr.calendarContainer.querySelector('.flatpickr-months');
 
     button.classList.add('button', 'flatpickr-now');
     button.textContent = 'Now';
@@ -215,17 +206,13 @@ var SearchBar = function (options) {
    */
   _getParams = function () {
     var bounds,
-        params,
-        period,
-        region;
-
-    period = _el.querySelector('ul.period .selected').id;
-    region = _el.querySelector('ul.region .selected').id;
-    params = {
-      minmagnitude: document.getElementById('minmagnitude').value,
-      period: period,
-      region: region
-    };
+        period = _el.querySelector('ul.period .selected').id,
+        region = _el.querySelector('ul.region .selected').id,
+        params = {
+          minmagnitude: document.getElementById('minmagnitude').value,
+          period: period,
+          region: region
+        };
 
     if (period === 'customPeriod') {
       Object.assign(params, {
@@ -337,11 +324,8 @@ var SearchBar = function (options) {
    * @return isValid {Boolean}
    */
   _isValid = function () {
-    var isValid,
-        period;
-
-    isValid = true; // default
-    period = _el.querySelector('ul.period .selected').id;
+    var isValid = true, // default
+        period = _el.querySelector('ul.period .selected').id;
 
     if (period === 'customPeriod') {
       isValid = _setValidity(_starttime) && _setValidity(_endtime);
@@ -413,13 +397,9 @@ var SearchBar = function (options) {
    * Handler that gets called when the endtime Flatpickr calendar is opened.
    */
   _onEndOpen = function () {
-    var maxDate,
-        minDate,
-        now;
-
-    now = new Date();
-    maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000);
-    minDate = _flatpickrs.starttime.selectedDates[0];
+    var now = new Date(),
+        maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000),
+        minDate = _flatpickrs.starttime.selectedDates[0];
 
     this.set('maxDate', maxDate);
     this.set('minDate', minDate);
@@ -436,11 +416,8 @@ var SearchBar = function (options) {
    * Handler that gets called when the starttime Flatpickr calendar is opened.
    */
   _onStartOpen = function () {
-    var endDate,
-        maxDate,
-        now;
-
-    endDate = _flatpickrs.endtime.selectedDates[0];
+    var maxDate, now,
+        endDate = _flatpickrs.endtime.selectedDates[0];
 
     if (endDate) {
       maxDate = endDate;
@@ -461,19 +438,14 @@ var SearchBar = function (options) {
    */
   _setControls = function () {
     var endtime,
-        minmagnitude,
-        output,
-        slider,
-        vals;
-
-    minmagnitude = document.getElementById('minmagnitude');
-    output = minmagnitude.nextElementSibling,
-    slider = minmagnitude.parentNode;
-    vals = {
-      minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
-      period: AppUtil.getParam('period') || _DEFAULTS.period,
-      region: AppUtil.getParam('region') || _DEFAULTS.region
-    };
+        minmagnitude = document.getElementById('minmagnitude'),
+        output = minmagnitude.nextElementSibling,
+        slider = minmagnitude.parentNode,
+        vals = {
+          minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
+          period: AppUtil.getParam('period') || _DEFAULTS.period,
+          region: AppUtil.getParam('region') || _DEFAULTS.region
+        };
 
     _selPeriod = document.getElementById(vals.period);
     _selRegion = document.getElementById(vals.region);
@@ -515,14 +487,10 @@ var SearchBar = function (options) {
    * time allowed is not a multiple of 5.
    */
   _setMinutes = function () {
-    var input,
-        minutes,
-        remainder,
-        value;
-
-    input = this.closest('.numInputWrapper').querySelector('input');
-    value = Number(input.value);
-    remainder = value % 5;
+    var minutes,
+        input = this.closest('.numInputWrapper').querySelector('input'),
+        value = Number(input.value),
+        remainder = value % 5;
 
     if (remainder) {
       if (this.className === 'arrowUp') {
@@ -544,15 +512,10 @@ var SearchBar = function (options) {
    * fields.
    */
   _setNow = function () {
-    var container,
-        flatpickr,
-        hour,
-        minute;
-
-    flatpickr = _flatpickrs.endtime;
-    container = flatpickr.calendarContainer;
-    hour = container.querySelector('.flatpickr-hour');
-    minute = container.querySelector('.flatpickr-minute');
+    var flatpickr = _flatpickrs.endtime,
+        container = flatpickr.calendarContainer,
+        hour = container.querySelector('.flatpickr-hour'),
+        minute = container.querySelector('.flatpickr-minute');
 
     flatpickr.clear();
 
@@ -615,10 +578,8 @@ var SearchBar = function (options) {
    *     div container with the calendar days of the selected month
    */
   _setUtcDay = function (days) {
-    var today,
-        tomorrow;
-
-    today = days.querySelector('.today');
+    var tomorrow,
+        today = days.querySelector('.today');
 
     if (today) { // selected calendar is the current month
       tomorrow = today.nextElementSibling;
@@ -643,13 +604,9 @@ var SearchBar = function (options) {
    * @param flatpickr {Object}
    */
   _setUtcMonth = function (flatpickr) {
-    var container,
-        selected,
-        today;
-
-    container = flatpickr.calendarContainer;
-    selected = container.querySelector('.flatpickr-day.selected');
-    today = container.querySelector('.today');
+    var container = flatpickr.calendarContainer,
+        selected = container.querySelector('.flatpickr-day.selected'),
+        today = container.querySelector('.today');
 
     if (!selected && today.classList.contains('nextMonthDay')) {
       flatpickr.changeMonth(1); // select the following month
@@ -665,11 +622,8 @@ var SearchBar = function (options) {
    *     whether or not the <input> is marked as valid
    */
   _setValidity = function (input) {
-    var div,
-        isValid;
-
-    div = input.closest('.flatpickr-wrapper');
-    isValid = /(now|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/.test(input.value);
+    var div = input.closest('.flatpickr-wrapper'),
+        isValid = /(now|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/.test(input.value);
 
     if (isValid) {
       div.classList.remove('invalid');
@@ -687,11 +641,8 @@ var SearchBar = function (options) {
    * region's (or default) bounds.
    */
   _setView = function () {
-    var map,
-        sidebar;
-
-    map = _el.querySelector('.customRegion');
-    sidebar = AppUtil.getParam('sidebar');
+    var map = _el.querySelector('.customRegion'),
+        sidebar = AppUtil.getParam('sidebar');
 
     if (map.classList.contains('hide')) return; // map not visible
 
@@ -709,13 +660,9 @@ var SearchBar = function (options) {
    * Display the <input> range slider's current value.
    */
   _updateSlider = function () {
-    var output,
-        slider,
-        value;
-
-    output = this.nextElementSibling,
-    slider = this.parentNode;
-    value = Number(this.value);
+    var output = this.nextElementSibling,
+        slider = this.parentNode,
+        value = Number(this.value);
 
     output.value = value;
     slider.style.setProperty('--val', value);
@@ -768,15 +715,10 @@ var SearchBar = function (options) {
    * current search params.
    */
   _this.setStatus = function () {
-    var currentParams,
-        newParams,
-        paramNames,
-        search;
-
-    currentParams = {};
-    newParams = _getParams();
-    paramNames = _customParams.concat(Object.keys(_DEFAULTS));
-    search = document.getElementById('search');
+    var currentParams = {},
+        newParams = _getParams(),
+        paramNames = _customParams.concat(Object.keys(_DEFAULTS)),
+        search = document.getElementById('search');
 
     paramNames.forEach(name => {
       var value = AppUtil.getParam(name);

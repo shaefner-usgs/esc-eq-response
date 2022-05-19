@@ -13,21 +13,15 @@ var AppUtil = function () {};
  * @return {String}
  */
 AppUtil.addCommas = function (num) {
-  var decStr,
-      intStr,
-      numStr,
-      parts,
-      regex;
+  var decStr = '',
+      numStr = String(num),
+      parts = numStr.split('.'),
+      intStr = parts[0],
+      regex = /(\d+)(\d{3})/;
 
   if (!num && num !== 0) {
     return '';
   }
-
-  decStr = '';
-  numStr = String(num);
-  parts = numStr.split('.');
-  intStr = parts[0];
-  regex = /(\d+)(\d{3})/;
 
   if (parts.length > 1) {
     decStr = '.' + parts[1];
@@ -162,13 +156,12 @@ AppUtil.fetchWithTimeout = async function (resource, options = {}) {
  * @return {String}
  */
 AppUtil.formatLatLon = function (coords) {
-  var lat,
-      lon;
+  var lat = Math.abs(coords[1]).toFixed(3),
+      latHemisphere = (coords[1] < 0 ? 'S' : 'N'),
+      lon = Math.abs(coords[0]).toFixed(3),
+      lonHemisphere = (coords[0] < 0 ? 'W' : 'E');
 
-  lat = [Math.abs(coords[1]).toFixed(3), '°', (coords[1] < 0 ? 'S':'N')].join('');
-  lon = [Math.abs(coords[0]).toFixed(3), '°', (coords[0] < 0 ? 'W':'E')].join('');
-
-  return lat + ', ' + lon;
+  return `${lat}°${latHemisphere}, ${lon}°${lonHemisphere}`;
 };
 
 /**
@@ -207,23 +200,20 @@ AppUtil.getRadius = function (mag) {
  * @return values {Array}
  */
 AppUtil.getShakingValues = function (mmis) {
-  var shaking,
-      values;
-
-  shaking = [
-    {intensity: 'N/A',  level: '–'},
-    {intensity: 'I',    level: 'Not felt'},
-    {intensity: 'II',   level: 'Weak'},
-    {intensity: 'III',  level: 'Weak'},
-    {intensity: 'IV',   level: 'Light'},
-    {intensity: 'V',    level: 'Moderate'},
-    {intensity: 'VI',   level: 'Strong'},
-    {intensity: 'VII',  level: 'Very strong'},
-    {intensity: 'VIII', level: 'Severe'},
-    {intensity: 'IX',   level: 'Violent'},
-    {intensity: 'X+',   level: 'Extreme'}
-  ];
-  values = [];
+  var shaking = [
+        {intensity: 'N/A',  level: '–'},
+        {intensity: 'I',    level: 'Not felt'},
+        {intensity: 'II',   level: 'Weak'},
+        {intensity: 'III',  level: 'Weak'},
+        {intensity: 'IV',   level: 'Light'},
+        {intensity: 'V',    level: 'Moderate'},
+        {intensity: 'VI',   level: 'Strong'},
+        {intensity: 'VII',  level: 'Very strong'},
+        {intensity: 'VIII', level: 'Severe'},
+        {intensity: 'IX',   level: 'Violent'},
+        {intensity: 'X+',   level: 'Extreme'}
+      ],
+      values = [];
 
   mmis.forEach(val =>
     values.push(shaking[val])
@@ -240,16 +230,13 @@ AppUtil.getShakingValues = function (mmis) {
  * @return value {String}
  */
 AppUtil.getSliderValue = function (input) {
-  var min,
-      percentage,
-      value;
+  var min = input.min || 0,
+      percentage = input.value,
+      value = percentage + '% 100%';
 
-  min = input.min || 0;
-  percentage = input.value;
   if (input.max) {
     percentage = Math.floor(100 * (input.value - min) / (input.max - min));
   }
-  value = percentage + '% 100%';
 
   return value;
 };
@@ -264,11 +251,8 @@ AppUtil.getSliderValue = function (input) {
  *     PST, CST, etc
  */
 AppUtil.getTimeZone = function () {
-  var now,
-      tz;
-
-  now = new Date().toString();
-  tz = '';
+  var now = new Date().toString(),
+      tz = '';
 
   try {
     if (now.indexOf('(') > -1) {
@@ -296,9 +280,13 @@ AppUtil.getTimeZone = function () {
  */
 AppUtil.romanize = function (num) {
   var digits,
-      i,
-      key,
-      roman;
+      i = 3,
+      key = [
+        '', 'C', 'CC', 'CCC', 'CD', 'D', 'DC', 'DCC', 'DCCC', 'CM',
+        '', 'X', 'XX', 'XXX', 'XL', 'L', 'LX', 'LXX', 'LXXX', 'XC',
+        '', 'I' ,'II' ,'III' ,'IV' ,'V' ,'VI' ,'VII' ,'VIII' ,'IX'
+      ],
+      roman = '';
 
   if (typeof num !== 'number') {
     return ''; // ignore non-number values
@@ -308,13 +296,6 @@ AppUtil.romanize = function (num) {
 
   num = Math.round(num) || 1; // return 'I' for values less than 1
   digits = String(num).split('');
-  i = 3;
-  key = [
-    '', 'C', 'CC', 'CCC', 'CD', 'D', 'DC', 'DCC', 'DCCC', 'CM',
-    '', 'X', 'XX', 'XXX', 'XL', 'L', 'LX', 'LXX', 'LXXX', 'XC',
-    '', 'I' ,'II' ,'III' ,'IV' ,'V' ,'VI' ,'VII' ,'VIII' ,'IX'
-  ];
-  roman = '';
 
   while (i--) {
     roman = (key[+digits.pop() + (i * 10)] || '') + roman;
@@ -339,15 +320,14 @@ AppUtil.romanize = function (num) {
  *     NOTE: does not return a Number
  */
 AppUtil.round = function (num, precision = 0, empty = '–') {
-  var multiplier,
-      rounded;
+  var rounded,
+      multiplier = Math.pow(10, precision);
 
   if (!num && num !== 0 || num === 'null') { // in case 'null' value is a string
     return empty;
   }
 
   num = Number(num);
-  multiplier = Math.pow(10, precision);
   rounded = Math.round(num * multiplier) / multiplier;
 
   return rounded.toFixed(precision);
@@ -398,11 +378,8 @@ AppUtil.setParam = function (name, value) {
  */
 AppUtil.shallowEqual = function (obj1, obj2) {
   var key,
-      keys1,
-      keys2;
-
-  keys1 = Object.keys(obj1);
-  keys2 = Object.keys(obj2);
+      keys1 = Object.keys(obj1),
+      keys2 = Object.keys(obj2);
 
   if (keys1.length !== keys2.length) {
     return false;
@@ -447,11 +424,8 @@ AppUtil.stripslashes = function (str) {
  * @param name {String}
  */
 AppUtil.updateParam = function (name) {
-  var input,
-      value;
-
-  input = document.getElementById(name);
-  value = input.value.replace(/\s+/g, ''); // strip whitespace
+  var input = document.getElementById(name),
+      value = input.value.replace(/\s+/g, ''); // strip whitespace
 
   input.value = value;
 

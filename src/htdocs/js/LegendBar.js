@@ -41,18 +41,13 @@ var LegendBar = function (options) {
    */
   _addSvgElements = function () {
     var circle,
-        colors,
-        line,
-        range,
-        triangle;
-
-    colors = _getColors();
-    line = _Svg.createLine({
-      color: '#c00',
-      opacity: '0.5'
-    });
-    range = _Svg.createCircleRange();
-    triangle = _Svg.createTriangle();
+        colors = _getColors(),
+        line = _Svg.createLine({
+          color: '#c00',
+          opacity: '0.5'
+        }),
+        range = _Svg.createCircleRange(),
+        triangle = _Svg.createTriangle();
 
     Object.keys(colors).forEach(key => {
       circle = _Svg.createCircle(colors[key]);
@@ -68,10 +63,10 @@ var LegendBar = function (options) {
   /**
    * Get the colors of the earthquake circles.
    *
-   * @return colors {Object}
+   * @return {Object}
    */
   _getColors = function () {
-    var colors = {
+    return {
       asDay: {
         fillColor: '#f90'
       },
@@ -94,8 +89,6 @@ var LegendBar = function (options) {
         fillColor: '#00f'
       },
     };
-
-    return colors;
   };
 
 

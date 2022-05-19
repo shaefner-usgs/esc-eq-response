@@ -45,13 +45,9 @@ var NearbyCities = function (options) {
    */
   _getFeedUrl = function () {
     var contents,
-        mainshock,
-        products,
-        url;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
-    url = '';
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products,
+        url = '';
 
     if (products['nearby-cities']) {
       contents = products['nearby-cities'][0].contents;

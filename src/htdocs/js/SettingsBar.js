@@ -68,13 +68,9 @@ var SettingsBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var buttons,
-        fields,
-        swap;
-
-    buttons = _el.querySelectorAll('.catalog li');
-    fields = _el.querySelectorAll('input');
-    swap = document.getElementById('swap');
+    var buttons = _el.querySelectorAll('.catalog li'),
+        fields = _el.querySelectorAll('input'),
+        swap = document.getElementById('swap');
 
     // Set the selected option on the 'radio-bar'
     buttons.forEach(button =>
@@ -116,13 +112,9 @@ var SettingsBar = function (options) {
    * @return {Object}
    */
   _getDefaults = function () {
-    var mag,
-        ruptureArea,
-        ruptureLength;
-
-    mag = _app.Features.getFeature('mainshock').json.properties.mag;
-    ruptureArea = Math.pow(10, mag - 4);
-    ruptureLength = Math.pow(ruptureArea, 0.7);
+    var mag = _app.Features.getFeature('mainshock').json.properties.mag,
+        ruptureArea = Math.pow(10, mag - 4),
+        ruptureLength = Math.pow(ruptureArea, 0.7);
 
     return Object.assign({}, _DEFAULTS, {
       'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
@@ -176,11 +168,8 @@ var SettingsBar = function (options) {
    * Set the catalog option to match the 'catalog' URL parameter if it is set.
    */
   _setCatalog = function () {
-    var catalog,
-        lis,
-        note;
-
-    catalog = AppUtil.getParam('catalog');
+    var lis, note,
+        catalog = AppUtil.getParam('catalog');
 
     if (catalog) {
       lis = _el.querySelectorAll('.catalog li');
@@ -233,11 +222,8 @@ var SettingsBar = function (options) {
    * Historical Seismicity Features.
    */
   _swapCatalog = function () {
-    var catalog,
-        mainshock;
-
-    catalog = _el.querySelector('.catalog .selected').id;
-    mainshock = _app.Features.getFeature('mainshock');
+    var catalog = _el.querySelector('.catalog .selected').id,
+        mainshock = _app.Features.getFeature('mainshock');
 
     AppUtil.setParam('catalog', catalog);
 
@@ -255,18 +241,13 @@ var SettingsBar = function (options) {
    * @param catalog {String <comcat|dd>}
    */
   _toggleSwap = function (catalog) {
-    var names,
-        prevCatalog,
-        span,
-        swap;
-
-    names = {
-      comcat: 'ComCat',
-      dd: 'Double Difference'
-    };
-    prevCatalog = AppUtil.getParam('catalog') || 'comcat';
-    swap = _el.querySelector('.swap');
-    span = swap.querySelector('span');
+    var names = {
+          comcat: 'ComCat',
+          dd: 'Double Difference'
+        },
+        prevCatalog = AppUtil.getParam('catalog') || 'comcat',
+        swap = _el.querySelector('.swap'),
+        span = swap.querySelector('span');
 
     if (catalog === prevCatalog) {
       swap.classList.add('hide');
@@ -299,11 +280,8 @@ var SettingsBar = function (options) {
    * @param feature {Object}
    */
   _this.addCount = function (feature) {
-    var count,
-        div,
-        loader;
-
-    div = _el.querySelector('.' + feature.id);
+    var count, loader,
+        div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configurable params
       count = div.querySelector('.count');
@@ -326,11 +304,8 @@ var SettingsBar = function (options) {
    * @param feature {Object}
    */
   _this.addLoader = function (feature) {
-    var count,
-        div,
-        loader;
-
-    div = _el.querySelector('.' + feature.id);
+    var count, loader,
+        div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configurable params
       count = div.querySelector('.count');
@@ -351,11 +326,8 @@ var SettingsBar = function (options) {
    * @param feature {Object}
    */
   _this.removeCount = function (feature) {
-    var count,
-        div,
-        loader;
-
-    div = _el.querySelector('.' + feature.id);
+    var count, loader,
+        div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has configurable params
       count = div.querySelector('.count');
@@ -375,21 +347,15 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via _this.removeCount().
    */
   _this.reset = function () {
-    var catalog,
-        inputs,
-        selCatalog,
-        selectors,
-        swap;
-
-    catalog = AppUtil.getParam('catalog') || 'comcat';
-    selectors = [
-      '.aftershocks input',
-      '.foreshocks input',
-      '.historical input'
-    ];
-    inputs = _el.querySelectorAll(selectors.join(','));
-    selCatalog = _el.querySelector('.catalog .selected').id;
-    swap = _el.querySelector('.swap');
+    var catalog = AppUtil.getParam('catalog') || 'comcat',
+        selectors = [
+          '.aftershocks input',
+          '.foreshocks input',
+          '.historical input'
+        ],
+        inputs = _el.querySelectorAll(selectors.join(',')),
+        selCatalog = _el.querySelector('.catalog .selected').id,
+        swap = _el.querySelector('.swap');
 
     _focusedField = null;
 
@@ -409,11 +375,8 @@ var SettingsBar = function (options) {
    * are overridden by existing queryString values when present.
    */
   _this.setDefaults = function () {
-    var defaults,
-        input,
-        param;
-
-    defaults = _getDefaults();
+    var input, param,
+        defaults = _getDefaults();
 
     Object.keys(defaults).forEach(key => {
       input = document.getElementById(key);

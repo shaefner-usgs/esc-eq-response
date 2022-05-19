@@ -48,15 +48,10 @@ var SideBar = function (options) {
    *     either 'on' or 'off'
    */
   _this.toggle = function (status) {
-    var button,
-        id,
-        selSideBar,
-        toggled;
-
-    button = document.querySelector('#navSub .selected');
-    id = button.className.match(/icon-(\w+)/)[1];
-    selSideBar = document.getElementById(id);
-    toggled = true; // default; whether or not sidebar visibility changed
+    var button = document.querySelector('#navSub .selected'),
+        id = button.className.match(/icon-(\w+)/)[1],
+        selSideBar = document.getElementById(id),
+        toggled = true; // default; whether or not sidebar visibility changed
 
     if (status === 'on') { // open sidebar
       AppUtil.setParam('sidebar', id);

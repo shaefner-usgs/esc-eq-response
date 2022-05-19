@@ -127,30 +127,24 @@ var Historical = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var endtime,
-        mainshock,
-        params,
-        starttime,
-        urlParams;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    endtime = Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
-      .toUTC().toISO().slice(0, -5);
-    urlParams = {
-      hsDist: document.getElementById('hs-dist').value,
-      hsMag: document.getElementById('hs-mag').value,
-      hsYears: document.getElementById('hs-years').value
-    };
-    starttime = Luxon.DateTime.fromMillis(mainshock.json.properties.time)
-      .toUTC().minus({ years: urlParams.hsYears }).toISO().slice(0, -5);
-    params = {
-      endtime: endtime,
-      latitude: mainshock.json.geometry.coordinates[1],
-      longitude: mainshock.json.geometry.coordinates[0],
-      maxradiuskm: Number(urlParams.hsDist),
-      minmagnitude: Number(urlParams.hsMag),
-      starttime: starttime
-    };
+    var mainshock = _app.Features.getFeature('mainshock'),
+        endtime = Luxon.DateTime.fromMillis(mainshock.json.properties.time - 1000)
+          .toUTC().toISO().slice(0, -5),
+        urlParams = {
+          hsDist: document.getElementById('hs-dist').value,
+          hsMag: document.getElementById('hs-mag').value,
+          hsYears: document.getElementById('hs-years').value
+        },
+        starttime = Luxon.DateTime.fromMillis(mainshock.json.properties.time)
+          .toUTC().minus({ years: urlParams.hsYears }).toISO().slice(0, -5),
+        params = {
+          endtime: endtime,
+          latitude: mainshock.json.geometry.coordinates[1],
+          longitude: mainshock.json.geometry.coordinates[0],
+          maxradiuskm: Number(urlParams.hsDist),
+          minmagnitude: Number(urlParams.hsMag),
+          starttime: starttime
+        };
 
     _this.url = Earthquakes.getFeedUrl(params);
   };

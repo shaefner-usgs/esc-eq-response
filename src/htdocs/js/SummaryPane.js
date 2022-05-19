@@ -70,9 +70,7 @@ var SummaryPane = function (options) {
    */
   _addCount = function (feature, div) {
     var count,
-        loader;
-
-    loader = div.querySelector('.breather');
+        loader = div.querySelector('.breather');
 
     if (loader) {
       loader.classList.add('hide');
@@ -99,15 +97,10 @@ var SummaryPane = function (options) {
    *     Feature id
    */
   _addListeners = function (id) {
-    var div,
-        input,
-        tables,
-        ths,
-        trs;
-
-    div = _el.querySelector('.' + id);
-    input = div.querySelector('.slider input');
-    tables = div.querySelectorAll('table.list');
+    var ths, trs,
+        div = _el.querySelector('.' + id),
+        input = div.querySelector('.slider input'),
+        tables = div.querySelectorAll('table.list');
 
     // Filter the earthquake list when the user interacts with the range slider
     if (input) {
@@ -164,13 +157,9 @@ var SummaryPane = function (options) {
    *     Feature id
    */
   _configTable = function (id) {
-    var div,
-        slider,
-        table;
-
-    div = _el.querySelector('.' + id);
-    slider = div.querySelector('.slider input');
-    table = div.querySelector('table.list');
+    var div = _el.querySelector('.' + id),
+        slider = div.querySelector('.slider input'),
+        table = div.querySelector('table.list');
 
     if (slider) {
       _app.setSliderStyles(slider); // set range slider to initial value
@@ -186,15 +175,10 @@ var SummaryPane = function (options) {
    * value.
    */
   _filterList = function () {
-    var feature,
-        props,
-        value,
-        scrollY;
-
-    feature = _app.Features.getFeature(this.id);
-    props = _filterProps[this.id];
-    value = Number(this.value);
-    scrollY = window.pageYOffset;
+    var feature = _app.Features.getFeature(this.id),
+        props = _filterProps[this.id],
+        value = Number(this.value),
+        scrollY = window.pageYOffset;
 
     props.count.innerHTML = feature.bins.mag[value];
     props.mag.innerHTML = value;
@@ -220,13 +204,9 @@ var SummaryPane = function (options) {
    * @param e {Event}
    */
   _hideMenu = function (e) {
-    var table,
-        tagName,
-        wrapper;
-
-    table = this.closest('table');
-    tagName = e.target.tagName.toLowerCase();
-    wrapper = this.closest('.wrapper');
+    var table = this.closest('table'),
+        tagName = e.target.tagName.toLowerCase(),
+        wrapper = this.closest('.wrapper');
 
     if (tagName === 'tr') { // ignore Tablesort Events
       this.classList.remove('active');
@@ -243,26 +223,21 @@ var SummaryPane = function (options) {
    *     Feature id
    */
   _initTableSort = function (id) {
-    var cleanNumber,
-        compareNumber,
-        table;
+    var cleanNumber = function (i) {
+          return i.replace(/[^\-?0-9.]/g, '');
+        },
+        compareNumber = function (a, b) {
+          a = parseFloat(a);
+          b = parseFloat(b);
 
-    // Add number sorting plugin to Tablesort
-    // https://gist.github.com/tristen/e79963856608bf54e046
-    cleanNumber = function (i) {
-      return i.replace(/[^\-?0-9.]/g, '');
-    };
-    compareNumber = function (a, b) {
-      a = parseFloat(a);
-      b = parseFloat(b);
+          a = isNaN(a) ? 0 : a;
+          b = isNaN(b) ? 0 : b;
 
-      a = isNaN(a) ? 0 : a;
-      b = isNaN(b) ? 0 : b;
+          return a - b;
+        },
+        table = _el.querySelector('.' + id + ' .sortable');
 
-      return a - b;
-    };
-    table = _el.querySelector('.' + id + ' .sortable');
-
+    // Add Number sorting (https://gist.github.com/tristen/e79963856608bf54e046)
     Tablesort.extend('number', item => {
       item.match(/^-?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
       item.match(/^-?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
@@ -286,19 +261,13 @@ var SummaryPane = function (options) {
    * @param e {Event}
    */
   _openPopup = function (e) {
-    var eqid,
-        featureId,
-        features,
-        isTextSelected,
-        parent,
-        selection;
-
-    eqid = this.querySelector('.eqid').textContent;
-    features = _app.Features.getFeatures();
-    parent = this.closest('.feature');
-    selection = window.getSelection();
-    isTextSelected = e.target.parentNode.contains(selection.anchorNode) &&
-      selection.toString().length > 0;
+    var featureId,
+        eqid = this.querySelector('.eqid').textContent,
+        features = _app.Features.getFeatures(),
+        parent = this.closest('.feature'),
+        selection = window.getSelection(),
+        isTextSelected = e.target.parentNode.contains(selection.anchorNode) &&
+          selection.toString().length > 0;
 
     // Keep row highlighted after click
     this.classList.add('selected');
@@ -342,17 +311,11 @@ var SummaryPane = function (options) {
    * @param e {Event}
    */
   _showMenu = function (e) {
-    var height,
-        mq,
-        table,
-        tr,
-        wrapper;
-
-    mq = window.matchMedia('(max-width: 735px)');
-    table = this.closest('table');
-    tr = this.closest('tr');
-    height = tr.offsetHeight + 'px';
-    wrapper = this.closest('.wrapper');
+    var mq = window.matchMedia('(max-width: 735px)'),
+        table = this.closest('table'),
+        tr = this.closest('tr'),
+        height = tr.offsetHeight + 'px',
+        wrapper = this.closest('.wrapper');
 
     if (mq.matches && !table.classList.contains('show-menu')) {
       e.stopImmediatePropagation(); // don't sort table
@@ -382,11 +345,8 @@ var SummaryPane = function (options) {
    * Update the timestamp.
    */
   _updateTimestamp = function () {
-    var el,
-        localtime;
-
-    el = document.getElementById('updated');
-    localtime = Luxon.DateTime.now().toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+    var el = document.getElementById('updated'),
+        localtime = Luxon.DateTime.now().toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
 
     el.innerHTML = `${localtime} (${_tz})`;
   };
@@ -427,11 +387,9 @@ var SummaryPane = function (options) {
    */
   _this.addLoader = function (feature) {
     var div,
-        placeholder;
+        placeholder = _el.querySelector('.' + feature.id + '.placeholder');
 
-    // Some Features are rendered in an existing placeholder (in mainshock section)
-    placeholder = _el.querySelector('.' + feature.id + '.placeholder');
-
+    // Note: some Features are rendered into an existing placeholder (under Mainshock)
     if (Object.prototype.hasOwnProperty.call(feature, 'summary') && !placeholder) {
       div = document.createElement('div');
       div.innerHTML = '<h2>' + feature.name + '<span class="breather">' +
@@ -472,15 +430,10 @@ var SummaryPane = function (options) {
    * Update the Mainshock's catalog-specific details.
    */
   _this.updateMainshock = function() {
-    var depth,
-        location,
-        mag,
-        mainshock;
-
-    depth = _el.querySelector('.details .depth span');
-    location = _el.querySelector('.details .location span');
-    mag = _el.querySelector('.details .mag span');
-    mainshock = _app.Features.getFeature('mainshock');
+    var depth = _el.querySelector('.details .depth span'),
+        location = _el.querySelector('.details .location span'),
+        mag = _el.querySelector('.details .mag span'),
+        mainshock = _app.Features.getFeature('mainshock');
 
     depth.textContent = mainshock.data.depthDisplay;
     location.textContent = mainshock.data.location;

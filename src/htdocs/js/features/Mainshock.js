@@ -124,69 +124,66 @@ var Mainshock = function (options) {
    * @return html {String}
    */
   _createSummary = function () {
-    var data,
-        html;
-
-    data = _getData();
-    html = L.Util.template(
-      _getNotice(data) +
-      '<div class="details bubble">' +
-        '<ul>' +
-          '<li class="mag">' +
-            '<strong>Mag</strong>' +
-            '<span>{magDisplay}</span>' +
-            '<small>{magType}</small>' +
-          '</li>' +
-          _getBubbles(data) +
-          _getShakeAlert(data) +
-          '<li class="date">' +
-            '<strong>Date</strong>' +
-            '<span>{date}</span>' +
-            '<small>{dayofweek}</small>' +
-          '</li>' +
-          '<li class="time">' +
-            '<strong>Time</strong>' +
-            '<span>{time}</span>' +
-            '<small>UTC</small>' +
-          '</li>' +
-          '<li class="depth">' +
-            '<strong>Depth</strong>' +
-            '<span>{depth}</span>' +
-            '<small>km</small>' +
-          '</li>' +
-          '<li class="location">' +
-            '<strong>Location</strong>' +
-            '<span>{location}</span>' +
-          '</li>' +
-          '<li class="status">' +
-            '<strong>Status</strong>' +
-            '<span>{statusIcon}</span>' +
-            '<small>{status}</small>' +
-          '</li>' +
-        '</ul>' +
-      '</div>' +
-      '<div class="products">' +
-        '<div class="thumbs bubble {visibility}">' +
-          _getDyfi(data) +
-          _getShakeMap(data) +
-          '<div class="focal-mechanism placeholder hide"></div>' +
-          '<div class="moment-tensor placeholder hide"></div>' +
-        '</div>' +
-        '<div class="pager-exposures bubble placeholder hide"></div>' +
-        _getPager(data) +
-        '<div class="download bubble">' +
-          '<h3>Event Summary</h3>' +
-          '<p><abbr title="Rich Text Format">RTF</abbr> document containing ' +
-            'earthquake details, images, plots and placeholders for talking ' +
-            'points and analysis. Microsoft Word is recommended for viewing ' +
-            'the document.</p>' +
-          '<button id="download" disabled="disabled" type="button" ' +
-            'title="Download RTF Document">Download</button>' +
-        '</div>' +
-        _getTectonic(data) +
-      '</div>',
-      data
-    );
+    var data = _getData(),
+        html = L.Util.template(
+          _getNotice(data) +
+          '<div class="details bubble">' +
+            '<ul>' +
+              '<li class="mag">' +
+                '<strong>Mag</strong>' +
+                '<span>{magDisplay}</span>' +
+                '<small>{magType}</small>' +
+              '</li>' +
+              _getBubbles(data) +
+              _getShakeAlert(data) +
+              '<li class="date">' +
+                '<strong>Date</strong>' +
+                '<span>{date}</span>' +
+                '<small>{dayofweek}</small>' +
+              '</li>' +
+              '<li class="time">' +
+                '<strong>Time</strong>' +
+                '<span>{time}</span>' +
+                '<small>UTC</small>' +
+              '</li>' +
+              '<li class="depth">' +
+                '<strong>Depth</strong>' +
+                '<span>{depth}</span>' +
+                '<small>km</small>' +
+              '</li>' +
+              '<li class="location">' +
+                '<strong>Location</strong>' +
+                '<span>{location}</span>' +
+              '</li>' +
+              '<li class="status">' +
+                '<strong>Status</strong>' +
+                '<span>{statusIcon}</span>' +
+                '<small>{status}</small>' +
+              '</li>' +
+            '</ul>' +
+          '</div>' +
+          '<div class="products">' +
+            '<div class="thumbs bubble {visibility}">' +
+              _getDyfi(data) +
+              _getShakeMap(data) +
+              '<div class="focal-mechanism placeholder hide"></div>' +
+              '<div class="moment-tensor placeholder hide"></div>' +
+            '</div>' +
+            '<div class="pager-exposures bubble placeholder hide"></div>' +
+            _getPager(data) +
+            '<div class="download bubble">' +
+              '<h3>Event Summary</h3>' +
+              '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
+                'containing earthquake details, images, plots and ' +
+                'placeholders for talking points and analysis. Microsoft ' +
+                'Word is recommended for viewing the document.</p>' +
+              '<button id="download" disabled="disabled" type="button" ' +
+                'title="Download RTF Document">Download</button>' +
+            '</div>' +
+            _getTectonic(data) +
+          '</div>',
+          data
+        );
 
     return html;
   };
@@ -255,38 +252,20 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var dyfi,
-        dyfiImg,
-        econImg,
-        eqTime,
-        fatalImg,
-        fm,
-        header,
-        mmiInt,
-        mt,
-        notice,
-        pager,
-        products,
-        shakeAlert,
-        shakeAlertStatus,
-        shakemap,
-        shakemapImg,
+    var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg,
         tectonic,
-        text,
-        visibility;
-
-    products = _this.json.properties.products;
-    dyfi = products.dyfi;
-    eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC();
-    fm = products['focal-mechanism'];
-    header = products['general-header'];
-    mmiInt = Math.round(_this.json.properties.mmi);
-    mt = products['moment-tensor'];
-    pager = products.losspager;
-    shakeAlert = products['shake-alert'];
-    shakemap = products.shakemap;
-    text = products['general-text'];
-    visibility = 'hide'; // default - product thumbs container
+        products = _this.json.properties.products,
+        dyfi = products.dyfi,
+        eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC(),
+        fm = products['focal-mechanism'],
+        header = products['general-header'],
+        mmiInt = Math.round(_this.json.properties.mmi),
+        mt = products['moment-tensor'],
+        pager = products.losspager,
+        shakeAlert = products['shake-alert'],
+        shakemap = products.shakemap,
+        text = products['general-text'],
+        visibility = 'hide'; // default - product thumbs container
 
     if (Array.isArray(dyfi)) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
@@ -481,11 +460,8 @@ var Mainshock = function (options) {
    * @return thumbs {Array}
    */
   _getThumbs = function () {
-    var div,
-        thumbs;
-
-    div = document.querySelector('#summaryPane .thumbs');
-    thumbs = [];
+    var div = document.querySelector('#summaryPane .thumbs'),
+        thumbs = [];
 
     Object.keys(_lightboxes).forEach(id => {
       _addThumb(thumbs, id, div.querySelector(`.${id} > a`));
@@ -503,11 +479,8 @@ var Mainshock = function (options) {
    * Refresh FM, MT BeachBalls.
    */
   _refreshBeachBalls = function () {
-    var fm,
-        mt;
-
-    fm = _app.Features.getFeature('focal-mechanism');
-    mt = _app.Features.getFeature('moment-tensor');
+    var fm = _app.Features.getFeature('focal-mechanism'),
+        mt = _app.Features.getFeature('moment-tensor');
 
     if (fm.mapLayer) {
       _app.MapPane.removeFeature(fm);
@@ -567,11 +540,8 @@ var Mainshock = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var button,
-        thumbs;
-
-    button = document.getElementById('download');
-    thumbs = _getThumbs();
+    var button = document.getElementById('download'),
+        thumbs = _getThumbs();
 
     // Load external feed data and create RTF Summary
     button.addEventListener('click', _app.Feeds.loadFeeds);
@@ -684,9 +654,7 @@ var Mainshock = function (options) {
    * @param catalog {String <comcat|dd>}
    */
   _this.update = function (catalog) {
-    var id,
-        mainshock,
-        url;
+    var id, mainshock, url;
 
     // Set the Double Difference catalog props if necessary; render the update
     if (!_ddJson) {

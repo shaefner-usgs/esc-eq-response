@@ -135,27 +135,24 @@ var Application = function (options) {
    * property so their public methods/props are accessible to other Classes.
    */
   _initClasses = function () {
-    var appClasses,
-        postInits;
-
-    appClasses = {
-      Features: Features, // must be first
-      Feeds: Feeds,
-      JsonFeed: JsonFeed,
-      LegendBar: LegendBar,
-      MapPane: MapPane,
-      NavBar: NavBar,
-      PlotsPane: PlotsPane,
-      SearchBar: SearchBar,
-      SelectBar: SelectBar,
-      SettingsBar: SettingsBar,
-      SideBar: SideBar,
-      SignificantEqs: SignificantEqs,
-      StatusBar: StatusBar,
-      SummaryPane: SummaryPane,
-      TitleBar: TitleBar
-    };
-    postInits = [];
+    var appClasses = {
+          Features: Features, // must be first
+          Feeds: Feeds,
+          JsonFeed: JsonFeed,
+          LegendBar: LegendBar,
+          MapPane: MapPane,
+          NavBar: NavBar,
+          PlotsPane: PlotsPane,
+          SearchBar: SearchBar,
+          SelectBar: SelectBar,
+          SettingsBar: SettingsBar,
+          SideBar: SideBar,
+          SignificantEqs: SignificantEqs,
+          StatusBar: StatusBar,
+          SummaryPane: SummaryPane,
+          TitleBar: TitleBar
+        },
+        postInits = [];
 
     Object.keys(appClasses).forEach(name => {
       _this[name] = appClasses[name]({
@@ -180,16 +177,11 @@ var Application = function (options) {
    * Reset the queryString, keeping only the non-Mainshock specific parameters.
    */
   _resetQueryString = function () {
-    var inputs,
-        msParams,
-        pairs,
-        params,
-        queryString;
-
-    inputs = document.querySelectorAll('#selectBar input, #settingsBar input');
-    msParams = [];
-    pairs = [];
-    params = new URLSearchParams(location.search);
+    var queryString,
+        inputs = document.querySelectorAll('#selectBar input, #settingsBar input'),
+        msParams = [],
+        pairs = [],
+        params = new URLSearchParams(location.search);
 
     inputs.forEach(input =>
       msParams.push(input.id)
@@ -211,9 +203,7 @@ var Application = function (options) {
    */
   _resetScrollPositions = function () {
     var id,
-        sections;
-
-    sections = document.querySelectorAll('section.bar, section.pane');
+        sections = document.querySelectorAll('section.bar, section.pane');
 
     sections.forEach(section => {
       id = section.getAttribute('id');
@@ -258,13 +248,9 @@ var Application = function (options) {
    * @return id {String}
    */
   _this.getPaneId = function () {
-    var hash,
-        id,
-        paneExists;
-
-    hash = location.hash;
-    id = _this.defaultPaneId;
-    paneExists = document.querySelector('section' + hash);
+    var hash = location.hash,
+        id = _this.defaultPaneId,
+        paneExists = document.querySelector('section' + hash);
 
     if (hash && paneExists) {
       id = hash.substr(1);
@@ -301,11 +287,8 @@ var Application = function (options) {
    * hide all other options.
    */
   _this.setOption = function () {
-    var option,
-        sibling;
-
-    option = document.querySelector('.option.' + this.id);
-    sibling = this.parentNode.firstElementChild;
+    var option = document.querySelector('.option.' + this.id),
+        sibling = this.parentNode.firstElementChild;
 
     // Highlight the selected button and show its options (if applicable)
     this.classList.add('selected');
@@ -354,15 +337,10 @@ var Application = function (options) {
    * @param input {Element}
    */
   _this.setSliderStyles = function (input) {
-    var newRules,
-        oldRules,
-        value,
-        vendorAttrs;
-
-    newRules = '';
-    oldRules = new RegExp('#' + input.id + '[^#]+', 'g');
-    value = AppUtil.getSliderValue(input);
-    vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
+    var newRules = '',
+        oldRules = new RegExp('#' + input.id + '[^#]+', 'g'),
+        value = AppUtil.getSliderValue(input),
+        vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
     vendorAttrs.forEach(attr =>
       newRules += `#${input.id}::-${attr}-track {background-size:${value} !important}`

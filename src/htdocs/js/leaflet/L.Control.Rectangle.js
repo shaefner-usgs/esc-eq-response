@@ -27,15 +27,12 @@ L.Control.Rectangle = L.Control.extend({
   },
 
   onAdd: function (map) {
-    var container,
-        divClasses;
-
-    divClasses = [
-      'leaflet-bar',
-      'leaflet-control',
-      'leaflet-control-edit'
-    ];
-    container = L.DomUtil.create('div', divClasses.join(' '));
+    var divClasses = [
+          'leaflet-bar',
+          'leaflet-control',
+          'leaflet-control-edit'
+        ],
+        container = L.DomUtil.create('div', divClasses.join(' '));
 
     this._button = L.DomUtil.create('a', '', container);
     this._button.href = '#';

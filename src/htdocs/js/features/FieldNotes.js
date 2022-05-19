@@ -96,11 +96,8 @@ var FieldNotes = function (options) {
    *     L.Popup div
    */
   _addListeners = function (div) {
-    var photo,
-        toggle;
-
-    photo = div.querySelector('.photo');
-    toggle = div.querySelector('.toggle');
+    var photo = div.querySelector('.photo'),
+        toggle = div.querySelector('.toggle');
 
     // Show full-size photo in a Lightbox
     if (photo) {
@@ -129,16 +126,12 @@ var FieldNotes = function (options) {
    * @return html {String}
    */
   _createList = function (props) {
-    var html,
-        list,
-        skipProps,
-        value;
-
-    html = '';
-    list = '';
-    skipProps = ['accuracy', 'attachment', 'description', 'form', 'igid',
-      'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
-      'timezone', 'title', 'zaccuracy'];
+    var value,
+        html = '',
+        list = '',
+        skipProps = ['accuracy', 'attachment', 'description', 'form', 'igid',
+          'notes', 'operator', 'recorded', 'site', 'synced', 'timestamp',
+          'timezone', 'title', 'zaccuracy'];
 
     Object.keys(props).forEach(key => {
       if (skipProps.indexOf(key) === -1) { // skip props shared by all types
@@ -166,14 +159,10 @@ var FieldNotes = function (options) {
    * @return div {Element}
    */
   _createPopup = function (data) {
-    var div,
-        html,
-        img,
-        props;
-
-    div = L.DomUtil.create('div');
-    img = '';
-    props = _createList(data);
+    var html,
+        div = L.DomUtil.create('div'),
+        img = '',
+        props = _createList(data);
 
     if (data.attachment) {
       img = '<a class="photo" href="{attachment}">' +
@@ -248,15 +237,10 @@ var FieldNotes = function (options) {
    * @param e {Event}
    */
   _updatePopup = function (e) {
-    var image,
-        popup,
-        regex,
-        url;
-
-    image = new Image();
-    popup = e.popup;
-    regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/;
-    url = regex.exec(popup.getContent().outerHTML);
+    var image = new Image(),
+        popup = e.popup,
+        regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/,
+        url = regex.exec(popup.getContent().outerHTML);
 
     if (url) { // popup includes a photo
       image.src = url[0];
@@ -310,26 +294,19 @@ var FieldNotes = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var after,
-        before,
-        mainshock,
-        pairs,
-        radius,
-        urlParams;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    after = Luxon.DateTime.fromMillis(mainshock.json.properties.time + 1000)
-      .toUTC().toSeconds();
-    before = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC()
-      .plus({ days: 30 }).toSeconds();
-    pairs = [];
-    radius = document.getElementById('as-dist').value;
-    urlParams = {
-      between: after + ',' + before,
-      lat: mainshock.json.geometry.coordinates[1],
-      lon: mainshock.json.geometry.coordinates[0],
-      radius: radius // use aftershocks radius
-    };
+    var mainshock = _app.Features.getFeature('mainshock'),
+        after = Luxon.DateTime.fromMillis(mainshock.json.properties.time + 1000)
+          .toUTC().toSeconds(),
+        before = Luxon.DateTime.fromMillis(mainshock.json.properties.time)
+          .toUTC().plus({ days: 30 }).toSeconds(),
+        pairs = [],
+        radius = document.getElementById('as-dist').value,
+        urlParams = {
+          between: after + ',' + before,
+          lat: mainshock.json.geometry.coordinates[1],
+          lon: mainshock.json.geometry.coordinates[0],
+          radius: radius // use aftershocks radius
+        };
 
     Object.keys(urlParams).forEach(key =>
       pairs.push(key + '=' + urlParams[key])

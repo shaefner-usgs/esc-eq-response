@@ -104,11 +104,8 @@ var PagerCities = function (options) {
    */
   _this.setFeedUrl = function () {
     var contents,
-        mainshock,
-        products;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products;
 
     if (products.losspager) {
       contents = products.losspager[0].contents;

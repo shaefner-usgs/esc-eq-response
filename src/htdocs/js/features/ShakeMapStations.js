@@ -154,63 +154,58 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _createPopup = function (station) {
-    var coords,
-        data,
-        html,
-        props;
-
-    coords = station.geometry.coordinates;
-    props = station.properties;
-    data = {
-      channels: _createTable(props.channels),
-      pga: AppUtil.round(props.pga, 2),
-      pgv: AppUtil.round(props.pgv, 2),
-      distance: AppUtil.round(props.distance, 1),
-      intensity: AppUtil.round(props.intensity, 1),
-      network: props.network || '–',
-      location: AppUtil.formatLatLon(coords),
-      romanIntensity: AppUtil.romanize(props.intensity) || 'I',
-      source: props.source || '–',
-      title: _getTitle(station)
-    };
-    html = L.Util.template(
-      '<div class="shakemap-stations">' +
-        '<h4>{title}</h4>' +
-        '<ul class="station-summary impact-bubbles">' +
-          '<li class="station-summary-intensity mmi{romanIntensity} impact-bubble">' +
-            '<strong class="roman">{romanIntensity}</strong>' +
-            '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
-          '</li>' +
-          '<li class="station-summary-pga">' +
-            '{pga}' +
-            '<abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr>' +
-          '</li>' +
-          '<li class="station-summary-pgv">' +
-            '{pgv}' +
-            '<abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr>' +
-          '</li>' +
-          '<li class="station-summary-distance">' +
-            '{distance}' +
-            '<abbr title="Distance from mainshock (km)">Dist</abbr>' +
-          '</li>' +
-        '</ul>' +
-        '<dl class="station-metadata horizontal params">' +
-          '<dt>Network</dt>' +
-          '<dd>{network}</dd>' +
-          '<dt>Location</dt>' +
-          '<dd>{location}</dd>' +
-          '<dt>Source</dt>' +
-          '<dd>{source}</dd>' +
-          '<dt>Intensity</dt>' +
-          '<dd>{intensity}</dd>' +
-        '</dl>' +
-        '<h5>Channels</h5>' +
-        '<div class="scroll-wrapper">' +
-        '{channels}' +
-        '</div>' +
-      '</div>',
-      data
-    );
+    var coords = station.geometry.coordinates,
+        props = station.properties,
+        data = {
+          channels: _createTable(props.channels),
+          pga: AppUtil.round(props.pga, 2),
+          pgv: AppUtil.round(props.pgv, 2),
+          distance: AppUtil.round(props.distance, 1),
+          intensity: AppUtil.round(props.intensity, 1),
+          network: props.network || '–',
+          location: AppUtil.formatLatLon(coords),
+          romanIntensity: AppUtil.romanize(props.intensity) || 'I',
+          source: props.source || '–',
+          title: _getTitle(station)
+        },
+        html = L.Util.template(
+          '<div class="shakemap-stations">' +
+            '<h4>{title}</h4>' +
+            '<ul class="station-summary impact-bubbles">' +
+              '<li class="station-summary-intensity mmi{romanIntensity} impact-bubble">' +
+                '<strong class="roman">{romanIntensity}</strong>' +
+                '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
+              '</li>' +
+              '<li class="station-summary-pga">' +
+                '{pga}' +
+                '<abbr title="Maximum Horizontal Peak Ground Acceleration (%g)">PGA</abbr>' +
+              '</li>' +
+              '<li class="station-summary-pgv">' +
+                '{pgv}' +
+                '<abbr title="Maximum Horizontal Peak Ground Velocity (cm/s)">PGV</abbr>' +
+              '</li>' +
+              '<li class="station-summary-distance">' +
+                '{distance}' +
+                '<abbr title="Distance from mainshock (km)">Dist</abbr>' +
+              '</li>' +
+            '</ul>' +
+            '<dl class="station-metadata horizontal params">' +
+              '<dt>Network</dt>' +
+              '<dd>{network}</dd>' +
+              '<dt>Location</dt>' +
+              '<dd>{location}</dd>' +
+              '<dt>Source</dt>' +
+              '<dd>{source}</dd>' +
+              '<dt>Intensity</dt>' +
+              '<dd>{intensity}</dd>' +
+            '</dl>' +
+            '<h5>Channels</h5>' +
+            '<div class="scroll-wrapper">' +
+            '{channels}' +
+            '</div>' +
+          '</div>',
+          data
+        );
 
     return html;
   };
@@ -223,30 +218,26 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _createRow = function (channel) {
-    var amplitude,
-        data,
-        html;
-
-    amplitude = _getAmplitudes(channel.amplitudes);
-    data = {
-      name: channel.name,
-      pga: _createComponent(amplitude.pga),
-      pgv: _createComponent(amplitude.pgv),
-      psa03: _createComponent(amplitude['sa(0.3)']),
-      psa10: _createComponent(amplitude['sa(1.0)']),
-      psa30: _createComponent(amplitude['sa(3.0)'])
-    };
-    html = L.Util.template(
-      '<tr>' +
-        '<th scope="row" class="station-channel-name freeze">{name}</th>' +
-        '<td class="station-channel-pga">{pga}</td>' +
-        '<td class="station-channel-pgv">{pgv}</td>' +
-        '<td class="station-channel-psa03">{psa03}</td>' +
-        '<td class="station-channel-psa10">{psa10}</td>' +
-        '<td class="station-channel-psa30">{psa30}</td>' +
-      '</tr>',
-      data
-    );
+    var amplitude = _getAmplitudes(channel.amplitudes),
+        data = {
+          name: channel.name,
+          pga: _createComponent(amplitude.pga),
+          pgv: _createComponent(amplitude.pgv),
+          psa03: _createComponent(amplitude['sa(0.3)']),
+          psa10: _createComponent(amplitude['sa(1.0)']),
+          psa30: _createComponent(amplitude['sa(3.0)'])
+        },
+        html = L.Util.template(
+          '<tr>' +
+            '<th scope="row" class="station-channel-name freeze">{name}</th>' +
+            '<td class="station-channel-pga">{pga}</td>' +
+            '<td class="station-channel-pgv">{pgv}</td>' +
+            '<td class="station-channel-psa03">{psa03}</td>' +
+            '<td class="station-channel-psa10">{psa10}</td>' +
+            '<td class="station-channel-psa30">{psa30}</td>' +
+          '</tr>',
+          data
+        );
 
     return html;
   };
@@ -332,14 +323,11 @@ var ShakeMapStations = function (options) {
    * @return {String}
    */
   _getTitle = function (station) {
-    var data,
-        props;
-
-    props = station.properties;
-    data = {
-      code: props.code || '–',
-      name: props.name || '–'
-    };
+    var props = station.properties,
+        data = {
+          code: props.code || '–',
+          name: props.name || '–'
+        };
 
     return L.Util.template('<strong>{code}</strong> {name}', data);
   };
@@ -368,11 +356,8 @@ var ShakeMapStations = function (options) {
    * @return {L.Marker}
    */
   _pointToLayer = function (feature, latlng) {
-    var props,
-        romanIntensity;
-
-    props = feature.properties;
-    romanIntensity = AppUtil.romanize(props.intensity) || 'I';
+    var props = feature.properties,
+        romanIntensity = AppUtil.romanize(props.intensity) || 'I';
 
     _markerOptions.className = 'station-layer-icon station-mmi' + romanIntensity;
 

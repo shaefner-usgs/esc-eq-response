@@ -84,11 +84,8 @@ var Forecast = function (options) {
    * @return html {String}
    */
   _createParameters = function (json) {
-    var html,
-        params;
-
-    html = '<h4>Parameters <a class="button">Show</a></h4>';
-    params = json.model?.parameters;
+    var html = '<h4>Parameters <a class="button">Show</a></h4>',
+        params = json.model?.parameters;
 
     html += '<dl class="params alt hide">';
 
@@ -109,23 +106,14 @@ var Forecast = function (options) {
    * @return html {String}
    */
   _createProbabilities = function (json) {
-    var data,
-        eqid,
-        html,
-        period,
-        probabilities,
-        range,
-        state,
-        timeframes,
-        visibility;
-
-    eqid = AppUtil.getParam('eqid');
-    data = {
-      url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
-    };
-    html = '';
-    probabilities = '';
-    timeframes = '';
+    var period, range, state, visibility,
+        eqid = AppUtil.getParam('eqid'),
+        data = {
+          url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
+        },
+        html = '',
+        probabilities = '',
+        timeframes = '';
 
     json.forecast.forEach(timeframe => {
       period = timeframe.label.replace(/1\s+/, '');
@@ -247,11 +235,8 @@ var Forecast = function (options) {
    */
   _this.setFeedUrl = function () {
     var contents,
-        mainshock,
-        products;
-
-    mainshock = _app.Features.getFeature('mainshock');
-    products = mainshock.json.properties.products;
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products;
 
     if (products.oaf) {
       contents = products.oaf[0].contents;
