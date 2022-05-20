@@ -227,18 +227,17 @@ AppUtil.getShakingValues = function (mmis) {
  *
  * @param input {Element}
  *
- * @return value {String}
+ * @return {String}
  */
 AppUtil.getSliderValue = function (input) {
   var min = input.min || 0,
-      percentage = input.value,
-      value = percentage + '% 100%';
+      value = input.value;
 
   if (input.max) {
-    percentage = Math.floor(100 * (input.value - min) / (input.max - min));
+    value = Math.floor(100 * (input.value - min) / (input.max - min));
   }
 
-  return value;
+  return value + '% 100%';
 };
 
 /**
