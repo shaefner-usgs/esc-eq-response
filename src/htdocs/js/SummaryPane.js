@@ -346,9 +346,9 @@ var SummaryPane = function (options) {
    */
   _updateTimestamp = function () {
     var el = document.getElementById('updated'),
-        localtime = Luxon.DateTime.now().toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+        userTime = Luxon.DateTime.now().toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
 
-    el.innerHTML = `${localtime} (${_tz})`;
+    el.innerHTML = `${userTime} (${_tz})`;
   };
 
   // ----------------------------------------------------------
