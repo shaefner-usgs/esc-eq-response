@@ -5,7 +5,7 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create PAGER Cities list for PAGER Exposures Feature.
+ * Create the PAGER Cities Feature, which is a sub-Feature of PAGER Exposures.
  *
  * @param options {Object}
  *   {

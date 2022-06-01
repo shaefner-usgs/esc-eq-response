@@ -6,7 +6,7 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create PAGER Exposures Feature.
+ * Create the PAGER Exposures Feature, which is a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *   {

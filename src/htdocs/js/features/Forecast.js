@@ -7,7 +7,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create the Forecast for Aftershocks Feature.
+ * Create the Forecast Feature, which is a sub-Feature of Aftershocks.
  *
  * @param options {Object}
  *   {

@@ -29,7 +29,7 @@ _DEFAULTS = {
 
 
 /**
- * Create ShakeMap Stations Feature.
+ * Create the ShakeMap Stations Feature.
  *
  * @param options {Object}
  *   {
@@ -55,7 +55,7 @@ var ShakeMapStations = function (options) {
   var _this,
       _initialize,
 
-      _mainshock,
+      _app,
       _markerOptions,
       _shakemap,
 
@@ -76,7 +76,7 @@ var ShakeMapStations = function (options) {
   _initialize = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
-    _mainshock = options.app.Features.getFeature('mainshock');
+    _app = options.app;
     _markerOptions = options.markerOptions;
 
     _this.count = 0;
@@ -387,7 +387,7 @@ var ShakeMapStations = function (options) {
   _this.destroy = function () {
     _initialize = null;
 
-    _mainshock = null;
+    _app = null;
     _markerOptions = null;
     _shakemap = null;
 
@@ -409,9 +409,10 @@ var ShakeMapStations = function (options) {
    * Set the JSON feed's URL.
    */
   _this.setFeedUrl = function () {
-    var contents;
+    var contents,
+        mainshock = _app.Features.getFeature('mainshock');
 
-    _shakemap = _mainshock.json.properties.products.shakemap;
+    _shakemap = mainshock.json.properties.products.shakemap;
 
     if (_shakemap) {
       contents = _shakemap[0].contents;
