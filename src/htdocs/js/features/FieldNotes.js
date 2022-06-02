@@ -31,7 +31,7 @@ _DEFAULTS = {
 };
 
 /**
- * Create FieldNotes Feature.
+ * Create the FieldNotes Feature.
  *
  * @param options {Object}
  *   {
@@ -303,8 +303,8 @@ var FieldNotes = function (options) {
         radius = document.getElementById('as-dist').value,
         urlParams = {
           between: after + ',' + before,
-          lat: mainshock.json.geometry.coordinates[1],
-          lon: mainshock.json.geometry.coordinates[0],
+          lat: mainshock.data.lat,
+          lon: mainshock.data.lon,
           radius: radius // use aftershocks radius
         };
 

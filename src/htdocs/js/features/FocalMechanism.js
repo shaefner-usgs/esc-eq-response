@@ -5,7 +5,7 @@ var BeachBall = require('features/util/BeachBall');
 
 
 /**
- * Create Focal Mechanism Feature.
+ * Create the Focal Mechanism Feature, which is a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *   {
@@ -70,8 +70,8 @@ var FocalMechanism = function (options) {
       });
       beachball = BeachBall({
         coords: [
-          _mainshock.json.geometry.coordinates[1],
-          _mainshock.json.geometry.coordinates[0]
+          _mainshock.data.lat,
+          _mainshock.data.lon
         ],
         data: data,
         id: _this.id,

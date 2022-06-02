@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Create interactive plots using Plotly. Add/remove/render a Feature's plots
  * when they are created/updated using external feed data.
@@ -39,11 +36,7 @@ var PlotsPane = function (options) {
       _addContainer,
       _addCount,
       _addListeners,
-      _getPlotlyConfig,
-      _getPlotlyData,
-      _getPlotlyLayout,
       _getPlotlyParams,
-      _getRatio,
       _isActive;
 
 
@@ -68,12 +61,12 @@ var PlotsPane = function (options) {
   /**
    * Add a plot's container and name to the DOM.
    *
+   * @param id {String <cumulative|hypocenters|magtime>}
    * @param featureId {String}
-   * @param plotId {String <cumulative|hypocenters|magtime>}
    *
    * @return container {Element}
    */
-  _addContainer = function (featureId, plotId) {
+  _addContainer = function (id, featureId) {
     var container = document.createElement('div'),
         h3 = document.createElement('h3'),
         names = {
@@ -83,9 +76,9 @@ var PlotsPane = function (options) {
         },
         parent = _contentEl.querySelector('.' + featureId + ' .bubble');
 
-    h3.innerHTML = names[plotId];
+    h3.innerHTML = names[id];
 
-    container.classList.add(plotId);
+    container.classList.add(id);
     parent.appendChild(h3);
     parent.appendChild(container);
 
@@ -126,22 +119,18 @@ var PlotsPane = function (options) {
    * @param plot {Element}
    */
   _addListeners = function (plot) {
-    var eqids,
-        featureId,
-        index,
-        plotId,
-        points;
+    var eqids, featureId, id, index, point;
 
     // Show the map and open a popup when the user clicks an eq on a 2d plot
     plot.on('plotly_click', data => {
-      points = data.points[0];
-      eqids = points.data.eqid;
-      featureId = points.data.feature;
-      index = points.pointNumber;
-      plotId = points.data.plotid;
+      point = data.points[0];
+      eqids = point.data.eqid;
+      featureId = point.data.feature;
+      index = point.pointNumber;
+      id = point.data.id;
 
       // The first point (index 0) on cumulative aftershocks curve is Mainshock
-      if (index === 0 && plotId === 'cumulative' && featureId === 'aftershocks') {
+      if (index === 0 && id === 'cumulative' && featureId === 'aftershocks') {
         featureId = 'mainshock';
       }
 
@@ -150,216 +139,21 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Get the Plotly config option for a plot.
-   *
-   * @param featureId {String}
-   * @param plotId {String <cumulative|hypocenters|magtime>}
-   *
-   * @return config {Object}
-   */
-  _getPlotlyConfig = function (featureId, plotId) {
-    var eqid, opts,
-        config = {
-          displaylogo: false,
-          modeBarButtonsToAdd: [{
-            click: gd => {
-              eqid = AppUtil.getParam('eqid');
-              opts = {
-                filename: eqid + '-' + featureId + '-' + plotId,
-                format: 'svg',
-                height: 500,
-                width: 1200
-              };
-
-              if (gd.classList.contains('hypocenters')) {
-                opts.height = 1000;
-              }
-
-              Plotly.downloadImage(gd, opts);
-            },
-            icon: Plotly.Icons.camera,
-            name: 'toImage2',
-            title: 'Download plot (.svg)'
-          }],
-          modeBarButtonsToRemove: ['hoverClosest3d','hoverClosestCartesian',
-            'hoverCompareCartesian', 'lasso2d', 'resetCameraDefault3d',
-            'resetScale2d', 'select2d', 'sendDataToCloud', 'toggleSpikelines',
-            'toImage'
-          ]
-        };
-
-    return config;
-  };
-
-  /**
-   * Get the Plotly data option for a plot. The Mainshock's trace is added to
-   * hypocenters and magtime plots.
-   *
-   * @param feature {Object}
-   * @param plotId {String <cumulative|hypocenters|magtime>}
-   *
-   * @return data {Array}
-   */
-  _getPlotlyData = function (feature, plotId) {
-    var data = [
-      feature.plotTraces[plotId]
-    ];
-
-    if (plotId === 'hypocenters' || plotId === 'magtime') {
-      data.push(_app.Features.getFeature('mainshock').plotTraces[plotId]);
-    }
-
-    return data;
-  };
-
-  /**
-   * Get the Plotly layout option for a plot.
-   *
-   * @param plotId {String <cumulative|hypocenters|magtime>}
-   * @param zRatio {Number} optional
-   *     only needed for hypocenters plot
-   *
-   * @return layout {Object}
-   */
-  _getPlotlyLayout = function (plotId, zRatio) {
-    var color = '#555',
-        layout = {
-          font: {
-            family: '"Helvetica Neue", Helvetica, Arial, sans-serif'
-          },
-          hovermode: 'closest',
-          margin: {
-            b: 50,
-            l: 50,
-            r: 50,
-            t: 0
-          },
-          showlegend: false
-        },
-        spikecolor = '#4440CC'; // accent-color
-
-    if (plotId === 'hypocenters') {
-      layout.scene = {
-        aspectmode: 'manual',
-        aspectratio: {
-          x: 1,
-          y: 1,
-          z: zRatio
-        },
-        camera: {
-          eye: {
-            'x': 0,
-            'y': -0.001,
-            'z': 2
-          }
-        },
-        xaxis: {
-          spikecolor: spikecolor,
-          title: {
-            font: {
-              color: color
-            },
-            text: 'Longitude'
-          },
-          zeroline: false
-        },
-        yaxis: {
-          spikecolor: spikecolor,
-          title: {
-            font: {
-              color: color
-            },
-            text: 'Latitude'
-          },
-          zeroline: false
-        },
-        zaxis: {
-          spikecolor: spikecolor,
-          title: {
-            font: {
-              color: color
-            },
-            text: 'Depth (km)'
-          },
-          zeroline: false
-        }
-      };
-    } else {
-      layout.xaxis = {
-        title: {
-          font: {
-            color: color
-          },
-          text: 'Time (UTC)'
-        }
-      };
-    }
-
-    if (plotId === 'magtime') {
-      layout.yaxis = {
-        title: {
-          font: {
-            color: color
-          },
-          text: 'Magnitude'
-        }
-      };
-    } else {
-      layout.yaxis = {
-        title: {
-          font: {
-            color: color
-          },
-          text: 'Earthquakes'
-        }
-      };
-    }
-
-    return layout;
-  };
-
-  /**
    * Get the Plotly parameters that are used to instantiate a new plot.
    *
+   * @param id {String <cumulative|hypocenters|magtime>}
    * @param feature {Object}
-   * @param plotId {String <cumulative|hypocenters|magtime>}
    *
    * @return {Object}
-   *     Plotly.newPlot signature
+   *     parameters for Plotly.newPlot()
    */
-  _getPlotlyParams = function (feature, plotId) {
-    var zRatio,
-        container = _addContainer(feature.id, plotId);
-
-    if (plotId === 'hypocenters') {
-      zRatio = _getRatio(feature.plotTraces.hypocenters);
-    }
+  _getPlotlyParams = function (id, feature) {
+    var container = _addContainer(id, feature.id);
 
     return {
       graphDiv: container,
-      options: {
-        data: _getPlotlyData(feature, plotId),
-        layout: _getPlotlyLayout(plotId, zRatio),
-        config: _getPlotlyConfig(feature.id, plotId)
-      }
+      options: feature.plots.getOptions(id)
     };
-  };
-
-  /**
-   * Get the ratio of depth:latitude for scaling a 3d plot.
-   *
-   * @param trace {Object}
-   *     plot's data trace
-   *
-   * @return {Number}
-   */
-  _getRatio = function (trace) {
-    var depthExtent = AppUtil.extent(trace.z),
-        depthRange = depthExtent[1] - depthExtent[0],
-        latExtent = AppUtil.extent(trace.y),
-        latRange = 111 * Math.abs(latExtent[1] - latExtent[0]);
-
-    return depthRange / latRange;
   };
 
   /**
@@ -380,18 +174,17 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add a Feature's plots. Plots are created, but not rendered, until PlotsPane
-   * is active.
+   * Add a Feature's plots. Plots are created and rendered when the PlotsPane is
+   * first viewed by the user.
    *
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var div,
-        html,
-        params;
+    var div, html, params,
+        plots = ['magtime', 'cumulative', 'hypocenters'];
 
     // Skip Mainshock (it's included in other Features' plots)
-    if (feature.plotTraces && feature.id !== 'mainshock') {
+    if (feature.plots && feature.id !== 'mainshock') {
       div = _el.querySelector('div.' + feature.id);
       html = `<div class="bubble">${feature.description}</div>`;
       params = {};
@@ -399,10 +192,10 @@ var PlotsPane = function (options) {
       // Inserting node this way preserves CSS transitions
       div.insertAdjacentHTML('beforeend', html);
 
-      Object.keys(feature.plotTraces).forEach(plotId => {
-        if (feature.plotTraces[plotId]) { // null if no data
-          if (plotId !== 'cumulative' || feature.count > 1) { // skip cumul. plot w/ 1eq
-            params[plotId] = _getPlotlyParams(feature, plotId);
+      plots.forEach(id => {
+        if (feature.plots.getTrace(id)) { // null if no data
+          if (!(id === 'cumulative' && feature.count === 1)) { // skip cumul. plot w/ 1eq
+            params[id] = _getPlotlyParams(id, feature);
           }
         }
       });
@@ -429,7 +222,7 @@ var PlotsPane = function (options) {
     var div;
 
     // Mainshock is included in other Features' plots, but not on its own
-    if (Object.prototype.hasOwnProperty.call(feature, 'plotTraces') &&
+    if (Object.prototype.hasOwnProperty.call(feature, 'plots') &&
       feature.id !== 'mainshock'
     ) {
       div = document.createElement('div');
@@ -472,35 +265,29 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Render plots.
+   * Render the plots.
    */
   _this.render = function () {
-    var graphDiv,
-        options,
-        path,
-        params,
-        rendered,
-        resetButton;
+    var graphDiv, params, path, rendered, resetButton;
 
     // Loop thru plots by Feature
-    Object.keys(_plots).forEach(id => {
-      params = _plots[id].params;
-      rendered = _plots[id].rendered;
+    Object.keys(_plots).forEach(featureId => {
+      params = _plots[featureId].params;
+      rendered = _plots[featureId].rendered;
 
       if (!rendered) {
         // Loop thru plot types
-        Object.keys(params).forEach(plotId => {
-          graphDiv = params[plotId].graphDiv;
-          options = params[plotId].options;
+        Object.keys(params).forEach(id => {
+          graphDiv = params[id].graphDiv;
 
-          Plotly.newPlot(graphDiv, options);
+          Plotly.newPlot(graphDiv, params[id].options);
 
-          if (plotId !== 'hypocenters') { // skip click events on 3d plots
+          if (id !== 'hypocenters') { // skip click events on 3d plots
             _addListeners(graphDiv);
           }
         });
 
-        _plots[id].rendered = true;
+        _plots[featureId].rendered = true;
 
         // Change 'reset camera' button -> 'autoscale' for consistency w/ other plots
         if (params.hypocenters) {
@@ -535,7 +322,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Resize plots: adds responsive / fluid sizing
+   * Resize plots: adds responsive / fluid sizing.
    */
   _this.resize = function () {
     var plots = _el.querySelectorAll('.js-plotly-plot');

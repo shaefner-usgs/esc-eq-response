@@ -6,7 +6,7 @@ var Earthquakes = require('features/util/Earthquakes'),
 
 
 /**
- * Create Foreshocks Feature.
+ * Create the Foreshocks Feature.
  *
  * @param options {Object}
  *   {
@@ -18,10 +18,10 @@ var Earthquakes = require('features/util/Earthquakes'),
  *     bins: {Object}
  *     count: {Integer}
  *     create: {Function}
+ *     data: {Array}
  *     description: {String}
  *     destroy: {Function}
  *     id: {String}
- *     list: {Array}
  *     mapLayer: {L.Layer}
  *     name: {String}
  *     reset: {Function}
@@ -100,8 +100,8 @@ var Foreshocks = function (options) {
 
     _this.bins = _earthquakes.bins;
     _this.count = _earthquakes.count;
+    _this.data = _earthquakes.data;
     _this.description = _earthquakes.createDescription();
-    _this.list = _earthquakes.list;
     _this.mapLayer = _earthquakes.mapLayer;
     _this.summary = _createSummary();
   };
@@ -136,8 +136,8 @@ var Foreshocks = function (options) {
           .toUTC().minus({ days: urlParams.fsDays }).toISO().slice(0, -5),
         params = {
           endtime: endtime,
-          latitude: mainshock.json.geometry.coordinates[1],
-          longitude: mainshock.json.geometry.coordinates[0],
+          latitude: mainshock.data.lat,
+          longitude: mainshock.data.lon,
           maxradiuskm: Number(urlParams.fsDist),
           minmagnitude: Number(urlParams.fsMag),
           starttime: starttime

@@ -353,7 +353,7 @@ var Features = function (options) {
    *     description: {String} text description of Feature
    *     json: {String} JSON feed data (Mainshock only)
    *     mapLayer: {L.Layer} Leaflet map layer for MapPane
-   *     plotTraces: {Object} data traces for PlotsPane formatted for Plot.ly
+   *     plots: {Object} Plotly parameters
    *     showLayer: {Boolean} whether or not map layer is "on" by default
    *     summary: {String} HTML for SummaryPane
    *     url: {String} URL of feed data for Feature

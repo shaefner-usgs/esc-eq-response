@@ -96,27 +96,27 @@ var Rtf = function (options) {
    *
    * @param feature {Object}
    *
-   * @return list {Array}
+   * @return data {Array}
    */
   _filter = function (feature) {
-    var list = feature.list,
+    var data = feature.data,
         slider = document.querySelector('.' + feature.id + ' .filter output'),
         sortValues = _getSortValues(feature.id);
 
     if (slider) { // eq list has a slider filter
       _magThreshold = Number(slider.value);
-      list = feature.list.filter(eq =>
+      data = feature.data.filter(eq =>
         eq.mag >= _magThreshold
       );
     }
 
     // Set sort key, order here (not in _compare) so it only gets set once/Feature
-    if (list.length > 1 && sortValues) {
+    if (data.length > 1 && sortValues) {
       _sortKey = sortValues.key;
       _sortOrder = sortValues.order;
     }
 
-    return list;
+    return data;
   };
 
   /**

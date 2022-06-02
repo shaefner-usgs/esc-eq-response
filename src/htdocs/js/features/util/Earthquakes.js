@@ -6,7 +6,8 @@ require('leaflet/L.GeoJSON.DateLine');
 
 var AppUtil = require('util/AppUtil'),
     LatLon = require('util/LatLon'),
-    Luxon = require('luxon');
+    Luxon = require('luxon'),
+    Plots = require('features/util/Plots');
 
 
 var _COLORS,
@@ -36,16 +37,16 @@ _DEFAULTS = {
 
 
 /**
- * Parse an earthquake JSON feed and create the Leaflet map layer, Plotly traces
- * and SummaryPane components for creating the description, range slider and
- * list table.
+ * Parse an earthquake JSON feed and create the Leaflet map layer, Plotly params
+ * and the components used to create the description, tables and range slider
+ * for the SummaryPane.
  *
  * @param options {Object}
  *   {
  *     app: {Object} Application
  *     id: {String} Feature's id
  *     json: {Object} Feature's JSON data
- *     sortByField: {String} initial sortby field for table - optional
+ *     sortByField: {String} initial sortby field for table (optional)
  *   }
  *
  * @return _this {Object}
@@ -56,9 +57,9 @@ _DEFAULTS = {
  *     createDescription: {Function}
  *     createListTable: {Function}
  *     createSlider: {Function}
- *     list: {Array}
+ *     data: {Array}
  *     mapLayer: {L.layer}
- *     plotTraces: {Object}
+ *     plots: {Object}
  *   }
  */
 var Earthquakes = function (options) {
@@ -70,28 +71,24 @@ var Earthquakes = function (options) {
       _distanceParam,
       _duration,
       _featureId,
-      _mainshockLatlon,
-      _mainshockTime,
-      _mainshockTitle,
+      _magParam,
+      _mainshock,
       _markerOptions,
-      _minMagParam,
       _now,
       _pastDay,
       _pastHour,
       _pastWeek,
-      _plotData,
       _sortByField,
-      _vectors,
 
       _addEqToBin,
       _addListeners,
       _filter,
       _getAge,
       _getBubbles,
+      _getData,
       _getDirection,
       _getDuration,
       _getIntervals,
-      _getPlotlyTrace,
       _getPopup,
       _getPrefix,
       _getTemplate,
@@ -104,7 +101,7 @@ var Earthquakes = function (options) {
   _this = {};
 
   _initialize = function (options) {
-    var coords, inputIdDist, inputIdMag, mainshock;
+    var inputIdDist, inputIdMag;
 
     options = Object.assign({}, _DEFAULTS, options);
 
@@ -113,56 +110,45 @@ var Earthquakes = function (options) {
     _featureId = options.id;
     _markerOptions = options.markerOptions;
     _now = Luxon.DateTime.utc();
-    _pastDay = _now.minus({ days: 1 });
-    _pastHour = _now.minus({ hours: 1 });
+    _pastDay = _now.minus({ days: 1 }),
+    _pastHour = _now.minus({ hours: 1 }),
     _pastWeek = _now.minus({ weeks: 1 });
-    _plotData = {
-      color: [],
-      date: [],
-      depth: [],
-      eqid: [],
-      lat: [],
-      lon: [],
-      mag: [],
-      size: [],
-      text: [],
-      title: [],
-      time: []
-    };
     _sortByField = options.sortByField;
-    _vectors = {};
 
     if (_featureId === 'search') {
-      _catalog = 'comcat'; // search layer is always from ComCat
+      _catalog = 'comcat'; // search layer always ComCat, despite catalog param
     }
 
     if (_featureId !== 'mainshock' && _featureId !== 'search') {
       inputIdDist = _getPrefix(_featureId) + '-dist';
       inputIdMag = _getPrefix(_featureId) + '-mag';
-      mainshock = _app.Features.getFeature('mainshock');
-      coords = mainshock.json.geometry.coordinates;
 
       _distanceParam = document.getElementById(inputIdDist).value;
-      _mainshockLatlon = LatLon(coords[1], coords[0]);
-      _mainshockTime = Luxon.DateTime.fromMillis(mainshock.json.properties.time).toUTC();
-      _mainshockTitle = mainshock.data.title;
-      _minMagParam = document.getElementById(inputIdMag).value;
+      _mainshock = _app.Features.getFeature('mainshock');
       _duration = _getDuration();
+      _magParam = document.getElementById(inputIdMag).value;
+
+      if (!_mainshock.Latlon) {
+        _mainshock.Latlon = LatLon(_mainshock.data.lat, _mainshock.data.lon);
+      }
     }
 
     _this.bins = {};
     _this.count = 0;
-    _this.list = [];
+    _this.data = _getData(options.json);
     _this.mapLayer = L.geoJSON.dateLine(options.json, {
       filter: _filter,
       onEachFeature: _onEachFeature,
       pointToLayer: _pointToLayer
     });
-    _this.plotTraces = {
-      magtime: _getPlotlyTrace('magtime', 'scatter'),
-      cumulative: _getPlotlyTrace('cumulative', 'scatter'),
-      hypocenters: _getPlotlyTrace('hypocenters', 'scatter3d')
-    };
+
+    if (_featureId !== 'foreshocks' && _featureId !== 'search') {
+      _this.plots = Plots({
+        app: _app,
+        data: _this.data,
+        featureId: _featureId
+      });
+    }
   };
 
   /**
@@ -231,58 +217,45 @@ var Earthquakes = function (options) {
   /**
    * Filter out earthquakes from NCEDC that are outside the search radius.
    *
-   * The NCEDC catalog does not support radius values specified in km for
-   * limiting search results, so a rectangle is used instead as a proxy.
+   * The NCEDC (double difference) catalog does not support radius values
+   * for limiting search results, so a rectangle is used instead as a proxy.
    *
    * @param feature {Object}
    *     geoJSON feature
    */
   _filter = function (feature) {
-    var coords, distance, latlon;
+    var eq;
 
-    // Search is always from ComCat, not NCEDC
+    // Search layer is always from ComCat, not NCEDC
     if (_featureId === 'mainshock' || _featureId === 'search') {
-      _this.count ++;
+      return ++ _this.count;
+    } else if (_catalog === 'dd') {
+      eq = _this.data.find(item => item.eqid === feature.id);
 
-      return true;
-    }
-
-    coords = feature.geometry.coordinates;
-    latlon = LatLon(coords[1], coords[0]);
-    distance = _mainshockLatlon.distanceTo(latlon) / 1000;
-
-    if (distance <= _distanceParam) {
-      _this.count ++;
-
-      // Cache distance/direction from Mainshock
-      _vectors[feature.id] = {
-        direction: _getDirection(latlon),
-        distance: distance
-      };
-
-      return true;
+      if (eq.distance <= _distanceParam) {
+        return ++ _this.count;
+      }
+    } else {
+      return ++ _this.count;
     }
   };
 
   /**
    * Get the 'age' of an earthquake (i.e. mainshock, historical, pastday, etc).
    *
-   * @param timestamp {Int}
+   * @param time {Luxon datetime}
    *
    * @return age {String}
    */
-  _getAge = function (timestamp) {
-    var eqTime,
-        age = _featureId; // everything but Aftershocks, Search
+  _getAge = function (time) {
+    var age = _featureId; // everything but Aftershocks, Search
 
     if (_featureId === 'aftershocks' || _featureId === 'search') {
-      eqTime = Luxon.DateTime.fromMillis(timestamp).toUTC();
-
-      if (eqTime >= _pastHour) {
+      if (time >= _pastHour) {
         age = 'pasthour';
-      } else if (eqTime >= _pastDay) {
+      } else if (time >= _pastDay) {
         age = 'pastday';
-      } else if (eqTime >= _pastWeek) {
+      } else if (time >= _pastWeek) {
         age = 'pastweek';
       } else {
         age = 'older';
@@ -346,6 +319,99 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the data used to create the Feature.
+   *
+   * @param json {Object}
+   *
+   * @return data {Object}
+   *     earthquakes keyed by id
+   */
+  _getData = function (json) {
+    var eq,
+        data = [],
+        features = json.features || [json];
+
+    features.forEach(feature => {
+      var direction, distance, distanceDisplay, latlon, localTime,
+          coords = feature.geometry.coordinates,
+          props = feature.properties,
+          datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+          magDisplay = AppUtil.round(props.mag, 1),
+          mag = parseFloat(magDisplay),
+          magType = props.magType || 'M',
+          statusIcon = '',
+          template = '<time datetime="{isoTime}">{utcTime}</time>',
+          title = magType + ' ' + magDisplay,
+          utcTime = datetime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>',
+          tooltip = magType + ' ' + magDisplay + '—' + utcTime;
+
+      if (_featureId !== 'mainshock' && _featureId !== 'search') {
+        latlon = LatLon(coords[1], coords[0]);
+        direction = _getDirection(latlon);
+        distance = _mainshock.Latlon.distanceTo(latlon) / 1000;
+        distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
+          `<span>${direction}</span>`;
+      }
+
+      if (props.place) {
+        title += '—' + props.place;
+      }
+
+      if (props.status === 'reviewed') {
+        statusIcon += '<i class="icon-check"></i>';
+      }
+
+      // Add local time if tz prop is included in feed
+      if (props.tz) {
+        localTime = datetime.toUTC(props.tz).toFormat('LLL d, yyyy tt') +
+          ' <span class="tz">at the epicenter</span>';
+        template += '<time datetime="{isoTime}">{localTime}</time>';
+      }
+
+      eq = {
+        alert: props.alert || '', // PAGER
+        catalog: _catalog,
+        cdi: AppUtil.romanize(props.cdi), // DYFI
+        datetime: datetime,
+        depth: coords[2],
+        depthDisplay: AppUtil.round(coords[2], 1) + ' km',
+        distance: distance || '',
+        distanceDisplay: distanceDisplay || '',
+        eqid: feature.id,
+        feature: _featureId,
+        felt: AppUtil.addCommas(props.felt), // DYFI felt reports
+        fillColor: _COLORS[_getAge(datetime)],
+        isoTime: datetime.toISO(),
+        lat: coords[1],
+        localTime: localTime || '',
+        location: AppUtil.formatLatLon(coords),
+        lon: coords[0],
+        mag: mag,
+        magDisplay: magDisplay,
+        magInt: Math.floor(mag, 1),
+        magType: magType,
+        mmi: AppUtil.romanize(props.mmi), // ShakeMap
+        radius: AppUtil.getRadius(AppUtil.round(props.mag, 1)),
+        status: props.status || '',
+        statusIcon: statusIcon,
+        title: title,
+        tooltip: tooltip,
+        tsunami: props.tsunami,
+        url: props.url,
+        utcTime: utcTime
+      };
+
+      // Set additional props that depend on other eq props already being set
+      eq.bubbles = _getBubbles(eq);
+      eq.timeDisplay = L.Util.template(template, eq);
+
+      data.push(eq);
+    });
+
+    return data;
+  };
+
+  /**
    * Calculate the direction from the Mainshock.
    *
    * @param latlon {Object}
@@ -353,7 +419,7 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _getDirection = function (latlon) {
-    var bearing = _mainshockLatlon.bearing(latlon),
+    var bearing = _mainshock.Latlon.bearing(latlon),
         compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
         octant = Math.floor((22.5 + (360.0 + bearing) % 360.0) / 45.0);
 
@@ -366,22 +432,24 @@ var Earthquakes = function (options) {
    * @return duration {Object}
    */
   _getDuration = function () {
-    var duration, fsInputId, hsInputId, interval;
+    var duration, inputId, interval;
 
     if (_featureId === 'aftershocks') {
-      interval = Luxon.Interval.fromDateTimes(_mainshockTime, _now).length('days');
+      interval = Luxon.Interval
+        .fromDateTimes(_mainshock.data.datetime, _now)
+        .length('days');
       duration = {
         days: Number(AppUtil.round(interval, 1))
       };
     } else if (_featureId === 'foreshocks') {
-      fsInputId = _getPrefix(_featureId) + '-days';
+      inputId = _getPrefix(_featureId) + '-days';
       duration = {
-        days: Number(document.getElementById(fsInputId).value)
+        days: Number(document.getElementById(inputId).value)
       };
     } else if (_featureId === 'historical') {
-      hsInputId = _getPrefix(_featureId) + '-years';
+      inputId = _getPrefix(_featureId) + '-years';
       duration = {
-        years: Number(document.getElementById(hsInputId).value)
+        years: Number(document.getElementById(inputId).value)
       };
     }
 
@@ -402,127 +470,6 @@ var Earthquakes = function (options) {
       year: 0,
       total: 0
     };
-  };
-
-  /**
-   * Get a plot's trace option for Plotly.
-   *
-   * @param plotId {String <cumulative|hypocenters|magtime>}
-   * @param type {String <scatter|scatter3d>}
-   *
-   * @return trace {Object} or undefined
-   */
-  _getPlotlyTrace = function (plotId, type) {
-    var date, eqid, mode, sizeref, text, title, trace, x, y, z;
-
-    if (_plotData.date.length === 0) {
-      return;
-    }
-
-    if (plotId === 'cumulative') { // cumulative plot
-      mode = 'lines+markers';
-
-      // Copy data arrays so they can be modified w/o affecting orig. data
-      date = _plotData.date.slice();
-      eqid = _plotData.eqid.slice();
-      title = _plotData.title.slice();
-      x = _plotData.time.slice();
-
-      // Fill y with values from 1 to length of x and date field
-      y = Array.from(
-        new Array(x.length),
-        (val, i) => i + 1
-      );
-
-      // Add origin point (Mainshock) to beginning of Aftershocks trace
-      if (_featureId === 'aftershocks') {
-        date.unshift(_mainshockTime.toFormat('LLL d, yyyy TT'));
-        eqid.unshift(AppUtil.getParam('eqid'));
-        title.unshift(_mainshockTitle);
-        x.unshift(_mainshockTime.toISO());
-        y.unshift(0);
-      } else if (_featureId === 'historical') { // and to end of Historical trace
-        date.push(_mainshockTime.toFormat('LLL d, yyyy TT'));
-        eqid.push(AppUtil.getParam('eqid'));
-        title.push(_mainshockTitle);
-        x.push(_mainshockTime.toISO());
-        y.push(y.length + 1);
-      }
-
-      // Add date field to hover text
-      text = y.map((val, i) => {
-        if (
-          (i === 0 && _featureId === 'aftershocks') ||
-          (i === y.length - 1 && _featureId === 'historical')
-        ) {
-          val = 'Mainshock';
-        }
-
-        return `${title[i]} (${val})<br />${date[i]}`;
-      });
-    } else { // hypocenters, magtime plots
-      eqid = _plotData.eqid;
-      text = _plotData.text;
-    }
-
-    if (plotId === 'hypocenters') {
-      mode = 'markers';
-      sizeref = 0.79; // adjust eq size for consistency with magtime plots
-      x = _plotData.lon;
-      y = _plotData.lat;
-      z = _plotData.depth;
-    } else if (plotId === 'magtime') {
-      mode = 'markers';
-      sizeref = 1;
-      x = _plotData.time;
-      y = _plotData.mag;
-    }
-
-    trace = {
-      eqid: eqid,
-      feature: _featureId,
-      hoverinfo: 'text',
-      hoverlabel: {
-        font: {
-          size: 15
-        }
-      },
-      mode: mode,
-      plotid: plotId,
-      text: text,
-      type: type,
-      x: x,
-      y: y,
-      z: z
-    };
-
-    if (mode === 'markers') { // hypocenters, magtime plots
-      trace.marker = {
-        color: _plotData.color, // fill
-        line: { // stroke
-          color: 'rgb(65, 65, 65)',
-          width: 1
-        },
-        opacity: 0.85,
-        size: _plotData.size,
-        sizeref: sizeref
-      };
-    } else { // cumulative plot
-      trace.line = {
-        color: 'rgb(120, 186, 232)',
-        width: 2
-      };
-      trace.marker = {
-        color: 'rgb(120, 186, 232)', // fill
-        line: { // stroke
-          color: 'rgb(31, 119, 180)',
-          width: 1
-        },
-        size: 3
-      };
-    }
-
-    return trace;
   };
 
   /**
@@ -633,12 +580,12 @@ var Earthquakes = function (options) {
         '</div>';
     } else if (type === 'popup') {
       template =
-        '<div class="{layerType} {catalog} earthquake">' +
+        '<div class="{feature} {catalog} earthquake">' +
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl class="params">' +
             '<dt>Time</dt>' +
-            '<dd>{htmlTime}</dd>' +
+            '<dd>{timeDisplay}</dd>' +
             '<dt>Depth</dt>' +
             '<dd>{depthDisplay}</dd>' +
             '<dt>Location</dt>' +
@@ -695,8 +642,8 @@ var Earthquakes = function (options) {
       }
     });
 
-    if (threshold < _minMagParam) { // happens when there's no smaller mag eqs
-      threshold = Math.floor(_minMagParam);
+    if (threshold < _magParam) { // happens when there's no smaller mag eqs
+      threshold = Math.floor(_magParam);
     }
 
     return threshold;
@@ -731,113 +678,48 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create Leaflet popups, tooltips and data for summary and plots; add
-   * earthquake to bins.
+   * Add Leaflet popups and tooltips; add earthquake to bins.
    *
    * @param feature {Object}
    *     geoJSON feature
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var days, distance, distanceDisplay, eq, eqTimeLocal, localTime,
-        coords = feature.geometry.coordinates,
-        props = feature.properties,
-        eqTime = Luxon.DateTime.fromMillis(props.time).toUTC(),
-        magDisplay = AppUtil.round(props.mag, 1),
-        mag = parseFloat(magDisplay),
-        magType = props.magType || 'M',
-        statusIcon = '',
-        template = '<time datetime="{isoTime}">{utcTime}</time>',
-        utcTime = eqTime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>',
-        tooltip = magType + ' ' + magDisplay + '—' + utcTime;
-
-    if (_featureId !== 'mainshock' && _featureId !== 'search') {
-      distance = _vectors[feature.id].distance;
-      distanceDisplay = AppUtil.round(distance, 1) + ' km <span>' +
-        _vectors[feature.id].direction + '</span>';
-    }
-
-    if (props.status === 'reviewed') {
-      statusIcon += '<i class="icon-check"></i>';
-    }
-
-    // Add local time if tz prop is included in feed
-    if (props.tz) {
-      eqTimeLocal = eqTime.toUTC(props.tz);
-      localTime = eqTimeLocal.toFormat('LLL d, yyyy tt') +
-        ' <span class="tz">at the epicenter</span>';
-      template += '<time datetime="{isoTime}">{localTime}</time>';
-    }
-
-    eq = {
-      alert: props.alert || '', // PAGER
-      catalog: _catalog,
-      cdi: AppUtil.romanize(props.cdi), // DYFI
-      depth: coords[2],
-      depthDisplay: AppUtil.round(coords[2], 1) + ' km',
-      distance: distance || '',
-      distanceDisplay: distanceDisplay || '',
-      eqid: feature.id,
-      felt: AppUtil.addCommas(props.felt), // DYFI felt reports
-      isoTime: eqTime.toISO(),
-      layerType: _featureId,
-      location: AppUtil.formatLatLon(coords),
-      localTime: localTime || '',
-      mag: mag,
-      magInt: Math.floor(mag, 1),
-      magDisplay: magDisplay,
-      magType: magType,
-      mmi: AppUtil.romanize(props.mmi), // ShakeMap
-      status: props.status || '',
-      statusIcon: statusIcon,
-      title: magType + ' ' + magDisplay,
-      tsunami: props.tsunami,
-      url: props.url,
-      utcTime: utcTime
-    };
-
-    if (props.place) {
-      eq.title += '—' + props.place;
-    }
-
-    // Set additional props that depend on other eq props already being set
-    eq.bubbles = _getBubbles(eq);
-    eq.htmlTime = L.Util.template(template, eq);
-
-    _this.list.push(eq);
+    var days,
+        eq = _this.data.find(item => item.eqid === feature.id);
 
     layer.bindPopup(_getPopup(eq, layer), {
       maxWidth: 375,
       minWidth: 250
-    }).bindTooltip(tooltip);
-
-    // Note: additional plotData props are added in _pointToLayer()
-    _plotData.date.push(eq.utcTime);
-    _plotData.depth.push(coords[2] * -1); // set to negative value for 3d plots
-    _plotData.eqid.push(eq.eqid);
-    _plotData.lat.push(coords[1]);
-    _plotData.lon.push(coords[0]);
-    _plotData.mag.push(eq.mag);
-    _plotData.text.push(eq.title + '<br />' + eq.utcTime);
-    _plotData.title.push(eq.title);
-    _plotData.time.push(eqTime.toISO());
+    }).bindTooltip(eq.tooltip);
 
     // Bin eq totals by magnitude and time / period
     if (_featureId === 'aftershocks') {
-      days = Math.ceil(Luxon.Interval.fromDateTimes(_mainshockTime, eqTime).length('days'));
+      days = Math.ceil(
+        Luxon.Interval
+          .fromDateTimes(_mainshock.data.datetime, eq.datetime)
+          .length('days')
+      );
       _addEqToBin(days, eq.magInt, 'first');
 
-      days = Math.ceil(Luxon.Interval.fromDateTimes(eqTime, _now).length('days'));
+      days = Math.ceil(
+        Luxon.Interval
+          .fromDateTimes(eq.datetime, _now)
+          .length('days')
+      );
       _addEqToBin(days, eq.magInt, 'past');
-    }
-    else if (_featureId === 'historical' || _featureId === 'foreshocks') {
-      days = Math.ceil(Luxon.Interval.fromDateTimes(eqTime, _mainshockTime).length('days'));
+    } else if (_featureId === 'historical' || _featureId === 'foreshocks') {
+      days = Math.ceil(
+        Luxon.Interval
+          .fromDateTimes(eq.datetime, _mainshock.data.datetime)
+          .length('days')
+      );
       _addEqToBin(days, eq.magInt, 'prior');
     }
   };
 
   /**
-   * Create Leaflet markers and data for plots.
+   * Create Leaflet markers.
    *
    * @param feature {Object}
    *     geoJSON feature
@@ -846,18 +728,12 @@ var Earthquakes = function (options) {
    * @return {L.CircleMarker}
    */
   _pointToLayer = function (feature, latlng) {
-    var props = feature.properties,
-        fillColor = _COLORS[_getAge(props.time)],
-        radius = AppUtil.getRadius(AppUtil.round(props.mag, 1)),
+    var eq = _this.data.find(item => item.eqid === feature.id),
         options = Object.assign({}, _markerOptions, {
-          fillColor: fillColor,
+          fillColor: eq.fillColor,
           pane: _featureId, // controls stacking order
-          radius: radius
+          radius: eq.radius
         });
-
-    // Note: additional plotData props are added in _onEachFeature
-    _plotData.color.push(fillColor);
-    _plotData.size.push(radius * 2); // Plotly uses diameter
 
     return L.circleMarker(latlng, options);
   };
@@ -935,7 +811,7 @@ var Earthquakes = function (options) {
     data = {
       distance: _distanceParam,
       ending: ending,
-      mag: _minMagParam
+      mag: _magParam
     };
 
     return L.Util.template(_getTemplate('description'), data);
@@ -950,9 +826,8 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _this.createListTable = function (type = 'all') {
-    var magInt, tr,
-        data = {},
-        eqs = _this.list,
+    var data, magInt, tr,
+        eqs = _this.data,
         fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'],
         magThreshold = _getThreshold(),
         rows = '',
@@ -960,7 +835,7 @@ var Earthquakes = function (options) {
         thClasses = {};
 
     if (type === 'mostRecent') {
-      eqs = [_this.list[_this.list.length - 1]];
+      eqs = [eqs[eqs.length - 1]];
       magThreshold = 0; // always show most recent eq
     }
     if (eqs.length > 1) {
@@ -1008,7 +883,7 @@ var Earthquakes = function (options) {
           id: _featureId,
           mag: magThreshold,
           max: _this.bins.mag.length - 1,
-          min: Math.floor(_minMagParam)
+          min: Math.floor(_magParam)
         },
         html = '',
         singleMagBin = _this.bins.mag.every(
@@ -1036,7 +911,7 @@ var Earthquakes = function (options) {
  *
  * @param params {Object}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
- * @param type {String} default is 'feature'
+ * @param type {String <feature|search>} default is 'feature'
  *
  * @return {String}
  */
@@ -1045,13 +920,13 @@ Earthquakes.getFeedUrl = function (params, type = 'feature') {
       baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query',
       pairs = [];
 
-  params = Object.assign({
+  Object.assign(params, {
     format: 'geojson',
     orderby: 'time-asc'
-  }, params);
+  });
 
   if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') {
-    baseUri = location.origin + '/php/fdsn/search.json.php';
+    baseUri = location.origin + '/php/fdsn/search.json.php'; // DD catalog
   }
 
   Object.keys(params).forEach(key => {

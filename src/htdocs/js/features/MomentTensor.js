@@ -5,7 +5,7 @@ var BeachBall = require('features/util/BeachBall');
 
 
 /**
- * Create Moment Tensor Feature.
+ * Create the Moment Tensor Feature, which is a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *   {
@@ -70,8 +70,8 @@ var MomentTensor = function (options) {
       });
       beachball = BeachBall({
         coords: [
-          _mainshock.json.geometry.coordinates[1],
-          _mainshock.json.geometry.coordinates[0]
+          _mainshock.data.lat,
+          _mainshock.data.lon
         ],
         data: data,
         id: _this.id,

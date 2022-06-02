@@ -6,7 +6,7 @@ var Earthquakes = require('features/util/Earthquakes'),
 
 
 /**
- * Create Historical Seismicity Feature.
+ * Create the Historical Seismicity Feature.
  *
  * @param options {Object}
  *   {
@@ -18,13 +18,13 @@ var Earthquakes = require('features/util/Earthquakes'),
  *     bins: {Object}
  *     count: {Integer}
  *     create: {Function}
+ *     data: {Array}
  *     description: {String}
  *     destroy: {Function}
  *     id: {String}
- *     list: {Array}
  *     mapLayer: {L.Layer}
  *     name: {String}
- *     plotTraces: {Object}
+ *     plots: {Object}
  *     reset: {Function}
  *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
@@ -54,7 +54,7 @@ var Historical = function (options) {
     _this.id = 'historical';
     _this.mapLayer = null;
     _this.name = 'Historical Seismicity';
-    _this.plotTraces = null;
+    _this.plots = null;
     _this.showLayer = true;
     _this.sortByField = 'mag';
     _this.summary = null;
@@ -102,10 +102,10 @@ var Historical = function (options) {
 
     _this.bins = _earthquakes.bins;
     _this.count = _earthquakes.count;
+    _this.data = _earthquakes.data;
     _this.description = _earthquakes.createDescription();
-    _this.list = _earthquakes.list;
     _this.mapLayer = _earthquakes.mapLayer;
-    _this.plotTraces = _earthquakes.plotTraces;
+    _this.plots = _earthquakes.plots;
     _this.summary = _createSummary();
   };
 
@@ -139,8 +139,8 @@ var Historical = function (options) {
           .toUTC().minus({ years: urlParams.hsYears }).toISO().slice(0, -5),
         params = {
           endtime: endtime,
-          latitude: mainshock.json.geometry.coordinates[1],
-          longitude: mainshock.json.geometry.coordinates[0],
+          latitude: mainshock.data.lat,
+          longitude: mainshock.data.lon,
           maxradiuskm: Number(urlParams.hsDist),
           minmagnitude: Number(urlParams.hsMag),
           starttime: starttime
@@ -154,7 +154,7 @@ var Historical = function (options) {
    */
   _this.reset = function () {
     _this.mapLayer = null;
-    _this.plotTraces = null;
+    _this.plots = null;
     _this.summary = null;
   };
 

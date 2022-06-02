@@ -9,7 +9,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create Mainshock Feature.
+ * Create the Mainshock Feature.
  *
  * @param options {Object}
  *   {
@@ -28,7 +28,7 @@ var AppUtil = require('util/AppUtil'),
  *     json: {Object}
  *     mapLayer: {L.Layer}
  *     name: {String}
- *     plotTraces: {Object}
+ *     plots: {Object}
  *     reset: {Function}
  *     setFeedUrl: {Function}
  *     showLayer: {Boolean}
@@ -81,7 +81,7 @@ var Mainshock = function (options) {
     _this.id = 'mainshock';
     _this.mapLayer = null;
     _this.name = 'Mainshock';
-    _this.plotTraces = null;
+    _this.plots = null;
     _this.showLayer = true;
     _this.summary = null;
     _this.zoomToLayer = true;
@@ -254,9 +254,9 @@ var Mainshock = function (options) {
   _getData = function () {
     var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg,
         tectonic,
+        datetime = _this.data.datetime,
         products = _this.json.properties.products,
         dyfi = products.dyfi,
-        eqTime = Luxon.DateTime.fromISO(_this.data.isoTime).toUTC(),
         fm = products['focal-mechanism'],
         header = products['general-header'],
         mmiInt = Math.round(_this.json.properties.mmi),
@@ -298,8 +298,8 @@ var Mainshock = function (options) {
     }
 
     return Object.assign({}, _this.data, {
-      date: eqTime.toLocaleString(Luxon.DateTime.DATE_MED),
-      dayofweek: eqTime.toFormat('cccc'),
+      date: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
+      dayofweek: datetime.toFormat('cccc'),
       dyfiBubble: _this.data.bubbles.dyfi || '',
       dyfiImg: dyfiImg || '',
       econImg: econImg || '',
@@ -311,7 +311,7 @@ var Mainshock = function (options) {
       shakemapBubble: _this.data.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
       tectonic: tectonic || '',
-      time: eqTime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      time: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
     });
@@ -568,10 +568,10 @@ var Mainshock = function (options) {
       json: json
     });
 
-    _this.data = earthquakes.list[0];
+    _this.data = earthquakes.data[0];
     _this.json = json; // used by other Features
     _this.mapLayer = earthquakes.mapLayer;
-    _this.plotTraces = earthquakes.plotTraces;
+    _this.plots = earthquakes.plots;
     _this.summary = _createSummary();
   };
 
@@ -635,7 +635,7 @@ var Mainshock = function (options) {
     _this.data = null;
     _this.json = null;
     _this.mapLayer = null;
-    _this.plotTraces = null;
+    _this.plots = null;
     _this.summary = null;
   };
 

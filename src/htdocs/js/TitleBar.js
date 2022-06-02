@@ -112,7 +112,7 @@ var TitleBar = function (options) {
     document.title = docTitle;
 
     _repaint(h1);
-    _setSubTitle(opts.htmlTime || '');
+    _setSubTitle(opts.timeDisplay || '');
   };
 
 
