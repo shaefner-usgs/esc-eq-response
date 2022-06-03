@@ -150,7 +150,8 @@ var Plots = function (options) {
   };
 
   /**
-   * Get the Plotly formatted data, customized for the given plot type.
+   * Get the Plotly formatted data, customized for the given plot type. Add
+   * additional props needed to create the plots.
    *
    * @return data {Object}
    */
@@ -162,10 +163,10 @@ var Plots = function (options) {
 
     if (_id === 'cumulative') {
       Object.assign(data, {
-        time: _mainshock.data.datetime.toFormat('LLL d, yyyy TT'),
         date: _data.date.slice(), // copy to add Mainshock w/o altering _data
         eqid: _data.eqid.slice(), // ...
         mode: 'lines+markers',
+        time: _mainshock.data.datetime.toFormat('LLL d, yyyy TT'),
         title: _data.title.slice(),
         x: _data.time.slice(),
         y: Array.from(new Array(_data.time.length), (val, i) => i + 1) // 1 to length of x
