@@ -920,13 +920,13 @@ Earthquakes.getFeedUrl = function (params, type = 'feature') {
       baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query',
       pairs = [];
 
-  Object.assign(params, {
+  Object.assign(params, { // always set these options
     format: 'geojson',
     orderby: 'time-asc'
   });
 
-  if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') {
-    baseUri = location.origin + '/php/fdsn/search.json.php'; // DD catalog
+  if (AppUtil.getParam('catalog') === 'dd' && type !== 'search') { // DD catalog
+    baseUri = location.origin + location.pathname + 'php/fdsn/search.json.php';
   }
 
   Object.keys(params).forEach(key => {
