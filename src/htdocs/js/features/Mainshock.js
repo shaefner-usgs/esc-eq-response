@@ -659,7 +659,8 @@ var Mainshock = function (options) {
     // Set the Double Difference catalog props if necessary; render the update
     if (!_ddJson) {
       id = AppUtil.getParam('eqid').replace(/[A-Za-z]{0,2}(\d+)/, '$1');
-      url = `${location.origin}/php/fdsn/search.json.php?eventid=${id}&format=text`;
+      url = location.origin + location.pathname + 'php/fdsn/search.json.php' +
+        `?eventid=${id}&format=text`;
 
       _app.JsonFeed.fetch({
         host: 'ncedc.org',
