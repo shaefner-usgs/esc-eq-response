@@ -38,6 +38,7 @@ var SearchBar = function (options) {
       _initialize,
 
       _app,
+      _catalogSearch,
       _customParams,
       _el,
       _endtime,
@@ -46,7 +47,7 @@ var SearchBar = function (options) {
       _map,
       _nowButton,
       _regionLayer,
-      _catalogSearch,
+      _searchButton,
       _selPeriod,
       _selRegion,
       _starttime,
@@ -82,6 +83,9 @@ var SearchBar = function (options) {
     options = options || {};
 
     _app = options.app;
+    _catalogSearch = CatalogSearch({
+      app: _app
+    });
     _customParams = [
       'endtime',
       'maxlatitude',
@@ -97,9 +101,7 @@ var SearchBar = function (options) {
       [49.5, -66],
       [24.5, -125]
     ]);
-    _catalogSearch = CatalogSearch({
-      app: _app
-    });
+    _searchButton = document.getElementById('search');
     _starttime = document.getElementById('starttime');
 
     _initFlatpickr();
@@ -127,7 +129,6 @@ var SearchBar = function (options) {
     var arrows = _el.querySelectorAll('.flatpickr-minute ~ span'),
         buttons = _el.querySelectorAll('.period li, .region li'),
         labels = _el.querySelectorAll('label'),
-        search = document.getElementById('search'),
         slider = _el.querySelector('.slider input');
 
     // Set the minutes value when the user clicks an arrow button
@@ -159,7 +160,7 @@ var SearchBar = function (options) {
     });
 
     // Search the catalog when the user clicks the 'Search' button
-    search.addEventListener('click', () => {
+    _searchButton.addEventListener('click', () => {
       location.href = '#mapPane';
 
       _this.searchCatalog();
@@ -712,13 +713,15 @@ var SearchBar = function (options) {
 
   /**
    * Set the 'Search' button text to 'Refresh' when all controls match the
-   * current search params.
+   * current search params; set button to disabled if input(s) invalid;
    */
   _this.setStatus = function () {
     var currentParams = {},
+        customPeriod = document.getElementById('customPeriod')
+          .classList.contains('selected'),
+        inputs = _el.querySelectorAll('.dates input'),
         newParams = _getParams(),
-        paramNames = _customParams.concat(Object.keys(_DEFAULTS)),
-        search = document.getElementById('search');
+        paramNames = _customParams.concat(Object.keys(_DEFAULTS));
 
     paramNames.forEach(name => {
       var value = AppUtil.getParam(name);
@@ -731,9 +734,24 @@ var SearchBar = function (options) {
     });
 
     if (AppUtil.shallowEqual(currentParams, newParams)) {
-      search.textContent = 'Refresh';
+      _searchButton.textContent = 'Refresh';
     } else {
-      search.textContent = 'Search';
+      _searchButton.textContent = 'Search';
+    }
+
+    _searchButton.removeAttribute('disabled');
+    _searchButton.removeAttribute('title');
+
+    if (customPeriod) {
+      inputs.forEach(input => {
+        var div = input.closest('div'),
+            invalid = div.classList.contains('invalid') || input.value === '';
+
+        if (invalid) {
+          _searchButton.setAttribute('disabled', 'disabled');
+          _searchButton.setAttribute('title', 'Disabled because custom dates are invalid');
+        }
+      });
     }
   };
 
