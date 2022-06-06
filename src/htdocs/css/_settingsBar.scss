@@ -19,12 +19,13 @@
   .dd {
     color: $text-color-lighter;
     font-size: .875rem;
-    margin: .25rem 0 0;
+    line-height: 1.2;
+    margin: .375rem 0 0;
     opacity: 1;
-    padding-bottom: .5rem;
     transition: opacity $effect-on-duration ease-out;
 
     &.hide {
+      height: .25rem;
       opacity: 0;
       transition: all $effect-off-duration-shorter ease-in;
       visibility: hidden;
@@ -45,14 +46,14 @@
   }
 
   .swap {
-    margin: .25rem 0 2.5rem;
+    margin: .25rem 0 2rem;
 
     &.hide {
       display: none;
     }
 
     p {
-      margin: 0;
+      margin: 1rem 0 0;
     }
   }
 }
