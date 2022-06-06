@@ -239,9 +239,7 @@ var SummaryPane = function (options) {
 
     // Add Number sorting (https://gist.github.com/tristen/e79963856608bf54e046)
     Tablesort.extend('number', item => {
-      item.match(/^-?[£\x24Û¢´€]?\d+\s*([,.]\d{0,2})/) || // Prefixed currency
-      item.match(/^-?\d+\s*([,.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
-      item.match(/^-?(\d)*-?([,.]){0,1}-?(\d)+([E,e][-+][\d]+)?%?$/); // Number
+      item.match(/^-?(\d)*-?([,.]){0,1}-?(\d)+([E,e][-+][\d]+)?%?$/);
     }, (a, b) => {
       a = cleanNumber(a);
       b = cleanNumber(b);
