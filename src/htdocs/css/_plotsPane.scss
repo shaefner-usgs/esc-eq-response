@@ -10,6 +10,22 @@
     flex-direction: column;
   }
 
+  .cumulative {
+    height: 33vh;
+  }
+
+  .hypocenters {
+    height: 83vh;
+  }
+
+  .js-plotly-plot {
+    width: 100%;
+  }
+
+  .magtime {
+    height: 33vh;
+  }
+
   /* Rendering order of Features */
 
   .aftershocks {

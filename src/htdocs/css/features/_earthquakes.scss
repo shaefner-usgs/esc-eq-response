@@ -1,23 +1,5 @@
 @use '../variables' as *;
 
-#plotsPane {
-  .cumulative {
-    height: 33vh;
-  }
-
-  .hypocenters {
-    height: 83vh;
-  }
-
-  .js-plotly-plot {
-    width: 100%;
-  }
-
-  .magtime {
-    height: 33vh;
-  }
-}
-
 #summaryPane {
   h3 {
     .mag {
