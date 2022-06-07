@@ -348,7 +348,7 @@ var Earthquakes = function (options) {
       if (_featureId !== 'mainshock' && _featureId !== 'search') {
         latlon = LatLon(coords[1], coords[0]);
         direction = _getDirection(latlon);
-        distance = _mainshock.Latlon.distanceTo(latlon) / 1000;
+        distance = AppUtil.round(_mainshock.Latlon.distanceTo(latlon) / 1000, 2);
         distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
           `<span>${direction}</span>`;
       }
