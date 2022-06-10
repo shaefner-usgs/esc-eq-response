@@ -67,6 +67,7 @@ var AppUtil = require('util/AppUtil'),
  *     setScrollPosition: {Function}
  *     setSliderStyles: {Function}
  *     sideBarWidth: {Number}
+ *     utcOffset: {String}
  *   }
  */
 var Application = function (options) {
@@ -89,6 +90,9 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options) {
+    var offset = new Date().getTimezoneOffset() / 60 * 1,
+        sign = (offset > 0 ? '-' : '+');
+
     _els = options || {};
     _initialLoad = true;
     _sidebar = document.getElementById('sideBar');
@@ -97,6 +101,7 @@ var Application = function (options) {
     _this.defaultPaneId = 'mapPane';
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
+    _this.utcOffset = `UTC${sign}${offset}`;
 
     _resetScrollPositions();
     _initClasses();

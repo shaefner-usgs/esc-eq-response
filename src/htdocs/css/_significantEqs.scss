@@ -42,7 +42,7 @@ ul#significantEqs { // list
       cursor: pointer;
       transition: all $effect-on-duration ease-out;
 
-      p {
+      time {
         color: $text-color;
         transition: color $effect-on-duration ease-out;
       }
@@ -62,7 +62,7 @@ ul#significantEqs { // list
         cursor: auto;
       }
 
-      p {
+      time {
         color: #fff;
         transition: color $effect-on-duration ease-out;
       }
@@ -86,9 +86,17 @@ ul#significantEqs { // list
     }
   }
 
-  p {
+  time {
     color: $text-color-lighter;
     margin: 0;
     transition: color $effect-off-duration ease-in;
   }
+}
+
+/* Toggle between user/utc time
+--------------------------------------------- */
+
+body.user #significantEqs time.utc,
+body.utc #significantEqs time.user {
+  display: none;
 }

@@ -136,15 +136,25 @@ var Mainshock = function (options) {
               '</li>' +
               _getBubbles(data) +
               _getShakeAlert(data) +
-              '<li class="date">' +
+              '<li class="utc date">' +
                 '<strong>Date</strong>' +
-                '<span>{date}</span>' +
-                '<small>{dayofweek}</small>' +
+                '<span>{utcDate}</span>' +
+                '<small>{utcDayofweek}</small>' +
               '</li>' +
-              '<li class="time">' +
+              '<li class="utc time">' +
                 '<strong>Time</strong>' +
-                '<span>{time}</span>' +
+                '<span>{utcTime}</span>' +
                 '<small>UTC</small>' +
+              '</li>' +
+              '<li class="user date">' +
+                '<strong>Date</strong>' +
+                '<span>{userDate}</span>' +
+                '<small>{userDayofweek}</small>' +
+              '</li>' +
+              '<li class="user time">' +
+                '<strong>Time</strong>' +
+                '<span>{userTime}</span>' +
+                '<small>' + _app.utcOffset + '</small>' +
               '</li>' +
               '<li class="depth">' +
                 '<strong>Depth</strong>' +
@@ -255,6 +265,7 @@ var Mainshock = function (options) {
     var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg,
         tectonic,
         datetime = _this.data.datetime,
+        format = 'cccc',
         products = _this.json.properties.products,
         dyfi = products.dyfi,
         fm = products['focal-mechanism'],
@@ -298,8 +309,6 @@ var Mainshock = function (options) {
     }
 
     return Object.assign({}, _this.data, {
-      date: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      dayofweek: datetime.toFormat('cccc'),
       dyfiBubble: _this.data.bubbles.dyfi || '',
       dyfiImg: dyfiImg || '',
       econImg: econImg || '',
@@ -311,7 +320,12 @@ var Mainshock = function (options) {
       shakemapBubble: _this.data.bubbles.shakemap || '',
       shakemapImg: shakemapImg || '',
       tectonic: tectonic || '',
-      time: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
+      userDayofweek: datetime.toLocal().toFormat(format),
+      userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
+      utcDayofweek: datetime.toFormat(format),
+      utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       tsunamiBubble: _this.data.bubbles.tsunami || '',
       visibility: visibility
     });

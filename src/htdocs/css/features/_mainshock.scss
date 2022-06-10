@@ -280,6 +280,14 @@
   border: 4px solid;
 }
 
+/* Toggle between user/utc time
+--------------------------------------------- */
+
+body.user #summaryPane li.utc,
+body.utc #summaryPane li.user {
+  display: none;
+}
+
 // @media only screen
 //   and (max-width: 890px) {
 // }

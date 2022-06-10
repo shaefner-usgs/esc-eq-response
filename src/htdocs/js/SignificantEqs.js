@@ -52,23 +52,26 @@ var SignificantEqs = function (options) {
    * @return list {Element}
    */
   _createList = function () {
-    var data, li, props,
+    var data, datetime, format, li, props,
         list = document.createElement('h4'); // default
 
-    list.id = 'significantEqs';
     list.innerHTML = 'None';
 
     if (_json.features) {
       list = document.createElement('ul');
-      list.id = 'significantEqs';
 
       _json.features.forEach(feature => {
         props = feature.properties;
+        datetime = Luxon.DateTime.fromMillis(props.time).toUTC();
+        format = 'LLL d, yyyy TT';
         data = {
-          date: Luxon.DateTime.fromMillis(props.time).toUTC().toFormat('LLL d, yyyy TT'),
+          isoTime: datetime.toISO(),
           mag: AppUtil.round(props.mag, 1),
           mmi: AppUtil.romanize(props.mmi),
-          place: props.place
+          place: props.place,
+          userTime: datetime.toLocal().toFormat(format),
+          utcTime: datetime.toFormat(format),
+          utcOffset: _app.utcOffset
         };
         li = document.createElement('li');
 
@@ -82,7 +85,8 @@ var SignificantEqs = function (options) {
           '</div>' +
           '<div>' +
             '<h4>{place}</h4>' +
-            '<p>{date} UTC</p>' +
+            '<time datetime="{isoTime}" class="user">{userTime} ({utcOffset})</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
           '</div>',
           data
         );
@@ -96,6 +100,8 @@ var SignificantEqs = function (options) {
         list.appendChild(li);
       });
     }
+
+    list.id = 'significantEqs';
 
     return list;
   };

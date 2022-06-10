@@ -39,4 +39,16 @@
     font: 1.25rem $font-family;
     margin: .5rem 0;
   }
+
+  time.local {
+    display: none;
+  }
+}
+
+/* Toggle between user/utc time
+--------------------------------------------- */
+
+body.user #titleBar time.utc,
+body.utc #titleBar time.user {
+  display: none;
 }

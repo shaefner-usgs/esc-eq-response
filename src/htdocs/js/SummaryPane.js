@@ -23,6 +23,7 @@ var AppUtil = require('util/AppUtil'),
  *     addLoader: {Function}
  *     removeFeature: {Function}
  *     reset: {Function}
+ *     swapSortIndicator: {Function}
  *     updateMainshock: {Function}
  *   }
  */
@@ -44,6 +45,7 @@ var SummaryPane = function (options) {
       _hideMenu,
       _initTableSort,
       _openPopup,
+      _removeSortIndicator,
       _renderEffects,
       _showMenu,
       _unselectRow,
@@ -120,7 +122,10 @@ var SummaryPane = function (options) {
         ths = table.querySelectorAll('th');
         trs = table.querySelectorAll('tr');
 
-        // Show the sort menu when the user clicks on the current sorted by option
+        // Remove extraneous sort indicator
+        table.addEventListener('afterSort', _removeSortIndicator);
+
+        // Show the sort menu on a responsive table
         ths.forEach(th =>
           th.addEventListener('click', _showMenu)
         );
@@ -159,20 +164,22 @@ var SummaryPane = function (options) {
   _configTable = function (id) {
     var div = _el.querySelector('.' + id),
         slider = div.querySelector('.slider input'),
-        table = div.querySelector('table.list');
+        table = div.querySelectorAll('table.list.sortable');
 
     if (slider) {
       _app.setSliderStyles(slider); // set range slider to initial value
     }
+
     if (table) {
       _addListeners(id);
       _initTableSort(id);
+      _this.swapSortIndicator(table);
     }
   };
 
   /**
-   * Filter an earthquake list and display the <input> range slider's current
-   * value.
+   * Filter an earthquake list by magnitude threshold and display the <input>
+   * range slider's current value.
    */
   _filterList = function () {
     var feature = _app.Features.getFeature(this.id),
@@ -279,6 +286,28 @@ var SummaryPane = function (options) {
 
     if (!isTextSelected) { // suppress click event if user is selecting text
       _app.MapPane.openPopup(eqid, featureId);
+    }
+  };
+
+  /**
+   * Remove the "extraneous" sort indicator that gets left behind when a table's
+   * sortby field is changed after switching between user/utc time.
+   *
+   * @param e {Event}
+   */
+  _removeSortIndicator = function (e) {
+    var table = e.target,
+        ths = table.querySelectorAll('.sort-down, .sort-up');
+
+    if (ths.length > 1) {
+      ths.forEach(th => {
+        if (
+          th.classList.contains('userTime') ||
+          th.classList.contains('utcTime')
+        ) {
+          th.classList.remove('sort-down', 'sort-up');
+        }
+      });
     }
   };
 
@@ -422,6 +451,37 @@ var SummaryPane = function (options) {
 
     time.innerHTML = '';
     _contentEl.innerHTML = '';
+  };
+
+  /**
+   * Swap the given tables' sort indicators between time fields to the field
+   * that is currently visible. Called when the time zone option is changed and
+   * when a table is added/updated.
+   *
+   * @param tables {NodeList|Array}
+   */
+  _this.swapSortIndicator = function (tables) {
+    var indicator, sortDown, sortUp, thHidden, thVisible,
+        fields = ['userTime', 'utcTime'],
+        visibleField = document.querySelector('ul.timezone .selected').id + 'Time';
+
+    tables.forEach(table => {
+      fields.forEach(field => {
+        if (field !== visibleField) {
+          thHidden = table.querySelector('th.' + field);
+          thVisible = table.querySelector('th.' + visibleField);
+          sortDown = thHidden.classList.contains('sort-down');
+          sortUp = thHidden.classList.contains('sort-up');
+
+          if (sortDown || sortUp) {
+            indicator = (sortDown ? 'sort-down' : 'sort-up');
+
+            thHidden.classList.remove(indicator);
+            thVisible.classList.add(indicator);
+          }
+        }
+      });
+    });
   };
 
   /**

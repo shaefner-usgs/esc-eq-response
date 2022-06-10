@@ -171,7 +171,9 @@
   }
 }
 
-// Earthquake details in map popups and on the SelectBar
+/* Earthquake details in map popups and on the SelectBar
+--------------------------------------------- */
+
 .earthquake {
   &:not(.mainshock) {
     .status {
@@ -214,10 +216,55 @@
         margin-left: .25rem;
       }
     }
+
+    &.time {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   time {
     display: block;
+
+    &.utc {
+      order: 1;
+    }
+    &.user {
+      order: 2;
+    }
+    &.local {
+      order: 3;
+    }
+  }
+}
+
+/* Toggle between user/utc time
+--------------------------------------------- */
+
+body.user {
+  td.utcTime,
+  th.utcTime,
+  .earthquake:not(.mainshock) time.utc,
+  .leaflet-tooltip time.utc,
+  .plotly .line > tspan:nth-of-type(2) {
+    display: none !important; // need !important for responsive tables
+  }
+
+  time.user {
+    order: 1;
+  }
+  time.utc {
+    order: 2;
+  }
+}
+
+body.utc {
+  td.userTime,
+  th.userTime,
+  .earthquake:not(.mainshock) time.user,
+  .leaflet-tooltip time.user,
+  .plotly .line > tspan:nth-of-type(1) {
+    display: none !important; // need !important for responsive tables
   }
 }
 

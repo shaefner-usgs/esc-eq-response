@@ -93,6 +93,7 @@ var Earthquakes = function (options) {
       _getPrefix,
       _getTemplate,
       _getThreshold,
+      _getTooltip,
       _initBins,
       _onEachFeature,
       _pointToLayer;
@@ -334,16 +335,20 @@ var Earthquakes = function (options) {
     features.forEach(feature => {
       var direction, distance, distanceDisplay, latlon, localTime,
           coords = feature.geometry.coordinates,
+          format = 'LLL d, yyyy TT',
           props = feature.properties,
           datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
           magDisplay = AppUtil.round(props.mag, 1),
           mag = parseFloat(magDisplay),
           magType = props.magType || 'M',
           statusIcon = '',
-          template = '<time datetime="{isoTime}">{utcTime}</time>',
+          template = '<time datetime="{isoTime}" class="user">{userTime}</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime}</time>',
           title = magType + ' ' + magDisplay,
-          utcTime = datetime.toFormat('LLL d, yyyy TT') + ' <span class="tz">UTC</span>',
-          tooltip = magType + ' ' + magDisplay + '—' + utcTime;
+          userTime = datetime.toLocal().toFormat(format) +
+            ` <span class="tz">(${_app.utcOffset})</span>`,
+          utcTime = datetime.toFormat(format) +
+            ' <span class="tz">(UTC)</span>';
 
       if (_featureId !== 'mainshock' && _featureId !== 'search') {
         latlon = LatLon(coords[1], coords[0]);
@@ -361,11 +366,11 @@ var Earthquakes = function (options) {
         statusIcon += '<i class="icon-check"></i>';
       }
 
-      // Add local time if tz prop is included in feed
+      // Add local time (at epicenter) if tz prop is included in feed
       if (props.tz) {
         localTime = datetime.toUTC(props.tz).toFormat('LLL d, yyyy tt') +
           ' <span class="tz">at the epicenter</span>';
-        template += '<time datetime="{isoTime}">{localTime}</time>';
+        template += '<time datetime="{isoTime}" class="local">{localTime}</time>';
       }
 
       eq = {
@@ -395,9 +400,9 @@ var Earthquakes = function (options) {
         status: props.status || '',
         statusIcon: statusIcon,
         title: title,
-        tooltip: tooltip,
         tsunami: props.tsunami,
         url: props.url,
+        userTime: userTime,
         utcTime: utcTime
       };
 
@@ -551,6 +556,7 @@ var Earthquakes = function (options) {
       template =
         '<tr class="m{magInt}" title="View earthquake on map">' +
           '<td class="mag" data-sort="{mag}"><span>{magType} </span>{magDisplay}</td>' +
+          '<td class="userTime" data-sort="{isoTime}">{userTime}</td>' +
           '<td class="utcTime" data-sort="{isoTime}">{utcTime}</td>' +
           '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
           '<td class="location">{location}</td>' +
@@ -564,6 +570,7 @@ var Earthquakes = function (options) {
             '<thead>' +
               '<tr class="no-sort">' +
                 '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
+                `<th class="{userTime}" data-sort-order="desc">Time <em>(${_app.utcOffset})</em></th>` +
                 '<th class="{utcTime}" data-sort-order="desc">Time <em>(UTC)</em></th>' +
                 '<th class="{depth}" data-sort-method="number">Depth</th>' +
                 '<th class="{location}">Location</th>' +
@@ -584,8 +591,8 @@ var Earthquakes = function (options) {
           '<h4>{title}</h4>' +
           '<div class="impact-bubbles">{bubbles}</div>' +
           '<dl class="params">' +
-            '<dt>Time</dt>' +
-            '<dd>{timeDisplay}</dd>' +
+            '<dt class="time">Time</dt>' +
+            '<dd class="time">{timeDisplay}</dd>' +
             '<dt>Depth</dt>' +
             '<dd>{depthDisplay}</dd>' +
             '<dt>Location</dt>' +
@@ -650,6 +657,22 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the Leaflet tooltip content for a given earthquake.
+   *
+   * @param eq {Object}
+   *
+   * @return tooltip {String}
+   */
+  _getTooltip = function(eq) {
+    var tooltip = eq.magType + ' ' + eq.magDisplay + '—';
+
+    tooltip += `<time datetime="${eq.isoTime}" class="user">${eq.userTime}</time>`;
+    tooltip += `<time datetime="${eq.isoTime}" class="utc">${eq.utcTime}</time>`;
+
+    return tooltip;
+  };
+
+  /**
    * Initialize the Object templates for storing binned data.
    *
    * @param magInt {Integer}
@@ -691,7 +714,7 @@ var Earthquakes = function (options) {
     layer.bindPopup(_getPopup(eq, layer), {
       maxWidth: 375,
       minWidth: 250
-    }).bindTooltip(eq.tooltip);
+    }).bindTooltip(_getTooltip(eq));
 
     // Bin eq totals by magnitude and time / period
     if (_featureId === 'aftershocks') {
@@ -828,7 +851,7 @@ var Earthquakes = function (options) {
   _this.createListTable = function (type = 'all') {
     var data, magInt, tr,
         eqs = _this.data,
-        fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'utcTime'],
+        fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'userTime', 'utcTime'],
         magThreshold = _getThreshold(),
         rows = '',
         tableClasses = ['list'],
