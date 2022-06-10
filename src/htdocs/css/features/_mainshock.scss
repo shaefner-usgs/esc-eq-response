@@ -234,6 +234,9 @@
 #summaryPane,
 .lightbox {
   img {
+    &.mmiN\/A {
+      border-color: $mmi-NAcolor;
+    }
     &.mmiI {
       border-color: $border-color-lighter;
     }
