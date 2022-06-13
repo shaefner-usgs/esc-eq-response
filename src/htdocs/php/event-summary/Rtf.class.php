@@ -143,8 +143,8 @@ class Rtf {
     $fields = [
       'magDisplay' => 'Mag',
       'utcTime' => 'Time (UTC)',
-      'location' => 'Location',
       'depthDisplay' => 'Depth',
+      'location' => 'Location',
       'distanceDisplay' => 'Distance',
       'eqid' => 'Event ID'
     ];
@@ -1341,7 +1341,7 @@ class Rtf {
 
     $table = $section->addTable();
     $table->addRows($numRows);
-    $table->addColumnsList(array(1.9, 4.4, 3.3, 2, 2.4, 2.9));
+    $table->addColumnsList(array(1.9, 4.4, 2, 3.3, 2.4, 2.9));
     $table->setBackgroundForCellRange('#666666', 1, 1, 1, 6);
     $table->setBordersForCellRange(
       $this->_format->borderDarker,
@@ -1352,7 +1352,8 @@ class Rtf {
     $table->setFontForCellRange($this->_font->td, 2, 1, $numRows, 6);
     $table->setTextAlignmentForCellRange('center', 1, 1, 1, 6);
     $table->setTextAlignmentForCellRange('right', 2, 1, $numRows, 1);
-    $table->setTextAlignmentForCellRange('right', 2, 4, $numRows, 4);
+    $table->setTextAlignmentForCellRange('right', 2, 3, $numRows, 3);
+    $table->setTextAlignmentForCellRange('center', 2, 4, $numRows, 4);
 
     // Header row
     $col = 0;
@@ -1374,7 +1375,7 @@ class Rtf {
         $cell = $table->getCell($row, $col);
 
         $cell->setCellPaddings(0, 0.1, 0, 0.1);
-        if ($col === 1 || $col === 4) { // text aligned right; add padding
+        if ($col === 1 || $col === 3) { // text aligned right; add padding
           $cell->setPaddingRight(.2);
         }
 
