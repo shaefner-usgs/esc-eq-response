@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
  * Create an Event Summary RTF document using a JSON string that is sent as a
  * POST data Blob to a PHP script that generates the binary file.
@@ -54,8 +57,7 @@ var Rtf = function (options) {
    * @return {Integer}
    */
   _compare = function (a, b) {
-    var aValue,
-        bValue,
+    var aValue, bValue,
         comparison = 0;
 
     if (_sortKey) { // not set for unsorted (i.e. single row) tables
@@ -71,7 +73,7 @@ var Rtf = function (options) {
       }
 
       // Use ISO time to sort date/time fields
-      if (_sortKey === 'utcTime') {
+      if (_sortKey === 'userTime' || _sortKey === 'utcTime') {
         aValue = a.isoTime;
         bValue = b.isoTime;
       }
@@ -186,7 +188,8 @@ var Rtf = function (options) {
         mainshock = _app.Features.getFeature('mainshock'),
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerExposures = _app.Features.getFeature('pager-exposures'),
-        products = _getProducts(mainshock.json.properties.products);
+        products = _getProducts(mainshock.json.properties.products),
+        zone = AppUtil.getParam('timezone') || 'utc';
 
     // IMPORTANT: Set appropriate types for 'empty' values (i.e. not undefined)
     data = {
@@ -229,7 +232,10 @@ var Rtf = function (options) {
       tectonic: products.tectonic || '',
       time: {
         local: mainshock.data.localTime,
-        utc: mainshock.data.utcTime
+        user: mainshock.data.userTime,
+        utc: mainshock.data.utcTime,
+        utcOffset: _app.utcOffset,
+        zone: zone
       },
       title: mainshock.data.title,
       urls: {
@@ -259,12 +265,7 @@ var Rtf = function (options) {
    * @return {Object}
    */
   _getProducts = function (products) {
-    var contents,
-        dyfi,
-        notice,
-        pager,
-        shakemap,
-        tectonic;
+    var contents, dyfi, notice, pager, shakemap, tectonic;
 
     if (products.dyfi) {
       contents = products.dyfi[0].contents;
@@ -407,7 +408,7 @@ var Rtf = function (options) {
    */
   _this.create = function () {
     var data,
-        l  = location,
+        l = location,
         url = `${l.protocol}//${l.host}${l.pathname}php/event-summary/create.php`;
 
     // Render plots so that their images can be captured

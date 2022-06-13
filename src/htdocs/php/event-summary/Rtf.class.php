@@ -20,6 +20,7 @@ date_default_timezone_set('America/Los_Angeles');
  */
 class Rtf {
   private $_data,
+          $_fields,
           $_font,
           $_format,
           $_now,
@@ -30,6 +31,7 @@ class Rtf {
 
   public function __construct ($data) {
     $this->_data = $data;
+    $this->_fields = $this->_getFields();
     $this->_font = new stdClass;
     $this->_format = new stdClass;
     $this->_now = date('Y-m-d g:ia \(T\)');
@@ -130,6 +132,33 @@ class Rtf {
     $this->_createSection7(); // Foreshocks
     $this->_createSection8(); // Historical Seismicity
     $this->_createSection9(); // ShakeAlert
+  }
+
+  /**
+   * Get the fields for the earthquake list tables.
+   *
+   * @return $fields {Array}
+   */
+  private function _getFields() {
+    $fields = [
+      'magDisplay' => 'Mag',
+      'utcTime' => 'Time (UTC)',
+      'location' => 'Location',
+      'depthDisplay' => 'Depth',
+      'distanceDisplay' => 'Distance',
+      'eqid' => 'Event ID'
+    ];
+    $time = $this->_data->time;
+
+    if ($time->zone === 'user') {
+      $fields = array_merge(
+        array_slice($fields, 0, 1),
+        ['userTime' => "Time ($time->utcOffset)"],
+        array_slice($fields, 2)
+      );
+    }
+
+    return $fields;
   }
 
   /**
@@ -260,9 +289,11 @@ class Rtf {
   private function _createSection1() {
     $section1 = $this->_rtf->addSection();
 
-    $datetime = strip_tags($this->_data->time->utc);
-    if ($this->_data->time->local) {
-      $datetime .= '<br>' . strip_tags($this->_data->time->local);
+    $time = $this->_data->time;
+    $datetime = strip_tags($time->utc) . '<br>';
+    $datetime .= strip_tags($time->user);
+    if ($time->local) {
+      $datetime .= '<br>' . strip_tags($time->local);
     }
 
     $nearbyCitiesList = '';
@@ -1300,14 +1331,6 @@ class Rtf {
    */
   private function _createTableEqlist($section, $id) {
     $eqs = $this->_data->{$id}->earthquakes;
-    $fields = [
-      'magDisplay' => 'Mag',
-      'utcTime' => 'Time (UTC)',
-      'location' => 'Location',
-      'depthDisplay' => 'Depth',
-      'distanceDisplay' => 'Distance',
-      'eqid' => 'Event ID'
-    ];
     $numRows = count($eqs) + 1; // data rows + 1 header row
 
     $section->writeText(
@@ -1335,7 +1358,7 @@ class Rtf {
     $col = 0;
     $row = 1;
 
-    foreach ($fields as $key => $value) {
+    foreach ($this->_fields as $key => $value) {
       $col ++;
       $cell = $table->getCell($row, $col);
       $cell->writeText($value);
@@ -1346,7 +1369,7 @@ class Rtf {
       $col = 0;
       $row ++;
 
-      foreach ($fields as $key => $value) {
+      foreach ($this->_fields as $key => $value) {
         $col ++;
         $cell = $table->getCell($row, $col);
 
@@ -1356,8 +1379,8 @@ class Rtf {
         }
 
         $fieldValue = strip_tags($eq->{$key});
-        if ($key === 'utcTime') {
-          $fieldValue = substr($fieldValue, 0, -4); // strip ' UTC' off end
+        if ($key === 'userTime' || $key === 'utcTime') { // strip off timezone
+          $fieldValue = preg_replace('/\s+\([\w\-:]+\)/', '', $fieldValue);
         } else if ($key === 'magDisplay') { // add mag type
           $fieldValue = $eq->magType . ' ' . $fieldValue;
         }
