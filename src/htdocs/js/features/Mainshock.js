@@ -61,6 +61,7 @@ var Mainshock = function (options) {
       _getTectonic,
       _getThumbs,
       _refreshBeachBalls,
+      _removeLightboxes,
       _renderUpdate,
       _setJson;
 
@@ -509,6 +510,15 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Remove Mainshock lightboxes from the DOM.
+   */
+  _removeLightboxes = function () {
+    Object.keys(_lightboxes).forEach(id => {
+      _lightboxes[id].remove();
+    });
+  };
+
+  /**
    * Render an update to apply either ComCat or Double Difference parameters.
    *
    * @param catalog {String <comcat|dd>}
@@ -593,6 +603,8 @@ var Mainshock = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    _removeLightboxes();
+
     _initialize = null;
 
     _app = null;
