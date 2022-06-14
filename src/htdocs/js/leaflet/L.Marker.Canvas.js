@@ -4,7 +4,8 @@
 
 /**
  * This class extends L.Marker to move an existing <canvas> in the DOM to the
- * Marker when the Marker is turned on in the layers control.
+ * Marker when the Marker is turned on in the layers control (it also updates
+ * the marker's position to always render in the currently visible map).
  *
  * This is necessary b/c Leaflet dynamically creates/destroys markers when they
  * are turned on/off in the layers control.
@@ -44,6 +45,9 @@ L.Marker.Canvas = L.Marker.extend({
 
   /**
    * Get the map's center, while accounting for the SideBar's current state.
+   *
+   * @return center {Number}
+   *     longitude value of map's center
    */
   _getCenter: function () {
     var delta, lng, offsetX,

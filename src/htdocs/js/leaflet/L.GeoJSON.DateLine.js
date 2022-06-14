@@ -8,6 +8,9 @@ require('leaflet-geojson-dateline');
 /**
  * This class redefines L.GeoJSON.DateLine to calculate the center of the map
  * correctly when the SideBar is open.
+ *
+ * @return center {Number}
+ *     longitude value of map's center
  */
 L.GeoJSON.DateLine.include({
   _getCenter: function () {
