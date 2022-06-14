@@ -274,6 +274,8 @@ var FieldNotes = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    _lightbox.remove();
+
     _initialize = null;
 
     _app = null;
