@@ -22,6 +22,10 @@ L.Marker.Canvas = L.Marker.extend({
 
       marker.appendChild(canvas); // move <canvas> to Marker
     }
+
+    map.on('moveend viewreset', this._update, this);
+
+    this._update();
   },
 
   onRemove: function (map) {
@@ -34,6 +38,54 @@ L.Marker.Canvas = L.Marker.extend({
     }
 
     L.Marker.prototype.onRemove.call(this, map);
+
+    map.off('moveend viewreset', this._update, this);
+  },
+
+  /**
+   * Get the map's center, while accounting for the SideBar's current state.
+   */
+  _getCenter: function () {
+    var delta, lng, offsetX,
+        center = this._map.getCenter().lng,
+        sidebar = document.body.classList.contains('sidebar');
+
+    if (sidebar) {
+      offsetX = document.getElementById('sideBar').offsetWidth / 2;
+      lng = this._map.containerPointToLatLng([offsetX, 0]).lng;
+      delta = lng - this._map.getBounds().getWest();
+
+      center -= delta;
+    }
+
+    return center;
+  },
+
+  /**
+   * Update the marker's position to be rendered in the visible map area,
+   * accounting for copies of "wrapping" maps.
+   */
+  _update: function () {
+    var status,
+        center = this._getCenter(),
+        latLng = this.getLatLng(),
+        options = {
+          max: center + 180,
+          min: center - 180
+        };
+
+    while (latLng.lng <= options.min) {
+      latLng.lng += 360;
+      status = 'updated';
+    }
+    while (latLng.lng > options.max) {
+      latLng.lng -= 360;
+      status = 'updated';
+    }
+
+    if (status === 'updated') {
+      this.setLatLng(latLng);
+    }
   }
 });
 
