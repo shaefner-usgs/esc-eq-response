@@ -55,21 +55,28 @@ var Plots = function (options) {
    * of the Historical trace.
    *
    * @param data {Object}
+   * @param timezone {String}
    */
-  _addMainshock = function (data) {
+  _addMainshock = function (data, timezone) {
+    var x = _mainshock.data.isoTime;
+
+    if (timezone === 'user') {
+      x = _mainshock.data.datetime.toLocal().toISO();
+    }
+
     if (_featureId === 'aftershocks') {
       data.eqid.unshift(AppUtil.getParam('eqid'));
       data.title.unshift(_mainshock.data.title);
       data.userTime.unshift(_mainshock.data.userTime);
       data.utcTime.unshift(_mainshock.data.utcTime);
-      data.x.unshift(_mainshock.data.isoTime);
+      data.x.unshift(x);
       data.y.unshift(0);
     } else if (_featureId === 'historical') {
       data.eqid.push(AppUtil.getParam('eqid'));
       data.title.push(_mainshock.data.title);
       data.userTime.push(_mainshock.data.userTime);
       data.utcTime.push(_mainshock.data.utcTime);
-      data.x.push(_mainshock.data.isoTime);
+      data.x.push(x);
       data.y.push(data.y.length + 1);
     }
   };
@@ -84,6 +91,7 @@ var Plots = function (options) {
   _formatData = function (eqs) {
     var data = {
       color: [],
+      datetime: [],
       depth: [],
       eqid: [],
       isoTime: [],
@@ -99,6 +107,7 @@ var Plots = function (options) {
 
     eqs.forEach(eq => {
       data.color.push(eq.fillColor);
+      data.datetime.push(eq.datetime);
       data.depth.push(eq.depth * -1); // set to negative value for 3d plots
       data.eqid.push(eq.eqid);
       data.isoTime.push(eq.isoTime);
@@ -198,7 +207,13 @@ var Plots = function (options) {
           },
           showlegend: false
         },
-        spikecolor = '#4440CC'; // SCSS $accent-color
+        spikecolor = '#4440CC', // SCSS $accent-color
+        timezone = AppUtil.getParam('timezone') || 'utc',
+        zoneDisplay = 'UTC';
+
+    if (timezone === 'user') {
+      zoneDisplay = _app.utcOffset;
+    }
 
     if (_id === 'hypocenters') {
       layout.scene = {
@@ -252,7 +267,7 @@ var Plots = function (options) {
           font: {
             color: color
           },
-          text: 'Time (UTC)'
+          text: `Time (${zoneDisplay})`
         }
       };
     }
@@ -304,11 +319,17 @@ var Plots = function (options) {
    */
   _getTraceData = function () {
     var data = { // defaults, common props
-      color: _data.color,
-      mode: 'markers',
-      size: _data.size,
-      type: 'scatter'
-    };
+          color: _data.color,
+          mode: 'markers',
+          size: _data.size,
+          type: 'scatter'
+        },
+        timezone = AppUtil.getParam('timezone') || 'utc',
+        x = _data.isoTime;
+
+    if (timezone === 'user') {
+      x = _data.datetime.map(datetime => datetime.toLocal().toISO());
+    }
 
     if (_id === 'cumulative') {
       // Use slice to copy Arrays to add Mainshock to trace w/o altering _data
@@ -318,11 +339,11 @@ var Plots = function (options) {
         title: _data.title.slice(),
         userTime: _data.userTime.slice(),
         utcTime: _data.utcTime.slice(),
-        x: _data.isoTime.slice(),
+        x: x.slice(),
         y: Array.from(new Array(_data.isoTime.length), (val, i) => i + 1) // 1 to length of x
       });
 
-      _addMainshock(data);
+      _addMainshock(data, timezone);
 
       data.text = data.y.map((val, i) => {
         if (
@@ -352,7 +373,7 @@ var Plots = function (options) {
       } else { // magtime plot
         Object.assign(data, {
           sizeref: 1,
-          x: _data.isoTime,
+          x: x,
           y: _data.mag
         });
       }

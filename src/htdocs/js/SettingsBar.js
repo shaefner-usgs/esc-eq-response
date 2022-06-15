@@ -284,6 +284,10 @@ var SettingsBar = function (options) {
     });
 
     document.body.classList.add(timezone);
+
+    if (document.body.classList.contains('mainshock')) {
+      _app.PlotsPane.update();
+    }
   };
 
   /**

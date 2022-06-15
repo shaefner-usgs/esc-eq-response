@@ -22,6 +22,7 @@
  *     rendered: {Boolean}
  *     reset: {Function}
  *     resize: {Function}
+ *     update: {Function}
  *   }
  */
 var PlotsPane = function (options) {
@@ -152,7 +153,8 @@ var PlotsPane = function (options) {
 
     return {
       graphDiv: container,
-      options: feature.plots.getOptions(id)
+      options: feature.plots.getOptions(id),
+      rendered: false
     };
   };
 
@@ -200,10 +202,7 @@ var PlotsPane = function (options) {
         }
       });
 
-      _plots[feature.id] = {
-        params: params,
-        rendered: false
-      };
+      _plots[feature.id] = params;
 
       _addCount(feature, div);
 
@@ -268,44 +267,42 @@ var PlotsPane = function (options) {
    * Render the plots.
    */
   _this.render = function () {
-    var graphDiv, params, path, rendered, resetButton;
+    var path, plot, plots, resetButton;
 
-    // Loop thru plots by Feature
+    // Loop thru sets of plots keyed by Feature
     Object.keys(_plots).forEach(featureId => {
-      params = _plots[featureId].params;
-      rendered = _plots[featureId].rendered;
+      plots = _plots[featureId];
 
-      if (!rendered) {
-        // Loop thru plot types
-        Object.keys(params).forEach(id => {
-          graphDiv = params[id].graphDiv;
+      // Loop thru plot types for a Feature
+      Object.keys(plots).forEach(id => {
+        plot = plots[id];
 
-          Plotly.newPlot(graphDiv, params[id].options);
+        if (!plot.rendered) {
+          Plotly.newPlot(plot.graphDiv, plot.options);
 
-          if (id !== 'hypocenters') { // skip click events on 3d plots
-            _addListeners(graphDiv);
+          if (id === 'hypocenters') {
+            // Change 'Reset camera' -> 'Autoscale' for consistency w/ other plots
+            resetButton = plot.graphDiv.querySelector(
+              '[data-attr="resetLastSave"]'
+            );
+            path = resetButton.querySelector('path');
+
+            path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 ' +
+              '188 187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 ' +
+              '62-62 0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 ' +
+              '0z m875 188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-' +
+              '125 188l-1 0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 ' +
+              '93-92-156-156-156 156 94 92 0 2-250 0 0-250 0 0 93 93 ' +
+              '157-156-157-156-93 94 0 0 0-250 250 0 0 0-94 93 156 157 ' +
+              '156-157-93-93 0 0 250 0 0 250z');
+            resetButton.setAttribute('data-title', 'Autoscale');
+          } else { // add click events to non-3d plots
+            _addListeners(plot.graphDiv);
           }
-        });
 
-        _plots[featureId].rendered = true;
-
-        // Change 'reset camera' button -> 'autoscale' for consistency w/ other plots
-        if (params.hypocenters) {
-          resetButton = params.hypocenters.graphDiv.querySelector(
-            '[data-attr="resetLastSave"]'
-          );
-          path = resetButton.querySelector('path');
-
-          path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 ' +
-            '187 0 0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 ' +
-            '0z m-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
-            '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
-            '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
-            '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 ' +
-            '0-250 250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
-          resetButton.setAttribute('data-title', 'Autoscale');
+          plot.rendered = true;
         }
-      }
+      });
     });
 
     _this.rendered = true;
@@ -332,6 +329,28 @@ var PlotsPane = function (options) {
         Plotly.Plots.resize(plot)
       );
     }
+  };
+
+  /**
+   * Update 2d plots. Useful for swapping between UTC and user time zones.
+   */
+  _this.update = function () {
+    var feature,
+        features = ['aftershocks', 'historical'],
+        plots = ['cumulative', 'magtime'];
+
+    features.forEach(featureId => {
+      feature = _app.Features.getFeature(featureId);
+
+      plots.forEach(id => {
+        Object.assign(_plots[featureId][id], {
+          options: feature.plots.getOptions(id), // gets timezone-specific data
+          rendered: false
+        });
+      });
+    });
+
+    _this.render();
   };
 
 
