@@ -335,9 +335,9 @@ var Earthquakes = function (options) {
     features.forEach(feature => {
       var direction, distance, distanceDisplay, latlon, localTime,
           coords = feature.geometry.coordinates,
-          format = 'LLL d, yyyy TT',
           props = feature.properties,
           datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+          format = 'LLL d, yyyy TT',
           magDisplay = AppUtil.round(props.mag, 1),
           mag = parseFloat(magDisplay),
           magType = props.magType || 'M',
