@@ -155,17 +155,17 @@ var Rtf = function (options) {
    *   }
    */
   _getPlotDivs = function () {
-    var params,
-        divs = {},
-        plots = _app.PlotsPane.getPlots();
+    var plots,
+        allPlots = _app.PlotsPane.getPlots(),
+        divs = {};
 
-    Object.keys(plots).forEach(featureId => {
+    Object.keys(allPlots).forEach(featureId => {
       divs[featureId] = [];
-      params = plots[featureId].params;
+      plots = allPlots[featureId];
 
-      Object.keys(params).forEach(plotId => {
-        if (plotId !== 'hypocenters') { // skip 3d plots
-          divs[featureId].push(params[plotId].graphDiv);
+      Object.keys(plots).forEach(id => {
+        if (id !== 'hypocenters') { // skip 3d plots
+          divs[featureId].push(plots[id].graphDiv);
         }
       });
     });
