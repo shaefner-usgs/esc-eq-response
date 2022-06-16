@@ -146,26 +146,24 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get an Array of <div> containers for all 2d plots, grouped by Feature.
+   * Get Arrays of the <div> containers for all 2d plots, grouped by Feature.
    *
    * @return divs {Object}
    *   {
-   *     featureId: [div1, ...]
+   *     featureId: [divs]
    *     ...
    *   }
    */
   _getPlotDivs = function () {
-    var plots,
-        allPlots = _app.PlotsPane.getPlots(),
+    var plots = _app.PlotsPane.getPlots(),
         divs = {};
 
-    Object.keys(allPlots).forEach(featureId => {
+    Object.keys(plots).forEach(featureId => {
       divs[featureId] = [];
-      plots = allPlots[featureId];
 
-      Object.keys(plots).forEach(id => {
+      Object.keys(plots[featureId]).forEach(id => {
         if (id !== 'hypocenters') { // skip 3d plots
-          divs[featureId].push(plots[id].graphDiv);
+          divs[featureId].push(plots[featureId][id].graphDiv);
         }
       });
     });
@@ -318,19 +316,20 @@ var Rtf = function (options) {
    * Get a Promise to (2d) plot image as a base64 encoded dataURL.
    *
    * @param div {Element}
-   * @param id {String}
-   *     Feature id
+   * @param featureId {String}
    *
    * @return promise {Object}
    */
-  _getPromise = function (div, id) {
-    var type = div.classList.item(0), // plot type key
+  _getPromise = function (div, featureId) {
+    var id = Array.from(div.classList).find(className =>
+          className !== 'js-plotly-plot'
+        ),
         promise = Plotly.toImage(div, {
           format: 'png',
           height: 300,
           width: 800
         }).then(dataUrl =>
-          _plots[id][type] = dataUrl
+          _plots[featureId][id] = dataUrl
         );
 
     return promise;
@@ -347,11 +346,11 @@ var Rtf = function (options) {
 
     _plots = {};
 
-    Object.keys(plotDivs).forEach(id => {
-      _plots[id] = {};
+    Object.keys(plotDivs).forEach(featureId => {
+      _plots[featureId] = {};
 
-      plotDivs[id].forEach(div =>
-        promises.push(_getPromise(div, id))
+      plotDivs[featureId].forEach(div =>
+        promises.push(_getPromise(div, featureId))
       );
     });
 

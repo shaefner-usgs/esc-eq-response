@@ -236,7 +236,10 @@ var SettingsBar = function (options) {
    */
   _setOption = function (e) {
     var tables,
-        name = e.target.closest('ul').classList[0],
+        ul = e.target.closest('ul'),
+        name = Array.from(ul.classList).find(className =>
+          className !== 'options'
+        ),
         value = this.id;
 
     _app.setOption.call(this);
