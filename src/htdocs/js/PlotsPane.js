@@ -332,7 +332,8 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Update 2d plots. Useful for swapping between UTC and user time zones.
+   * Update the 2d plots, rendering them in the time zone currently selected on
+   * the SettingsBar.
    */
   _this.update = function () {
     var feature,
@@ -343,10 +344,12 @@ var PlotsPane = function (options) {
       feature = _app.Features.getFeature(featureId);
 
       plots.forEach(id => {
-        Object.assign(_plots[featureId][id], {
-          options: feature.plots.getOptions(id), // gets timezone-specific data
-          rendered: false
-        });
+        if (_plots[featureId][id]) {
+          Object.assign(_plots[featureId][id], {
+            options: feature.plots.getOptions(id), // selected timezone's data
+            rendered: false
+          });
+        }
       });
     });
 
