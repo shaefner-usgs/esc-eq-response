@@ -3,11 +3,11 @@
 
 
 /**
- * This class extends L.Control.Zoom to zoom from the center point of the
+ * This class redefines L.Control.Zoom to zoom from the center point of the
  * visible map area, which varies depending on the header's height and whether
  * or not the sidebar is toggled on.
  */
-L.Control.ZoomCenter = L.Control.Zoom.extend({
+L.Control.Zoom = L.Control.Zoom.include({
   _getCenter: function () {
     var offsetX = document.getElementById('sideBar').offsetWidth / 2,
         offsetY = document.querySelector('header').offsetHeight / 2,

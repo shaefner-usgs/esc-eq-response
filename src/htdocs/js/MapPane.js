@@ -4,7 +4,7 @@
 
 // Leaflet plugins and layer factories
 require('leaflet-mouse-position');
-require('leaflet/L.Control.ZoomCenter');
+require('leaflet/L.Control.Zoom');
 require('leaflet/L.DarkLayer');
 require('leaflet/L.FaultsLayer');
 require('leaflet/L.GreyscaleLayer');
@@ -98,7 +98,6 @@ var MapPane = function (options) {
 
     L.control.mousePosition().addTo(_map);
     L.control.scale().addTo(_map);
-    L.control.zoomCenter().addTo(_map);
   };
 
   /**
@@ -273,8 +272,7 @@ var MapPane = function (options) {
 
     _map = L.map(_el.querySelector('.map'), {
       layers: _staticLayers.defaults,
-      minZoom: 1,
-      zoomControl: false // hide default control in favor of custom control
+      minZoom: 1
     });
 
     _createPane('faults', 'tilePane');
