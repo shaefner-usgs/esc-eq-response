@@ -67,7 +67,7 @@ var PagerCities = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create cities list.
+   * Create the PAGER cities list.
    *
    * @param json {Object}
    *     feed data for Feature
