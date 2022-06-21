@@ -41,7 +41,7 @@ var Historical = function (options) {
       _app,
       _earthquakes,
 
-      _createSummary;
+      _getSummary;
 
 
   _this = {};
@@ -62,19 +62,19 @@ var Historical = function (options) {
   };
 
   /**
-   * Create summary HTML.
+   * Get the HTML for the summary.
    *
    * @return html {String}
    */
-  _createSummary = function () {
+  _getSummary = function () {
     var html = '<div class="bubble">';
 
-    html += _earthquakes.createDescription();
+    html += _earthquakes.description;
 
     if (_this.count > 0) {
-      html += _earthquakes.createBinTable('prior');
-      html += _earthquakes.createSlider();
-      html += _earthquakes.createListTable('all');
+      html += _earthquakes.getBinTable('prior');
+      html += _earthquakes.getSlider();
+      html += _earthquakes.getListTable('all');
     }
 
     html += '</div>';
@@ -103,10 +103,10 @@ var Historical = function (options) {
     _this.bins = _earthquakes.bins;
     _this.count = _earthquakes.count;
     _this.data = _earthquakes.data;
-    _this.description = _earthquakes.createDescription();
+    _this.description = _earthquakes.description;
     _this.mapLayer = _earthquakes.mapLayer;
     _this.plots = _earthquakes.plots;
-    _this.summary = _createSummary();
+    _this.summary = _getSummary();
   };
 
   /**
@@ -118,7 +118,7 @@ var Historical = function (options) {
     _app = null;
     _earthquakes = null;
 
-    _createSummary = null;
+    _getSummary = null;
 
     _this = null;
   };

@@ -51,7 +51,6 @@ var Mainshock = function (options) {
       _addBeachBalls,
       _addThumb,
       _cleanup,
-      _createSummary,
       _getBubbles,
       _getData,
       _getDyfi,
@@ -59,6 +58,7 @@ var Mainshock = function (options) {
       _getPager,
       _getShakeAlert,
       _getShakeMap,
+      _getSummary,
       _getTectonic,
       _getThumbs,
       _refreshBeachBalls,
@@ -126,86 +126,6 @@ var Mainshock = function (options) {
     Object.keys(_lightboxes).forEach(id => {
       _lightboxes[id].remove();
     });
-  };
-
-  /**
-   * Create summary HTML.
-   *
-   * @return html {String}
-   */
-  _createSummary = function () {
-    var data = _getData(),
-        html = L.Util.template(
-          _getNotice(data) +
-          '<div class="details bubble">' +
-            '<ul>' +
-              '<li class="mag">' +
-                '<strong>Mag</strong>' +
-                '<span>{magDisplay}</span>' +
-                '<small>{magType}</small>' +
-              '</li>' +
-              _getBubbles(data) +
-              _getShakeAlert(data) +
-              '<li class="utc date">' +
-                '<strong>Date</strong>' +
-                '<span>{utcDate}</span>' +
-                '<small>{utcDayofweek}</small>' +
-              '</li>' +
-              '<li class="utc time">' +
-                '<strong>Time</strong>' +
-                '<span>{utcTime}</span>' +
-                '<small>UTC</small>' +
-              '</li>' +
-              '<li class="user date">' +
-                '<strong>Date</strong>' +
-                '<span>{userDate}</span>' +
-                '<small>{userDayofweek}</small>' +
-              '</li>' +
-              '<li class="user time">' +
-                '<strong>Time</strong>' +
-                '<span>{userTime}</span>' +
-                '<small>' + _app.utcOffset + '</small>' +
-              '</li>' +
-              '<li class="depth">' +
-                '<strong>Depth</strong>' +
-                '<span>{depth}</span>' +
-                '<small>km</small>' +
-              '</li>' +
-              '<li class="location">' +
-                '<strong>Location</strong>' +
-                '<span>{location}</span>' +
-              '</li>' +
-              '<li class="status">' +
-                '<strong>Status</strong>' +
-                '<span>{statusIcon}</span>' +
-                '<small>{status}</small>' +
-              '</li>' +
-            '</ul>' +
-          '</div>' +
-          '<div class="products">' +
-            '<div class="thumbs bubble {visibility}">' +
-              _getDyfi(data) +
-              _getShakeMap(data) +
-              '<div class="focal-mechanism placeholder hide"></div>' +
-              '<div class="moment-tensor placeholder hide"></div>' +
-            '</div>' +
-            '<div class="pager-exposures bubble placeholder hide"></div>' +
-            _getPager(data) +
-            '<div class="download bubble">' +
-              '<h3>Event Summary</h3>' +
-              '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
-                'containing earthquake details, images, plots and ' +
-                'placeholders for talking points and analysis. Microsoft ' +
-                'Word is recommended for viewing the document.</p>' +
-              '<button id="download" disabled="disabled" type="button" ' +
-                'title="Download RTF Document">Download</button>' +
-            '</div>' +
-            _getTectonic(data) +
-          '</div>',
-          data
-        );
-
-    return html;
   };
 
   /**
@@ -458,6 +378,86 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Get the HTML for the summary.
+   *
+   * @return html {String}
+   */
+  _getSummary = function () {
+    var data = _getData(),
+        html = L.Util.template(
+          _getNotice(data) +
+          '<div class="details bubble">' +
+            '<ul>' +
+              '<li class="mag">' +
+                '<strong>Mag</strong>' +
+                '<span>{magDisplay}</span>' +
+                '<small>{magType}</small>' +
+              '</li>' +
+              _getBubbles(data) +
+              _getShakeAlert(data) +
+              '<li class="utc date">' +
+                '<strong>Date</strong>' +
+                '<span>{utcDate}</span>' +
+                '<small>{utcDayofweek}</small>' +
+              '</li>' +
+              '<li class="utc time">' +
+                '<strong>Time</strong>' +
+                '<span>{utcTime}</span>' +
+                '<small>UTC</small>' +
+              '</li>' +
+              '<li class="user date">' +
+                '<strong>Date</strong>' +
+                '<span>{userDate}</span>' +
+                '<small>{userDayofweek}</small>' +
+              '</li>' +
+              '<li class="user time">' +
+                '<strong>Time</strong>' +
+                '<span>{userTime}</span>' +
+                '<small>' + _app.utcOffset + '</small>' +
+              '</li>' +
+              '<li class="depth">' +
+                '<strong>Depth</strong>' +
+                '<span>{depth}</span>' +
+                '<small>km</small>' +
+              '</li>' +
+              '<li class="location">' +
+                '<strong>Location</strong>' +
+                '<span>{location}</span>' +
+              '</li>' +
+              '<li class="status">' +
+                '<strong>Status</strong>' +
+                '<span>{statusIcon}</span>' +
+                '<small>{status}</small>' +
+              '</li>' +
+            '</ul>' +
+          '</div>' +
+          '<div class="products">' +
+            '<div class="thumbs bubble {visibility}">' +
+              _getDyfi(data) +
+              _getShakeMap(data) +
+              '<div class="focal-mechanism placeholder hide"></div>' +
+              '<div class="moment-tensor placeholder hide"></div>' +
+            '</div>' +
+            '<div class="pager-exposures bubble placeholder hide"></div>' +
+            _getPager(data) +
+            '<div class="download bubble">' +
+              '<h3>Event Summary</h3>' +
+              '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
+                'containing earthquake details, images, plots and ' +
+                'placeholders for talking points and analysis. Microsoft ' +
+                'Word is recommended for viewing the document.</p>' +
+              '<button id="download" disabled="disabled" type="button" ' +
+                'title="Download RTF Document">Download</button>' +
+            '</div>' +
+            _getTectonic(data) +
+          '</div>',
+          data
+        );
+
+    return html;
+  };
+
+  /**
    * Get the tectonic summary product HTML template.
    *
    * @param data {Object}
@@ -596,7 +596,7 @@ var Mainshock = function (options) {
     _this.json = json; // used by other Features
     _this.mapLayer = earthquakes.mapLayer;
     _this.plots = earthquakes.plots;
-    _this.summary = _createSummary();
+    _this.summary = _getSummary();
   };
 
   /**
@@ -615,7 +615,6 @@ var Mainshock = function (options) {
 
     _addBeachBalls = null;
     _addThumb = null;
-    _createSummary = null;
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
@@ -623,6 +622,7 @@ var Mainshock = function (options) {
     _getNotice = null;
     _getShakeAlert = null;
     _getShakeMap = null;
+    _getSummary = null;
     _getTectonic = null;
     _getThumbs = null;
     _refreshBeachBalls = null;

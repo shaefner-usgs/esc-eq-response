@@ -59,13 +59,13 @@ var ShakeMapStations = function (options) {
       _markerOptions,
       _shakemap,
 
-      _createComponent,
-      _createMapLayer,
-      _createPopup,
-      _createRow,
-      _createTable,
       _filter,
       _getAmplitudes,
+      _getComponent,
+      _getMapLayer,
+      _getPopup,
+      _getRow,
+      _getTable,
       _getTitle,
       _onEachFeature,
       _pointToLayer;
@@ -89,13 +89,45 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create channel component HTML.
+   * Filter out DYFI stations.
+   *
+   * @param station {Object}
+   */
+  _filter = function (station) {
+    var props = station.properties;
+
+    if (props.network !== 'DYFI' && props.network !== 'INTENSITY') {
+      _this.count ++;
+
+      return true;
+    }
+  };
+
+  /**
+   * Get an amplitudes object keyed by 'name'.
+   *
+   * @param amps {Array}
+   *
+   * @return amplitudes {Object}
+   */
+  _getAmplitudes = function (amps) {
+    var amplitudes = {};
+
+    amps.forEach(amplitude =>
+      amplitudes[amplitude.name] = amplitude
+    );
+
+    return amplitudes;
+  };
+
+  /**
+   * Get the HTML for a channel component.
    *
    * @param data {Object}
    *
    * @return html {String}
    */
-  _createComponent = function (data) {
+  _getComponent = function (data) {
     var flag,
         html,
         value;
@@ -126,13 +158,13 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create Leaflet map layer.
+   * Get the Leaflet map layer.
    *
    * @param json {Object}
    *
    * @return mapLayer {L.Layer}
    */
-  _createMapLayer = function (json) {
+  _getMapLayer = function (json) {
     var mapLayer;
 
     if (_shakemap) {
@@ -147,17 +179,17 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create Leaflet popup content.
+   * Get the Leaflet popup content for the given station.
    *
    * @param station {Object}
    *
    * @return html {String}
    */
-  _createPopup = function (station) {
+  _getPopup = function (station) {
     var coords = station.geometry.coordinates,
         props = station.properties,
         data = {
-          channels: _createTable(props.channels),
+          channels: _getTable(props.channels),
           pga: AppUtil.round(props.pga, 2),
           pgv: AppUtil.round(props.pgv, 2),
           distance: AppUtil.round(props.distance, 1),
@@ -211,21 +243,21 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create channel row HTML.
+   * Get the HTML for the given channel's table row.
    *
    * @param channel {Object}
    *
    * @return html {String}
    */
-  _createRow = function (channel) {
+  _getRow = function (channel) {
     var amplitude = _getAmplitudes(channel.amplitudes),
         data = {
           name: channel.name,
-          pga: _createComponent(amplitude.pga),
-          pgv: _createComponent(amplitude.pgv),
-          psa03: _createComponent(amplitude['sa(0.3)']),
-          psa10: _createComponent(amplitude['sa(1.0)']),
-          psa30: _createComponent(amplitude['sa(3.0)'])
+          pga: _getComponent(amplitude.pga),
+          pgv: _getComponent(amplitude.pgv),
+          psa03: _getComponent(amplitude['sa(0.3)']),
+          psa10: _getComponent(amplitude['sa(1.0)']),
+          psa30: _getComponent(amplitude['sa(3.0)'])
         },
         html = L.Util.template(
           '<tr>' +
@@ -243,13 +275,13 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create channels table HTML.
+   * Get the HTML table for the given channels.
    *
    * @param channels {Array}
    *
    * @return html {String}
    */
-  _createTable = function (channels) {
+  _getTable = function (channels) {
     var html =
       '<table class="station-channels-map">' +
         '<thead>' +
@@ -275,7 +307,7 @@ var ShakeMapStations = function (options) {
         '<tbody>';
 
     channels.forEach(channel =>
-      html += _createRow(channel)
+      html += _getRow(channel)
     );
 
     html += '</tbody></table>';
@@ -284,39 +316,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Filter out DYFI stations.
-   *
-   * @param station {Object}
-   */
-  _filter = function (station) {
-    var props = station.properties;
-
-    if (props.network !== 'DYFI' && props.network !== 'INTENSITY') {
-      _this.count ++;
-
-      return true;
-    }
-  };
-
-  /**
-   * Get an amplitudes object keyed by 'name'.
-   *
-   * @param amps {Array}
-   *
-   * @return amplitudes {Object}
-   */
-  _getAmplitudes = function (amps) {
-    var amplitudes = {};
-
-    amps.forEach(amplitude =>
-      amplitudes[amplitude.name] = amplitude
-    );
-
-    return amplitudes;
-  };
-
-  /**
-   * Get station's title.
+   * Get the HTML title for the given station.
    *
    * @param station {Object}
    *
@@ -333,7 +333,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create Leaflet popups and tooltips.
+   * Add Leaflet popups and tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -341,7 +341,7 @@ var ShakeMapStations = function (options) {
   _onEachFeature = function (feature, layer) {
     var tooltip = _getTitle(feature);
 
-    layer.bindPopup(_createPopup(feature), {
+    layer.bindPopup(_getPopup(feature), {
       maxWidth: 425,
       minWidth: 300
     }).bindTooltip(tooltip);
@@ -378,7 +378,7 @@ var ShakeMapStations = function (options) {
    *     feed data for feature
    */
   _this.create = function (json) {
-    _this.mapLayer = _createMapLayer(json);
+    _this.mapLayer = _getMapLayer(json);
   };
 
   /**
@@ -391,13 +391,13 @@ var ShakeMapStations = function (options) {
     _markerOptions = null;
     _shakemap = null;
 
-    _createComponent = null;
-    _createMapLayer = null;
-    _createPopup = null;
-    _createRow = null;
-    _createTable = null;
     _filter = null;
     _getAmplitudes = null;
+    _getComponent = null;
+    _getMapLayer = null;
+    _getPopup = null;
+    _getRow = null;
+    _getTable = null;
     _getTitle = null;
     _onEachFeature = null;
     _pointToLayer = null;

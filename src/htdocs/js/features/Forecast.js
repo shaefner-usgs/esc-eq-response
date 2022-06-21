@@ -33,10 +33,10 @@ var Forecast = function (options) {
 
       _app,
 
-      _createItem,
-      _createParameters,
-      _createProbabilities,
-      _getPercentage;
+      _getItem,
+      _getParameters,
+      _getPercentage,
+      _getProbabilities;
 
 
   _this = {};
@@ -53,13 +53,13 @@ var Forecast = function (options) {
   };
 
   /**
-   * Create an item for the probabilities list.
+   * Get an item for the probabilities list.
    *
    * @param data {Object}
    *
    * @return {String}
    */
-  _createItem = function (data) {
+  _getItem = function (data) {
     return L.Util.template(
       '<li>' +
         '<a href="{url}" target="new">' +
@@ -77,13 +77,13 @@ var Forecast = function (options) {
   };
 
   /**
-   * Create the HTML for the parameters.
+   * Get the HTML for the parameters.
    *
    * @param json {Object}
    *
    * @return html {String}
    */
-  _createParameters = function (json) {
+  _getParameters = function (json) {
     var html = '<h4>Parameters <a class="button">Show</a></h4>',
         params = json.model?.parameters;
 
@@ -99,13 +99,34 @@ var Forecast = function (options) {
   };
 
   /**
-   * Create the HTML for the probabilities.
+   * Get the given probability as a percentage.
+   *
+   * @param probability {Number}
+   *
+   * @return percentage {String}
+   */
+  _getPercentage = function (probability) {
+    var percentage;
+
+    if (probability < 0.01) {
+      percentage = '< 1%';
+    } else if (probability > 0.99) {
+      percentage = '> 99%';
+    } else {
+      percentage = AppUtil.round(100 * probability, 0) + '%';
+    }
+
+    return percentage;
+  };
+
+  /**
+   * Get the HTML for the probabilities.
    *
    * @param json {Object}
    *
    * @return html {String}
    */
-  _createProbabilities = function (json) {
+  _getProbabilities = function (json) {
     var period, range, state, visibility,
         eqid = AppUtil.getParam('eqid'),
         data = {
@@ -140,7 +161,7 @@ var Forecast = function (options) {
           range: range
         });
 
-        probabilities += _createItem(data);
+        probabilities += _getItem(data);
       });
 
       probabilities += '</ol></li>';
@@ -152,27 +173,6 @@ var Forecast = function (options) {
     }
 
     return html;
-  };
-
-  /**
-   * Get the probability as a percentage.
-   *
-   * @param probability {Number}
-   *
-   * @return percentage {String}
-   */
-  _getPercentage = function (probability) {
-    var percentage;
-
-    if (probability < 0.01) {
-      percentage = '< 1%';
-    } else if (probability > 0.99) {
-      percentage = '> 99%';
-    } else {
-      percentage = AppUtil.round(100 * probability, 0) + '%';
-    }
-
-    return percentage;
   };
 
   // ----------------------------------------------------------
@@ -187,8 +187,8 @@ var Forecast = function (options) {
    */
   _this.create = function (json) {
     var data = {
-      parameters: _createParameters(json),
-      probabilities: _createProbabilities(json),
+      parameters: _getParameters(json),
+      probabilities: _getProbabilities(json),
     };
 
     _this.forecast = json.forecast;
@@ -223,9 +223,10 @@ var Forecast = function (options) {
 
     _app = null;
 
-    _createProbabilities = null;
-    _createParameters = null;
+    _getItem = null;
+    _getParameters = null;
     _getPercentage = null;
+    _getProbabilities = null;
 
     _this = null;
   };

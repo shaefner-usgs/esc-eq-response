@@ -32,7 +32,7 @@ var SignificantEqs = function (options) {
       _el,
       _json,
 
-      _createList,
+      _getList,
       _selectEq;
 
 
@@ -47,11 +47,11 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Create the SignificantEqs HTML list.
+   * Get the HTML for the Significant Earthquakes list.
    *
    * @return list {Element}
    */
-  _createList = function () {
+  _getList = function () {
     var data, datetime, format, li, props,
         list = document.createElement('h4'); // default
 
@@ -162,7 +162,7 @@ var SignificantEqs = function (options) {
    * loader on initial load).
    */
   _this.replaceList = function () {
-    var list = _createList();
+    var list = _getList();
 
     _el.replaceWith(list);
 

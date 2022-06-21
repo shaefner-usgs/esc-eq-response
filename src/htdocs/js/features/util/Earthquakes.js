@@ -53,11 +53,11 @@ _DEFAULTS = {
  *   {
  *     bins: {Object}
  *     count: {Integer}
- *     createBinTable: {Function}
- *     createDescription: {Function}
- *     createListTable: {Function}
- *     createSlider: {Function}
  *     data: {Array}
+ *     description: {String}
+ *     getBinTable: {Function}
+ *     getListTable: {Function}
+ *     getSlider: {Function}
  *     mapLayer: {L.layer}
  *     plots: {Object}
  *   }
@@ -86,6 +86,7 @@ var Earthquakes = function (options) {
       _getAge,
       _getBubbles,
       _getData,
+      _getDescription,
       _getDirection,
       _getDuration,
       _getIntervals,
@@ -128,6 +129,8 @@ var Earthquakes = function (options) {
       _mainshock = _app.Features.getFeature('mainshock');
       _duration = _getDuration();
       _magParam = document.getElementById(inputIdMag).value;
+
+      _this.description = _getDescription();
 
       if (!_mainshock.Latlon) {
         _mainshock.Latlon = LatLon(_mainshock.data.lat, _mainshock.data.lon);
@@ -417,6 +420,33 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the HTML for the Feature's description.
+   *
+   * @return {String}
+   */
+  _getDescription = function () {
+    var data, ending,
+        interval = Object.keys(_duration)[0],
+        length = _duration[interval];
+
+    if (_featureId === 'aftershocks') {
+      ending = '. The duration of the aftershock sequence is <strong>' +
+        `${length} ${interval}</strong>`;
+    } else {
+      ending = ` in the prior <strong>${length} ${interval} ` +
+        '</strong> before the mainshock';
+    }
+
+    data = {
+      distance: _distanceParam,
+      ending: ending,
+      mag: _magParam
+    };
+
+    return L.Util.template(_getTemplate('description'), data);
+  };
+
+  /**
    * Calculate the direction from the Mainshock.
    *
    * @param latlon {Object}
@@ -478,7 +508,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the Leaflet popup content for a given earthquake.
+   * Get the Leaflet popup content for the given earthquake.
    *
    * @param eq {Object}
    * @param layer {L.layer}
@@ -766,13 +796,13 @@ var Earthquakes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create binned earthquake data table HTML.
+   * Get the HTML for the given type of binned earthquake data.
    *
    * @param type {String <first|past|prior>}
    *
    * @return {String}
    */
-  _this.createBinTable = function (type) {
+  _this.getBinTable = function (type) {
     var data, td, tdClasses,
         days = Luxon.Duration.fromObject(_duration).as('days'),
         rows = '',
@@ -814,41 +844,14 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create Feature description HTML.
-   *
-   * @return {String}
-   */
-  _this.createDescription = function () {
-    var data, ending,
-        interval = Object.keys(_duration)[0],
-        length = _duration[interval];
-
-    if (_featureId === 'aftershocks') {
-      ending = '. The duration of the aftershock sequence is <strong>' +
-        `${length} ${interval}</strong>`;
-    } else {
-      ending = ` in the prior <strong>${length} ${interval} ` +
-        '</strong> before the mainshock';
-    }
-
-    data = {
-      distance: _distanceParam,
-      ending: ending,
-      mag: _magParam
-    };
-
-    return L.Util.template(_getTemplate('description'), data);
-  };
-
-  /**
-   * Create earthquake list table HTML.
+   * Get the HTML for the given type of earthquake list.
    *
    * @param type {String <all|mostRecent>} default is 'all'
    *     'mostRecent' is for Aftershocks only
    *
    * @return {String}
    */
-  _this.createListTable = function (type = 'all') {
+  _this.getListTable = function (type = 'all') {
     var data, magInt, tr,
         eqs = _this.data,
         fields = ['depth', 'distance', 'eqid', 'location', 'mag', 'userTime', 'utcTime'],
@@ -895,11 +898,12 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create magnitude range slider (filter) and/or subheader HTML.
+   * Get the HTML for the magnitude range slider (filter) and/or its associated
+   * subheader.
    *
    * @return html {String}
    */
-  _this.createSlider = function () {
+  _this.getSlider = function () {
     var magThreshold = _getThreshold(),
         data = {
           count: _this.bins.mag[magThreshold],

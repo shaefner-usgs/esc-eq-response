@@ -62,8 +62,8 @@ var FieldNotes = function (options) {
       _markerOptions,
 
       _addListeners,
-      _createList,
-      _createPopup,
+      _getList,
+      _getPopup,
       _onEachFeature,
       _pointToLayer,
       _updatePopup;
@@ -118,14 +118,14 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create the 'Additional properties' list HTML. These are 'custom' props that
-   * vary based on observation type.
+   * Get the HTML for the 'Additional properties' list. These are 'custom' props
+   * that vary based on the observation type.
    *
    * @param props {Object}
    *
    * @return html {String}
    */
-  _createList = function (props) {
+  _getList = function (props) {
     var value,
         html = '',
         list = '',
@@ -152,17 +152,17 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create Leaflet popup content.
+   * Get the Leaflet popup content for a marker.
    *
    * @param data {Object}
    *
    * @return div {Element}
    */
-  _createPopup = function (data) {
+  _getPopup = function (data) {
     var html,
         div = L.DomUtil.create('div'),
         img = '',
-        props = _createList(data);
+        props = _getList(data);
 
     if (data.attachment) {
       img = '<a class="photo" href="{attachment}">' +
@@ -191,7 +191,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Create Leaflet popups and tooltips.
+   * Add Leaflet popups and tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -210,7 +210,7 @@ var FieldNotes = function (options) {
     }
 
     layer
-      .bindPopup(_createPopup(props), {
+      .bindPopup(_getPopup(props), {
         className: 'fieldnotes',
         maxWidth: 398, // fits 4X3 images 'flush' in popup (max-height is 300px)
         minWidth: 320
@@ -283,8 +283,8 @@ var FieldNotes = function (options) {
     _markerOptions = null;
 
     _addListeners = null;
-    _createList = null;
-    _createPopup = null;
+    _getList = null;
+    _getPopup = null;
     _onEachFeature = null;
     _pointToLayer = null;
     _updatePopup = null;

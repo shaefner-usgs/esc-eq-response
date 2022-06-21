@@ -33,9 +33,9 @@ var PagerExposures = function (options) {
 
       _app,
 
-      _createRows,
-      _createSummary,
-      _getExposures;
+      _getExposures,
+      _getRows,
+      _getSummary;
 
 
   _this = {};
@@ -55,11 +55,31 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Create table rows HTML.
+   * Get the aggregated population exposure and associated MMI/shaking (ASC).
+   *
+   * @param json {Object}
+   *
+   * @return {Object}
+   */
+  _getExposures = function (json) {
+    var mmi = json.population_exposure.mmi,
+        population = json.population_exposure.aggregated_exposure.map(pop =>
+          AppUtil.roundThousands(pop)
+        );
+
+    return {
+      mmi: mmi.reverse(),
+      population: population.reverse(),
+      shaking: AppUtil.getShakingValues(mmi)
+    };
+  };
+
+  /**
+   * Get the HTML for the table rows.
    *
    * @return html {String}
    */
-  _createRows = function () {
+  _getRows = function () {
     var data,
         cities = _app.Features.getFeature('pager-cities').cities,
         html = '',
@@ -110,13 +130,13 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Create summary HTML.
+   * Get the HTML for the summary.
    *
    * @return html {String}
    */
-  _createSummary = function () {
+  _getSummary = function () {
     var data = {
-          rows: _createRows()
+          rows: _getRows()
         },
         html = '';
 
@@ -144,26 +164,6 @@ var PagerExposures = function (options) {
     return html;
   };
 
-  /**
-   * Get aggregated population exposure and associated MMI/shaking (ASC order).
-   *
-   * @param json {Object}
-   *
-   * @return {Object}
-   */
-  _getExposures = function (json) {
-    var mmi = json.population_exposure.mmi,
-        population = json.population_exposure.aggregated_exposure.map(pop =>
-          AppUtil.roundThousands(pop)
-        );
-
-    return {
-      mmi: mmi.reverse(),
-      population: population.reverse(),
-      shaking: AppUtil.getShakingValues(mmi)
-    };
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -176,7 +176,7 @@ var PagerExposures = function (options) {
    */
   _this.create = function (json) {
     _this.exposures = _getExposures(json);
-    _this.summary = _createSummary();
+    _this.summary = _getSummary();
   };
 
   /**
@@ -187,9 +187,9 @@ var PagerExposures = function (options) {
 
     _app = null;
 
-    _createRows = null;
-    _createSummary = null;
     _getExposures = null;
+    _getRows = null;
+    _getSummary = null;
 
     _this = null;
   };

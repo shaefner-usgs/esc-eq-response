@@ -44,7 +44,7 @@ var Aftershocks = function (options) {
       _app,
       _earthquakes,
 
-      _createSummary,
+      _getSummary,
       _toggleParams;
 
 
@@ -69,20 +69,20 @@ var Aftershocks = function (options) {
   };
 
   /**
-   * Create summary HTML.
+   * Get the HTML for the summary.
    *
    * @return html {String}
    */
-  _createSummary = function () {
+  _getSummary = function () {
     var duration, interval, mostRecentEq,
         html = '<div class="bubble">';
 
-    html += _earthquakes.createDescription();
+    html += _earthquakes.description;
 
     if (_this.count > 0) {
       html += '<div class="bins">';
-      html += _earthquakes.createBinTable('first');
-      html += _earthquakes.createBinTable('past');
+      html += _earthquakes.getBinTable('first');
+      html += _earthquakes.getBinTable('past');
       html += '</div>';
     }
 
@@ -98,12 +98,12 @@ var Aftershocks = function (options) {
 
       html += '<h3>Most Recent Aftershock</h3>';
       html += `<p>The most recent aftershock was <strong>${duration} ago</strong>.</p>`;
-      html += _earthquakes.createListTable('mostRecent');
+      html += _earthquakes.getListTable('mostRecent');
     }
 
     if (_this.count > 0) {
-      html += _earthquakes.createSlider();
-      html += _earthquakes.createListTable('all');
+      html += _earthquakes.getSlider();
+      html += _earthquakes.getListTable('all');
     }
 
     html += '</div>';
@@ -165,10 +165,10 @@ var Aftershocks = function (options) {
     _this.bins = _earthquakes.bins;
     _this.count = _earthquakes.count;
     _this.data = _earthquakes.data;
-    _this.description = _earthquakes.createDescription();
+    _this.description = _earthquakes.description;
     _this.mapLayer = _earthquakes.mapLayer;
     _this.plots = _earthquakes.plots;
-    _this.summary = _createSummary();
+    _this.summary = _getSummary();
   };
 
   /**
@@ -180,7 +180,7 @@ var Aftershocks = function (options) {
     _app = null;
     _earthquakes = null;
 
-    _createSummary = null;
+    _getSummary = null;
     _toggleParams = null;
 
     _this = null;
