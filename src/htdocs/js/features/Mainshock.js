@@ -79,13 +79,15 @@ var Mainshock = function (options) {
       shakemap: Lightbox({id: 'shakemap'})
     };
 
-    _this.id = 'mainshock';
-    _this.mapLayer = null;
-    _this.name = 'Mainshock';
-    _this.plots = null;
-    _this.showLayer = true;
-    _this.summary = null;
-    _this.zoomToLayer = true;
+    Object.assign(_this, {
+      id: 'mainshock',
+      mapLayer: null,
+      name: 'Mainshock',
+      plots: null,
+      showLayer: true,
+      summary: null,
+      zoomToLayer: true
+    });
   };
 
   /**
@@ -592,10 +594,13 @@ var Mainshock = function (options) {
       json: json
     });
 
-    _this.data = earthquakes.data[0];
-    _this.json = json; // used by other Features
-    _this.mapLayer = earthquakes.mapLayer;
-    _this.plots = earthquakes.plots;
+    Object.assign(_this, {
+      data: earthquakes.data[0],
+      json: json, // used by other Features
+      mapLayer: earthquakes.mapLayer,
+      plots: earthquakes.plots
+    });
+
     _this.summary = _getSummary();
   };
 
@@ -658,11 +663,13 @@ var Mainshock = function (options) {
     _eqid = null;
     _json = null;
 
-    _this.data = null;
-    _this.json = null;
-    _this.mapLayer = null;
-    _this.plots = null;
-    _this.summary = null;
+    Object.assign(_this, {
+      data: null,
+      json: null,
+      mapLayer: null,
+      plots: null,
+      summary: null
+    });
   };
 
   /**

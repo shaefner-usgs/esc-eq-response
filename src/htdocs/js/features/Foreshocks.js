@@ -50,13 +50,15 @@ var Foreshocks = function (options) {
 
     _app = options.app;
 
-    _this.id = 'foreshocks';
-    _this.mapLayer = null;
-    _this.name = 'Foreshocks';
-    _this.showLayer = true;
-    _this.sortByField = 'utcTime';
-    _this.summary = null;
-    _this.zoomToLayer = true;
+    Object.assign(_this, {
+      id: 'foreshocks',
+      mapLayer: null,
+      name: 'Foreshocks',
+      showLayer: true,
+      sortByField: 'utcTime',
+      summary: null,
+      zoomToLayer: true
+    });
   };
 
   /**
@@ -153,8 +155,10 @@ var Foreshocks = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
-    _this.mapLayer = null;
-    _this.summary = null;
+    Object.assign(_this, {
+      mapLayer: null,
+      summary: null
+    });
   };
 
 

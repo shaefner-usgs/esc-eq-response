@@ -79,13 +79,15 @@ var ShakeMapStations = function (options) {
     _app = options.app;
     _markerOptions = options.markerOptions;
 
-    _this.count = 0;
-    _this.id = 'shakemap-stations';
-    _this.mapLayer = null;
-    _this.name = 'ShakeMap Stations';
-    _this.showLayer = false;
-    _this.url = '';
-    _this.zoomToLayer = false;
+    Object.assign(_this, {
+      count: 0,
+      id: 'shakemap-stations',
+      mapLayer: null,
+      name: 'ShakeMap Stations',
+      showLayer: false,
+      url: '',
+      zoomToLayer: false
+    });
   };
 
   /**
@@ -427,8 +429,10 @@ var ShakeMapStations = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
-    _this.count = 0;
-    _this.mapLayer = null;
+    Object.assign(_this, {
+      count: 0,
+      mapLayer: null
+    });
   };
 
 

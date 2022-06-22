@@ -39,9 +39,11 @@ var PagerCities = function (options) {
 
     _app = options.app;
 
-    _this.id = 'pager-cities';
-    _this.name = 'PAGER Cities';
-    _this.url = '';
+    Object.assign(_this, {
+      id: 'pager-cities',
+      name: 'PAGER Cities',
+      url: ''
+    });
   };
 
   /**

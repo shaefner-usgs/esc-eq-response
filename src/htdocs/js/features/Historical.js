@@ -51,14 +51,16 @@ var Historical = function (options) {
 
     _app = options.app;
 
-    _this.id = 'historical';
-    _this.mapLayer = null;
-    _this.name = 'Historical Seismicity';
-    _this.plots = null;
-    _this.showLayer = true;
-    _this.sortByField = 'mag';
-    _this.summary = null;
-    _this.zoomToLayer = true;
+    Object.assign(_this, {
+      id: 'historical',
+      mapLayer: null,
+      name: 'Historical Seismicity',
+      plots: null,
+      showLayer: true,
+      sortByField: 'mag',
+      summary: null,
+      zoomToLayer: true
+    });
   };
 
   /**
@@ -156,9 +158,11 @@ var Historical = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
-    _this.mapLayer = null;
-    _this.plots = null;
-    _this.summary = null;
+    Object.assign(_this, {
+      mapLayer: null,
+      plots: null,
+      summary: null
+    });
   };
 
 

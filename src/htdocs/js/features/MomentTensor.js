@@ -43,14 +43,16 @@ var MomentTensor = function (options) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
 
-    _this.id = 'moment-tensor';
-    _this.lightbox = null;
-    _this.mapLayer = null;
-    _this.name = 'Moment Tensor';
-    _this.render = null;
-    _this.showLayer = false;
-    _this.summary = null;
-    _this.zoomToLayer = false;
+    Object.assign(_this, {
+      id: 'moment-tensor',
+      lightbox: null,
+      mapLayer: null,
+      name: 'Moment Tensor',
+      render: null,
+      showLayer: false,
+      summary: null,
+      zoomToLayer: false
+    });
   };
 
   // ----------------------------------------------------------
@@ -79,10 +81,12 @@ var MomentTensor = function (options) {
         type: 'moment-tensor'
       });
 
-      _this.lightbox = beachball.createLightbox();
-      _this.mapLayer = beachball.createMapLayer();
-      _this.render = beachball.render;
-      _this.summary = beachball.createSummary();
+      Object.assign(_this, {
+        lightbox: beachball.createLightbox(),
+        mapLayer: beachball.createMapLayer(),
+        render: beachball.render,
+        summary: beachball.createSummary()
+      });
     }
   };
 
@@ -102,10 +106,12 @@ var MomentTensor = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
-    _this.lightbox = null;
-    _this.mapLayer = null;
-    _this.render = null;
-    _this.summary = null;
+    Object.assign(_this, {
+      lightbox: null,
+      mapLayer: null,
+      render: null,
+      summary: null
+    });
   };
 
 

@@ -55,17 +55,19 @@ var Aftershocks = function (options) {
 
     _app = options.app;
 
-    _this.dependencies = [
-      'forecast'
-    ];
-    _this.id = 'aftershocks';
-    _this.mapLayer = null;
-    _this.name = 'Aftershocks';
-    _this.plots = null;
-    _this.showLayer = true;
-    _this.sortByField = 'utcTime';
-    _this.summary = null;
-    _this.zoomToLayer = true;
+    Object.assign(_this, {
+      dependencies: [
+        'forecast'
+      ],
+      id: 'aftershocks',
+      mapLayer: null,
+      name: 'Aftershocks',
+      plots: null,
+      showLayer: true,
+      sortByField: 'utcTime',
+      summary: null,
+      zoomToLayer: true
+    });
   };
 
   /**
@@ -193,9 +195,11 @@ var Aftershocks = function (options) {
    * Reset to initial state.
    */
   _this.reset = function () {
-    _this.mapLayer = null;
-    _this.plots = null;
-    _this.summary = null;
+    Object.assign(_this, {
+      mapLayer: null,
+      plots: null,
+      summary: null
+    });
   };
 
   /**

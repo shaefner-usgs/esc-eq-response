@@ -77,11 +77,13 @@ var FieldNotes = function (options) {
     _app = options.app;
     _lightbox = Lightbox({id: 'fieldnotes'});
 
-    _this.id = 'fieldnotes';
-    _this.mapLayer = null;
-    _this.name = 'Fieldnotes';
-    _this.showLayer = false;
-    _this.zoomToLayer = false;
+    Object.assign(_this, {
+      id: 'fieldnotes',
+      mapLayer: null,
+      name: 'Fieldnotes',
+      showLayer: false,
+      zoomToLayer: false
+    });
 
     _markerOptions = Object.assign({
       icon: L.icon(options.iconOptions),
@@ -263,10 +265,12 @@ var FieldNotes = function (options) {
    *     feed data for Feature
    */
   _this.create = function (json) {
-    _this.count = json.features.length;
-    _this.mapLayer = L.geoJSON.dateLine(json, {
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
+    Object.assign(_this, {
+      count: json.features.length,
+      mapLayer: L.geoJSON.dateLine(json, {
+        onEachFeature: _onEachFeature,
+        pointToLayer: _pointToLayer
+      })
     });
   };
 

@@ -46,10 +46,12 @@ var Forecast = function (options) {
 
     _app = options.app;
 
-    _this.html = '';
-    _this.id = 'forecast';
-    _this.name = 'Aftershocks Forecast';
-    _this.url = '';
+    Object.assign(_this, {
+      html: '',
+      id: 'forecast',
+      name: 'Aftershocks Forecast',
+      url: ''
+    });
   };
 
   /**
@@ -191,8 +193,10 @@ var Forecast = function (options) {
       probabilities: _getProbabilities(json),
     };
 
-    _this.forecast = json.forecast;
-    _this.model = json.model;
+    Object.assign(_this, {
+      forecast: json.forecast,
+      model: json.model
+    });
 
     if (data.probabilities) {
       data.model = json.model.name;

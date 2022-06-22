@@ -45,13 +45,15 @@ var PagerExposures = function (options) {
 
     _app = options.app;
 
-    _this.dependencies = [
-      'pager-cities'
-    ];
-    _this.id = 'pager-exposures';
-    _this.name = 'PAGER Exposures';
-    _this.summary = null;
-    _this.url = '';
+    Object.assign(_this, {
+      dependencies: [
+        'pager-cities'
+      ],
+      id: 'pager-exposures',
+      name: 'PAGER Exposures',
+      summary: null,
+      url: ''
+    });
   };
 
   /**
