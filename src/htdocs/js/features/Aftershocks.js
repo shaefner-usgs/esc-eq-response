@@ -81,7 +81,7 @@ var Aftershocks = function (options) {
 
     html += _earthquakes.description;
 
-    if (_this.count > 0) {
+    if (_earthquakes.count > 0) {
       html += '<div class="bins">';
       html += _earthquakes.getBinTable('first');
       html += _earthquakes.getBinTable('past');
@@ -90,7 +90,7 @@ var Aftershocks = function (options) {
 
     html += _app.Features.getFeature('forecast').html;
 
-    if (_this.count > 1) {
+    if (_earthquakes.count > 1) {
       mostRecentEq = _earthquakes.data[_earthquakes.data.length - 1];
       interval = Luxon.Interval.fromDateTimes(
         Luxon.DateTime.fromISO(mostRecentEq.isoTime),
@@ -103,7 +103,7 @@ var Aftershocks = function (options) {
       html += _earthquakes.getListTable('mostRecent');
     }
 
-    if (_this.count > 0) {
+    if (_earthquakes.count > 0) {
       html += _earthquakes.getSlider();
       html += _earthquakes.getListTable('all');
     }
@@ -170,10 +170,9 @@ var Aftershocks = function (options) {
       data: _earthquakes.data,
       description: _earthquakes.description,
       mapLayer: _earthquakes.mapLayer,
-      plots: _earthquakes.plots
+      plots: _earthquakes.plots,
+      summary: _getSummary()
     });
-
-    _this.summary = _getSummary();
   };
 
   /**

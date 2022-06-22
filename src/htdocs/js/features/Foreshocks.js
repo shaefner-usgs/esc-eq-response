@@ -71,7 +71,7 @@ var Foreshocks = function (options) {
 
     html += _earthquakes.description;
 
-    if (_this.count > 0) {
+    if (_earthquakes.count > 0) {
       html += _earthquakes.getBinTable('prior');
       html += _earthquakes.getSlider();
       html += _earthquakes.getListTable('all');
@@ -105,10 +105,9 @@ var Foreshocks = function (options) {
       count: _earthquakes.count,
       data: _earthquakes.data,
       description: _earthquakes.description,
-      mapLayer: _earthquakes.mapLayer
+      mapLayer: _earthquakes.mapLayer,
+      summary: _getSummary()
     });
-
-    _this.summary = _getSummary();
   };
 
   /**

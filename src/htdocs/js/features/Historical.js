@@ -73,7 +73,7 @@ var Historical = function (options) {
 
     html += _earthquakes.description;
 
-    if (_this.count > 0) {
+    if (_earthquakes.count > 0) {
       html += _earthquakes.getBinTable('prior');
       html += _earthquakes.getSlider();
       html += _earthquakes.getListTable('all');
@@ -108,10 +108,9 @@ var Historical = function (options) {
       data: _earthquakes.data,
       description: _earthquakes.description,
       mapLayer: _earthquakes.mapLayer,
-      plots: _earthquakes.plots
+      plots: _earthquakes.plots,
+      summary: _getSummary()
     });
-
-    _this.summary = _getSummary();
   };
 
   /**
