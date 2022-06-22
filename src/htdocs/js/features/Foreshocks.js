@@ -98,11 +98,14 @@ var Foreshocks = function (options) {
       sortByField: _this.sortByField
     });
 
-    _this.bins = _earthquakes.bins;
-    _this.count = _earthquakes.count;
-    _this.data = _earthquakes.data;
-    _this.description = _earthquakes.description;
-    _this.mapLayer = _earthquakes.mapLayer;
+    Object.assign(_this, {
+      bins: _earthquakes.bins,
+      count: _earthquakes.count,
+      data: _earthquakes.data,
+      description: _earthquakes.description,
+      mapLayer: _earthquakes.mapLayer
+    });
+
     _this.summary = _getSummary();
   };
 
