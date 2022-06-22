@@ -83,7 +83,7 @@ var MomentTensor = function (options) {
 
       Object.assign(_this, {
         lightbox: beachball.createLightbox(),
-        mapLayer: beachball.createMapLayer(),
+        mapLayer: beachball.createMapLayer(_this.name),
         render: beachball.render,
         summary: beachball.createSummary()
       });

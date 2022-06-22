@@ -328,16 +328,18 @@ var BeachBall = function (options) {
    * Note: the marker's beachball is moved from its placeholder in the DOM to
    * the Canvas Marker when the layer is turned on.
    *
+   * @param name {String}
+   *
    * @return {L.layer}
    */
-  _this.createMapLayer = function () {
+  _this.createMapLayer = function (name) {
     return L.marker.canvas(_coords, {
       icon: L.divIcon({
         className: _className,
         iconSize: L.point(_markerSize, _markerSize)
       }),
       pane: _className // put marker in custom Leaflet map pane
-    });
+    }).bindTooltip(name);
   };
 
   /**
