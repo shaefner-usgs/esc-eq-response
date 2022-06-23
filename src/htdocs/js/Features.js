@@ -92,6 +92,19 @@ var Features = function (options) {
   _addFeature = function (feature) {
     var status = _this.getLoadingStatus();
 
+    if (feature.id === 'mainshock') {
+      _app.SelectBar.showMainshock();
+      _app.SettingsBar.setDefaults();
+      _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
+
+      if (AppUtil.getParam('catalog') === 'dd') {
+        feature.update('dd'); // show Double Difference properties
+      }
+
+      document.body.classList.remove('loading');
+      document.body.classList.add('mainshock');
+    }
+
     try {
       _app.MapPane.addFeature(feature);
       _app.PlotsPane.addFeature(feature);
@@ -99,19 +112,8 @@ var Features = function (options) {
       _app.SummaryPane.addFeature(feature);
 
       if (feature.id === 'mainshock') {
-        _app.SelectBar.showMainshock();
-        _app.SettingsBar.setDefaults();
-        _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
-
-        document.body.classList.remove('loading');
-        document.body.classList.add('mainshock');
-
-        // Create the other Features now that the Mainshock is ready
+        // Create the other Features now that the Mainshock has been added
         _createFeatures();
-
-        if (AppUtil.getParam('catalog') === 'dd') {
-          feature.update('dd'); // show Double Difference properties
-        }
       }
 
       // Add listeners that depend on Feature being added first
