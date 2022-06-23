@@ -95,7 +95,7 @@ var Features = function (options) {
     if (feature.id === 'mainshock') {
       _app.SelectBar.showMainshock();
       _app.SettingsBar.setDefaults();
-      _app.SignificantEqs.replaceList(); // selects Mainshock if it's in list
+      _app.SignificantEqs.update(); // selects Mainshock if it's in list
 
       if (AppUtil.getParam('catalog') === 'dd') {
         feature.update('dd'); // show Double Difference properties

@@ -20,8 +20,8 @@ var AppUtil = require('util/AppUtil'),
  *   {
  *     loadFeed: {Function}
  *     postInit: {Function}
- *     replaceList: {Function}
  *     reset: {Function}
+ *     update: {Function}
  *   }
  */
 var SignificantEqs = function (options) {
@@ -146,7 +146,7 @@ var SignificantEqs = function (options) {
         _json = json; // cache feed data
       }
 
-      _this.replaceList();
+      _this.update();
     });
   };
 
@@ -158,18 +158,6 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Show the list of Significant Earthquakes (replaces the current list or the
-   * loader on initial load).
-   */
-  _this.replaceList = function () {
-    var list = _getList();
-
-    _el.replaceWith(list);
-
-    _el = list;
-  };
-
-  /**
    * Unselect all earthquakes in the list.
    */
   _this.reset = function () {
@@ -178,6 +166,18 @@ var SignificantEqs = function (options) {
     lis.forEach(li =>
       li.classList.remove('selected')
     );
+  };
+
+  /**
+   * Show the list of Significant Earthquakes (replaces the current list or the
+   * loader on initial load).
+   */
+  _this.update = function () {
+    var list = _getList();
+
+    _el.replaceWith(list);
+
+    _el = list;
   };
 
 
