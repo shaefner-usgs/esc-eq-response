@@ -537,7 +537,7 @@ var MapPane = function (options) {
    */
   _this.reset = function () {
     var bounds = _searchBounds || _defaultBounds,
-        canvasEls = document.querySelectorAll('#mapPane .content canvas');
+        canvasEls = document.querySelectorAll('#mapPane .container canvas');
 
     _bounds = L.latLngBounds();
     _initialView = true;

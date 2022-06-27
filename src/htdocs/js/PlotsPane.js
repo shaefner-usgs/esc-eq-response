@@ -30,7 +30,7 @@ var PlotsPane = function (options) {
       _initialize,
 
       _app,
-      _contentEl,
+      _container,
       _el,
       _plots,
 
@@ -48,7 +48,7 @@ var PlotsPane = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _contentEl = _el.querySelector('.content');
+    _container = _el.querySelector('.container');
     _plots = {};
 
     _this.rendered = false;
@@ -75,7 +75,7 @@ var PlotsPane = function (options) {
           hypocenters: '3D Hypocenters',
           magtime: 'Magnitude vs. Time'
         },
-        parent = _contentEl.querySelector('.' + featureId + ' .bubble');
+        parent = _container.querySelector('.' + featureId + ' .bubble');
 
     h3.innerHTML = names[id];
 
@@ -230,7 +230,7 @@ var PlotsPane = function (options) {
 
       div.classList.add(feature.id, 'feature');
 
-      _contentEl.appendChild(div);
+      _container.appendChild(div);
     }
   };
 
@@ -314,7 +314,7 @@ var PlotsPane = function (options) {
   _this.reset = function () {
     _plots = {};
 
-    _contentEl.innerHTML = '';
+    _container.innerHTML = '';
     _this.rendered = false;
   };
 

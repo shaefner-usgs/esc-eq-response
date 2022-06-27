@@ -42,7 +42,7 @@
     text-transform: uppercase;
   }
 
-  .container {
+  .content {
     display: flex;
     flex-flow: row nowrap;
   }
@@ -94,7 +94,7 @@ and (max-width: $breakpoint-phone-width) {
       order: 1;
     }
 
-    .container {
+    .content {
       flex-flow: row wrap;
     }
   }

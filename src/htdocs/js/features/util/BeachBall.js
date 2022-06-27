@@ -79,7 +79,7 @@ var BeachBall = function (options) {
     _name = options.name;
     _selectors = { // querySelectors for beachball containers
       annotated: `#${_className}Lightbox .beachball`,
-      marker: '#mapPane .content',
+      marker: '#mapPane .container',
       thumb: `#summaryPane div.${_className} a`
     };
     _tensor = Tensor.fromProduct(_data);

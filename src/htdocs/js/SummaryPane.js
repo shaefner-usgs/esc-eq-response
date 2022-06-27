@@ -32,7 +32,7 @@ var SummaryPane = function (options) {
       _initialize,
 
       _app,
-      _contentEl,
+      _container,
       _el,
       _filterProps,
       _tz,
@@ -59,7 +59,7 @@ var SummaryPane = function (options) {
 
     _app = options.app;
     _el = options.el || document.createElement('section');
-    _contentEl = _el.querySelector('.content');
+    _container = _el.querySelector('.container');
     _filterProps = {};
     _tz = AppUtil.getTimeZone();
   };
@@ -424,7 +424,7 @@ var SummaryPane = function (options) {
 
       div.classList.add(feature.id, 'feature');
 
-      _contentEl.appendChild(div);
+      _container.appendChild(div);
     }
   };
 
@@ -450,7 +450,7 @@ var SummaryPane = function (options) {
     var time = _el.querySelector('time');
 
     time.innerHTML = '';
-    _contentEl.innerHTML = '';
+    _container.innerHTML = '';
   };
 
   /**

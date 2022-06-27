@@ -32,10 +32,10 @@ L.Marker.Canvas = L.Marker.extend({
   onRemove: function (map) {
     var className = this.options.icon.options.className,
         canvas = document.querySelector('.map canvas.' + className),
-        contentEl = document.querySelector('#mapPane .content');
+        container = document.querySelector('#mapPane .container');
 
     if (canvas) {
-      contentEl.appendChild(canvas); // put <canvas> back
+      container.appendChild(canvas); // put <canvas> back
     }
 
     L.Marker.prototype.onRemove.call(this, map);
