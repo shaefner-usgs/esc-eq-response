@@ -103,9 +103,9 @@ var NavBar = function (options) {
    * the PlotsPane is shown.
    */
   _renderPlots = function () {
-    var numPlots = Object.keys(_app.PlotsPane.getPlots()).length;
+    var plots = _app.PlotsPane.getPlots();
 
-    if (numPlots > 0 && !_app.PlotsPane.rendered) {
+    if (!AppUtil.isEmpty(plots) && !_app.PlotsPane.rendered) {
       _app.StatusBar.addItem({
         id: 'rendering',
         name: 'Plots'
