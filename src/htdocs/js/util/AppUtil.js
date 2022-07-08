@@ -271,6 +271,17 @@ AppUtil.getTimeZone = function () {
 };
 
 /**
+ * Check if an Object is empty.
+ *
+ * @param obj {Object}
+ *
+ * @return {Boolean}
+ */
+AppUtil.isEmpty = function (obj) {
+  return Object.keys(obj).length === 0;
+};
+
+/**
  * Convert a number to a roman numeral.
  *
  * @param num {Number}
