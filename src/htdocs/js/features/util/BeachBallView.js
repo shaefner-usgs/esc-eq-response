@@ -2,8 +2,7 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    Canvas = require('features/util/Canvas');
+var Canvas = require('features/util/Canvas');
 
 
 var _D2R,
@@ -266,14 +265,17 @@ var BeachBallView = function (options) {
   /**
    * Free references.
    */
-  _this.destroy = AppUtil.compose(function () {
+  _this.destroy = function () {
     if (!_this) {
       return;
     }
 
     _axisSize = null;
     _bgColor = null;
+    _canvas = null;
+    _className = null;
     _fillColor = null;
+    _height = null;
     _labelAxes = null;
     _labelAxesFont = null;
     _labelPlanes = null;
@@ -282,18 +284,16 @@ var BeachBallView = function (options) {
     _lineWidth = null;
     _plotAxes = null;
     _plotPlanes = null;
+    _radius = null;
     _size = null;
     _tensor = null;
-
-    _radius = null;
-    _height = null;
     _width = null;
     _x0 = null;
     _y0 = null;
 
     _this = null;
     _initialize = null;
-  }, _this.destroy);
+  };
 
   /**
    * Get a line for a nodal plane.
