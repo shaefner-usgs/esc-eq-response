@@ -52,36 +52,6 @@ AppUtil.capitalize = function (str) {
 };
 
 /**
- * Create a function that is a composition of other functions.
- *
- * For example:
- *      a(b(c(x))) === compose(c, b, a)(x);
- *
- * Each function should accept as an argument, the result of the previous
- * function call in the chain. It is allowable for all functions to have no
- * return value as well.
- *
- * @param ... {Function}
- *     a variable set of functions to call, in order
- *
- * @return {Function}
- *     the composition of the functions provided as arguments
- */
-AppUtil.compose = function () {
-  var fns = arguments;
-
-  return result => {
-    fns.forEach(fn => {
-      if (fn && fn.call) {
-        result = fn.call(this, result);
-      }
-    });
-
-    return result;
-  };
-};
-
-/**
  * Delete the given URL parameter and update the URL.
  *
  * @param name {String}
