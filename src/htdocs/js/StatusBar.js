@@ -2,24 +2,22 @@
 
 
 /**
- * Show the loading status of the app and external feed data; log errors.
+ * Show the loading status of fetched data as well as any errors encountered.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     addError: {Function}
- *     addItem: {Function}
- *     clearItems: {Function}
- *     hasError: {Function}
- *     postInit: {Function}
- *     removeItem: {Function}
- *     reset: {Function}
- *   }
+ *     {
+ *       addError: {Function}
+ *       addItem: {Function}
+ *       removeItem: {Function}
+ *       removeItems: {Function}
+ *       reset: {Function}
+ *     }
  */
 var StatusBar = function (options) {
   var _this,
@@ -37,11 +35,9 @@ var StatusBar = function (options) {
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _el = options.el || document.createElement('div');
+    _el = options.el;
   };
 
   /**
@@ -49,6 +45,7 @@ var StatusBar = function (options) {
    *
    * @param div {Element}
    * @param id {String}
+   *     Feature id
    */
   _addListeners = function (div, id) {
     var close = div.querySelector('.close'),
@@ -62,7 +59,7 @@ var StatusBar = function (options) {
       });
     }
 
-    // Reload a Feature or catalog search
+    // Reload a Feature
     if (reload) {
       reload.addEventListener('click', e => {
         e.preventDefault();
@@ -70,10 +67,8 @@ var StatusBar = function (options) {
 
         if (id === 'search') {
           _app.SearchBar.searchCatalog();
-        } else if (id === 'significantEqs') {
-          _app.SignificantEqs.loadFeed();
-        } else { // Feature
-          _app.Features.createFeature(id);
+        } else {
+          _app.Features.refreshFeature(id);
         }
       });
     }
@@ -101,18 +96,18 @@ var StatusBar = function (options) {
       msg = opts.prepend + ' ' + msg;
     }
 
-    return msg += loader;
+    return msg + loader;
   };
 
   /**
-   * Hide the StatusBar container.
+   * Hide the StatusBar.
    */
   _hide = function () {
     _el.classList.add('hide');
   };
 
   /**
-   * Remove a StatusBar item (i.e. node) from the DOM.
+   * Remove the given node from the DOM.
    *
    * @param el {Element}
    */
@@ -122,18 +117,18 @@ var StatusBar = function (options) {
     if (parent) {
       parent.removeChild(el);
 
-      // Due to a timing issue w/ CSS transition, 'hide' class is not always set
-      if (!parent.hasChildNodes()) {
-        parent.style.display = 'none';
+      // Due to CSS transition timing, 'hide' class is not always set
+      if (!_el.hasChildNodes()) {
+        _el.style.display = 'none';
       }
     }
   };
 
   /**
-   * Show the StatusBar container.
+   * Show the StatusBar.
    */
   _show = function () {
-    _el.style.display = 'block'; // undo setting to 'none' in _removeNode()
+    _el.style.display = 'block'; // undo setting of 'none' in _removeNode()
 
     _el.classList.remove('hide');
   };
@@ -143,24 +138,21 @@ var StatusBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add an error to the StatusBar (and show it).
+   * Add an error and show the StatusBar.
    *
    * @param error {Object}
-   *   {
-   *     id: {String}
-   *     message: {String}
-   *     status: {Mixed <Number|String>} optional; status code or 'invalid'
-   *   }
+   *     {
+   *       id: {String} Feature id
+   *       message: {String}
+   *       status: {Mixed <Number|String>} status code or 'invalid'
+   *     }
    */
   _this.addError = function (error) {
     var content = error.message,
-        div = document.createElement('div'),
-        isFeature = _app.Features.isFeature(error.id),
-        isSearch = (error.id === 'search' ? true : false),
-        isSignificantEqs = (error.id === 'significantEqs' ? true : false);
+        div = document.createElement('div');
 
     if (
-      (isFeature || isSearch || isSignificantEqs) &&
+      error.status !== 200 &&
       error.status !== 400 &&
       error.status !== 404 &&
       error.status !== 'invalid'
@@ -169,8 +161,8 @@ var StatusBar = function (options) {
     }
 
     content += '<a href="#" class="close"></a>';
-    div.innerHTML = content;
 
+    div.innerHTML = content;
     div.classList.add(error.id, 'error');
 
     // Remove any leftover items with this id, then add it
@@ -181,18 +173,18 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Add an item to the StatusBar (and show it).
+   * Add an item and show the StatusBar.
    *
    * @param item {Object}
-   *   {
-   *     id: {String}
-   *     name: {String} optional
-   *   }
+   *     {
+   *       id: {String} Feature id
+   *       name: {String} optional
+   *     }
    * @param opts {Object}
-   *   {
-   *     append: {String} optional
-   *     prepend: {String} optional
-   *   }
+   *     {
+   *       append: {String} optional
+   *       prepend: {String} optional
+   *     }
    */
   _this.addItem = function (item, opts) {
     var message,
@@ -205,7 +197,6 @@ var StatusBar = function (options) {
     message = _getMessage(item, opts);
 
     div.innerHTML = '<h4>' + message + '</h4>';
-
     div.classList.add(item.id);
 
     // Remove any leftover items with this id, then add it
@@ -215,54 +206,22 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Clear all items from the StatusBar (and hide it).
-   */
-  _this.clearItems = function () {
-    while (_el.firstChild) {
-      _el.removeChild(_el.lastChild); // faster to remove lastChild
-    }
-
-    _hide();
-  };
-
-  /**
-   * Check if an error exists for the item with the given id.
+   * Remove the item with the given id (and hide the StatusBar when it's empty).
    *
    * @param id {String}
-   *
-   * @return {Boolean}
-   */
-  _this.hasError = function (id) {
-    var error = _el.querySelector('.' + id + '.error');
-
-    if (error) {
-      return true;
-    }
-
-    return false;
-  };
-
-  /**
-   * Initialization that depends on other Classes being ready before running.
-   */
-  _this.postInit = function () {
-    _this.removeItem('initial'); // remove initial "Loading..." message
-  };
-
-  /**
-   * Remove the item with the given id from the StatusBar (and hide it if it's
-   * empty).
-   *
-   * @param id {String}
+   *     Feature id
    */
   _this.removeItem = function (id) {
-    var items = _el.querySelectorAll('.' + id);
+    var items = _el.querySelectorAll('.' + id); // also remove duplicate items
 
-    items.forEach(item => { // also remove duplicate items
-      if (_el.children.length === 1) {
+    items.forEach(item => {
+      if (id.includes('mainshock')) {
+        // Don't remove item before other (dependent) Features are added
+        setTimeout(_removeNode, 250, item);
+      } else if (_el.children.length === 1) {
         _hide();
 
-        // Don't remove node until CSS transition is complete
+        // Don't remove item until CSS transition is complete
         setTimeout(_removeNode, 1500, item);
       } else {
         _removeNode(item);
@@ -271,7 +230,18 @@ var StatusBar = function (options) {
   };
 
   /**
-   * Clear all items from the StatusBar.
+   * Remove all items and hide the StatusBar.
+   */
+  _this.removeItems = function () {
+    while (_el.firstChild) {
+      _el.removeChild(_el.lastChild); // faster to remove lastChild
+    }
+
+    _hide();
+  };
+
+  /**
+   * Reset to default state.
    */
   _this.reset = function () {
     _el.innerHTML = '';

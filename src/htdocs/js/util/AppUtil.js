@@ -100,20 +100,20 @@ AppUtil.extent = function (values) {
  *
  * @param resource {String}
  *     URI
- * @param options {Object} optional; default is {}
+ * @param options {Object} default is {}
  *     fetch() settings, with an additional prop for timeout in milliseconds
  */
 AppUtil.fetchWithTimeout = async function (resource, options = {}) {
   const { timeout = 10000 } = options;
 
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+  const timer = setTimeout(() => controller.abort(), timeout);
 
   const response = await fetch(resource, {
     ...options,
     signal: controller.signal
   });
-  clearTimeout(id);
+  clearTimeout(timer);
 
   return response;
 };
@@ -135,7 +135,7 @@ AppUtil.formatLatLon = function (coords) {
 };
 
 /**
- * Get the value of a given URL parameter.
+ * Get the value of the given URL parameter.
  *
  * @param name {String}
  *
@@ -149,8 +149,8 @@ AppUtil.getParam = function (name) {
 };
 
 /**
- * Get the circle marker radius for a given eq magnitude, rounded to the nearest
- * tenth.
+ * Get the circle marker radius for the given eq magnitude, rounded to the
+ * nearest tenth.
  *
  * @param mag {Number}
  *
@@ -193,24 +193,6 @@ AppUtil.getShakingValues = function (mmis) {
 };
 
 /**
- * Get the CSS value for the colored section of an <input> range slider.
- *
- * @param input {Element}
- *
- * @return {String}
- */
-AppUtil.getSliderValue = function (input) {
-  var min = input.min || 0,
-      value = input.value;
-
-  if (input.max) {
-    value = Math.floor(100 * (input.value - min) / (input.max - min));
-  }
-
-  return value + '% 100%';
-};
-
-/**
  * Get the timezone on the user's device.
  *
  * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-
@@ -248,7 +230,9 @@ AppUtil.getTimeZone = function () {
  * @return {Boolean}
  */
 AppUtil.isEmpty = function (obj) {
-  return Object.keys(obj).length === 0;
+  if (typeof obj === 'object' && obj.constructor === Object) {
+    return Object.keys(obj).length === 0;
+  }
 };
 
 /**
@@ -285,15 +269,15 @@ AppUtil.romanize = function (num) {
 };
 
 /**
- * Round a number to a given number of decimal places.
+ * Round a number to the given number of decimal places.
  *
  * Always return the explicit number of decimal places specified by the
  * precision parameter (i.e. return '2.0' for example).
  *
  * @param num {Number}
- * @param precision {Number} optional; default is 0
+ * @param precision {Number} default is 0
  *     number of decimal places
- * @param empty {String} optional; default is '–'
+ * @param empty {String} default is '–'
  *     string to return if num is null
  *
  * @return {String}
@@ -349,17 +333,22 @@ AppUtil.setParam = function (name, value) {
 };
 
 /**
- * Check if two (shallow) objects are equal.
+ * Check if two (shallow) objects are equal, ignoring properties listed in skip.
  *
  * @param obj1 {Object}
  * @param obj2 {Object}
+ * @param skip {Array} default is []
  *
  * @return {Boolean}
  */
-AppUtil.shallowEqual = function (obj1, obj2) {
+AppUtil.shallowEqual = function (obj1, obj2, skip = []) {
   var key,
       keys1 = Object.keys(obj1),
       keys2 = Object.keys(obj2);
+
+  // Ignore skipped items
+  keys1 = keys1.filter(item => !skip.includes(item));
+  keys2 = keys2.filter(item => !skip.includes(item));
 
   if (keys1.length !== keys2.length) {
     return false;

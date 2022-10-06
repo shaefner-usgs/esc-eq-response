@@ -8,18 +8,20 @@ var Svg = require('util/Svg');
  * Add SVG elements to the LegendBar.
  *
  * @param options {Object}
- *   {
- *     el: {Element}
- *   }
+ *     {
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object)
+ *     {
+ *       reset: {Function}
+ *     }
  */
 var LegendBar = function (options) {
   var _this,
       _initialize,
 
       _el,
-      _Svg,
 
       _addSvgElements,
       _getColors;
@@ -27,30 +29,27 @@ var LegendBar = function (options) {
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
-    _el = options.el || document.createElement('section');
-    _Svg = Svg();
+  _initialize = function (options = {}) {
+    _el = options.el;
 
     _addSvgElements();
   };
 
   /**
-   * Add the SVG elements to the DOM.
+   * Add the SVG elements to the legend.
    */
   _addSvgElements = function () {
-    var circle,
-        colors = _getColors(),
-        line = _Svg.createLine({
+    var colors = _getColors(),
+        svg = Svg(),
+        line = svg.createLine({
           color: '#c00',
           opacity: '0.5'
         }),
-        range = _Svg.createCircleRange(),
-        triangle = _Svg.createTriangle();
+        range = svg.createCircleRange(),
+        triangle = svg.createTriangle();
 
     Object.keys(colors).forEach(key => {
-      circle = _Svg.createCircle(colors[key]);
+      var circle = svg.createCircle(colors[key]);
 
       _el.querySelector('.' + key).appendChild(circle);
     });
@@ -61,7 +60,7 @@ var LegendBar = function (options) {
   };
 
   /**
-   * Get the colors of the earthquake circles.
+   * Get the colors of the earthquake circles keyed by type.
    *
    * @return {Object}
    */
@@ -89,6 +88,19 @@ var LegendBar = function (options) {
         fillColor: '#00f'
       },
     };
+  };
+
+  // ----------------------------------------------------------
+  // Public methods
+  // ----------------------------------------------------------
+
+  /**
+   * Reset to default state.
+   */
+  _this.reset = function () {
+    var fieldnotes = _el.querySelector('.fieldnotes');
+
+    fieldnotes.classList.add('hide');
   };
 
 

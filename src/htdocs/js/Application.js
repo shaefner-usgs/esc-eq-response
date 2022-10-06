@@ -1,19 +1,16 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    Features = require('Features'),
-    Feeds = require('Feeds'),
-    JsonFeed = require('JsonFeed'),
+var Features = require('Features'),
     LegendBar = require('LegendBar'),
     MapPane = require('MapPane'),
     NavBar = require('NavBar'),
+    Pane = require('Pane'),
     PlotsPane = require('PlotsPane'),
     SearchBar = require('SearchBar'),
     SelectBar = require('SelectBar'),
     SettingsBar = require('SettingsBar'),
     SideBar = require('SideBar'),
-    SignificantEqs = require('SignificantEqs'),
     StatusBar = require('StatusBar'),
     SummaryPane = require('SummaryPane'),
     TitleBar = require('TitleBar');
@@ -22,53 +19,51 @@ var AppUtil = require('util/AppUtil'),
 /**
  * Earthquake Response Application.
  *
- * Instantiate the app's "primary" Classes and handle app resets. Also track/set
- * saved scroll positions for Panes and SideBars and set input range slider
- * styles.
+ * Instantiate the app's "primary" Classes and bind them together via the 'app'
+ * property that is passed to all of the Classes. This makes all of their public
+ * props/methods accessible globally.
+ *
+ * Handle the input range 'slider' and 'radio-bar' custom UI components as well
+ * as resetting the app to its default state.
  *
  * @param options {Object}
- *   {
- *     LegendBar: {Element}
- *     MapPane: {Element}
- *     NavBar: {Element}
- *     PlotsPane: {Element}
- *     SearchBar: {Element}
- *     SelectBar: {Element}
- *     SettingsBar: {Element}
- *     SideBar: {Element}
- *     SignificantEqs: {Element}
- *     StatusBar: {Element}
- *     SummaryPane: {Element}
- *     TitleBar: {Element}
- *   }
+ *     {
+ *       LegendBar: {Element}
+ *       MapPane: {Element}
+ *       NavBar: {Element}
+ *       Pane: {Element}
+ *       PlotsPane: {Element}
+ *       SearchBar: {Element}
+ *       SelectBar: {Element}
+ *       SettingsBar: {Element}
+ *       SideBar: {Element}
+ *       StatusBar: {Element}
+ *       SummaryPane: {Element}
+ *       TitleBar: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     Features: {Object}
- *     Feeds: {Object}
- *     JsonFeed: {Object}
- *     LegendBar: {Object}
- *     MapPane: {Object}
- *     NavBar: {Object}
- *     PlotsPane: {Object}
- *     SearchBar: {Object}
- *     SelectBar: {Object}
- *     SettingsBar: {Object}
- *     SideBar: {Object}
- *     SignificantEqs: {Object}
- *     StatusBar: {Object}
- *     SummaryPane: {Object}
- *     TitleBar: {Object}
- *     defaultPaneId: {String}
- *     getPaneId: {Function}
- *     headerHeight: {Number}
- *     reset: {Function}
- *     setOption: {Function}
- *     setScrollPosition: {Function}
- *     setSliderStyles: {Function}
- *     sideBarWidth: {Number}
- *     utcOffset: {String}
- *   }
+ *     {
+ *       Features: {Object}
+ *       LegendBar: {Object}
+ *       MapPane: {Object}
+ *       NavBar: {Object}
+ *       Pane: {Object}
+ *       PlotsPane: {Object}
+ *       SearchBar: {Object}
+ *       SelectBar: {Object}
+ *       SettingsBar: {Object}
+ *       SideBar: {Object}
+ *       StatusBar: {Object}
+ *       SummaryPane: {Object}
+ *       TitleBar: {Object}
+ *       headerHeight: {Number}
+ *       reset: {Function}
+ *       setOption: {Function}
+ *       setSliderStyles: {Function}
+ *       sideBarWidth: {Number}
+ *       utcOffset: {String}
+ *     }
  */
 var Application = function (options) {
   var _this,
@@ -76,86 +71,71 @@ var Application = function (options) {
 
       _els,
       _initialLoad,
-      _sidebar,
       _style,
-      _throttle,
 
-      _addListeners,
+      _getSliderValue,
       _initClasses,
-      _resetQueryString,
-      _resetScrollPositions,
-      _saveScrollPosition;
+      _resetQueryString;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    var offset = new Date().getTimezoneOffset() / 60 * 1,
-        sign = (offset > 0 ? '-' : '+');
+  _initialize = function (options = {}) {
+    var minutes = new Date().getTimezoneOffset(),
+        hours = Math.abs(minutes / 60),
+        sign = (minutes > 0 ? '-' : '+');
 
-    _els = options || {};
+    _els = options;
     _initialLoad = true;
-    _sidebar = document.getElementById('sideBar');
     _style = document.createElement('style');
 
-    _this.defaultPaneId = 'mapPane';
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
-    _this.utcOffset = `UTC${sign}${offset}`;
+    _this.utcOffset = `UTC${sign}${hours}`;
 
-    _resetScrollPositions();
-    _initClasses();
-
-    // Add <style> tag for dynamic range input (slider) styles
+    // Add a <style> tag for the range sliders' styles
     document.body.appendChild(_style);
+
+    _initClasses();
   };
 
   /**
-   * Add event listeners.
+   * Get the CSS value for the colored section of a range slider.
+   *
+   * @param input {Element}
+   *
+   * @return {String}
    */
-  _addListeners = function () {
-    var select = document.querySelector('.select');
+  _getSliderValue = function (input) {
+    var min = input.min || 0,
+        value = input.value;
 
-    // Save scroll position of Panes
-    window.addEventListener('scroll', () =>
-      _saveScrollPosition('pane')
-    );
+    if (input.max) {
+      value = Math.floor(100 * (input.value - min) / (input.max - min));
+    }
 
-    // Save scroll position of SideBars
-    _sidebar.addEventListener('scroll', () =>
-      _saveScrollPosition('sidebar')
-    );
-
-    // Show the SelectBar
-    select.addEventListener('click', () => {
-      sessionStorage.setItem('selectBar', 0);
-
-      _this.NavBar.switchSideBars('selectBar');
-      _this.setScrollPosition('selectBar');
-    });
+    return value + '% 100%';
   };
 
   /**
-   * Instantiate app's "primary" Classes and store/share them via the 'app'
-   * property so their public methods/props are accessible to other Classes.
+   * Instantiate the app's "primary" Classes and store/share them via the 'app'
+   * property.
    */
   _initClasses = function () {
     var appClasses = {
-          Features: Features, // must be first
-          Feeds: Feeds,
-          JsonFeed: JsonFeed,
           LegendBar: LegendBar,
           MapPane: MapPane,
           NavBar: NavBar,
+          Pane: Pane,
           PlotsPane: PlotsPane,
           SearchBar: SearchBar,
           SelectBar: SelectBar,
           SettingsBar: SettingsBar,
           SideBar: SideBar,
-          SignificantEqs: SignificantEqs,
           StatusBar: StatusBar,
           SummaryPane: SummaryPane,
-          TitleBar: TitleBar
+          TitleBar: TitleBar,
+          Features: Features // Features must be last so that the UI is ready
         },
         postInits = [];
 
@@ -169,8 +149,6 @@ var Application = function (options) {
         postInits.push(_this[name]);
       }
     });
-
-    _addListeners();
 
     // Run post-initialization code now that all Classes are ready
     postInits.forEach(name =>
@@ -203,85 +181,30 @@ var Application = function (options) {
     history.replaceState({}, '', queryString + location.hash);
   };
 
-  /**
-   * Reset saved scroll positions.
-   */
-  _resetScrollPositions = function () {
-    var id,
-        sections = document.querySelectorAll('section.bar, section.pane');
-
-    sections.forEach(section => {
-      id = section.getAttribute('id');
-
-      sessionStorage.setItem(id, 0);
-    });
-  };
-
-  /**
-   * Save the current scroll position in sessionStorage.
-   *
-   * @param type {String}
-   *     'pane' or 'sidebar'
-   */
-  _saveScrollPosition = function (type) {
-    var id,
-        position;
-
-    if (type === 'sidebar') {
-      id = AppUtil.getParam('sidebar');
-      position = _sidebar.scrollTop;
-    } else { // 'pane'
-      id = _this.getPaneId();
-      position = window.pageYOffset;
-    }
-
-    clearTimeout(_throttle);
-
-    // Throttle scroll event
-    _throttle = setTimeout(() =>
-      sessionStorage.setItem(id, position), 50
-    );
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Get the id value of the selected Pane from the URL.
-   *
-   * @return id {String}
-   */
-  _this.getPaneId = function () {
-    var hash = location.hash,
-        id = _this.defaultPaneId,
-        paneExists = document.querySelector('section' + hash);
-
-    if (hash && paneExists) {
-      id = hash.substr(1);
-    }
-
-    return id;
-  };
-
-  /**
-   * Reset app to default state (i.e. no Mainshock selected).
+   * Reset the app to its default state (i.e. no Mainshock selected).
    */
   _this.reset = function () {
-    _this.Features.reset(); // must be first
-    _this.Feeds.reset();
+    document.body.classList.remove('loading', 'mainshock');
+
+    _this.Features.reset(); // Features must be first
+    _this.LegendBar.reset();
     _this.MapPane.reset();
+    _this.Pane.reset();
     _this.PlotsPane.reset();
     _this.SelectBar.reset();
     _this.SettingsBar.reset();
-    _this.SignificantEqs.reset();
+    _this.SideBar.reset();
     _this.StatusBar.reset();
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
 
-    if (!_initialLoad) {
+    if (!_initialLoad) { // preserve initial URL parameters
       _resetQueryString();
-      _resetScrollPositions();
     }
 
     _initialLoad = false;
@@ -319,39 +242,22 @@ var Application = function (options) {
   };
 
   /**
-   * Set the scroll position of the Pane or SideBar to the previous value.
-   *
-   * @param id {String}
-   */
-  _this.setScrollPosition = function (id) {
-    var position = Number(sessionStorage.getItem(id));
-
-    if (position !== null) {
-      if (/Pane$/.test(id)) { // pane
-        window.scroll(0, position);
-      } else { // sidebar
-        _sidebar.scrollTop = position;
-      }
-    }
-  };
-
-  /**
-   * Set the dynamic, inline styles for the colored section of an input range
-   * slider.
+   * Set the dynamic, inline styles for the colored section of the given input
+   * range slider.
    *
    * @param input {Element}
    */
   _this.setSliderStyles = function (input) {
     var newRules = '',
-        oldRules = new RegExp('#' + input.id + '[^#]+', 'g'),
-        value = AppUtil.getSliderValue(input),
+        oldRules = /`#${input.id}[^#]+`/g,
+        value = _getSliderValue(input),
         vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
     vendorAttrs.forEach(attr =>
       newRules += `#${input.id}::-${attr}-track {background-size:${value} !important}`
     );
 
-    // Remove 'old' css rules first, then add new ones
+    // Remove 'old' CSS rules, then add new ones
     _style.textContent = _style.textContent.replace(oldRules, '');
     _style.appendChild(document.createTextNode(newRules));
   };

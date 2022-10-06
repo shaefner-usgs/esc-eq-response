@@ -15,25 +15,23 @@ var _DEFAULTS = {
 
 
 /**
- * Refresh a Feature when the user tweaks its settings and set the URL to match
- * the application's state. Also set the default parameter values based on the
- * selected Mainshock.
+ * Refresh Features and swap between catalogs and timezones when the settings
+ * are changed. Also set the URL parameters to match the application's state
+ * and set default values based on the selected Mainshock.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     addCount: {Function}
- *     addLoader: {Function}
- *     removeCount: {Function}
- *     reset: {Function}
- *     setDefaults: {Function}
- *     setFocusedField: {Function}
- *   }
+ *     {
+ *       postInit: {Function}
+ *       reset: {Function}
+ *       setFocusedField: {Function}
+ *       setValues: {Function}
+ *     }
  */
 var SettingsBar = function (options) {
   var _this,
@@ -42,66 +40,82 @@ var SettingsBar = function (options) {
       _app,
       _el,
       _focusedField,
+      _throttlers,
 
+      _addFeatures,
       _addListeners,
       _addOffset,
       _getDefaults,
+      _hasChanged,
+      _initButtons,
       _refreshFeature,
       _setCatalog,
-      _setDefaults,
       _setField,
       _setOption,
       _setParam,
       _setTimeZone,
-      _toggle,
       _update;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _el = options.el || document.createElement('section');
+    _el = options.el;
+    _throttlers = {};
 
     _addListeners();
     _addOffset();
   };
 
   /**
-   * Add event listeners.
+   * Add the given catalog's Features.
+   *
+   * @param catalog {String <comcat|dd>}
    */
-  _addListeners = function () {
-    var buttons = _el.querySelectorAll('.catalog li, .timezone li'),
-        fields = _el.querySelectorAll('input'),
-        swap = document.getElementById('swap');
+  _addFeatures = function (catalog) {
+    var features = _app.Features.getFeatures(catalog);
 
-    // Set the selected catalog/time zone option
-    buttons.forEach(button =>
-      button.addEventListener('click', _setOption)
-    );
+    Object.keys(features).forEach(id => {
+      var feature = features[id];
 
-    // Track changes to input fields
-    fields.forEach(field => {
-      field.addEventListener('focus', _setField);
-      field.addEventListener('input', _update);
-    });
+      _app.Features.addFeature(feature);
 
-    // Refresh Features using data from an alternative catalog
-    swap.addEventListener('click', _setCatalog);
-
-    // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
-    window.addEventListener('pageshow', () => {
-      if (document.body.classList.contains('mainshock')) {
-        // Set a slight delay so browser doesn't wipe out values
-        setTimeout(_this.setDefaults, 25);
+      if (_hasChanged(feature)) {
+        _refreshFeature(id);
       }
     });
   };
 
   /**
-   * Add UTC offset to 'User' timezone button.
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    var inputs = _el.querySelectorAll('input'),
+        options = _el.querySelectorAll('.catalog li, .timezone li');
+
+    // Track changes to input fields
+    inputs.forEach(input => {
+      input.addEventListener('focus', _setField);
+      input.addEventListener('input', _update);
+    });
+
+    // Set the selected catalog or timezone 'radio-bar' option
+    options.forEach(option =>
+      option.addEventListener('click', _setOption)
+    );
+
+    // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
+    window.addEventListener('pageshow', () => {
+      if (document.body.classList.contains('mainshock')) {
+        // Set a slight delay so browser doesn't wipe out updated values
+        setTimeout(_this.setValues, 25);
+      }
+    });
+  };
+
+  /**
+   * Add the current UTC offset to 'User' timezone button.
    */
   _addOffset = function () {
     var button = document.getElementById('user');
@@ -110,8 +124,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get the default values for fields that depend on the selected Mainshock
-   * and merge them with the 'static' default values.
+   * Get the default parameter values for the selected Mainshock.
    *
    * Default values for distances are based on rupture length, which we estimate
    * from the Hanks-Bakun (2014) magnitude-area relation, rounded the nearest
@@ -139,67 +152,43 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Refresh a Feature, throttling repeated requests. Triggered when the user
-   * tweaks the settings and when the earthquake catalog is swapped.
+   * Check if the given Feature's settings have changed since it was last
+   * fetched.
    *
-   * @param id {String}
-   * @param throttle {Boolean} optional; default is true
+   * @param feature {Object}
+   *
+   * @return changed {Boolean}
    */
-  _refreshFeature = function (id, throttle = true) {
-    var feature;
+  _hasChanged = function (feature) {
+    var inputs,
+        changed = false, // default
+        lookup = {
+          dist: 'distance',
+          mag: 'magnitude'
+        },
+        settings = _el.querySelector('.' + feature.id);
 
-    if (document.body.classList.contains('mainshock')) {
-      feature = _app.Features.getFeature(id);
+    if (settings) {
+      inputs = settings.querySelectorAll('input');
 
-      // Immediately show loading status (don't wait for throttle timers)
-      if (feature) {
-        _app.StatusBar.addItem({
-          id: feature.id,
-          name: feature.name
-        });
-      }
+      inputs.forEach(input => {
+        var key = input.id.replace(/[a|f|h]s-/, '');
 
-      if (throttle) {
-        _app.JsonFeed.initThrottlers(id);
-        _app.JsonFeed.throttlers[id].push(
-          setTimeout(() => {
-            if (feature) {
-              _app.Features.refreshFeature(feature);
-            } else { // Feature never created (likely due to a bad Fetch request)
-              _app.Features.createFeature(id);
-            }
-          }, 500)
-        );
-      } else {
-        _app.Features.refreshFeature(feature); // refresh immediately
-      }
+        key = lookup[key] || key;
 
-      _app.PlotsPane.rendered = false; // flag to (re-)render plots
+        if (Number(input.value) !== feature.params[key]) {
+          changed = true;
+        }
+      });
     }
+
+    return changed;
   };
 
   /**
-   * Set the earthquake catalog (source data) for Aftershocks, Foreshocks and
-   * Historical Seismicity Features.
+   * Set the initially selected catalog and timezone 'radio-bar' buttons.
    */
-  _setCatalog = function () {
-    var catalog = _el.querySelector('.catalog .selected').id,
-        mainshock = _app.Features.getFeature('mainshock');
-
-    _setParam('catalog', catalog);
-    _toggle(catalog);
-
-    mainshock.update(catalog);
-    _refreshFeature('aftershocks', false);
-    _refreshFeature('foreshocks', false);
-    _refreshFeature('historical', false);
-  };
-
-  /**
-   * Set the default values for the 'catalog' and 'timezone' options, which are
-   * overridden by existing queryString values when present.
-   */
-  _setDefaults = function () {
+  _initButtons = function () {
     var catalog = AppUtil.getParam('catalog') || _DEFAULTS['catalog'],
         timezone = AppUtil.getParam('timezone') || _DEFAULTS['timezone'],
         buttons = [
@@ -208,14 +197,76 @@ var SettingsBar = function (options) {
         ];
 
     buttons.forEach(button => {
-      button.click(); // select appropriate button in UI
+      button.click(); // set selected button in UI
     });
-
-    _setTimeZone(timezone);
   };
 
   /**
-   * Save the id of the last focused field and select the text in the field.
+   * Refresh a Feature, throttling stacked requests when user changes Feature's
+   * settings rapidly.
+   *
+   * @param id {String}
+   *     Feature id
+   */
+  _refreshFeature = function (id) {
+    var feature = _app.Features.getFeature(id);
+
+    if (document.body.classList.contains('mainshock')) {
+      // Immediately show loading status (don't wait for throttlers)
+      _app.StatusBar.addItem({
+        id: id,
+        name: feature.name
+      });
+
+      if (_throttlers[id]) {
+        clearTimeout(_throttlers[id]);
+      }
+
+      _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
+
+      _app.PlotsPane.rendered = false; // flag to (re-)render plots
+    }
+  };
+
+  /**
+   * Set the source data to the given catalog for the Mainshock, Aftershocks,
+   * Foreshocks, and Historical Seismicity Features.
+   *
+   * @param catalog {String <comcat|dd>}
+   */
+  _setCatalog = function (catalog) {
+    var catalogs = ['comcat', 'dd'],
+        mainshock = _app.Features.getFeature('mainshock'),
+        pane = _app.Pane.getSelected(),
+        prevCatalog = catalogs.filter(item => item !== catalog)[0],
+        prevFeatures = _app.Features.getFeatures(prevCatalog),
+        status = _app.Features.getStatus(catalog);
+
+    mainshock.update(catalog);
+
+    // Remove previous catalog's Features
+    Object.keys(prevFeatures).forEach(id => {
+      _app.Features.removeFeature(prevFeatures[id], false);
+    });
+
+    if (status === 'ready') { // re-add selected catalog's Features
+      _addFeatures(catalog);
+    } else { // create (and add) new catalog's Features
+      _app.Features.createFeatures(catalog);
+    }
+
+    if (pane !== 'mapPane') {
+      _app.Pane.setScrollPosition(pane);
+    }
+
+    _app.PlotsPane.rendered = false; // flag to (re-)render plots
+  };
+
+  /**
+   * Event handler that saves the last focused field and selects the text in the
+   * field (when clicking the label or tabbing between fields).
+   *
+   * Note: doesn't work when clicking inside the field in some browsers.
    *
    * @param e {Event}
    */
@@ -225,42 +276,40 @@ var SettingsBar = function (options) {
     _focusedField = input.id;
 
     input.select();
-    input.addEventListener('mouseup', e => e.preventDefault());
   };
 
   /**
-   * Wrapper method that sets the selected 'radio-bar' option and calls other
-   * methods associated with the button the user clicked.
+   * Event handler that sets the selected option on a 'radio-bar'.
    *
    * @param e {Event}
    */
   _setOption = function (e) {
     var tables,
         ul = e.target.closest('ul'),
-        name = Array.from(ul.classList).find(className =>
+        type = Array.from(ul.classList).find(className =>
           className !== 'options'
         ),
         value = this.id;
 
-    _app.setOption.call(this);
+    if (!e.target.classList.contains('selected')) {
+      _app.setOption.call(this);
+      _setParam(type, value);
 
-    if (name === 'catalog') {
-      if (document.body.classList.contains('mainshock')) {
-        _toggle(value);
-      } else {
-        _setParam(name, value);
+      if (type === 'catalog') {
+        if (document.body.classList.contains('mainshock')) {
+          _setCatalog(value);
+        }
+      } else { // timezone
+        tables = document.querySelectorAll('#summaryPane table.list.sortable');
+
+        _setTimeZone(value);
+        _app.SummaryPane.swapSortIndicator(tables);
       }
-    } else { // timezone option
-      tables = document.querySelectorAll('#summaryPane table.list.sortable');
-
-      _setParam(name, value);
-      _setTimeZone(value);
-      _app.SummaryPane.swapSortIndicator(tables);
     }
   };
 
   /**
-   * Set (or delete) the given URL parameter depending on whether or not the
+   * Set (or delete) the given URL parameter, depending on whether or not the
    * given value is the default.
    *
    * @param name {String}
@@ -275,7 +324,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Show earthquake times in the given timezone.
+   * Set the data displayed to the given timezone.
    *
    * @param timezone {String <user|utc>}
    */
@@ -294,37 +343,20 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Toggle the option to swap catalogs on/off depending on the current state.
-   *
-   * @param catalog {String <comcat|dd>}
-   */
-  _toggle = function (catalog) {
-    var names = {
-          comcat: 'ComCat',
-          dd: 'Double Difference'
-        },
-        prevCatalog = AppUtil.getParam('catalog') || _DEFAULTS.catalog,
-        swap = _el.querySelector('.swap'),
-        span = swap.querySelector('span');
-
-    if (catalog === prevCatalog) {
-      swap.classList.add('hide');
-    } else {
-      swap.classList.remove('hide');
-      span.textContent = names[prevCatalog];
-    }
-  };
-
-  /**
-   * Update the URL and refresh a Feature when its settings are changed.
+   * Event handler that updates the URL parameter and refreshes a Feature.
    */
   _update = function () {
-    var featureId = this.closest('div').className;
+    var classList = Array.from(this.closest('div').classList),
+        id = classList.filter(className => !className.includes('dd-'))[0];
 
-    AppUtil.updateParam(this.id);
+    if (AppUtil.getParam('catalog') === 'dd') {
+      id = classList.filter(className => className.includes('dd-'))[0];
+    }
+
+    AppUtil.updateParam(this.id); // <input> id
 
     if (this.value !== '') {
-      _refreshFeature(featureId);
+      _refreshFeature(id);
     }
   };
 
@@ -333,121 +365,46 @@ var SettingsBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the count value to the Feature's name and hide the 'loader'.
-   *
-   * @param feature {Object}
-   */
-  _this.addCount = function (feature) {
-    var count, loader,
-        div = _el.querySelector('.' + feature.id);
-
-    if (div) { // Feature has configurable params
-      count = div.querySelector('.count');
-      loader = div.querySelector('.breather');
-
-      loader.classList.add('hide');
-
-      // Add/show count if applicable
-      if (count && Object.prototype.hasOwnProperty.call(feature, 'count')) {
-        count.textContent = feature.count;
-
-        count.classList.remove('hide');
-      }
-    }
-  };
-
-  /**
-   * Show the 'loader' next to the Feature's name and hide the count value.
-   *
-   * @param feature {Object}
-   */
-  _this.addLoader = function (feature) {
-    var count, loader,
-        div = _el.querySelector('.' + feature.id);
-
-    if (div) { // Feature has configurable params
-      count = div.querySelector('.count');
-      loader = div.querySelector('.breather');
-
-      loader.innerHTML = '<span></span>';
-      loader.classList.remove('hide');
-
-      if (count) {
-        count.classList.add('hide');
-      }
-    }
-  };
-
-  /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _setDefaults();
-  };
-
-  /**
-   * Hide the 'loader' and count value next to the Feature's name.
-   *
-   * @param feature {Object}
-   */
-  _this.removeCount = function (feature) {
-    var count, loader,
-        div = _el.querySelector('.' + feature.id);
-
-    if (div) { // Feature has configurable params
-      count = div.querySelector('.count');
-      loader = div.querySelector('.breather');
-
-      loader.classList.add('hide');
-
-      if (count) {
-        count.classList.add('hide');
-      }
-    }
+    _initButtons();
   };
 
   /**
    * Reset to default state.
    *
-   * Note: Feature counts are removed separately via _this.removeCount().
+   * Note: Feature counts are removed separately via Features.js.
    */
   _this.reset = function () {
-    var catalog = AppUtil.getParam('catalog') || _DEFAULTS.catalog,
-        selectors = [
-          '.aftershocks input',
-          '.foreshocks input',
-          '.historical input'
-        ],
-        inputs = _el.querySelectorAll(selectors.join(',')),
-        selected = _el.querySelector('.catalog .selected'),
-        swap = _el.querySelector('.swap');
-
-    _focusedField = null;
+    var inputs = _el.querySelectorAll('input');
 
     inputs.forEach(input =>
       input.value = ''
     );
 
-    // Set the catalog param when user changed setting but didn't complete swap
-    if (selected) {
-      if (catalog !== selected.id && !swap.classList.contains('hide')) {
-        _setParam('catalog', selected.id);
-        swap.classList.add('hide');
-      }
+    _focusedField = null;
+  };
+
+  /**
+   * Set the focus to the last field selected by the user.
+   */
+  _this.setFocusedField = function () {
+    if (_focusedField) {
+      document.getElementById(_focusedField).focus();
     }
   };
 
   /**
-   * Set the default form field values based on the selected Mainshock, which
-   * are overridden by existing queryString values when present.
+   * Set the input field values to the selected Mainshock's defaults. URL
+   * parameter values (if present) override the defaults.
    */
-  _this.setDefaults = function () {
-    var input, param,
-        defaults = _getDefaults();
+  _this.setValues = function () {
+    var defaults = _getDefaults();
 
     Object.keys(defaults).forEach(key => {
-      input = document.getElementById(key);
-      param = AppUtil.getParam(key);
+      var input = document.getElementById(key),
+          param = AppUtil.getParam(key);
 
       if (input) {
         if (param) {
@@ -457,19 +414,6 @@ var SettingsBar = function (options) {
         }
       }
     });
-  };
-
-  /**
-   * Set the focus to the last field selected by user (or Event ID by default).
-   */
-  _this.setFocusedField = function () {
-    var field = 'eqid'; // default
-
-    if (_focusedField) {
-      field = _focusedField;
-    }
-
-    document.getElementById(field).focus();
   };
 
 

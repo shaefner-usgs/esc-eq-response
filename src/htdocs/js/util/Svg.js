@@ -15,21 +15,23 @@ var _DEFAULTS = {
   width: 20
 };
 
+
 /**
- * Create <svg> elements.
+ * Create <svg> elements for the LegendBar.
  *
  * @return _this {Object}
- *   {
- *     createCircle: {Function}
- *     createCircleRange: {Function}
- *     createLine: {Function}
- *     createTriangle: {Function}
- *   }
+ *     {
+ *       createCircle: {Function}
+ *       createCircleRange: {Function}
+ *       createLine: {Function}
+ *       createTriangle: {Function}
+ *     }
  */
 var Svg = function () {
   var _this,
 
-      _createElement;
+      _createElement,
+      _setProps;
 
 
   _this = {};
@@ -41,6 +43,20 @@ var Svg = function () {
    */
   _createElement = function () {
     return document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  };
+
+  /**
+   * Set <svg> properties.
+   *
+   * @param svg {Element}
+   * @param template {String}
+   * @param opts {Object}
+   */
+  _setProps = function (svg, template, opts) {
+    svg.innerHTML = L.Util.template(template, opts);
+
+    svg.setAttribute('height', opts.height);
+    svg.setAttribute('width', opts.width);
   };
 
   // ----------------------------------------------------------
@@ -65,12 +81,12 @@ var Svg = function () {
     size = Math.ceil(opts.radius * 2 + 2);
 
     Object.assign(opts, {
-      origin: size / 2
+      height: size,
+      origin: size / 2,
+      width: size
     });
 
-    svg.innerHTML = L.Util.template(template, opts);
-    svg.setAttribute('height', size);
-    svg.setAttribute('width', size);
+    _setProps(svg, template, opts);
 
     return svg;
   };
@@ -78,22 +94,15 @@ var Svg = function () {
   /**
    * Create a range of <svg> circles as an ordered list.
    *
-   * @param opts {Object}
-   *
    * @return ol {Element}
    */
-  _this.createCircleRange = function (opts) {
+  _this.createCircleRange = function () {
     var circle, li,
         ol = document.createElement('ol');
 
-    opts = Object.assign({
-      max: 7,
-      min: 0
-    }, opts);
-
     ol.classList.add('mags');
 
-    for (var i = opts.min; i <= opts.max; i ++) {
+    for (var i = 0; i <= 7; i ++) {
       circle = _this.createCircle({
         radius: AppUtil.getRadius(i)
       });
@@ -121,10 +130,7 @@ var Svg = function () {
 
     opts = Object.assign({}, _DEFAULTS, opts);
 
-    svg.innerHTML = L.Util.template(template, opts);
-    svg.setAttribute('height', opts.height);
-    svg.setAttribute('width', opts.width);
-    svg.setAttribute('viewBox', '0 0 ' + opts.width + ' ' + opts.height);
+    _setProps(svg, template, opts);
 
     return svg;
   };
@@ -144,10 +150,7 @@ var Svg = function () {
 
     opts = Object.assign({}, _DEFAULTS, opts);
 
-    svg.innerHTML = L.Util.template(template, opts);
-    svg.setAttribute('height', opts.height);
-    svg.setAttribute('width', opts.width);
-    svg.setAttribute('viewBox', '0 0 ' + opts.width + ' ' + opts.height);
+    _setProps(svg, template, opts);
 
     return svg;
   };

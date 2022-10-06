@@ -5,25 +5,21 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Switch between Panes (i.e. 'pages') of the app and toggle/switch between
- * SideBars.
- *
- * Also mitigate issues where the map/plots don't render correctly when they're
- * created while their respective Pane is hidden.
+ * Switch between Panes (i.e. 'pages') and toggle/switch between SideBars.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     hideAll: {Function}
- *     postInit: {Function}
- *     reset: {Function}
- *     switchSideBars: {Function}
- *   }
+ *     {
+ *       hideAll: {Function}
+ *       postInit: {Function}
+ *       reset: {Function}
+ *       switchSideBar: {Function}
+ *     }
  */
 var NavBar = function (options) {
   var _this,
@@ -33,20 +29,16 @@ var NavBar = function (options) {
       _el,
 
       _addListeners,
-      _renderPane,
-      _renderPlots,
       _showPane,
       _showSideBar,
-      _switchPanes;
+      _switchPane;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _el = options.el || document.createElement('nav');
+    _el = options.el;
 
     _addListeners();
   };
@@ -55,111 +47,59 @@ var NavBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var close = document.querySelector('aside .icon-close'),
-        lis = _el.querySelectorAll('#navSub li');
+    var lis = _el.querySelectorAll('#navSub li');
 
-    // Switch between Panes
-    window.addEventListener('hashchange', _switchPanes);
+    // Switch Panes
+    window.addEventListener('hashchange', _switchPane);
 
-    // Switch between sidebars
+    // Switch SideBars
     lis.forEach(li => {
       li.addEventListener('click', () => {
-        var button,
-            id;
+        var button = li.querySelector('i'),
+            id = button.className.match(/icon-(\w+)/)[1];
 
-        button = li.querySelector('i');
-        id = button.className.match(/icon-(\w+)/)[1];
-
-        _this.switchSideBars(id);
+        _this.switchSideBar(id);
       });
     });
-
-    // Close the sidebar
-    close.addEventListener('click', () =>
-      _app.SideBar.toggle('off')
-    );
   };
 
   /**
-   * Render the Pane matching the given 'id' value. These are extra steps that
-   * are necessary to render the Pane correctly when it is unhidden.
+   * Show the given Pane and select its nav button.
    *
    * @param id {String}
-   */
-  _renderPane = function (id) {
-    _app.setScrollPosition(id);
-
-    if (id === 'mapPane') {
-      _app.MapPane.render();
-    } else if (id === 'plotsPane') {
-      _renderPlots();
-    }
-
-    _app.SideBar.toggleMapLinks(id);
-  };
-
-  /**
-   * Wrapper method to render the plots (and display the rendering status) when
-   * the PlotsPane is shown.
-   */
-  _renderPlots = function () {
-    var plots = _app.PlotsPane.getPlots();
-
-    if (!AppUtil.isEmpty(plots) && !_app.PlotsPane.rendered) {
-      _app.StatusBar.addItem({
-        id: 'rendering',
-        name: 'Plots'
-      }, {
-        prepend: 'Rendering'
-      });
-
-      // Add a slight delay; otherwise rendering message does not display
-      setTimeout(() => {
-        _app.PlotsPane.render();
-        _app.StatusBar.removeItem('rendering');
-      }, 50);
-    }
-
-    _app.PlotsPane.resize(); // in case size of content area changed
-  };
-
-  /**
-   * Show the Pane matching the given 'id' value and select the appropriate nav
-   * button.
-   *
-   * @param id {String}
+   *     Pane id
    */
   _showPane = function (id) {
     var button = _el.querySelector('[href="#' + id + '"]'),
-        selPane = document.getElementById(id);
+        pane = document.getElementById(id);
 
     button.classList.add('selected');
-    selPane.classList.remove('hide');
+    pane.classList.remove('hide');
 
-    _renderPane(id);
+    _app.Pane.render(id);
   };
 
   /**
-   * Show the SideBar matching the given 'id' value, set the 'sidebar' URL
-   * parameter, and select the given nav button.
+   * Show the given SideBar and select its nav button.
    *
    * @param id {String}
+   *     SideBar id
    */
   _showSideBar = function (id) {
     var button = _el.querySelector('.icon-' + id),
-        selSideBar = document.getElementById(id);
+        sideBar = document.getElementById(id);
 
     button.classList.add('selected');
-    selSideBar.classList.remove('hide');
+    sideBar.classList.remove('hide');
 
     _app.SideBar.toggle('on');
   };
 
   /**
-   * Switch to the Pane matching the current URL hash.
+   * Event handler that switches to the Pane matching the URL hash.
    */
-  _switchPanes = function () {
-    var id = _app.getPaneId();
+  _switchPane = function () {
+    var id = _app.Pane.getSelected();
 
     _this.hideAll('panes');
     _showPane(id);
@@ -170,26 +110,22 @@ var NavBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Hide all Panes or all SideBars and unselect all of their nav buttons.
+   * Hide all Panes or SideBars and unselect all of their nav buttons.
    *
-   * @param items {String}
-   *     'panes' or 'sidebars'
+   * @param items {String <panes|sidebars>}
    */
   _this.hideAll = function (items) {
-    var button,
-        els,
-        id;
+    var els = document.querySelectorAll('section.pane');
 
     if (items === 'sidebars') {
       els = document.querySelectorAll('section.bar');
-    } else {
-      els = document.querySelectorAll('section.pane');
     }
 
     els.forEach(el => {
-      id = el.getAttribute('id');
+      var button,
+          id = el.getAttribute('id');
 
-      if (el.classList.contains('pane')) { // panes
+      if (el.classList.contains('pane')) {
         button = _el.querySelector('[href="#' + id + '"]');
       } else { // sidebars
         button = _el.querySelector('.icon-' + id);
@@ -204,33 +140,34 @@ var NavBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    var sideBarId = AppUtil.getParam('sidebar');
+    var id = AppUtil.getParam('sidebar');
 
-    if (sideBarId === null) {
-      sideBarId = 'selectBar'; // default
+    if (id === null) {
+      id = 'selectBar'; // default'
     }
-    if (sideBarId) {
-      _showSideBar(sideBarId);
+    if (id) {
+      _showSideBar(id);
     }
 
-    _showPane(_app.getPaneId());
+    _showPane(_app.Pane.getSelected());
   };
 
   /**
    * Reset to default state.
    */
   _this.reset = function () {
-    location.hash = '#' + _app.defaultPaneId;
+    location.hash = '#mapPane';
 
-    _switchPanes();
+    _switchPane();
   };
 
   /**
-   * Switch to the SideBar matching the current 'sidebar' URL parameter.
+   * Event handler that switches to the given SideBar.
    *
    * @param id {String}
+   *     SideBar id
    */
-  _this.switchSideBars = function (id) {
+  _this.switchSideBar = function (id) {
     if (id === AppUtil.getParam('sidebar')) {
       sessionStorage.setItem(id, 0); // reset scroll position to top
     }
