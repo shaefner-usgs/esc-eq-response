@@ -32,7 +32,7 @@
     "leaflet.path.drag": "^0.0.6",
     "leaflet.utfgrid": "github:danzel/Leaflet.utfgrid",
     "luxon": "^2.3.1",
-    "plotly.js": "^2.12.1",
+    "plotly.js": "^2.14.0",
     "tablesort": "github:shaefner-usgs/tablesort"
   },
   "devDependencies": {
