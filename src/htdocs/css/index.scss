@@ -190,11 +190,6 @@ tr {
   &:before {
     content: "(";
   }
-
-  &.hide {
-    opacity: 0;
-    transition: none;
-  }
 }
 
 .description {
@@ -222,7 +217,7 @@ tr {
   }
 }
 
-.params {
+.props {
   display: grid;
   grid-template-columns: max-content auto;
   margin-bottom: 0;

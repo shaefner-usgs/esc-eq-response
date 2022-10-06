@@ -28,6 +28,14 @@
   .container {
     display: flex;
     flex-direction: column;
+
+    > .content {
+      display: none; // hide preserved sub-Features when their parent is removed
+    }
+  }
+
+  .feature .hide { // missing product
+    display: none !important;
   }
 
   /* Rendering order of Features */
@@ -40,15 +48,18 @@
     }
   }
 
-  .aftershocks {
+  .aftershocks,
+  .dd-aftershocks {
     order: 1;
   }
 
-  .foreshocks {
+  .foreshocks,
+  .dd-foreshocks {
     order: 2
   }
 
-  .historical {
+  .historical,
+  .dd-historical {
     order: 3;
   }
 }

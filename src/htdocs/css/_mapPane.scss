@@ -26,11 +26,10 @@
     display: none;
   }
 
-  /*
-    Rendering order of features on map and layer controller. All map layers
-    (except faults) are rendered in leaflet-overlay-pane which has a z-index of
-    400.
-  */
+  /**
+   * Rendering order of Features on the map and layer controller. All overlays
+   * are rendered in leaflet-overlay-pane which has a z-index of 400.
+   */
   .leaflet-focal-mechanism-pane {
     z-index: 425;
   }
@@ -40,13 +39,16 @@
   .leaflet-mainshock-pane {
     z-index: 423;
   }
-  .leaflet-aftershocks-pane {
+  .leaflet-aftershocks-pane,
+  .leaflet-dd-aftershocks-pane {
     z-index: 422;
   }
-  .leaflet-foreshocks-pane {
+  .leaflet-foreshocks-pane,
+  .leaflet-dd-foreshocks-pane {
     z-index: 421;
   }
-  .leaflet-historical-pane {
+  .leaflet-historical-pane,
+  .leaflet-dd-historical-pane {
     z-index: 420;
   }
   .leaflet-shakemap-stations-pane {
@@ -58,8 +60,9 @@
   .leaflet-search-pane {
     z-index: 417;
   }
-  .leaflet-faults-pane {
-    z-index: 416;
+
+  .leaflet-control-layers .hide {
+    display: none; // hide empty FieldNotes layer
   }
 
   // Push top controls down to accommodate header

@@ -1,8 +1,8 @@
 @use '../mixins' as *;
 @use '../variables' as *;
 
-#focal-mechanismLightbox,
-#moment-tensorLightbox {
+#focal-mechanism-lightbox,
+#moment-tensor-lightbox {
   canvas {
     margin-top: 3.5rem;
     max-width: 100%;
@@ -76,8 +76,8 @@
 
 @media only screen
 and (max-width: $breakpoint-phone-width) {
-  #focal-mechanismLightbox,
-  #moment-tensorLightbox {
+  #focal-mechanism-lightbox,
+  #moment-tensor-lightbox {
     canvas {
       display: block;
       margin: 0 auto 2rem;

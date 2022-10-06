@@ -8,14 +8,6 @@
       display: none;
     }
 
-    .params {
-      margin: .25rem 0 1.5rem;
-
-      dd {
-        max-width: 7rem;
-      }
-    }
-
     .probabilities {
       line-height: 1;
       list-style: none;
@@ -109,6 +101,14 @@
 
     .probability {
       font: 1.25rem $font-family-mmi;
+    }
+
+    .props {
+      margin: .25rem 0 1.5rem;
+
+      dd {
+        max-width: 7rem;
+      }
     }
 
     .timeframe {

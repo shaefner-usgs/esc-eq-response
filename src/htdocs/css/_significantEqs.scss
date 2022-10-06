@@ -1,102 +1,100 @@
 @use 'variables' as *;
 
-#significantEqs {
+#significant-eqs {
   border-bottom: 1px solid $border-color-lighter;
   border-top: 1px solid $border-color;
-}
-
-div#significantEqs { // loader
-  height: 5rem;
+  min-height: 4rem;
   position: relative;
 
-  .spinner {
-    top: 35%;
-  }
-}
-
-h4#significantEqs { // no Significant Eqs msg
-  padding: 1rem 0;
-}
-
-ul#significantEqs { // list
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  h4 {
-    font-size: 1.125rem;
-    margin-bottom: .125rem;
-  }
-
-  li {
-    align-items: center;
-    border-bottom: 1px solid $border-color-lighter;
-    display: flex;
+  > h4 { // no Significant Eqs msg
     margin: 0;
-    padding: .5rem .25rem;
-    transition: all $effect-off-duration ease-in;
+    padding: 1rem 0;
+  }
 
-    &:hover {
-      background: $accent-color-lightest;
-      color: $text-color-darker;
-      cursor: pointer;
-      transition: all $effect-on-duration ease-out;
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 
-      time {
-        color: $text-color;
-        transition: color $effect-on-duration ease-out;
-      }
+    h4 {
+      font-size: 1.125rem;
+      margin-bottom: .125rem;
     }
 
-    &:last-child {
-      border: none;
-    }
-
-    &:active,
-    &.selected {
-      background: $accent-color;
-      color: #fff;
-      transition: all $effect-on-duration ease-out;
+    li {
+      align-items: center;
+      border-bottom: 1px solid $border-color-lighter;
+      display: flex;
+      margin: 0;
+      padding: .5rem .25rem;
+      transition: all $effect-off-duration ease-in;
 
       &:hover {
-        cursor: auto;
+        background: $accent-color-lightest;
+        color: $text-color-darker;
+        cursor: pointer;
+        transition: all $effect-on-duration ease-out;
+
+        time {
+          color: $text-color;
+          transition: color $effect-on-duration ease-out;
+        }
       }
 
-      time {
+      &:last-child {
+        border: none;
+      }
+
+      &:active,
+      &.selected {
+        background: $accent-color;
         color: #fff;
-        transition: color $effect-on-duration ease-out;
+        transition: all $effect-on-duration ease-out;
+
+        &:hover {
+          cursor: auto;
+        }
+
+        time {
+          color: #fff;
+          transition: color $effect-on-duration ease-out;
+        }
+      }
+
+      > div:first-of-type {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        margin-right: .75rem;
+      }
+
+      span.mmi {
+        visibility: hidden; /* hide empty (no MMI assigned) bubbles */
+      }
+
+      .mag {
+        font-size: 1.25rem;
+        line-height: 1;
+        padding-bottom: .25rem;
       }
     }
 
-    > div:first-of-type {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      margin-right: .75rem;
-    }
-
-    span.mmi {
-      visibility: hidden; /* hide empty (no MMI assigned) bubbles */
-    }
-
-    .mag {
-      font-size: 1.25rem;
-      line-height: 1;
-      padding-bottom: .25rem;
+    time {
+      color: $text-color-lighter;
+      margin: 0;
+      transition: color $effect-off-duration ease-in;
     }
   }
 
-  time {
-    color: $text-color-lighter;
-    margin: 0;
-    transition: color $effect-off-duration ease-in;
+  .spinner {
+    top: 33%;
   }
 }
 
-/* Toggle between user/utc time
+/* Toggle between user/UTC time
 --------------------------------------------- */
 
-body.user #significantEqs time.utc,
-body.utc #significantEqs time.user {
+body.user #significant-eqs time.utc,
+body.utc #significant-eqs time.user {
   display: none;
 }
