@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -5,23 +6,22 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the PAGER Cities Feature, which is a sub-Feature of PAGER Exposures.
+ * Create the PAGER Cities Feature, a co-Feature of PAGER Exposures.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     cities: {Object}
- *     create: {Function}
- *     destroy: {Function}
- *     id: {String}
- *     name: {String)
- *     setFeedUrl: {Function}
- *     url: {String}
- *   }
+ *     {
+ *       addData: {Function}
+ *       cities: {Array}
+ *       destroy: {Function}
+ *       id: {String}
+ *       name: {String)
+ *       url: {String}
+ *     }
  */
 var PagerCities = function (options) {
   var _this,
@@ -29,28 +29,28 @@ var PagerCities = function (options) {
 
       _app,
 
-      _compare;
+      _compare,
+      _fetch,
+      _getUrl;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
 
-    Object.assign(_this, {
-      id: 'pager-cities',
-      name: 'PAGER Cities',
-      url: ''
-    });
+    _this.cities = [];
+    _this.id = 'pager-cities';
+    _this.name = 'PAGER Cities';
+    _this.url =_getUrl();
+
+    _fetch();
   };
 
   /**
    * Comparison function to sort cities by population (DESC).
    *
    * @params a, b {Objects}
-   *     Objects to compare/sort
    *
    * @return {Integer}
    */
@@ -64,19 +64,50 @@ var PagerCities = function (options) {
     return 0;
   };
 
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    if (_this.url) {
+      L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this
+      });
+    }
+  };
+
+  /**
+   * Get the JSON feed's URL.
+   *
+   * @return url {String}
+   */
+  _getUrl = function () {
+    var contents,
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products,
+        url = '';
+
+    if (products.losspager) {
+      contents = products.losspager[0].contents;
+
+      if (contents['json/cities.json']) {
+        url = contents['json/cities.json'].url;
+      }
+    }
+
+    return url;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Create the PAGER cities list.
+   * Add the JSON feed data.
    *
    * @param json {Object}
-   *     feed data for Feature
    */
-  _this.create = function (json) {
-    _this.cities = [];
-
+  _this.addData = function (json) {
     if (json.onepager_cities) {
       _this.cities = json.onepager_cities.sort(_compare);
     } else if (Array.isArray(json)) { // sometimes data stored as top-level Array
@@ -97,25 +128,10 @@ var PagerCities = function (options) {
     _app = null;
 
     _compare = null;
+    _fetch = null;
+    _getUrl = null;
 
     _this = null;
-  };
-
-  /**
-   * Set the JSON feed's URL.
-   */
-  _this.setFeedUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.json.properties.products;
-
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/cities.json']) {
-        _this.url = contents['json/cities.json'].url;
-      }
-    }
   };
 
 

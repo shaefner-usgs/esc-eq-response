@@ -1,21 +1,24 @@
+/* global L */
 'use strict';
 
 
 /**
- * Nearby Cities Feed.
+ * Create the Nearby Cities Feature.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     destroy: {Function}
- *     id: {String}
- *     name: {String}
- *     url: {String}
- *   }
+ *     {
+ *       addData: {Function}
+ *       cities: {Array}
+ *       destroy: {Function}
+ *       id: {String}
+ *       name: {String}
+ *       url: {String}
+ *     }
  */
 var NearbyCities = function (options) {
   var _this,
@@ -23,19 +26,33 @@ var NearbyCities = function (options) {
 
       _app,
 
-      _getFeedUrl;
+      _fetch,
+      _getUrl;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
 
+    _this.cities = [];
     _this.id = 'nearby-cities';
     _this.name = 'Nearby Cities';
-    _this.url = _getFeedUrl();
+    _this.url = _getUrl();
+
+    _fetch();
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    if (_this.url) {
+      L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this
+      });
+    }
   };
 
   /**
@@ -43,7 +60,7 @@ var NearbyCities = function (options) {
    *
    * @return url {String}
    */
-  _getFeedUrl = function () {
+  _getUrl = function () {
     var contents,
         mainshock = _app.Features.getFeature('mainshock'),
         products = mainshock.json.properties.products,
@@ -65,12 +82,25 @@ var NearbyCities = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Add the JSON feed data.
+   *
+   * @param json {Object}
+   */
+  _this.addData = function (json) {
+    _this.cities = json;
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
-    _getFeedUrl = null;
+
+    _fetch = null;
+    _getUrl = null;
+
     _this = null;
   };
 

@@ -1,21 +1,25 @@
+/* global L */
 'use strict';
 
 
 /**
- * PAGER Comments Feed.
+ * Create the PAGER Comments Feature.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     destroy: {Function}
- *     id: {String}
- *     name: {String}
- *     url: {String}
- *   }
+ *     {
+ *       addData: {Function}
+ *       destroy: {Function}
+ *       id: {String}
+ *       impact1: {String}
+ *       name: {String}
+ *       structComment: {String}
+ *       url: {String}
+ *     }
  */
 var PagerComments = function (options) {
   var _this,
@@ -23,19 +27,34 @@ var PagerComments = function (options) {
 
       _app,
 
-      _getFeedUrl;
+      _fetch,
+      _getUrl;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
 
     _this.id = 'pager-comments';
+    _this.impact1 = '';
     _this.name = 'PAGER Comments';
-    _this.url = _getFeedUrl();
+    _this.structComment = '';
+    _this.url = _getUrl();
+
+    _fetch();
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    if (_this.url) {
+      L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this
+      });
+    }
   };
 
   /**
@@ -43,7 +62,7 @@ var PagerComments = function (options) {
    *
    * @return url {String}
    */
-  _getFeedUrl = function () {
+  _getUrl = function () {
     var contents,
         mainshock = _app.Features.getFeature('mainshock'),
         products = mainshock.json.properties.products,
@@ -65,12 +84,26 @@ var PagerComments = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Add the JSON feed data.
+   *
+   * @param json {Object}
+   */
+  _this.addData = function (json) {
+    _this.impact1 = json.impact1;
+    _this.structComment = json.struct_comment;
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
-    _getFeedUrl = null;
+
+    _fetch = null;
+    _getUrl = null;
+
     _this = null;
   };
 

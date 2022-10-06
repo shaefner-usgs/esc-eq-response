@@ -6,20 +6,24 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the parameters that are used to instantiate the Plotly plots.
+ * Supply the Plotly parameters that are used to create the plots for the
+ * Mainshock, Aftershocks, and Historical Seismicity Features.
  *
  * @param options {Object}
- *   {
- *     app {Object}
- *     data {Array}
- *     featureId {String}
- *   }
+ *     {
+ *       app: {Object}
+ *       data: {Array}
+ *       featureId: {String}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     getOptions: {Function}
- *     getTrace: {Function}
- *   }
+ *     {
+ *       addListeners: {Function}
+ *       destroy: {Function}
+ *       getParams: {Function}
+ *       getTrace: {Function}
+ *       removeListeners: {Function}
+ *     }
  */
 var Plots = function (options) {
   var _this,
@@ -28,22 +32,23 @@ var Plots = function (options) {
       _app,
       _data,
       _featureId,
-      _id,
       _mainshock,
       _zRatio,
 
+      _addContainer,
       _addMainshock,
       _formatData,
       _getConfig,
       _getData,
       _getLayout,
       _getRatio,
-      _getTraceData;
+      _getTraceData,
+      _openPopup;
 
 
   _this = {};
 
-  _initialize = function (options) {
+  _initialize = function (options = {}) {
     _app = options.app;
     _data = _formatData(options.data);
     _featureId = options.featureId;
@@ -51,31 +56,59 @@ var Plots = function (options) {
   };
 
   /**
-   * Add the Mainshock to the beginning of the Aftershocks trace, or to the end
-   * of the Historical trace.
+   * Add the given plot type's container and name to the DOM, if it does not
+   * already exist.
+   *
+   * @param id {String <cumulative|hypocenters|magtime>}
+   *
+   * @return container {Element}
+   */
+  _addContainer = function (id) {
+    var h3,
+        el = document.getElementById('plotsPane'),
+        parent = el.querySelector(`.${_featureId} .bubble`),
+        container = parent.querySelector('.' + id);
+
+    if (!container) {
+      container = document.createElement('div');
+      h3 = document.createElement('h3');
+      h3.innerHTML = _app.PlotsPane.names[id];
+
+      container.classList.add(id);
+      parent.appendChild(h3);
+      parent.appendChild(container);
+    }
+
+    return container;
+  };
+
+  /**
+   * Add the Mainshock to the beginning of the cumulative Aftershocks trace, or
+   * to the end of the cumulative Historical trace.
    *
    * @param data {Object}
    * @param timezone {String}
    */
   _addMainshock = function (data, timezone) {
-    var x = _mainshock.data.isoTime;
+    var eqid = AppUtil.getParam('eqid'),
+        x = _mainshock.data.isoTime;
 
     if (timezone === 'user') {
       x = _mainshock.data.datetime.toLocal().toISO();
     }
 
-    if (_featureId === 'aftershocks') {
-      data.eqid.unshift(AppUtil.getParam('eqid'));
+    if (_featureId.includes('aftershocks')) {
+      data.eqid.unshift(eqid);
       data.title.unshift(_mainshock.data.title);
-      data.userTime.unshift(_mainshock.data.userTime);
-      data.utcTime.unshift(_mainshock.data.utcTime);
+      data.userTime.unshift(_mainshock.data.userTimeDisplay);
+      data.utcTime.unshift(_mainshock.data.utcTimeDisplay);
       data.x.unshift(x);
       data.y.unshift(0);
-    } else if (_featureId === 'historical') {
-      data.eqid.push(AppUtil.getParam('eqid'));
+    } else if (_featureId.includes('historical')) {
+      data.eqid.push(eqid);
       data.title.push(_mainshock.data.title);
-      data.userTime.push(_mainshock.data.userTime);
-      data.utcTime.push(_mainshock.data.utcTime);
+      data.userTime.push(_mainshock.data.userTimeDisplay);
+      data.utcTime.push(_mainshock.data.utcTimeDisplay);
       data.x.push(x);
       data.y.push(data.y.length + 1);
     }
@@ -106,42 +139,43 @@ var Plots = function (options) {
     };
 
     eqs.forEach(eq => {
+      var text = `${eq.title}<br /><span>${eq.userTimeDisplay}</span>` +
+        `<span>${eq.utcTimeDisplay}</span>`;
+
       data.color.push(eq.fillColor);
       data.datetime.push(eq.datetime);
-      data.depth.push(eq.depth * -1); // set to negative value for 3d plots
-      data.eqid.push(eq.eqid);
+      data.depth.push(eq.coords[2] * -1); // set to negative value for 3d plots
+      data.eqid.push(eq.id);
       data.isoTime.push(eq.isoTime);
-      data.lat.push(eq.lat);
-      data.lon.push(eq.lon);
+      data.lat.push(eq.coords[1]);
+      data.lon.push(eq.coords[0]);
       data.mag.push(eq.mag);
       data.size.push(eq.radius * 2); // Plotly uses diameter
-      data.text.push(
-        eq.title + '<br />' +
-        `<span>${eq.userTime}</span><span>${eq.utcTime}</span>`
-      );
+      data.text.push(text);
       data.title.push(eq.title);
-      data.userTime.push(eq.userTime);
-      data.utcTime.push(eq.utcTime);
+      data.userTime.push(eq.userTimeDisplay);
+      data.utcTime.push(eq.utcTimeDisplay);
     });
 
     return data;
   };
 
   /**
-   * Get the Plotly config parameter.
+   * Get the Plotly config parameter for the given plot type.
+   *
+   * @param id {String <cumulative|hypocenters|magtime>}
    *
    * @return {Object}
    */
-  _getConfig = function () {
-    var opts,
-        eqid = AppUtil.getParam('eqid');
+  _getConfig = function (id) {
+    var eqid = AppUtil.getParam('eqid');
 
     return {
       displaylogo: false,
       modeBarButtonsToAdd: [{
         click: gd => {
-          opts = {
-            filename: eqid + '-' + _featureId + '-' + _id,
+          var opts = {
+            filename: eqid + '-' + _featureId + '-' + id,
             format: 'svg',
             height: 500,
             width: 1200
@@ -166,33 +200,38 @@ var Plots = function (options) {
   };
 
   /**
-   * Get the Plotly data parameter. Add the Mainshock's trace to the hypocenters
-   * and magtime plots.
+   * Get the Plotly data parameter for the given plot type. Add the Mainshock's
+   * trace to the hypocenters and magtime plots and set the Z ratio for the
+   * hypocenters plot.
+   *
+   * @param id {String <cumulative|hypocenters|magtime>}
    *
    * @return data {Array}
    */
-  _getData = function () {
-    var trace = _this.getTrace(_id),
+  _getData = function (id) {
+    var trace = _this.getTrace(id),
         data = [trace];
 
-    // Set Z Ratio value for 3d plot now that trace is created
-    if (_id === 'hypocenters') {
-      _zRatio = _getRatio(trace);
+    if (id !== 'cumulative') {
+      data.push(_mainshock.plots.getTrace(id));
     }
 
-    if (_id !== 'cumulative') {
-      data.push(_mainshock.plots.getTrace(_id));
+    // Set the 3d plot's Z ratio now that its trace is ready
+    if (id === 'hypocenters') {
+      _zRatio = _getRatio(trace);
     }
 
     return data;
   };
 
   /**
-   * Get the Plotly layout parameter.
+   * Get the Plotly layout parameter for the given plot type.
+   *
+   * @param id {String <cumulative|hypocenters|magtime>}
    *
    * @return layout {Object}
    */
-  _getLayout = function () {
+  _getLayout = function (id) {
     var color = '#555',
         layout = {
           font: {
@@ -215,7 +254,7 @@ var Plots = function (options) {
       zoneDisplay = _app.utcOffset;
     }
 
-    if (_id === 'hypocenters') {
+    if (id === 'hypocenters') {
       layout.scene = {
         aspectmode: 'manual',
         aspectratio: {
@@ -261,7 +300,7 @@ var Plots = function (options) {
           zeroline: false
         }
       };
-    } else {
+    } else { // cumulative, magtime
       layout.xaxis = {
         title: {
           font: {
@@ -270,26 +309,26 @@ var Plots = function (options) {
           text: `Time (${zoneDisplay})`
         }
       };
-    }
 
-    if (_id === 'magtime') {
-      layout.yaxis = {
-        title: {
-          font: {
-            color: color
-          },
-          text: 'Magnitude'
-        }
-      };
-    } else {
-      layout.yaxis = {
-        title: {
-          font: {
-            color: color
-          },
-          text: 'Earthquakes'
-        }
-      };
+      if (id === 'cumulative') {
+        layout.yaxis = {
+          title: {
+            font: {
+              color: color
+            },
+            text: 'Earthquakes'
+          }
+        };
+      } else {
+        layout.yaxis = {
+          title: {
+            font: {
+              color: color
+            },
+            text: 'Magnitude'
+          }
+        };
+      }
     }
 
     return layout;
@@ -313,11 +352,13 @@ var Plots = function (options) {
   };
 
   /**
-   * Get the Plotly trace data for a plot.
+   * Get the Plotly trace data for the given plot type.
+   *
+   * @param id {String <cumulative|hypocenters|magtime>}
    *
    * @return data {Object}
    */
-  _getTraceData = function () {
+  _getTraceData = function (id) {
     var data = { // defaults, common props
           color: _data.color,
           mode: 'markers',
@@ -331,11 +372,10 @@ var Plots = function (options) {
       x = _data.datetime.map(datetime => datetime.toLocal().toISO());
     }
 
-    if (_id === 'cumulative') {
-      // Use slice to copy Arrays to add Mainshock to trace w/o altering _data
+    if (id === 'cumulative') {
+      // Copy data Arrays using slice to add Mainshock to trace w/o altering _data
       Object.assign(data, {
         eqid: _data.eqid.slice(),
-        mode: 'lines+markers',
         title: _data.title.slice(),
         userTime: _data.userTime.slice(),
         utcTime: _data.utcTime.slice(),
@@ -345,24 +385,27 @@ var Plots = function (options) {
 
       _addMainshock(data, timezone);
 
-      data.text = data.y.map((val, i) => {
-        if (
-          (i === 0 && _featureId === 'aftershocks') ||
-          (i === data.y.length - 1 && _featureId === 'historical')
-        ) {
-          val = 'Mainshock'; // overrides cumulative count value
-        }
+      Object.assign(data, {
+        mode: 'lines+markers',
+        text: data.y.map((val, i) => {
+          if (
+            (i === 0 && _featureId.includes('aftershocks')) ||
+            (i === data.y.length - 1 && _featureId.includes('historical'))
+          ) {
+            val = 'Mainshock'; // overrides cumulative count value
+          }
 
-        return `${data.title[i]} (${val})<br />` +
-          `<span>${data.userTime[i]}</span><span>${data.utcTime[i]}</span>`;
+          return `${data.title[i]} (${val})<br />` +
+            `<span>${data.userTime[i]}</span><span>${data.utcTime[i]}</span>`;
+        })
       });
-    } else { // hypocenters, magtime plots
+    } else { // hypocenters, magtime
       Object.assign(data, {
         eqid: _data.eqid,
         text: _data.text
       });
 
-      if (_id === 'hypocenters') {
+      if (id === 'hypocenters') {
         Object.assign(data, {
           sizeref: 0.79, // adjust eq size for consistency with magtime plot
           type: 'scatter3d',
@@ -370,7 +413,7 @@ var Plots = function (options) {
           y: _data.lat,
           z: _data.depth
         });
-      } else { // magtime plot
+      } else { // magtime
         Object.assign(data, {
           sizeref: 1,
           x: x,
@@ -382,61 +425,113 @@ var Plots = function (options) {
     return data;
   };
 
+  /**
+   * Event handler that opens the given earthquake's map Popup.
+   *
+   * @param data {Object}
+   */
+  _openPopup = function (data) {
+    var point = data.points[0],
+        featureId = point.data.featureId,
+        count = _app.Features.getFeature(featureId).count,
+        eqids = point.data.eqid,
+        id = point.data.id,
+        index = point.pointNumber;
+
+    // The first/last point on cumulative aftershocks/historical curve is Mainshock
+    if (id === 'cumulative' &&
+      (featureId === 'aftershocks' && index === 0) ||
+      (featureId === 'historical' && index === count)
+    ) {
+      featureId = 'mainshock';
+    }
+
+    _app.MapPane.openPopup(eqids[index], featureId);
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Get the Plotly parameters that are used to create a plot.
+   * Add event listeners.
+   *
+   * @param plot {Element}
+   */
+  _this.addListeners = function (plot) {
+    plot.on('plotly_click', _openPopup);
+  };
+
+  /**
+   * Destroy this Class to aid in garbage collection.
+   */
+  _this.destroy = function () {
+    _initialize = null;
+
+    _app = null;
+    _data = null;
+    _featureId = null;
+    _mainshock = null;
+    _zRatio = null;
+
+    _addContainer = null;
+    _addMainshock = null;
+    _formatData = null;
+    _getConfig = null;
+    _getData = null;
+    _getLayout = null;
+    _getRatio = null;
+    _getTraceData = null;
+    _openPopup = null;
+
+    _this = null;
+  };
+
+  /**
+   * Get the Plotly parameters for the given plot type.
    *
    * @param id {String <cumulative|hypocenters|magtime>}
    *
    * @return {Object}
    */
-  _this.getOptions = function (id) {
-    _id = id;
+  _this.getParams = function (id) {
+    var container = _addContainer(id, _featureId);
 
     return {
-      config: _getConfig(),
-      data: _getData(),
-      layout: _getLayout()
+      config: _getConfig(id),
+      data: _getData(id),
+      graphDiv: container,
+      layout: _getLayout(id),
+      rendered: false
     };
   };
 
   /**
-   * Get the Plotly trace for a plot.
+   * Get the Plotly trace for the given plot type.
    *
    * @param id {String <cumulative|hypocenters|magtime>}
    *
-   * @return trace {Object} or undefined
+   * @return trace {Object}
    */
   _this.getTrace = function (id) {
-    var data, trace;
-
-    if (_data.eqid.length === 0) {
-      return;
-    }
-
-    _id = id;
-
-    data = _getTraceData();
-    trace = {
-      eqid: data.eqid,
-      feature: _featureId,
-      hoverinfo: 'text',
-      hoverlabel: {
-        font: {
-          size: 15
-        }
-      },
-      id: id,
-      mode: data.mode,
-      text: data.text,
-      type: data.type,
-      x: data.x,
-      y: data.y,
-      z: data.z
-    };
+    var data = _getTraceData(id),
+        trace = {
+          eqid: data.eqid,
+          featureId: _featureId,
+          hoverinfo: 'text',
+          hoverlabel: {
+            font: {
+              size: 15
+            }
+          },
+          id: id,
+          mode: data.mode,
+          text: data.text,
+          type: data.type,
+          x: data.x,
+          y: data.y,
+          z: data.z
+        };
 
     if (data.mode === 'markers') { // hypocenters, magtime plots
       trace.marker = {
@@ -467,6 +562,15 @@ var Plots = function (options) {
     }
 
     return trace;
+  };
+
+  /**
+   * Remove event listeners.
+   *
+   * @param plot {Element}
+   */
+  _this.removeListeners = function (plot) {
+    plot.removeListener('plotly_click', _openPopup);
   };
 
 
