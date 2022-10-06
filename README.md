@@ -20,7 +20,7 @@ git clone https://github.com/shaefner-usgs/esc-eq-response.git
 ```
 cd esc-eq-response
 npm install
-php composer.phar install
+composer install (or php composer.phar install)
 
 # If you need to add a CA certificate file:
 npm config set cafile "<path to your certificate file>"
