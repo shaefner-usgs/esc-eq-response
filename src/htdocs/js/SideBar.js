@@ -5,35 +5,89 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Toggle the SideBar and highlight the selected 'radio-bar' UI option.
+ * Toggle the SideBar on/off (and render it properly), set the 'sidebar' URL
+ * parameter, and remember each SideBar's scroll position. Also toggle the map
+ * links in the SideBar.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     toggle: {Function}
- *     toggleMapLinks: {Function}
- *   }
+ *     {
+ *       reset: {Function}
+ *       toggle: {Function}
+ *       toggleLinks: {Function}
+ *     }
  */
 var SideBar = function (options) {
   var _this,
       _initialize,
 
       _app,
-      _el;
+      _el,
+      _throttler,
+
+      _addListeners,
+      _saveScrollPosition,
+      _setScrollPosition;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _el = options.el || document.createElement('section');
+    _el = options.el;
+
+    _addListeners();
+    _this.reset();
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    var close = _el.querySelector('.icon-close');
+
+    // Close the SideBar
+    close.addEventListener('click', () =>
+      _this.toggle('off')
+    );
+
+    // Save the scroll position
+    _el.addEventListener('scroll', () =>
+      _saveScrollPosition()
+    );
+  };
+
+  /**
+   * Save the current scroll position in sessionStorage.
+   */
+  _saveScrollPosition = function () {
+    var id = AppUtil.getParam('sidebar'),
+        position = _el.scrollTop;
+
+    clearTimeout(_throttler);
+
+    // Throttle scroll event
+    _throttler = setTimeout(() =>
+      sessionStorage.setItem(id, position), 250
+    );
+  };
+
+  /**
+   * Set the scroll position to its previously saved value.
+   *
+   * @param id {String}
+   */
+  _setScrollPosition = function (id) {
+    var position = Number(sessionStorage.getItem(id));
+
+    if (position !== null) {
+      _el.scrollTop = position;
+    }
   };
 
   // ----------------------------------------------------------
@@ -41,21 +95,33 @@ var SideBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Toggle the SideBar on/off and shift the map's center point. Also set the
-   * 'sidebar' URL parameter and resize the plots if they are visible.
-   *
-   * @param status {String}
-   *     either 'on' or 'off'
+   * Reset to default state.
    */
-  _this.toggle = function (status) {
-    var button = document.querySelector('#navSub .selected'),
-        id = button.className.match(/icon-(\w+)/)[1],
-        selSideBar = document.getElementById(id),
-        toggled = true; // default; whether or not sidebar visibility changed
+  _this.reset = function () {
+    var sidebars = _el.querySelectorAll('section.bar');
 
-    if (status === 'on') { // open sidebar
+    sidebars.forEach(sidebar => {
+      var id = sidebar.getAttribute('id');
+
+      sessionStorage.setItem(id, 0);
+    });
+  };
+
+  /**
+   * Toggle the SideBar on/off and set the 'sidebar' URL parameter. Also shift
+   * the map's center point and resize the plots if they are visible.
+   *
+   * @param state {String <on|off>}
+   */
+  _this.toggle = function (state) {
+    var selected = document.querySelector('#navSub .selected'),
+        id = selected.className.match(/icon-(\w+)/)[1],
+        el = document.getElementById(id),
+        toggled = true; // default; whether or not SideBar visibility changed
+
+    if (state === 'on') { // open SideBar (if it's closed)
       AppUtil.setParam('sidebar', id);
-      _app.setScrollPosition(id);
+      _setScrollPosition(id);
 
       if (document.body.classList.contains('sidebar')) {
         toggled = false; // already open
@@ -64,22 +130,22 @@ var SideBar = function (options) {
       }
 
       if (id === 'searchBar') {
-        _app.SearchBar.renderMap();
+        _app.SearchBar.render();
       } else if (id === 'settingsBar') {
         _app.SettingsBar.setFocusedField();
       }
-    } else { // close sidebar
-      AppUtil.setParam('sidebar', '');
-      _app.NavBar.hideAll('sidebars');
-
-      selSideBar.classList.remove('hide'); // keep visible for animation
+    } else { // close SideBar
+      AppUtil.setParam('sidebar', ''); // retain param to repress default SideBar
       document.body.classList.remove('sidebar');
+
+      _app.NavBar.hideAll('sidebars');
+      el.classList.remove('hide'); // keep visible for animation
     }
 
     if (toggled) {
       _app.MapPane.shiftMap();
 
-      if (_app.getPaneId() === 'plotsPane') {
+      if (_app.Pane.getSelected() === 'plotsPane') {
         _app.PlotsPane.resize();
       }
     }
@@ -88,13 +154,14 @@ var SideBar = function (options) {
   /**
    * Toggle the 'map' links depending on whether or not the MapPane is visible.
    *
-   * @param paneId {String}
+   * @param id {String}
+   *     Pane id
    */
-  _this.toggleMapLinks = function (paneId) {
+  _this.toggleLinks = function (id) {
     var links = _el.querySelectorAll('a[href="#mapPane"]');
 
     links.forEach(link => {
-      if (paneId === 'mapPane') {
+      if (id === 'mapPane') {
         link.classList.add('hide-link');
       } else {
         link.classList.remove('hide-link');

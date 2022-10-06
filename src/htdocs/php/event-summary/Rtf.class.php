@@ -24,7 +24,6 @@ class Rtf {
           $_font,
           $_format,
           $_now,
-          $_plotNames,
           $_rtf;
 
   public $file;
@@ -35,10 +34,6 @@ class Rtf {
     $this->_font = new stdClass;
     $this->_format = new stdClass;
     $this->_now = date('Y-m-d g:ia \(T\)');
-    $this->_plotNames = [
-      'cumulative' => 'Cumulative Earthquakes',
-      'magtime' => 'Magnitude vs. Time'
-    ];
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
 
     if ($this->_data) {
@@ -95,23 +90,16 @@ class Rtf {
     $this->_data->notice = trim($this->_data->notice);
 
     // Strip extra whitespace from PAGER summary
-    if (property_exists($this->_data, 'pager-comments')) {
-      $this->_data->{'pager-comments'}->struct_comment = preg_replace(
-        '/\s+/', ' ', $this->_data->{'pager-comments'}->struct_comment
-      );
-    }
+    $this->_data->pagerComments->structComment = preg_replace(
+      '/\s+/', ' ', $this->_data->pagerComments->structComment
+    );
 
     // Clean up / remove NULL values from historical events list
-    if (property_exists($this->_data, 'historical-events')) {
-      foreach ($this->_data->{'historical-events'} as $key => $event) {
-        if (!$event) { // NULL
-          unset($this->_data->{'historical-events'}[$key]);
-        } else { // clean up slashes/extra quotes on name prop
-          $event->Name = trim(stripslashes($event->Name), '"');
-        }
-      }
-      if (count($this->_data->{'historical-events'}) === 0) {
-        unset($this->_data->{'historical-events'});
+    foreach ($this->_data->historicalEvents as $key => $event) {
+      if (!$event) { // NULL
+        unset($this->_data->historicalEvents[$key]);
+      } else { // clean up slashes/extra quotes on name prop
+        $event->Name = trim(stripslashes($event->Name), '"');
       }
     }
   }
@@ -135,25 +123,26 @@ class Rtf {
   }
 
   /**
-   * Get the fields for the earthquake list tables.
+   * Get the field names for the earthquake list tables.
    *
    * @return $fields {Array}
    */
   private function _getFields() {
     $fields = [
       'magDisplay' => 'Mag',
-      'utcTime' => 'Time (UTC)',
+      'utcTimeDisplay' => 'Time (UTC)',
       'depthDisplay' => 'Depth',
       'location' => 'Location',
       'distanceDisplay' => 'Distance',
-      'eqid' => 'Event ID'
+      'id' => 'Event ID'
     ];
     $time = $this->_data->time;
 
+    // Display user time (replace UTC time)
     if ($time->zone === 'user') {
       $fields = array_merge(
         array_slice($fields, 0, 1),
-        ['userTime' => "Time ($time->utcOffset)"],
+        ['userTimeDisplay' => "Time ($time->utcOffset)"],
         array_slice($fields, 2)
       );
     }
@@ -290,20 +279,17 @@ class Rtf {
     $section1 = $this->_rtf->addSection();
 
     $time = $this->_data->time;
-    $datetime = strip_tags($time->utc) . '<br>';
-    $datetime .= strip_tags($time->user);
+    $datetime = strip_tags($time->utc) . '<br>' . strip_tags($time->user);
     if ($time->local) {
       $datetime .= '<br>' . strip_tags($time->local);
     }
-
     $nearbyCitiesList = '';
-    if (property_exists($this->_data, 'nearby-cities')) {
-      foreach ($this->_data->{'nearby-cities'} as $city) {
-        $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
-          ' of ' . $city->name . '<br>';
-      }
-      $nearbyCitiesList = substr($nearbyCitiesList, 0, -4); // remove final <br>
+
+    foreach ($this->_data->nearbyCities as $city) {
+      $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
+        ' of ' . $city->name . '<br>';
     }
+    $nearbyCitiesList = substr($nearbyCitiesList, 0, -4); // remove final <br>
 
     $section1->writeText(
       $this->_data->title,
@@ -344,7 +330,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->depthDisplay,
+      strip_tags($this->_data->depthDisplay),
       $this->_font->body,
       $this->_format->body
     );
@@ -503,7 +489,9 @@ class Rtf {
    * Section 3: Impact.
    */
   private function _createSection3() {
-    if (!empty(get_object_vars($this->_data->pager))) {
+    $pager = $this->_data->pager;
+
+    if (!empty(get_object_vars($pager))) {
       $section3 = $this->_rtf->addSection();
 
       $section3->writeText(
@@ -518,64 +506,66 @@ class Rtf {
         $this->_format->h3
       );
 
-      if (property_exists($this->_data->pager, 'alert')) {
+      if (property_exists($pager, 'alert')) {
         $section3->writeText(
           'Alert Level',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->writeText(
-          ucfirst($this->_data->pager->alert),
-          $this->_font->pagerAlert[$this->_data->pager->alert],
+          ucfirst($pager->alert),
+          $this->_font->pagerAlert[$pager->alert],
           $this->_format->body
         );
       }
 
-      if (property_exists($this->_data, 'pager-comments')) {
+      $pagerComments = $this->_data->pagerComments;
+
+      if ($pagerComments->impact1 || $pagerComments->structComment) {
         $section3->writeText(
           'Summary',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->writeText(
-          $this->_data->{'pager-comments'}->impact1,
+          $pagerComments->impact1,
           $this->_font->body,
           $this->_format->p // margin below
         );
         $section3->writeText(
-          $this->_data->{'pager-comments'}->struct_comment,
+          $pagerComments->structComment,
           $this->_font->body,
           $this->_format->body // no margin below (margins don't collapse)
         );
       }
 
-      if (property_exists($this->_data->pager, 'economic')) {
+      if (property_exists($pager, 'economic')) {
         $section3->writeText(
           'Estimated Economic Losses',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->addImage(
-          $this->_getRemoteImage($this->_data->pager->economic),
+          $this->_getRemoteImage($pager->economic),
           $this->_format->image,
           12
         );
       }
 
-      if (property_exists($this->_data->pager, 'fatalities')) {
+      if (property_exists($pager, 'fatalities')) {
         $section3->writeText(
           'Estimated Fatalities',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->addImage(
-          $this->_getRemoteImage($this->_data->pager->fatalities),
+          $this->_getRemoteImage($pager->fatalities),
           $this->_format->image,
           12
         );
       }
 
-      if (property_exists($this->_data->pager, 'exposure')) {
+      if (property_exists($pager, 'exposure')) {
         $section3->insertPageBreak();
         $section3->writeText(
           'Population Exposure',
@@ -584,13 +574,13 @@ class Rtf {
         );
         $section3->writeText('<br>');
         $section3->addImage(
-          $this->_getRemoteImage($this->_data->pager->exposure),
+          $this->_getRemoteImage($pager->exposure),
           $this->_format->image,
           10
         );
       }
 
-      if (!empty(get_object_vars($this->_data->{'pager-exposures'}))) {
+      if (!empty(get_object_vars($this->_data->pagerExposures))) {
         $this->_createTableExposure($section3);
       }
     }
@@ -683,15 +673,16 @@ class Rtf {
       );
     }
 
-    if (property_exists($this->_data, 'shakemap-info')) {
-      $motions = $this->_data->{'shakemap-info'}->output->ground_motions;
+    $motions = $this->_data->groundMotions;
 
+    if (!empty(get_object_vars($motions))) {
       $mmiProp = ''; // property name is inconsistent
       if (property_exists($motions, 'intensity')) {
         $mmiProp = 'intensity';
       } else if (property_exists($motions, 'MMI')) {
         $mmiProp = 'MMI';
       }
+
       if ($mmiProp) {
         $mmi = round($motions->{$mmiProp}->max, 1);
         if ($motions->{$mmiProp}->bias) {
@@ -710,6 +701,7 @@ class Rtf {
       } else if (property_exists($motions, 'PGA')) {
         $pgaProp = 'PGA';
       }
+
       if ($pgaProp) {
         $pga = round($motions->{$pgaProp}->max, 1) . ' ' .
           $motions->{$pgaProp}->units;
@@ -729,6 +721,7 @@ class Rtf {
       } else if (property_exists($motions, 'PGV')) {
         $pgvProp = 'PGV';
       }
+
       if ($pgvProp) {
         $pgv = round($motions->{$pgvProp}->max, 1) . ' ' .
           $motions->{$pgvProp}->units;
@@ -762,33 +755,35 @@ class Rtf {
       $this->_format->body
     );
 
-    if (!empty(get_object_vars($this->_data->dyfi))) {
+    $dyfi = $this->_data->dyfi;
+
+    if (!empty(get_object_vars($dyfi))) {
       $section5->writeText(
         'Did You Feel It?',
         $this->_font->h4,
         $this->_format->h4
       );
       $section5->writeText(
-        $this->_data->dyfi->responses . ' responses as of ' . $this->_now,
+        $dyfi->responses . ' responses as of ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max MMI: ' . $this->_data->dyfi->maxmmi,
+        'Max MMI: ' . $dyfi->maxmmi,
         $this->_font->body,
         $this->_format->body
       );
 
-      if (property_exists($this->_data->dyfi, 'map')) {
+      if (property_exists($dyfi, 'map')) {
         $section5->addImage(
-          $this->_getRemoteImage($this->_data->dyfi->map),
+          $this->_getRemoteImage($dyfi->map),
           $this->_format->image,
           12
         );
       }
-      if (property_exists($this->_data->dyfi, 'plot')) {
+      if (property_exists($dyfi, 'plot')) {
         $section5->addImage(
-          $this->_getRemoteImage($this->_data->dyfi->plot),
+          $this->_getRemoteImage($dyfi->plot),
           $this->_format->image,
           12
         );
@@ -854,10 +849,12 @@ class Rtf {
       $this->_createTableEqlist($section6, 'aftershocks');
     }
 
-    if (!empty(get_object_vars($aftershocks->plots))) {
-      foreach ($aftershocks->plots as $type => $dataUrl) {
+    $plots = $aftershocks->plots;
+
+    if (!empty(get_object_vars($plots))) {
+      foreach ($plots as $type => $dataUrl) {
         $section6->writeText(
-          $this->_plotNames[$type],
+          $this->_data->plotNames->{$type},
           $this->_font->h4,
           $this->_format->h4
         );
@@ -1010,10 +1007,12 @@ class Rtf {
       $this->_createTableEqlist($section8, 'historical');
     }
 
-    if (!empty(get_object_vars($historical->plots))) {
-      foreach ($historical->plots as $type => $dataUrl) {
+    $plots = $historical->plots;
+
+    if (!empty(get_object_vars($plots))) {
+      foreach ($plots as $type => $dataUrl) {
         $section8->writeText(
-          $this->_plotNames[$type],
+          $this->_data->plotNames->{$type},
           $this->_font->h4,
           $this->_format->h4
         );
@@ -1026,12 +1025,11 @@ class Rtf {
       }
     }
 
-    if (property_exists($this->_data, 'historical-events')) {
-      $events = $this->_data->{'historical-events'};
-
+    $historicalEvents = $this->_data->historicalEvents;
+    if (!empty($historicalEvents)) {
       // Get sort order based on event date/time
       $dates = array();
-      foreach ($events as $key => $event) {
+      foreach ($historicalEvents as $key => $event) {
         $dates[$key] = $event->Time;
       }
       arsort($dates);
@@ -1044,7 +1042,7 @@ class Rtf {
       );
 
       foreach ($sortKeys as $key) {
-        $event = $events[$key];
+        $event = $historicalEvents[$key];
 
         $section8->writeText(
           $event->Name,
@@ -1106,9 +1104,9 @@ class Rtf {
       $this->_format->h2
     );
 
-    if (property_exists($this->_data, 'shake-alert')) {
-      $shakeAlert = $this->_data->{'shake-alert'};
+    $shakeAlert = $this->_data->shakeAlert;
 
+    if (!empty(get_object_vars($shakeAlert))) {
       $section9->writeText(
         '<strong>Status</strong>: ' . $shakeAlert->properties->announcement,
         $this->_font->body,
@@ -1380,7 +1378,7 @@ class Rtf {
         }
 
         $fieldValue = strip_tags($eq->{$key});
-        if ($key === 'userTime' || $key === 'utcTime') { // strip off timezone
+        if ($key === 'userTimeDisplay' || $key === 'utcTimeDisplay') { // strip off timezone
           $fieldValue = preg_replace('/\s+\([\w\-:]+\)/', '', $fieldValue);
         } else if ($key === 'magDisplay') { // add mag type
           $fieldValue = $eq->magType . ' ' . $fieldValue;
@@ -1398,7 +1396,7 @@ class Rtf {
    */
   private function _createTableExposure($section) {
     $cities = array_filter( // keep values where mmi >=2
-      $this->_data->{'pager-cities'},
+      $this->_data->pagerCities,
       function($value) {
         if (intVal(round($value->mmi)) >= 2) {
           return $value;
@@ -1406,7 +1404,7 @@ class Rtf {
       }
     );
     $mmis = array_filter( // keep values where mmi >=2
-      $this->_data->{'pager-exposures'}->mmi,
+      $this->_data->pagerExposures->mmi,
       function($value) {
         if ($value >= 2) {
           return $value;
@@ -1414,15 +1412,15 @@ class Rtf {
       }
     );
     $population = array_filter( // keep values where population > 0 and mmi >=2
-      $this->_data->{'pager-exposures'}->population,
+      $this->_data->pagerExposures->population,
       function($value, $key) {
-        if ($value > 0 && $this->_data->{'pager-exposures'}->mmi[$key] >= 2) {
+        if ($value > 0 && $this->_data->pagerExposures->mmi[$key] >= 2) {
           return $value;
         }
       },
       ARRAY_FILTER_USE_BOTH
     );
-    $shaking = $this->_data->{'pager-exposures'}->shaking;
+    $shaking = $this->_data->pagerExposures->shaking;
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
     if ($numRows > 1) { // table contains data (and not just a header row)
@@ -1585,7 +1583,7 @@ class Rtf {
    *     RTF Document section
    */
   function _createTableShakeAlert($section) {
-    $cities = $this->_data->{'shake-alert'}->cities->features;
+    $cities = $this->_data->shakeAlert->cities->features;
     $numRows = count($cities) + 1; // data rows + 1 header row
 
     $section->writeText(

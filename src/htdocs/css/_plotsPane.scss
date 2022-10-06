@@ -5,7 +5,7 @@
     margin: 1.625rem 0 1.25rem;
   }
 
-  .content {
+  .container {
     display: flex;
     flex-direction: column;
   }
@@ -28,7 +28,8 @@
 
   /* Rendering order of Features */
 
-  .aftershocks {
+  .aftershocks,
+  .dd-aftershocks {
     order: 0;
 
     h2 {
@@ -36,11 +37,13 @@
     }
   }
 
-  .foreshocks {
+  .foreshocks,
+  .dd-foreshocks {
     order: 1;
   }
 
-  .historical {
+  .historical,
+  .dd-historical {
     order: 2;
   }
 }

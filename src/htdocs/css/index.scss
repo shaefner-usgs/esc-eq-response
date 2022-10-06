@@ -173,7 +173,7 @@ tr {
   padding: 1rem;
 }
 
-.content {
+.container {
   line-height: 1.625;
   padding: 1rem var(--padding-gutter);
 }
@@ -189,11 +189,6 @@ tr {
   }
   &:before {
     content: "(";
-  }
-
-  &.hide {
-    opacity: 0;
-    transition: none;
   }
 }
 
@@ -222,7 +217,7 @@ tr {
   }
 }
 
-.params {
+.props {
   display: grid;
   grid-template-columns: max-content auto;
   margin-bottom: 0;

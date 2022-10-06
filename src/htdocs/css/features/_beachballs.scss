@@ -1,8 +1,8 @@
 @use '../mixins' as *;
 @use '../variables' as *;
 
-#focal-mechanismLightbox,
-#moment-tensorLightbox {
+#focal-mechanism-lightbox,
+#moment-tensor-lightbox {
   canvas {
     margin-top: 3.5rem;
     max-width: 100%;
@@ -42,7 +42,7 @@
     text-transform: uppercase;
   }
 
-  .container {
+  .content {
     display: flex;
     flex-flow: row nowrap;
   }
@@ -76,8 +76,8 @@
 
 @media only screen
 and (max-width: $breakpoint-phone-width) {
-  #focal-mechanismLightbox,
-  #moment-tensorLightbox {
+  #focal-mechanism-lightbox,
+  #moment-tensor-lightbox {
     canvas {
       display: block;
       margin: 0 auto 2rem;
@@ -94,7 +94,7 @@ and (max-width: $breakpoint-phone-width) {
       order: 1;
     }
 
-    .container {
+    .content {
       flex-flow: row wrap;
     }
   }

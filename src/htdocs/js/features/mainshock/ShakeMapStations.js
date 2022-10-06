@@ -2,14 +2,12 @@
 'use strict';
 
 
-require('leaflet/L.GeoJSON.DateLine');
-
 var AppUtil = require('util/AppUtil');
 
 
 var _DEFAULTS,
     _FLAG_DESCRIPTIONS,
-    _MARKER_DEFAULTS;
+    _MARKER;
 
 _FLAG_DESCRIPTIONS = {
   G: 'Glitch (clipped or below noise)',
@@ -18,13 +16,13 @@ _FLAG_DESCRIPTIONS = {
   N: 'Not in list of known stations',
   T: 'Outlier'
 };
-_MARKER_DEFAULTS = {
+_MARKER = {
   iconAnchor: [7, 5],
   iconSize: [14, 10],
   popupAnchor: [0, -5]
 };
 _DEFAULTS = {
-  markerOptions: _MARKER_DEFAULTS
+  marker: _MARKER
 };
 
 
@@ -32,24 +30,23 @@ _DEFAULTS = {
  * Create the ShakeMap Stations Feature.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *       defaults: {Object}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     count: {Integer}
- *     create: {Function}
- *     destroy: {Function}
- *     id: {String}
- *     mapLayer: {L.Layer}
- *     name: {String}
- *     reset: {Function}
- *     setFeedUrl: {Function}
- *     showLayer: {Boolean}
- *     url: {String}
- *     zoomToLayer: {Boolean}
- *   }
+ *     {
+ *       count: {Integer}
+ *       deferFetch: {Boolean}
+ *       destroy: {Function}
+ *       id: {String}
+ *       mapLayer: {L.FeatureGroup}
+ *       name: {String}
+ *       showLayer: {Boolean}
+ *       url: {String}
+ *       zoomToLayer: {Boolean}
+ *     }
  */
 var ShakeMapStations = function (options) {
   var _this,
@@ -57,51 +54,61 @@ var ShakeMapStations = function (options) {
 
       _app,
       _markerOptions,
-      _shakemap,
 
       _filter,
       _getAmplitudes,
       _getComponent,
-      _getMapLayer,
       _getPopup,
       _getRow,
       _getTable,
-      _getTitle,
+      _getTooltip,
+      _getUrl,
       _onEachFeature,
       _pointToLayer;
 
 
   _this = {};
 
-  _initialize = function (options) {
+  _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
 
-    _app = options.app;
-    _markerOptions = options.markerOptions;
+    Object.assign(_this, options.defaults);
 
-    Object.assign(_this, {
-      count: 0,
-      id: 'shakemap-stations',
-      mapLayer: null,
-      name: 'ShakeMap Stations',
-      showLayer: false,
-      url: '',
-      zoomToLayer: false
-    });
+    _app = options.app;
+    _markerOptions = options.marker;
+
+    _this.count = 0;
+    _this.deferFetch = true;
+    _this.id = 'shakemap-stations';
+    _this.mapLayer = null; // default
+    _this.name = 'ShakeMap Stations';
+    _this.showLayer = false;
+    _this.url = _getUrl();
+    _this.zoomToLayer = false;
+
+    if (_this.url) {
+      _this.mapLayer = L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this,
+        filter: _filter,
+        onEachFeature: _onEachFeature,
+        pointToLayer: _pointToLayer
+      });
+    }
   };
 
   /**
    * Filter out DYFI stations.
    *
    * @param station {Object}
+   *
+   * @return {Number}
    */
   _filter = function (station) {
     var props = station.properties;
 
     if (props.network !== 'DYFI' && props.network !== 'INTENSITY') {
-      _this.count ++;
-
-      return true;
+      return ++ _this.count;
     }
   };
 
@@ -123,31 +130,30 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML for a channel component.
+   * Get the HTML content for the given amplitude's channel component.
    *
-   * @param data {Object}
+   * @param amplitude {Object}
    *
    * @return html {String}
    */
-  _getComponent = function (data) {
-    var flag,
-        html,
-        value;
+  _getComponent = function (amplitude) {
+    var flag, html, value;
 
-    if (data) {
-      flag = data.flag;
-      value = AppUtil.round(data.value, 2);
+    if (amplitude) {
+      flag = amplitude.flag;
+      value = AppUtil.round(amplitude.value, 2);
 
       // Add flag class for all non-zero flags
       if (flag && flag !== '0') {
         html = '<span class="station-flag">' + value;
 
         // display flag with title text
-        if (Object.prototype.hasOwnProperty.call(_FLAG_DESCRIPTIONS, flag)) {
-          html += `<abbr title="${_FLAG_DESCRIPTIONS[flag]}">(${flag})</abbr>`;
+        if (_FLAG_DESCRIPTIONS[flag]) {
+          html += ` <abbr title="${_FLAG_DESCRIPTIONS[flag]}">(${flag})</abbr>`;
         } else {
-          html += `(${flag})`;
+          html += ` (${flag})`;
         }
+
         html += '</span>';
       } else {
         html = `<span>${value}</span>`;
@@ -160,28 +166,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the Leaflet map layer.
-   *
-   * @param json {Object}
-   *
-   * @return mapLayer {L.Layer}
-   */
-  _getMapLayer = function (json) {
-    var mapLayer;
-
-    if (_shakemap) {
-      mapLayer = L.geoJSON.dateLine(json, {
-        filter: _filter,
-        onEachFeature: _onEachFeature,
-        pointToLayer: _pointToLayer
-      });
-    }
-
-    return mapLayer;
-  };
-
-  /**
-   * Get the Leaflet popup content for the given station.
+   * Get the HTML content for the given station's Leaflet popup.
    *
    * @param station {Object}
    *
@@ -200,7 +185,7 @@ var ShakeMapStations = function (options) {
           location: AppUtil.formatLatLon(coords),
           romanIntensity: AppUtil.romanize(props.intensity) || 'I',
           source: props.source || '–',
-          title: _getTitle(station)
+          title: _getTooltip(station)
         },
         html = L.Util.template(
           '<div class="shakemap-stations">' +
@@ -223,7 +208,7 @@ var ShakeMapStations = function (options) {
                 '<abbr title="Distance from mainshock (km)">Dist</abbr>' +
               '</li>' +
             '</ul>' +
-            '<dl class="station-metadata horizontal params">' +
+            '<dl class="station-metadata horizontal props">' +
               '<dt>Network</dt>' +
               '<dd>{network}</dd>' +
               '<dt>Location</dt>' +
@@ -245,21 +230,21 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML for the given channel's table row.
+   * Get the HTML <tr> for the given channel.
    *
    * @param channel {Object}
    *
    * @return html {String}
    */
   _getRow = function (channel) {
-    var amplitude = _getAmplitudes(channel.amplitudes),
+    var amplitudes = _getAmplitudes(channel.amplitudes),
         data = {
           name: channel.name,
-          pga: _getComponent(amplitude.pga),
-          pgv: _getComponent(amplitude.pgv),
-          psa03: _getComponent(amplitude['sa(0.3)']),
-          psa10: _getComponent(amplitude['sa(1.0)']),
-          psa30: _getComponent(amplitude['sa(3.0)'])
+          pga: _getComponent(amplitudes.pga),
+          pgv: _getComponent(amplitudes.pgv),
+          psa03: _getComponent(amplitudes['sa(0.3)']),
+          psa10: _getComponent(amplitudes['sa(1.0)']),
+          psa30: _getComponent(amplitudes['sa(3.0)'])
         },
         html = L.Util.template(
           '<tr>' +
@@ -277,7 +262,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML table for the given channels.
+   * Get the HTML <table> for the given channels.
    *
    * @param channels {Array}
    *
@@ -318,13 +303,13 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML title for the given station.
+   * Get the HTML content for the given station's Leaflet tooltip.
    *
    * @param station {Object}
    *
    * @return {String}
    */
-  _getTitle = function (station) {
+  _getTooltip = function (station) {
     var props = station.properties,
         data = {
           code: props.code || '–',
@@ -335,13 +320,35 @@ var ShakeMapStations = function (options) {
   };
 
   /**
+   * Get the JSON feed's URL.
+   *
+   * @return url {String}
+   */
+  _getUrl = function () {
+    var contents,
+        mainshock = _app.Features.getFeature('mainshock'),
+        shakemap = mainshock.json.properties.products.shakemap,
+        url = '';
+
+    if (shakemap) {
+      contents = shakemap[0].contents;
+
+      if (contents['download/stationlist.json']) {
+        url = contents['download/stationlist.json'].url;
+      }
+    }
+
+    return url;
+  };
+
+  /**
    * Add Leaflet popups and tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
    */
   _onEachFeature = function (feature, layer) {
-    var tooltip = _getTitle(feature);
+    var tooltip = _getTooltip(feature);
 
     layer.bindPopup(_getPopup(feature), {
       maxWidth: 425,
@@ -359,29 +366,20 @@ var ShakeMapStations = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     var props = feature.properties,
-        romanIntensity = AppUtil.romanize(props.intensity) || 'I';
-
-    _markerOptions.className = 'station-layer-icon station-mmi' + romanIntensity;
+        romanIntensity = AppUtil.romanize(props.intensity) || 'I',
+        options = Object.assign({}, _markerOptions, {
+          className: 'station-layer-icon station-mmi' + romanIntensity
+        });
 
     return L.marker(latlng, {
-      icon: L.divIcon(_markerOptions),
-      pane: _this.id // put markers in custom Leaflet map pane
+      icon: L.divIcon(options),
+      pane: _this.id // controls stacking order
     });
   };
 
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
-
-  /**
-   * Create Feature (set properties that depend on external feed data).
-   *
-   * @param json {Object}
-   *     feed data for feature
-   */
-  _this.create = function (json) {
-    _this.mapLayer = _getMapLayer(json);
-  };
 
   /**
    * Destroy this Class to aid in garbage collection.
@@ -391,48 +389,19 @@ var ShakeMapStations = function (options) {
 
     _app = null;
     _markerOptions = null;
-    _shakemap = null;
 
     _filter = null;
     _getAmplitudes = null;
     _getComponent = null;
-    _getMapLayer = null;
     _getPopup = null;
     _getRow = null;
     _getTable = null;
-    _getTitle = null;
+    _getTooltip = null;
+    _getUrl = null;
     _onEachFeature = null;
     _pointToLayer = null;
 
     _this = null;
-  };
-
-  /**
-   * Set the JSON feed's URL.
-   */
-  _this.setFeedUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock');
-
-    _shakemap = mainshock.json.properties.products.shakemap;
-
-    if (_shakemap) {
-      contents = _shakemap[0].contents;
-
-      if (contents['download/stationlist.json']) {
-        _this.url = contents['download/stationlist.json'].url;
-      }
-    }
-  };
-
-  /**
-   * Reset to initial state.
-   */
-  _this.reset = function () {
-    Object.assign(_this, {
-      count: 0,
-      mapLayer: null
-    });
   };
 
 

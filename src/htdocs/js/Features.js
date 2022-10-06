@@ -1,58 +1,104 @@
 'use strict';
 
 
-var Aftershocks = require('features/Aftershocks'),
+var Aftershocks = require('features/mainshock/Aftershocks'),
     AppUtil = require('util/AppUtil'),
-    FieldNotes = require('features/FieldNotes'),
-    FocalMechanism = require('features/FocalMechanism'),
-    Forecast = require('features/Forecast'),
-    Foreshocks = require('features/Foreshocks'),
-    Historical = require('features/Historical'),
-    Mainshock = require('features/Mainshock'),
-    MomentTensor = require('features/MomentTensor'),
-    PagerCities = require('features/PagerCities'),
-    PagerExposures = require('features/PagerExposures'),
-    ShakeMapStations = require('features/ShakeMapStations');
+    CatalogSearch = require('features/base/CatalogSearch'),
+    DDMainshock = require('features/mainshock/dd/Mainshock'),
+    FieldNotes = require('features/mainshock/FieldNotes'),
+    FocalMechanism = require('features/mainshock/FocalMechanism'),
+    Forecast = require('features/mainshock/Forecast'),
+    Foreshocks = require('features/mainshock/Foreshocks'),
+    Historical = require('features/mainshock/Historical'),
+    HistoricalEvents = require('features/rtf/HistoricalEvents'),
+    Mainshock = require('features/mainshock//Mainshock'),
+    MomentTensor = require('features/mainshock/MomentTensor'),
+    NearbyCities = require('features/rtf/NearbyCities'),
+    PagerCities = require('features/mainshock/PagerCities'),
+    PagerComments = require('features/rtf/PagerComments'),
+    PagerExposures = require('features/mainshock/PagerExposures'),
+    Rtf = require('util/Rtf'),
+    ShakeAlert = require('features/rtf/ShakeAlert'),
+    ShakeMapInfo = require('features/rtf/ShakeMapInfo'),
+    ShakeMapStations = require('features/mainshock/ShakeMapStations'),
+    SignificantEqs = require('features/base/SignificantEqs');
 
+
+var _DEFAULTS,
+    _MODULES;
 
 /**
- * Set which Features get added, and the order they are loaded (Mainshock must
- * be first). Stacking order is set in CSS.
+ * Default settings for new Features.
  */
-var _FEATURECLASSES = [
-  Mainshock,
-  Forecast, // load ASAP: dependency for Aftershocks
-  PagerCities, // load ASAP: dependency for PagerExposures
-  FocalMechanism,
-  MomentTensor,
-  Aftershocks,
-  Foreshocks,
-  Historical,
-  PagerExposures,
-  ShakeMapStations,
-  FieldNotes
-];
+_DEFAULTS = {
+  showLayer: true,
+  zoomToLayer: true
+};
+
+/**
+ * Feature modules, organized by display mode.
+ */
+_MODULES = {
+  base: [ // Features added when the app is loaded
+    CatalogSearch,
+    SignificantEqs
+  ],
+  comcat: [ // ComCat catalog's Mainshock Features
+    Aftershocks,
+    Foreshocks,
+    Historical
+  ],
+  dd: [ // double-difference catalog's Mainshock Features
+    DDMainshock, // must be first
+    Aftershocks,
+    Foreshocks,
+    Historical
+  ],
+  mainshock: [ // Features added when a new Mainshock is selected
+    Mainshock, // must be first
+    FieldNotes,
+    FocalMechanism,
+    Forecast,
+    MomentTensor,
+    PagerCities,
+    PagerExposures,
+    ShakeMapStations
+  ],
+  rtf: [ // Features added when the Event Summary RTF is created
+    HistoricalEvents,
+    NearbyCities,
+    PagerComments,
+    ShakeAlert,
+    ShakeMapInfo
+  ]
+};
 
 
 /**
- * Load, create, add, remove and refresh Features on Map/Plots/SummaryPanes.
+ * Create, add, get, remove, and refresh Features.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     createFeature: {Function}
- *     getFeature: {Function}
- *     getFeatures: {Function}
- *     getLoadingStatus: {Function}
- *     isFeature: {Function}
- *     postInit: {Function}
- *     refreshFeature: {Function}
- *     reset: {Function}
- *   }
+ *     {
+ *       addContent: {Function}
+ *       addFeature: {Function}
+ *       checkDependencies: {Function}
+ *       clearQueue: {Function}
+ *       createFeatures: {Function}
+ *       getFeature: {Function}
+ *       getFeatures: {Function}
+ *       getHeaders: {Function}
+ *       getStatus: {Function}
+ *       isFeature: {Function}
+ *       postInit: {Function)
+ *       refreshFeature: {Function}
+ *       removeFeature: {Function}
+ *       reset: {Function}
+ *     }
  */
 var Features = function (options) {
   var _this,
@@ -60,104 +106,86 @@ var Features = function (options) {
 
       _app,
       _features,
+      _modules,
       _prevFeatures,
+      _queue,
 
+      _addCount,
       _addFeature,
-      _addLoaders,
       _cacheFeature,
-      _checkDependencies,
-      _createFeatures,
+      _createFeature,
+      _getMode,
       _initFeatures,
-      _loadFeature,
-      _removeFeatures,
-      _removeFeature;
+      _isReady,
+      _removeCount,
+      _removeFeatures;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _features = {};
+    _modules = {};
     _prevFeatures = {};
+    _queue = [];
+
+    _initFeatures();
   };
 
   /**
-   * Add the given Feature to Map/Plots/SummaryPanes; add the Feature's count to
-   * SettingsBar. Also add event listeners if present.
+   * Add the given Feature's count next to its name.
+   *
+   * Note: also replaces (or removes) the loader.
+   *
+   * @param feature {Object}
+   */
+  _addCount = function (feature) {
+    var count = '',
+        els = _this.getHeaders(feature.id);
+
+    if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
+      count = `<span class="count">${feature.count}</span>`;
+    }
+
+    els.forEach(el => {
+      el.innerHTML = feature.name + count;
+    });
+
+    // Layer control's count is handled by its Leaflet plugin
+    _app.MapPane.layerControl.addCount(count, feature.id);
+  };
+
+  /**
+   * Add the given Feature to the Map/Plots/SummaryPanes. This is typically a
+   * placeholder where fetched data is subsequently added when it is ready.
    *
    * @param feature {Object}
    */
   _addFeature = function (feature) {
-    var status = _this.getLoadingStatus();
-
-    if (feature.id === 'mainshock') {
-      _app.SelectBar.showMainshock();
-      _app.SettingsBar.setDefaults();
-      _app.SignificantEqs.update(); // selects Mainshock if it's in list
-
-      if (AppUtil.getParam('catalog') === 'dd') {
-        feature.update('dd'); // show Double Difference properties
-      }
-
-      document.body.classList.remove('loading');
-      document.body.classList.add('mainshock');
-    }
-
     try {
-      _app.MapPane.addFeature(feature);
       _app.PlotsPane.addFeature(feature);
-      _app.SettingsBar.addCount(feature);
       _app.SummaryPane.addFeature(feature);
-
-      if (feature.id === 'mainshock') {
-        // Create the other Features now that the Mainshock has been added
-        _createFeatures();
-      }
-
-      // Add listeners that depend on Feature being added first
-      if (feature.addListeners) {
-        feature.addListeners();
-      }
-
-      if (status === 'complete') {
-        _this.getFeature('mainshock').enableButton();
-      }
+      _app.MapPane.addFeature(feature); // must be last (so loaders can be added)
     } catch (error) {
       _app.StatusBar.addError({
         id: feature.id,
         message: `<h4>Error Adding ${feature.name}</h4><ul><li>${error}</li></ul>`
       });
-      _removeFeature(feature);
+      _this.removeFeature(feature);
 
       console.error(error);
     }
   };
 
   /**
-   * Add a 'loader' on Map/Plots/SummaryPanes and SettingsBar while fetching
-   * data for a Feature. Also add the Feature's name in a container <div> on
-   * Plots/SummaryPanes and in the layer controller on MapPane.
-   *
-   * @param feature {Object}
-   */
-  _addLoaders = function (feature) {
-    _app.MapPane.addLoader(feature);
-    _app.PlotsPane.addLoader(feature);
-    _app.SettingsBar.addLoader(feature);
-    _app.SummaryPane.addLoader(feature);
-  };
-
-  /**
    * Cache an existing Feature (in an Array due to the potential of 'stacked'
-   * Fetch requests). Used to purge the 'previous' Feature when a refresh
-   * completes.
+   * Fetch requests). This is used to purge the 'previous' Feature when a
+   * refresh completes.
    *
    * @param feature {Object}
    */
   _cacheFeature = function (feature) {
-    if (!Object.prototype.hasOwnProperty.call(_prevFeatures, feature.id)) {
+    if (!_prevFeatures[feature.id]) {
       _prevFeatures[feature.id] = [];
     }
 
@@ -165,138 +193,204 @@ var Features = function (options) {
   };
 
   /**
-   * Check for dependencies for a given Feature and delay creating the Feature
-   * until its dependencies are ready.
+   * Create a new Feature (when its dependencies are ready) using the given
+   * module and then add it. Also store it in _features.
    *
-   * @param feature {Object}
+   * @param mode {String <base|comcat|dd|mainshock|rtf>}
+   * @param module {Object}
+   *     Feature's module
    *
-   * @return status {String}
+   *     {
+   *       Required props:
+   *
+   *         destroy: {Function} free references
+   *         id: {String} unique id
+   *         name: {String} display name
+   *
+   *       Auto-set props:
+   *
+   *         mode: {String <base|mainshock>} display mode
+   *         status: {String} loading status
+   *
+   *       Default props (for Features that implement them):
+   *
+   *         showLayer: {Boolean true}
+   *         zoomToLayer: {Boolean true}
+   *
+   *       Common props:
+   *
+   *         addData: {Function} receives fetched JSON data
+   *         addListeners: {Function} event listeners added with Feature
+   *         content: {String} HTML content added to SideBar (in Element#feature-id)
+   *         count: {Integer} Feature's count value added next to its name
+   *         deferFetch: {Boolean} fetch data on demand when map layer turned 'on'
+   *           Note: only Features with a map layer; showLayer must be false
+   *         dependencies: {Array} Features (besides Mainshock) that must be ready
+   *         json: {String} JSON feed data (Mainshock only)
+   *         mapLayer: {L.Layer} Leaflet layer added to MapPane
+   *         params: {Object} Feature's parameters that are exposed in SettingsBar
+   *         placeholder: {String} initial HTML content added to Plots/SummaryPanes
+   *           Note: fetched content is appended to Element.content in placeholder
+   *         plots: {Object} Plotly parameters for Plots added to PlotsPane
+   *         removeListeners: {Function} event listeners removed with Feature
+   *         showLayer: {Boolean} whether or not map layer is "on" by default
+   *         summary: {String} HTML content added to SummaryPane
+   *         title: {String} document and page title (Mainshock and Catalog Search)
+   *         update: {Function} manual post-fetch updates
+   *         url: {String} URL of data feed
+   *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
+   *     }
+   * @param opts {Object} default is {}
    */
-  _checkDependencies = function (feature) {
-    var dependency,
-        status = 'complete'; // default
+  _createFeature = function (mode, module, opts = {}) {
+    var defaults, feature,
+        status = 'initialized'; // default
 
-    if (Array.isArray(feature.dependencies)) { // load dependencies first
-      feature.dependencies.forEach(id => {
-        dependency = _features[id];
+    if (_isReady(mode)) { // create Feature when dependencies are ready
+      defaults = Object.assign({}, _DEFAULTS, opts);
+      feature = module({
+        app: _app,
+        defaults: defaults
+      });
 
-        if (dependency.isLoading) {
-          status = 'loading';
+      if (!feature.url) {
+        status = 'ready';
+      } else if (feature.status) {
+        status = feature.status; // preserve assigned status
+      }
 
-          setTimeout(() =>
-            _this.createFeature(feature.id), 250
-          );
+      Object.assign(feature, {
+        mode: mode,
+        status: status
+      });
+
+      _features[mode][feature.id] = feature;
+      _modules[feature.id] = module;
+
+      _addFeature(feature);
+    } else { // dependencies not ready
+      _queue.push(setTimeout(() => {
+        _createFeature(mode, module);
+      }, 250));
+    }
+  };
+
+  /**
+   * Get the display mode for the Feature with the given id.
+   *
+   * @param id {String}
+   *     Feature id
+   *
+   * @return match {String <base|mainshock|rtf>} default is ''
+   */
+  _getMode = function (id) {
+    var match = ''; // default
+
+    Object.keys(_features).forEach(mode => {
+      Object.keys(_features[mode]).forEach(featureId => {
+        if (id === featureId) {
+          match = mode;
         }
       });
-    }
-
-    return status;
-  };
-
-  /**
-   * Wrapper method to create Features. Skips the Mainshock which was already
-   * created since other Features depend on it.
-   */
-  _createFeatures = function () {
-    Object.keys(_features).forEach(id => {
-      if (id !== 'mainshock') {
-        _this.createFeature(id);
-      }
     });
+
+    return match;
   };
 
   /**
-   * Instantiate Features and store them in _features.
+   * Initialize _features, which stores Features grouped by their display mode.
    */
   _initFeatures = function () {
-    var feature;
+    var base;
 
-    _FEATURECLASSES.forEach(FeatureClass => {
-      feature = FeatureClass({
-        app: _app
-      });
+    if (typeof _features === 'object') {
+      base = _features.base; // leave 'base' Features intact
+    }
 
-      feature.isLoading = true;
-      _features[feature.id] = feature;
-    });
+    _features = {
+      base: base || {},
+      comcat: {},
+      dd: {},
+      mainshock: {},
+      rtf: {}
+    };
   };
 
   /**
-   * Load feed data (if available) for a given Feature and then create/add it.
+   * Determine if a Feature with the given display mode is ready to be fetched.
+   * SignificantEqs must be fetched before the Mainshock and all 'mainshock',
+   * 'comcat', and 'dd' mode Features are dependent on their respective
+   * Mainshocks being fetched first.
+   *
+   * @param mode {String <base|comcat|dd|mainshock|rtf>}
+   *
+   * @return {Boolean}
+   */
+  _isReady = function (mode) {
+    var ddMainshock = _this.getFeature('dd-mainshock'),
+        mainshock = _this.getFeature('mainshock'),
+        significantEqs = _this.getFeature('significant-eqs');
+
+    if (
+      mode === 'base' || // no dependencies
+      mode === 'comcat' && mainshock.status === 'ready' ||
+      mode === 'dd' && (
+        ( // first create the DD Mainshock (once the Mainshock is ready)...
+          mainshock.status === 'ready' &&
+          !_this.isFeature(ddMainshock)
+        ) ||
+        ddMainshock.status === 'ready' // then create the other dd Features
+      ) ||
+      mode === 'mainshock' && (
+        ( // first create the Mainshock (once SignificantEqs is ready)...
+          significantEqs.status ===  'ready' &&
+          !_this.isFeature(mainshock)
+        ) ||
+        mainshock.status === 'ready' // then create the other Mainshock Features
+      ) ||
+      mode === 'rtf' // other Features will always be ready
+    ) {
+      return true;
+    }
+
+    return false; // default
+  };
+
+  /**
+   * Remove the given Feature's count value (or its loader if it was still
+   * loading) in the SettingsBar, if applicable.
    *
    * @param feature {Object}
    */
-  _loadFeature = function (feature) {
-    var fetchOpts = {},
-        resource = feature;
+  _removeCount = function (feature) {
+    var count, loader,
+        el = document.getElementById('settingsBar'),
+        header = el.querySelector(`div.${feature.id} h3`);
 
-    if (AppUtil.getParam('catalog') === 'dd' && (
-      feature.id === 'aftershocks' ||
-      feature.id === 'foreshocks' ||
-      feature.id === 'historical'
-    )) {
-      fetchOpts.timeout = 20000; // NCEDC catalog search is sloooow
-      resource = Object.assign({}, feature, {
-        host: 'ncedc.org',
-        name: 'DD ' + feature.name // prepend 'DD' to name shown in StatusBar
-      });
-    }
+    if (header) { // Feature has user-configurable settings
+      count = header.querySelector('.count');
+      loader = header.querySelector('.breather');
 
-    if (feature.url) {
-      _addLoaders(feature);
-      _app.JsonFeed.fetch(resource, fetchOpts).then(json => {
-        if (json) {
-          feature.isLoading = false;
-
-          feature.create(json);
-          _addFeature(feature);
-        } else {
-          _removeFeature(feature);
-        }
-      }).catch(error => {
-        _app.StatusBar.addError({
-          id: feature.id,
-          message: `<h4>Error Adding ${feature.name}</h4><ul><li>${error}</li></ul>`
-        });
-
-        console.error(error);
-      });
-    } else { // data feed not available
-      feature.isLoading = false;
+      if (count) {
+        header.removeChild(count);
+      }
+      if (loader) {
+        header.removeChild(loader);
+      }
     }
   };
 
   /**
-   * Remove all Features from Map/Plots/SummaryPanes and destroy them.
+   * Remove all Features, except 'base' Features.
    */
   _removeFeatures = function () {
-    var feature;
-
-    if (_features) {
-      Object.keys(_features).forEach(id => {
-        feature = _features[id];
-
-        _removeFeature(feature);
-        feature.destroy();
-      });
-    }
-
-    document.body.classList.remove('loading', 'mainshock');
-  };
-
-  /**
-   * Remove the given Feature from Map/Plots/SummaryPanes; remove the Feature's
-   * count from SettingsBar.
-   *
-   * @param feature {Object}
-   */
-  _removeFeature = function (feature) {
-    if (_this.isFeature(feature.id)) {
-      _app.MapPane.removeFeature(feature);
-      _app.PlotsPane.removeFeature(feature);
-      _app.SettingsBar.removeCount(feature);
-      _app.SummaryPane.removeFeature(feature);
-    }
+    Object.keys(_features).forEach(mode => {
+      if (mode !== 'base') {
+        Object.keys(_features[mode]).forEach(id => {
+          _this.removeFeature(_this.getFeature(id));
+        });
+      }
+    });
   };
 
   // ----------------------------------------------------------
@@ -304,160 +398,291 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create the Feature matching the given 'id' value.
+   * Add the given Feature's content (i.e. the fetched data). Also render and
+   * add its event listeners, if applicable.
    *
-   * @param id {String}
-   *     Feature id
+   * Optionally create the RTF document when all of its Features are ready.
+   *
+   * @param feature {Object}
    */
-  _this.createFeature = function (id) {
-    var feature,
-        status;
+  _this.addContent = function (feature) {
+    var el;
 
-    if (_this.isFeature(id)) {
-      feature = _features[id];
-      feature.isLoading = true;
-      status = _checkDependencies(feature);
+    _app.MapPane.addContent(feature);
+    _app.PlotsPane.addContent(feature);
+    _app.SummaryPane.addContent(feature);
+    _addCount(feature);
 
-      if (status === 'loading') {
-        return; // dependencies are not ready
-      }
+    if (feature.content) {
+      el = document.getElementById(feature.id);
+      el.innerHTML = feature.content; // add SideBar content
+    }
+    if (feature.render) {
+      feature.render(); // add BeachBalls
+    }
+    if (feature.addListeners) {
+      feature.addListeners();
+    }
 
-      if (feature.setFeedUrl) {
-        feature.setFeedUrl();
-        _loadFeature(feature); // creates Feature after loading data
-      } else { // data feed not required
-        feature.isLoading = false;
-
-        feature.create();
-        _addFeature(feature);
+    // RTF document
+    if (feature.mode === 'rtf') {
+      if (_this.getStatus('rtf') === 'ready') {
+        Rtf({
+          app: _app
+        });
       }
     }
   };
 
   /**
-   * Get the Feature matching the given 'id' value.
+   * Add the given Feature back to the Map/Plots/SummaryPanes (when swapping
+   * between catalogs).
    *
-   * @param id {String}
-   *     Feature id
+   * Note: the Feature's placeholder and its content are added at once, as its
+   * data has already been fetched.
    *
-   * @return feature {Mixed <Object|undefined>}
-   *   {
-   *     Required props
-   *
-   *     create: {Function}
-   *     id: {String} unique Feature id
-   *     name: {String} display name of Feature
-   *
-   *     Example of optional props that might also be set
-   *
-   *     count: {Integer} number of items
-   *     dependencies: {Array} other Features that need to be loaded first
-   *     description: {String} text description of Feature
-   *     json: {String} JSON feed data (Mainshock only)
-   *     mapLayer: {L.Layer} Leaflet map layer for MapPane
-   *     plots: {Object} Plotly parameters
-   *     showLayer: {Boolean} whether or not map layer is "on" by default
-   *     summary: {String} HTML for SummaryPane
-   *     url: {String} URL of feed data for Feature
-   *     zoomToLayer: {Boolean} whether or not map zooms to fit layer by default
-   *   }
+   * @param feature {Object}
    */
-  _this.getFeature = function (id) {
-    return _features[id];
+  _this.addFeature = function (feature) {
+    _addFeature(feature);
+    _this.addContent(feature);
   };
 
   /**
-   * Get all Features, keyed by their 'id' value.
+   * Check if the dependencies (if any) for the given Feature are ready.
    *
-   * @return _features {Object}
-   */
-  _this.getFeatures = function () {
-    return _features;
-  };
-
-  /**
-   * Get the loading status of the Features.
+   * @param feature {Object}
    *
    * @return status {String}
    */
-  _this.getLoadingStatus = function () {
-    var status = 'complete'; // default
+  _this.checkDependencies = function (feature) {
+    var status = 'ready'; // default
 
-    Object.keys(_features).forEach(id => {
-      if (_features[id].isLoading) {
-        status = 'loading';
-      }
-    });
+    if (Array.isArray(feature.dependencies)) { // load dependencies first
+      feature.dependencies.forEach(id => {
+        var dependency = _this.getFeature(id);
+
+        if (dependency.status !== 'ready') {
+          status = dependency.status;
+        }
+      });
+    }
 
     return status;
   };
 
   /**
-   * Check if the given 'id' matches an existing Feature's 'id' value.
+   * Clear the queue of Features waiting to be fetched.
+   */
+  _this.clearQueue = function () {
+    _queue.forEach(timer => clearTimeout(timer));
+
+    _queue = [];
+  };
+
+  /**
+   * Wrapper method that creates all of the Features for the given display mode.
+   *
+   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   */
+  _this.createFeatures = function (mode = 'mainshock') {
+    var catalog = AppUtil.getParam('catalog') || 'comcat';
+
+    _MODULES[mode].forEach(Module => {
+      _createFeature(mode, Module);
+    });
+
+    // Add the selected catalog-specific Features
+    if (mode === 'mainshock') {
+      _this.createFeatures(catalog);
+    }
+  };
+
+  /**
+   * Get the Feature matching the given id.
    *
    * @param id {String}
+   *     Feature id
    *
-   * @return isFeature {Boolean}
+   * @return {Object}
    */
-  _this.isFeature = function (id) {
-    var isFeature = false; // default
+  _this.getFeature = function (id) {
+    var feature = {}, // default
+        mode = _getMode(id);
 
-    Object.keys(_features).forEach(function(key) {
-      if (id === key) {
-        isFeature = true;
+    if (mode) { // Feature exists
+      feature = _features[mode][id];
+    }
+
+    return feature;
+  };
+
+  /**
+   * Get all Features matching the given display mode, keyed by their id values.
+   *
+   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   *
+   * @return {Object}
+   *     Features keyed by id
+   */
+  _this.getFeatures = function (mode = 'mainshock') {
+    return _features[mode] || {};
+  };
+
+  /**
+   * Get all of the given Feature's header Elements for adding loaders/count
+   * values next to the Feature's name.
+   *
+   * Note: the layer control's loaders/count values are handled separately (by
+   * L.Control.Layers.Sorted.js).
+   *
+   * @param id {String}
+   *     Feature id
+   *
+   * @return els {Array}
+   */
+  _this.getHeaders = function (id) {
+    var els = [],
+        selectors = [
+          `#plotsPane div.${id} h2`,
+          `#settingsBar div.${id} h3`,
+          `#summaryPane div.${id} h2`
+        ];
+
+    selectors.forEach(selector => {
+      var el = document.querySelector(selector);
+
+      if (el) {
+        els.push(el);
       }
     });
 
-    return isFeature;
+    return els;
+  };
+
+  /**
+   * Get the collective loading status (ready or not) of all Features for the
+   * given display mode.
+   *
+   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   *
+   * @return status {String <error|initialized|loading|ready>} default is ''
+   */
+  _this.getStatus = function (mode = 'mainshock') {
+    var count = Object.keys(_features[mode]).length,
+        status = ''; // default
+
+    if (count === 1 && (mode === 'mainshock' || mode === 'dd')) {
+      status = 'loading'; // only the Mainshock is ready
+    } else if (count !== 0) {
+      status = 'ready';
+
+      Object.keys(_features[mode]).forEach(id => {
+        var feature = _this.getFeature(id);
+
+        if (feature.status !== 'ready') {
+          status = feature.status; // error, initialized or loading
+        }
+      });
+    }
+
+    return status;
+  };
+
+  /**
+   * Check if the given feature exists (i.e. it's not an empty Object).
+   *
+   * @param feature {Object}
+   *
+   * @return {Boolean}
+   */
+  _this.isFeature = function (feature) {
+    if (AppUtil.isEmpty(feature)) {
+      return false;
+    }
+
+    return true;
   };
 
   /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _initFeatures();
+    _this.createFeatures('base');
   };
 
   /**
    * Refresh the given Feature.
    *
-   * @param feature {Object}
-   *     existing Feature before refresh
+   * @param id {Object}
+   *     Feature id
    */
-  _this.refreshFeature = function (feature) {
-    var prevFeature;
+  _this.refreshFeature = function (id) {
+    var module, prevFeature,
+        feature = _this.getFeature(id),
+        mode = _getMode(id),
+        showLayer = feature.showLayer; // use cached value
 
-    if (_this.isFeature(feature.id)) {
-      _this.getFeature('mainshock').disableButton();
-      _cacheFeature(feature);
+    _cacheFeature(feature);
 
-      prevFeature = _prevFeatures[feature.id].shift(); // 'oldest' Feature
+    module = _modules[id];
+    prevFeature = _prevFeatures[id].shift(); // 'oldest' Feature
 
-      _removeFeature(prevFeature);
+    if (feature.mode === 'mainshock') {
+      _this.getFeature('mainshock').disableDownload();
+    }
 
-      if (feature.reset) {
-        feature.reset();
+    _this.removeFeature(prevFeature);
+    _createFeature(mode, module, {
+      showLayer: showLayer
+    });
+  };
+
+  /**
+   * Remove the given Feature and optionally destroy it. Also remove the count
+   * value from the SettingsBar (if applicable).
+   *
+   * Note: when swapping between catalogs, the count value is updated, so it
+   * shouldn't be removed.
+   *
+   * @param feature {Object}
+   * @param destroy {Boolean} default is true
+   *     set to false when swapping between catalogs
+   */
+  _this.removeFeature = function (feature, destroy = true) {
+    if (_this.isFeature(feature)) {
+      if (feature.removeListeners && destroy) {
+        feature.removeListeners();
       }
 
-      _this.createFeature(feature.id);
+      _app.MapPane.removeFeature(feature);
+      _app.PlotsPane.removeFeature(feature);
+      _app.SummaryPane.removeFeature(feature);
 
-      // Refresh FieldNotes when Aftershocks is refreshed (shares SettingsBar params)
-      if (feature.id === 'aftershocks') {
-        _this.refreshFeature(_features.fieldnotes);
+      // Mainshock details in SelectBar
+      if (feature.id === 'mainshock') {
+        document.getElementById('mainshock').innerHTML = '';
+      }
+
+      // Purge Feature unless swapping between catalogs
+      if (destroy) {
+        feature.destroy();
+        _removeCount(feature);
+
+        delete _features[feature.mode][feature.id];
       }
     }
   };
 
   /**
-   * Reset to initial state; remove all Features.
+   * Reset to default state.
    */
   _this.reset = function () {
+    _this.clearQueue();
     _removeFeatures();
-
-    _features = {};
-    _prevFeatures = {};
-
     _initFeatures();
+
+    _prevFeatures = {};
   };
 
 

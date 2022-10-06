@@ -34,7 +34,7 @@
   }
 
   > img,
-  .content {
+  .container {
     background: $bg-color;
     border-radius: $content-border-radius;
     margin: auto;
@@ -42,7 +42,7 @@
     max-width: 100%;
     padding: 1rem 1.5rem;
   }
-  .content {
+  .container {
     overflow: scroll;
   }
 
@@ -56,7 +56,7 @@ and (max-width: $breakpoint-phone-width) {
   .lightbox {
     padding: 0;
 
-    .content {
+    .container {
       border-radius: 0;
     }
   }

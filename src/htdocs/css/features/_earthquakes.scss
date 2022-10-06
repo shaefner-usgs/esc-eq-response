@@ -48,7 +48,7 @@
     }
 
     th {
-      &.period {
+      &.type {
         border-bottom: 1px solid $border-color-lighter;
         font-weight: 400;
         padding-right: 2px;
@@ -238,7 +238,7 @@
   }
 }
 
-/* Toggle between user/utc time
+/* Toggle between user/UTC time
 --------------------------------------------- */
 
 body.user {

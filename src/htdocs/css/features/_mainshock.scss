@@ -26,7 +26,8 @@
       margin: 0;
       padding: 0 1rem;
 
-      &:first-child {
+      &:first-child,
+      &.dd.mag {
         padding-left: .25rem;
       }
 
@@ -69,6 +70,10 @@
       span {
         margin-top: -.125rem;
       }
+    }
+
+    .depth span span {
+      display: none;
     }
 
     .impact-bubble {
@@ -147,6 +152,19 @@
   }
 
   .mainshock {
+    h2 {
+      flex-direction: column;
+
+      span {
+        font-size: 1.2rem;
+        margin-bottom: -3px;
+
+        &.hide {
+          display: none;
+        }
+      }
+    }
+
     .bubble {
       margin: 1rem .5rem 0;
 
@@ -194,10 +212,6 @@
     h4 {
       margin-top: .125rem;
       text-align: center;
-    }
-
-    .hide { // missing product
-      display: none !important;
     }
   }
 
@@ -280,7 +294,7 @@
   border: 4px solid;
 }
 
-/* Toggle between user/utc time
+/* Toggle displayed content based on Time Zone setting
 --------------------------------------------- */
 
 body.user #summaryPane li.utc,

@@ -1,21 +1,24 @@
+/* global L */
 'use strict';
 
 
 /**
- * Historical Events Feed.
+ * Create the Historical Events Feature.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     destroy: {Function}
- *     id: {String}
- *     name: {String}
- *     url: {String}
- *   }
+ *     {
+ *       addData: {Function}
+ *       destroy: {Function}
+ *       events: {Array}
+ *       id: {String}
+ *       name: {String}
+ *       url: {String}
+ *     }
  */
 var HistoricalEvents = function (options) {
   var _this,
@@ -23,19 +26,33 @@ var HistoricalEvents = function (options) {
 
       _app,
 
-      _getFeedUrl;
+      _fetch,
+      _getUrl;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
 
+    _this.events = [];
     _this.id = 'historical-events';
     _this.name = 'Historical Events';
-    _this.url = _getFeedUrl();
+    _this.url = _getUrl();
+
+    _fetch();
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    if (_this.url) {
+      L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this
+      });
+    }
   };
 
   /**
@@ -43,7 +60,7 @@ var HistoricalEvents = function (options) {
    *
    * @return url {String}
    */
-  _getFeedUrl = function () {
+  _getUrl = function () {
     var contents,
         mainshock = _app.Features.getFeature('mainshock'),
         products = mainshock.json.properties.products,
@@ -65,12 +82,25 @@ var HistoricalEvents = function (options) {
   // ----------------------------------------------------------
 
   /**
+   * Add the JSON feed data.
+   *
+   * @param json {Object}
+   */
+  _this.addData = function (json) {
+    _this.events = json;
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
+
     _app = null;
-    _getFeedUrl = null;
+
+    _fetch = null;
+    _getUrl = null;
+
     _this = null;
   };
 

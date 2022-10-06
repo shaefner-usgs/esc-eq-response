@@ -6,26 +6,24 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the PAGER Exposures Feature, which is a sub-Feature of the Mainshock.
+ * Create the PAGER Exposures Feature, a sub-Feature of the Mainshock.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *   }
+ *     {
+ *       app: {Object} Application
+ *     }
  *
  * @return _this {Object}
- *   {
- *     create: {Function}
- *     dependencies: {Array}
- *     destroy: {Function}
- *     exposures: {Object}
- *     id: {String}
- *     name: {String)
- *     reset: {Function}
- *     setFeedUrl: {Function}
- *     summary: {String}
- *     url: {String}
- *   }
+ *     {
+ *       addData: {Function}
+ *       dependencies: {Array}
+ *       destroy: {Function}
+ *       exposures: {Object}
+ *       id: {String}
+ *       name: {String)
+ *       summary: {String}
+ *       url: {String}
+ *     }
  */
 var PagerExposures = function (options) {
   var _this,
@@ -33,27 +31,38 @@ var PagerExposures = function (options) {
 
       _app,
 
+      _fetch,
       _getExposures,
       _getRows,
-      _getSummary;
+      _getSummary,
+      _getUrl;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
 
-    Object.assign(_this, {
-      dependencies: [
-        'pager-cities'
-      ],
-      id: 'pager-exposures',
-      name: 'PAGER Exposures',
-      summary: null,
-      url: ''
-    });
+    _this.dependencies = ['pager-cities'];
+    _this.exposures = {};
+    _this.id = 'pager-exposures';
+    _this.name = 'PAGER Exposures';
+    _this.summary = '';
+    _this.url = _getUrl();
+
+    _fetch();
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    if (_this.url) {
+      L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this
+      });
+    }
   };
 
   /**
@@ -64,8 +73,9 @@ var PagerExposures = function (options) {
    * @return {Object}
    */
   _getExposures = function (json) {
-    var mmi = json.population_exposure.mmi,
-        population = json.population_exposure.aggregated_exposure.map(pop =>
+    var exposure = json.population_exposure,
+        mmi = exposure.mmi,
+        population = exposure.aggregated_exposure.map(pop =>
           AppUtil.roundThousands(pop)
         );
 
@@ -77,13 +87,12 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get the HTML for the table rows.
+   * Get the HTML content for the table rows.
    *
    * @return html {String}
    */
   _getRows = function () {
-    var data,
-        cities = _app.Features.getFeature('pager-cities').cities,
+    var cities = _app.Features.getFeature('pager-cities').cities,
         html = '',
         mmis = _this.exposures.mmi,
         population = _this.exposures.population,
@@ -91,11 +100,12 @@ var PagerExposures = function (options) {
 
     mmis.forEach((mmi, i) => {
       if (mmi >= 2 && Number(population[i]) !== 0) { // skip mmi below 2 and when nobody affected
-        data = {
+        var data = {
           intensity: shaking[i].intensity,
           level: shaking[i].level,
           population: population[i]
         };
+
         html += L.Util.template(
           '<tr>' +
             '<td>' +
@@ -111,10 +121,11 @@ var PagerExposures = function (options) {
 
         cities.forEach(city => {
           if (mmi === Number(AppUtil.round(city.mmi, 0))) {
-            data = {
+            var data = {
               name: city.name,
               population: city.pop
             };
+
             html += L.Util.template(
               '<tr class="city">' +
                 '<td></td>' +
@@ -132,18 +143,16 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get the HTML for the summary.
+   * Get the HTML content for the SummaryPane.
    *
    * @return html {String}
    */
   _getSummary = function () {
-    var data = {
-          rows: _getRows()
-        },
+    var rows = _getRows(),
         html = '';
 
-    if (data.rows) {
-      html = L.Util.template(
+    if (rows) {
+      html =
         '<h3>Population Exposure</h3>' +
         '<table>' +
           '<thead>' +
@@ -156,14 +165,34 @@ var PagerExposures = function (options) {
             '<tr>' +
           '</thead>' +
           '<tbody>' +
-            '{rows}' +
+            rows +
           '</tbody>' +
-        '</table>',
-        data
-      );
+        '</table>';
     }
 
     return html;
+  };
+
+  /**
+   * Get the JSON feed's URL.
+   *
+   * @return url {String}
+   */
+  _getUrl = function () {
+    var contents,
+        mainshock = _app.Features.getFeature('mainshock'),
+        products = mainshock.json.properties.products,
+        url = '';
+
+    if (products.losspager) {
+      contents = products.losspager[0].contents;
+
+      if (contents['json/exposures.json']) {
+        url = contents['json/exposures.json'].url;
+      }
+    }
+
+    return url;
   };
 
   // ----------------------------------------------------------
@@ -171,12 +200,11 @@ var PagerExposures = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Create Feature (set properties that depend on external feed data).
+   * Add the JSON feed data.
    *
    * @param json {Object}
-   *     feed data for Feature
    */
-  _this.create = function (json) {
+  _this.addData = function (json) {
     _this.exposures = _getExposures(json);
     _this.summary = _getSummary();
   };
@@ -189,35 +217,13 @@ var PagerExposures = function (options) {
 
     _app = null;
 
+    _fetch = null;
     _getExposures = null;
     _getRows = null;
     _getSummary = null;
+    _getUrl = null;
 
     _this = null;
-  };
-
-  /**
-   * Set the JSON feed's URL.
-   */
-  _this.setFeedUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.json.properties.products;
-
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/exposures.json']) {
-        _this.url = contents['json/exposures.json'].url;
-      }
-    }
-  };
-
-  /**
-   * Reset to initial state.
-   */
-  _this.reset = function () {
-    _this.summary = null;
   };
 
 

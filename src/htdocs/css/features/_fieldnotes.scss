@@ -25,11 +25,6 @@
     margin-top: 4px;
   }
 
-  .hide + .params {
-    max-height: 0;
-    transition: max-height .1s ease-in;
-  }
-
   .leaflet-popup-content {
     margin: 0.75rem 0 !important; // allow "full-bleed" photos
   }
@@ -50,12 +45,6 @@
     }
   }
 
-  .params {
-    max-height: 400px;
-    overflow: hidden;
-    transition: max-height .3s ease-out;
-  }
-
   .photo {
     display: block;
     min-height: 200px;
@@ -67,7 +56,18 @@
     }
   }
 
-  .properties {
+  .props {
+    max-height: 400px;
+    overflow: hidden;
+    transition: max-height .3s ease-out;
+
+    &.hide {
+      max-height: 0;
+      transition: max-height .1s ease-in;
+    }
+  }
+
+  .toggle {
     line-height: 1;
     margin-bottom: 0;
     position: relative;
@@ -81,13 +81,13 @@
       left: 0;
       position: absolute;
       top: .25rem;
-      transform: rotate(90deg);
+      transform: rotate(0deg);
       transition: transform .3s ease-in-out;
       width: 0;
     }
 
-    &.hide:before {
-      transform: rotate(0deg);
+    &.on:before {
+      transform: rotate(90deg);
     }
 
     a {

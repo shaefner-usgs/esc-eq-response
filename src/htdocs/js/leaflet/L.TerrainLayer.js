@@ -3,12 +3,12 @@
 
 
 /**
- * Factory for Terrain base layer.
+ * Factory for the Terrain base layer.
  *
  * @param options {Object}
- *     L.tileLayer options
+ *     L.TileLayer options
  *
- * @return {L.tileLayer}
+ * @return {L.TileLayer}
  */
 L.TerrainLayer = function (options) {
   options = Object.assign({

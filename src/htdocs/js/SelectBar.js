@@ -5,22 +5,21 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Kick off the creation of Features when the user selects a Mainshock and also
- * display its details on the SelectBar.
+ * Create the Features when a new Mainshock is selected and display its details
+ * on the SideBar.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     handleMainshock: {Function}
- *     postInit: {Function}
- *     reset: {Function}
- *     showMainshock: {Function}
- *   }
+ *     {
+ *       postInit: {Function}
+ *       reset: {Function}
+ *       setMainshock: {Function}
+ *     }
  */
 var SelectBar = function (options) {
   var _this,
@@ -31,21 +30,19 @@ var SelectBar = function (options) {
       _eqid,
 
       _addListeners,
-      _createMainshock,
+      _createFeatures,
       _hardReset,
       _isEqidValid;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _el = options.el || document.createElement('section');
+    _el = options.el;
     _eqid = document.getElementById('eqid');
 
-    // Set the Event ID <input>'s value
+    // Set the Event ID <input>'s initial value
     _eqid.value = AppUtil.getParam('eqid');
 
     _addListeners();
@@ -65,24 +62,24 @@ var SelectBar = function (options) {
     search.addEventListener('click', e => {
       e.preventDefault();
 
-      _app.NavBar.switchSideBars('searchBar');
+      _app.NavBar.switchSideBar('searchBar');
     });
 
-    // Create a new Mainshock and load its Features
-    _eqid.addEventListener('input', _this.handleMainshock);
+    // Create a new Mainshock and fetch its Features
+    _eqid.addEventListener('input', _this.setMainshock);
   };
 
   /**
-   * Create a new Mainshock (which subsequently creates all other Features).
+   * Create the Features if the Mainshock's eqid is valid.
    */
-  _createMainshock = function () {
+  _createFeatures = function () {
     var message;
 
     if (_isEqidValid()) {
       AppUtil.setParam('eqid', _eqid.value);
-      _app.Features.createFeature('mainshock');
+      _app.Features.createFeatures();
     } else {
-      message = '' +
+      message =
         '<h4>Error Loading Mainshock</h4>' +
         '<ul>' +
           `<li>Event ID (${_eqid.value}) is invalid</li>` +
@@ -97,24 +94,27 @@ var SelectBar = function (options) {
   };
 
   /**
-   * Do a 'hard' reset when the 'Reset Mainshock' button is clicked.
+   * Event handler that performs a 'hard' reset, returning the app to its
+   * default state.
+   *
+   * @param e {Event}
    */
   _hardReset = function (e) {
-    var input = _el.querySelector('input');
-
-    e.preventDefault();
-    this.classList.add('dim');
+    var input = _el.querySelector('input'),
+        sidebar = document.getElementById('sideBar');
 
     input.value = '';
+    sidebar.scrollTop = 0;
 
+    e.preventDefault();
+
+    this.classList.add('dim');
     _app.reset();
-    _app.setScrollPosition('selectBar'); // scroll to top
-    _app.MapPane.showSearchLayer();
     _app.NavBar.reset();
   };
 
   /**
-   * Check if the current value entered in the Event ID field is valid.
+   * Check if the Event ID <input> value is valid.
    *
    * @return isValid {Boolean}
    */
@@ -134,44 +134,12 @@ var SelectBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Handler for creating a new Mainshock. Triggered when the Event ID <input>
-   * is changed.
-   *
-   * Note: must be called manually when the Event ID is changed programmatically.
-   */
-  _this.handleMainshock = function () {
-    var id = 'mainshock',
-        reset = document.getElementById('reset');
-
-    _app.reset();
-
-    if (_eqid.value) {
-      _app.JsonFeed.initThrottlers(id);
-
-      // Immediately show loading status (don't wait for throttle timers)
-      document.body.classList.add('loading');
-      _app.StatusBar.clearItems();
-      _app.StatusBar.addItem({
-        id: id,
-        name: 'Mainshock'
-      });
-
-      // Throttle requests
-      _app.JsonFeed.throttlers[id].push(
-        setTimeout(_createMainshock, 500)
-      );
-
-      reset.classList.remove('dim');
-    }
-  };
-
-  /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
     // Get things rolling if an Event ID is already set
     if (AppUtil.getParam('eqid')) {
-      _this.handleMainshock();
+      _this.setMainshock();
     }
   };
 
@@ -179,22 +147,29 @@ var SelectBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var details = _el.querySelector('.details');
+    var significantEqs = _app.Features.getFeature('significant-eqs');
 
-    details.classList.add('hide'); // previously selected Mainshock's details
+    if (_app.Features.isFeature(significantEqs)) {
+      significantEqs.update(); // unselects all Events
+    }
   };
 
   /**
-   * Show the Mainshock's details.
+   * Event handler that sets a new Mainshock.
+   *
+   * Note: triggered automatically if the Event ID <input> is changed by the
+   * user; must be called manually if the <input> is changed programmatically.
    */
-  _this.showMainshock = function () {
-    var details = _el.querySelector('.details'),
-        mainshock = _app.Features.getFeature('mainshock');
+  _this.setMainshock = function () {
+    var reset = document.getElementById('reset');
 
-    details.innerHTML = mainshock.mapLayer.getLayers()[0].getPopup().getContent().outerHTML;
-    details.classList.remove('hide');
+    _app.reset();
 
-    _app.TitleBar.setTitle(mainshock.data);
+    if (_eqid.value) {
+      _app.StatusBar.removeItems();
+      _createFeatures();
+      reset.classList.remove('dim');
+    }
   };
 
 

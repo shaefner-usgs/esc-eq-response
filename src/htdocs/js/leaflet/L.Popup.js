@@ -8,16 +8,21 @@
  * or SideBar.
  */
 L.Popup.include({
+  /**
+   * Override _adjustPan from L.Popup.
+   *
+   * @param e {Event}
+   */
   _adjustPan: function (e) {
     if (!this.options.autoPan || this._rendered) { return; }
     if (this._map._panAnim) { this._map._panAnim.stop(); }
 
-    var map = this._map,
+    var autoPanPadding = null,
         marginBottom = parseInt(L.DomUtil.getStyle(this._container, 'marginBottom'), 10) || 0,
         containerHeight = this._container.offsetHeight + marginBottom,
         containerWidth = this._containerWidth,
         layerPos = new L.Point(this._containerLeft, -containerHeight - this._containerBottom),
-        autoPanPadding = null;
+        map = this._map;
 
     layerPos._add(L.DomUtil.getPosition(this._container));
 
@@ -27,11 +32,13 @@ L.Popup.include({
 
     var containerPos = map.layerPointToContainerPoint(layerPos),
         defaults = this._getDefaults(),
-        paddingTL = L.point(this.options.autoPanPaddingTopLeft || autoPanPadding || defaults.topLeft),
-        paddingBR = L.point(this.options.autoPanPaddingBottomRight || autoPanPadding || defaults.bottomRight),
-        size = map.getSize(),
         dx = 0,
-        dy = 0;
+        dy = 0,
+        paddingTL = L.point(this.options.autoPanPaddingTopLeft ||
+          autoPanPadding || defaults.topLeft),
+        paddingBR = L.point(this.options.autoPanPaddingBottomRight ||
+          autoPanPadding || defaults.bottomRight),
+        size = map.getSize();
 
     if (containerPos.x + containerWidth + paddingBR.x > size.x) { // right
       dx = containerPos.x + containerWidth - size.x + paddingBR.x;
@@ -61,6 +68,11 @@ L.Popup.include({
     this._map.on('popupclose', this._setRendered, this);
   },
 
+  /**
+   * Get the default values for L.Popup's autoPanPadding option.
+   *
+   * @return {Object}
+   */
   _getDefaults: function () {
     var bottom = document.querySelector('.leaflet-bottom.leaflet-left').offsetHeight + 10,
         left = document.querySelector('.leaflet-top.leaflet-left').offsetWidth + 10,
@@ -74,6 +86,9 @@ L.Popup.include({
     };
   },
 
+  /**
+   * Event handler that resets _rendered to false.
+   */
   _setRendered: function () {
     this._rendered = false;
     this._map.off('popupclose', this._setRendered, this);

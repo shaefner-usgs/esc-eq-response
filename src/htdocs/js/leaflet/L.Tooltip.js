@@ -2,25 +2,31 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
- * This class redefines L.Tooltip to set the position of the Tooltip on the L or
- * R side of the mouse cursor depending on the mouse position on screen and
- * whether or not the SideBar is currently open.
+ * This class redefines L.Tooltip to set the position of the Tooltip to the left
+ * or right side of the mouse cursor, depending on the mouse's position on
+ * screen and whether or not the SideBar is currently open.
  */
 L.Tooltip.include({
+  /**
+   * Override _setPosition from L.Tooltip.
+   */
   _setPosition: function (pos) {
     var subX, subY,
+        anchor = this._getAnchor(),
         map = this._map,
-        container = this._container,
         centerPoint = map.latLngToContainerPoint(map.getCenter()),
-        tooltipPoint = map.layerPointToContainerPoint(pos),
+        container = this._container,
         direction = this.options.direction,
-        tooltipWidth = container.offsetWidth,
-        tooltipHeight = container.offsetHeight,
         offset = L.point(this.options.offset),
         offsetX = document.getElementById('sideBar').offsetWidth / 2,
-        sidebar = document.body.classList.contains('sidebar'),
-        anchor = this._getAnchor();
+        sidebar = AppUtil.getParam('sidebar'),
+        tooltipHeight = container.offsetHeight,
+        tooltipPoint = map.layerPointToContainerPoint(pos),
+        tooltipWidth = container.offsetWidth;
 
     if (sidebar) {
       centerPoint.x -= offsetX;

@@ -32,16 +32,16 @@
         </ul>
       </nav>
     </header>
-    <main>
+    <main id="pane">
       <section id="mapPane" class="pane hide">
-        <div class="content"></div>
+        <div class="container"></div>
         <div class="map"></div>
       </section>
       <section id="plotsPane" class="pane hide">
-        <div class="content"></div>
+        <div class="container"></div>
       </section>
       <section id="summaryPane" class="pane hide">
-        <div class="content"></div>
+        <div class="container"></div>
         <time id="updated"></time>
       </section>
       <section id="selectPane">
@@ -52,32 +52,31 @@
     <aside id="sideBar">
       <form>
         <section id="selectBar" class="bar hide">
-          <div class="content">
+          <div class="container">
             <h2>Select an Earthquake</h2>
             <p>Select an earthquake from the list or <a href="#mapPane">map</a>,
               or <a href="#" class="search">search</a> the catalog for an
               earthquake. You can also enter an Event ID manually below.</p>
             <h3>Significant Earthquakes <span>Past Month</span></h3>
-            <div id="significantEqs"><div class="spinner"></div></div>
+            <div id="significant-eqs">
+              <div class="spinner"></div>
+            </div>
             <h3>Mainshock</h3>
             <label for="eqid">Event ID</label>
             <input type="text" id="eqid" value="" required="required"
               pattern="^[^/\\:]+$" tabindex="1" />
-            <div class="details hide"></div>
+            <div id="mainshock"></div>
             <button type="reset" id="reset" class="dim">Reset</button>
           </div>
         </section>
         <section id="settingsBar" class="bar hide">
-          <div class="content">
+          <div class="container">
             <h2>Settings</h2>
             <p>Initial values for Aftershocks, Foreshocks, and Historical
               Seismicity are set automatically based on the Mainshock’s
               magnitude and estimated rupture length.</p>
-            <div class="aftershocks">
-              <h3>Aftershocks
-                <span class="breather hide"></span>
-                <span class="count hide"></span>
-              </h3>
+            <div class="aftershocks dd-aftershocks">
+              <h3>Aftershocks</h3>
               <label for="as-mag">Min magnitude</label>
               <input type="number" id="as-mag" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="4" />
@@ -85,11 +84,8 @@
               <input type="number" id="as-dist" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="5" />
             </div>
-            <div class="foreshocks">
-              <h3>Foreshocks
-                <span class="breather hide"></span>
-                <span class="count hide"></span>
-              </h3>
+            <div class="foreshocks dd-foreshocks">
+              <h3>Foreshocks</h3>
               <label for="fs-mag">Min magnitude</label>
               <input type="number" id="fs-mag" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="6" />
@@ -100,11 +96,8 @@
               <input type="number" id="fs-days" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="8" />
             </div>
-            <div class="historical">
-              <h3>Historical Seismicity
-                <span class="breather hide"></span>
-                <span class="count hide"></span>
-              </h3>
+            <div class="historical dd-historical">
+              <h3>Historical Seismicity</h3>
               <label for="hs-mag">Min magnitude</label>
               <input type="number" id="hs-mag" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="9" />
@@ -118,13 +111,9 @@
             <h3>Earthquake Catalog</h3>
             <ul class="catalog options">
               <li id="comcat">ComCat</li>
-              <li id="dd">Double Difference</li>
+              <li id="dd">Double-Difference</li>
             </ul>
             <p class="dd option hide">Northern California events only</p>
-            <div class="swap hide">
-              <p>Currently showing <span>ComCat</span> earthquakes.</p>
-              <button type="button" id="swap">Switch</button>
-            </div>
             <h3>Time Zone</h3>
             <ul class="timezone options">
               <li id="utc">UTC</li>
@@ -139,7 +128,7 @@
         </section>
       </form>
       <section id="searchBar" class="bar hide">
-        <div class="content">
+        <div class="container">
           <h2>Find an Earthquake</h2>
           <p>Search the ComCat earthquake catalog and display the results on the
             <a href="#mapPane">map</a>.</p>
@@ -181,7 +170,8 @@
             <li id="customRegion">Custom</li>
           </ul>
           <div class="customRegion option hide"></div>
-          <p class="instructions hide">Click and drag to draw a new custom region.</p>
+          <p class="instructions hide">Click and drag to draw a new custom
+            region.</p>
           <button type="button" id="search">Search</button>
           <p class="note">When you search the catalog, the
             <abbr title="Uniform Resource Locator (web address)">URL</abbr> is
@@ -190,7 +180,7 @@
         </div>
       </section>
       <section id="legendBar" class="bar hide">
-        <div class="content">
+        <div class="container">
           <h2>Legend</h2>
           <ul>
             <li class="mainshock">Mainshock</li>
@@ -205,7 +195,7 @@
             <li class="foreshocks">Foreshocks</li>
             <li class="historical">Historical Seismicity</li>
             <li class="magnitude">Magnitude</li>
-            <li class="fieldnotes">FieldNotes
+            <li class="fieldnotes hide">FieldNotes
               <img src="img/pin-s-star+c0f@2x.png" alt="fieldnotes icon" />
             </li>
             <li class="faults">Faults, Plate Boundaries</li>
@@ -217,7 +207,7 @@
         </div>
       </section>
       <section id="infoBar" class="bar hide">
-        <div class="content">
+        <div class="container">
           <h2>Earthquake Response App</h2>
           <p>This web application creates an interactive Map, Plots, and Summary
             of any earthquake using real-time data. It helps you visualize,
@@ -254,11 +244,7 @@
       <a class="icon-close">×</a>
     </aside>
     <footer>
-      <div id="statusBar">
-        <div class="initial">
-          <h4>Loading<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span></h4>
-        </div>
-      </div>
+      <div id="statusBar"></div>
     </footer>
     <script src="lib/flatpickr/flatpickr.js"></script>
     <script src="lib/plotly/plotly-gl3d.js"></script>

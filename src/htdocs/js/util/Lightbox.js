@@ -2,48 +2,121 @@
 
 
 /**
- * Create a Lightbox overlay instance.
+ * Create and add a Lightbox to the DOM.
+ *
+ * Note: Set the Lightbox content and show it using its public methods.
  *
  * @param options {Object}
- *   {
- *     id: {String}
- *   }
+ *     {
+ *       id: {String}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     add: {Function}
- *     hide: {Function}
- *     remove: {Function}
- *     show: {Function}
- *   }
+ *     {
+ *       destroy: {Function}
+ *       setContent: {Function}
+ *       show: {Function}
+ *     }
  */
 var Lightbox = function (options) {
   var _this,
       _initialize,
 
-      _id,
-      _lightbox,
+      _content,
+      _el,
 
-      _onKeyDown;
+      _add,
+      _addListeners,
+      _hide,
+      _onKeyDown,
+      _remove,
+      _removeListeners,
+      _stopPropagation;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
+  _initialize = function (options = {}) {
+    _el = document.createElement('div');
 
-    _id = options.id + 'Lightbox';
+    _add(options.id);
   };
 
   /**
-   * Hide the Lightbox when the user hits the escape key.
+   * Add the Lightbox to the DOM.
+   *
+   * @param id {String}
+   */
+  _add = function (id) {
+    _el.classList.add('lightbox', 'hide');
+    _el.id = id + '-lightbox';
+
+    _remove(); // remove any pre-existing Lightbox first
+    document.body.appendChild(_el);
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    _el.addEventListener('click', _hide);
+    document.addEventListener('keydown', _onKeyDown, true);
+
+    // Disable click to close on top of Lightbox's content
+    if (_content) {
+      _content.addEventListener('click', _stopPropagation);
+    }
+  };
+
+  /**
+   * Hide the Lightbox and remove its listeners.
+   */
+  _hide = function () {
+    _el.classList.add('hide');
+    _removeListeners();
+  };
+
+  /**
+   * Event handler that hides the Lightbox when the user hits the escape key.
    *
    * @param e {Event}
    */
   _onKeyDown = function (e) {
     if (e.key === 'Escape') {
-      _this.hide();
+      e.stopPropagation(); // don't also close Leaflet Popup
+
+      _hide();
     }
+  };
+
+  /**
+   * Remove the Lightbox from the DOM.
+   */
+  _remove = function () {
+    if (document.getElementById(_el.id)) {
+      _el.parentNode.removeChild(_el);
+    }
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _removeListeners = function () {
+    _el.removeEventListener('click', _hide);
+    document.removeEventListener('keydown', _onKeyDown, true);
+
+    if (_content) {
+      _content.removeEventListener('click', _stopPropagation);
+    }
+  };
+
+  /**
+   * Event handler that stops event propagation.
+   *
+   * @param e {Event}
+   */
+  _stopPropagation = function (e) {
+    e.stopPropagation();
   };
 
   // ----------------------------------------------------------
@@ -51,62 +124,47 @@ var Lightbox = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the Lightbox to the document.
+   * Destroy this Class to aid in garbage collection.
+   */
+  _this.destroy = function () {
+    _remove(); // also remove from DOM
+
+    _initialize = null;
+
+    _content = null;
+    _el = null;
+
+    _add = null;
+    _addListeners = null;
+    _hide = null;
+    _onKeyDown = null;
+    _remove = null;
+    _removeListeners = null;
+    _stopPropagation = null;
+
+    _this = null;
+  };
+
+  /**
+   * Set the Lightbox's content.
    *
    * @param html {String}
-   *     Lightbox content
+   *
+   * @return _this {Object}
    */
-  _this.add = function (html) {
-    var content,
-        div = document.createElement('div');
+  _this.setContent = function (html) {
+    _el.innerHTML = html;
+    _content = _el.querySelector(':scope > *');
 
-    div.id = _id;
-    div.innerHTML = html;
-    div.classList.add('lightbox', 'hide');
-
-    _this.remove(); // first remove any pre-existing Lightbox w/ this _id
-    document.body.appendChild(div);
-
-    _lightbox = div;
-    content = _lightbox.querySelector(':scope > *');
-
-    // Disable click to close on Lightbox content
-    if (content) {
-      content.addEventListener('click', e => e.stopPropagation());
-    }
-  };
-
-  /**
-   * Hide the Lightbox.
-   */
-  _this.hide = function () {
-    if (_lightbox) {
-      _lightbox.classList.add('hide');
-      _lightbox.removeEventListener('click', _this.hide);
-    }
-
-    document.removeEventListener('keydown', _onKeyDown);
-  };
-
-  /**
-   * Remove the Lightbox from the document.
-   */
-  _this.remove = function () {
-    if (_lightbox) {
-      _lightbox.parentNode.removeChild(_lightbox);
-    }
+    return _this; // enable chaining
   };
 
   /**
    * Show the Lightbox.
    */
   _this.show = function () {
-    if (_lightbox) {
-      _lightbox.classList.remove('hide');
-      _lightbox.addEventListener('click', _this.hide);
-    }
-
-    document.addEventListener('keydown', _onKeyDown);
+    _el.classList.remove('hide');
+    _addListeners();
   };
 
 

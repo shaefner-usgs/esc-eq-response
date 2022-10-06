@@ -32,10 +32,6 @@
     }
   }
 
-  .hide + .swap {
-    margin-top: -.75rem;
-  }
-
   .historical + p {
     margin-top: 1.5rem;
   }
@@ -43,18 +39,6 @@
   .required {
     color: $invalid-color;
     margin-bottom: 0;
-  }
-
-  .swap {
-    margin: .25rem 0 2rem;
-
-    &.hide {
-      display: none;
-    }
-
-    p {
-      margin: 1rem 0 0;
-    }
   }
 
   .timezone {

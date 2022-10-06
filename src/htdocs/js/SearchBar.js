@@ -3,64 +3,78 @@
 
 
 require('leaflet-editable');
-require('leaflet/L.Control.Rectangle'); // custom map control for Leaflet.Editable
+require('leaflet.path.drag'); // add path dragging to Leaflet.Editable
+require('leaflet/L.Control.Rectangle'); // map control to draw a rectangle
 
 var AppUtil = require('util/AppUtil'),
-    CatalogSearch = require('CatalogSearch');
+    Luxon = require('luxon');
 
 
-var _DEFAULTS = {
-  minmagnitude: '3.5', // URL params are Strings
+var _DEFAULTS,
+    _CANV;
+
+_DEFAULTS = {
+  endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
+  maxlatitude: 90,
+  maxlongitude: 180,
+  minlatitude: -90,
+  minlongitude: -180,
+  minmagnitude: 3.5,
   period: 'month',
-  region: 'worldwide'
+  region: 'worldwide',
+  starttime: Luxon.DateTime.now().minus({months: 1}).toUTC().toISO().slice(0, -5)
+};
+_CANV = {
+  maxlatitude: 42.1,
+  maxlongitude: -114,
+  minlatitude: 32.4,
+  minlongitude: -124.6
 };
 
 
 /**
- * Search the earthquake catalog and display the results on the map.
+ * Search the earthquake catalog and initialize/handle the search UI, including
+ * the date pickers and Leaflet map instance.
  *
  * @param options {Object}
- *   {
- *     app: {Object} Application
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object}
- *   {
- *     postInit: {Function}
- *     renderMap: {Function}
- *     searchCatalog: {Function}
- *     setStatus: {Function}
- *   }
+ *     {
+ *       getParams: {Function}
+ *       postInit: {Function}
+ *       render: {Function}
+ *       searchCatalog: {Function}
+ *       setButton: {Function}
+ *     }
  */
 var SearchBar = function (options) {
   var _this,
       _initialize,
 
       _app,
-      _catalogSearch,
-      _customParams,
       _el,
       _endtime,
-      _flatpickrs,
       _initialView,
       _map,
       _nowButton,
+      _period,
+      _pickers,
+      _region,
       _regionLayer,
       _searchButton,
-      _selPeriod,
-      _selRegion,
       _starttime,
 
+      _addButton,
       _addControl,
       _addListeners,
-      _addNowButton,
-      _cancelEdit,
-      _getParams,
-      _initFlatpickr,
+      _cancelRegion,
       _initMap,
+      _initPickers,
       _isValid,
-      _loadFeed,
       _onDateChange,
       _onDateClose,
       _onEndOpen,
@@ -70,31 +84,18 @@ var SearchBar = function (options) {
       _setNow,
       _setOption,
       _setParams,
+      _setSlider,
       _setUtcDay,
       _setUtcMonth,
       _setValidity,
-      _setView,
-      _updateSlider;
+      _setView;
 
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
     _app = options.app;
-    _catalogSearch = CatalogSearch({
-      app: _app
-    });
-    _customParams = [
-      'endtime',
-      'maxlatitude',
-      'maxlongitude',
-      'minlatitude',
-      'minlongitude',
-      'starttime'
-    ];
-    _el = options.el || document.createElement('section');
+    _el = options.el;
     _endtime = document.getElementById('endtime');
     _initialView = true;
     _regionLayer = L.rectangle([ // default - contiguous U.S.
@@ -104,14 +105,31 @@ var SearchBar = function (options) {
     _searchButton = document.getElementById('search');
     _starttime = document.getElementById('starttime');
 
-    _initFlatpickr();
+    _initPickers();
     _setControls();
-    _initMap();
     _addListeners();
+    _initMap();
   };
 
   /**
-   * Add a control to the map for creating a custom region Rectangle.
+   * Add a 'Now' button to the 'endtime' Flatpickr calendar.
+   *
+   * @return {Element}
+   */
+  _addButton = function () {
+    var button = document.createElement('a'),
+        container = _pickers.endtime.calendarContainer,
+        parent = container.querySelector('.flatpickr-months');
+
+    button.classList.add('button', 'flatpickr-now');
+    button.textContent = 'Now';
+    parent.appendChild(button);
+
+    return _el.querySelector('.flatpickr-now');
+  };
+
+  /**
+   * Add a control to the map for creating a custom region rectangle.
    */
   _addControl = function () {
     var control = L.control.rectangle({
@@ -127,33 +145,39 @@ var SearchBar = function (options) {
    */
   _addListeners = function () {
     var arrows = _el.querySelectorAll('.flatpickr-minute ~ span'),
-        buttons = _el.querySelectorAll('.period li, .region li'),
         labels = _el.querySelectorAll('label'),
+        options = _el.querySelectorAll('.period li, .region li'),
         slider = _el.querySelector('.slider input');
 
-    // Set the minutes value when the user clicks an arrow button
+    // Set the minutes value when the user clicks an up/down arrow button
     arrows.forEach(arrow =>
       arrow.addEventListener('click', _setMinutes)
     );
 
-    // Set the selected option on a 'radio-bar'
-    buttons.forEach(button =>
-      button.addEventListener('click', function() {
-        _setOption.call(this);
-        _this.setStatus();
-      })
-    );
-
-    // Open the associated date picker when the user clicks a label
+    // Open the associated date picker when the user clicks on a label
     labels.forEach(label =>
       label.addEventListener('click', () => {
         var id = label.getAttribute('for');
 
-        _flatpickrs[id].open();
+        _pickers[id].open();
       })
     );
 
-    // Set the end time to 'Now' when the user clicks the 'Now' button
+    // Set the selected period or region 'radio-bar' option
+    options.forEach(option =>
+      option.addEventListener('click', function() {
+        _setOption.call(this);
+        _this.setButton();
+      })
+    );
+
+    // Keep the magnitude range slider in sync
+    slider.addEventListener('input', function() {
+      _setSlider(this);
+      _this.setButton();
+    });
+
+    // Set the end time to 'now' when the user clicks the 'Now' button
     _nowButton.addEventListener('click', e => {
       e.preventDefault();
       _setNow();
@@ -165,95 +189,52 @@ var SearchBar = function (options) {
 
       _this.searchCatalog();
     });
-
-    // Update the range slider
-    slider.addEventListener('input', _updateSlider);
   };
 
   /**
-   * Add a 'Now' button to the endtime Flatpickr calendar.
-   *
-   * @param flatpickr {Object}
+   * Cancel the new custom region Leaflet control if it's active.
    */
-  _addNowButton = function (flatpickr) {
-    var button = document.createElement('a'),
-        div = flatpickr.calendarContainer.querySelector('.flatpickr-months');
-
-    button.classList.add('button', 'flatpickr-now');
-    button.textContent = 'Now';
-    div.appendChild(button);
-
-    _nowButton = _el.querySelector('.flatpickr-now');
-  };
-
-  /**
-   * Cancel edit mode for the custom region Leaflet control if it's active.
-   */
-  _cancelEdit = function () {
+  _cancelRegion = function () {
     var control = _el.querySelector('.leaflet-control-edit a');
 
     if (control.classList.contains('selected')) {
-      control.click(); // exit custom region edit mode
+      control.click(); // exit new custom region mode
     }
   };
 
   /**
-   * Get the parameters for a catalog search from the UI controls.
-   *
-   * Note: explicitly return Strings for Number values since URLparams are
-   * always Strings, which allows comparison btwn. the two sets of values.
-   *
-   * @return params {Object}
+   * Create the Leaflet map instance.
    */
-  _getParams = function () {
-    var bounds,
-        period = _el.querySelector('ul.period .selected').id,
-        region = _el.querySelector('ul.region .selected').id,
-        params = {
-          minmagnitude: document.getElementById('minmagnitude').value,
-          period: period,
-          region: region
-        };
+  _initMap = function () {
+    var zoomControl;
 
-    if (period === 'customPeriod') {
-      Object.assign(params, {
-        endtime: _endtime.value,
-        starttime: _starttime.value
-      });
+    _map = L.map(_el.querySelector('.customRegion'), {
+      editable: true,
+      layers: [
+        L.greyscaleLayer(),
+        _regionLayer
+      ],
+      minZoom: 1,
+      scrollWheelZoom: false
+    });
+
+    _map.setView([0, 0], 1); // set an arbitrary view for now
+    _regionLayer.enableEdit();
+    _addControl();
+
+    // Hide the zoom control on mobile (in favor of pinch-to-zoom)
+    if (L.Browser.mobile) {
+      zoomControl = _el.querySelector('.leaflet-control-zoom');
+
+      zoomControl.style.display = 'none';
     }
-
-    if (region === 'ca-nv') {
-      Object.assign(params, {
-        maxlatitude: '42.10',
-        maxlongitude: '-114.00',
-        minlatitude: '32.40',
-        minlongitude: '-124.60'
-      });
-    } else if (region === 'customRegion') {
-      _cancelEdit();
-
-      _map.eachLayer(layer => {
-        if (layer.getBounds) { // only the region layer has bounds
-          bounds = layer.getBounds();
-        }
-      });
-
-      Object.assign(params, {
-        maxlatitude: String(AppUtil.round(bounds.getNorth(), 2)),
-        maxlongitude: String(AppUtil.round(bounds.getEast(), 2)),
-        minlatitude: String(AppUtil.round(bounds.getSouth(), 2)),
-        minlongitude: String(AppUtil.round(bounds.getWest(), 2))
-      });
-    }
-
-    return params;
   };
 
   /**
-   * Create the Flatpickr (date picker) calendar instances.
+   * Create the Flatpickr (date picker) begin and end time calendar instances.
    */
-  _initFlatpickr = function () {
-    var opts = { // shared options for begin/end date pickers
+  _initPickers = function () {
+    var options = {
       altFormat: 'M j, Y H:i',
       altInput: true,
       dateFormat: 'Y-m-d\\TH:i:S',
@@ -272,51 +253,23 @@ var SearchBar = function (options) {
       time_24hr: true
     };
 
-    _flatpickrs = {
+    _pickers = {
       endtime: flatpickr('#endtime',
-        Object.assign({}, opts, {
+        Object.assign({}, options, {
           altInputClass: 'endtime-alt',
           onOpen: _onEndOpen,
           position: 'auto right'
         })
       ),
       starttime: flatpickr('#starttime',
-        Object.assign({}, opts, {
+        Object.assign({}, options, {
           altInputClass: 'starttime-alt',
           onOpen: _onStartOpen,
           position: 'auto left'
         })
       )
     };
-
-    _addNowButton(_flatpickrs.endtime);
-  };
-
-  /**
-   * Create the Leaflet map instance.
-   */
-  _initMap = function () {
-    var zoomControl;
-
-    _map = L.map(_el.querySelector('.customRegion'), {
-      editable: true,
-      layers: [
-        L.greyscaleLayer(),
-        _regionLayer
-      ],
-      scrollWheelZoom: false
-    });
-
-    _map.setView([0, 0], 1); // set arbitrary view for now
-    _regionLayer.enableEdit();
-    _addControl();
-
-    // Hide the zoom control on mobile (in favor of pinch-to-zoom)
-    if (L.Browser.mobile) {
-      zoomControl = _el.querySelector('.leaflet-control-zoom');
-
-      zoomControl.style.display = 'none';
-    }
+    _nowButton = _addButton();
   };
 
   /**
@@ -332,7 +285,7 @@ var SearchBar = function (options) {
       isValid = _setValidity(_starttime) && _setValidity(_endtime);
 
       if (!isValid) {
-        _setValidity(_endtime); // be certain that invalid endtime is also flagged
+        _setValidity(_endtime); // be certain to flag invalid endtime as well
       }
     }
 
@@ -340,36 +293,13 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Fetch the earthquakes and display them on the map.
+   * Event handler for changing the date of a Flatpickr calendar.
+   *
+   * @param selDates {Array}
+   * @param dateStr {String}
    */
-  _loadFeed = function () {
-    _app.MapPane.addLoader(_catalogSearch);
-    _app.JsonFeed.fetch(_catalogSearch).then(json => {
-      if (json) {
-        _catalogSearch.create(json);
-        _app.MapPane.addLayer(_catalogSearch);
-        _app.TitleBar.setTitle({
-          title: _catalogSearch.title,
-          type: 'search'
-        });
-      } else {
-        _app.MapPane.removeFeature(_catalogSearch);
-      }
-    }).catch(error => {
-      _app.StatusBar.addError({
-        id: _catalogSearch.id,
-        message: `<h4>Error Adding ${_catalogSearch.name}</h4><ul><li>${error}</li></ul>`
-      });
-
-      console.error(error);
-    });
-  };
-
-  /**
-   * Handler that gets called when a Flatpickr calendar's date is changed.
-   */
-  _onDateChange = function (dates, dateStr) {
-    var datePicked = dates.length > 0 && dateStr;
+  _onDateChange = function (selDates, dateStr) {
+    var datePicked = selDates.length > 0 && dateStr;
 
     _setUtcDay(this.days);
     _setValidity(this.input);
@@ -381,7 +311,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that gets called when a Flatpickr calendar is closed.
+   * Event handler for closing a Flatpickr calendar.
    */
   _onDateClose = function () {
     _setValidity(this.input);
@@ -391,16 +321,16 @@ var SearchBar = function (options) {
       _setNow();
     }
 
-    _this.setStatus();
+    _this.setButton();
   };
 
   /**
-   * Handler that gets called when the endtime Flatpickr calendar is opened.
+   * Event handler for opening an 'endtime' Flatpickr calendar.
    */
   _onEndOpen = function () {
     var now = new Date(),
         maxDate = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000),
-        minDate = _flatpickrs.starttime.selectedDates[0];
+        minDate = _pickers.starttime.selectedDates[0];
 
     this.set('maxDate', maxDate);
     this.set('minDate', minDate);
@@ -414,11 +344,11 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Handler that gets called when the starttime Flatpickr calendar is opened.
+   * Event handler for opening a 'starttime' Flatpickr calendar.
    */
   _onStartOpen = function () {
     var maxDate, now,
-        endDate = _flatpickrs.endtime.selectedDates[0];
+        endDate = _pickers.endtime.selectedDates[0];
 
     if (endDate) {
       maxDate = endDate;
@@ -429,47 +359,46 @@ var SearchBar = function (options) {
 
     this.set('maxDate', maxDate);
     _setUtcDay(this.days);
+    _setUtcMonth(this);
   };
 
   /**
-   * Set the UI controls to match the values of the URL params (or to the
-   * default value if a param is not set).
+   * Set the UI controls to match the URL parameters (or to its default value if
+   * a parameter is not set).
    *
-   * Note: The selected 'radio-bar' options are set in _this.postInit.
+   * Note: The selected 'radio-bar' options are set via _this.postInit().
    */
   _setControls = function () {
     var endtime,
         minmagnitude = document.getElementById('minmagnitude'),
-        output = minmagnitude.nextElementSibling,
-        slider = minmagnitude.parentNode,
-        vals = {
+        settings = {
           minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
           period: AppUtil.getParam('period') || _DEFAULTS.period,
           region: AppUtil.getParam('region') || _DEFAULTS.region
         };
 
-    _selPeriod = document.getElementById(vals.period);
-    _selRegion = document.getElementById(vals.region);
+    _period = document.getElementById(settings.period);
+    _region = document.getElementById(settings.region);
 
-    minmagnitude.value = vals.minmagnitude;
-    output.value = vals.minmagnitude;
-    slider.style.setProperty('--val', vals.minmagnitude);
+    // Set magnitude
+    minmagnitude.value = settings.minmagnitude;
+    _setSlider(minmagnitude);
 
-    _app.setSliderStyles(minmagnitude);
-
-    if (_selPeriod.id === 'customPeriod') {
+    // Set custom dates
+    if (_period.id === 'customPeriod') {
       endtime = AppUtil.getParam('endtime');
 
       if (endtime === 'now') {
         _setNow();
       } else {
-        _flatpickrs.endtime.setDate(endtime);
+        _pickers.endtime.setDate(endtime);
       }
 
-      _flatpickrs.starttime.setDate(AppUtil.getParam('starttime'));
+      _pickers.starttime.setDate(AppUtil.getParam('starttime'));
     }
 
-    if (_selRegion.id === 'customRegion') {
+    // Set custom region polygon
+    if (_region.id === 'customRegion') {
       _regionLayer = L.rectangle([
         [
           AppUtil.getParam('maxlatitude'),
@@ -484,8 +413,8 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Ensure minutes value is a multiple of 5. It gets out of sync when the max
-   * time allowed is not a multiple of 5.
+   * Event handler that sets the minutes value to a multiple of 5. It gets out
+   * of sync when the max time allowed is not a multiple of 5.
    */
   _setMinutes = function () {
     var minutes,
@@ -509,50 +438,48 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the endtime to 'Now' on the endtime Flatpickr calendar and its <input>
-   * fields.
+   * Set the endtime to 'Now' on the endtime calendar and its <input> fields.
    */
   _setNow = function () {
-    var flatpickr = _flatpickrs.endtime,
-        container = flatpickr.calendarContainer,
+    var picker = _pickers.endtime,
+        container = picker.calendarContainer,
         hour = container.querySelector('.flatpickr-hour'),
         minute = container.querySelector('.flatpickr-minute');
 
-    flatpickr.clear();
+    picker.clear();
 
-    flatpickr.altInput.value = 'Now';
+    picker.altInput.value = 'Now';
     hour.value = '00';
     minute.value = '00';
     _endtime.value = 'now';
 
     _nowButton.classList.add('selected');
-    _setUtcMonth(flatpickr);
+    _setUtcMonth(picker);
     _setValidity(_endtime);
   };
 
   /**
-   * Wrapper method to set the selected 'radio-bar' option and also render the
-   * map/cancel the edit depending on the current state.
+   * Wrapper method that sets the selected option on a 'radio-bar' and
+   * optionally renders the map/cancels the custom region, depending on the
+   * current state.
    */
   _setOption = function () {
     _app.setOption.call(this);
 
     if (this.id === 'customRegion') {
-      _this.renderMap();
-    } else if (this.id === 'worldwide') {
-      _cancelEdit();
+      _this.render();
+    } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
+      _cancelRegion();
     }
   };
 
   /**
-   * Set the URL params to match the UI controls. Only set a param if the
-   * control is not set to its default value and also delete custom search
-   * params if their corresponding 'custom' option is not selected.
-   *
-   * @param params {Object}
-   *    current UI control settings
+   * Set the URL parameters to match the UI controls. Don't set a parameter if
+   * its control is set to its default value; delete unneeded time parameters.
    */
-  _setParams = function (params) {
+  _setParams = function () {
+    var params = _this.getParams();
+
     Object.keys(params).forEach(name => {
       var value = params[name];
 
@@ -563,54 +490,74 @@ var SearchBar = function (options) {
       }
     });
 
-    // Delete unneeded custom params (when control is not set to 'custom')
-    _customParams.forEach(name => {
-      if (!Object.prototype.hasOwnProperty.call(params, name)) {
-        AppUtil.deleteParam(name);
-      }
-    });
+    if (params.period !== 'customPeriod') {
+      AppUtil.deleteParam('endtime');
+      AppUtil.deleteParam('starttime');
+    }
+
   };
 
   /**
-   * Set the highlighted calendar day to the current UTC day (the local day is
-   * highlighted by default).
+   * Set the range slider's current value.
+   *
+   * @param input {Element}
+   */
+  _setSlider = function (input) {
+    var output = input.nextElementSibling,
+        slider = input.parentNode,
+        value = Number(input.value);
+
+    output.value = value;
+    slider.style.setProperty('--val', value);
+
+    _app.setSliderStyles(input);
+  };
+
+  /**
+   * Set the highlighted calendar day to the current UTC day (which might be the
+   * previous/following day).
    *
    * @param days {Element}
    *     div container with the calendar days of the selected month
    */
   _setUtcDay = function (days) {
-    var tomorrow,
+    var tomorrow, yesterday,
         today = days.querySelector('.today');
 
     if (today) { // selected calendar is the current month
       tomorrow = today.nextElementSibling;
+      yesterday = today.previousElementSibling;
+      today.style.transitionProperty = 'none'; // disable transitions
 
       if (tomorrow && !tomorrow.classList.contains('flatpickr-disabled')) {
-        today.style.transitionProperty = 'none'; // disable transitions
-
         today.classList.remove('today');
         tomorrow.classList.add('today');
-
-        setTimeout(() =>  // restore transitions
-          today.style.transitionProperty = 'background, color', 500
-        );
+      } else if (today.classList.contains('flatpickr-disabled')) {
+        today.classList.remove('today');
+        yesterday.classList.add('today');
       }
+
+      setTimeout(() => // restore transitions
+        today.style.transitionProperty = 'background, color', 500
+      );
     }
   };
 
   /**
    * Set the given Flatpickr calendar to the current UTC month (which might be
-   * the following month in UTC time on the last day of a month).
+   * the previous/following month on the first/last day of the month).
    *
-   * @param flatpickr {Object}
+   * @param picker {Object}
    */
-  _setUtcMonth = function (flatpickr) {
-    var container = flatpickr.calendarContainer,
+  _setUtcMonth = function (picker) {
+    var container = picker.calendarContainer,
         selected = container.querySelector('.flatpickr-day.selected'),
         today = container.querySelector('.today');
 
-    if (!selected && today.classList.contains('nextMonthDay')) {
-      flatpickr.changeMonth(1); // select the following month
+    if (!selected && today.classList.contains('prevMonthDay')) {
+      picker.changeMonth(-1);
+    } else if (!selected && today.classList.contains('nextMonthDay')) {
+      picker.changeMonth(1);
     }
   };
 
@@ -638,7 +585,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the initial view of the custom region map to contain the current search
+   * Set the initial view of the custom region map to contain the custom search
    * region's (or default) bounds.
    */
   _setView = function () {
@@ -657,83 +604,117 @@ var SearchBar = function (options) {
     }
   };
 
-  /**
-   * Display the <input> range slider's current value.
-   */
-  _updateSlider = function () {
-    var output = this.nextElementSibling,
-        slider = this.parentNode,
-        value = Number(this.value);
-
-    output.value = value;
-    slider.style.setProperty('--val', value);
-
-    _app.setSliderStyles(this);
-    _this.setStatus();
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
+   * Get the search parameters from the UI controls and _DEFAULTS.
+   *
+   * @return {Object}
+   */
+  _this.getParams = function () {
+    var bounds,
+        minus = {},
+        params = {
+          minmagnitude: Number(document.getElementById('minmagnitude').value),
+          period: _el.querySelector('ul.period .selected').id,
+          region: _el.querySelector('ul.region .selected').id
+        };
+
+    // Begin, end times
+    if (params.period.match(/day|week|month/)) {
+      minus[params.period + 's'] = 1;
+
+      Object.assign(params, {
+        endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
+        starttime: Luxon.DateTime.now().minus(minus).toUTC().toISO().slice(0, -5)
+      });
+    } else if (params.period === 'customPeriod') {
+      Object.assign(params, {
+        endtime: _endtime.value,
+        starttime: _starttime.value
+      });
+    }
+
+    // Bounds
+    if (params.region === 'ca-nv') {
+      Object.assign(params, _CANV);
+    } else if (params.region === 'customRegion') {
+      _cancelRegion(); // can't get params while active
+
+      _map.eachLayer(layer => {
+        if (layer.getBounds) { // only the region layer has bounds
+          bounds = layer.getBounds();
+        }
+      });
+
+      Object.assign(params, {
+        maxlatitude: Number(AppUtil.round(bounds.getNorth(), 2)),
+        maxlongitude: Number(AppUtil.round(bounds.getEast(), 2)),
+        minlatitude: Number(AppUtil.round(bounds.getSouth(), 2)),
+        minlongitude: Number(AppUtil.round(bounds.getWest(), 2))
+      });
+    }
+
+    return Object.assign({}, _DEFAULTS, params);
+  };
+
+  /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _setOption.call(_selPeriod);
-    _setOption.call(_selRegion);
-    _this.searchCatalog();
+    _setOption.call(_period);
+    _setOption.call(_region);
   };
 
   /**
    * Render the region map so it displays correctly.
    */
-  _this.renderMap = function () {
+  _this.render = function () {
     _map.invalidateSize();
     _setView();
   };
 
   /**
-   * Search the earthquake catalog.
+   * Event handler that searches the earthquake catalog and displays the results.
    */
   _this.searchCatalog = function () {
-    var params = _getParams();
+    if (_isValid()) { // checks custom dates
+      _setParams();
+      _app.Features.refreshFeature('search');
 
-    // Check that custom dates are valid if applicable
-    if (_isValid()) {
-      _setParams(params);
-      _app.MapPane.removeFeature(_catalogSearch);
-      _catalogSearch.reset();
-      _catalogSearch.setFeedUrl(params);
-      _loadFeed();
+      if (!document.body.classList.contains('mainshock')) {
+        _app.MapPane.initBounds();
+        _app.MapPane.setView();
+      }
     }
-
-    _this.setStatus();
   };
 
   /**
-   * Set the 'Search' button text to 'Refresh' when all controls match the
-   * current search params; set button to disabled if input(s) invalid;
+   * Set the 'Search' button to 'Refresh' when all UI controls match the
+   * current Catalog Search parameters; set it to disabled if any controls
+   * are invalid.
    */
-  _this.setStatus = function () {
-    var currentParams = {},
-        customPeriod = document.getElementById('customPeriod')
+  _this.setButton = function () {
+    var customPeriod = document.getElementById('customPeriod')
           .classList.contains('selected'),
-        inputs = _el.querySelectorAll('.dates input'),
-        newParams = _getParams(),
-        paramNames = _customParams.concat(Object.keys(_DEFAULTS));
+        inputs = [
+          document.getElementById('endtime'),
+          document.getElementById('starttime')
+        ],
+        params = {
+          controls: _this.getParams(),
+          search: _app.Features.getFeature('search').params
+        },
+        skip = [];
 
-    paramNames.forEach(name => {
-      var value = AppUtil.getParam(name);
+    // Times may differ slightly (by seconds), but it's irrelevant
+    if (params.controls.period.match(/day|week|month/)) {
+      skip = ['endtime', 'starttime'];
+    }
 
-      if (value) {
-        currentParams[name] = value;
-      } else if (Object.prototype.hasOwnProperty.call(_DEFAULTS, name)) {
-        currentParams[name] = _DEFAULTS[name];
-      }
-    });
-
-    if (AppUtil.shallowEqual(currentParams, newParams)) {
+    if (AppUtil.shallowEqual(params.controls, params.search, skip)) {
       _searchButton.textContent = 'Refresh';
     } else {
       _searchButton.textContent = 'Search';

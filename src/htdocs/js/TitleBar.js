@@ -5,23 +5,24 @@
  * Set the TitleBar's content.
  *
  * @param options {Object}
- *   {
- *     el: {Element}
- *   }
+ *     {
+ *       app: {Object} Application
+ *       el: {Element}
+ *     }
  *
  * @return _this {Object)
- *   {
- *     reset: {Function}
- *     setTitle: {Function}
- *   }
+ *     {
+ *       reset: {Function}
+ *       setTitle: {Function}
+ *     }
  */
 var TitleBar = function (options) {
   var _this,
       _initialize,
 
+      _app,
+      _defaults,
       _el,
-      _subTitle,
-      _title,
 
       _repaint,
       _setSubTitle;
@@ -29,12 +30,13 @@ var TitleBar = function (options) {
 
   _this = {};
 
-  _initialize = function (options) {
-    options = options || {};
-
+  _initialize = function (options = {}) {
+    _app = options.app;
     _el = options.el;
-    _subTitle = _el.querySelector('p').innerText;
-    _title = document.title;
+    _defaults = { // cache initial text from static HTML
+      subTitle: _el.querySelector('p').innerText, // instructions
+      title: _el.querySelector('h1').innerText // app name
+    };
   };
 
   /**
@@ -43,20 +45,20 @@ var TitleBar = function (options) {
    * @param el {Element}
    */
   _repaint = function (el) {
-    el.style.display='none';
+    el.style.display = 'none';
     el.offsetHeight;
-    el.style.display='block';
+    el.style.display = 'block';
   };
 
   /**
-   * Set the TitleBar's subtitle.
+   * Set the subtitle.
    *
-   * @param subTitle {String}
+   * @param subTitle {String} optional
    */
-  _setSubTitle = function (subTitle) {
+  _setSubTitle = function (subTitle = '') {
     var p = _el.querySelector('p');
 
-    p.innerHTML = subTitle || _subTitle;
+    p.innerHTML = subTitle || _defaults.subTitle;
   };
 
   // ----------------------------------------------------------
@@ -67,52 +69,37 @@ var TitleBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    _this.setTitle();
+    var search = _app.Features.getFeature('search');
+
+    if (_app.Features.isFeature(search)) {
+      _this.setTitle(search);
+    }
   };
 
   /**
-   * Set the TitleBar's title (and the document's <title>).
+   * Set the title (both the TitleBar and document <title>).
    *
-   * @param opts {Object} optional; default is {}
-   *   {
-   *     htmlTime: {String}
-   *     title: {String}
-   *     type: {String}
-   *     url: {String}
-   *   }
+   * @param feature {Object}
+   *     Mainshock or CatalogSearch Feature
    */
-  _this.setTitle = function (opts = {}) {
-    var docTitle,
-        appName = document.title.split(' | ')[1] || document.title,
+  _this.setTitle = function (feature) {
+    var subTitle,
         h1 = _el.querySelector('h1'),
-        title = _title;
+        title = feature.title;
 
-    if (opts.title) {
-      title = opts.title;
-
-      if (opts.type === 'search') {
-        _title = opts.title; // cache value
-
-        if (document.body.classList.contains('mainshock')) {
-          return; // don't change the title if a Mainshock is selected
-        }
-      }
-    }
-
-    docTitle = title + ' | ' + appName;
-
-    if (opts.url) {
-      title = '' +
-        `<a href="${opts.url}" target="new" title="USGS Event Page">` +
+    if (feature.id === 'mainshock') {
+      subTitle = feature.data.timeDisplay;
+      title = // link to Event Page
+        `<a href="${feature.data.url}" target="new" title="USGS Event Page">` +
           `${title}<i class="icon-link"></i>` +
         '</a>';
     }
 
     h1.innerHTML = title;
-    document.title = docTitle;
+    document.title = feature.title + ' | ' + _defaults.title; // include app's name;
 
     _repaint(h1);
-    _setSubTitle(opts.timeDisplay || '');
+    _setSubTitle(subTitle);
   };
 
 
