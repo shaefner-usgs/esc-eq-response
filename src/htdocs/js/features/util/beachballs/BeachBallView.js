@@ -2,7 +2,7 @@
 'use strict';
 
 
-var Canvas = require('features/util/Canvas');
+var Canvas = require('./Canvas');
 
 
 var _D2R,
