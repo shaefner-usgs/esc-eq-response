@@ -40,7 +40,8 @@ class Ncedc {
    * results. Extraneous results outside the circle can be filtered out later if
    * desired.
    *
-   * @param $params {Array} Note: passed by reference
+   * @param $params {Array}
+   *     Note: passed by reference
    */
   private function _addBoundingBox(&$params) {
     if (array_key_exists('maxradiuskm', $this->_params)) {
@@ -57,45 +58,6 @@ class Ncedc {
       $params['minlat'] = $this->_params['latitude'] - $latDegrees;
       $params['minlon'] = $this->_params['longitude'] - $lonDegrees;
     }
-  }
-
-  /**
-   * Convert the query parameters from ComCat to NCEDC syntax.
-   *
-   * @return $params {Array}
-   */
-  private function _convertParams() {
-    $keep = [
-      'eventid',
-      'format',
-      'orderby'
-    ];
-    $params = [];
-    $rename = [
-      'endtime' => 'end',
-      'minmagnitude' => 'minmag',
-      'starttime' => 'start'
-    ];
-
-    foreach($this->_params as $name => $value) {
-      if (array_key_exists($name, $rename)) {
-        $name = $rename[$name];
-      } else if (!in_array($name, $keep)) {
-        continue; // only keep compatible params
-      }
-
-      if ($name === 'minmag') {
-        $value += .05; // 'undo' rounding down for ComCat (also preempts a bug¹)
-      }
-
-      if ($value === 'geojson') { // no support for GeoJSON output
-        $value = 'text';
-      }
-
-      $params[$name] = $value;
-    }
-
-    return $params;
   }
 
   /**
@@ -180,12 +142,37 @@ class Ncedc {
   }
 
   /**
-   * Get the query parameters for a catalog search.
+   * Get the query parameters for a catalog search. Converts them from ComCat to
+   * NCEDC syntax
    *
    * @return $params {Array}
    */
   private function _getParams() {
-    $params = $this->_convertParams();
+    $keep = [
+      'eventid',
+      'format',
+      'orderby'
+    ];
+    $params = [];
+    $rename = [
+      'endtime' => 'end',
+      'minmagnitude' => 'minmag',
+      'starttime' => 'start'
+    ];
+
+    foreach($this->_params as $name => $value) {
+      if (array_key_exists($name, $rename)) {
+        $name = $rename[$name]; // rename param
+      } else if (!in_array($name, $keep)) {
+        continue; // discard param
+      }
+
+      if ($name === 'minmag') {
+        $value += .05; // 'undo' rounding down for ComCat (also preempts a bug¹)
+      }
+
+      $params[$name] = $value;
+    }
 
     // Add additional params
     $params['catalog'] = 'DD';
