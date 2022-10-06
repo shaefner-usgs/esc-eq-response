@@ -3,13 +3,13 @@
 
 
 /**
- * Factory for Satellite base layer.
+ * Factory for the Satellite base layer.
  *
- * @param provider {String} optional; default is 'esri'
+ * @param provider {String} default is 'esri'
  * @param options {Object}
- *     L.tileLayer options
+ *     L.TileLayer options
  *
- * @return {Object <L.layerGroup|L.tileLayer>}
+ * @return {<L.LayerGroup|L.TileLayer>}
  */
 L.SatelliteLayer = function (provider = 'esri', options) {
   var base, places, placesUrl, transportation, transportationUrl,

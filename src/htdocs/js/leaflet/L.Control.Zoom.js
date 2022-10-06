@@ -7,38 +7,32 @@
  * visible map area, which varies depending on the header's height and whether
  * or not the sidebar is toggled on.
  */
-L.Control.Zoom = L.Control.Zoom.include({
-  _getCenter: function () {
-    var offsetX = document.getElementById('sideBar').offsetWidth / 2,
-        offsetY = document.querySelector('header').offsetHeight / 2,
-        point = this._map.getSize().divideBy(2).add([0, offsetY]),
-        sidebar = document.body.classList.contains('sidebar');
-
-    if (sidebar) {
-      point = point.subtract([offsetX, 0]);
-    }
-
-    return this._map.containerPointToLatLng(point);
-  },
-
+L.Control.Zoom.include({
+  /**
+   * Override _zoomIn from L.Control.Zoom.
+   *
+   * @param e {Event}
+   */
   _zoomIn: function (e) {
-    var zoom = this._map._zoom + this._map.options.zoomDelta * (e.shiftKey ? 3 : 1);
+    var delta = this._map.options.zoomDelta * (e.shiftKey ? 3 : 1),
+        zoom = this._map._zoom + delta;
 
     if (!this._disabled && this._map._zoom < this._map.getMaxZoom()) {
-      this._map.setZoomAround(this._getCenter(), zoom);
+      this._map.setZoomAround(this._map.getVisibleCenter(), zoom);
     }
   },
 
+  /**
+   * Override _zoomOut from L.Control.Zoom.
+   *
+   * @param e {Event}
+   */
   _zoomOut: function (e) {
-    var zoom = this._map._zoom - this._map.options.zoomDelta * (e.shiftKey ? 3 : 1);
+    var delta = this._map.options.zoomDelta * (e.shiftKey ? 3 : 1),
+        zoom = this._map._zoom - delta;
 
     if (!this._disabled && this._map._zoom > this._map.getMinZoom()) {
-      this._map.setZoomAround(this._getCenter(), zoom);
+      this._map.setZoomAround(this._map.getVisibleCenter(), zoom);
     }
   }
 });
-
-
-L.control.zoomCenter = function (options) {
-  return new L.Control.ZoomCenter(options);
-};

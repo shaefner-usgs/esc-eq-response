@@ -3,13 +3,13 @@
 
 
 /**
- * Factory for Greyscale base layer.
+ * Factory for the Greyscale base layer.
  *
- * @param provider {String} optional; default is 'cartodb'
+ * @param provider {String} default is 'cartodb'
  * @param options {Object}
- *     L.tileLayer options
+ *     L.TileLayer options
  *
- * @return {Object <L.layerGroup|L.tileLayer>}
+ * @return {<L.LayerGroup|L.TileLayer>}
  */
 L.GreyscaleLayer = function (provider = 'cartodb', options) {
   var base, labels,
