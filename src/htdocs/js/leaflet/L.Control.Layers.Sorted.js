@@ -92,13 +92,18 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
    */
   removeLayer: function (layer) {
     var catalog = AppUtil.getParam('catalog') || 'comcat',
-        mode = layer._feature?.mode || '';
+        mode = layer._feature?.mode || '',
+        obj = this._getLayer(L.Util.stamp(layer));
 
-    if ((mode === 'comcat' || mode === 'dd') && mode !== catalog) {
-      return; // ignore alt-catalog Features
+    if ((mode === 'comcat' || mode === 'dd') && mode === catalog) {
+      layer.off('add remove', this._onLayerChange, this);
     }
 
-    L.Control.Layers.prototype.removeLayer.call(this, layer);
+    if (obj) {
+      this._layers.splice(this._layers.indexOf(obj), 1);
+    }
+
+    return (this._map) ? this._update() : this;
   },
 
   /**
