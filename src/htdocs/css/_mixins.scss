@@ -1,7 +1,7 @@
 @use 'variables' as *;
 
 @mixin close() {
-  background: none;
+  background: #fff;
   border-radius: 50%;
   color: $accent-color;
   cursor: pointer;
