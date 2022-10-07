@@ -164,10 +164,10 @@ var MapPane = function (options) {
 
     layers = {
       baseLayers: {
-        'Greyscale': greyscale,
-        'Terrain': L.terrainLayer(),
+        'Light': greyscale,
+        'Dark': L.darkLayer(),
         'Satellite': L.satelliteLayer(),
-        'Dark': L.darkLayer()
+        'Terrain': L.terrainLayer()
       },
       defaults: [
         faults,
