@@ -132,6 +132,8 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   /**
    * Override _addItem from L.Control.Layers.
    *
+   * Include the loader or count value in an overlay's display name.
+   *
    * @param obj {Object}
    *
    * @return label {Element}
