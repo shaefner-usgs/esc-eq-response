@@ -127,6 +127,17 @@
             <p>Initial values for Aftershocks, Foreshocks, and Historical
               Seismicity are set automatically based on the Mainshock’s
               magnitude and estimated rupture length.</p>
+            <h3>Earthquake Catalog</h3>
+            <ul class="catalog options">
+              <li id="comcat">ComCat</li>
+              <li id="dd">Double-Difference</li>
+            </ul>
+            <p class="dd option hide">Northern California events only</p>
+            <h3>Time Zone</h3>
+            <ul class="timezone options">
+              <li id="utc">UTC</li>
+              <li id="user">User</li>
+            </ul>
             <div class="aftershocks dd-aftershocks">
               <h3>Aftershocks</h3>
               <label for="as-mag">Min magnitude</label>
@@ -160,17 +171,6 @@
               <input type="number" id="hs-years" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="11">
             </div>
-            <h3>Earthquake Catalog</h3>
-            <ul class="catalog options">
-              <li id="comcat">ComCat</li>
-              <li id="dd">Double-Difference</li>
-            </ul>
-            <p class="dd option hide">Northern California events only</p>
-            <h3>Time Zone</h3>
-            <ul class="timezone options">
-              <li id="utc">UTC</li>
-              <li id="user">User</li>
-            </ul>
             <p class="note">When you customize the settings, the
               <abbr title="Uniform Resource Locator (web address)">URL</abbr> is
               automatically updated, making it easy to share or bookmark your
