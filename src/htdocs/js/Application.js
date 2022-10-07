@@ -70,7 +70,7 @@ var Application = function (options) {
       _initialize,
 
       _els,
-      _initialLoad,
+      _rendered,
       _style,
 
       _getSliderValue,
@@ -86,7 +86,7 @@ var Application = function (options) {
         sign = (minutes > 0 ? '-' : '+');
 
     _els = options;
-    _initialLoad = true;
+    _rendered = false;
     _style = document.createElement('style');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
@@ -203,11 +203,11 @@ var Application = function (options) {
     _this.SummaryPane.reset();
     _this.TitleBar.reset();
 
-    if (!_initialLoad) { // preserve initial URL parameters
+    if (_rendered) { // preserve initial (incoming) URL parameters
       _resetQueryString();
     }
 
-    _initialLoad = false;
+    _rendered = true;
   };
 
   /**

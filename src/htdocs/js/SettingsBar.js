@@ -4,7 +4,7 @@
 var AppUtil = require('util/AppUtil');
 
 
-var _DEFAULTS = {
+var _SETTINGS = { // defaults
   'as-mag': 0,
   catalog: 'comcat',
   'fs-days': 30,
@@ -143,7 +143,7 @@ var SettingsBar = function (options) {
         ruptureArea = Math.pow(10, mag - 4),
         ruptureLength = Math.pow(ruptureArea, 0.7);
 
-    return Object.assign({}, _DEFAULTS, {
+    return Object.assign({}, _SETTINGS, {
       'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
@@ -189,8 +189,8 @@ var SettingsBar = function (options) {
    * Set the initially selected catalog and timezone 'radio-bar' buttons.
    */
   _initButtons = function () {
-    var catalog = AppUtil.getParam('catalog') || _DEFAULTS['catalog'],
-        timezone = AppUtil.getParam('timezone') || _DEFAULTS['timezone'],
+    var catalog = AppUtil.getParam('catalog') || _SETTINGS['catalog'],
+        timezone = AppUtil.getParam('timezone') || _SETTINGS['timezone'],
         buttons = [
           document.getElementById(catalog),
           document.getElementById(timezone)
@@ -316,7 +316,7 @@ var SettingsBar = function (options) {
    * @param value {String}
    */
   _setParam = function (name, value) {
-    if (value === _DEFAULTS[name]) {
+    if (value === _SETTINGS[name]) {
       AppUtil.deleteParam(name, value);
     } else {
       AppUtil.setParam(name, value);

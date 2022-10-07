@@ -10,10 +10,16 @@ var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon');
 
 
-var _DEFAULTS,
-    _CANV;
+var _CANV,
+    _SETTINGS;
 
-_DEFAULTS = {
+_CANV = {
+  maxlatitude: 42.1,
+  maxlongitude: -114,
+  minlatitude: 32.4,
+  minlongitude: -124.6
+};
+_SETTINGS = { // defaults
   endtime: Luxon.DateTime.now().toUTC().toISO().slice(0, -5),
   maxlatitude: 90,
   maxlongitude: 180,
@@ -23,12 +29,6 @@ _DEFAULTS = {
   period: 'month',
   region: 'worldwide',
   starttime: Luxon.DateTime.now().minus({months: 1}).toUTC().toISO().slice(0, -5)
-};
-_CANV = {
-  maxlatitude: 42.1,
-  maxlongitude: -114,
-  minlatitude: 32.4,
-  minlongitude: -124.6
 };
 
 
@@ -58,13 +58,13 @@ var SearchBar = function (options) {
       _app,
       _el,
       _endtime,
-      _initialView,
       _map,
       _nowButton,
       _period,
       _pickers,
       _region,
       _regionLayer,
+      _rendered,
       _searchButton,
       _starttime,
 
@@ -97,11 +97,11 @@ var SearchBar = function (options) {
     _app = options.app;
     _el = options.el;
     _endtime = document.getElementById('endtime');
-    _initialView = true;
     _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
       [24.5, -125]
     ]);
+    _rendered = false;
     _searchButton = document.getElementById('search');
     _starttime = document.getElementById('starttime');
 
@@ -372,9 +372,9 @@ var SearchBar = function (options) {
     var endtime,
         minmagnitude = document.getElementById('minmagnitude'),
         settings = {
-          minmagnitude: AppUtil.getParam('minmagnitude') || _DEFAULTS.minmagnitude,
-          period: AppUtil.getParam('period') || _DEFAULTS.period,
-          region: AppUtil.getParam('region') || _DEFAULTS.region
+          minmagnitude: AppUtil.getParam('minmagnitude') || _SETTINGS.minmagnitude,
+          period: AppUtil.getParam('period') || _SETTINGS.period,
+          region: AppUtil.getParam('region') || _SETTINGS.region
         };
 
     _period = document.getElementById(settings.period);
@@ -483,7 +483,7 @@ var SearchBar = function (options) {
     Object.keys(params).forEach(name => {
       var value = params[name];
 
-      if (value === _DEFAULTS[name]) {
+      if (value === _SETTINGS[name]) {
         AppUtil.deleteParam(name);
       } else {
         AppUtil.setParam(name, value);
@@ -594,13 +594,13 @@ var SearchBar = function (options) {
 
     if (map.classList.contains('hide')) return; // map not visible
 
-    if (sidebar === 'searchBar' && _initialView) {
+    if (sidebar === 'searchBar' && !_rendered) {
       _map.fitBounds(_regionLayer.getBounds(), {
         animate: false,
         padding: [32, 0]
       });
 
-      _initialView = false;
+      _rendered = true;
     }
   };
 
@@ -609,7 +609,7 @@ var SearchBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get the search parameters from the UI controls and _DEFAULTS.
+   * Get the search parameters from the UI controls and _SETTINGS.
    *
    * @return {Object}
    */
@@ -657,7 +657,7 @@ var SearchBar = function (options) {
       });
     }
 
-    return Object.assign({}, _DEFAULTS, params);
+    return Object.assign({}, _SETTINGS, params);
   };
 
   /**
