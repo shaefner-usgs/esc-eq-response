@@ -11,7 +11,6 @@ var BeachBalls = require('features/util/beachballs/BeachBalls'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
  *     }
  *
  * @return _this {Object}
@@ -45,8 +44,6 @@ var FocalMechanism = function (options) {
   _initialize = function (options = {}) {
     var fm,
         app = options.app;
-
-    Object.assign(_this, options.defaults);
 
     _this.addListeners = function () {};
     _this.id = 'focal-mechanism';

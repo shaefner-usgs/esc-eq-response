@@ -28,7 +28,6 @@ _DEFAULTS = {
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
  *     }
  *
  * @return _this {Object}
@@ -67,8 +66,6 @@ var ShakeMapStations = function (options) {
 
   _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
-
-    Object.assign(_this, options.defaults);
 
     _app = options.app;
     _markerOptions = {
