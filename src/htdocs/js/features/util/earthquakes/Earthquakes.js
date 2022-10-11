@@ -8,8 +8,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 var _COLORS,
-    _DEFAULTS,
-    _MARKER;
+    _DEFAULTS;
 
 _COLORS = {
   historical: '#dde',
@@ -20,14 +19,11 @@ _COLORS = {
   pastweek: '#ff0',
   older: '#ffd'
 };
-_MARKER = {
-  color: '#000',
-  fillOpacity: 0.85,
-  opacity: 0.6,
-  weight: 1
-};
 _DEFAULTS = {
-  marker: _MARKER
+  color: '#000', // stroke
+  fillOpacity: 0.85,
+  opacity: 0.6, // stroke
+  weight: 1 // stroke width
 };
 
 
@@ -96,7 +92,12 @@ var Earthquakes = function (options) {
     _app = options.app;
     _catalog = AppUtil.getParam('catalog') || 'comcat';
     _feature = options.feature;
-    _markerOptions = options.marker;
+    _markerOptions = {
+      color: options.color,
+      fillOpacity: options.fillOpacity,
+      opacity: options.opacity,
+      weight: options.weight
+    };
     _periods = {
       pastday: _this.params.now.minus({ days: 1 }),
       pasthour: _this.params.now.minus({ hours: 1 }),

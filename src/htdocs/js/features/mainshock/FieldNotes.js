@@ -9,25 +9,16 @@ var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon');
 
 
-var _DEFAULTS,
-    _ICON,
-    _MARKER;
-
-_ICON = {
+var _DEFAULTS = {
   iconAnchor: L.point(10, 25),
   iconRetinaUrl: 'img/pin-s-star+c0f@2x.png',
   iconSize: L.point(20, 50),
   iconUrl: 'img/pin-s-star+c0f.png',
+  opacity: 0.85,
   popupAnchor: L.point(0, -25),
   tooltipAnchor: L.point(0, -15)
 };
-_MARKER = {
-  opacity: 0.85
-};
-_DEFAULTS = {
-  icon: _ICON,
-  marker: _MARKER
-};
+
 
 /**
  * Create the FieldNotes Feature.
@@ -90,10 +81,18 @@ var FieldNotes = function (options) {
     _this.zoomToLayer = false;
 
     _lightbox = Lightbox({id: _this.id});
-    _markerOptions = Object.assign({
-      icon: L.icon(options.icon),
+    _markerOptions = {
+      icon: L.icon({
+        iconAnchor: options.iconAnchor,
+        iconRetinaUrl: options.iconRetinaUrl,
+        iconSize: options.iconSize,
+        iconUrl: options.iconUrl,
+        popupAnchor: options.popupAnchor,
+        tooltipAnchor: options.tooltipAnchor
+      }),
+      opacity: options.opacity,
       pane: _this.id // controls stacking order
-    }, options.marker);
+    };
 
     _this.mapLayer = L.geoJSON.async(_this.url, {
       app: _app,

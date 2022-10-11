@@ -6,8 +6,7 @@ var AppUtil = require('util/AppUtil');
 
 
 var _DEFAULTS,
-    _FLAG_DESCRIPTIONS,
-    _MARKER;
+    _FLAG_DESCRIPTIONS;
 
 _FLAG_DESCRIPTIONS = {
   G: 'Glitch (clipped or below noise)',
@@ -16,13 +15,10 @@ _FLAG_DESCRIPTIONS = {
   N: 'Not in list of known stations',
   T: 'Outlier'
 };
-_MARKER = {
+_DEFAULTS = {
   iconAnchor: [7, 5],
   iconSize: [14, 10],
   popupAnchor: [0, -5]
-};
-_DEFAULTS = {
-  marker: _MARKER
 };
 
 
@@ -75,7 +71,11 @@ var ShakeMapStations = function (options) {
     Object.assign(_this, options.defaults);
 
     _app = options.app;
-    _markerOptions = options.marker;
+    _markerOptions = {
+      iconAnchor: options.iconAnchor,
+      iconSize: options.iconSize,
+      popupAnchor: options.popupAnchor
+    };
 
     _this.count = 0;
     _this.deferFetch = true;
