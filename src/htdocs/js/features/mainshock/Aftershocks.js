@@ -14,7 +14,8 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
+ *       showLayer: {Boolean}
+ *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -54,8 +55,6 @@ var Aftershocks = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    Object.assign(_this, options.defaults);
-
     _app = options.app;
 
     _this.id = 'aftershocks';
@@ -65,8 +64,10 @@ var Aftershocks = function (options) {
       magnitude: Number(document.getElementById('as-mag').value)
     };
     _this.plots = {};
+    _this.showLayer = options.showLayer;
     _this.summary = '';
     _this.url = _getUrl();
+    _this.zoomToLayer = options.zoomToLayer;
 
     if (AppUtil.getParam('catalog') === 'dd') {
       _this.id = 'dd-aftershocks';

@@ -16,7 +16,8 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
+ *       showLayer: {Boolean}
+ *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -78,8 +79,6 @@ var Mainshock = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    Object.assign(_this, options.defaults);
-
     _app = options.app;
 
     _this.id = 'mainshock';
@@ -87,8 +86,10 @@ var Mainshock = function (options) {
     _this.name = 'Mainshock';
     _this.placeholder = '<div class="content"></div>';
     _this.plots = {};
+    _this.showLayer = options.showLayer;
     _this.summary = '';
     _this.url = _getUrl();
+    _this.zoomToLayer = options.zoomToLayer;
 
     _earthquakes = Earthquakes({
       app: _app,

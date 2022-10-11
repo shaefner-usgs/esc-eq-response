@@ -240,18 +240,17 @@ var Features = function (options) {
    *         url: {String} URL of data feed
    *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
    *     }
-   * @param opts {Object} default is {}
+   * @param options {Object} default is {}
    */
-  _createFeature = function (mode, module, opts = {}) {
-    var defaults, feature,
+  _createFeature = function (mode, module, options = {}) {
+    var feature,
         status = 'initialized'; // default
 
     if (_isReady(mode)) { // create Feature when dependencies are ready
-      defaults = Object.assign({}, _DEFAULTS, opts);
-      feature = module({
-        app: _app,
-        defaults: defaults
+      options = Object.assign({}, _DEFAULTS, options, {
+        app: _app
       });
+      feature = module(options);
 
       if (!feature.url) {
         status = 'ready';
@@ -488,8 +487,8 @@ var Features = function (options) {
   _this.createFeatures = function (mode = 'mainshock') {
     var catalog = AppUtil.getParam('catalog') || 'comcat';
 
-    _MODULES[mode].forEach(Module => {
-      _createFeature(mode, Module);
+    _MODULES[mode].forEach(module => {
+      _createFeature(mode, module);
     });
 
     // Add the selected catalog-specific Features

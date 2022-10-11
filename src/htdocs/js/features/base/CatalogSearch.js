@@ -11,7 +11,8 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
+ *       showLayer: {Boolean}
+ *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -46,13 +47,12 @@ var CatalogSearch = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    Object.assign(_this, options.defaults);
-
     _app = options.app;
 
     _this.id = 'search';
     _this.name = 'Catalog Search';
     _this.params = _app.SearchBar.getParams();
+    _this.showLayer = options.showLayer;
     _this.title = _getTitle();
     _this.url = _getUrl();
     _this.zoomToLayer = false;

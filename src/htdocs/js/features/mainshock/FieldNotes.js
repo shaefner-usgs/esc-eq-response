@@ -26,7 +26,7 @@ var _DEFAULTS = {
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
+ *       showLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -70,13 +70,12 @@ var FieldNotes = function (options) {
   _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
 
-    Object.assign(_this, options.defaults);
-
     _app = options.app;
 
     _this.count = 0;
     _this.id = 'fieldnotes';
     _this.name = 'Fieldnotes';
+    _this.showLayer = options.showLayer;
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 

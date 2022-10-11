@@ -13,7 +13,8 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       defaults: {Object}
+ *       showLayer: {Boolean}
+ *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -51,8 +52,6 @@ var Foreshocks = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    Object.assign(_this, options.defaults);
-
     _app = options.app;
 
     _this.id = 'foreshocks';
@@ -62,8 +61,10 @@ var Foreshocks = function (options) {
       distance: Number(document.getElementById('fs-dist').value),
       magnitude: Number(document.getElementById('fs-mag').value)
     };
+    _this.showLayer = options.showLayer;
     _this.summary = '';
     _this.url = _getUrl();
+    _this.zoomToLayer = options.zoomToLayer;
 
     if (AppUtil.getParam('catalog') === 'dd') {
       _this.id = 'dd-foreshocks';
