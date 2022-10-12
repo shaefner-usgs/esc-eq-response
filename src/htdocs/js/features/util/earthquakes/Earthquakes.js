@@ -61,7 +61,6 @@ var Earthquakes = function (options) {
       _feature,
       _mainshock,
       _markerOptions,
-      _periods,
 
       _addBubbles,
       _addListeners,
@@ -97,11 +96,6 @@ var Earthquakes = function (options) {
       fillOpacity: options.fillOpacity,
       opacity: options.opacity,
       weight: options.weight
-    };
-    _periods = {
-      pastday: _this.params.now.minus({ days: 1 }),
-      pasthour: _this.params.now.minus({ hours: 1 }),
-      pastweek: _this.params.now.minus({ weeks: 1 })
     };
 
     if (_feature.id === 'mainshock' || _feature.id === 'search') {
@@ -233,14 +227,17 @@ var Earthquakes = function (options) {
    * @return age {String}
    */
   _getAge = function (datetime) {
-    var age = _feature.id.replace('dd-', ''); // remove prefix from DD Features
+    var age = _feature.id.replace('dd-', ''), // default
+        pastday = _this.params.now.minus({ days: 1 }),
+        pasthour = _this.params.now.minus({ hours: 1 }),
+        pastweek = _this.params.now.minus({ weeks: 1 });
 
     if (_feature.id.includes('aftershocks') || _feature.id === 'search') {
-      if (datetime >= _periods.pasthour) {
+      if (datetime >= pasthour) {
         age = 'pasthour';
-      } else if (datetime >= _periods.pastday) {
+      } else if (datetime >= pastday) {
         age = 'pastday';
-      } else if (datetime >= _periods.pastweek) {
+      } else if (datetime >= pastweek) {
         age = 'pastweek';
       } else {
         age = 'older';
@@ -523,7 +520,6 @@ var Earthquakes = function (options) {
     _feature = null;
     _mainshock = null;
     _markerOptions = null;
-    _periods = null;
 
     _addBubbles = null;
     _addListeners = null;
