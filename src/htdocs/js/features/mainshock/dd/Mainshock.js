@@ -74,7 +74,8 @@ var Mainshock = function (options) {
         coords = feature.geometry.coordinates,
         props = feature.properties,
         datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
-        mag = AppUtil.round(props.mag, 1);
+        mag = AppUtil.round(props.mag, 1),
+        magType = props.magType || 'M';
 
     return {
       catalog: 'dd',
@@ -83,7 +84,8 @@ var Mainshock = function (options) {
       latLng: L.latLng(coords[1], coords[0]),
       location: AppUtil.formatLatLon(coords),
       magDisplay: mag,
-      title: _mainshock.data.title.replace(/\d\.\d/, mag),
+      magType: magType,
+      title: _mainshock.data.title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
       userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
       userDayofweek: datetime.toLocal().toFormat(format),
       userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
