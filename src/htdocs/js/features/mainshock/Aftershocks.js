@@ -21,7 +21,6 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *     {
  *       addData: {Function}
- *       addForecast: {Function}
  *       addListeners: {Function}
  *       bins: {Object}
  *       count: {Integer}
@@ -144,23 +143,6 @@ var Aftershocks = function (options) {
       featureId: _this.id
     });
     _this.summary = _summary.getContent();
-  };
-
-  /**
-   * Add the Forecast if it exists. The Forecast already exists when refreshing
-   * or swapping between earthquake catalogs.
-   */
-  _this.addForecast = function () {
-    var content, el, placeholder,
-        forecast = _app.Features.getFeature('forecast');
-
-    if (forecast.summary) {
-      el = document.getElementById('summaryPane');
-      content = el.querySelector('.container > .forecast');
-      placeholder = el.querySelector(`.${_this.id} .forecast`);
-
-      placeholder.replaceWith(content);
-    }
   };
 
   /**

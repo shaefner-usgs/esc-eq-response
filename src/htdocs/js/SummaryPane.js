@@ -32,8 +32,10 @@ var SummaryPane = function (options) {
 
       _app,
       _el,
+      _subFeatures,
 
       _cacheFeatures,
+      _embedFeatures,
       _updateTimestamp;
 
 
@@ -42,22 +44,51 @@ var SummaryPane = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
+    _subFeatures = {};
   };
 
   /**
    * Un-nest (i.e. preserve) the given Feature's sub-Features.
    *
-   * @param feature {Element}
+   * @param feature {Object}
    */
   _cacheFeatures = function (feature) {
-    var subFeatures,
-        container = _el.querySelector('.container');
+    var container, featureId,
+        subFeatures = _el.querySelectorAll(`.${feature.id} .content .content`);
 
-    subFeatures = feature.querySelectorAll('.content .content');
+    if (subFeatures) {
+      container = _el.querySelector('.container');
+      featureId = feature.id.replace(/^dd-/, ''); // combine ComCat, DD sub-Features
+      _subFeatures[featureId] = [];
 
-    subFeatures.forEach(subFeature => {
-      container.appendChild(subFeature);
-    });
+      subFeatures.forEach(subFeature => {
+        var classList = Array.from(subFeature.classList),
+            id = classList.filter(className => className !== 'content')[0];
+
+        _subFeatures[featureId].push(id); // store cached sub-Features by id
+        container.appendChild(subFeature);
+      });
+    }
+  };
+
+  /**
+   * Embed the given Feature's cached sub-Features (during a Feature refresh or
+   * when swapping catalogs).
+   *
+   * @param feature {Object}
+   */
+  _embedFeatures = function (feature) {
+    var featureId = feature.id.replace(/^dd-/, ''), // combined ComCat, DD sub-Features
+        ids = _subFeatures[featureId];
+
+    if (ids) {
+      ids.forEach(id => {
+        var content = _el.querySelector(`.container > .${id}`),
+            placeholder = _el.querySelector(`.${feature.id} .${id}`);
+
+        placeholder.replaceWith(content);
+      });
+    }
   };
 
   /**
@@ -95,12 +126,8 @@ var SummaryPane = function (options) {
       parent.insertAdjacentHTML('beforeend', feature.summary);
       parent.classList.remove('hide'); // un-hide placeholder
 
+      _embedFeatures(feature);
       _updateTimestamp();
-    }
-
-    // Add the Forecast to Aftershocks if it exists
-    if (feature.id.includes('aftershocks')) {
-      feature.addForecast();
     }
 
     if (status === 'ready') {
@@ -148,7 +175,7 @@ var SummaryPane = function (options) {
       if (isNested) {
         el.innerHTML = ''; // nested sub-Feature
       } else {
-        _cacheFeatures(el);
+        _cacheFeatures(feature);
         el.parentNode.removeChild(el);
       }
     }
@@ -159,6 +186,8 @@ var SummaryPane = function (options) {
    */
   _this.reset = function () {
     _el.querySelector('.container').innerHTML = '';
+
+    _subFeatures = {};
   };
 
   /**
