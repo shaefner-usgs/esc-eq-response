@@ -43,12 +43,12 @@ _MODULES = {
     CatalogSearch,
     SignificantEqs
   ],
-  comcat: [ // ComCat catalog's Mainshock Features
+  comcat: [ // Features added when the ComCat catalog option is selected
     Aftershocks,
     Foreshocks,
     Historical
   ],
-  dd: [ // double-difference catalog's Mainshock Features
+  dd: [ // Features added when the double-difference catalog option is selected
     DDMainshock, // must be first
     Aftershocks,
     Foreshocks,
@@ -183,6 +183,8 @@ var Features = function (options) {
    * refresh completes.
    *
    * @param feature {Object}
+   *
+   * @return feature {Object}
    */
   _cacheFeature = function (feature) {
     if (!_prevFeatures[feature.id]) {
@@ -190,11 +192,13 @@ var Features = function (options) {
     }
 
     _prevFeatures[feature.id].push(feature);
+
+    return _prevFeatures[feature.id].shift(); // 'oldest' Feature in Array
   };
 
   /**
    * Create a new Feature (when its dependencies are ready) using the given
-   * module and then add it. Also store it in _features.
+   * module and then add it. Also store it in _features and store its module.
    *
    * @param mode {String <base|comcat|dd|mainshock|rtf>}
    * @param module {Object}
@@ -209,13 +213,8 @@ var Features = function (options) {
    *
    *       Auto-set props:
    *
-   *         mode: {String <base|mainshock>} display mode
+   *         mode: {String <base|comcat|dd|mainshock|rtf>} display mode
    *         status: {String} loading status
-   *
-   *       Default props (for Features that implement them):
-   *
-   *         showLayer: {Boolean true}
-   *         zoomToLayer: {Boolean true}
    *
    *       Common props:
    *
@@ -224,7 +223,7 @@ var Features = function (options) {
    *         content: {String} HTML content added to SideBar (in Element#feature-id)
    *         count: {Integer} Feature's count value added next to its name
    *         deferFetch: {Boolean} fetch data on demand when map layer turned 'on'
-   *           Note: only Features with a map layer; showLayer must be false
+   *           Note: only Features with a map layer; showLayer prop must be false
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
    *         json: {String} JSON feed data (Mainshock only)
    *         mapLayer: {L.Layer} Leaflet layer added to MapPane
@@ -269,7 +268,7 @@ var Features = function (options) {
       _addFeature(feature);
     } else { // dependencies not ready
       _queue.push(setTimeout(() => {
-        _createFeature(mode, module);
+        _createFeature(mode, module, options);
       }, 250));
     }
   };
@@ -280,7 +279,7 @@ var Features = function (options) {
    * @param id {String}
    *     Feature id
    *
-   * @return match {String <base|mainshock|rtf>} default is ''
+   * @return match {String <base|comcat|dd|mainshock|rtf>} default is ''
    */
   _getMode = function (id) {
     var match = ''; // default
@@ -617,19 +616,17 @@ var Features = function (options) {
    *     Feature id
    */
   _this.refreshFeature = function (id) {
-    var module, prevFeature,
+    var prevFeature,
         feature = _this.getFeature(id),
         mode = _getMode(id),
+        module = _modules[id],
         showLayer = feature.showLayer; // use cached value
-
-    _cacheFeature(feature);
-
-    module = _modules[id];
-    prevFeature = _prevFeatures[id].shift(); // 'oldest' Feature
 
     if (feature.mode === 'mainshock') {
       _this.getFeature('mainshock').disableDownload();
     }
+
+    prevFeature = _cacheFeature(feature);
 
     _this.removeFeature(prevFeature);
     _createFeature(mode, module, {
