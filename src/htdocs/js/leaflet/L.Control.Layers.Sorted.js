@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * This class extends L.Control.Layers to sort the list of map layers based on
  * their stacking order on the map. It also adds (and preserves) the loaders and
@@ -78,32 +75,6 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
       this._displayNames[id] = this._names[id] + loader;
       this._setName(id);
     }
-  },
-
-  /**
-   * Override removeLayer from L.Control.Layers.
-   *
-   * Suppresses 'listener not found' warnings by ignoring alternate catalog's
-   * Features that were already removed from the layer control.
-   *
-   * @param layer {Object}
-   *
-   * @return {Mixed}
-   */
-  removeLayer: function (layer) {
-    var catalog = AppUtil.getParam('catalog') || 'comcat',
-        mode = layer._feature?.mode || '',
-        obj = this._getLayer(L.Util.stamp(layer));
-
-    if ((mode === 'comcat' || mode === 'dd') && mode === catalog) {
-      layer.off('add remove', this._onLayerChange, this);
-    }
-
-    if (obj) {
-      this._layers.splice(this._layers.indexOf(obj), 1);
-    }
-
-    return (this._map) ? this._update() : this;
   },
 
   /**
