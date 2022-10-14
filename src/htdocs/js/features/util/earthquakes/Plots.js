@@ -426,7 +426,7 @@ var Plots = function (options) {
   };
 
   /**
-   * Event handler that opens the given earthquake's map Popup.
+   * Event handler that opens an earthquake's map Popup.
    *
    * @param data {Object}
    */
