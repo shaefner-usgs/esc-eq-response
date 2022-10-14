@@ -22,7 +22,7 @@ var AppUtil = require('util/AppUtil');
 /**
  * Create the "main" Leaflet map instance, add the initial (static) layers to
  * the map, and add/remove Features (dynamic layers). Set/update the map extent
- * based on the current status.
+ * based on the current state.
  *
  * @param options {Object}
  *     {
@@ -52,7 +52,8 @@ var MapPane = function (options) {
       _app,
       _bounds,
       _el,
-      _initialView,
+      _initialExtent,
+      _rendered,
 
       _addControls,
       _addListeners,
@@ -60,7 +61,9 @@ var MapPane = function (options) {
       _getBounds,
       _getLayers,
       _initMap,
-      _setBounds;
+      _setBounds,
+      _setFlag,
+      _trackExtent;
 
 
   _this = {};
@@ -68,7 +71,8 @@ var MapPane = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
-    _initialView = true;
+    _initialExtent = true;
+    _rendered = false;
 
     _initMap();
     _addListeners();
@@ -219,6 +223,29 @@ var MapPane = function (options) {
     }
   };
 
+  /**
+   * Event handler that sets _initialExtent to false.
+   */
+  _setFlag = function () {
+    _initialExtent = false;
+  };
+
+  /**
+   * Add event listeners that set a flag when the map extent is changed. Used to
+   * determine if the user has interacted with the map yet.
+   *
+   * Notes:
+   *  1. It is not possible to distinguish btwn user and programmatic events in
+   *     Leaflet, so the flag (_initialExtent) is manipulated elsewhere to
+   *     mitigate.
+   *  2. This method might get called multiple times due to Features being added
+   *     asynchronously.
+   */
+  _trackExtent = function () {
+    _this.map.off('movestart zoomstart', _setFlag); // avoid duplicate listeners
+    _this.map.once('movestart zoomstart', _setFlag);
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -250,8 +277,15 @@ var MapPane = function (options) {
         status = _app.Features.getStatus('dd');
       }
 
-      if (status === 'ready') {
+      if (status === 'ready' && _initialExtent) {
         _this.setView();
+
+        // Set up tracking after fitBounds() animation ends
+        _this.map.once('moveend zoomend', () => {
+          _initialExtent = true;
+
+          _trackExtent();
+        });
       }
     }
   };
@@ -333,10 +367,9 @@ var MapPane = function (options) {
       _this.map.addLayer(layer);
     }
 
-    _this.map.on('visible', () => {
+    _this.map.once('visible', () => {
       marker.openPopup();
       marker.getPopup().update(); // renders popup properly
-      _this.map.off('visible');
     });
 
     location.href = '#mapPane';
@@ -366,8 +399,8 @@ var MapPane = function (options) {
     _this.map.fire('visible'); // flag for popups opened programmatically
 
     // Set initial view (map must be visible)
-    if (_initialView) {
-      _initialView = false;
+    if (!_rendered) {
+      _rendered = true;
 
       _this.setView();
     }
@@ -382,7 +415,8 @@ var MapPane = function (options) {
     // Purge canvas elements (FM, MT beachballs)
     canvasEls.forEach(el => el.remove());
 
-    _initialView = true;
+    _initialExtent = true;
+    _rendered = false;
 
     _this.initBounds();
     _this.setView();
@@ -396,6 +430,7 @@ var MapPane = function (options) {
    */
   _this.setView = function (bounds = _bounds) {
     var animate = false,
+        initialExtent = _initialExtent, // cache
         status = _app.Features.getStatus(),
         x = 0;
 
@@ -403,7 +438,7 @@ var MapPane = function (options) {
       animate = true;
 
       if (_app.Pane.getSelected() === 'mapPane') {
-        _initialView = false;
+        _rendered = true;
       }
     }
 
@@ -418,6 +453,8 @@ var MapPane = function (options) {
         paddingTopLeft: L.point(0, _app.headerHeight) // accommodate header
       });
     }
+
+    _initialExtent = initialExtent; // set back to cached value
   };
 
   /**
