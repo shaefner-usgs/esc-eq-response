@@ -11,6 +11,7 @@ require('leaflet/L.FaultsLayer');
 require('leaflet/L.GreyscaleLayer');
 require('leaflet/L.GeoJSON.async');
 require('leaflet/L.Map');
+require('leaflet/L.Map.BoxZoom');
 require('leaflet/L.Popup');
 require('leaflet/L.SatelliteLayer');
 require('leaflet/L.TerrainLayer');
