@@ -4,7 +4,7 @@
 var Aftershocks = require('features/mainshock/Aftershocks'),
     AppUtil = require('util/AppUtil'),
     CatalogSearch = require('features/base/CatalogSearch'),
-    DDMainshock = require('features/mainshock/dd/Mainshock'),
+    DDMainshock = require('features/mainshock/DDMainshock'),
     FieldNotes = require('features/mainshock/FieldNotes'),
     FocalMechanism = require('features/mainshock/FocalMechanism'),
     Forecast = require('features/mainshock/Forecast'),
