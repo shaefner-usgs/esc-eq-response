@@ -460,7 +460,7 @@ var Mainshock = function (options) {
   _getUrl = function () {
     var eqid = AppUtil.getParam('eqid');
 
-    return `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${eqid}.geojson`;
+    return `https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=${eqid}&format=geojson`;
   };
 
   /**
