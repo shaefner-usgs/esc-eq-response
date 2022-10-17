@@ -135,6 +135,9 @@
           border-color: $text-color transparent;
         }
       }
+      &.sort-header:active {
+        color: $text-color-darker;
+      }
 
       em {
         font-family: $font-family-headers;
