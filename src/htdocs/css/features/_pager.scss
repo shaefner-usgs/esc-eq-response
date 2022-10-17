@@ -33,9 +33,13 @@
         text-align: right;
       }
     }
+    td {
+      font-weight: 500;
+    }
 
     .city td {
       color: $text-color-lighter;
+      font-weight: 400;
       line-height: 1.4;
       padding-bottom: .375rem;
       padding-top: .125rem;
