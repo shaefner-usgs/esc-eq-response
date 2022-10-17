@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * This class redefines L.Tooltip to set the position of the Tooltip to the left
  * or right side of the mouse cursor, depending on the mouse's position on
@@ -12,25 +9,34 @@ var AppUtil = require('util/AppUtil');
  */
 L.Tooltip.include({
   /**
+   * Override for _setPosition.
+   *
+   * @return L.Point {Object}
+   */
+  _override: function () {
+    var map = this._map;
+
+    return map.latLngToContainerPoint(map.getVisibleCenter());
+  },
+
+  /**
    * Override _setPosition from L.Tooltip.
+   *
+   * @param pos L.Point {Object}
    */
   _setPosition: function (pos) {
     var subX, subY,
-        anchor = this._getAnchor(),
         map = this._map,
-        centerPoint = map.latLngToContainerPoint(map.getCenter()),
         container = this._container,
-        direction = this.options.direction,
-        offset = L.point(this.options.offset),
-        offsetX = document.getElementById('sideBar').offsetWidth / 2,
-        sidebar = AppUtil.getParam('sidebar'),
-        tooltipHeight = container.offsetHeight,
+        centerPoint = map.latLngToContainerPoint(map.getCenter()),
         tooltipPoint = map.layerPointToContainerPoint(pos),
-        tooltipWidth = container.offsetWidth;
+        direction = this.options.direction,
+        tooltipWidth = container.offsetWidth,
+        tooltipHeight = container.offsetHeight,
+        offset = L.point(this.options.offset),
+        anchor = this._getAnchor();
 
-    if (sidebar) {
-      centerPoint.x -= offsetX;
-    }
+    centerPoint = this._override(); // override
 
     if (direction === 'top') {
       subX = tooltipWidth / 2;

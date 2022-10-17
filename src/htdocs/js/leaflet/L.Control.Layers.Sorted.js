@@ -91,13 +91,12 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
-   * Reset to default state (but retain the Catalog Search layer's count value).
+   * Reset to default state (but retain Catalog Search layer's display name).
    */
   reset: function () {
-    var search = this._displayNames.search;
-
-    this._displayNames = {};
-    this._displayNames.search = search;
+    this._displayNames = {
+      search: this._displayNames.search
+    };
   },
 
   /**
@@ -110,34 +109,17 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
    * @return label {Element}
    */
   _addItem: function (obj) {
-    var container, holder, input,
+    var label = document.createElement('label'),
         checked = this._map.hasLayer(obj.layer),
-        id = '',
-        label = document.createElement('label'),
-        name = obj.name, // default
-        span = document.createElement('span');
+        input;
 
     if (obj.overlay) {
-      id = obj.layer.id || '';
       input = document.createElement('input');
+      input.type = 'checkbox';
       input.className = 'leaflet-control-layers-selector';
       input.defaultChecked = checked;
-      input.type = 'checkbox';
-
-      if (id) {
-        if (!this._names[id]) {
-          this._names[id] = obj.name; // store the 'original' name of the overlay
-        }
-
-        // Add CSS classes
-        if (this._classNames[id]) {
-          label.classList.add(this._classNames[id].join(','));
-        }
-
-        label.classList.add(id);
-      }
     } else {
-      input = this._createRadioElement('leaflet-base-layers_' + L.Util.stamp(this), checked);
+      input = this._createRadioElement(`leaflet-base-layers_${L.Util.stamp(this)}`, checked);
     }
 
     this._layerControlInputs.push(input);
@@ -145,25 +127,58 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
 
     L.DomEvent.on(input, 'click', this._onInputClick, this);
 
-    if (this._displayNames[id]) {
-      name = this._displayNames[id];
+    var name = document.createElement('span');
+    name.innerHTML = ` ${obj.name}`;
+
+    // Override
+    var displayName = this._override(obj, label);
+    if (displayName) {
+      name.innerHTML = ` ${displayName}`;
     }
-    span.innerHTML = ' ' + name;
 
     // Helps from preventing layer control flicker when checkboxes are disabled
     // https://github.com/Leaflet/Leaflet/issues/2771
-    holder = document.createElement('span');
+    var holder = document.createElement('span');
 
     label.appendChild(holder);
     holder.appendChild(input);
-    holder.appendChild(span);
+    holder.appendChild(name);
 
-    container = obj.overlay ? this._overlaysList : this._baseLayersList;
-
+    var container = obj.overlay ? this._overlaysList : this._baseLayersList;
     container.appendChild(label);
-    this._checkDisabledLayers();
 
+    this._checkDisabledLayers();
     return label;
+  },
+
+  /**
+   * Override for _addItem.
+   *
+   * @param obj {Object}
+   * @param label {Element}
+   *
+   * @return displayName {String}
+   */
+  _override: function (obj, label) {
+    var displayName = '',
+        id = obj.layer?.id || '';
+
+    if (id) {
+      displayName = this._displayNames[id] || '';
+
+      if (!this._names[id]) {
+        this._names[id] = obj.name; // store the 'original' name of the overlay
+      }
+
+      // Add CSS classes
+      if (this._classNames[id]) {
+        label.classList.add(this._classNames[id].join(','));
+      }
+
+      label.classList.add(id);
+    }
+
+    return displayName;
   },
 
   /**

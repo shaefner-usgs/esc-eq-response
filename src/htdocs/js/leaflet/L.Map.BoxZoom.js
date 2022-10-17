@@ -17,8 +17,6 @@ L.Map.BoxZoom.include({
    * @param e {Event}
    */
   _onMouseUp: function (e) {
-    var bounds, offsetX, offsetY;
-
     if ((e.which !== 1) && (e.button !== 1)) { return; }
 
     this._finish();
@@ -27,25 +25,33 @@ L.Map.BoxZoom.include({
     // Postpone to next JS tick so internal click event handling
     // still see it as "moved".
     this._clearDeferredResetState();
-    this._resetStateTimeout = setTimeout(L.Util.bind(this._resetState, this), 0);
+    this._resetStateTimeout = setTimeout(this._resetState.bind(this), 0);
 
-    bounds = new L.LatLngBounds(
+    var bounds = new L.LatLngBounds(
       this._map.containerPointToLatLng(this._startPoint),
-      this._map.containerPointToLatLng(this._point)
-    );
+      this._map.containerPointToLatLng(this._point));
 
-    offsetX = 0,
-    offsetY = document.querySelector('header').offsetHeight;
+    this._map
+      .fitBounds(bounds, this._override()) // override
+      .fire('boxzoomend', {boxZoomBounds: bounds});
+  },
+
+  /**
+   * Override for _onMouseUp.
+   *
+   * @return {Object}
+   */
+  _override: function () {
+    var offsetX = 0,
+        offsetY = document.querySelector('header').offsetHeight;
 
     if (AppUtil.getParam('sidebar')) {
       offsetX = document.getElementById('sideBar').offsetWidth;
     }
 
-    this._map
-      .fitBounds(bounds, {
-        paddingBottomRight: [offsetX, 0],
-        paddingTopLeft: [0, offsetY]
-      })
-      .fire('boxzoomend', {boxZoomBounds: bounds});
-  }
+    return {
+      paddingBottomRight: [offsetX, 0],
+      paddingTopLeft: [0, offsetY]
+    };
+  },
 });
