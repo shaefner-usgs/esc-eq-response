@@ -671,11 +671,14 @@ var Mainshock = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    _button.removeEventListener('click', _createFeatures);
-
-    _thumbs.forEach(thumb => {
-      thumb.removeEventListener('click', _showLightbox);
-    });
+    if (_button) {
+      _button.removeEventListener('click', _createFeatures);
+    }
+    if (_thumbs) {
+      _thumbs.forEach(thumb => {
+        thumb.removeEventListener('click', _showLightbox);
+      });
+    }
   };
 
   /**

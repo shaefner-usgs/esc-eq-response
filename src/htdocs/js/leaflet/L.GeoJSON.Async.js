@@ -203,6 +203,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         type = 'notfound';
 
         this._app.Features.clearQueue();
+        this._app.Features.removeFeature(feature);
       } else {
         text = await response.text();
       }
