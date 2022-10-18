@@ -270,24 +270,15 @@ var MapPane = function (options) {
       _setBounds(feature);
     }
 
-    if (status === 'ready') { // Mainshock Features are ready
-      // Also account for status of ComCat, double-difference Features
-      status = _app.Features.getStatus('comcat');
+    if (status === 'ready' && _initialExtent) { // Mainshock Features are ready
+      _this.setView();
 
-      if (AppUtil.getParam('catalog') === 'dd') {
-        status = _app.Features.getStatus('dd');
-      }
+      // Set up tracking after fitBounds() animation ends
+      _this.map.once('moveend zoomend', () => {
+        _initialExtent = true;
 
-      if (status === 'ready' && _initialExtent) {
-        _this.setView();
-
-        // Set up tracking after fitBounds() animation ends
-        _this.map.once('moveend zoomend', () => {
-          _initialExtent = true;
-
-          _trackExtent();
-        });
-      }
+        _trackExtent();
+      });
     }
   };
 
