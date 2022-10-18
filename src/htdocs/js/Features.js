@@ -567,7 +567,8 @@ var Features = function (options) {
    * @return status {String <error|initialized|loading|ready>} default is ''
    */
   _this.getStatus = function (mode = 'mainshock') {
-    var count = Object.keys(_features[mode]).length,
+    var catalog = AppUtil.getParam('catalog') || 'comcat',
+        count = Object.keys(_features[mode]).length,
         status = ''; // default
 
     if (count === 1 && (mode === 'mainshock' || mode === 'dd')) {
@@ -582,6 +583,11 @@ var Features = function (options) {
           status = feature.status; // error, initialized or loading
         }
       });
+
+      // Account for status of Mainshock's ComCat or double-difference Features
+      if (mode === 'mainshock' && status === 'ready') {
+        status = _this.getStatus(catalog);
+      }
     }
 
     return status;
