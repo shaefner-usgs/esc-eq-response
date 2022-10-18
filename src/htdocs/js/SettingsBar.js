@@ -243,6 +243,7 @@ var SettingsBar = function (options) {
         status = _app.Features.getStatus(catalog);
 
     mainshock.update(catalog);
+    mainshock.disableDownload();
 
     // Remove previous catalog's Features
     Object.keys(prevFeatures).forEach(id => {
