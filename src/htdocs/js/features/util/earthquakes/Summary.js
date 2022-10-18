@@ -562,26 +562,29 @@ var Summary = function (options) {
   _openPopup = function (e) {
     var featureId,
         catalog = AppUtil.getParam('catalog') || 'comcat',
-        eqid = this.querySelector('.eqid').textContent,
+        tr = e.target.closest('tr'),
+        eqid = tr.querySelector('.eqid').textContent,
         features = _app.Features.getFeatures(catalog),
-        parent = this.closest('.feature'),
+        parent = tr.closest('.feature'),
         selection = window.getSelection(),
-        isTextSelected = e.target.parentNode.contains(selection.anchorNode) &&
+        isTextSelected = tr.contains(selection.anchorNode) &&
           selection.toString().length > 0;
 
-    // Keep row highlighted after click
-    this.classList.add('selected');
+    if (!tr.classList.contains('no-sort')) { // ignore header rows
+      // Keep row highlighted after click
+      tr.classList.add('selected');
 
-    // Determine which Feature was clicked
-    Object.keys(features).forEach(id => {
-      if (parent.classList.contains(id)) {
-        featureId = id;
+      // Determine which Feature was clicked
+      Object.keys(features).forEach(id => {
+        if (parent.classList.contains(id)) {
+          featureId = id;
+        }
+      });
+
+      // Suppress click event if user is selecting text
+      if (!isTextSelected) {
+        _app.MapPane.openPopup(eqid, featureId);
       }
-    });
-
-    // Suppress click event if user is selecting text
-    if (!isTextSelected) {
-      _app.MapPane.openPopup(eqid, featureId);
     }
   };
 
@@ -692,8 +695,7 @@ var Summary = function (options) {
 
     if (_tables) {
       _tables.forEach(table => {
-        var ths = table.querySelectorAll('th'),
-            trs = table.querySelectorAll('tr');
+        var ths = table.querySelectorAll('th');
 
         if (table.classList.contains('sortable')) {
           // Remove extraneous sort indicator
@@ -708,12 +710,8 @@ var Summary = function (options) {
         }
 
         // Show the map and open a popup when the user clicks on an earthquake
-        trs.forEach(tr => {
-          if (!tr.classList.contains('no-sort')) { // skip header row
-            tr.addEventListener('click', _openPopup);
-            tr.addEventListener('mouseover', _unselectRow);
-          }
-        });
+        table.addEventListener('click', _openPopup);
+        table.addEventListener('mouseover', _unselectRow);
       });
     }
   };
@@ -815,8 +813,7 @@ var Summary = function (options) {
 
     if (_tables) {
       _tables.forEach(table => {
-        var ths = table.querySelectorAll('th'),
-            trs = table.querySelectorAll('tr');
+        var ths = table.querySelectorAll('th');
 
         if (table.classList.contains('sortable')) {
           table.removeEventListener('afterSort', _removeSortIndicator);
@@ -826,12 +823,8 @@ var Summary = function (options) {
           );
         }
 
-        trs.forEach(tr => {
-          if (!tr.classList.contains('no-sort')) { // skip header row
-            tr.removeEventListener('click', _openPopup);
-            tr.removeEventListener('mouseover', _unselectRow);
-          }
-        });
+        table.removeEventListener('click', _openPopup);
+        table.removeEventListener('mouseover', _unselectRow);
       });
     }
   };
