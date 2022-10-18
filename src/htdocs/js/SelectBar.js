@@ -61,7 +61,6 @@ var SelectBar = function (options) {
     // Show the SearchBar
     search.addEventListener('click', e => {
       e.preventDefault();
-
       _app.NavBar.switchSideBar('searchBar');
     });
 
