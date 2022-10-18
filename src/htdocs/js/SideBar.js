@@ -57,9 +57,7 @@ var SideBar = function (options) {
     );
 
     // Save the scroll position
-    _el.addEventListener('scroll', () =>
-      _saveScrollPosition()
-    );
+    _el.addEventListener('scroll', _saveScrollPosition);
   };
 
   /**
