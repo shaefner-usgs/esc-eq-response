@@ -152,19 +152,6 @@
   }
 
   .mainshock {
-    h2 {
-      flex-direction: column;
-
-      span {
-        font-size: 1.2rem;
-        margin-bottom: -3px;
-
-        &.hide {
-          display: none;
-        }
-      }
-    }
-
     .bubble {
       margin: 1rem .5rem 0;
 
@@ -292,6 +279,22 @@
 
 .lightbox > img {
   border: 4px solid;
+}
+
+// Double-difference label (scope to body.mainshock so loader is not affected)
+body.mainshock #summaryPane .mainshock {
+  h2 {
+    flex-direction: column;
+
+    span {
+      font-size: 1.2rem;
+      margin-bottom: -3px;
+
+      &.hide {
+        display: none;
+      }
+    }
+  }
 }
 
 /* Toggle displayed content based on Time Zone setting
