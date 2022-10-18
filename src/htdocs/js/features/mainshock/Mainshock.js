@@ -653,18 +653,14 @@ var Mainshock = function (options) {
    * Disable the download RTF button.
    */
   _this.disableDownload = function () {
-    var button = document.getElementById('download');
-
-    button.setAttribute('disabled', 'disabled');
+    _button.setAttribute('disabled', 'disabled');
   };
 
   /**
    * Enable the download RTF button.
    */
   _this.enableDownload = function () {
-    var button = document.getElementById('download');
-
-    button.removeAttribute('disabled');
+    _button.removeAttribute('disabled');
   };
 
   /**
