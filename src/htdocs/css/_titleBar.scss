@@ -1,6 +1,11 @@
 @use 'variables' as *;
 
 #titleBar {
+  h1,
+  p {
+    white-space: nowrap;
+  }
+
   h1 {
     a {
       color: $text-color;
