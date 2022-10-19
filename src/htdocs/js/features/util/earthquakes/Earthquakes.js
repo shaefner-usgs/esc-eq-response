@@ -57,7 +57,6 @@ var Earthquakes = function (options) {
 
       _app,
       _catalog,
-      _distance,
       _feature,
       _mainshock,
       _markerOptions,
@@ -69,7 +68,6 @@ var Earthquakes = function (options) {
       _getData,
       _getDirection,
       _getDuration,
-      _getPrefix,
       _onEachFeature,
       _pointToLayer,
       _removeListeners,
@@ -79,8 +77,7 @@ var Earthquakes = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    var inputs,
-        host = '';
+    var host = '';
 
     options = Object.assign({}, _DEFAULTS, options);
 
@@ -101,17 +98,12 @@ var Earthquakes = function (options) {
     if (_feature.id === 'mainshock' || _feature.id === 'search') {
       _catalog = 'comcat'; // always ComCat, despite catalog param
     } else { // Aftershocks, Foreshocks, or Historical Seismicity
-      inputs = {
-        dist: _getPrefix(_feature.id) + '-dist',
-        mag: _getPrefix(_feature.id) + '-mag'
-      };
-
-      _distance = document.getElementById(inputs.dist).value;
       _mainshock = _app.Features.getFeature('mainshock');
 
       Object.assign(_this.params, {
+        distance: _feature.params.distance,
         duration: _getDuration(),
-        magnitude: document.getElementById(inputs.mag).value
+        magnitude: _feature.params.magnitude
       });
     }
 
@@ -342,7 +334,7 @@ var Earthquakes = function (options) {
       if (
         _feature.id === 'mainshock' ||
         _catalog === 'comcat' ||
-        eq.distance <= Number(_distance) // DD Aftershocks, Foreshocks, Historical Seismicity
+        eq.distance <= Number(_this.params.distance) // DD Aftershocks, Foreshocks, Historical Seismicity
       ) {
         data.push(eq);
       }
@@ -372,53 +364,21 @@ var Earthquakes = function (options) {
    * @return duration {Object}
    */
   _getDuration = function () {
-    var duration, inputId, interval;
+    var interval,
+        duration = {};
 
     if (_feature.id.includes('aftershocks')) {
       interval = Luxon.Interval
         .fromDateTimes(_mainshock.data.datetime, _this.params.now)
         .length('days');
-      duration = {
-        days: Number(AppUtil.round(interval, 1))
-      };
+      duration.days = Number(AppUtil.round(interval, 1));
     } else if (_feature.id.includes('foreshocks')) {
-      inputId = _getPrefix(_feature.id) + '-days';
-      duration = {
-        days: Number(document.getElementById(inputId).value)
-      };
+      duration.days = _feature.params.days;
     } else { // historical
-      inputId = _getPrefix(_feature.id) + '-years';
-      duration = {
-        years: Number(document.getElementById(inputId).value)
-      };
+      duration.years = _feature.params.years;
     }
 
     return duration;
-  };
-
-  /**
-   * Get the URL parameter prefix of the given Feature.
-   *
-   * @param id {String}
-   *     Feature id
-   *
-   * @return {String}
-   */
-  _getPrefix = function (id) {
-    var prefix,
-        lookup = {
-          as: ['aftershocks', 'dd-aftershocks'],
-          fs: ['foreshocks', 'dd-foreshocks'],
-          hs: ['historical', 'dd-historical']
-        };
-
-    Object.keys(lookup).forEach(key => {
-      if (lookup[key].indexOf(id) !== -1) {
-        prefix = key;
-      }
-    });
-
-    return prefix || '';
   };
 
   /**
@@ -516,7 +476,6 @@ var Earthquakes = function (options) {
 
     _app = null;
     _catalog = null;
-    _distance = null;
     _feature = null;
     _mainshock = null;
     _markerOptions = null;
@@ -528,7 +487,6 @@ var Earthquakes = function (options) {
     _getData = null;
     _getDirection = null;
     _getDuration = null;
-    _getPrefix = null;
     _onEachFeature = null;
     _pointToLayer = null;
     _removeListeners = null;
@@ -605,7 +563,7 @@ var Earthquakes = function (options) {
     data = {
       append: append,
       catalog: catalog,
-      distance: _distance,
+      distance: _this.params.distance,
       magnitude: _this.params.magnitude
     };
 
