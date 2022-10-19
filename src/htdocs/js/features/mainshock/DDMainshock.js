@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    LatLon = require('util/LatLon'),
     Luxon = require('luxon');
 
 
@@ -66,33 +67,51 @@ var Mainshock = function (options) {
    *
    * @param json {Object}
    *
-   * @return {Object}
+   * @return data {Object}
    */
   _getData = function (json) {
-    var format = 'cccc',
+    var data,
         feature = json.features[0],
         coords = feature.geometry.coordinates,
         props = feature.properties,
         datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+        dayFormat = 'cccc',
+        format = 'LLL d, yyyy TT',
         mag = AppUtil.round(props.mag, 1),
-        magType = props.magType || 'M';
+        magType = props.magType || 'M',
+        template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+        userTimeDisplay = datetime.toLocal().toFormat(format) +
+          ` <span class="tz">(${_app.utcOffset})</span>`,
+        utcTimeDisplay = datetime.toFormat(format) +
+          ' <span class="tz">(UTC)</span>';
 
-    return {
+    data = {
       catalog: 'dd',
       coords: coords,
+      datetime: datetime,
       depthDisplay: AppUtil.round(coords[2], 1) + '<span> km</span>',
-      latLng: L.latLng(coords[1], coords[0]),
+      isoTime: datetime.toISO(),
+      latLng: L.latLng(coords[1], coords[0]), // for map marker
+      latlon: LatLon(coords[1], coords[0]), // for distance, direction
       location: AppUtil.formatLatLon(coords),
       magDisplay: mag,
       magType: magType,
       title: _mainshock.data.title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
       userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
-      userDayofweek: datetime.toLocal().toFormat(format),
+      userDayofweek: datetime.toLocal().toFormat(dayFormat),
       userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      userTimeDisplay: userTimeDisplay,
       utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      utcDayofweek: datetime.toFormat(format),
-      utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
+      utcDayofweek: datetime.toFormat(dayFormat),
+      utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      utcTimeDisplay: utcTimeDisplay
     };
+
+    // Add timeDisplay prop that depends on other props being set first
+    data.timeDisplay = L.Util.template(template, data);
+
+    return data;
   };
 
   /**
