@@ -361,7 +361,7 @@ var MapPane = function (options) {
 
     _this.map.once('visible', () => {
       marker.openPopup();
-      marker.getPopup().update(); // renders popup properly
+      marker.getPopup().update(); // render popup properly
     });
 
     location.href = '#mapPane';
@@ -389,6 +389,11 @@ var MapPane = function (options) {
   _this.render = function () {
     _this.map.invalidateSize(); // updates map if its container size has changed
     _this.map.fire('visible'); // flag for popups opened programmatically
+
+    // Update popup (useful when swapping catalogs w/ Mainshock's popup open)
+    if (_this.map._popup) {
+      _this.map._popup.update();
+    }
 
     // Set initial view (map must be visible)
     if (!_rendered) {
