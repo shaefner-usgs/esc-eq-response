@@ -146,7 +146,7 @@ var Rtf = function (options) {
         params = _getParams(feature.id),
         slider = document.querySelector('.' + feature.id + ' .filter output');
 
-    _magThreshold = 0; // default
+    _magThreshold = feature.params.magnitude; // default
 
     if (slider) {
       _magThreshold = Number(slider.value);
@@ -276,6 +276,8 @@ var Rtf = function (options) {
         eventPage: mainshock.data.url
       }
     };
+
+    console.log(data);
 
     return data;
   };
