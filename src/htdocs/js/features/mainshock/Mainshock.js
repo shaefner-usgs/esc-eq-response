@@ -51,6 +51,7 @@ var Mainshock = function (options) {
 
       _app,
       _button,
+      _buttonTitle,
       _ddData,
       _earthquakes,
       _json,
@@ -425,7 +426,8 @@ var Mainshock = function (options) {
             'placeholders for talking points and analysis. Microsoft ' +
             'Word is recommended for viewing the document.</p>' +
           '<button id="download" disabled="disabled" type="button" ' +
-            'title="Download RTF Document">Download</button>' +
+            'title="Disabled because some features have not finished ' +
+            'loading">Download</button>' +
         '</div>' +
         _getTectonic() +
       '</div>',
@@ -653,13 +655,20 @@ var Mainshock = function (options) {
    */
   _this.disableDownload = function () {
     _button.setAttribute('disabled', 'disabled');
+
+    if (_buttonTitle) {
+      _button.setAttribute('title', _buttonTitle);
+    }
   };
 
   /**
    * Enable the download RTF button.
    */
   _this.enableDownload = function () {
+    _buttonTitle = _button.getAttribute('title');
+
     _button.removeAttribute('disabled');
+    _button.setAttribute('title', 'Download RTF Document');
   };
 
   /**
