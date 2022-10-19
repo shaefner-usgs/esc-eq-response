@@ -5,8 +5,7 @@
 require('leaflet');
 
 var AppUtil = require('util/AppUtil'),
-    Lightbox = require('util/Lightbox'),
-    Luxon = require('luxon');
+    Lightbox = require('util/Lightbox');
 
 
 var _DEFAULTS = {
@@ -196,11 +195,8 @@ var FieldNotes = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        props = mainshock.json.properties,
-        after = Luxon.DateTime.fromMillis(props.time + 1000).toUTC()
-          .toSeconds(),
-        before = Luxon.DateTime.fromMillis(props.time).toUTC()
-          .plus({ days: 30 }).toSeconds(),
+        after = mainshock.data.datetime.plus({ seconds: 1 }).toSeconds(),
+        before = mainshock.data.datetime.plus({ days: 30 }).toSeconds(),
         coords = mainshock.data.coords,
         pairs = [],
         params = {
