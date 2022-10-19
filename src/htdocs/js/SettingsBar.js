@@ -139,7 +139,7 @@ var SettingsBar = function (options) {
    * @return {Object}
    */
   _getDefaults = function () {
-    var mag = _app.Features.getFeature('mainshock').json.properties.mag,
+    var mag = _app.Features.getFeature('mainshock').data.mag,
         ruptureArea = Math.pow(10, mag - 4),
         ruptureLength = Math.pow(ruptureArea, 0.7);
 

@@ -324,7 +324,7 @@ var ShakeMapStations = function (options) {
   _getUrl = function () {
     var contents,
         mainshock = _app.Features.getFeature('mainshock'),
-        shakemap = mainshock.json.properties.products.shakemap,
+        shakemap = mainshock.data.products.shakemap,
         url = '';
 
     if (shakemap) {

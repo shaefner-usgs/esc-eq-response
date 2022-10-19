@@ -56,7 +56,7 @@ var FocalMechanism = function (options) {
     _this.zoomToLayer = false;
 
     _mainshock = app.Features.getFeature('mainshock');
-    fm = _mainshock.json.properties.products[_this.id];
+    fm = _mainshock.data.products[_this.id];
 
     if (fm) {
       _beachballs = BeachBalls({

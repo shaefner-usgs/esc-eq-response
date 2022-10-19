@@ -63,7 +63,7 @@ var ShakeAlert = function (options) {
   _getUrl = function () {
     var contents,
         mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.json.properties.products,
+        products = mainshock.data.products,
         url = '';
 
     if (products['shake-alert']) {

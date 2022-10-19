@@ -56,7 +56,7 @@ var MomentTensor = function (options) {
     _this.zoomToLayer = false;
 
     _mainshock = app.Features.getFeature('mainshock');
-    mt = _mainshock.json.properties.products[_this.id];
+    mt = _mainshock.data.products[_this.id];
 
     if (mt) {
       _beachballs = BeachBalls({

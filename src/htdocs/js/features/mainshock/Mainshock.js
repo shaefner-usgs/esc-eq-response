@@ -31,7 +31,6 @@ var AppUtil = require('util/AppUtil'),
  *       disableDownload: {Function}
  *       enableDownload: {Function}
  *       id: {String}
- *       json: {Object}
  *       lightboxes: {Object}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
@@ -54,6 +53,7 @@ var Mainshock = function (options) {
       _button,
       _ddData,
       _earthquakes,
+      _json,
       _thumbs,
 
       _createFeatures,
@@ -167,14 +167,13 @@ var Mainshock = function (options) {
     var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg, tectonic,
         data = _earthquakes.data[0], // formatted JSON feed data
         datetime = data.datetime,
-        props = _this.json.properties,
-        products = props.products,
+        products = _json.properties.products,
         dyfi = products.dyfi,
         fm = products['focal-mechanism'],
         format = 'cccc',
         header = products['general-header'],
         hide = 'hide', // default - hide product thumbs container
-        mmiInt = Math.round(props.mmi),
+        mmiInt = Math.round(_json.properties.mmi),
         mt = products['moment-tensor'],
         pager = products.losspager,
         plurality = 's', // default
@@ -226,6 +225,7 @@ var Mainshock = function (options) {
       level: AppUtil.getShakingValues([mmiInt])[0].level || '', // ShakeMap
       notice: notice || '',
       plurality: plurality,
+      products: products,
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapImg: shakemapImg || '',
       tectonic: tectonic || '',
@@ -557,8 +557,8 @@ var Mainshock = function (options) {
     var significantEqs = _app.Features.getFeature('significant-eqs');
 
     _earthquakes.addData(json);
+    _json = json;
 
-    _this.json = json; // used by other Features
     _this.data = _getData(); // used by Rtf.js, etc.
     _this.content = _earthquakes.getContent(_this.data);
     _this.plots = Plots({

@@ -211,7 +211,7 @@ var Rtf = function (options) {
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerComments = _app.Features.getFeature('pager-comments'),
         pagerExposures = _app.Features.getFeature('pager-exposures'),
-        products = _getProducts(mainshock.json.properties.products),
+        products = _getProducts(mainshock.data.products),
         shakeAlert = _app.Features.getFeature('shake-alert'),
         shakemapInfo = _app.Features.getFeature('shakemap-info'),
         zone = AppUtil.getParam('timezone') || 'utc';
@@ -230,7 +230,7 @@ var Rtf = function (options) {
       beachballs: _getBeachBalls(),
       depthDisplay: mainshock.data.depthDisplay,
       dyfi: products.dyfi,
-      eqid: mainshock.json.id,
+      eqid: mainshock.data.id,
       foreshocks: {
         bins: foreshocks.bins,
         count: foreshocks.count,
