@@ -289,7 +289,7 @@ var Earthquakes = function (options) {
       ) {
         latlon = LatLon(coords[1], coords[0]);
         direction = _getDirection(latlon);
-        distance = AppUtil.round(_mainshock.latlon.distanceTo(latlon) / 1000, 2);
+        distance = AppUtil.round(_mainshock.data.latlon.distanceTo(latlon) / 1000, 2);
         distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
           `<span>${direction}</span>`;
       }
@@ -326,7 +326,7 @@ var Earthquakes = function (options) {
         utcTimeDisplay: utcTimeDisplay
       };
 
-      // Add additional props that depend on other eq props already being set
+      // Add additional props that depend on other props being set first
       _addBubbles(eq);
       eq.timeDisplay = L.Util.template(template, eq);
 
@@ -351,7 +351,7 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _getDirection = function (latlon) {
-    var bearing = _mainshock.latlon.bearing(latlon),
+    var bearing = _mainshock.data.latlon.bearing(latlon),
         compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
         octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 

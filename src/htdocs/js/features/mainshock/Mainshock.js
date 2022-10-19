@@ -32,7 +32,6 @@ var AppUtil = require('util/AppUtil'),
  *       enableDownload: {Function}
  *       id: {String}
  *       json: {Object}
- *       latlon: {Object}
  *       lightboxes: {Object}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
@@ -222,7 +221,8 @@ var Mainshock = function (options) {
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       hide: hide,
-      latLng: L.latLng(data.coords[1], data.coords[0]),
+      latLng: L.latLng(data.coords[1], data.coords[0]), // for map marker
+      latlon: LatLon(data.coords[1], data.coords[0]), // for distance, direction
       level: AppUtil.getShakingValues([mmiInt])[0].level || '', // ShakeMap
       notice: notice || '',
       plurality: plurality,
@@ -561,7 +561,6 @@ var Mainshock = function (options) {
     _this.json = json; // used by other Features
     _this.data = _getData(); // used by Rtf.js, etc.
     _this.content = _earthquakes.getContent(_this.data);
-    _this.latlon = LatLon(_this.data.coords[1], _this.data.coords[0]);
     _this.plots = Plots({
       app: _app,
       data: [_this.data],
