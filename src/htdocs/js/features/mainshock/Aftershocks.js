@@ -3,7 +3,6 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
-    Luxon = require('luxon'),
     Plots = require('features/util/earthquakes/Plots'),
     Summary = require('features/util/earthquakes/Summary');
 
@@ -103,8 +102,7 @@ var Aftershocks = function (options) {
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
         coords = mainshock.data.coords,
-        props = mainshock.json.properties,
-        starttime = Luxon.DateTime.fromMillis(props.time + 1000).toUTC()
+        starttime = mainshock.data.datetime.plus({ seconds: 1 })
           .toISO().slice(0, -5);
 
     return Earthquakes.getUrl({

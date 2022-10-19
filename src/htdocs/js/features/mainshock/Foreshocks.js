@@ -3,7 +3,6 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
-    Luxon = require('luxon'),
     Summary = require('features/util/earthquakes/Summary');
 
 
@@ -101,11 +100,9 @@ var Foreshocks = function (options) {
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
         coords = mainshock.data.coords,
-        props = mainshock.json.properties,
-        endtime = Luxon.DateTime.fromMillis(props.time - 1000).toUTC()
+        endtime = mainshock.data.datetime.minus({ seconds: 1 })
           .toISO().slice(0, -5),
-        starttime = Luxon.DateTime.fromMillis(props.time).toUTC()
-          .minus({ days: _this.params.days })
+        starttime = mainshock.data.datetime.minus({ days: _this.params.days })
           .toISO().slice(0, -5);
 
     return Earthquakes.getUrl({
