@@ -54,6 +54,7 @@ var Mainshock = function (options) {
       _buttonTitle,
       _ddData,
       _earthquakes,
+      _json,
       _thumbs,
 
       _addLightbox,
@@ -216,11 +217,11 @@ var Mainshock = function (options) {
    * JSON feed data from Earthquakes.js, plus additional Mainshock-specific
    * convenience properties.
    *
-   * @param json {Object}
+   * @param json {Object} default is _json
    *
    * @return {Object}
    */
-  _getData = function (json) {
+  _getData = function (json = _json) {
     var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg, tectonic,
         data = _earthquakes.data[0], // formatted JSON feed data
         datetime = data.datetime,
@@ -237,6 +238,8 @@ var Mainshock = function (options) {
         shakeAlert = products['shake-alert'],
         shakemap = products.shakemap,
         text = products['general-text'];
+
+    _json = json; // cache feed data
 
     if (Array.isArray(dyfi)) {
       dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
@@ -688,6 +691,7 @@ var Mainshock = function (options) {
     _buttonTitle = null;
     _ddData = null;
     _earthquakes = null;
+    _json = null;
     _thumbs = null;
 
     _addLightbox = null;
