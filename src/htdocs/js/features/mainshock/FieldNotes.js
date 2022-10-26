@@ -78,7 +78,6 @@ var FieldNotes = function (options) {
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
-    _lightbox = Lightbox({id: _this.id});
     _markerOptions = {
       icon: L.icon({
         iconAnchor: options.iconAnchor,
@@ -317,19 +316,20 @@ var FieldNotes = function (options) {
    */
   _updatePopup = function (e) {
     var image,
-        regex = /https:\/\/bayquakealliance\.org\/fieldnotes\/uploads\/\d+\.jpg/,
-        url = regex.exec(e.popup.getContent());
+        props = e.layer.feature.properties,
+        url = props.attachment;
 
     if (url) { // Popup includes a photo
       image = new Image();
-      image.src = url[0];
+      image.src = url;
       image.onload = function () {
         _removeListeners(e);
         e.popup.update(); // pan map to contain popup after image loads
         _addListeners(e);
       };
 
-      _lightbox.setContent(`<img src="${image.src}" alt="enlarged photo" />`);
+      _lightbox.setContent(`<img src="${image.src}" alt="enlarged photo" />`)
+        .setTitle(props.title);
     }
   };
 
@@ -343,14 +343,17 @@ var FieldNotes = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    var legend = document.querySelector('#legendBar .fieldnotes');
+    var legend;
 
     _this.count = json.features.length;
 
-    // Hide if empty (only the 2014 Napa quake has FieldNotes data)
     if (_this.count === 0) {
+      // Hide if empty (only the 2014 Napa quake has FieldNotes data)
       _app.MapPane.layerControl.addClass('hide', _this.id);
     } else {
+      _lightbox = Lightbox({id: _this.id});
+      legend = document.querySelector('#legendBar .fieldnotes');
+
       legend.classList.remove('hide');
     }
   };
@@ -369,7 +372,9 @@ var FieldNotes = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _lightbox.destroy();
+    if (_lightbox) {
+      _lightbox.destroy();
+    }
 
     _initialize = null;
 
