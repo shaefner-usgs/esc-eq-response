@@ -113,7 +113,7 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var parent, selectors,
+    var el, selectors,
         status = _app.Features.getStatus();
 
     if (feature.summary) {
@@ -121,10 +121,10 @@ var SummaryPane = function (options) {
         div.${feature.id}.content,
         div.${feature.id} .content
       `;
-      parent = _el.querySelector(selectors);
+      el = _el.querySelector(selectors);
 
-      parent.insertAdjacentHTML('beforeend', feature.summary);
-      parent.classList.remove('hide'); // un-hide placeholder
+      el.insertAdjacentHTML('beforeend', feature.summary);
+      el.classList.remove('hide'); // un-hide placeholder
 
       _embedFeatures(feature);
       _updateTimestamp();
@@ -142,12 +142,13 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var html, parent;
+    var el, html;
 
     if (
       feature.placeholder &&
       Object.prototype.hasOwnProperty.call(feature, 'summary')
     ) {
+      el = _el.querySelector('.container');
       html = L.Util.template(
         '<div class="{id} feature">' +
           '<h2>{name}</h2>' +
@@ -155,9 +156,8 @@ var SummaryPane = function (options) {
         '</div>',
         feature
       );
-      parent = _el.querySelector('.container');
 
-      parent.insertAdjacentHTML('beforeend', html);
+      el.insertAdjacentHTML('beforeend', html);
     }
   };
 

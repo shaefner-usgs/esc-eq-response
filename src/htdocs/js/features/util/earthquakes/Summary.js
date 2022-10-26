@@ -563,9 +563,9 @@ var Summary = function (options) {
     var featureId,
         catalog = AppUtil.getParam('catalog') || 'comcat',
         tr = e.target.closest('tr'),
+        div = tr.closest('.feature'),
         eqid = tr.querySelector('.eqid').textContent,
         features = _app.Features.getFeatures(catalog),
-        parent = tr.closest('.feature'),
         selection = window.getSelection(),
         isTextSelected = tr.contains(selection.anchorNode) &&
           selection.toString().length > 0;
@@ -576,7 +576,7 @@ var Summary = function (options) {
 
       // Determine which Feature was clicked
       Object.keys(features).forEach(id => {
-        if (parent.classList.contains(id)) {
+        if (div.classList.contains(id)) {
           featureId = id;
         }
       });

@@ -130,10 +130,11 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var html, parent;
+    var el, html;
 
     // Skip the Mainshock (it's included in other Features' plots)
     if (feature.plots && feature.id !== 'mainshock') {
+      el = _el.querySelector('.container');
       html = L.Util.template(
         '<div class="{id} feature">' +
           '<h2>{name}</h2>' +
@@ -141,9 +142,8 @@ var PlotsPane = function (options) {
         '</div>',
         feature
       );
-      parent = _el.querySelector('.container');
 
-      parent.insertAdjacentHTML('beforeend', html);
+      el.insertAdjacentHTML('beforeend', html);
     }
   };
 
