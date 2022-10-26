@@ -1,102 +1,113 @@
 @use '../variables' as *;
 
-.leaflet-popup.fieldnotes {
-  dl,
-  h4,
-  p,
-  time {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-  dl {
-    margin-top: .5rem;
-  }
-
-  img {
-    display: block;
-    margin: 0 auto;
-    max-height: 300px;
-    max-width: 100%;
-  }
-
-  time {
-    color: $text-color-lighter;
-    font-size: .9rem;
-    margin-top: 4px;
-  }
-
-  .leaflet-popup-content {
-    margin: 0.75rem 0 !important; // allow "full-bleed" photos
-  }
-
-  .leaflet-popup-content-wrapper {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .operator {
-    border-top: 1px solid $border-color-lighter;
-    margin-bottom: 0;
-    margin-top: 1.5rem;
-
-    a {
-      display: inline-block;
-      padding-top: 3px;
+#mapPane {
+  .fieldnotes { // map popups
+    dl,
+    h4,
+    p,
+    time {
+      margin-left: 1rem;
+      margin-right: 1rem;
     }
-  }
-
-  .photo {
-    display: block;
-    min-height: 200px;
-    position: relative;
+    dl {
+      margin-top: .5rem;
+    }
 
     img {
-      position: relative;
-      z-index: 1001;
-    }
-  }
-
-  .props {
-    max-height: 400px;
-    overflow: hidden;
-    transition: max-height .3s ease-out;
-
-    &.hide {
-      max-height: 0;
-      transition: max-height .1s ease-in;
-    }
-  }
-
-  .toggle {
-    line-height: 1;
-    margin-bottom: 0;
-    position: relative;
-
-    &:before {
-      border-bottom: 4px solid transparent;
-      border-left: 6px solid $accent-color;
-      border-top: 4px solid transparent;
-      content: '';
-      height: 0;
-      left: 0;
-      position: absolute;
-      top: .25rem;
-      transform: rotate(0deg);
-      transition: transform .3s ease-in-out;
-      width: 0;
+      display: block;
+      margin: 0 auto;
+      max-height: 300px;
+      max-width: 100%;
     }
 
-    &.on:before {
-      transform: rotate(90deg);
+    time {
+      color: $text-color-lighter;
+      font-size: .9rem;
+      margin-top: 4px;
     }
 
-    a {
-      padding-left: 10px;
-      position: relative;
+    .leaflet-popup-content {
+      margin: 0.75rem 0 !important; // allow "full-bleed" photos
+    }
 
-      &:active {
-        color: $accent-color;
+    .leaflet-popup-content-wrapper {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .operator {
+      border-top: 1px solid $border-color-lighter;
+      margin-bottom: 0;
+      margin-top: 1.5rem;
+
+      a {
+        display: inline-block;
+        padding-top: 3px;
       }
     }
+
+    .photo {
+      display: block;
+      min-height: 200px;
+      position: relative;
+
+      img {
+        position: relative;
+        z-index: 1001;
+      }
+    }
+
+    .props {
+      max-height: 400px;
+      overflow: hidden;
+      transition: max-height .3s ease-out;
+
+      &.hide {
+        max-height: 0;
+        transition: max-height .1s ease-in;
+      }
+    }
+
+    .toggle {
+      line-height: 1;
+      margin-bottom: 0;
+      position: relative;
+
+      &:before {
+        border-bottom: 4px solid transparent;
+        border-left: 6px solid $accent-color;
+        border-top: 4px solid transparent;
+        content: '';
+        height: 0;
+        left: 0;
+        position: absolute;
+        top: .25rem;
+        transform: rotate(0deg);
+        transition: transform .3s ease-in-out;
+        width: 0;
+      }
+
+      &.on:before {
+        transform: rotate(90deg);
+      }
+
+      a {
+        padding-left: 10px;
+        position: relative;
+
+        &:active {
+          color: $accent-color;
+        }
+      }
+    }
+  }
+}
+
+/* Lightbox
+--------------------------------------------- */
+
+#fieldnotes {
+  img {
+    max-width: 100%;
   }
 }
