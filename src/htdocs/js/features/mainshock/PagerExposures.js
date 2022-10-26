@@ -16,9 +16,9 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       data: {Object}
  *       dependencies: {Array}
  *       destroy: {Function}
- *       exposures: {Object}
  *       id: {String}
  *       name: {String)
  *       summary: {String}
@@ -43,8 +43,8 @@ var PagerExposures = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
+    _this.data = {};
     _this.dependencies = ['pager-cities'];
-    _this.exposures = {};
     _this.id = 'pager-exposures';
     _this.name = 'PAGER Exposures';
     _this.summary = '';
@@ -92,11 +92,11 @@ var PagerExposures = function (options) {
    * @return html {String}
    */
   _getRows = function () {
-    var cities = _app.Features.getFeature('pager-cities').cities,
+    var cities = _app.Features.getFeature('pager-cities').data,
         html = '',
-        mmis = _this.exposures.mmi,
-        population = _this.exposures.population,
-        shaking = _this.exposures.shaking;
+        mmis = _this.data.mmi,
+        population = _this.data.population,
+        shaking = _this.data.shaking;
 
     mmis.forEach((mmi, i) => {
       if (mmi >= 2 && Number(population[i]) !== 0) { // skip mmi below 2 and when nobody affected
@@ -205,7 +205,7 @@ var PagerExposures = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    _this.exposures = _getExposures(json);
+    _this.data = _getExposures(json);
     _this.summary = _getSummary();
   };
 

@@ -16,7 +16,7 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *     {
  *       addData: {Function}
- *       cities: {Array}
+ *       data: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String)
@@ -39,7 +39,7 @@ var PagerCities = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
-    _this.cities = [];
+    _this.data = [];
     _this.id = 'pager-cities';
     _this.name = 'PAGER Cities';
     _this.url =_getUrl();
@@ -109,12 +109,12 @@ var PagerCities = function (options) {
    */
   _this.addData = function (json) {
     if (json.onepager_cities) {
-      _this.cities = json.onepager_cities.sort(_compare);
+      _this.data = json.onepager_cities.sort(_compare);
     } else if (Array.isArray(json)) { // sometimes data stored as top-level Array
-      _this.cities = json.sort(_compare);
+      _this.data = json.sort(_compare);
     }
 
-    _this.cities.forEach(city => {
+    _this.data.forEach(city => {
       city.pop = AppUtil.roundThousands(city.pop);
     });
   };

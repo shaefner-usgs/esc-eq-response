@@ -252,12 +252,12 @@ var Rtf = function (options) {
       nearbyCities: nearbyCities.cities,
       notice: products.notice,
       pager: products.pager,
-      pagerCities: pagerCities.cities,
+      pagerCities: pagerCities.data,
       pagerComments: {
         impact1: pagerComments.impact1,
         structComment: pagerComments.structComment
       },
-      pagerExposures: pagerExposures.exposures,
+      pagerExposures: pagerExposures.data,
       plotNames: _app.PlotsPane.names,
       shakeAlert: shakeAlert.data,
       shakemap: products.shakemap,
