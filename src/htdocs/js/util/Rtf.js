@@ -277,8 +277,6 @@ var Rtf = function (options) {
       }
     };
 
-    console.log(data);
-
     return data;
   };
 
