@@ -338,9 +338,9 @@ var Mainshock = function (options) {
       template =
         '<div class="pager-loss bubble">' +
           '<h4>Estimated Fatalities</h4>' +
-          '<img src="{fatalImg}" alt="Estimated fatalities histogram" />' +
+          '<img src="{fatalImg}" alt="Estimated fatalities histogram">' +
           '<h4>Estimated Economic Losses</h4>' +
-          '<img src="{econImg}" alt="Estimated economic losses histogram" />' +
+          '<img src="{econImg}" alt="Estimated economic losses histogram">' +
         '</div>';
     }
 
@@ -375,7 +375,7 @@ var Mainshock = function (options) {
         '<li class="shake-alert">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
           '<a href="{url}/shake-alert" target="new">' +
-            '<img src="img/shake-alert.png" alt="ShakeAlert logo" />' +
+            '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
           '</a>' +
           '<small>{shakeAlertStatus}</small>' +
         '</li>';

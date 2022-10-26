@@ -421,7 +421,7 @@ var Summary = function (options) {
           '<div class="slider-container">' +
             '<div class="min">{min}</div>' +
             '<div class="slider inverted" style="--min:{min}; --max:{max}; --val:{mag};">' +
-              '<input id="{id}" type="range" min="{min}" max="{max}" value="{mag}"/>' +
+              '<input id="{id}" type="range" min="{min}" max="{max}" value="{mag}">' +
               '<output for="{id}">{mag}</output>' +
             '</div>' +
             '<div class="max">{max}</div>' +

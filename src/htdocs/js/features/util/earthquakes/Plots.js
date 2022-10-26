@@ -139,7 +139,7 @@ var Plots = function (options) {
     };
 
     eqs.forEach(eq => {
-      var text = `${eq.title}<br /><span>${eq.userTimeDisplay}</span>` +
+      var text = `${eq.title}<br><span>${eq.userTimeDisplay}</span>` +
         `<span>${eq.utcTimeDisplay}</span>`;
 
       data.color.push(eq.fillColor);
@@ -395,7 +395,7 @@ var Plots = function (options) {
             val = 'Mainshock'; // overrides cumulative count value
           }
 
-          return `${data.title[i]} (${val})<br />` +
+          return `${data.title[i]} (${val})<br>` +
             `<span>${data.userTime[i]}</span><span>${data.utcTime[i]}</span>`;
         })
       });

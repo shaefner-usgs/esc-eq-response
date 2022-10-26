@@ -168,7 +168,7 @@ var FieldNotes = function (options) {
       img =
         '<a class="photo" href="{attachment}">' +
           '<div class="spinner"></div>' +
-          '<img src="{attachment}" alt="photo" />' +
+          '<img src="{attachment}" alt="photo">' +
         '</a>';
     }
 
@@ -328,7 +328,7 @@ var FieldNotes = function (options) {
         _addListeners(e);
       };
 
-      _lightbox.setContent(`<img src="${image.src}" alt="enlarged photo" />`)
+      _lightbox.setContent(`<img src="${image.src}" alt="enlarged photo">`)
         .setTitle(props.title);
     }
   };
