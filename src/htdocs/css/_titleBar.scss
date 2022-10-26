@@ -9,7 +9,6 @@
   h1 {
     a {
       color: $text-color;
-      position: relative;
       text-decoration-color: transparent;
       text-decoration-skip-ink: none;
       text-decoration-thickness: 2px;
@@ -20,22 +19,14 @@
         color: $text-color-darker;
         text-decoration-color: $text-color-lighter;
         transition: all $effect-on-duration ease-out;
-
-        i {
-          opacity: 1;
-          transition: all $effect-on-duration ease-out;
-        }
       }
     }
 
     i {
       color: $text-color-lighter;
       font-size: 1.25rem;
-      opacity: 0;
-      position: absolute;
       right: -1.75rem;
       top: .75rem;
-      transition: all $effect-off-duration ease-in;
     }
   }
 

@@ -202,6 +202,23 @@ tr {
   margin: 0;
 }
 
+.external {
+  position: relative;
+
+  &:hover {
+    i {
+      opacity: 1;
+      transition: all $effect-on-duration ease-out;
+    }
+  }
+
+  i {
+    opacity: 0;
+    position: absolute;
+    transition: all $effect-off-duration ease-in;
+  }
+}
+
 .feature {
   width: 100%;
 }
