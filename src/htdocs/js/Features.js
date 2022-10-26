@@ -19,7 +19,7 @@ var Aftershocks = require('features/mainshock/Aftershocks'),
     PagerExposures = require('features/mainshock/PagerExposures'),
     Rtf = require('util/Rtf'),
     ShakeAlert = require('features/rtf/ShakeAlert'),
-    ShakeMapInfo = require('features/rtf/ShakeMapInfo'),
+    ShakeMapInfo = require('features/mainshock/ShakeMapInfo'),
     ShakeMapStations = require('features/mainshock/ShakeMapStations'),
     SignificantEqs = require('features/base/SignificantEqs');
 
@@ -62,14 +62,14 @@ _MODULES = {
     MomentTensor,
     PagerCities,
     PagerExposures,
+    ShakeMapInfo,
     ShakeMapStations
   ],
   rtf: [ // Features added when the Event Summary RTF is created
     HistoricalEvents,
     NearbyCities,
     PagerComments,
-    ShakeAlert,
-    ShakeMapInfo
+    ShakeAlert
   ]
 };
 
@@ -112,6 +112,7 @@ var Features = function (options) {
 
       _addCount,
       _addFeature,
+      _addLightbox,
       _cacheFeature,
       _createFeature,
       _getMode,
@@ -178,6 +179,22 @@ var Features = function (options) {
   };
 
   /**
+   * Add the given Feature's Lightbox content.
+   *
+   * Note: a pre-existing Lightbox with a placeholder for the given Feature is
+   * required.
+   *
+   * @param feature {Object}
+   */
+  _addLightbox = function (feature) {
+    var el = document.querySelector('.lightbox .' + feature.id);
+
+    if (el) {
+      el.insertAdjacentHTML('afterbegin', feature.lightbox);
+    }
+  };
+
+  /**
    * Cache an existing Feature (in an Array due to the potential of 'stacked'
    * Fetch requests). This is used to purge the 'previous' Feature when a
    * refresh completes.
@@ -226,6 +243,7 @@ var Features = function (options) {
    *           Note: only Features with a map layer; showLayer prop must be false
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
    *         json: {String} JSON feed data (Mainshock only)
+   *         lightbox: {String} HTML content added to pre-existing Lightbox
    *         mapLayer: {L.Layer} Leaflet layer added to MapPane
    *         params: {Object} Feature's parameters that are exposed in SettingsBar
    *         placeholder: {String} initial HTML content added to Plots/SummaryPanes
@@ -414,6 +432,9 @@ var Features = function (options) {
     if (feature.content) {
       el = document.getElementById(feature.id);
       el.innerHTML = feature.content; // add SideBar content
+    }
+    if (feature.lightbox) {
+      _addLightbox(feature);
     }
     if (feature.render) {
       feature.render(); // add BeachBalls

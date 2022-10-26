@@ -673,68 +673,38 @@ class Rtf {
       );
     }
 
-    $motions = $this->_data->groundMotions;
+    $smInfo = $this->_data->shakemapInfo;
 
-    if (!empty(get_object_vars($motions))) {
-      $mmiProp = ''; // property name is inconsistent
-      if (property_exists($motions, 'intensity')) {
-        $mmiProp = 'intensity';
-      } else if (property_exists($motions, 'MMI')) {
-        $mmiProp = 'MMI';
-      }
-
-      if ($mmiProp) {
-        $mmi = round($motions->{$mmiProp}->max, 1);
-        if ($motions->{$mmiProp}->bias) {
-          $mmi .= ' (bias: ' . round($motions->{$mmiProp}->bias, 3) . ')';
-        }
-        $section5->writeText(
-          'Max MMI: ' . $mmi,
-          $this->_font->body,
-          $this->_format->body
-        );
-      }
-
-      $pgaProp = ''; // property name is inconsistent
-      if (property_exists($motions, 'pga')) {
-        $pgaProp = 'pga';
-      } else if (property_exists($motions, 'PGA')) {
-        $pgaProp = 'PGA';
-      }
-
-      if ($pgaProp) {
-        $pga = round($motions->{$pgaProp}->max, 1) . ' ' .
-          $motions->{$pgaProp}->units;
-        if ($motions->{$pgaProp}->bias) {
-          $pga .= ' (bias: ' . round($motions->{$pgaProp}->bias, 3) . ')';
-        }
-        $section5->writeText(
-          'Max PGA: ' . $pga,
-          $this->_font->body,
-          $this->_format->body
-        );
-      }
-
-      $pgvProp = ''; // property name is inconsistent
-      if (property_exists($motions, 'pgv')) {
-        $pgvProp = 'pgv';
-      } else if (property_exists($motions, 'PGV')) {
-        $pgvProp = 'PGV';
-      }
-
-      if ($pgvProp) {
-        $pgv = round($motions->{$pgvProp}->max, 1) . ' ' .
-          $motions->{$pgvProp}->units;
-        if ($motions->{$pgvProp}->bias) {
-          $pgv .= ' (bias: ' . round($motions->{$pgvProp}->bias, 3) . ')';
-        }
-        $section5->writeText(
-          'Max PGV: ' . $pgv,
-          $this->_font->body,
-          $this->_format->body
-        );
-      }
-    }
+    $section5->writeText(
+      'Max MMI: ' . strip_tags($smInfo->mmi),
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section5->writeText(
+      'Max PGA: ' . strip_tags($smInfo->pga),
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section5->writeText(
+      'Max PGV: ' . strip_tags($smInfo->pgv),
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section5->writeText(
+      'Max SA (0.3s): ' . strip_tags($smInfo->sa03),
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section5->writeText(
+      'Max SA (1.0s): ' . strip_tags($smInfo->sa10),
+      $this->_font->body,
+      $this->_format->body
+    );
+    $section5->writeText(
+      'Max SA (3.0s): ' . strip_tags($smInfo->sa30),
+      $this->_font->body,
+      $this->_format->body
+    );
 
     if ($this->_data->shakemap) {
       $section5->addImage(

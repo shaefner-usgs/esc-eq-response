@@ -82,8 +82,10 @@ var FocalMechanism = function (options) {
    */
   _addLightbox = function () {
     var lightbox = Lightbox({
-      id: _this.id
-    }).setContent(_beachballs.getContent());
+      content: _beachballs.getContent(),
+      id: _this.id,
+      title: _beachballs.getTitle()
+    });
 
     _mainshock.lightboxes[_this.id] = lightbox; // add to Mainshock
   };

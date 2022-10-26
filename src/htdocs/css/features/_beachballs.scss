@@ -1,11 +1,15 @@
 @use '../mixins' as *;
 @use '../variables' as *;
 
-#focal-mechanism-lightbox,
-#moment-tensor-lightbox {
+/* Lightboxes
+--------------------------------------------- */
+
+#focal-mechanism,
+#moment-tensor {
   canvas {
-    margin-top: 3.5rem;
     max-width: 100%;
+    position: sticky;
+    top: 5rem;
     width: 350px;
   }
 
@@ -13,8 +17,8 @@
     max-width: 10rem;
   }
 
-  h3 {
-    margin-top: 0;
+  dl {
+    margin: 0;
   }
 
   h4 {
@@ -32,10 +36,6 @@
     }
   }
 
-  .beachball {
-    margin-left: 1rem;
-  }
-
   .catalog,
   .contributor,
   .source {
@@ -45,6 +45,7 @@
   .content {
     display: flex;
     flex-flow: row nowrap;
+    gap: 3rem;
   }
 
   .planes {
@@ -54,7 +55,7 @@
   }
 
   .status {
-    margin-bottom: 0;
+    margin: 1.5rem 0 0;
 
     &:before {
       @include labels;
@@ -76,11 +77,11 @@
 
 @media only screen
 and (max-width: $breakpoint-phone-width) {
-  #focal-mechanism-lightbox,
-  #moment-tensor-lightbox {
+  #focal-mechanism,
+  #moment-tensor {
     canvas {
       display: block;
-      margin: 0 auto 2rem;
+      margin: 1.5rem auto 0;
     }
 
     .beachball,

@@ -1,12 +1,15 @@
 @use 'sass:color';
 
+@use 'mixins' as *;
 @use 'variables' as *;
 
 .lightbox {
+  align-items: center;
   background: rgba(0, 0, 0, .93);
   bottom: 0;
   cursor: pointer;
   display: flex;
+  justify-content: center;
   left: 0;
   opacity: 1;
   padding: 1rem 2.5rem;
@@ -20,34 +23,55 @@
   &.hide {
     opacity: 0;
     visibility: hidden;
-  }
 
-  &:after {
-    color: color.scale($accent-color, $lightness: 75%, $saturation: 90%);
-    content: '\d7';
-    font-size: 2rem;
-    font-weight: bold;
-    line-height: 1;
-    position: absolute;
-    right: 1rem;
-    top: .25rem;
-  }
-
-  > img,
-  .container {
-    background: $bg-color;
-    border-radius: $content-border-radius;
-    margin: auto;
-    max-height: 100%;
-    max-width: 100%;
-    padding: 1rem 1.5rem;
-  }
-  .container {
-    overflow: scroll;
+    .close {
+      display: none;
+    }
   }
 
   > * {
     cursor: auto;
+  }
+
+  h3 {
+    background: $bg-color;
+    margin: 0;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10001;
+  }
+
+  .close {
+    position: sticky;
+    top: 0;
+    z-index: 10002;
+  }
+
+  .container {
+    background: $bg-color;
+    border-radius: $content-border-radius;
+    max-height: 100%;
+    max-width: 100%;
+    overflow: scroll;
+    padding: 0 1.5rem 1rem;
+    position: relative;
+
+    // Hide scrollbars
+    -ms-overflow-style: none; // IE, Edge
+    scrollbar-width: none; // Firefox
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari, and Opera
+    }
+  }
+
+  .icon-close {
+    @include close;
+
+    position: absolute;
+    right: -1.375rem;
+    top: .125rem;
   }
 }
 

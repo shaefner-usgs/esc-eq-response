@@ -2,7 +2,8 @@
 
 
 /**
- * Creates a LatLon point on the Earth's surface at the specified lat/lng.
+ * Create a LatLon point on the Earth's surface at the specified lat/lng. Used
+ * to calculate the distance and direction from a Mainshock.
  *
  * Taken from: https://www.movable-type.co.uk/scripts/latlong.html
  *
@@ -25,8 +26,8 @@ function LatLon(lat, lon) {
 }
 
 /**
- * Returns the distance from ‘this’ point to destination point (using haversine
- * formula).
+ * Get the distance from a LatLon point to the given destination point (using
+ * the haversine formula).
  *
  * @param point {LatLon}
  *     Latitude/longitude of destination point.
@@ -63,7 +64,7 @@ LatLon.prototype.distanceTo = function(point, radius) {
 };
 
 /**
- * Forward azimuth (takeoff bearing) from point to destination.
+ * Get the compass direction from a LatLon point to the given destination point.
  *
  * @param point {LatLon}
  *     Latitude/longitude of destination point.
