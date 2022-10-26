@@ -54,9 +54,9 @@ var Mainshock = function (options) {
       _buttonTitle,
       _ddData,
       _earthquakes,
-      _json,
       _thumbs,
 
+      _addLightbox,
       _createFeatures,
       _getBubbles,
       _getData,
@@ -98,6 +98,60 @@ var Mainshock = function (options) {
     _ddData = {}; // double-difference data
 
     _this.mapLayer = _earthquakes.mapLayer;
+  };
+
+  /**
+   * Create and add a Lightbox for either DYFI or ShakeMap.
+   *
+   * @param opts {Object}
+   *     {
+   *       id: {String}
+   *       img: {String}
+   *       title: {String}
+   *     }
+   *
+   * @return Lightbox {Class}
+   */
+  _addLightbox = function (opts) {
+    var props, template,
+        data = _this.data; // default
+
+    if (opts.id === 'dyfi') {
+      props = data.products.dyfi[0].properties;
+      data = Object.assign({}, _this.data, {
+        maxmmi: props.maxmmi,
+        responses: props.numResp
+      });
+      template = opts.img +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{maxmmi}</dd>' +
+            '<dt>Responses</dt>' +
+            '<dd>{responses}</dd>' +
+          '</dl>' +
+          '<p>' +
+            '<a href="{url}/dyfi" class="external" target="new">Additional maps' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>';
+    } else { // ShakeMap
+      template = opts.img +
+        '<div class="shakemap-info details">' +
+          '<p>' +
+            '<a href="{url}/shakemap" class="external" target="new">Full details and additional maps' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>';
+    }
+
+    return Lightbox({
+      content: L.Util.template(template, data),
+      id: opts.id,
+      title: opts.title
+    });
   };
 
   /**
@@ -162,19 +216,21 @@ var Mainshock = function (options) {
    * JSON feed data from Earthquakes.js, plus additional Mainshock-specific
    * convenience properties.
    *
+   * @param json {Object}
+   *
    * @return {Object}
    */
-  _getData = function () {
+  _getData = function (json) {
     var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg, tectonic,
         data = _earthquakes.data[0], // formatted JSON feed data
         datetime = data.datetime,
-        products = _json.properties.products,
+        products = json.properties.products,
         dyfi = products.dyfi,
         fm = products['focal-mechanism'],
         format = 'cccc',
         header = products['general-header'],
         hide = 'hide', // default - hide product thumbs container
-        mmiInt = Math.round(_json.properties.mmi),
+        mmiInt = Math.round(json.properties.mmi),
         mt = products['moment-tensor'],
         pager = products.losspager,
         plurality = 's', // default
@@ -240,25 +296,28 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'Did You Feel It?' and create its Lightbox.
+   * Get the HTML template for 'Did You Feel It?' (and add its Lightbox).
    *
    * @return template {String}
    */
   _getDyfi = function () {
     var img,
+        id = 'dyfi',
         template = '';
 
     if (_this.data.dyfiImg) {
-      img = `<img src="${_this.data.dyfiImg}" class="mmi${_this.data.cdi}" alt="DYFI" />`;
+      img = '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">';
       template =
         '<div class="dyfi">' +
           '<h4>Did You Feel It?</h4>' +
-          '<a href="{dyfiImg}">' +
-            '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity" />' +
-          '</a>' +
+          '<a href="{dyfiImg}">' + img + '</a>' +
         '</div>';
 
-      _this.lightboxes.dyfi = Lightbox({id: 'dyfi'}).setContent(img);
+      _this.lightboxes[id] = _addLightbox({
+        id: id,
+        img: img,
+        title: 'Did You Feel It?'
+      });
     }
 
     return template;
@@ -323,25 +382,28 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'ShakeMap' and create its Lightbox.
+   * Get the HTML template for 'ShakeMap' (and add its Lightbox).
    *
    * @return template {String}
    */
   _getShakeMap = function () {
     var img,
+        id = 'shakemap',
         template = '';
 
     if (_this.data.shakemapImg) {
-      img = `<img src="${_this.data.shakemapImg}" class="mmi${_this.data.mmi}" alt="ShakeMap" />`;
+      img = '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity">';
       template =
         '<div class="shakemap">' +
           '<h4>ShakeMap</h4>' +
-          '<a href="{shakemapImg}">' +
-            '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity" />' +
-          '</a>' +
+          '<a href="{shakemapImg}">' + img + '</a>' +
         '</div>';
 
-      _this.lightboxes.shakemap = Lightbox({id: 'shakemap'}).setContent(img);
+      _this.lightboxes[id] = _addLightbox({
+        id: id,
+        img: img,
+        title: 'ShakeMap'
+      });
     }
 
     return template;
@@ -559,9 +621,7 @@ var Mainshock = function (options) {
     var significantEqs = _app.Features.getFeature('significant-eqs');
 
     _earthquakes.addData(json);
-    _json = json;
-
-    _this.data = _getData(); // used by Rtf.js, etc.
+    _this.data = _getData(json); // used by Rtf.js, etc.
     _this.content = _earthquakes.getContent(_this.data);
     _this.plots = Plots({
       app: _app,
@@ -596,7 +656,7 @@ var Mainshock = function (options) {
    */
   _this.addListeners = function () {
     _button = document.getElementById('download');
-    _thumbs = document.querySelectorAll('.thumbs .dyfi, .thumbs .shakemap');
+    _thumbs = document.querySelectorAll('.thumbs .dyfi a, .thumbs .shakemap a');
 
     // Create RTF Features (RTF document is created when all Features are ready)
     _button.addEventListener('click', _createFeatures);
@@ -625,10 +685,12 @@ var Mainshock = function (options) {
 
     _app = null;
     _button = null;
+    _buttonTitle = null;
     _ddData = null;
     _earthquakes = null;
     _thumbs = null;
 
+    _addLightbox = null;
     _createFeatures = null;
     _getBubbles = null;
     _getData = null;
