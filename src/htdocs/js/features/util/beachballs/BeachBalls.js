@@ -42,6 +42,7 @@ _R2D = 180 / Math.PI;
  *       getContent: {Function}
  *       getMapLayer: {Function}
  *       getSummary: {Function}
+ *       getTitle: {Function}
  *       removeListeners: {Function}
  *       render: {Function}
  *     }
@@ -64,7 +65,6 @@ var BeachBalls = function (options) {
       _getData,
       _getProps,
       _getTemplate,
-      _getTitle,
       _showLightbox;
 
 
@@ -105,7 +105,7 @@ var BeachBalls = function (options) {
           tensor: _tensor
         },
         selectors = { // BeachBall containers
-          lightbox: `#${_type}-lightbox .beachball`,
+          lightbox: `#${_type} .beachball`,
           marker: '#mapPane .container',
           thumb: `#summaryPane div.${_type} a`
         };
@@ -259,7 +259,6 @@ var BeachBalls = function (options) {
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
-      title: _getTitle()
     };
   };
 
@@ -295,82 +294,45 @@ var BeachBalls = function (options) {
    */
   _getTemplate = function () {
     return '' +
-      '<div class="container">' +
-        '<div class="content">' +
-          '<div class="details">' +
-            '<h3>{title}</h3>' +
-            '<dl class="props alt">' +
-              _getProps() +
-              '<dt>Catalog</dt>' +
-              '<dd class="catalog">{catalog}</dd>' +
-              '<dt>Data Source</dt>' +
-              '<dd class="source">{dataSource}</dd>' +
-              '<dt>Contributor</dt>' +
-              '<dd class="contributor">{contributor}</dd>' +
-            '</dl>' +
-            '<h4>Nodal Planes</h4>' +
-            '<table class="planes">' +
-              '<thead>' +
-                '<tr>' +
-                  '<th>Plane</th>' +
-                  '<th>Strike</th>' +
-                  '<th>Dip</th>' +
-                  '<th>Rake</th>' +
-                '</tr>' +
-              '</thead>' +
-              '<tbody>' +
-                '<tr>' +
-                  '<th>NP1</th>' +
-                  '<td>{np1Strike}</td>' +
-                  '<td>{np1Dip}</td>' +
-                  '<td>{np1Rake}</td>' +
-                '</tr>' +
-                '<tr>' +
-                  '<th>NP2</th>' +
-                  '<td>{np2Strike}</td>' +
-                  '<td>{np2Dip}</td>' +
-                  '<td>{np2Rake}</td>' +
-                '</tr>' +
-              '</tbody>' +
-            '</table>' +
-            _getAxes() +
-          '</div>' +
-          '<div class="beachball"></div>' +
-        '</div>' +
+      '<div class="details">' +
+        '<dl class="props alt">' +
+          _getProps() +
+          '<dt>Catalog</dt>' +
+          '<dd class="catalog">{catalog}</dd>' +
+          '<dt>Data Source</dt>' +
+          '<dd class="source">{dataSource}</dd>' +
+          '<dt>Contributor</dt>' +
+          '<dd class="contributor">{contributor}</dd>' +
+        '</dl>' +
+        '<h4>Nodal Planes</h4>' +
+        '<table class="planes">' +
+          '<thead>' +
+            '<tr>' +
+              '<th>Plane</th>' +
+              '<th>Strike</th>' +
+              '<th>Dip</th>' +
+              '<th>Rake</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr>' +
+              '<th>NP1</th>' +
+              '<td>{np1Strike}</td>' +
+              '<td>{np1Dip}</td>' +
+              '<td>{np1Rake}</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<th>NP2</th>' +
+              '<td>{np2Strike}</td>' +
+              '<td>{np2Dip}</td>' +
+              '<td>{np2Rake}</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        _getAxes() +
         '<p class="status"><span>{status}</span></p>' +
-      '</div>';
-  };
-
-  /**
-   * Get the Feature's title.
-   *
-   * @return title {String}
-   */
-  _getTitle = function () {
-    var title, type,
-        titles = {
-          MWW: 'W-phase Moment Tensor (Mww)',
-          MWC: 'Centroid Moment Tensor (Mwc)',
-          MWB: 'Body-wave Moment Tensor (Mwb)',
-          MWR: 'Regional Moment Tensor (Mwr)'
-        };
-
-    if (_type === 'focal-mechanism') {
-      title = 'Focal Mechanism';
-    } else {
-      type = (_tensor.type || '').toUpperCase();
-      title = titles[type];
-
-      if (!title) {
-        title = 'Moment Tensor';
-
-        if (_tensor.type) {
-          title += ` (${_tensor.type})`;
-        }
-      }
-    }
-
-    return title;
+      '</div>' +
+      '<div class="beachball"></div>';
   };
 
   /**
@@ -422,7 +384,6 @@ var BeachBalls = function (options) {
     _getData = null;
     _getProps = null;
     _getTemplate = null;
-    _getTitle = null;
     _showLightbox = null;
 
     _this = null;
@@ -452,7 +413,7 @@ var BeachBalls = function (options) {
         iconSize: L.point(40, 40)
       }),
       pane: _type // controls stacking order
-    }).bindTooltip(_getTitle());
+    }).bindTooltip(_this.getTitle());
   };
 
   /**
@@ -465,6 +426,38 @@ var BeachBalls = function (options) {
         url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/${_type}`;
 
     return `<h4>${_name}</h4><a href="${url}" target="new"></a>`;
+  };
+
+  /**
+   * Get the Feature's title.
+   *
+   * @return title {String}
+   */
+  _this.getTitle = function () {
+    var title, type,
+        titles = {
+          MWW: 'W-phase Moment Tensor (Mww)',
+          MWC: 'Centroid Moment Tensor (Mwc)',
+          MWB: 'Body-wave Moment Tensor (Mwb)',
+          MWR: 'Regional Moment Tensor (Mwr)'
+        };
+
+    if (_type === 'focal-mechanism') {
+      title = 'Focal Mechanism';
+    } else {
+      type = (_tensor.type || '').toUpperCase();
+      title = titles[type];
+
+      if (!title) {
+        title = 'Moment Tensor';
+
+        if (_tensor.type) {
+          title += ` (${_tensor.type})`;
+        }
+      }
+    }
+
+    return title;
   };
 
   /**
