@@ -172,8 +172,8 @@ var Rtf = function (options) {
   _getBeachBalls = function () {
     var beachballs = {},
         canvasEls = {
-          fm: document.querySelector('#focal-mechanism-lightbox canvas'),
-          mt: document.querySelector('#moment-tensor-lightbox canvas')
+          fm: document.querySelector('#focal-mechanism canvas'),
+          mt: document.querySelector('#moment-tensor canvas')
         };
 
     Object.keys(canvasEls).forEach(key => {
@@ -238,7 +238,6 @@ var Rtf = function (options) {
         earthquakes: _filter(foreshocks).sort(_compare),
         magThreshold: _magThreshold
       },
-      groundMotions: shakemapInfo.groundMotions,
       historical: {
         bins: historical.bins,
         count: historical.count,
@@ -262,6 +261,7 @@ var Rtf = function (options) {
       plotNames: _app.PlotsPane.names,
       shakeAlert: shakeAlert.data,
       shakemap: products.shakemap,
+      shakemapInfo: shakemapInfo.data,
       tectonic: products.tectonic,
       time: {
         local: mainshock.data.localTime,
