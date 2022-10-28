@@ -55,7 +55,7 @@
 
     position: fixed;
     right: $sidebar-width * -1;
-    top: 8rem;
+    top: 7.625rem;
     transition: right $sidebar-toggle-duration ease;
     z-index: 10000;
   }
@@ -82,7 +82,7 @@ body.sidebar {
     margin-right: 0;
 
     .icon-close {
-      right: 1.0625rem;
+      right: .5rem;
     }
   }
 
