@@ -26,7 +26,7 @@ function create() {
   } catch (Exception $e) {
     $response['error'] = $e->getMessage();
 
-    setHeaders('HTTP/1.0 500 Internal Server Error');
+    http_response_code($e->getCode());
   } finally {
     sendResponse($response);
   }
