@@ -203,6 +203,7 @@ tr {
 }
 
 .external {
+  padding-right: .5rem;
   position: relative;
 
   &:hover {
@@ -213,8 +214,12 @@ tr {
   }
 
   i {
+    color: color.scale($link-color, $lightness: 25%);
+    font-size: .875rem;
     opacity: 0;
     position: absolute;
+    right: -.625rem;
+    top: 0;
     transition: all $effect-off-duration ease-in;
   }
 }
