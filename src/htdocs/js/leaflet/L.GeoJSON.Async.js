@@ -87,7 +87,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         feature.addData(this._json);
       }
       if (feature.mapLayer) {
-        this.addData(this._json); // add to MapPane
+        this.addData(this._json); // L.GeoJSON: add to MapPane
 
         if (feature.showLayer) {
           this._render(); // L.GeoJSON.DateLine: render on both sides of IDL
