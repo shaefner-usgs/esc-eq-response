@@ -257,17 +257,17 @@ var Features = function (options) {
    *         url: {String} URL of data feed
    *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
    *     }
-   * @param options {Object} default is {}
+   * @param opts {Object} default is {}
    */
-  _createFeature = function (mode, module, options = {}) {
+  _createFeature = function (mode, module, opts = {}) {
     var feature,
         status = 'initialized'; // default
 
     if (_isReady(mode)) { // create Feature when dependencies are ready
-      options = Object.assign({}, _DEFAULTS, options, {
+      opts = Object.assign({}, _DEFAULTS, opts, {
         app: _app
       });
-      feature = module(options);
+      feature = module(opts);
 
       if (!feature.url) {
         status = 'ready';
@@ -286,7 +286,7 @@ var Features = function (options) {
       _addFeature(feature);
     } else { // dependencies not ready
       _queue.push(setTimeout(() => {
-        _createFeature(mode, module, options);
+        _createFeature(mode, module, opts);
       }, 250));
     }
   };

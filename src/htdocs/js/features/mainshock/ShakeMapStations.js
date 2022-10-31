@@ -364,12 +364,12 @@ var ShakeMapStations = function (options) {
   _pointToLayer = function (feature, latlng) {
     var props = feature.properties,
         romanIntensity = AppUtil.romanize(props.intensity) || 'I',
-        options = Object.assign({}, _markerOptions, {
+        opts = Object.assign({}, _markerOptions, {
           className: 'station-layer-icon station-mmi' + romanIntensity
         });
 
     return L.marker(latlng, {
-      icon: L.divIcon(options),
+      icon: L.divIcon(opts),
       pane: _this.id // controls stacking order
     });
   };

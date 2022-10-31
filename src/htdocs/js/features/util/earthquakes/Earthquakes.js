@@ -408,13 +408,13 @@ var Earthquakes = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     var eq = _this.data.find(item => item.id === feature.id), // eqid
-        options = Object.assign({}, _markerOptions, {
+        opts = Object.assign({}, _markerOptions, {
           fillColor: eq.fillColor,
           pane: _feature.id, // controls stacking order
           radius: eq.radius
         });
 
-    return L.circleMarker(latlng, options);
+    return L.circleMarker(latlng, opts);
   };
 
   /**
