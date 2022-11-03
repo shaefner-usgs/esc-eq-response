@@ -3,7 +3,8 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Luxon = require('luxon');
+    Luxon = require('luxon'),
+    RadioBar = require('util/RadioBar');
 
 
 /**
@@ -34,6 +35,10 @@ var Forecast = function (options) {
       _initialize,
 
       _app,
+      _el,
+      _radioBar,
+      _radioBarOpts,
+      _toggle,
 
       _fetch,
       _getItem,
@@ -56,10 +61,15 @@ var Forecast = function (options) {
     }
 
     _app = options.app;
+    _radioBarOpts = {
+      id: 'timeframe',
+      items: [],
+      selected: ''
+    };
 
-    _this.id = 'forecast';
     _this.dependencies = [dependency];
     _this.forecast = [];
+    _this.id = 'forecast';
     _this.model = {};
     _this.name = 'Forecast';
     _this.summary = '';
@@ -183,7 +193,8 @@ var Forecast = function (options) {
   };
 
   /**
-   * Get the HTML content for the list of probabilities and its 'radio-bar'.
+   * Get the HTML content for the list of probabilities and populate its
+   * RadioBar items.
    *
    * @param json {Object}
    *
@@ -191,27 +202,29 @@ var Forecast = function (options) {
    */
   _getProbabilities = function (json) {
     var html = '',
-        nav = '',
         probabilities = '';
 
     json.forecast.forEach(timeframe => {
-      var hide = 'hide',
+      var hide = 'hide', // default
           period = timeframe.label.replace(/1\s+/, ''),
-          selected = '';
+          id = 'next' + period;
 
       if (timeframe.label === json.advisoryTimeFrame) {
         hide = ''; // show
-        selected = 'selected';
+        _radioBarOpts.selected = id;
       }
 
-      nav += `<li id="next${period}" class="${selected}">${timeframe.label}</li>`;
-      probabilities += `<li class="next${period} option ${hide}">`;
+      _radioBarOpts.items.push({
+        id: id,
+        name: timeframe.label
+      });
+
+      probabilities += `<li class="${id} option ${hide}">`;
       probabilities += _getList(timeframe);
       probabilities += '</li>';
     });
 
     if (probabilities) {
-      html += `<ul class="timeframe options">${nav}</ul>`;
       html += `<ul class="probabilities">${probabilities}</ul>`;
     }
 
@@ -231,6 +244,7 @@ var Forecast = function (options) {
         probabilities = _getProbabilities(json);
 
     if (probabilities) {
+      _radioBar = RadioBar(_radioBarOpts);
       timeStart = Luxon.DateTime.fromMillis(json.forecast[0].timeStart).toUTC()
         .toFormat("ccc, LLL d, yyyy 'at' T"); // eslint-disable-line
 
@@ -239,6 +253,7 @@ var Forecast = function (options) {
         name: _this.name,
         parameters: _getParameters(json),
         probabilities: probabilities,
+        radioBar: _radioBar.getHtml(),
         timeStart: timeStart
       };
 
@@ -248,6 +263,7 @@ var Forecast = function (options) {
           'frame and magnitude range starting on {timeStart} UTC. The ' +
           'likely number of aftershocks (95% confidence range) is listed  ' +
           'below the probability.</p>' +
+        '{radioBar}' +
         '{probabilities}' +
         '{parameters}' +
         '<p><strong>Model</strong>: {model}</p>',
@@ -287,7 +303,7 @@ var Forecast = function (options) {
    */
   _toggleParams = function (e) {
     var button = e.target,
-        params = document.querySelector('.forecast .props');
+        params = _el.querySelector('.props');
 
     e.preventDefault();
 
@@ -314,26 +330,31 @@ var Forecast = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var el = document.querySelector('#summaryPane .forecast'),
-        buttons = el.querySelectorAll('.timeframe li'),
-        toggle = el.querySelector('.toggle');
+    _el = document.querySelector('#summaryPane .forecast');
+    _toggle = _el.querySelector('.toggle');
 
-    // Set the selected option on the timeframe 'radio-bar'
-    buttons.forEach(button =>
-      button.addEventListener('click', _app.setOption)
-    );
+    // Display the selected timeframe's forecast
+    _radioBar.addListeners(document.getElementById('timeframe'));
 
-    // Toggle the Forecast params
-    toggle.addEventListener('click', _toggleParams);
+    // Toggle the forecast parameters
+    _toggle.addEventListener('click', _toggleParams);
   };
 
   /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    if (_radioBar) {
+      _radioBar.destroy(); // also removes its listeners
+    }
+
     _initialize = null;
 
     _app = null;
+    _el = null;
+    _radioBar = null;
+    _radioBarOpts = null;
+    _toggle = null;
 
     _fetch = null;
     _getItem = null;
@@ -352,20 +373,8 @@ var Forecast = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    var buttons, toggle,
-        el = document.querySelector('#summaryPane .forecast');
-
-    if (el) {
-      buttons = el.querySelectorAll('.timeframe li'),
-      toggle = el.querySelector('.toggle');
-
-      buttons.forEach(button =>
-        button.removeEventListener('click', _app.setOption)
-      );
-
-      if (toggle) {
-        toggle.removeEventListener('click', _toggleParams);
-      }
+    if (_toggle) {
+      _toggle.removeEventListener('click', _toggleParams);
     }
   };
 

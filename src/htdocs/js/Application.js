@@ -21,10 +21,9 @@ var Features = require('Features'),
  *
  * Instantiate the app's "primary" Classes and bind them together via the 'app'
  * property that is passed to all of the Classes. This makes all of their public
- * props/methods accessible globally.
+ * properties and methods accessible to each other.
  *
- * Handle the input range 'slider' and 'radio-bar' custom UI components as well
- * as resetting the app to its default state.
+ * Also handle resetting the app to its default state.
  *
  * @param options {Object}
  *     {
@@ -59,8 +58,6 @@ var Features = require('Features'),
  *       TitleBar: {Object}
  *       headerHeight: {Number}
  *       reset: {Function}
- *       setOption: {Function}
- *       setSliderStyles: {Function}
  *       sideBarWidth: {Number}
  *       utcOffset: {String}
  *     }
@@ -71,9 +68,7 @@ var Application = function (options) {
 
       _els,
       _rendered,
-      _style,
 
-      _getSliderValue,
       _initClasses,
       _resetQueryString;
 
@@ -87,34 +82,12 @@ var Application = function (options) {
 
     _els = options;
     _rendered = false;
-    _style = document.createElement('style');
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
     _this.utcOffset = `UTC${sign}${hours}`;
 
-    // Add a <style> tag for the range sliders' styles
-    document.body.appendChild(_style);
-
     _initClasses();
-  };
-
-  /**
-   * Get the CSS value for the colored section of a range slider.
-   *
-   * @param input {Element}
-   *
-   * @return {String}
-   */
-  _getSliderValue = function (input) {
-    var min = input.min || 0,
-        value = input.value;
-
-    if (input.max) {
-      value = Math.floor(100 * (input.value - min) / (input.max - min));
-    }
-
-    return value + '% 100%';
   };
 
   /**
@@ -208,58 +181,6 @@ var Application = function (options) {
     }
 
     _rendered = true;
-  };
-
-  /**
-   * Highlight and show the selected option on a 'radio-bar'; un-highlight and
-   * hide all other options.
-   */
-  _this.setOption = function () {
-    var option = document.querySelector('.option.' + this.id),
-        sibling = this.parentNode.firstElementChild;
-
-    // Highlight the selected button and show its options (if applicable)
-    this.classList.add('selected');
-
-    if (option) {
-      option.classList.remove('hide');
-    }
-
-    // Un-highlight all other buttons and hide their options
-    while (sibling) {
-      if (sibling !== this) {
-        option = document.querySelector('.option.' + sibling.id);
-
-        sibling.classList.remove('selected');
-
-        if (option) {
-          option.classList.add('hide');
-        }
-      }
-
-      sibling = sibling.nextElementSibling;
-    }
-  };
-
-  /**
-   * Set the dynamic, inline styles for the colored section of the given input
-   * range slider.
-   *
-   * @param input {Element}
-   */
-  _this.setSliderStyles = function (input) {
-    var newRules = '',
-        oldRules = /`#${input.id}[^#]+`/g,
-        value = _getSliderValue(input),
-        vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
-
-    vendorAttrs.forEach(attr =>
-      newRules += `#${input.id}::-${attr}-track {background-size:${value} !important}`
-    );
-
-    // Remove 'old' CSS rules, then add new ones
-    _style.textContent = _style.textContent.replace(oldRules, '');
-    _style.appendChild(document.createTextNode(newRules));
   };
 
 

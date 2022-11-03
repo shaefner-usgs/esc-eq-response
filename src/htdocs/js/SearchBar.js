@@ -7,7 +7,9 @@ require('leaflet.path.drag'); // add path dragging to Leaflet.Editable
 require('leaflet/L.Control.Rectangle'); // map control to draw a rectangle
 
 var AppUtil = require('util/AppUtil'),
-    Luxon = require('luxon');
+    Luxon = require('luxon'),
+    RadioBar = require('util/RadioBar'),
+    Slider = require('util/Slider');
 
 
 var _CANV,
@@ -59,10 +61,13 @@ var SearchBar = function (options) {
       _el,
       _endtime,
       _map,
+      _minmagnitude,
       _nowButton,
       _period,
+      _periodBar,
       _pickers,
       _region,
+      _regionBar,
       _regionLayer,
       _rendered,
       _searchButton,
@@ -82,9 +87,8 @@ var SearchBar = function (options) {
       _setControls,
       _setMinutes,
       _setNow,
-      _setOption,
       _setParams,
-      _setSlider,
+      _setRegion,
       _setUtcDay,
       _setUtcMonth,
       _setValidity,
@@ -97,6 +101,12 @@ var SearchBar = function (options) {
     _app = options.app;
     _el = options.el;
     _endtime = document.getElementById('endtime');
+    _periodBar = RadioBar({
+      el: document.getElementById('period')
+    });
+    _regionBar = RadioBar({
+      el: document.getElementById('region')
+    });
     _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
       [24.5, -125]
@@ -146,15 +156,16 @@ var SearchBar = function (options) {
   _addListeners = function () {
     var arrows = _el.querySelectorAll('.flatpickr-minute ~ span'),
         labels = _el.querySelectorAll('label'),
-        options = _el.querySelectorAll('.period li, .region li'),
+        opts = _el.querySelectorAll('#period li, #region li'),
+        regionOpts = _el.querySelectorAll('#region li'),
         slider = _el.querySelector('.slider input');
 
-    // Set the minutes value when the user clicks an up/down arrow button
+    // Set the minutes value
     arrows.forEach(arrow =>
       arrow.addEventListener('click', _setMinutes)
     );
 
-    // Open the associated date picker when the user clicks on a label
+    // Open the date picker
     labels.forEach(label =>
       label.addEventListener('click', () => {
         var id = label.getAttribute('for');
@@ -163,27 +174,19 @@ var SearchBar = function (options) {
       })
     );
 
-    // Set the selected period or region 'radio-bar' option
-    options.forEach(option =>
-      option.addEventListener('click', function() {
-        _setOption.call(this);
-        _this.setButton();
-      })
-    );
+    // Keep search button status in sync and set custom region options
+    opts.forEach(button => button.addEventListener('click', _this.setButton));
+    regionOpts.forEach(button => button.addEventListener('click', _setRegion));
 
-    // Keep the magnitude range slider in sync
-    slider.addEventListener('input', function() {
-      _setSlider(this);
-      _this.setButton();
-    });
+    slider.addEventListener('input', _this.setButton);
 
-    // Set the end time to 'now' when the user clicks the 'Now' button
+    // Set the end time to 'now'
     _nowButton.addEventListener('click', e => {
       e.preventDefault();
       _setNow();
     });
 
-    // Search the catalog when the user clicks the 'Search' button
+    // Search the catalog
     _searchButton.addEventListener('click', () => {
       location.href = '#mapPane';
 
@@ -279,7 +282,7 @@ var SearchBar = function (options) {
    */
   _isValid = function () {
     var isValid = true, // default
-        period = _el.querySelector('ul.period .selected').id;
+        period = _el.querySelector('#period .selected').id;
 
     if (period === 'customPeriod') {
       isValid = _setValidity(_starttime) && _setValidity(_endtime);
@@ -366,23 +369,26 @@ var SearchBar = function (options) {
    * Set the UI controls to match the URL parameters (or to its default value if
    * a parameter is not set).
    *
-   * Note: The selected 'radio-bar' options are set via _this.postInit().
+   * Note: The selected RadioBar options are set via _this.postInit().
    */
   _setControls = function () {
     var endtime,
-        minmagnitude = document.getElementById('minmagnitude'),
         settings = {
           minmagnitude: AppUtil.getParam('minmagnitude') || _SETTINGS.minmagnitude,
           period: AppUtil.getParam('period') || _SETTINGS.period,
           region: AppUtil.getParam('region') || _SETTINGS.region
-        };
+        },
+        slider = Slider({
+          el: document.getElementById('minmagnitude')
+        });
 
+    _minmagnitude = document.getElementById('minmagnitude');
     _period = document.getElementById(settings.period);
     _region = document.getElementById(settings.region);
 
     // Set magnitude
-    minmagnitude.value = settings.minmagnitude;
-    _setSlider(minmagnitude);
+    _minmagnitude.value = settings.minmagnitude;
+    slider.setValue();
 
     // Set custom dates
     if (_period.id === 'customPeriod') {
@@ -459,21 +465,6 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Wrapper method that sets the selected option on a 'radio-bar' and
-   * optionally renders the map/cancels the custom region, depending on the
-   * current state.
-   */
-  _setOption = function () {
-    _app.setOption.call(this);
-
-    if (this.id === 'customRegion') {
-      _this.render();
-    } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
-      _cancelRegion();
-    }
-  };
-
-  /**
    * Set the URL parameters to match the UI controls. Don't set a parameter if
    * its control is set to its default value; delete unneeded time parameters.
    */
@@ -494,23 +485,17 @@ var SearchBar = function (options) {
       AppUtil.deleteParam('endtime');
       AppUtil.deleteParam('starttime');
     }
-
   };
 
   /**
-   * Set the range slider's current value.
-   *
-   * @param input {Element}
+   * Event handler that sets a selected region's custom options.
    */
-  _setSlider = function (input) {
-    var output = input.nextElementSibling,
-        slider = input.parentNode,
-        value = Number(input.value);
-
-    output.value = value;
-    slider.style.setProperty('--val', value);
-
-    _app.setSliderStyles(input);
+  _setRegion = function () {
+    if (this.id === 'customRegion') {
+      _this.render();
+    } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
+      _cancelRegion();
+    }
   };
 
   /**
@@ -617,9 +602,9 @@ var SearchBar = function (options) {
     var bounds,
         minus = {},
         params = {
-          minmagnitude: Number(document.getElementById('minmagnitude').value),
-          period: _el.querySelector('ul.period .selected').id,
-          region: _el.querySelector('ul.region .selected').id
+          minmagnitude: Number(_minmagnitude.value),
+          period: _el.querySelector('#period .selected').id,
+          region: _el.querySelector('#region .selected').id
         };
 
     // Begin, end times
@@ -664,8 +649,10 @@ var SearchBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _setOption.call(_period);
-    _setOption.call(_region);
+    _periodBar.setOption.call(_period);
+    _regionBar.setOption.call(_region);
+
+    _setRegion.call(_region);
   };
 
   /**
@@ -699,10 +686,7 @@ var SearchBar = function (options) {
   _this.setButton = function () {
     var customPeriod = document.getElementById('customPeriod')
           .classList.contains('selected'),
-        inputs = [
-          document.getElementById('endtime'),
-          document.getElementById('starttime')
-        ],
+        inputs = [_endtime, _starttime],
         params = {
           controls: _this.getParams(),
           search: _app.Features.getFeature('search').params

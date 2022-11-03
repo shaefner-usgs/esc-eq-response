@@ -1,7 +1,8 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
+var AppUtil = require('util/AppUtil'),
+    RadioBar = require('util/RadioBar');
 
 
 var _SETTINGS = { // defaults
@@ -38,9 +39,11 @@ var SettingsBar = function (options) {
       _initialize,
 
       _app,
+      _catalogBar,
       _el,
       _focusedField,
       _throttlers,
+      _timezoneBar,
 
       _addFeatures,
       _addListeners,
@@ -51,7 +54,6 @@ var SettingsBar = function (options) {
       _refreshFeature,
       _setCatalog,
       _setField,
-      _setOption,
       _setParam,
       _setTimeZone,
       _update;
@@ -61,8 +63,14 @@ var SettingsBar = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
+    _catalogBar = RadioBar({
+      el: document.getElementById('catalog')
+    });
     _el = options.el;
     _throttlers = {};
+    _timezoneBar = RadioBar({
+      el: document.getElementById('timezone')
+    });
 
     _addListeners();
     _addOffset();
@@ -91,19 +99,19 @@ var SettingsBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var inputs = _el.querySelectorAll('input'),
-        options = _el.querySelectorAll('.catalog li, .timezone li');
+    var catalog = _el.querySelectorAll('#catalog li'),
+        inputs = _el.querySelectorAll('input'),
+        timezone = _el.querySelectorAll('#timezone li');
+
+    // Set the catalog and timezone options
+    catalog.forEach(button => button.addEventListener('click', _setCatalog));
+    timezone.forEach(button => button.addEventListener('click', _setTimeZone));
 
     // Track changes to input fields
     inputs.forEach(input => {
       input.addEventListener('focus', _setField);
       input.addEventListener('input', _update);
     });
-
-    // Set the selected catalog or timezone 'radio-bar' option
-    options.forEach(option =>
-      option.addEventListener('click', _setOption)
-    );
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
     window.addEventListener('pageshow', () => {
@@ -186,7 +194,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the initially selected catalog and timezone 'radio-bar' buttons.
+   * Set the initially selected catalog and timezone RadioBar buttons.
    */
   _initButtons = function () {
     var catalog = AppUtil.getParam('catalog') || _SETTINGS['catalog'],
@@ -229,38 +237,42 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the source data to the given catalog for the Mainshock, Aftershocks,
-   * Foreshocks, and Historical Seismicity Features.
-   *
-   * @param catalog {String <comcat|dd>}
+   * Event handler that sets the earthquake catalog option.
    */
-  _setCatalog = function (catalog) {
-    var catalogs = ['comcat', 'dd'],
-        mainshock = _app.Features.getFeature('mainshock'),
-        pane = _app.Pane.getSelected(),
-        prevCatalog = catalogs.filter(item => item !== catalog)[0],
-        prevFeatures = _app.Features.getFeatures(prevCatalog),
-        status = _app.Features.getStatus(catalog);
+  _setCatalog = function () {
+    var catalogs, mainshock, pane, prevCatalog, prevFeatures, status,
+        catalog = this.id;
 
-    mainshock.update(catalog);
-    mainshock.disableDownload();
+    _setParam('catalog', catalog);
 
-    // Remove previous catalog's Features
-    Object.keys(prevFeatures).forEach(id => {
-      _app.Features.removeFeature(prevFeatures[id], false);
-    });
+    if (document.body.classList.contains('mainshock')) {
+      catalogs = _catalogBar.getIds(),
+      mainshock = _app.Features.getFeature('mainshock'),
+      pane = _app.Pane.getSelected(),
+      prevCatalog = catalogs.filter(item => item !== catalog)[0],
+      prevFeatures = _app.Features.getFeatures(prevCatalog),
+      status = _app.Features.getStatus(catalog);
 
-    if (status === 'ready') { // re-add selected catalog's Features
-      _addFeatures(catalog);
-    } else { // create (and add) new catalog's Features
-      _app.Features.createFeatures(catalog);
+      mainshock.update(catalog);
+      mainshock.disableDownload();
+
+      // Remove previous catalog's Features
+      Object.keys(prevFeatures).forEach(id => {
+        _app.Features.removeFeature(prevFeatures[id], false);
+      });
+
+      if (status === 'ready') { // re-add selected catalog's Features
+        _addFeatures(catalog);
+      } else { // create (and add) new catalog's Features
+        _app.Features.createFeatures(catalog);
+      }
+
+      if (pane !== 'mapPane') {
+        _app.Pane.setScrollPosition(pane);
+      }
+
+      _app.PlotsPane.rendered = false; // flag to (re-)render plots
     }
-
-    if (pane !== 'mapPane') {
-      _app.Pane.setScrollPosition(pane);
-    }
-
-    _app.PlotsPane.rendered = false; // flag to (re-)render plots
   };
 
   /**
@@ -280,36 +292,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Event handler that sets the selected option on a 'radio-bar'.
-   *
-   * @param e {Event}
-   */
-  _setOption = function (e) {
-    var tables,
-        ul = e.target.closest('ul'),
-        type = Array.from(ul.classList).find(className =>
-          className !== 'options'
-        ),
-        value = this.id;
-
-    if (!e.target.classList.contains('selected')) {
-      _app.setOption.call(this);
-      _setParam(type, value);
-
-      if (type === 'catalog') {
-        if (document.body.classList.contains('mainshock')) {
-          _setCatalog(value);
-        }
-      } else { // timezone
-        tables = document.querySelectorAll('#summaryPane table.list.sortable');
-
-        _setTimeZone(value);
-        _app.SummaryPane.swapSortIndicator(tables);
-      }
-    }
-  };
-
-  /**
    * Set (or delete) the given URL parameter, depending on whether or not the
    * given value is the default.
    *
@@ -317,7 +299,7 @@ var SettingsBar = function (options) {
    * @param value {String}
    */
   _setParam = function (name, value) {
-    if (value === _SETTINGS[name]) {
+    if (value === _SETTINGS[name]) { // default
       AppUtil.deleteParam(name, value);
     } else {
       AppUtil.setParam(name, value);
@@ -325,21 +307,23 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the data displayed to the given timezone.
-   *
-   * @param timezone {String <user|utc>}
+   * Event handler that sets the timezone option.
    */
-  _setTimeZone = function (timezone) {
-    var tzs = ['user', 'utc'];
+  _setTimeZone = function () {
+    var tables,
+        timezone = this.id,
+        tzs = _timezoneBar.getIds();
 
-    tzs.forEach(tz => {
-      document.body.classList.remove(tz);
-    });
+    tzs.forEach(tz => document.body.classList.remove(tz));
 
     document.body.classList.add(timezone);
+    _setParam('timezone', timezone);
 
     if (document.body.classList.contains('mainshock')) {
+      tables = document.querySelectorAll('#summaryPane table.list.sortable');
+
       _app.PlotsPane.update();
+      _app.SummaryPane.swapSortIndicator(tables);
     }
   };
 

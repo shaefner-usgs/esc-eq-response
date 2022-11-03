@@ -202,7 +202,7 @@ var SummaryPane = function (options) {
   _this.swapSortIndicator = function (tables) {
     var indicator, sortDown, sortUp, thHidden, thVisible,
         fields = ['userTime', 'utcTime'],
-        visibleField = document.querySelector('ul.timezone .selected').id + 'Time';
+        visibleField = document.querySelector('#timezone .selected').id + 'Time';
 
     tables.forEach(table => {
       fields.forEach(field => {

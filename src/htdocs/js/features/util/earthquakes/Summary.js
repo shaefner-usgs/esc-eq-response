@@ -4,6 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon'),
+    Slider = require('util/Slider'),
     Tablesort = require('tablesort');
 
 
@@ -41,9 +42,9 @@ var Summary = function (options) {
       _data,
       _el,
       _featureId,
+      _magThreshold,
       _maxNumEqs,
       _params,
-      _props,
       _slider,
       _tables,
 
@@ -55,6 +56,7 @@ var Summary = function (options) {
       _getBinnedTable,
       _getListTable,
       _getSlider,
+      _getSubHeader,
       _getTemplate,
       _getThreshold,
       _hideMenu,
@@ -78,7 +80,6 @@ var Summary = function (options) {
     _featureId = options.featureId;
     _maxNumEqs = options.maxNumEqs;
     _params = options.earthquakes.params;
-    _props = {};
 
     _createBins(); // creates, populates _this.bins
   };
@@ -132,7 +133,7 @@ var Summary = function (options) {
       }
     }
 
-    // Total number of eqs by mag, inclusive (for range slider)
+    // Total number of eqs by mag, inclusive (for range Slider)
     if (type !== 'past') { // don't calculate totals 2x for Aftershocks
       for (var i = magInt; i >= 0; i --) {
         _this.bins.mag[i] ++;
@@ -145,16 +146,21 @@ var Summary = function (options) {
    * earthquake list table's interactive components (filtering and sorting).
    *
    * @param table {Element}
+   * @param container {Element}
    */
-  _configTable = function (table) {
-    var input = _el.querySelector(`.${_featureId} .slider input`);
-
+  _configTable = function (table, container) {
     _addTitles(table);
     _initSort(table);
     _app.SummaryPane.swapSortIndicator([table]);
 
-    if (input) {
-      _app.setSliderStyles(input); // set range slider to initial value
+    if (_slider) { // eq list filter
+      _slider.els = {
+        count: container.querySelector('h3 .count'),
+        mag: container.querySelector('h3 .mag'),
+        table: container.querySelector('.filter + .wrapper table')
+      };
+
+      _slider.setValue(); // set the range Slider to its initial value
     }
   };
 
@@ -199,30 +205,24 @@ var Summary = function (options) {
   };
 
   /**
-   * Event handler that filters an earthquake list by magnitude and displays the
-   * <input> range slider's current value.
+   * Filter an earthquake list by magnitude and display the range Slider's
+   * current value.
    */
   _filter = function () {
     var i,
+        els = _slider.els,
         feature = _app.Features.getFeature(this.id),
-        value = Number(this.value),
-        scrollY = window.pageYOffset;
+        value = Number(this.value);
 
-    _props.count.innerHTML = feature.bins.mag[value];
-    _props.mag.innerHTML = value;
-    _props.output.value = value;
-    _props.slider.style.setProperty('--val', value);
+    els.count.innerHTML = feature.bins.mag[value];
+    els.mag.innerHTML = value;
 
     for (i = value; i <= this.getAttribute('max'); i ++) {
-      _props.table.classList.add('m' + i); // show eqs at/above threshold
+      els.table.classList.add('m' + i); // show eqs at/above threshold
     }
     for (i = value; i >= this.getAttribute('min'); i --) {
-      _props.table.classList.remove('m' + (i - 1)); // hide eqs below threshold
+      els.table.classList.remove('m' + (i - 1)); // hide eqs below threshold
     }
-
-    // Prevent page scrolling and update slider track
-    window.scroll(0, scrollY);
-    _app.setSliderStyles(this);
   };
 
   /**
@@ -306,7 +306,7 @@ var Summary = function (options) {
           'userTime',
           'utcTime'
         ],
-        magThreshold = _getThreshold(),
+        magThreshold = _magThreshold, // default
         rows = '',
         sortByField = 'utcTime', // default
         tableClasses = ['list'],
@@ -390,48 +390,48 @@ var Summary = function (options) {
   };
 
   /**
-   * Get the HTML content for the magnitude range slider (filter) and/or its
-   * associated sub header.
+   * Get the HTML content for the magnitude range Slider (filter).
    *
    * @return html {String}
    */
   _getSlider = function () {
-    var magThreshold = _getThreshold(),
-        data = {
-          count: _this.bins.mag[magThreshold],
-          id: _featureId,
-          mag: magThreshold,
-          max: _this.bins.mag.length - 1,
-          min: Math.floor(_params.magnitude)
-        },
-        html = L.Util.template(
-          '<h3>' +
-            'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
-          '</h3>',
-          data
-        ),
+    var html = '',
         singleMagBin = _this.bins.mag.every(
           (value, i, array) => array[0] === value // all values are the same
         );
 
     if (!singleMagBin) {
-      html += L.Util.template(
-        '<div class="filter">' +
-          '<label for="{id}">Filter by magnitude</label>' +
-          '<div class="slider-container">' +
-            '<div class="min">{min}</div>' +
-            '<div class="slider inverted" style="--min:{min}; --max:{max}; --val:{mag};">' +
-              '<input id="{id}" type="range" min="{min}" max="{max}" value="{mag}">' +
-              '<output for="{id}">{mag}</output>' +
-            '</div>' +
-            '<div class="max">{max}</div>' +
-          '</div>' +
-        '</div>',
-        data
-      );
+      _slider = Slider({
+        filter: _filter,
+        id: _featureId,
+        label: 'Filter by magnitude',
+        max: _this.bins.mag.length - 1,
+        min: Math.floor(_params.magnitude),
+        val: _magThreshold
+      });
+      html += _slider.getHtml();
     }
 
     return html;
+  };
+
+  /**
+   * Get the HTML for the Earthquakes list sub-header.
+   *
+   * @return {String}
+   */
+  _getSubHeader = function () {
+    var data = {
+      count: _this.bins.mag[_magThreshold],
+      mag: _magThreshold,
+    };
+
+    return L.Util.template(
+      '<h3>' +
+        'M <span class="mag">{mag}</span>+ Earthquakes <span class="count">{count}</span>' +
+      '</h3>',
+      data
+    );
   };
 
   /**
@@ -677,20 +677,10 @@ var Summary = function (options) {
   _this.addListeners = function () {
     var container = _el.querySelector('.' + _featureId);
 
-    _slider = container.querySelector('.slider input'),
     _tables = container.querySelectorAll('table.list');
 
-    // Filter the earthquake list when the user interacts with the range slider
     if (_slider) {
-      _props = {
-        count: container.querySelector('h3 .count'),
-        mag: container.querySelector('h3 .mag'),
-        output: _slider.nextElementSibling,
-        slider: _slider.parentNode,
-        table: container.querySelector('div.filter + .wrapper .list')
-      };
-
-      _slider.addEventListener('input', _filter);
+      _slider.addListeners(container.querySelector('.slider-container'));
     }
 
     if (_tables) {
@@ -702,14 +692,12 @@ var Summary = function (options) {
           table.addEventListener('afterSort', _removeSortIndicator);
 
           // Show the sort menu on a responsive table
-          ths.forEach(th =>
-            th.addEventListener('click', _showMenu)
-          );
+          ths.forEach(th => th.addEventListener('click', _showMenu));
 
-          _configTable(table);
+          _configTable(table, container);
         }
 
-        // Show the map and open a popup when the user clicks on an earthquake
+        // Show the map and open a popup
         table.addEventListener('click', _openPopup);
         table.addEventListener('mouseover', _unselectRow);
       });
@@ -720,15 +708,19 @@ var Summary = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    if (_slider) {
+      _slider.destroy(); // also removes its listeners
+    }
+
     _initialize = null;
 
     _app = null;
     _data = null;
     _el = null;
     _featureId = null;
+    _magThreshold = null;
     _maxNumEqs = null;
     _params = null;
-    _props = null;
     _slider = null;
     _tables = null;
 
@@ -740,6 +732,7 @@ var Summary = function (options) {
     _getBinnedTable = null;
     _getListTable = null;
     _getSlider = null;
+    _getSubHeader = null;
     _getTemplate = null;
     _getThreshold = null;
     _hideMenu = null;
@@ -789,6 +782,8 @@ var Summary = function (options) {
     }
 
     if (count > 0) {
+      _magThreshold = _getThreshold();
+
       if (
         _featureId.includes('foreshocks') ||
         _featureId.includes('historical')
@@ -796,6 +791,7 @@ var Summary = function (options) {
         html += _getBinnedTable('prior');
       }
 
+      html += _getSubHeader();
       html += _getSlider();
       html += _getListTable();
     }
@@ -807,10 +803,6 @@ var Summary = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    if (_slider) {
-      _slider.removeEventListener('input', _filter);
-    }
-
     if (_tables) {
       _tables.forEach(table => {
         var ths = table.querySelectorAll('th');
