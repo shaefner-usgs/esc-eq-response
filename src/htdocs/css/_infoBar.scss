@@ -1,6 +1,10 @@
 @use 'variables' as *;
 
 #infoBar {
+  dl {
+    margin: 0 0 .75rem;
+  }
+
   ol,
   ul {
     list-style: none;
@@ -34,10 +38,5 @@
         width: 1.75rem;
       }
     }
-  }
-
-  .note {
-    margin-top: 2rem;
-    padding-top: .5rem !important;
   }
 }

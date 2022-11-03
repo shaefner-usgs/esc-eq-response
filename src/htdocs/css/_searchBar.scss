@@ -9,6 +9,10 @@
     display: none;
   }
 
+  p.note {
+    margin-top: 1.25rem;
+  }
+
   #endtime ~ .flatpickr-calendar {
     right: 0; // align end date calendar to right edge
   }
