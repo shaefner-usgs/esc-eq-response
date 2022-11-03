@@ -4,6 +4,10 @@
 
 #summaryPane {
   .forecast {
+    #timeframe {
+      margin-bottom: 1.5rem;
+    }
+
     .hide {
       display: none;
     }
@@ -109,10 +113,6 @@
       dd {
         max-width: 7rem;
       }
-    }
-
-    .timeframe {
-      margin-bottom: 1.5rem;
     }
   }
 }
