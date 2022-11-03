@@ -44,6 +44,10 @@
     display: none;
   }
 
+  ul.options {
+    margin-bottom: .25rem;
+  }
+
   .hide-link {
     color: $text-color;
     cursor: text;
