@@ -135,7 +135,7 @@ var Rtf = function (options) {
 
   /**
    * Filter out earthquakes below the current magnitude threshold setting of the
-   * Feature's range slider on the SummaryPane.
+   * Feature's range Slider on the SummaryPane.
    *
    * @param feature {Object}
    *

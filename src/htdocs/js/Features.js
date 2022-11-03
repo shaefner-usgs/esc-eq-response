@@ -415,7 +415,7 @@ var Features = function (options) {
 
   /**
    * Add the given Feature's content (i.e. the fetched data). Also render and
-   * add its event listeners, if applicable.
+   * add its event listeners and Lightbox, if applicable.
    *
    * Optionally create the RTF document when all of its Features are ready.
    *
