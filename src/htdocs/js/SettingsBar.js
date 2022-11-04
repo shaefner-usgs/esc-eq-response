@@ -55,6 +55,7 @@ var SettingsBar = function (options) {
       _setCatalog,
       _setField,
       _setParam,
+      _setStatus,
       _setTimeZone,
       _update;
 
@@ -74,6 +75,7 @@ var SettingsBar = function (options) {
 
     _addListeners();
     _addOffset();
+    _setStatus('disabled');
   };
 
   /**
@@ -307,6 +309,33 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Set the status of the <input> fields and required notice.
+   *
+   * @param status {String <enabled|disabled>}
+   */
+  _setStatus = function (status) {
+    var inputs = _el.querySelectorAll('input'),
+        required = _el.querySelector('.required'),
+        title = 'Disabled because no mainshock is selected';
+
+    inputs.forEach(input => {
+      if (status === 'enabled') {
+        input.removeAttribute('disabled');
+        input.removeAttribute('title');
+      } else {
+        input.setAttribute('disabled', 'disabled');
+        input.setAttribute('title', title);
+      }
+    });
+
+    if (status === 'enabled') {
+      required.classList.remove('hide');
+    } else {
+      required.classList.add('hide');
+    }
+  };
+
+  /**
    * Event handler that sets the timezone option.
    */
   _setTimeZone = function () {
@@ -369,6 +398,8 @@ var SettingsBar = function (options) {
     );
 
     _focusedField = null;
+
+    _setStatus('disabled');
   };
 
   /**
@@ -399,6 +430,8 @@ var SettingsBar = function (options) {
         }
       }
     });
+
+    _setStatus('enabled');
   };
 
 

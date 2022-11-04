@@ -35,9 +35,26 @@
   .required {
     color: $invalid-color;
     margin-bottom: 0;
+
+    &.hide {
+      display: none;
+    }
   }
 
   .timezone {
     margin-bottom: .5rem;
+  }
+}
+
+body:not(.mainshock) {
+  #settingsBar {
+    .aftershocks,
+    .foreshocks,
+    .historical {
+      h3,
+      label {
+        color: $text-color-lightest;
+      }
+    }
   }
 }
