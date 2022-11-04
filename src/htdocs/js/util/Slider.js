@@ -6,8 +6,8 @@
  * Create a new range Slider (or configure an existing one), which is a custom
  * UI component for setting an <input> value.
  *
- * Either supply a pre-existing Slider Element, or an id plus minimum, maximum,
- * and initial values (and optionally a filter and label).
+ * Either supply a pre-existing Slider Element, or an id plus the minimum,
+ * maximum, and initial values (and optionally a filter and label).
  *
  * @param options {Object}
  *     {
@@ -33,10 +33,8 @@ var Slider = function (options) {
       _initialize,
 
       _data,
+      _el,
       _filter,
-      _id,
-      _input,
-      _label,
       _output,
       _slider,
       _style,
@@ -49,16 +47,15 @@ var Slider = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    var el = options.el?.closest('.slider-container');
-
     _data = {
+      id: options.id,
+      label: options.label,
       max: options.max,
       min: options.min,
       val: options.val
     };
+    _el = options.el;
     _filter = options.filter;
-    _id = options.id;
-    _label = options.label;
     _style = document.getElementById('sliders');
 
     // Add a single <style> tag for all Sliders' styles
@@ -69,8 +66,8 @@ var Slider = function (options) {
       document.body.appendChild(_style);
     }
 
-    if (el) {
-      _this.addListeners(el);
+    if (_el) {
+      _this.addListeners();
     }
   };
 
@@ -80,11 +77,11 @@ var Slider = function (options) {
    * @return {String}
    */
   _getValue = function () {
-    var max = Number(_input.max),
-        min = Number(_input.min) || 0,
-        value = Number(_input.value);
+    var max = Number(_el.max),
+        min = Number(_el.min) || 0,
+        value = Number(_el.value);
 
-    if (max) {
+    if (max && value) {
       value = Math.floor(100 * (value - min) / (max - min));
     }
 
@@ -95,7 +92,7 @@ var Slider = function (options) {
    * Remove event listeners.
    */
   _removeListeners = function () {
-    _input.removeEventListener('input', _update);
+    _el.removeEventListener('input', _update);
   };
 
   /**
@@ -103,7 +100,7 @@ var Slider = function (options) {
    * displayed content.
    */
   _update = function () {
-    _this.setValue(this);
+    _this.setValue();
 
     if (_filter) {
       _filter.call(this);
@@ -119,15 +116,17 @@ var Slider = function (options) {
   /**
    * Add event listeners (and set dependent vars).
    *
-   * @param el {Element}
-   *     Slider's parent <div> container
+   * @param el {Element} optional; default is _el
+   *     Slider's <input>
    */
-  _this.addListeners = function (el) {
-    _input = el.querySelector('input');
-    _output = el.querySelector('output');
-    _slider = el.querySelector('.slider');
+  _this.addListeners = function (el = _el) {
+    var container = el.closest('.slider-container');
 
-    _input.addEventListener('input', _update);
+    _el = el; // in case it wasn't set in _initialize()
+    _output = container.querySelector('output');
+    _slider = container.querySelector('.slider');
+
+    _el.addEventListener('input', _update);
   };
 
   /**
@@ -139,10 +138,8 @@ var Slider = function (options) {
     _initialize = null;
 
     _data = null;
+    _el = null;
     _filter = null;
-    _id = null;
-    _input = null;
-    _label = null;
     _output = null;
     _slider = null;
     _style = null;
@@ -160,13 +157,7 @@ var Slider = function (options) {
    * @return {String}
    */
   _this.getHtml = function () {
-    var template,
-        data = Object.assign({}, _data, {
-          id: _id,
-          label: _label
-        });
-
-    template =
+    var template =
       '<div class="slider-container">' +
         '<div class="min">{min}</div>' +
         '<div class="slider inverted" style="--min:{min}; --max:{max}; --val:{val};">' +
@@ -184,7 +175,7 @@ var Slider = function (options) {
         '</div>';
     }
 
-    return L.Util.template(template, data);
+    return L.Util.template(template, _data);
   };
 
   /**
@@ -192,23 +183,23 @@ var Slider = function (options) {
    * Slider.
    */
   _this.setValue = function () {
-    var newRules = '',
-        oldRules = /`#${input.id}[^#]+`/g,
+    var newStyles = '',
+        oldStyles = /`#${input.id}[^#]+`/g,
         value = _getValue(),
         vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
     vendorAttrs.forEach(attr =>
-      newRules += `#${_input.id}::-${attr}-track {background-size:${value} !important}`
+      newStyles += `#${_el.id}::-${attr}-track {background-size:${value} !important}`
     );
 
-    _output.value = _input.value;
+    _output.value = _el.value;
 
-    // Remove the 'old' CSS rules from <style>, then add new ones
-    _style.textContent = _style.textContent.replace(oldRules, '');
-    _style.appendChild(document.createTextNode(newRules));
+    // Set the inline CSS styles in <style#sliders>
+    _style.textContent = _style.textContent.replace(oldStyles, '');
+    _style.appendChild(document.createTextNode(newStyles));
 
     // Set the style attribute on the control
-    _slider.style.setProperty('--val', _input.value);
+    _slider.style.setProperty('--val', _el.value);
   };
 
 
