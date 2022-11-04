@@ -121,7 +121,7 @@ var Mainshock = function (options) {
       props = data.products.dyfi[0].properties;
       data = Object.assign({}, _this.data, {
         maxmmi: props.maxmmi,
-        responses: props.numResp
+        responses: AppUtil.addCommas(props.numResp)
       });
       template = opts.img +
         '<div class="details">' +
@@ -527,7 +527,7 @@ var Mainshock = function (options) {
   _getUrl = function () {
     var eqid = AppUtil.getParam('eqid');
 
-    return `https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=${eqid}&format=geojson`;
+    return `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${eqid}.geojson`;
   };
 
   /**
