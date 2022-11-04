@@ -76,8 +76,8 @@ var Summary = function (options) {
 
     _app = options.app;
     _data = options.earthquakes.data;
-    _el = document.getElementById('summaryPane');
     _featureId = options.featureId;
+    _el = document.querySelector('#summaryPane .' + _featureId);
     _maxNumEqs = options.maxNumEqs;
     _params = options.earthquakes.params;
 
@@ -146,18 +146,17 @@ var Summary = function (options) {
    * earthquake list table's interactive components (filtering and sorting).
    *
    * @param table {Element}
-   * @param container {Element}
    */
-  _configTable = function (table, container) {
+  _configTable = function (table) {
     _addTitles(table);
     _initSort(table);
     _app.SummaryPane.swapSortIndicator([table]);
 
     if (_slider) { // eq list filter
       _slider.els = {
-        count: container.querySelector('h3 .count'),
-        mag: container.querySelector('h3 .mag'),
-        table: container.querySelector('.filter + .wrapper table')
+        count: _el.querySelector('h3 .count'),
+        mag: _el.querySelector('h3 .mag'),
+        table: _el.querySelector('.filter + .wrapper table')
       };
 
       _slider.setValue(); // set the range Slider to its initial value
@@ -657,10 +656,12 @@ var Summary = function (options) {
   };
 
   /**
-   * Event handler that turns off the 'selected' (previously clicked) row.
+   * Event handler that turns off the 'selected' (previously clicked) row in any
+   * Feature's table.
    */
   _unselectRow = function () {
-    var selected = _el.querySelector('tr.selected');
+    var container = _el.closest('.container'),
+        selected = container.querySelector('tr.selected');
 
     if (selected) {
       selected.classList.remove('selected');
@@ -675,12 +676,10 @@ var Summary = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var container = _el.querySelector('.' + _featureId);
-
-    _tables = container.querySelectorAll('table.list');
+    _tables = _el.querySelectorAll('table.list');
 
     if (_slider) {
-      _slider.addListeners(container.querySelector('.slider-container'));
+      _slider.addListeners(document.getElementById(_featureId));
     }
 
     if (_tables) {
@@ -694,7 +693,7 @@ var Summary = function (options) {
           // Show the sort menu on a responsive table
           ths.forEach(th => th.addEventListener('click', _showMenu));
 
-          _configTable(table, container);
+          _configTable(table);
         }
 
         // Show the map and open a popup
