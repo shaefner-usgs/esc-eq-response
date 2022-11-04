@@ -32,7 +32,8 @@ var SelectBar = function (options) {
       _addListeners,
       _createFeatures,
       _hardReset,
-      _isEqidValid;
+      _isEqidValid,
+      _setStatus;
 
 
   _this = {};
@@ -46,6 +47,7 @@ var SelectBar = function (options) {
     _eqid.value = AppUtil.getParam('eqid');
 
     _addListeners();
+    _setStatus();
   };
 
   /**
@@ -107,7 +109,7 @@ var SelectBar = function (options) {
 
     e.preventDefault();
 
-    this.classList.add('dim');
+    _setStatus('disabled');
     _app.reset();
     _app.NavBar.reset();
   };
@@ -127,6 +129,25 @@ var SelectBar = function (options) {
 
     return isValid;
   };
+
+  /**
+   * Set the status of the Reset button.
+   *
+   * @param status {String <enabled|disabled>}
+   */
+  _setStatus = function (status) {
+    var reset = document.getElementById('reset'),
+        title = 'Disabled because no mainshock is selected';
+
+    if (status === 'enabled') {
+      reset.removeAttribute('title');
+      reset.classList.remove('dim');
+    } else {
+      reset.setAttribute('title', title);
+      reset.classList.add('dim');
+    }
+  };
+
 
   // ----------------------------------------------------------
   // Public methods
@@ -160,14 +181,12 @@ var SelectBar = function (options) {
    * user; must be called manually if the <input> is changed programmatically.
    */
   _this.setMainshock = function () {
-    var reset = document.getElementById('reset');
-
     _app.reset();
 
     if (_eqid.value) {
       _app.StatusBar.removeItems();
       _createFeatures();
-      reset.classList.remove('dim');
+      _setStatus('enabled');
     }
   };
 
