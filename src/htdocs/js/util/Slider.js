@@ -68,6 +68,10 @@ var Slider = function (options) {
 
     if (_el) {
       _this.addListeners();
+
+      if (_el.value) {
+        _this.setValue();
+      }
     }
   };
 
