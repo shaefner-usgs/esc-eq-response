@@ -110,7 +110,7 @@ var PlotsPane = function (options) {
       ids.forEach(id => {
         if (feature.count > 0) {
           if (!(id === 'cumulative' && feature.count === 1)) {
-            params[id] = feature.plots.getParams(id);
+            params[id] = feature.plots.getParams(id); // adds headers, containers
           }
         }
       });
