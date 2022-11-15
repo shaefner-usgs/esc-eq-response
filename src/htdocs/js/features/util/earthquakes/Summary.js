@@ -205,7 +205,7 @@ var Summary = function (options) {
 
   /**
    * Filter an earthquake list by magnitude and display the range Slider's
-   * current value.
+   * current value and count in the header.
    */
   _filter = function () {
     var i,
