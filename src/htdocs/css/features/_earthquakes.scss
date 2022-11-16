@@ -1,5 +1,25 @@
 @use '../variables' as *;
 
+#plotsPane,
+#summaryPane {
+  .filter {
+    align-items: center;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    margin-top: -.5rem;
+
+    label {
+      color: $text-color-lighter;
+      margin-left: 1rem;
+    }
+  }
+}
+#plotsPane .filter {
+  justify-content: center;
+  margin-top: -1.5rem;
+}
+
 #summaryPane {
   h3 {
     .mag {
@@ -79,19 +99,6 @@
       &:last-child {
         margin-right: 0;
       }
-    }
-  }
-
-  .filter {
-    align-items: center;
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    margin-top: -.5rem;
-
-    label {
-      color: $text-color-lighter;
-      margin-left: 1rem;
     }
   }
 

@@ -2,7 +2,8 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
+var AppUtil = require('util/AppUtil'),
+    Slider = require('util/Slider');
 
 
 /**
@@ -33,17 +34,21 @@ var Plots = function (options) {
       _data,
       _featureId,
       _mainshock,
+      _slider,
       _zRatio,
 
       _addContainer,
       _addMainshock,
+      _filter,
       _formatData,
       _getConfig,
       _getData,
       _getLayout,
       _getRatio,
+      _getSlider,
       _getTraceData,
-      _openPopup;
+      _openPopup,
+      _update;
 
 
   _this = {};
@@ -56,8 +61,8 @@ var Plots = function (options) {
   };
 
   /**
-   * Add the given plot type's container and name to the DOM, if it does not
-   * already exist.
+   * Add the given plot type's container, header, and filter (3d plots only) to
+   * the DOM, if they don't already exist.
    *
    * @param id {String <cumulative|hypocenters|magtime>}
    *
@@ -71,12 +76,15 @@ var Plots = function (options) {
 
     if (!container) {
       container = document.createElement('div');
-      h3 = document.createElement('h3');
-      h3.innerHTML = _app.PlotsPane.names[id];
+      h3 = `<h3>${_app.PlotsPane.names[id]}</h3>`;
 
-      container.classList.add(id);
-      parent.appendChild(h3);
       parent.appendChild(container);
+      container.classList.add(id);
+      container.insertAdjacentHTML('beforebegin', h3);
+
+      if (id === 'hypocenters') {
+        container.insertAdjacentHTML('afterend', _getSlider());
+      }
     }
 
     return container;
@@ -112,6 +120,35 @@ var Plots = function (options) {
       data.x.push(x);
       data.y.push(data.y.length + 1);
     }
+  };
+
+  /**
+   * Filter the Hypocenters data by depth.
+   */
+  _filter = function () {
+    var params = _this.getParams('hypocenters'),
+        data = params.data.filter(trace => trace.featureId === _featureId)[0],
+        depth = this.value, // Slider's current depth value
+        filtered = {},
+        keep = [];
+
+    data.z.filter((value, index) => {
+      if (value > depth) {
+        keep.push(index); // array indices of values to keep
+      }
+    });
+
+    ['eqid', 'text', 'x', 'y', 'z'].forEach(key => {
+      filtered[key] = [];
+
+      keep.forEach(index => {
+        filtered[key].push(data[key][index]);
+      });
+
+      data[key] = filtered[key];
+    });
+
+    _update(data);
   };
 
   /**
@@ -352,6 +389,33 @@ var Plots = function (options) {
   };
 
   /**
+   * Get the HTML content for the depth range Slider (filter).
+   *
+   * @return html {String}
+   */
+  _getSlider = function () {
+    var depths = _data.depth,
+        extent = AppUtil.extent(depths),
+        html = '',
+        min = Math.floor(extent[0]);
+
+    if (depths.length > 2) {
+      _slider = Slider({
+        filter: _filter,
+        id: _featureId + '-depth',
+        label: 'Filter by depth (km)',
+        max: Math.ceil(extent[1]),
+        min: min,
+        val: min
+      });
+
+      html = _slider.getHtml();
+    }
+
+    return html;
+  };
+
+  /**
    * Get the Plotly trace data for the given plot type.
    *
    * @param id {String <cumulative|hypocenters|magtime>}
@@ -449,6 +513,25 @@ var Plots = function (options) {
     _app.MapPane.openPopup(eqids[index], featureId);
   };
 
+  /**
+   * Update the Hypocenters plot with the given trace.
+   *
+   * @param trace {Object}
+   */
+  _update = function (trace) {
+    var params = _app.PlotsPane.params[_featureId].hypocenters;
+
+    Object.assign(params, {
+      data: [
+        trace,
+        _mainshock.plots.getTrace('hypocenters')
+      ],
+      rendered: false
+    });
+
+    _app.PlotsPane.render();
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -459,6 +542,13 @@ var Plots = function (options) {
    * @param plot {Element}
    */
   _this.addListeners = function (plot) {
+    var input = document.getElementById(`${_featureId}-depth`);
+
+    if (input) {
+      _slider.addListeners(input);
+      _slider.setValue(); // also set the initial state
+    }
+
     plot.on('plotly_click', _openPopup);
   };
 
@@ -466,23 +556,31 @@ var Plots = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    if (_slider) {
+      _slider.destroy(); // also removes its listeners
+    }
+
     _initialize = null;
 
     _app = null;
     _data = null;
     _featureId = null;
     _mainshock = null;
+    _slider = null;
     _zRatio = null;
 
     _addContainer = null;
     _addMainshock = null;
+    _filter = null;
     _formatData = null;
     _getConfig = null;
     _getData = null;
     _getLayout = null;
     _getRatio = null;
+    _getSlider = null;
     _getTraceData = null;
     _openPopup = null;
+    _update = null;
 
     _this = null;
   };
