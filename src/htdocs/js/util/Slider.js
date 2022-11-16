@@ -96,7 +96,9 @@ var Slider = function (options) {
    * Remove event listeners.
    */
   _removeListeners = function () {
-    _el.removeEventListener('input', _update);
+    if (_el) {
+      _el.removeEventListener('input', _update);
+    }
   };
 
   /**
