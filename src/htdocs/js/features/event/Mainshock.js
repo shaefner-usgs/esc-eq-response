@@ -139,7 +139,7 @@ var Mainshock = function (options) {
         '</div>';
     } else { // ShakeMap
       template = opts.img +
-        '<div class="shakemap-info details">' +
+        '<div class="shakemap details">' +
           '<p>' +
             '<a href="{url}/shakemap" class="external" target="new">Full details and additional maps' +
               '<i class="icon-link"></i>' +

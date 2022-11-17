@@ -213,7 +213,7 @@ var Rtf = function (options) {
         pagerExposures = _app.Features.getFeature('pager-exposures'),
         products = _getProducts(mainshock.data.products),
         shakeAlert = _app.Features.getFeature('shake-alert'),
-        shakemapInfo = _app.Features.getFeature('shakemap-info'),
+        shakemap = _app.Features.getFeature('shakemap'),
         zone = AppUtil.getParam('timezone') || 'utc';
 
     data = {
@@ -261,7 +261,7 @@ var Rtf = function (options) {
       plotNames: _app.PlotsPane.names,
       shakeAlert: shakeAlert.data,
       shakemap: products.shakemap,
-      shakemapInfo: shakemapInfo.data,
+      shakemapData: shakemap.data,
       tectonic: products.tectonic,
       time: {
         local: mainshock.data.localTime,

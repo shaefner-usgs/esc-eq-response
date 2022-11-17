@@ -673,7 +673,7 @@ class Rtf {
       );
     }
 
-    $smInfo = $this->_data->shakemapInfo;
+    $smInfo = $this->_data->shakemapData;
 
     $section5->writeText(
       'Max MMI: ' . strip_tags($smInfo->mmi),

@@ -6,7 +6,7 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the ShakeMap Info Feature.
+ * Create the ShakeMap Feature.
  *
  * @param options {Object}
  *     {
@@ -24,7 +24,7 @@ var AppUtil = require('util/AppUtil');
  *       url: {String}
  *     }
  */
-var ShakeMapInfo = function (options) {
+var ShakeMap = function (options) {
   var _this,
       _initialize,
 
@@ -42,9 +42,9 @@ var ShakeMapInfo = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
-    _this.id = 'shakemap-info';
+    _this.id = 'shakemap';
     _this.lightbox = '';
-    _this.name = 'ShakeMap Info';
+    _this.name = 'ShakeMap';
     _this.url = _getUrl();
 
     _fetch();
@@ -264,4 +264,4 @@ var ShakeMapInfo = function (options) {
 };
 
 
-module.exports = ShakeMapInfo;
+module.exports = ShakeMap;
