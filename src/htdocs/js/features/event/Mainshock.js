@@ -290,10 +290,10 @@ var Mainshock = function (options) {
       shakemapImg: shakemapImg || '',
       tectonic: tectonic || '',
       userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
-      userDayofweek: datetime.toLocal().toFormat(format),
+      userDayofWeek: datetime.toLocal().toFormat(format),
       userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      utcDayofweek: datetime.toFormat(format),
+      utcDayofWeek: datetime.toFormat(format),
       utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
     });
   };
@@ -431,7 +431,7 @@ var Mainshock = function (options) {
           '<li class="utc date">' +
             '<strong>Date</strong>' +
             '<span>{utcDate}</span>' +
-            '<small>{utcDayofweek}</small>' +
+            '<small>{utcDayofWeek}</small>' +
           '</li>' +
           '<li class="utc time">' +
             '<strong>Time</strong>' +
@@ -441,7 +441,7 @@ var Mainshock = function (options) {
           '<li class="user date">' +
             '<strong>Date</strong>' +
             '<span>{userDate}</span>' +
-            '<small>{userDayofweek}</small>' +
+            '<small>{userDayofWeek}</small>' +
           '</li>' +
           '<li class="user time">' +
             '<strong>Time</strong>' +
