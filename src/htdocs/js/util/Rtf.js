@@ -228,6 +228,10 @@ var Rtf = function (options) {
         plots: _plots.aftershocks
       },
       beachballs: _getBeachBalls(),
+      day: {
+        user: mainshock.data.userDayofweek,
+        utc: mainshock.data.utcDayofweek
+      },
       depthDisplay: mainshock.data.depthDisplay,
       dyfi: products.dyfi,
       eqid: mainshock.data.id,

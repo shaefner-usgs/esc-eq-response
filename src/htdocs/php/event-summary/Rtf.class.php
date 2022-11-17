@@ -123,6 +123,31 @@ class Rtf {
   }
 
   /**
+   * Get the Mainshock's date and time formatted for display.
+   *
+   * @return $datetime {String}
+   */
+  private function _getDateTime() {
+    $day = $this->_data->day;
+    $time = $this->_data->time;
+    $datetime = join(' ', [
+      substr($day->utc, 0, 3),
+      strip_tags($time->utc),
+      '<br>'
+    ]);
+    $datetime .= join(' ', [
+      substr($day->user, 0, 3),
+      strip_tags($time->user)
+    ]);
+
+    if ($time->local) {
+      $datetime .= '<br>' . strip_tags($time->local);
+    }
+
+    return $datetime;
+  }
+
+  /**
    * Get the field names for the earthquake list tables.
    *
    * @return $fields {Array}
@@ -276,14 +301,8 @@ class Rtf {
    * Section 1: Basic earthquake details.
    */
   private function _createSection1() {
-    $section1 = $this->_rtf->addSection();
-
-    $time = $this->_data->time;
-    $datetime = strip_tags($time->utc) . '<br>' . strip_tags($time->user);
-    if ($time->local) {
-      $datetime .= '<br>' . strip_tags($time->local);
-    }
     $nearbyCitiesList = '';
+    $section1 = $this->_rtf->addSection();
 
     foreach ($this->_data->nearbyCities as $city) {
       $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
@@ -308,7 +327,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $datetime,
+      $this->_getDateTime(),
       $this->_font->body,
       $this->_format->body
     );
@@ -590,9 +609,8 @@ class Rtf {
    * Section 4: Mechanism and Fault.
    */
   private function _createSection4() {
-    $section4 = $this->_rtf->addSection();
-
     $beachballs = $this->_data->beachballs;
+    $section4 = $this->_rtf->addSection();
 
     $section4->writeText(
       'Mechanism and Fault',
