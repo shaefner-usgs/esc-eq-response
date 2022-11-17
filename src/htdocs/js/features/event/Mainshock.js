@@ -5,7 +5,7 @@
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
     LatLon = require('util/LatLon'),
-    Lightbox = require('util/Lightbox'),
+    Lightbox = require('util/ui/Lightbox'),
     Luxon = require('luxon'),
     Plots = require('features/util/earthquakes/Plots');
 

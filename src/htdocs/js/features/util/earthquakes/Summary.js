@@ -4,7 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon'),
-    Slider = require('util/Slider'),
+    Slider = require('util/ui/Slider'),
     Tablesort = require('tablesort');
 
 

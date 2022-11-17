@@ -2,7 +2,7 @@
 
 
 var BeachBalls = require('features/util/beachballs/BeachBalls'),
-    Lightbox = require('util/Lightbox');
+    Lightbox = require('util/ui/Lightbox');
 
 
 /**
