@@ -116,3 +116,11 @@
     }
   }
 }
+
+/* Toggle between user/UTC time
+--------------------------------------------- */
+
+body.user .forecast time.utc,
+body.utc .forecast time.user {
+  display: none;
+}

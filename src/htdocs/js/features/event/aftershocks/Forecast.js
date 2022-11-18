@@ -239,29 +239,34 @@ var Forecast = function (options) {
    * @return html {String}
    */
   _getSummary = function (json) {
-    var data, timeStart,
+    var data, datetime, format,
         html = '',
         probabilities = _getProbabilities(json);
 
     if (probabilities) {
       _radioBar = RadioBar(_radioBarOpts);
-      timeStart = Luxon.DateTime.fromMillis(json.forecast[0].timeStart).toUTC()
-        .toFormat("ccc, LLL d, yyyy 'at' T"); // eslint-disable-line
+      datetime = Luxon.DateTime.fromMillis(json.forecast[0].timeStart).toUTC();
+      format = "ccc, LLL d, yyyy 'at' T"; // eslint-disable-line
 
       data = {
+        isoTime: datetime.toISO(),
         model: json.model.name,
         name: _this.name,
         parameters: _getParameters(json),
         probabilities: probabilities,
         radioBar: _radioBar.getHtml(),
-        timeStart: timeStart
+        userTime: datetime.toLocal().toFormat(format),
+        utcOffset: _app.utcOffset,
+        utcTime: datetime.toFormat(format)
       };
 
       html = L.Util.template(
         '<h3>{name}</h3>' +
         '<p>Probability of one or more aftershocks in the specified time ' +
-          'frame and magnitude range starting on {timeStart} UTC. The ' +
-          'likely number of aftershocks (95% confidence range) is listed  ' +
+          'frame and magnitude range starting on ' +
+          '<time datetime="{isoTime}" class="user">{userTime} ({utcOffset})</time> ' +
+          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>. ' +
+          'The likely number of aftershocks (95% confidence range) is listed ' +
           'below the probability.</p>' +
         '{radioBar}' +
         '{probabilities}' +
