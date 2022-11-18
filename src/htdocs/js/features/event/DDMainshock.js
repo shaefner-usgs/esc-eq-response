@@ -25,7 +25,7 @@ var AppUtil = require('util/AppUtil'),
  *       url: {String}
  *     }
  */
-var Mainshock = function (options) {
+var DdMainshock = function (options) {
   var _this,
       _initialize,
 
@@ -170,4 +170,4 @@ var Mainshock = function (options) {
 };
 
 
-module.exports = Mainshock;
+module.exports = DdMainshock;

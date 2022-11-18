@@ -4,7 +4,7 @@
 var Aftershocks = require('features/event/Aftershocks'),
     AppUtil = require('util/AppUtil'),
     CatalogSearch = require('features/base/CatalogSearch'),
-    DDMainshock = require('features/event/DDMainshock'),
+    DdMainshock = require('features/event/DdMainshock'),
     FieldNotes = require('features/event/FieldNotes'),
     FocalMechanism = require('features/event/mainshock/FocalMechanism'),
     Forecast = require('features/event/aftershocks/Forecast'),
@@ -49,7 +49,7 @@ _MODULES = {
     Historical
   ],
   dd: [ // 'event' Features added when Double-difference catalog is selected
-    DDMainshock, // must be first
+    DdMainshock, // must be first
     Aftershocks,
     Foreshocks,
     Historical
