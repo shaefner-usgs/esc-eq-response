@@ -43,18 +43,18 @@ _MODULES = {
     CatalogSearch,
     SignificantEqs
   ],
-  comcat: [ // Features added when the ComCat catalog option is selected
+  comcat: [ // 'event' Features added when ComCat catalog is selected
     Aftershocks,
     Foreshocks,
     Historical
   ],
-  dd: [ // Features added when the double-difference catalog option is selected
+  dd: [ // 'event' Features added when Double-difference catalog is selected
     DDMainshock, // must be first
     Aftershocks,
     Foreshocks,
     Historical
   ],
-  mainshock: [ // Features added when a new Mainshock is selected
+  event: [ // Features added when a new Mainshock (event) is selected
     Mainshock, // must be first
     FieldNotes,
     FocalMechanism,
@@ -217,7 +217,7 @@ var Features = function (options) {
    * Create a new Feature (when its dependencies are ready) using the given
    * module and then add it. Also store it in _features and store its module.
    *
-   * @param mode {String <base|comcat|dd|mainshock|rtf>}
+   * @param mode {String <base|comcat|dd|event|rtf>}
    * @param module {Object}
    *     Feature's module
    *
@@ -230,7 +230,7 @@ var Features = function (options) {
    *
    *       Auto-set props:
    *
-   *         mode: {String <base|comcat|dd|mainshock|rtf>} display mode
+   *         mode: {String <base|comcat|dd|event|rtf>} display mode
    *         status: {String} loading status
    *
    *       Common props:
@@ -297,7 +297,7 @@ var Features = function (options) {
    * @param id {String}
    *     Feature id
    *
-   * @return match {String <base|comcat|dd|mainshock|rtf>} default is ''
+   * @return match {String <base|comcat|dd|event|rtf>} default is ''
    */
   _getMode = function (id) {
     var match = ''; // default
@@ -327,18 +327,18 @@ var Features = function (options) {
       base: base || {},
       comcat: {},
       dd: {},
-      mainshock: {},
+      event: {},
       rtf: {}
     };
   };
 
   /**
    * Determine if a Feature with the given display mode is ready to be fetched.
-   * SignificantEqs must be fetched before the Mainshock and all 'mainshock',
+   * SignificantEqs must be fetched before the Mainshock and all 'event',
    * 'comcat', and 'dd' mode Features are dependent on their respective
    * Mainshocks being fetched first.
    *
-   * @param mode {String <base|comcat|dd|mainshock|rtf>}
+   * @param mode {String <base|comcat|dd|event|rtf>}
    *
    * @return {Boolean}
    */
@@ -357,7 +357,7 @@ var Features = function (options) {
         ) ||
         ddMainshock.status === 'ready' // then create the other dd Features
       ) ||
-      mode === 'mainshock' && (
+      mode === 'event' && (
         ( // first create the Mainshock (once SignificantEqs is ready)...
           significantEqs.status ===  'ready' &&
           !_this.isFeature(mainshock)
@@ -502,9 +502,9 @@ var Features = function (options) {
   /**
    * Wrapper method that creates all of the Features for the given display mode.
    *
-   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   * @param mode {String <base|comcat|dd|event|rtf>} default is 'event'
    */
-  _this.createFeatures = function (mode = 'mainshock') {
+  _this.createFeatures = function (mode = 'event') {
     var catalog = AppUtil.getParam('catalog') || 'comcat';
 
     _MODULES[mode].forEach(module => {
@@ -512,7 +512,7 @@ var Features = function (options) {
     });
 
     // Add the selected catalog-specific Features
-    if (mode === 'mainshock') {
+    if (mode === 'event') {
       _this.createFeatures(catalog);
     }
   };
@@ -539,12 +539,12 @@ var Features = function (options) {
   /**
    * Get all Features matching the given display mode, keyed by their id values.
    *
-   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   * @param mode {String <base|comcat|dd|event|rtf>} default is 'event'
    *
    * @return {Object}
    *     Features keyed by id
    */
-  _this.getFeatures = function (mode = 'mainshock') {
+  _this.getFeatures = function (mode = 'event') {
     return _features[mode] || {};
   };
 
@@ -583,16 +583,16 @@ var Features = function (options) {
    * Get the collective loading status (ready or not) of all Features for the
    * given display mode.
    *
-   * @param mode {String <base|comcat|dd|mainshock|rtf>} default is 'mainshock'
+   * @param mode {String <base|comcat|dd|event|rtf>} default is 'event'
    *
    * @return status {String <error|initialized|loading|ready>} default is ''
    */
-  _this.getStatus = function (mode = 'mainshock') {
+  _this.getStatus = function (mode = 'event') {
     var catalog = AppUtil.getParam('catalog') || 'comcat',
         count = Object.keys(_features[mode]).length,
         status = ''; // default
 
-    if (count === 1 && (mode === 'mainshock' || mode === 'dd')) {
+    if (count === 1 && (mode === 'event' || mode === 'dd')) {
       status = 'loading'; // only the Mainshock is ready
     } else if (count !== 0) {
       status = 'ready';
@@ -606,7 +606,7 @@ var Features = function (options) {
       });
 
       // Account for status of Mainshock's ComCat or double-difference Features
-      if (mode === 'mainshock' && status === 'ready') {
+      if (mode === 'event' && status === 'ready') {
         status = _this.getStatus(catalog);
       }
     }
@@ -649,7 +649,7 @@ var Features = function (options) {
         module = _modules[id],
         showLayer = feature.showLayer; // use cached value
 
-    if (feature.mode === 'mainshock') {
+    if (feature.mode === 'event') {
       _this.getFeature('mainshock').disableDownload();
     }
 

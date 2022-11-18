@@ -218,7 +218,7 @@ var MapPane = function (options) {
    */
   _setBounds = function (feature) {
     if (feature.id === 'mainshock') {
-      _this.initBounds('mainshock');
+      _this.initBounds('event');
     } else {
       _bounds.extend(feature.mapLayer.getBounds());
     }
@@ -263,7 +263,7 @@ var MapPane = function (options) {
       _this.setView(_getBounds(feature));
     }
     if (feature.zoomToLayer && (
-      feature.mode === 'mainshock' ||
+      feature.mode === 'event' ||
       feature.mode === 'comcat' ||
       feature.mode === 'dd'
     )) {
@@ -304,12 +304,12 @@ var MapPane = function (options) {
    * Initialize the map's bounds for the given display mode:
    *
    *   1. 'base': shows the current Catalog Search
-   *   2. 'mainshock': centered on the selected Mainshock
+   *   2. 'event': centered on the selected Mainshock
    *
    * Note: the temporary bounds used while a new Mainshock is still loading its
    * Features is set separately in _setBounds().
    *
-   * @param mode {String <base|mainshock>} default is 'base'
+   * @param mode {String <base|event>} default is 'base'
    */
   _this.initBounds = function (mode = 'base') {
     var mainshock;
@@ -319,7 +319,7 @@ var MapPane = function (options) {
       [60, -48]
     );
 
-    if (mode === 'mainshock') {
+    if (mode === 'event') {
       mainshock = _app.Features.getFeature('mainshock');
       _bounds = mainshock.data.latLng.toBounds(5000); // init val: 2.5km radius
     } else if (AppUtil.getParam('region')) {
