@@ -20,7 +20,7 @@ var Aftershocks = require('features/event/Aftershocks'),
     Rtf = require('util/Rtf'),
     ShakeAlert = require('features/rtf/ShakeAlert'),
     ShakeMap = require('features/event/mainshock/ShakeMap'),
-    ShakeMapStations = require('features/event/SMStations'),
+    ShakeMapStations = require('features/event/ShakeMapStations'),
     SignificantEqs = require('features/base/SignificantEqs');
 
 
