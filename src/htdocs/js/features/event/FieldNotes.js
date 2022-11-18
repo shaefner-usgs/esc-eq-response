@@ -59,7 +59,7 @@ var FieldNotes = function (options) {
       _onPopupOpen,
       _pointToLayer,
       _removeListeners,
-      _showPhoto,
+      _showLightbox,
       _toggleProps,
       _updatePopup;
 
@@ -110,7 +110,7 @@ var FieldNotes = function (options) {
         toggle = popup.querySelector('.toggle a');
 
     if (photo) {
-      photo.addEventListener('click', _showPhoto);
+      photo.addEventListener('click', _showLightbox);
     }
 
     if (toggle) {
@@ -274,7 +274,7 @@ var FieldNotes = function (options) {
         toggle = popup.querySelector('.toggle a');
 
     if (photo) {
-      photo.removeEventListener('click', _showPhoto);
+      photo.removeEventListener('click', _showLightbox);
     }
 
     if (toggle) {
@@ -287,7 +287,7 @@ var FieldNotes = function (options) {
    *
    * @param e {Event}
    */
-  _showPhoto = function (e) {
+  _showLightbox = function (e) {
     e.preventDefault();
 
     _lightbox.show();
@@ -390,7 +390,7 @@ var FieldNotes = function (options) {
     _onPopupOpen = null;
     _pointToLayer = null;
     _removeListeners = null;
-    _showPhoto = null;
+    _showLightbox = null;
     _toggleProps = null;
     _updatePopup = null;
 
