@@ -229,8 +229,8 @@ var Rtf = function (options) {
       },
       beachballs: _getBeachBalls(),
       day: {
-        user: mainshock.data.userDayofweek,
-        utc: mainshock.data.utcDayofweek
+        user: mainshock.data.utcDayofWeek,
+        utc: mainshock.data.utcDayofWeek
       },
       depthDisplay: mainshock.data.depthDisplay,
       dyfi: products.dyfi,
