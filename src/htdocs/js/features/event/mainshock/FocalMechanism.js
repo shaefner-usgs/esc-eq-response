@@ -18,6 +18,7 @@ var BeachBalls = require('features/util/beachballs/BeachBalls'),
  *       addListeners: {Function}
  *       destroy: {Function}
  *       id: {String}
+ *       lightbox: {Object}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
  *       removeListeners: {Function}
@@ -32,7 +33,6 @@ var FocalMechanism = function (options) {
   var _this,
       _initialize,
 
-      _mainshock,
       _beachballs,
 
       _addLightbox,
@@ -43,7 +43,8 @@ var FocalMechanism = function (options) {
 
   _initialize = function (options = {}) {
     var fm,
-        app = options.app;
+        app = options.app,
+        mainshock = app.Features.getFeature('mainshock');
 
     _this.addListeners = function () {};
     _this.id = 'focal-mechanism';
@@ -55,15 +56,15 @@ var FocalMechanism = function (options) {
     _this.summary = '';
     _this.zoomToLayer = false;
 
-    _mainshock = app.Features.getFeature('mainshock');
-    fm = _mainshock.data.products[_this.id];
+    fm = mainshock.data.products[_this.id];
 
     if (fm) {
       _beachballs = BeachBalls({
+        app: app,
         data: _getData(fm),
-        mainshock: _mainshock,
-        name: _this.name,
-        type: _this.id
+        id: _this.id,
+        mainshock: mainshock,
+        name: _this.name
       });
 
       _this.addListeners = _beachballs.addListeners;
@@ -81,13 +82,11 @@ var FocalMechanism = function (options) {
    * Add the Lightbox.
    */
   _addLightbox = function () {
-    var lightbox = Lightbox({
+    _this.lightbox = Lightbox({
       content: _beachballs.getContent(),
       id: _this.id,
       title: _beachballs.getTitle()
     });
-
-    _mainshock.lightboxes[_this.id] = lightbox; // add to Mainshock
   };
 
   /**
@@ -113,12 +112,12 @@ var FocalMechanism = function (options) {
   _this.destroy = function () {
     if (_beachballs) {
       _beachballs.destroy();
+      _this.lightbox.destroy();
     }
 
     _initialize = null;
 
     _beachballs = null;
-    _mainshock = null;
 
     _addLightbox = null;
     _getData = null;

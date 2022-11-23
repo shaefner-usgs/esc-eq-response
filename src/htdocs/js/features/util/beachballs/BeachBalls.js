@@ -18,8 +18,8 @@ _COLORS = {
   'moment-tensor': '#6ea8ff'
 };
 _DEFAULTS = {
-  name: 'Moment Tensor',
-  type: 'moment-tensor'
+  id: 'moment-tensor',
+  name: 'Moment Tensor'
 };
 _R2D = 180 / Math.PI;
 
@@ -29,10 +29,11 @@ _R2D = 180 / Math.PI;
  *
  * @param options {Object}
  *     {
+ *       app: {Object}
  *       data: {Object}
+ *       id: {String} optional
  *       mainshock: {Object}
  *       name: {String} optional
- *       type: {String} optional
  *     }
  *
  * @return _this {Object}
@@ -51,13 +52,14 @@ var BeachBalls = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _beachballs,
       _data,
       _els,
+      _id,
       _mainshock,
       _name,
       _tensor,
-      _type,
 
       _create,
       _getAxes,
@@ -73,18 +75,19 @@ var BeachBalls = function (options) {
   _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
 
+    _app = options.app;
     _data = options.data;
+    _id = options.id;
     _mainshock = options.mainshock;
     _name = options.name;
-    _type = options.type;
 
-    if (_type !== 'focal-mechanism') {
-      _type = _DEFAULTS.type;
+    if (_id !== 'focal-mechanism') {
+      _id = _DEFAULTS.id;
     }
 
     _tensor = Tensor.fromProduct(
       Object.assign({}, _data, {
-        type: _type
+        type: _id
       })
     );
   };
@@ -98,16 +101,16 @@ var BeachBalls = function (options) {
    */
   _create = function () {
     var options = {
-          className: _type,
-          fillColor: _COLORS[_type],
+          className: _id,
+          fillColor: _COLORS[_id],
           labelAxes: false,
           labelPlanes: false,
           tensor: _tensor
         },
         selectors = { // BeachBall containers
-          lightbox: `#${_type} .beachball`,
+          lightbox: `#${_id} .beachball`,
           marker: '#mapPane .container',
-          thumb: `#summaryPane div.${_type} a`
+          thumb: `#summaryPane div.${_id} a`
         };
 
     _beachballs = {
@@ -142,7 +145,7 @@ var BeachBalls = function (options) {
   _getAxes = function () {
     var template = '';
 
-    if (_type === 'moment-tensor') {
+    if (_id === 'moment-tensor') {
       template =
         '<h4>Principal Axes</h4>' +
         '<table class="axes">' +
@@ -270,7 +273,7 @@ var BeachBalls = function (options) {
   _getProps = function () {
     var template = '';
 
-    if (_type === 'moment-tensor') {
+    if (_id === 'moment-tensor') {
       template =
         '<dt>Moment</dt>' +
         '<dd>{moment}</dd>' +
@@ -341,9 +344,10 @@ var BeachBalls = function (options) {
    * @param e {Event}
    */
   _showLightbox = function (e) {
-    e.preventDefault();
+    var feature = _app.Features.getFeature(_id);
 
-    _mainshock.lightboxes[_type].show();
+    e.preventDefault();
+    feature.lightbox.show();
   };
 
   // ----------------------------------------------------------
@@ -355,8 +359,8 @@ var BeachBalls = function (options) {
    */
   _this.addListeners = function () {
     _els = [
-      document.querySelector(`#summaryPane div.${_type} > a`),
-      document.querySelector(`#mapPane canvas.${_type}`)
+      document.querySelector(`#summaryPane div.${_id} > a`),
+      document.querySelector(`#mapPane canvas.${_id}`)
     ];
 
     _els.forEach(el =>
@@ -370,13 +374,14 @@ var BeachBalls = function (options) {
   _this.destroy = function () {
     _initialize = null;
 
+    _app = null;
     _beachballs = null;
     _data = null;
     _els = null;
+    _id = null;
     _mainshock = null;
     _name = null;
     _tensor = null;
-    _type = null;
 
     _create = null;
     _getAxes = null;
@@ -409,10 +414,10 @@ var BeachBalls = function (options) {
   _this.getMapLayer = function () {
     return L.marker.canvas(_mainshock.data.latLng, {
       icon: L.divIcon({
-        className: _type,
+        className: _id,
         iconSize: L.point(40, 40)
       }),
-      pane: _type // controls stacking order
+      pane: _id // controls stacking order
     }).bindTooltip(_this.getTitle());
   };
 
@@ -423,7 +428,7 @@ var BeachBalls = function (options) {
    */
   _this.getSummary = function () {
     var eqid = AppUtil.getParam('eqid'),
-        url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/${_type}`;
+        url = `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/${_id}`;
 
     return `<h4>${_name}</h4><a href="${url}" target="new"></a>`;
   };
@@ -442,7 +447,7 @@ var BeachBalls = function (options) {
           MWR: 'Regional Moment Tensor (Mwr)'
         };
 
-    if (_type === 'focal-mechanism') {
+    if (_id === 'focal-mechanism') {
       title = 'Focal Mechanism';
     } else {
       type = (_tensor.type || '').toUpperCase();
