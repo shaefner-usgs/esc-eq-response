@@ -144,7 +144,7 @@ var Rtf = function (options) {
   _filter = function (feature) {
     var eqs = feature.data,
         params = _getParams(feature.id),
-        slider = document.querySelector('.' + feature.id + ' .filter output');
+        slider = document.querySelector(`#summaryPane .${feature.id} output`);
 
     _magThreshold = feature.params.magnitude; // default
 
