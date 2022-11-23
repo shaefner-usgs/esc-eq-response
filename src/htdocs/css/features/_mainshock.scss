@@ -231,7 +231,7 @@
   }
 }
 
-/* Lightboxes (and their thumbnail links)
+/* Colored borders around thumbnails (and their associated Lightbox images)
 --------------------------------------------- */
 
 #dyfi,
@@ -282,54 +282,7 @@
   }
 }
 
-#dyfi,
-#shakemap {
-  dl {
-    margin: 0;
-  }
-
-  img {
-    border: 3px solid;
-    border-radius: $content-border-radius;
-    margin: 0 1px .375rem 0; // 1px: fix border rendering issue when scrolled (webkit)
-    max-height: 650px;
-    max-width: 100%;
-  }
-
-  p {
-    margin: 1.5rem 0 0;
-  }
-
-  .content {
-    align-items: flex-start;
-    display: flex;
-    gap: 1.5rem;
-    position: relative;
-  }
-
-  .details {
-    position: sticky;
-    top: 4rem;
-  }
-
-  .props {
-    em {
-      font-size: .75rem;
-      font-style: normal;
-      padding-left: .25rem;
-    }
-
-    span {
-      color: $text-color-lighter;
-    }
-  }
-
-  .stations {
-    margin-top: .5rem;
-  }
-}
-
-/* Double-difference label (scope to body.mainshock so loader is not affected)
+/* Double-difference header (scoped to body.mainshock so loader not affected)
 --------------------------------------------- */
 
 body.mainshock #summaryPane .mainshock {
