@@ -314,12 +314,12 @@ var Rtf = function (options) {
     });
 
     // Weed out other (sorting algorithm) CSS classes
-    field = Array.from(el.classList).filter(className =>
+    field = Array.from(el.classList).find(className =>
       !regex2.test(className)
     );
 
     return {
-      field: field[0],
+      field: field,
       order: order
     };
   };

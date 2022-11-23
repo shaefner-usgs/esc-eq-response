@@ -252,7 +252,7 @@ var SettingsBar = function (options) {
       catalogs = _catalogBar.getIds(),
       mainshock = _app.Features.getFeature('mainshock'),
       pane = _app.Pane.getSelected(),
-      prevCatalog = catalogs.filter(item => item !== catalog)[0],
+      prevCatalog = catalogs.find(item => item !== catalog),
       prevFeatures = _app.Features.getFeatures(prevCatalog),
       status = _app.Features.getStatus(catalog);
 
@@ -362,10 +362,10 @@ var SettingsBar = function (options) {
    */
   _update = function () {
     var classList = Array.from(this.closest('div').classList),
-        id = classList.filter(className => !className.includes('dd-'))[0];
+        id = classList.find(className => !className.includes('dd-'));
 
     if (AppUtil.getParam('catalog') === 'dd') {
-      id = classList.filter(className => className.includes('dd-'))[0];
+      id = classList.find(className => className.includes('dd-'));
     }
 
     AppUtil.updateParam(this.id); // <input> id

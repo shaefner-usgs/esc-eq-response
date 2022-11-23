@@ -127,7 +127,7 @@ var Plots = function (options) {
    */
   _filter = function () {
     var params = _this.getParams('hypocenters'),
-        data = params.data.filter(trace => trace.featureId === _featureId)[0],
+        data = params.data.find(trace => trace.featureId === _featureId),
         depth = this.value, // Slider's current depth value
         filtered = {},
         keep = [];
