@@ -30,6 +30,7 @@ var _SETTINGS = { // defaults
  *     {
  *       postInit: {Function}
  *       reset: {Function}
+ *       resetCatalog: {Function}
  *       setFocusedField: {Function}
  *       setValues: {Function}
  *     }
@@ -400,6 +401,15 @@ var SettingsBar = function (options) {
     _focusedField = null;
 
     _setStatus('disabled');
+  };
+
+  /**
+   * Reset the Earthquake Catalog setting to ComCat (default).
+   */
+  _this.resetCatalog = function () {
+    var comcat = document.getElementById('comcat');
+
+    _catalogBar.setOption.call(comcat);
   };
 
   /**

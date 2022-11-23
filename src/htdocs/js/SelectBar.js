@@ -112,6 +112,7 @@ var SelectBar = function (options) {
     _setStatus('disabled');
     _app.reset();
     _app.NavBar.reset();
+    _app.SettingsBar.resetCatalog();
   };
 
   /**
