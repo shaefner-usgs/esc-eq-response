@@ -2,11 +2,13 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
+var AppUtil = require('util/AppUtil'),
+    Lightbox = require('util/ui/Lightbox'),
+    RadioBar = require('util/ui/RadioBar');
 
 
 /**
- * Create the ShakeMap Feature.
+ * Create the ShakeMap Feature, a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *     {
@@ -16,11 +18,12 @@ var AppUtil = require('util/AppUtil');
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       addListeners: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {String}
  *       name: {String}
+ *       removeListeners: {Function}
  *       url: {String}
  *     }
  */
@@ -29,25 +32,47 @@ var ShakeMap = function (options) {
       _initialize,
 
       _app,
+      _el,
+      _lightbox,
+      _mainshock,
+      _radioBar,
+      _selected,
 
+      _addLightbox,
       _fetch,
+      _getContent,
       _getData,
-      _getLightbox,
+      _getImages,
       _getProps,
-      _getUrl;
+      _getUrl,
+      _showLightbox;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
     _app = options.app;
+    _mainshock = _app.Features.getFeature('mainshock');
+    _selected = 'intensity';
 
     _this.id = 'shakemap';
-    _this.lightbox = '';
     _this.name = 'ShakeMap';
     _this.url = _getUrl();
 
     _fetch();
+  };
+
+  /**
+   * Add the Lightbox.
+   */
+  _addLightbox = function () {
+    _lightbox = Lightbox({
+      content: _getContent(),
+      id: _this.id,
+      title: _this.name
+    });
+
+    _radioBar.setOption.call(document.getElementById(_selected));
   };
 
   /**
@@ -63,6 +88,68 @@ var ShakeMap = function (options) {
   };
 
   /**
+   * Get the HTML content for the Lightbox.
+   *
+   * @return {String}
+   */
+  _getContent = function () {
+    var template,
+        data = Object.assign({}, _this.data, {
+          radioBar: ''
+        }),
+        images = _getImages(),
+        imgsHtml = '';
+
+    images.forEach(image => {
+      imgsHtml += `<img src="${image.url}" class="mmi{mmiValue} ${image.id} option" alt="ShakeMap ${image.name}">`;
+    });
+
+    if (images.length > 1) {
+      _radioBar = RadioBar({
+        id: 'shakemap-images',
+        items: images,
+        selected: _selected
+      });
+
+      data.radioBar = _radioBar.getHtml();
+    }
+
+    template =
+      '<div class="images">' +
+        '{radioBar}' +
+        imgsHtml +
+      '</div>' +
+      '<div class="details">' +
+        '<dl class="props alt">' +
+          '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+          '<dd>{mmi}</dd>' +
+          '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
+          '<dd>{pga}</dd>' +
+          '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
+          '<dd>{pgv}</dd>' +
+          '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA <em>(0.3s)</em></abbr></dt>' +
+          '<dd>{sa03}</dd>' +
+          '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA <em>(1.0s)</em></abbr></dt>' +
+          '<dd>{sa10}</dd>' +
+          '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA <em>(3.0s)</em></abbr></dt>' +
+          '<dd>{sa30}</dd>' +
+          '<dt class="stations">Seismic Stations</dt>' +
+          '<dd class="stations">{seismic}</dd>' +
+          '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
+          '<dd>{dyfi}</dd>' +
+        '</dl>' +
+        '<p>' +
+          '<a href="{url}/shakemap" class="external" target="new">' +
+            'Event Page ShakeMap' +
+            '<i class="icon-link"></i>' +
+          '</a>' +
+        '</p>' +
+      '</div>';
+
+    return L.Util.template(template, data);
+  };
+
+  /**
    * Get the data used to create the content.
    *
    * @param json {Object}
@@ -70,104 +157,123 @@ var ShakeMap = function (options) {
    * @return data {Object}
    */
   _getData = function (json) {
-    var data = { // defaults
+    var data = { // defaults, known values
           dyfi: '–',
+          img: _mainshock.data.shakemapImg,
           mmi: '–',
+          mmiValue: _mainshock.data.mmi,
           pga: '–',
           pgv: '–',
           sa03: '–',
           sa10: '–',
           sa30: '–',
-          seismic: '–'
+          seismic: '–',
+          url: _mainshock.data.url
         },
         info = json.input.event_information,
         props = _getProps(json.output.ground_motions);
 
-    if (props.mmi) {
-      data.mmi = AppUtil.round(props.mmi.max, 1);
-
-      if (props.mmi.bias) {
-        data.mmi += ` <span>(bias: ${AppUtil.round(props.mmi.bias, 2)})</span>`;
-      }
-    }
-
-    if (props.pga) {
-      data.pga = `${AppUtil.round(props.pga.max, 2)} ${props.pga.units}`;
-
-      if (props.pga.bias) {
-        data.pga += ` <span>(bias: ${AppUtil.round(props.pga.bias, 2)})</span>`;
-      }
-    }
-
-    if (props.pgv) {
-      data.pgv = `${AppUtil.round(props.pgv.max, 2)} ${props.pgv.units}`;
-
-      if (props.pgv.bias) {
-        data.pgv += ` <span>(bias: ${AppUtil.round(props.pgv.bias, 2)})</span>`;
-      }
-    }
-
-    if (props.sa03) {
-      data.sa03 = `${AppUtil.round(props.sa03.max, 2)} ${props.sa03.units}`;
-
-      if (props.sa03.bias) {
-        data.sa03 += ` <span>(bias: ${AppUtil.round(props.sa03.bias, 2)})</span>`;
-      }
-    }
-
-    if (props.sa10) {
-      data.sa10 = `${AppUtil.round(props.sa10.max, 2)} ${props.sa10.units}`;
-
-      if (props.sa10.bias) {
-        data.sa10 += ` <span>(bias: ${AppUtil.round(props.sa10.bias, 2)})</span>`;
-      }
-    }
-
-    if (props.sa30) {
-      data.sa30 = `${AppUtil.round(props.sa30.max, 2)} ${props.sa30.units}`;
-
-      if (props.sa30.bias) {
-        data.sa30 += ` <span>(bias: ${AppUtil.round(props.sa30.bias, 2)})</span>`;
-      }
+    if (info.intensity_observations) {
+      data.dyfi = info.intensity_observations;
     }
 
     if (info.seismic_stations) {
       data.seismic = info.seismic_stations;
     }
-    if (info.intensity_observations) {
-      data.dyfi = info.intensity_observations;
+
+    if (props.mmi) {
+      data.mmi = AppUtil.round(props.mmi.max, 1);
+
+      if (props.mmi.bias) {
+        data.mmi += ` <span>(bias: ${AppUtil.round(props.mmi.bias, 3)})</span>`;
+      }
+    }
+
+    if (props.pga) {
+      data.pga = `${AppUtil.round(props.pga.max, 3)} ${props.pga.units}`;
+
+      if (props.pga.bias) {
+        data.pga += ` <span>(bias: ${AppUtil.round(props.pga.bias, 3)})</span>`;
+      }
+    }
+
+    if (props.pgv) {
+      data.pgv = `${AppUtil.round(props.pgv.max, 3)} ${props.pgv.units}`;
+
+      if (props.pgv.bias) {
+        data.pgv += ` <span>(bias: ${AppUtil.round(props.pgv.bias, 3)})</span>`;
+      }
+    }
+
+    if (props.sa03) {
+      data.sa03 = `${AppUtil.round(props.sa03.max, 3)} ${props.sa03.units}`;
+
+      if (props.sa03.bias) {
+        data.sa03 += ` <span>(bias: ${AppUtil.round(props.sa03.bias, 3)})</span>`;
+      }
+    }
+
+    if (props.sa10) {
+      data.sa10 = `${AppUtil.round(props.sa10.max, 3)} ${props.sa10.units}`;
+
+      if (props.sa10.bias) {
+        data.sa10 += ` <span>(bias: ${AppUtil.round(props.sa10.bias, 3)})</span>`;
+      }
+    }
+
+    if (props.sa30) {
+      data.sa30 = `${AppUtil.round(props.sa30.max, 3)} ${props.sa30.units}`;
+
+      if (props.sa30.bias) {
+        data.sa30 += ` <span>(bias: ${AppUtil.round(props.sa30.bias, 3)})</span>`;
+      }
     }
 
     return data;
   };
 
   /**
-   * Get the Lightbox HTML content.
+   * Get the list of images.
    *
-   * @return {String}
+   * @return images {Array}
    */
-  _getLightbox = function () {
-    var template =
-      '<dl class="props alt">' +
-        '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-        '<dd>{mmi}</dd>' +
-        '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
-        '<dd>{pga}</dd>' +
-        '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
-        '<dd>{pgv}</dd>' +
-        '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA<em>(0.3s)</em></abbr></dt>' +
-        '<dd>{sa03}</dd>' +
-        '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA<em>(1.0s)</em></abbr></dt>' +
-        '<dd>{sa10}</dd>' +
-        '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA<em>(3.0s)</em></abbr></dt>' +
-        '<dd>{sa30}</dd>' +
-        '<dt class="stations">Seismic Stations</dt>' +
-        '<dd class="stations">{seismic}</dd>' +
-        '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
-        '<dd>{dyfi}</dd>' +
-      '</dl>';
+  _getImages = function () {
+    var filenames = [
+          'pga.jpg',
+          'pgv.jpg',
+          'psa0p3.jpg',
+          'psa1p0.jpg',
+          'psa3p0.jpg'
+        ],
+        images = [{ // default image
+          id: 'intensity',
+          name: 'Intensity',
+          url: _mainshock.data.shakemapImg
+        }],
+        shakemap = _mainshock.data.products.shakemap[0];
 
-    return L.Util.template(template, _this.data);
+    filenames.forEach(filename => {
+      var id, name, secs,
+          path = 'download/' + filename;
+
+      if (shakemap.contents[path]) {
+        id = filename.replace(/\.jpg$/, '');
+        name = id.toUpperCase();
+
+        if (filename.startsWith('psa')) {
+          secs = filename.match(/^psa(.*)\.jpg$/)[1].replace('p', '.');
+          name = `PSA <em>(${secs}<span>s</span>)</em>`;
+        }
+
+        images.push({
+          id: id,
+          name: name,
+          url: shakemap.contents[path].url
+        });
+      }
+    });
+
+    return images;
   };
 
   /**
@@ -226,6 +332,16 @@ var ShakeMap = function (options) {
     return url;
   };
 
+  /**
+   * Event handler that shows the Lightbox.
+   *
+   * @param e {Event}
+   */
+  _showLightbox = function (e) {
+    e.preventDefault();
+    _lightbox.show();
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -237,24 +353,65 @@ var ShakeMap = function (options) {
    */
   _this.addData = function (json) {
     _this.data = _getData(json);
-    _this.lightbox = _getLightbox();
+
+    _addLightbox();
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    _el = document.querySelector('.thumbs .shakemap a');
+
+    if (_el) {
+      _el.addEventListener('click', _showLightbox);
+    }
+
+    // Display the selected image
+    if (_radioBar) {
+      _radioBar.addListeners(document.getElementById('shakemap-images'));
+    }
   };
 
   /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    if (_lightbox) {
+      _lightbox.destroy();
+    }
+    if (_radioBar) {
+      _radioBar.destroy(); // also removes its listeners
+    }
+
     _initialize = null;
 
     _app = null;
+    _el = null;
+    _lightbox = null;
+    _mainshock = null;
+    _radioBar = null;
+    _selected = null;
 
+    _addLightbox = null;
     _fetch = null;
+    _getContent = null;
     _getData = null;
-    _getLightbox = null;
+    _getImages = null;
     _getProps = null;
     _getUrl = null;
+    _showLightbox = null;
 
     _this = null;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    if (_el) {
+      _el.removeEventListener('click', _showLightbox);
+    }
   };
 
 
