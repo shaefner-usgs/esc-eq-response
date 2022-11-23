@@ -410,6 +410,7 @@ var SettingsBar = function (options) {
     var comcat = document.getElementById('comcat');
 
     _catalogBar.setOption.call(comcat);
+    AppUtil.deleteParam('catalog');
   };
 
   /**
