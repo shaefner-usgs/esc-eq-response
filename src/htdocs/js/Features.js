@@ -5,6 +5,7 @@ var Aftershocks = require('features/event/Aftershocks'),
     AppUtil = require('util/AppUtil'),
     CatalogSearch = require('features/base/CatalogSearch'),
     DdMainshock = require('features/event/DdMainshock'),
+    Dyfi = require('features/event/mainshock/Dyfi'),
     FieldNotes = require('features/event/FieldNotes'),
     FocalMechanism = require('features/event/mainshock/FocalMechanism'),
     Forecast = require('features/event/aftershocks/Forecast'),
@@ -56,6 +57,7 @@ _MODULES = {
   ],
   event: [ // Features added when a new Mainshock (event) is selected
     Mainshock, // must be first
+    Dyfi,
     FieldNotes,
     FocalMechanism,
     Forecast,
@@ -112,7 +114,6 @@ var Features = function (options) {
 
       _addCount,
       _addFeature,
-      _addLightbox,
       _cacheFeature,
       _createFeature,
       _getMode,
@@ -175,22 +176,6 @@ var Features = function (options) {
       _this.removeFeature(feature);
 
       console.error(error);
-    }
-  };
-
-  /**
-   * Add the given Feature's Lightbox content.
-   *
-   * Note: a pre-existing Lightbox with a placeholder for the given Feature is
-   * required.
-   *
-   * @param feature {Object}
-   */
-  _addLightbox = function (feature) {
-    var el = document.querySelector('.lightbox .' + feature.id);
-
-    if (el) {
-      el.insertAdjacentHTML('afterbegin', feature.lightbox);
     }
   };
 
@@ -432,9 +417,6 @@ var Features = function (options) {
     if (feature.content) {
       el = document.getElementById(feature.id);
       el.innerHTML = feature.content; // add SideBar content
-    }
-    if (feature.lightbox) {
-      _addLightbox(feature);
     }
     if (feature.render) {
       feature.render(); // add BeachBalls
