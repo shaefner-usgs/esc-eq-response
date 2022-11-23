@@ -1,0 +1,64 @@
+@use '../../variables' as *;
+
+/* Lightboxes
+--------------------------------------------- */
+
+#dyfi,
+#shakemap {
+  dl {
+    margin: 0;
+  }
+
+  em {
+    font-size: .75rem;
+    font-style: normal;
+
+    span {
+      text-transform: lowercase;
+    }
+  }
+
+  img {
+    border: 3px solid;
+    border-radius: $content-border-radius;
+    display: block;
+    margin: 0 1px .375rem 0; // 1px: fix border rendering issue when scrolled (webkit)
+    max-height: 650px;
+    max-width: 100%;
+
+    &.hide {
+      display: none;
+    }
+  }
+
+  p {
+    margin: 1.5rem 0 0;
+  }
+
+  .content {
+    align-items: flex-start;
+    display: flex;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .details {
+    position: sticky;
+    top: 4rem;
+  }
+
+  .options {
+    margin-bottom: 1.25rem;
+  }
+
+  .props {
+    span {
+      color: $text-color-lighter;
+      padding-left: .25rem;
+    }
+  }
+
+  .stations {
+    margin-top: .5rem;
+  }
+}
