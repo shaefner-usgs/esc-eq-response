@@ -5,7 +5,6 @@
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
     LatLon = require('util/LatLon'),
-    Lightbox = require('util/ui/Lightbox'),
     Luxon = require('luxon'),
     Plots = require('features/util/earthquakes/Plots');
 
@@ -31,7 +30,6 @@ var AppUtil = require('util/AppUtil'),
  *       disableDownload: {Function}
  *       enableDownload: {Function}
  *       id: {String}
- *       lightboxes: {Object}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
  *       placeholder: {String}
@@ -55,9 +53,7 @@ var Mainshock = function (options) {
       _ddData,
       _earthquakes,
       _json,
-      _thumbs,
 
-      _addLightbox,
       _createFeatures,
       _getBubbles,
       _getData,
@@ -70,7 +66,6 @@ var Mainshock = function (options) {
       _getSummary,
       _getTectonic,
       _getUrl,
-      _showLightbox,
       _updateDetails,
       _updateHeader,
       _updateMarker,
@@ -83,7 +78,6 @@ var Mainshock = function (options) {
     _app = options.app;
 
     _this.id = 'mainshock';
-    _this.lightboxes = {};
     _this.name = 'Mainshock';
     _this.placeholder = '<div class="content"></div>';
     _this.plots = {};
@@ -99,60 +93,6 @@ var Mainshock = function (options) {
     _ddData = {}; // double-difference data
 
     _this.mapLayer = _earthquakes.mapLayer;
-  };
-
-  /**
-   * Create and add a Lightbox for either DYFI or ShakeMap.
-   *
-   * @param opts {Object}
-   *     {
-   *       id: {String}
-   *       img: {String}
-   *       title: {String}
-   *     }
-   *
-   * @return Lightbox {Class}
-   */
-  _addLightbox = function (opts) {
-    var props, template,
-        data = _this.data; // default
-
-    if (opts.id === 'dyfi') {
-      props = data.products.dyfi[0].properties;
-      data = Object.assign({}, _this.data, {
-        maxmmi: props.maxmmi,
-        responses: AppUtil.addCommas(props.numResp)
-      });
-      template = opts.img +
-        '<div class="details">' +
-          '<dl class="props alt">' +
-            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-            '<dd>{maxmmi}</dd>' +
-            '<dt>Responses</dt>' +
-            '<dd>{responses}</dd>' +
-          '</dl>' +
-          '<p>' +
-            '<a href="{url}/dyfi" class="external" target="new">Additional maps' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
-        '</div>';
-    } else { // ShakeMap
-      template = opts.img +
-        '<div class="shakemap details">' +
-          '<p>' +
-            '<a href="{url}/shakemap" class="external" target="new">Full details and additional maps' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
-        '</div>';
-    }
-
-    return Lightbox({
-      content: L.Util.template(template, data),
-      id: opts.id,
-      title: opts.title
-    });
   };
 
   /**
@@ -299,13 +239,12 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'Did You Feel It?' (and add its Lightbox).
+   * Get the HTML template for 'Did You Feel It?'.
    *
    * @return template {String}
    */
   _getDyfi = function () {
     var img,
-        id = 'dyfi',
         template = '';
 
     if (_this.data.dyfiImg) {
@@ -315,12 +254,6 @@ var Mainshock = function (options) {
           '<h4>Did You Feel It?</h4>' +
           '<a href="{dyfiImg}">' + img + '</a>' +
         '</div>';
-
-      _this.lightboxes[id] = _addLightbox({
-        id: id,
-        img: img,
-        title: 'Did You Feel It?'
-      });
     }
 
     return template;
@@ -385,13 +318,12 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'ShakeMap' (and add its Lightbox).
+   * Get the HTML template for 'ShakeMap'.
    *
    * @return template {String}
    */
   _getShakeMap = function () {
     var img,
-        id = 'shakemap',
         template = '';
 
     if (_this.data.shakemapImg) {
@@ -401,12 +333,6 @@ var Mainshock = function (options) {
           '<h4>ShakeMap</h4>' +
           '<a href="{shakemapImg}">' + img + '</a>' +
         '</div>';
-
-      _this.lightboxes[id] = _addLightbox({
-        id: id,
-        img: img,
-        title: 'ShakeMap'
-      });
     }
 
     return template;
@@ -531,19 +457,6 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Event handler that shows a Lightbox.
-   *
-   * @param e {Event}
-   */
-  _showLightbox = function (e) {
-    var id = e.target.closest('div').className;
-
-    e.preventDefault();
-
-    _this.lightboxes[id].show();
-  };
-
-  /**
    * Update the earthquake details 'strip' (on the SummaryPane) and 'balloon'
    * (on the SelectBar) using the selected catalog's data.
    */
@@ -654,20 +567,14 @@ var Mainshock = function (options) {
   /**
    * Add event listeners.
    *
-   * Note: event listeners for the Beachball thumbnails are added by their
+   * Note: event listeners for the product Lightboxes are added by their
    * respective Feature classes.
    */
   _this.addListeners = function () {
     _button = document.getElementById('download');
-    _thumbs = document.querySelectorAll('.thumbs .dyfi a, .thumbs .shakemap a');
 
     // Create RTF Features (RTF document is created when all Features are ready)
     _button.addEventListener('click', _createFeatures);
-
-    // Show Lightbox content
-    _thumbs.forEach(thumb => {
-      thumb.addEventListener('click', _showLightbox);
-    });
   };
 
   /**
@@ -680,10 +587,6 @@ var Mainshock = function (options) {
       _this.plots.destroy();
     }
 
-    Object.keys(_this.lightboxes).forEach(id => {
-      _this.lightboxes[id].destroy();
-    });
-
     _initialize = null;
 
     _app = null;
@@ -692,9 +595,7 @@ var Mainshock = function (options) {
     _ddData = null;
     _earthquakes = null;
     _json = null;
-    _thumbs = null;
 
-    _addLightbox = null;
     _createFeatures = null;
     _getBubbles = null;
     _getData = null;
@@ -707,7 +608,6 @@ var Mainshock = function (options) {
     _getSummary = null;
     _getTectonic = null;
     _getUrl = null;
-    _showLightbox = null;
     _updateDetails = null;
     _updateHeader = null;
     _updateMarker = null;
@@ -743,11 +643,6 @@ var Mainshock = function (options) {
   _this.removeListeners = function () {
     if (_button) {
       _button.removeEventListener('click', _createFeatures);
-    }
-    if (_thumbs) {
-      _thumbs.forEach(thumb => {
-        thumb.removeEventListener('click', _showLightbox);
-      });
     }
   };
 
