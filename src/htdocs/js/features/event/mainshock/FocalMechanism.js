@@ -1,8 +1,7 @@
 'use strict';
 
 
-var BeachBalls = require('features/util/beachballs/BeachBalls'),
-    Lightbox = require('util/ui/Lightbox');
+var BeachBalls = require('features/util/beachballs/BeachBalls');
 
 
 /**
@@ -18,7 +17,7 @@ var BeachBalls = require('features/util/beachballs/BeachBalls'),
  *       addListeners: {Function}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {Object}
+ *       lightbox: {String}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
  *       removeListeners: {Function}
@@ -33,21 +32,22 @@ var FocalMechanism = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _beachballs,
 
-      _addLightbox,
       _getData;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
-    var fm,
-        app = options.app,
-        mainshock = app.Features.getFeature('mainshock');
+    var fm, mainshock;
+
+    _app = options.app;
 
     _this.addListeners = function () {};
     _this.id = 'focal-mechanism';
+    _this.lightbox = '';
     _this.mapLayer = null;
     _this.name = 'Focal Mechanism';
     _this.removeListeners = function () {};
@@ -56,11 +56,12 @@ var FocalMechanism = function (options) {
     _this.summary = '';
     _this.zoomToLayer = false;
 
+    mainshock = _app.Features.getFeature('mainshock');
     fm = mainshock.data.products[_this.id];
 
     if (fm) {
       _beachballs = BeachBalls({
-        app: app,
+        app: _app,
         data: _getData(fm),
         id: _this.id,
         mainshock: mainshock,
@@ -68,25 +69,14 @@ var FocalMechanism = function (options) {
       });
 
       _this.addListeners = _beachballs.addListeners;
+      _this.lightbox = _beachballs.getContent();
       _this.mapLayer = _beachballs.getMapLayer();
       _this.removeListeners = _beachballs.removeListeners;
       _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
 
-      _addLightbox();
-      app.Features.addContent(_this); // add manually b/c there's no feed data
+      _app.Features.addContent(_this); // no feed data => add manually
     }
-  };
-
-  /**
-   * Add the Lightbox.
-   */
-  _addLightbox = function () {
-    _this.lightbox = Lightbox({
-      content: _beachballs.getContent(),
-      id: _this.id,
-      title: _beachballs.getTitle()
-    });
   };
 
   /**
@@ -112,14 +102,14 @@ var FocalMechanism = function (options) {
   _this.destroy = function () {
     if (_beachballs) {
       _beachballs.destroy();
-      _this.lightbox.destroy();
+      _app.Features.getLightbox(_this.id).destroy();
     }
 
     _initialize = null;
 
+    _app = null;
     _beachballs = null;
 
-    _addLightbox = null;
     _getData = null;
 
     _this = null;

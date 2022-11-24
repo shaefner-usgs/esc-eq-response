@@ -66,8 +66,7 @@ var BeachBalls = function (options) {
       _getAxis,
       _getData,
       _getProps,
-      _getTemplate,
-      _showLightbox;
+      _getTemplate;
 
 
   _this = {};
@@ -338,18 +337,6 @@ var BeachBalls = function (options) {
       '<div class="beachball"></div>';
   };
 
-  /**
-   * Event handler that shows a Lightbox.
-   *
-   * @param e {Event}
-   */
-  _showLightbox = function (e) {
-    var feature = _app.Features.getFeature(_id);
-
-    e.preventDefault();
-    feature.lightbox.show();
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -364,7 +351,7 @@ var BeachBalls = function (options) {
     ];
 
     _els.forEach(el =>
-      el.addEventListener('click', _showLightbox)
+      el.addEventListener('click', _app.Features.show)
     );
   };
 
@@ -389,7 +376,6 @@ var BeachBalls = function (options) {
     _getData = null;
     _getProps = null;
     _getTemplate = null;
-    _showLightbox = null;
 
     _this = null;
   };
@@ -471,7 +457,7 @@ var BeachBalls = function (options) {
   _this.removeListeners = function () {
     _els.forEach(el => {
       if (el) {
-        el.removeEventListener('click', _showLightbox);
+        el.removeEventListener('click', _app.Features.show);
       }
     });
   };

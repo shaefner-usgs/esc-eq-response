@@ -3,7 +3,6 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Lightbox = require('util/ui/Lightbox'),
     RadioBar = require('util/ui/RadioBar');
 
 
@@ -22,8 +21,10 @@ var AppUtil = require('util/AppUtil'),
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
+ *       lightbox: {String}
  *       name: {String}
  *       removeListeners: {Function}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -33,19 +34,16 @@ var ShakeMap = function (options) {
 
       _app,
       _el,
-      _lightbox,
       _mainshock,
       _radioBar,
       _selected,
 
-      _addLightbox,
       _fetch,
       _getContent,
       _getData,
       _getImages,
       _getProps,
-      _getUrl,
-      _showLightbox;
+      _getUrl;
 
 
   _this = {};
@@ -55,24 +53,13 @@ var ShakeMap = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'intensity';
 
+    _this.data = {};
     _this.id = 'shakemap';
+    _this.lightbox = '';
     _this.name = 'ShakeMap';
     _this.url = _getUrl();
 
     _fetch();
-  };
-
-  /**
-   * Add the Lightbox.
-   */
-  _addLightbox = function () {
-    _lightbox = Lightbox({
-      content: _getContent(),
-      id: _this.id,
-      title: _this.name
-    });
-
-    _radioBar.setOption.call(document.getElementById(_selected));
   };
 
   /**
@@ -332,16 +319,6 @@ var ShakeMap = function (options) {
     return url;
   };
 
-  /**
-   * Event handler that shows the Lightbox.
-   *
-   * @param e {Event}
-   */
-  _showLightbox = function (e) {
-    e.preventDefault();
-    _lightbox.show();
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -353,8 +330,7 @@ var ShakeMap = function (options) {
    */
   _this.addData = function (json) {
     _this.data = _getData(json);
-
-    _addLightbox();
+    _this.lightbox = _getContent();
   };
 
   /**
@@ -364,7 +340,7 @@ var ShakeMap = function (options) {
     _el = document.querySelector('.thumbs .shakemap a');
 
     if (_el) {
-      _el.addEventListener('click', _showLightbox);
+      _el.addEventListener('click', _app.Features.show);
     }
 
     // Display the selected image
@@ -377,8 +353,8 @@ var ShakeMap = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    if (_lightbox) {
-      _lightbox.destroy();
+    if (_this.lightbox) {
+      _app.Features.getLightbox(_this.id).destroy();
     }
     if (_radioBar) {
       _radioBar.destroy(); // also removes its listeners
@@ -388,19 +364,16 @@ var ShakeMap = function (options) {
 
     _app = null;
     _el = null;
-    _lightbox = null;
     _mainshock = null;
     _radioBar = null;
     _selected = null;
 
-    _addLightbox = null;
     _fetch = null;
     _getContent = null;
     _getData = null;
     _getImages = null;
     _getProps = null;
     _getUrl = null;
-    _showLightbox = null;
 
     _this = null;
   };
@@ -410,8 +383,15 @@ var ShakeMap = function (options) {
    */
   _this.removeListeners = function () {
     if (_el) {
-      _el.removeEventListener('click', _showLightbox);
+      _el.removeEventListener('click', _app.Features.show);
     }
+  };
+
+  /**
+   * Set the selected RadioBar option.
+   */
+  _this.render = function () {
+    _radioBar.setOption.call(document.getElementById(_selected));
   };
 
 

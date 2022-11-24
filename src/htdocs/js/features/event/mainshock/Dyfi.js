@@ -3,7 +3,6 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Lightbox = require('util/ui/Lightbox'),
     RadioBar = require('util/ui/RadioBar');
 
 
@@ -17,71 +16,45 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
+ *       addListeners: {Function}
  *       destroy: {Function}
  *       id: {String}
+ *       lightbox: {String}
  *       name: {String}
  *       removeListeners: {Function}
+ *       render: {Function}
  *     }
  */
 var Dyfi = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _el,
-      _lightbox,
       _mainshock,
       _radioBar,
       _selected,
 
-      _addLightbox,
-      _addListeners,
       _getContent,
       _getData,
-      _getImages,
-      _showLightbox;
+      _getImages;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
-    _mainshock = options.app.Features.getFeature('mainshock');
+    _app = options.app;
+    _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'block';
 
     _this.id = 'dyfi';
+    _this.lightbox = '';
     _this.name = 'Did You Feel It?';
 
     if (_mainshock.data.dyfiImg) {
-      _addLightbox();
-      _addListeners();
-    }
-  };
+      _this.lightbox = _getContent();
 
-  /**
-   * Add the Lightbox.
-   */
-  _addLightbox = function () {
-    _lightbox = Lightbox({
-      content: _getContent(),
-      id: _this.id,
-      title: _this.name
-    });
-
-    _radioBar.setOption.call(document.getElementById(_selected));
-  };
-
-  /**
-   * Add event listeners.
-   */
-  _addListeners = function () {
-    _el = document.querySelector('.thumbs .dyfi a');
-
-    if (_el) {
-      _el.addEventListener('click', _showLightbox);
-    }
-
-    // Display the selected image
-    if (_radioBar) {
-      _radioBar.addListeners(document.getElementById('dyfi-images'));
+      _app.Features.addContent(_this); // no feed data => add manually
     }
   };
 
@@ -176,26 +149,32 @@ var Dyfi = function (options) {
     return images;
   };
 
-  /**
-   * Event handler that shows the Lightbox.
-   *
-   * @param e {Event}
-   */
-  _showLightbox = function (e) {
-    e.preventDefault();
-    _lightbox.show();
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    _el = document.querySelector('.thumbs .dyfi a');
+
+    if (_el) {
+      _el.addEventListener('click', _app.Features.show);
+    }
+
+    // Display the selected image
+    if (_radioBar) {
+      _radioBar.addListeners(document.getElementById('dyfi-images'));
+    }
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    if (_lightbox) {
-      _lightbox.destroy();
+    if (_this.lightbox) {
+      _app.Features.getLightbox(_this.id).destroy();
     }
     if (_radioBar) {
       _radioBar.destroy(); // also removes its listeners
@@ -203,18 +182,15 @@ var Dyfi = function (options) {
 
     _initialize = null;
 
+    _app = null;
     _el = null;
-    _lightbox = null;
     _mainshock = null;
     _radioBar = null;
     _selected = null;
 
-    _addLightbox = null;
-    _addListeners = null;
     _getContent = null;
     _getData = null;
     _getImages = null;
-    _showLightbox = null;
 
     _this = null;
   };
@@ -224,8 +200,15 @@ var Dyfi = function (options) {
    */
   _this.removeListeners = function () {
     if (_el) {
-      _el.removeEventListener('click', _showLightbox);
+      _el.removeEventListener('click', _app.Features.show);
     }
+  };
+
+  /**
+   * Set the selected RadioBar option.
+   */
+  _this.render = function () {
+    _radioBar.setOption.call(document.getElementById(_selected));
   };
 
 

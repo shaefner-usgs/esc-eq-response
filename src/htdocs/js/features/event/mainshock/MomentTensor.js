@@ -1,8 +1,7 @@
 'use strict';
 
 
-var BeachBalls = require('features/util/beachballs/BeachBalls'),
-    Lightbox = require('util/ui/Lightbox');
+var BeachBalls = require('features/util/beachballs/BeachBalls');
 
 
 /**
@@ -18,13 +17,14 @@ var BeachBalls = require('features/util/beachballs/BeachBalls'),
  *       addListeners: {Function}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {Object}
+ *       lightbox: {String}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
  *       removeListeners: {Function}
  *       render: {Function}
  *       showLayer: {Boolean}
  *       summary: {String}
+ *       title: {String}
  *       update: {Function}
  *       zoomToLayer: {Boolean}
  *     }
@@ -33,34 +33,37 @@ var MomentTensor = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _beachballs,
 
-      _addLightbox,
       _getData;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
-    var mt,
-        app = options.app,
-        mainshock = app.Features.getFeature('mainshock');
+    var mt, mainshock;
+
+    _app = options.app;
 
     _this.addListeners = function () {};
     _this.id = 'moment-tensor';
+    _this.lightbox = '';
     _this.mapLayer = null;
     _this.name = 'Moment Tensor';
     _this.removeListeners = function () {};
     _this.render = function () {};
     _this.showLayer = false;
     _this.summary = '';
+    _this.title = '';
     _this.zoomToLayer = false;
 
+    mainshock = _app.Features.getFeature('mainshock');
     mt = mainshock.data.products[_this.id];
 
     if (mt) {
       _beachballs = BeachBalls({
-        app: app,
+        app: _app,
         data: _getData(mt),
         id: _this.id,
         mainshock: mainshock,
@@ -68,25 +71,15 @@ var MomentTensor = function (options) {
       });
 
       _this.addListeners = _beachballs.addListeners;
+      _this.lightbox = _beachballs.getContent();
       _this.mapLayer = _beachballs.getMapLayer();
       _this.removeListeners = _beachballs.removeListeners;
       _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
+      _this.title = _beachballs.getTitle();
 
-      _addLightbox();
-      app.Features.addContent(_this); // add manually b/c there's no feed data
+      _app.Features.addContent(_this); // no feed data => add manually
     }
-  };
-
-  /**
-   * Add the Lightbox.
-   */
-  _addLightbox = function () {
-    _this.lightbox = Lightbox({
-      content: _beachballs.getContent(),
-      id: _this.id,
-      title: _beachballs.getTitle()
-    });
   };
 
   /**
@@ -112,14 +105,14 @@ var MomentTensor = function (options) {
   _this.destroy = function () {
     if (_beachballs) {
       _beachballs.destroy();
-      _this.lightbox.destroy();
+      _app.Features.getLightbox(_this.id).destroy();
     }
 
     _initialize = null;
 
+    _app = null;
     _beachballs = null;
 
-    _addLightbox = null;
     _getData = null;
 
     _this = null;

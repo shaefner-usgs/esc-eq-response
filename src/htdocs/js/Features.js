@@ -12,6 +12,7 @@ var Aftershocks = require('features/event/Aftershocks'),
     Foreshocks = require('features/event/Foreshocks'),
     Historical = require('features/event/Historical'),
     HistoricalEvents = require('features/rtf/HistoricalEvents'),
+    Lightbox = require('util/ui/Lightbox'),
     Mainshock = require('features/event//Mainshock'),
     MomentTensor = require('features/event/mainshock/MomentTensor'),
     NearbyCities = require('features/rtf/NearbyCities'),
@@ -94,12 +95,14 @@ _MODULES = {
  *       getFeature: {Function}
  *       getFeatures: {Function}
  *       getHeaders: {Function}
+ *       getLightbox: {Function}
  *       getStatus: {Function}
  *       isFeature: {Function}
  *       postInit: {Function)
  *       refreshFeature: {Function}
  *       removeFeature: {Function}
  *       reset: {Function}
+ *       show: {Function}
  *     }
  */
 var Features = function (options) {
@@ -108,12 +111,14 @@ var Features = function (options) {
 
       _app,
       _features,
+      _lightboxes,
       _modules,
       _prevFeatures,
       _queue,
 
       _addCount,
       _addFeature,
+      _addLightbox,
       _cacheFeature,
       _createFeature,
       _getMode,
@@ -127,6 +132,7 @@ var Features = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
+    _lightboxes = {};
     _modules = {};
     _prevFeatures = {};
     _queue = [];
@@ -180,6 +186,21 @@ var Features = function (options) {
   };
 
   /**
+    * Add the given Feature's Lightbox to the DOM.
+    *
+    * @param feature {Object}
+    */
+  _addLightbox = function (feature) {
+    var id = feature.id;
+
+    _lightboxes[id] = Lightbox({
+      content: feature.lightbox,
+      id: id,
+      title: feature.title || feature.name
+    });
+  };
+
+  /**
    * Cache an existing Feature (in an Array due to the potential of 'stacked'
    * Fetch requests). This is used to purge the 'previous' Feature when a
    * refresh completes.
@@ -228,7 +249,7 @@ var Features = function (options) {
    *           Note: only Features with a map layer; showLayer prop must be false
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
    *         json: {String} JSON feed data (Mainshock only)
-   *         lightbox: {String} HTML content added to pre-existing Lightbox
+   *         lightbox: {String} HTML content of Feature's Lightbox
    *         mapLayer: {L.Layer} Leaflet layer added to MapPane
    *         params: {Object} Feature's parameters that are exposed in SettingsBar
    *         placeholder: {String} initial HTML content added to Plots/SummaryPanes
@@ -414,12 +435,15 @@ var Features = function (options) {
     _app.SummaryPane.addContent(feature);
     _addCount(feature);
 
-    if (feature.content) {
+    if (feature.content) { // SideBar content
       el = document.getElementById(feature.id);
-      el.innerHTML = feature.content; // add SideBar content
+      el.innerHTML = feature.content;
+    }
+    if (feature.lightbox) {
+      _addLightbox(feature);
     }
     if (feature.render) {
-      feature.render(); // add BeachBalls
+      feature.render();
     }
     if (feature.addListeners) {
       feature.addListeners();
@@ -505,7 +529,7 @@ var Features = function (options) {
    * @param id {String}
    *     Feature id
    *
-   * @return {Object}
+   * @return feature {Object}
    */
   _this.getFeature = function (id) {
     var feature = {}, // default
@@ -559,6 +583,18 @@ var Features = function (options) {
     });
 
     return els;
+  };
+
+  /**
+   * Get the given Feature's Lightbox instance.
+   *
+   * @param id {Object}
+   *     Feature id
+   *
+   * @return {Object}
+   */
+  _this.getLightbox = function (id) {
+    return _lightboxes[id] || {};
   };
 
   /**
@@ -687,7 +723,23 @@ var Features = function (options) {
     _removeFeatures();
     _initFeatures();
 
+    _lightboxes = {};
     _prevFeatures = {};
+  };
+
+  /**
+   * Event handler that shows a Feature's Lightbox.
+   *
+   * @param e {Event}
+   */
+  _this.show = function (e) {
+    var el = e.target.closest('.feature'),
+        id = Array.from(el.classList).find(className =>
+          className !== 'content' && className !== 'feature'
+        );
+
+    e.preventDefault();
+    _lightboxes[id].show();
   };
 
 
