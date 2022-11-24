@@ -179,6 +179,10 @@ tr {
 .container {
   line-height: 1.625;
   padding: 1rem var(--padding-gutter);
+
+  > .feature {
+    width: 100%;
+  }
 }
 
 .count {
@@ -221,10 +225,6 @@ tr {
     top: 0;
     transition: all $effect-off-duration ease-in;
   }
-}
-
-.feature {
-  width: 100%;
 }
 
 .icon-check {
