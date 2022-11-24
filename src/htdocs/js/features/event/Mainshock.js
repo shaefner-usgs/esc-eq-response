@@ -250,7 +250,7 @@ var Mainshock = function (options) {
     if (_this.data.dyfiImg) {
       img = '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">';
       template =
-        '<div class="dyfi">' +
+        '<div class="dyfi feature">' +
           '<h4>Did You Feel It?</h4>' +
           '<a href="{dyfiImg}">' + img + '</a>' +
         '</div>';
@@ -329,7 +329,7 @@ var Mainshock = function (options) {
     if (_this.data.shakemapImg) {
       img = '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity">';
       template =
-        '<div class="shakemap">' +
+        '<div class="shakemap feature">' +
           '<h4>ShakeMap</h4>' +
           '<a href="{shakemapImg}">' + img + '</a>' +
         '</div>';
@@ -405,8 +405,8 @@ var Mainshock = function (options) {
         '<div class="thumbs bubble {hide}">' +
           _getDyfi() +
           _getShakeMap() +
-          '<div class="focal-mechanism content hide"></div>' +
-          '<div class="moment-tensor content hide"></div>' +
+          '<div class="focal-mechanism feature content hide"></div>' +
+          '<div class="moment-tensor feature content hide"></div>' +
         '</div>' +
         '<div class="pager-exposures bubble content hide"></div>' +
         _getLossPager() +
