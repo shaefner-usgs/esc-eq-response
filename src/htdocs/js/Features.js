@@ -20,7 +20,7 @@ var Aftershocks = require('features/event/Aftershocks'),
     PagerComments = require('features/rtf/PagerComments'),
     PagerExposures = require('features/event/mainshock/PagerExposures'),
     Rtf = require('util/Rtf'),
-    ShakeAlert = require('features/rtf/ShakeAlert'),
+    ShakeAlert = require('features/event/mainshock/ShakeAlert'),
     ShakeMap = require('features/event/mainshock/ShakeMap'),
     ShakeMapStations = require('features/event/ShakeMapStations'),
     SignificantEqs = require('features/base/SignificantEqs');
@@ -65,14 +65,14 @@ _MODULES = {
     MomentTensor,
     PagerCities,
     PagerExposures,
+    ShakeAlert,
     ShakeMap,
     ShakeMapStations
   ],
   rtf: [ // Features added when the Event Summary RTF is created
     HistoricalEvents,
     NearbyCities,
-    PagerComments,
-    ShakeAlert
+    PagerComments
   ]
 };
 

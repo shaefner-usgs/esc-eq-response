@@ -3,7 +3,7 @@
 
 
 /**
- * Create the ShakeAlert Feature.
+ * Create the ShakeAlert Feature, a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *     {
