@@ -115,7 +115,7 @@ var Pane = function (options) {
         paneExists = _el.querySelector('section' + hash);
 
     if (hash && paneExists) {
-      id = hash.substr(1);
+      id = hash.substring(1);
     }
 
     return id;
