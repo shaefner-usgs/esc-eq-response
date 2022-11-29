@@ -102,7 +102,7 @@ _MODULES = {
  *       refreshFeature: {Function}
  *       removeFeature: {Function}
  *       reset: {Function}
- *       show: {Function}
+ *       showLightbox: {Function}
  *     }
  */
 var Features = function (options) {
@@ -732,7 +732,7 @@ var Features = function (options) {
    *
    * @param e {Event}
    */
-  _this.show = function (e) {
+  _this.showLightbox = function (e) {
     var el = e.target.closest('.feature'),
         id = Array.from(el.classList).find(className =>
           className !== 'content' && className !== 'feature'

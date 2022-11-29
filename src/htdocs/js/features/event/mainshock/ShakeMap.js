@@ -340,7 +340,7 @@ var ShakeMap = function (options) {
     _el = document.querySelector('.thumbs .shakemap a');
 
     if (_el) {
-      _el.addEventListener('click', _app.Features.show);
+      _el.addEventListener('click', _app.Features.showLightbox);
     }
 
     // Display the selected image
@@ -383,7 +383,7 @@ var ShakeMap = function (options) {
    */
   _this.removeListeners = function () {
     if (_el) {
-      _el.removeEventListener('click', _app.Features.show);
+      _el.removeEventListener('click', _app.Features.showLightbox);
     }
   };
 

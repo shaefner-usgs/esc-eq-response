@@ -351,7 +351,7 @@ var BeachBalls = function (options) {
     ];
 
     _els.forEach(el =>
-      el.addEventListener('click', _app.Features.show)
+      el.addEventListener('click', _app.Features.showLightbox)
     );
   };
 
@@ -457,7 +457,7 @@ var BeachBalls = function (options) {
   _this.removeListeners = function () {
     _els.forEach(el => {
       if (el) {
-        el.removeEventListener('click', _app.Features.show);
+        el.removeEventListener('click', _app.Features.showLightbox);
       }
     });
   };
