@@ -49,26 +49,6 @@
       padding-right: 1.25rem;
     }
   }
-
-  .status {
-    margin: 1.5rem 0 0;
-
-    &:before {
-      @include labels;
-
-      content: 'Status';
-      margin-right: .5rem;
-    }
-
-    i {
-      margin-left: .25rem;
-    }
-
-    span { // nested (span) tag and inline-block are necessary for text-transform
-      display: inline-block;
-      text-transform: capitalize;
-    }
-  }
 }
 
 @media only screen

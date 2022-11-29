@@ -300,25 +300,10 @@ body.mainshock #summaryPane .mainshock {
   }
 }
 
-/* Toggle displayed content based on Time Zone setting
+/* Toggle between user/UTC time
 --------------------------------------------- */
 
 body.user #summaryPane li.utc,
 body.utc #summaryPane li.user {
   display: none;
-}
-
-@media only screen
-and (max-width: 950px) {
-  #dyfi,
-  #shakemap {
-    img {
-      display: block;
-      margin: 0 auto;
-    }
-
-    .content {
-      flex-flow: row wrap;
-    }
-  }
 }
