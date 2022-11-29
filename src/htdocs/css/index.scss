@@ -256,9 +256,17 @@ tr {
     }
     dd {
       padding-left: .75rem;
+
+      &:last-child {
+        border-bottom: 0;
+      }
     }
     dt {
       text-transform: none;
+
+      &:nth-last-child(2) {
+        border-bottom: 0;
+      }
     }
   }
 
