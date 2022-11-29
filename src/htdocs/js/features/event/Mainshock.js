@@ -305,7 +305,7 @@ var Mainshock = function (options) {
 
     if (_this.data.shakeAlertStatus) {
       template =
-        '<li class="shake-alert">' +
+        '<li class="shake-alert feature">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
           '<a href="{url}/shake-alert" target="new">' +
             '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
@@ -571,10 +571,18 @@ var Mainshock = function (options) {
    * respective Feature classes.
    */
   _this.addListeners = function () {
+    var el = document.querySelector('#summaryPane .mainshock .details'),
+        shakealert = el.querySelector('.shake-alert');
+
     _button = document.getElementById('download');
 
     // Create RTF Features (RTF document is created when all Features are ready)
     _button.addEventListener('click', _createFeatures);
+
+    // Show Feature's Lightboxes
+    if (shakealert) {
+      shakealert.addEventListener('click', _app.Features.showLightbox);
+    }
   };
 
   /**
