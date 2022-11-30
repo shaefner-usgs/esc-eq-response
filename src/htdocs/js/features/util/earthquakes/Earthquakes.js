@@ -271,7 +271,7 @@ var Earthquakes = function (options) {
       if (props.place) {
         title += '—' + props.place;
       }
-      if (props.status === 'reviewed') {
+      if (props.status.toLowerCase() === 'reviewed') {
         statusIcon = '<i class="icon-check"></i>';
       }
 
