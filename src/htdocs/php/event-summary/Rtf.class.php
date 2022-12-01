@@ -684,46 +684,50 @@ class Rtf {
         $this->_font->h4,
         $this->_format->h4
       );
-    }
 
-    $smInfo = $this->_data->shakemapData;
+      $smInfo = $this->_data->shakemapData;
 
-    $section5->writeText(
-      'Max MMI: ' . strip_tags($smInfo->mmi),
-      $this->_font->body,
-      $this->_format->body
-    );
-    $section5->writeText(
-      'Max PGA: ' . strip_tags($smInfo->pga),
-      $this->_font->body,
-      $this->_format->body
-    );
-    $section5->writeText(
-      'Max PGV: ' . strip_tags($smInfo->pgv),
-      $this->_font->body,
-      $this->_format->body
-    );
-    $section5->writeText(
-      'Max SA (0.3s): ' . strip_tags($smInfo->sa03),
-      $this->_font->body,
-      $this->_format->body
-    );
-    $section5->writeText(
-      'Max SA (1.0s): ' . strip_tags($smInfo->sa10),
-      $this->_font->body,
-      $this->_format->body
-    );
-    $section5->writeText(
-      'Max SA (3.0s): ' . strip_tags($smInfo->sa30),
-      $this->_font->body,
-      $this->_format->body
-    );
+      $section5->writeText(
+        'Max MMI: ' . strip_tags($smInfo->mmi),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max PGA: ' . strip_tags($smInfo->pga),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max PGV: ' . strip_tags($smInfo->pgv),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max SA (0.3s): ' . strip_tags($smInfo->sa03),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max SA (1.0s): ' . strip_tags($smInfo->sa10),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section5->writeText(
+        'Max SA (3.0s): ' . strip_tags($smInfo->sa30),
+        $this->_font->body,
+        $this->_format->body
+      );
 
-    if ($this->_data->shakemap) {
       $section5->addImage(
         $this->_getRemoteImage($this->_data->shakemap),
         $this->_format->image,
         12
+      );
+
+      $section5->writeText(
+        'Status: ' . ucfirst(strip_tags($smInfo->status)),
+        $this->_font->body,
+        $this->_format->body
       );
     }
 
