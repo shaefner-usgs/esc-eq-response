@@ -105,6 +105,7 @@ var ShakeMap = function (options) {
       '<div class="images">' +
         '{radioBar}' +
         imgsHtml +
+        '<p class="status"><span>{status}</span></p>' +
       '</div>' +
       '<div class="details">' +
         '<dl class="props alt">' +
@@ -141,82 +142,83 @@ var ShakeMap = function (options) {
    *
    * @param json {Object}
    *
-   * @return data {Object}
+   * @return {Object}
    */
   _getData = function (json) {
-    var data = { // defaults, known values
-          dyfi: '–',
-          img: _mainshock.data.shakemapImg,
-          mmi: '–',
-          mmiValue: _mainshock.data.mmi,
-          pga: '–',
-          pgv: '–',
-          sa03: '–',
-          sa10: '–',
-          sa30: '–',
-          seismic: '–',
-          url: _mainshock.data.url
-        },
+    var dyfi, mmi, pga, pgv, sa03, sa10, sa30, seismic,
         info = json.input.event_information,
-        props = _getProps(json.output.ground_motions);
+        product = _mainshock.data.products.shakemap[0],
+        props = _getProps(json.output.ground_motions),
+        status = product.properties['review-status'].toLowerCase();
 
     if (info.intensity_observations) {
-      data.dyfi = info.intensity_observations;
+      dyfi = info.intensity_observations;
     }
-
     if (info.seismic_stations) {
-      data.seismic = info.seismic_stations;
+      seismic = info.seismic_stations;
     }
 
     if (props.mmi) {
-      data.mmi = AppUtil.round(props.mmi.max, 1);
+      mmi = AppUtil.round(props.mmi.max, 1);
 
       if (props.mmi.bias) {
-        data.mmi += ` <span>(bias: ${AppUtil.round(props.mmi.bias, 3)})</span>`;
+        mmi += ` <span>(bias: ${AppUtil.round(props.mmi.bias, 3)})</span>`;
       }
     }
-
     if (props.pga) {
-      data.pga = `${AppUtil.round(props.pga.max, 3)} ${props.pga.units}`;
+      pga = `${AppUtil.round(props.pga.max, 3)} ${props.pga.units}`;
 
       if (props.pga.bias) {
-        data.pga += ` <span>(bias: ${AppUtil.round(props.pga.bias, 3)})</span>`;
+        pga += ` <span>(bias: ${AppUtil.round(props.pga.bias, 3)})</span>`;
       }
     }
-
     if (props.pgv) {
-      data.pgv = `${AppUtil.round(props.pgv.max, 3)} ${props.pgv.units}`;
+      pgv = `${AppUtil.round(props.pgv.max, 3)} ${props.pgv.units}`;
 
       if (props.pgv.bias) {
-        data.pgv += ` <span>(bias: ${AppUtil.round(props.pgv.bias, 3)})</span>`;
+        pgv += ` <span>(bias: ${AppUtil.round(props.pgv.bias, 3)})</span>`;
       }
     }
-
     if (props.sa03) {
-      data.sa03 = `${AppUtil.round(props.sa03.max, 3)} ${props.sa03.units}`;
+      sa03 = `${AppUtil.round(props.sa03.max, 3)} ${props.sa03.units}`;
 
       if (props.sa03.bias) {
-        data.sa03 += ` <span>(bias: ${AppUtil.round(props.sa03.bias, 3)})</span>`;
+        sa03 += ` <span>(bias: ${AppUtil.round(props.sa03.bias, 3)})</span>`;
       }
     }
-
     if (props.sa10) {
-      data.sa10 = `${AppUtil.round(props.sa10.max, 3)} ${props.sa10.units}`;
+      sa10 = `${AppUtil.round(props.sa10.max, 3)} ${props.sa10.units}`;
 
       if (props.sa10.bias) {
-        data.sa10 += ` <span>(bias: ${AppUtil.round(props.sa10.bias, 3)})</span>`;
+        sa10 += ` <span>(bias: ${AppUtil.round(props.sa10.bias, 3)})</span>`;
       }
     }
-
     if (props.sa30) {
-      data.sa30 = `${AppUtil.round(props.sa30.max, 3)} ${props.sa30.units}`;
+      sa30 = `${AppUtil.round(props.sa30.max, 3)} ${props.sa30.units}`;
 
       if (props.sa30.bias) {
-        data.sa30 += ` <span>(bias: ${AppUtil.round(props.sa30.bias, 3)})</span>`;
+        sa30 += ` <span>(bias: ${AppUtil.round(props.sa30.bias, 3)})</span>`;
       }
     }
 
-    return data;
+    if (status === 'reviewed') {
+      status += '<i class="icon-check"></i>';
+    }
+
+    return {
+      dyfi: dyfi || '–',
+      img: _mainshock.data.shakemapImg,
+      mmi: mmi || '–',
+      mmiValue: _mainshock.data.mmi,
+      pga: pga || '–',
+      pgv: pgv || '–',
+      sa03: sa03 || '–',
+      sa10: sa10 || '–',
+      sa30: sa30 || '–',
+      seismic: seismic||  '–',
+      status: status,
+      url: _mainshock.data.url
+    };
   };
 
   /**
@@ -271,7 +273,7 @@ var ShakeMap = function (options) {
    * @return {Object}
    */
   _getProps = function (motions) {
-    var mmi, pga, pgv, sa03, sa10, sa30;
+    var mmi;
 
     // Property name is inconsistent
     if (motions.intensity) {
@@ -281,19 +283,13 @@ var ShakeMap = function (options) {
     }
 
     // Case-insensitive search for keys
-    pga = motions[Object.keys(motions).find(key => key.match(/^PGA$/i))];
-    pgv = motions[Object.keys(motions).find(key => key.match(/^PGV$/i))];
-    sa03 = motions[Object.keys(motions).find(key => key.match(/^SA\(0.3\)$/i))];
-    sa10 = motions[Object.keys(motions).find(key => key.match(/^SA\(1.0\)$/i))];
-    sa30 = motions[Object.keys(motions).find(key => key.match(/^SA\(3.0\)$/i))];
-
     return {
       mmi: mmi,
-      pga: pga,
-      pgv: pgv,
-      sa03: sa03,
-      sa10: sa10,
-      sa30: sa30
+      pga: motions[Object.keys(motions).find(key => key.match(/^PGA$/i))],
+      pgv: motions[Object.keys(motions).find(key => key.match(/^PGV$/i))],
+      sa03: motions[Object.keys(motions).find(key => key.match(/^SA\(0.3\)$/i))],
+      sa10: motions[Object.keys(motions).find(key => key.match(/^SA\(1.0\)$/i))],
+      sa30: motions[Object.keys(motions).find(key => key.match(/^SA\(3.0\)$/i))]
     };
   };
 
