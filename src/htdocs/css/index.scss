@@ -253,20 +253,23 @@ tr {
       border-bottom: 1px solid $border-color-lightest;
       padding-bottom: .25rem;
       padding-top: .25rem;
+
+      &:first-child,
+      &:nth-child(2) {
+        padding-top: 0
+      }
+
+      &:nth-last-child(2),
+      &:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
     }
     dd {
       padding-left: .75rem;
-
-      &:last-child {
-        border-bottom: 0;
-      }
     }
     dt {
       text-transform: none;
-
-      &:nth-last-child(2) {
-        border-bottom: 0;
-      }
     }
   }
 
