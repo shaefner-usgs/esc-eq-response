@@ -850,7 +850,9 @@ class Rtf {
       }
     }
 
-    if (!empty($aftershocks->forecast)) {
+    $forecast = $aftershocks->forecast;
+
+    if (!empty(get_object_vars($forecast))) {
       $section6->writeText(
         'Aftershock Forecast',
         $this->_font->h4,
@@ -879,18 +881,21 @@ class Rtf {
         $this->_format->p
       );
 
-      $datetime = gmdate(
-        'Y-m-d H:i:s',
-        $aftershocks->forecast[0]->timeStart / 1000
-      );
+      $zone = $this->_data->time->zone; // 'user' or 'utc'
+      $datetime = $forecast->startTime->{$zone};
+      $zoneDisplay = 'UTC';
+
+      if ($zone === 'user') {
+        $zoneDisplay = $forecast->utcOffset;
+      }
       $section6->writeText(
-        '<strong>Forecast starts</strong>: ' . $datetime . ' (UTC)',
+        "<strong>Forecast starts</strong>: $datetime ($zoneDisplay)",
         $this->_font->body,
         $this->_format->p
       );
 
       $section6->writeText(
-        '<strong>Model</strong>: ' . $aftershocks->model->name,
+        '<strong>Model</strong>: ' . $forecast->model->name,
         $this->_font->body,
         $this->_format->p
       );
@@ -1463,7 +1468,7 @@ class Rtf {
    * @param $type {String <number|probability>}
    */
   private function _createTableForecast($section, $type) {
-    $forecasts = $this->_data->aftershocks->forecast;
+    $forecasts = $this->_data->aftershocks->forecast->forecasts;
     $numCols = count($forecasts) + 1; // data cols + 1 header col
     $numRows = count($forecasts[0]->bins) + 1; // data rows + 1 header row
 

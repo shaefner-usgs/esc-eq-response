@@ -19,11 +19,10 @@ var AppUtil = require('util/AppUtil'),
  *     {
  *       addData: {Function}
  *       addListeners: {Function}
+ *       data: {Object}
  *       dependencies: {Array}
  *       destroy: {Function}
- *       forecast: {Array}
  *       id: {String}
- *       model: {Object}
  *       name: {String)
  *       removeListeners: {Function}
  *       summary: {String}
@@ -67,10 +66,9 @@ var Forecast = function (options) {
       selected: ''
     };
 
+    _this.data = {};
     _this.dependencies = [dependency];
-    _this.forecast = [];
     _this.id = 'forecast';
-    _this.model = {};
     _this.name = 'Forecast';
     _this.summary = '';
     _this.url = _getUrl();
@@ -260,6 +258,14 @@ var Forecast = function (options) {
         utcTime: datetime.toFormat(format)
       };
 
+      Object.assign(_this.data, {
+        startTime: {
+          user: data.userTime,
+          utc: data.utcTime
+        },
+        utcOffset: data.utcOffset
+      });
+
       html = L.Util.template(
         '<h3>{name}</h3>' +
         '<p>Probability of one or more aftershocks in the specified time ' +
@@ -326,8 +332,10 @@ var Forecast = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    _this.forecast = json.forecast;
-    _this.model = json.model;
+    _this.data = {
+      forecasts: json.forecast,
+      model: json.model,
+    };
     _this.summary = _getSummary(json);
   };
 

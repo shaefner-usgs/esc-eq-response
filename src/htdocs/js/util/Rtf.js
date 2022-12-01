@@ -229,9 +229,8 @@ var Rtf = function (options) {
         count: aftershocks.count,
         description: description.aftershocks,
         earthquakes: _filter(aftershocks).sort(_compare),
-        forecast: forecast.forecast,
+        forecast: forecast.data,
         magThreshold: _magThreshold,
-        model: forecast.model,
         plots: _plots.aftershocks
       },
       beachballs: _getBeachBalls(mainshock),
