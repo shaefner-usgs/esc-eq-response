@@ -599,7 +599,9 @@ class Rtf {
       $this->_format->h2
     );
 
-    if (property_exists($beachballs, 'fm')) {
+    if (property_exists($beachballs, 'focal-mechanism')) {
+      $beachball = $beachballs->{'focal-mechanism'};
+
       $section4->writeText(
         'Focal Mechanism',
         $this->_font->h4,
@@ -607,13 +609,20 @@ class Rtf {
       );
       $section4->writeText('<br>');
       $section4->addImage(
-        $this->_getImage($beachballs->fm),
+        $this->_getImage($beachball->image),
         $this->_format->image,
         10
       );
+      $section4->writeText(
+        'Status: ' . ucfirst($beachball->status),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
 
-    if (property_exists($beachballs, 'mt')) {
+    if (property_exists($beachballs, 'moment-tensor')) {
+      $beachball = $beachballs->{'moment-tensor'};
+
       $section4->writeText(
         'Moment Tensor',
         $this->_font->h4,
@@ -621,9 +630,14 @@ class Rtf {
       );
       $section4->writeText('<br>');
       $section4->addImage(
-        $this->_getImage($beachballs->mt),
+        $this->_getImage($beachball->image),
         $this->_format->image,
         10
+      );
+      $section4->writeText(
+        'Status: ' . ucfirst($beachball->status),
+        $this->_font->body,
+        $this->_format->body
       );
     }
 

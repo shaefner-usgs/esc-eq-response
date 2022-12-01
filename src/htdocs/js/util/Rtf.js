@@ -164,23 +164,30 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get the FocalMechanism and MomentTensor beachballs as base64 encoded
-   * dataURLs.
+   * Get the FocalMechanism and MomentTensor beachball images as base64 encoded
+   * dataURLs, along with their status.
+   *
+   * @param mainshock {Object}
    *
    * @return beachballs {Object}
    */
-  _getBeachBalls = function () {
+  _getBeachBalls = function (mainshock) {
     var beachballs = {},
         canvasEls = {
-          fm: document.querySelector('#focal-mechanism canvas'),
-          mt: document.querySelector('#moment-tensor canvas')
+          'focal-mechanism': document.querySelector('#focal-mechanism canvas'),
+          'moment-tensor': document.querySelector('#moment-tensor canvas')
         };
 
     Object.keys(canvasEls).forEach(key => {
-      var beachball = canvasEls[key];
+      var product,
+          beachball = canvasEls[key];
 
       if (beachball) {
-        beachballs[key] = beachball.toDataURL('image/png');
+        product = mainshock.data.products[key][0];
+        beachballs[key] = {
+          image: beachball.toDataURL('image/png'),
+          status: product.properties['review-status'].toLowerCase()
+        };
       }
     });
 
@@ -227,7 +234,7 @@ var Rtf = function (options) {
         model: forecast.model,
         plots: _plots.aftershocks
       },
-      beachballs: _getBeachBalls(),
+      beachballs: _getBeachBalls(mainshock),
       day: {
         user: mainshock.data.utcDayofWeek,
         utc: mainshock.data.utcDayofWeek
