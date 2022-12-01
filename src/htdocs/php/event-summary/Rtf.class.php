@@ -1095,17 +1095,24 @@ class Rtf {
 
     if (!empty(get_object_vars($shakeAlert))) {
       $zone = $this->_data->time->zone; // 'user' or 'utc'
-      $key = $zone . 'Time';
+      $key1 = $zone . 'Time';
+      $key2 = $zone . 'UpdateTime';
+      $datetime = $shakeAlert->{$key1} . $shakeAlert->decimalSecs;
+      $updateTime = $shakeAlert->{$key2};
+      $magAnss = "$shakeAlert->magAnss ($shakeAlert->magSeconds after origin)";
       $zoneDisplay = 'UTC';
 
       if ($zone === 'user') {
         $zoneDisplay = $shakeAlert->utcOffset;
       }
 
-      $datetime = $shakeAlert->{$key} . $shakeAlert->decimalSecs;
-
       $section9->writeText(
         "Message issued $datetime ($zoneDisplay)",
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        "Last updated $updateTime ($zoneDisplay)",
         $this->_font->body,
         $this->_format->body
       );
@@ -1131,7 +1138,6 @@ class Rtf {
         $this->_format->body
       );
 
-      $magAnss = "$shakeAlert->magAnss ($shakeAlert->magSeconds after origin)";
       $section9->writeText(
         'Magnitude Accuracy',
         $this->_font->h4,
@@ -1196,6 +1202,24 @@ class Rtf {
         $this->_format->h4
       );
       $this->_createTableShakeAlert($section9);
+
+      if ($shakeAlert->wea) {
+        $section9->writeText(
+          'Wireless Emergency Alert',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section9->writeText(
+          $shakeAlert->wea,
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section9->writeText(
+          'WEA alerts are distributed to the MMI 4+ area if ShakeAlert Peak M ≥ 5.0.',
+          $this->_font->body,
+          $this->_format->p
+        );
+      }
 
       $section9->writeText(
         'Status: ' . ucfirst(strip_tags($shakeAlert->status)),
@@ -1693,5 +1717,6 @@ class Rtf {
     $this->_format->p->setSpaceBetweenLines(1.5);
 
     $this->_format->table = new PHPRtfLite_ParFormat('left');
+    $this->_format->table->setSpaceAfter(0);
   }
 }

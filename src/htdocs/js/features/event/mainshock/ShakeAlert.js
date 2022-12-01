@@ -36,7 +36,8 @@ var ShakeAlert = function (options) {
       _getContent,
       _getData,
       _getLocation,
-      _getUrl;
+      _getUrl,
+      _getWeaAlert;
 
 
   _this = {};
@@ -66,7 +67,7 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get the cities table.
+   * Get the HTML for the cities table.
    *
    * @return table {String}
    */
@@ -114,6 +115,9 @@ var ShakeAlert = function (options) {
         '<p class="issued">Message issued ' +
           '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ({utcOffset})</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} (UTC)</time>' +
+          '<br>Last updated ' +
+          '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ({utcOffset})</time>' +
+          '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} (UTC)</time>' +
         '</p>' +
         '<h4>Alert Latency</h4>' +
         '<dl class="props alt">' +
@@ -148,6 +152,7 @@ var ShakeAlert = function (options) {
         '</ul>' +
         '<h4>Nearby Cities</h4>' +
         _getCities() +
+        _getWeaAlert() +
         '<p class="status"><span>{status}</span></p>' +
       '</div>' +
       '<div class="logo">' +
@@ -181,7 +186,8 @@ var ShakeAlert = function (options) {
         radius = '',
         status = product.properties['review-status'].toLowerCase(),
         time = props.time.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
-        datetime = Luxon.DateTime.fromISO(time).toUTC();
+        datetime = Luxon.DateTime.fromISO(time).toUTC(),
+        updateTime = Luxon.DateTime.fromSeconds(product.updateTime/1000).toUTC();
 
     json.initial_alert.features.forEach(feature => {
       if (feature.id === 'acircle_0.0') {
@@ -203,6 +209,7 @@ var ShakeAlert = function (options) {
       cities: json.cities.features,
       decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
       isoTime: datetime.toISO(),
+      isoUpdateTime: updateTime.toISO(),
       latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
       latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
       locationFinal: _getLocation(final),
@@ -218,8 +225,11 @@ var ShakeAlert = function (options) {
       status: status,
       url: mainshock.data.url + '/shake-alert',
       userTime: datetime.toLocal().toFormat(format),
+      userUpdateTime: updateTime.toLocal().toFormat(format),
       utcOffset: _app.utcOffset,
-      utcTime: datetime.toFormat(format)
+      utcTime: datetime.toFormat(format),
+      utcUpdateTime: updateTime.toFormat(format),
+      wea: props.wea_report || ''
     };
   };
 
@@ -264,6 +274,26 @@ var ShakeAlert = function (options) {
     return url;
   };
 
+  /**
+   * Get the WEA alert status.
+   *
+   * @return alert {String}
+   */
+  _getWeaAlert = function () {
+    var alert = '';
+
+    if (_this.data.wea) {
+      alert =
+        '<h4>Wireless Emergency Alert</h4>' +
+        '<p>' +
+          _this.data.wea + '<br>' +
+          'WEA alerts are distributed to the MMI 4+ area if ShakeAlert Peak M ≥ 5.0.' +
+        '</p>';
+    }
+
+    return alert;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -296,6 +326,7 @@ var ShakeAlert = function (options) {
     _getData = null;
     _getLocation = null;
     _getUrl = null;
+    _getWeaAlert = null;
 
     _this = null;
   };
