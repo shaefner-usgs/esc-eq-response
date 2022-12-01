@@ -628,10 +628,12 @@ var Mainshock = function (options) {
    * Disable the download RTF button.
    */
   _this.disableDownload = function () {
-    _button.setAttribute('disabled', 'disabled');
+    if (_button) {
+      _button.setAttribute('disabled', 'disabled');
 
-    if (_buttonTitle) {
-      _button.setAttribute('title', _buttonTitle);
+      if (_buttonTitle) {
+        _button.setAttribute('title', _buttonTitle);
+      }
     }
   };
 
