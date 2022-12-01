@@ -121,6 +121,7 @@ var Features = function (options) {
       _addLightbox,
       _cacheFeature,
       _createFeature,
+      _createRtf,
       _getMode,
       _initFeatures,
       _isReady,
@@ -289,11 +290,28 @@ var Features = function (options) {
       _features[mode][feature.id] = feature;
       _modules[feature.id] = module;
 
+      if (mode === 'rtf') {
+        _createRtf(); // creates RTF doc when no RTF Features exist
+      }
+
       _addFeature(feature);
     } else { // dependencies not ready
       _queue.push(setTimeout(() => {
         _createFeature(mode, module, opts);
       }, 250));
+    }
+  };
+
+  /**
+   * Create the RTF Event Summary document if all RTF Features are ready.
+   */
+  _createRtf = function () {
+    var status = _this.getStatus('rtf');
+
+    if (status === 'ready') {
+      Rtf({
+        app: _app
+      });
     }
   };
 
@@ -449,13 +467,8 @@ var Features = function (options) {
       feature.addListeners();
     }
 
-    // RTF document
     if (feature.mode === 'rtf') {
-      if (_this.getStatus('rtf') === 'ready') {
-        Rtf({
-          app: _app
-        });
-      }
+      _createRtf();
     }
   };
 
@@ -512,6 +525,10 @@ var Features = function (options) {
    */
   _this.createFeatures = function (mode = 'event') {
     var catalog = AppUtil.getParam('catalog') || 'comcat';
+
+    if (mode === 'rtf') {
+      _features.rtf = {}; // reset so _this.getStatus() is accurate
+    }
 
     _MODULES[mode].forEach(module => {
       _createFeature(mode, module);
@@ -606,7 +623,8 @@ var Features = function (options) {
    * @return status {String <error|initialized|loading|ready>} default is ''
    */
   _this.getStatus = function (mode = 'event') {
-    var catalog = AppUtil.getParam('catalog') || 'comcat',
+    var numFeatures, numModules,
+        catalog = AppUtil.getParam('catalog') || 'comcat',
         count = Object.keys(_features[mode]).length,
         status = ''; // default
 
@@ -626,6 +644,16 @@ var Features = function (options) {
       // Account for status of Mainshock's ComCat or double-difference Features
       if (mode === 'event' && status === 'ready') {
         status = _this.getStatus(catalog);
+      }
+    }
+
+    // Check that all RTF Features have been instantiated
+    if (mode === 'rtf') {
+      numFeatures = Object.keys(_features.rtf).length;
+      numModules = _MODULES.rtf.length;
+
+      if (numFeatures !== numModules) {
+        status = 'loading';
       }
     }
 
