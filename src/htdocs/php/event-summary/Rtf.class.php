@@ -1094,10 +1094,18 @@ class Rtf {
     );
 
     if (!empty(get_object_vars($shakeAlert))) {
-      $datetime = $shakeAlert->utcTime . $shakeAlert->decimalSecs;
+      $zone = $this->_data->time->zone; // 'user' or 'utc'
+      $key = $zone . 'Time';
+      $zoneDisplay = 'UTC';
+
+      if ($zone === 'user') {
+        $zoneDisplay = $shakeAlert->utcOffset;
+      }
+
+      $datetime = $shakeAlert->{$key} . $shakeAlert->decimalSecs;
 
       $section9->writeText(
-        'Message issued ' . $datetime . ' (UTC)',
+        "Message issued $datetime ($zoneDisplay)",
         $this->_font->body,
         $this->_format->body
       );
