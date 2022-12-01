@@ -1,0 +1,89 @@
+@use '../variables' as *;
+
+#shake-alert {
+  dl {
+    max-width: 21rem;
+  }
+
+  h3 {
+    align-items: flex-start;
+    gap: .25rem;
+  }
+
+  h4 span,
+  sup {
+    color: $text-color-lighter;
+    font-size: .75em;
+  }
+
+  td {
+    &:nth-child(2) {
+      padding-right: 1.25rem;
+      text-align: right;
+    }
+    &:nth-child(3) {
+      padding-right: 2.75rem;
+      text-align: right;
+    }
+    &:last-child {
+      text-align: center;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+
+    strong {
+      font-weight: 500;
+    }
+  }
+
+  .content {
+    align-items: flex-start;
+    display: flex;
+    gap: 2rem;
+    position: relative;
+  }
+
+  .issued {
+    margin-top: 0;
+  }
+
+  .logo {
+    position: sticky;
+    top: 4rem;
+
+    img {
+      max-width: 100%;
+      width: 250px;
+    }
+  }
+}
+
+/* Toggle between user/UTC time
+--------------------------------------------- */
+
+body.user #shake-alert time.utc,
+body.utc #shake-alert time.user {
+  display: none;
+}
+
+@media only screen
+and (max-width: $breakpoint-phone-width) {
+  #shake-alert {
+    img {
+      display: block;
+      margin: 1rem auto 0;
+    }
+
+    .content {
+      flex-flow: row wrap;
+    }
+
+    .details,
+    .logo {
+      width: 100%;
+    }
+  }
+}
