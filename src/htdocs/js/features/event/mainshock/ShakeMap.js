@@ -128,7 +128,7 @@ var ShakeMap = function (options) {
           '<dd>{dyfi}</dd>' +
         '</dl>' +
         '<p>' +
-          '<a href="{url}/shakemap" class="external" target="new">' +
+          '<a href="{url}" class="external" target="new">' +
             'Event Page ShakeMap' +
             '<i class="icon-link"></i>' +
           '</a>' +
@@ -213,7 +213,7 @@ var ShakeMap = function (options) {
       sa30: sa30 || '–',
       seismic: seismic||  '–',
       status: _getStatus(product),
-      url: _mainshock.data.url
+      url: _mainshock.data.url + '/shakemap'
     };
   };
 
