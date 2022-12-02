@@ -300,7 +300,7 @@ var ShakeAlert = function (options) {
     if (_this.data.wea) {
       alert =
         '<h4>Wireless Emergency Alert</h4>' +
-        '<p>' +
+        '<p class="wea">' +
           _this.data.wea + ' ' +
           'WEA alerts are distributed to the MMI 4+ area if ShakeAlert Peak M ≥ 5.0.' +
         '</p>';
