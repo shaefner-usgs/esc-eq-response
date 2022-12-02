@@ -203,6 +203,7 @@ var Rtf = function (options) {
     var data,
         prefix = (AppUtil.getParam('catalog') === 'dd' ? 'dd-' : ''),
         aftershocks = _app.Features.getFeature(`${prefix}aftershocks`),
+        dyfi = _app.Features.getFeature('dyfi'),
         el = document.getElementById('summaryPane'),
         description = {
           aftershocks: el.querySelector(`.${prefix}aftershocks .description`).innerText,
@@ -239,7 +240,7 @@ var Rtf = function (options) {
         utc: mainshock.data.utcDayofWeek
       },
       depthDisplay: mainshock.data.depthDisplay,
-      dyfi: products.dyfi,
+      dyfi: dyfi.data,
       eqid: mainshock.data.id,
       foreshocks: {
         bins: foreshocks.bins,
@@ -270,8 +271,7 @@ var Rtf = function (options) {
       pagerExposures: pagerExposures.data,
       plotNames: _app.PlotsPane.names,
       shakeAlert: shakeAlert.data,
-      shakemap: products.shakemap,
-      shakemapData: shakemap.data,
+      shakemap: shakemap.data,
       tectonic: products.tectonic,
       time: {
         local: mainshock.data.localTime,
@@ -357,26 +357,15 @@ var Rtf = function (options) {
   };
 
   /**
-   * Check if DYFI, Notice, PAGER, ShakeMap and Tectonic products exist, and if
-   * they do, return select properties for each.
+   * Check if Notice, PAGER and Tectonic products exist, and if they do, return
+   * select properties for each.
    *
    * @param products {Object}
    *
    * @return {Object}
    */
   _getProducts = function (products) {
-    var contents, dyfi, notice, pager, product, shakemap, tectonic;
-
-    if (products.dyfi) {
-      product = products.dyfi[0];
-      contents = product.contents;
-      dyfi = {
-        map: contents[product.code + '_ciim_geo.jpg'].url,
-        maxmmi: Number(product.properties.maxmmi),
-        plot: contents[product.code + '_plot_atten.jpg'].url,
-        responses: Number(product.properties.numResp)
-      };
-    }
+    var contents, notice, pager, product, tectonic;
 
     if (products['general-header']) {
       notice = products['general-header'][0].contents[''].bytes;
@@ -393,25 +382,13 @@ var Rtf = function (options) {
       };
     }
 
-    if (products.shakemap) {
-      contents = products.shakemap[0].contents;
-
-      if (contents['download/tvmap.jpg']) {
-        shakemap = contents['download/tvmap.jpg'].url;
-      } else if (contents['download/intensity.jpg'].url) {
-        shakemap = contents['download/intensity.jpg'].url;
-      }
-    }
-
     if (products['general-text']) {
       tectonic = products['general-text'][0].contents[''].bytes;
     }
 
     return {
-      dyfi: dyfi || {},
       notice: notice || '',
       pager: pager || {},
-      shakemap: shakemap || '',
       tectonic: tectonic || ''
     };
   };
