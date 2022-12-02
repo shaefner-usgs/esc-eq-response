@@ -43,6 +43,7 @@ var ShakeMap = function (options) {
       _getData,
       _getImages,
       _getProps,
+      _getStatus,
       _getUrl;
 
 
@@ -148,8 +149,7 @@ var ShakeMap = function (options) {
     var dyfi, mmi, pga, pgv, sa03, sa10, sa30, seismic,
         info = json.input.event_information,
         product = _mainshock.data.products.shakemap[0],
-        props = _getProps(json.output.ground_motions),
-        status = product.properties['review-status'].toLowerCase();
+        props = _getProps(json.output.ground_motions);
 
     if (info.intensity_observations) {
       dyfi = info.intensity_observations;
@@ -201,10 +201,6 @@ var ShakeMap = function (options) {
       }
     }
 
-    if (status === 'reviewed') {
-      status += '<i class="icon-check"></i>';
-    }
-
     return {
       dyfi: dyfi || '–',
       img: _mainshock.data.shakemapImg,
@@ -216,7 +212,7 @@ var ShakeMap = function (options) {
       sa10: sa10 || '–',
       sa30: sa30 || '–',
       seismic: seismic||  '–',
-      status: status,
+      status: _getStatus(product),
       url: _mainshock.data.url
     };
   };
@@ -283,6 +279,25 @@ var ShakeMap = function (options) {
       sa10: motions[keys.find(key => key.match(/sa.*1.*0/i))],
       sa30: motions[keys.find(key => key.match(/sa.*3.*0/i))]
     };
+  };
+
+  /**
+   * Get the review status.
+   *
+   * @param product {Object}
+   *
+   * @return status {String}
+   */
+  _getStatus = function (product) {
+    var status = 'not reviewed'; // default
+
+    status = (product.properties['review-status'] || status).toLowerCase();
+
+    if (status === 'reviewed') {
+      status += '<i class="icon-check"></i>';
+    }
+
+    return status;
   };
 
   /**
@@ -361,6 +376,7 @@ var ShakeMap = function (options) {
     _getData = null;
     _getImages = null;
     _getProps = null;
+    _getStatus = null;
     _getUrl = null;
 
     _this = null;

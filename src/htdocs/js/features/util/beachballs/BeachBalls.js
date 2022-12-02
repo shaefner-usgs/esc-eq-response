@@ -66,6 +66,7 @@ var BeachBalls = function (options) {
       _getAxis,
       _getData,
       _getProps,
+      _getStatus,
       _getTemplate;
 
 
@@ -223,14 +224,10 @@ var BeachBalls = function (options) {
         },
         duration = _data['sourcetime-duration'],
         moment = (_tensor.moment / _tensor.scale).toFixed(3) +
-          `e+${_tensor.exponent} ${_tensor.units}`,
-        status = _data['review-status'] || '';
+          `e+${_tensor.exponent} ${_tensor.units}`;
 
     if (duration) {
       halfDuration = duration / 2 + ' s';
-    }
-    if (status === 'reviewed') {
-      status += '<i class="icon-check"></i>';
     }
 
     return {
@@ -257,7 +254,7 @@ var BeachBalls = function (options) {
       pAxisPlunge: axes.P.plunge,
       pAxisValue: axes.P.value,
       percentDC: AppUtil.round(_tensor.percentDC * 100, 0) + '%',
-      status: status.toLowerCase(),
+      status: _getStatus(),
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
@@ -287,6 +284,23 @@ var BeachBalls = function (options) {
     }
 
     return template;
+  };
+
+  /**
+   * Get the review status.
+   *
+   * @return status {String}
+   */
+  _getStatus = function () {
+    var status = 'not reviewed'; // default
+
+    status = (_data['review-status'] || status).toLowerCase();
+
+    if (status === 'reviewed') {
+      status += '<i class="icon-check"></i>';
+    }
+
+    return status;
   };
 
   /**
@@ -375,6 +389,7 @@ var BeachBalls = function (options) {
     _getAxis = null;
     _getData = null;
     _getProps = null;
+    _getStatus = null;
     _getTemplate = null;
 
     _this = null;

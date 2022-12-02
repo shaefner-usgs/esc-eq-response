@@ -238,6 +238,17 @@ class Rtf {
   }
 
   /**
+   * Format the review status for display.
+   *
+   * @param $status {String}
+   *
+   * @return {String}
+   */
+  private function _getStatus($status) {
+    return 'Status: ' . ucwords(strip_tags($status));
+  }
+
+  /**
    * Get a roman numeral from number.
    *
    * @param $number {Number}
@@ -614,7 +625,7 @@ class Rtf {
         10
       );
       $section4->writeText(
-        'Status: ' . ucfirst($beachball->status),
+        $this->_getStatus($beachball->status),
         $this->_font->body,
         $this->_format->body
       );
@@ -635,7 +646,7 @@ class Rtf {
         10
       );
       $section4->writeText(
-        'Status: ' . ucfirst($beachball->status),
+        $this->_getStatus($beachball->status),
         $this->_font->body,
         $this->_format->body
       );
@@ -725,7 +736,7 @@ class Rtf {
       );
 
       $section5->writeText(
-        'Status: ' . ucfirst(strip_tags($smInfo->status)),
+        $this->_getStatus($smInfo->status),
         $this->_font->body,
         $this->_format->body
       );
@@ -1226,7 +1237,7 @@ class Rtf {
       }
 
       $section9->writeText(
-        'Status: ' . ucfirst(strip_tags($shakeAlert->status)),
+        $this->_getStatus($shakeAlert->status),
         $this->_font->body,
         $this->_format->body
       );

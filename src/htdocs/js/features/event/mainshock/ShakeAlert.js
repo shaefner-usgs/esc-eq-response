@@ -36,6 +36,7 @@ var ShakeAlert = function (options) {
       _getContent,
       _getData,
       _getLocation,
+      _getStatus,
       _getUrl,
       _getWeaAlert;
 
@@ -184,7 +185,6 @@ var ShakeAlert = function (options) {
         mainshock = _app.Features.getFeature('mainshock'),
         product = mainshock.data.products['shake-alert'][0],
         radius = '',
-        status = product.properties['review-status'].toLowerCase(),
         time = props.time.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
         datetime = Luxon.DateTime.fromISO(time).toUTC(),
         updateTime = Luxon.DateTime.fromSeconds(product.updateTime/1000).toUTC();
@@ -200,10 +200,6 @@ var ShakeAlert = function (options) {
         radius = AppUtil.round(radius, 1) + ' km';
       }
     });
-
-    if (status === 'reviewed') {
-      status += '<i class="icon-check"></i>';
-    }
 
     return {
       cities: json.cities.features,
@@ -222,7 +218,7 @@ var ShakeAlert = function (options) {
       numStations10: props.num_stations_10km,
       numStations100: props.num_stations_100km,
       radius: radius,
-      status: status,
+      status: _getStatus(product),
       url: mainshock.data.url + '/shake-alert',
       userTime: datetime.toLocal().toFormat(format),
       userUpdateTime: updateTime.toLocal().toFormat(format),
@@ -253,6 +249,25 @@ var ShakeAlert = function (options) {
   };
 
   /**
+   * Get the review status.
+   *
+   * @param product {Object}
+   *
+   * @return status {String}
+   */
+  _getStatus = function (product) {
+    var status = 'not reviewed'; // default
+
+    status = (product.properties['review-status'] || status).toLowerCase();
+
+    if (status === 'reviewed') {
+      status += '<i class="icon-check"></i>';
+    }
+
+    return status;
+  };
+
+  /**
    * Get the JSON feed's URL.
    *
    * @return url {String}
@@ -275,7 +290,7 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get the WEA alert status.
+   * Get the WEA alert.
    *
    * @return alert {String}
    */
@@ -325,6 +340,7 @@ var ShakeAlert = function (options) {
     _getContent = null;
     _getData = null;
     _getLocation = null;
+    _getStatus = null;
     _getUrl = null;
     _getWeaAlert = null;
 
