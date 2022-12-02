@@ -273,23 +273,15 @@ var ShakeMap = function (options) {
    * @return {Object}
    */
   _getProps = function (motions) {
-    var mmi;
+    var keys = Object.keys(motions);
 
-    // Property name is inconsistent
-    if (motions.intensity) {
-      mmi = motions.intensity;
-    } else if (motions.MMI) {
-      mmi = motions.MMI;
-    }
-
-    // Case-insensitive search for keys
     return {
-      mmi: mmi,
-      pga: motions[Object.keys(motions).find(key => key.match(/^PGA$/i))],
-      pgv: motions[Object.keys(motions).find(key => key.match(/^PGV$/i))],
-      sa03: motions[Object.keys(motions).find(key => key.match(/^SA\(0.3\)$/i))],
-      sa10: motions[Object.keys(motions).find(key => key.match(/^SA\(1.0\)$/i))],
-      sa30: motions[Object.keys(motions).find(key => key.match(/^SA\(3.0\)$/i))]
+      mmi: motions[keys.find(key => key.match(/mmi|intensity/i))],
+      pga: motions[keys.find(key => key.match(/pga/i))],
+      pgv: motions[keys.find(key => key.match(/pgv/i))],
+      sa03: motions[keys.find(key => key.match(/sa.*0.*3/i))],
+      sa10: motions[keys.find(key => key.match(/sa.*1.*0/i))],
+      sa30: motions[keys.find(key => key.match(/sa.*3.*0/i))]
     };
   };
 
