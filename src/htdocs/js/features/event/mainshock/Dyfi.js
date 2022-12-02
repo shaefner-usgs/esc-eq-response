@@ -17,6 +17,7 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *     {
  *       addListeners: {Function}
+ *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
  *       lightbox: {String}
@@ -32,12 +33,14 @@ var Dyfi = function (options) {
       _app,
       _el,
       _mainshock,
+      _product,
       _radioBar,
       _selected,
 
       _getContent,
       _getData,
-      _getImages;
+      _getImages,
+      _getStatus;
 
 
   _this = {};
@@ -47,11 +50,14 @@ var Dyfi = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'block';
 
+    _this.data = {},
     _this.id = 'dyfi';
     _this.lightbox = '';
     _this.name = 'Did You Feel It?';
 
     if (_mainshock.data.dyfiImg) {
+      _product = _mainshock.data.products.dyfi[0];
+      _this.data = _getData();
       _this.lightbox = _getContent();
 
       _app.Features.addContent(_this); // no feed data => add manually
@@ -65,7 +71,7 @@ var Dyfi = function (options) {
    */
   _getContent = function () {
     var template,
-        data = Object.assign({}, _getData(), {
+        data = Object.assign({}, _this.data, {
           radioBar: ''
         }),
         images = _getImages(),
@@ -89,6 +95,7 @@ var Dyfi = function (options) {
       '<div class="images">' +
         '{radioBar}' +
         imgsHtml +
+        '<p class="status"><span>{status}</span></p>' +
       '</div>' +
       '<div class="details">' +
         '<dl class="props alt">' +
@@ -98,7 +105,7 @@ var Dyfi = function (options) {
           '<dd>{responses}</dd>' +
         '</dl>' +
         '<p>' +
-          '<a href="{url}/dyfi" class="external" target="new">Event Page DYFI?' +
+          '<a href="{url}" class="external" target="new">Event Page DYFI?' +
             '<i class="icon-link"></i>' +
           '</a>' +
         '</p>' +
@@ -113,14 +120,16 @@ var Dyfi = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var props = _mainshock.data.products.dyfi[0].properties;
+    var props = _product.properties;
 
     return {
       cdi: _mainshock.data.cdi,
-      img: _mainshock.data.dyfiImg,
+      map: _mainshock.data.dyfiImg,
       maxmmi: props.maxmmi,
+      plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url,
       responses: AppUtil.addCommas(props.numResp),
-      url: _mainshock.data.url
+      status: _getStatus(props),
+      url: _mainshock.data.url + '/dyfi'
     };
   };
 
@@ -130,23 +139,48 @@ var Dyfi = function (options) {
    * @return images {Array}
    */
   _getImages = function () {
-    var dyfi = _mainshock.data.products.dyfi[0],
-        filename = _mainshock.data.id + '_ciim.jpg', // zip code map
+    var filename = _mainshock.data.id + '_ciim.jpg',
         images = [{ // default image
           id: 'block',
-          name: 'Intensity',
-          url: _mainshock.data.dyfiImg
+          name: 'Intensity Map',
+          url: _this.data.map
         }];
 
-    if (dyfi.contents[filename]) {
+    if (_product.contents[filename]) {
       images.push({
         id: 'zip',
-        name: 'ZIP Codes',
-        url: dyfi.contents[filename].url
+        name: 'ZIP Code Map',
+        url: _product.contents[filename].url
+      });
+    }
+    if (_this.data.plot) {
+      images.push({
+        id: 'plot',
+        name: 'Intensity vs. Distance',
+        url: _this.data.plot
       });
     }
 
     return images;
+  };
+
+  /**
+   * Get the review status.
+   *
+   * @param props {Object}
+   *
+   * @return status {String}
+   */
+  _getStatus = function (props) {
+    var status = 'not reviewed'; // default
+
+    status = (props['review-status'] || status).toLowerCase();
+
+    if (status === 'reviewed') {
+      status += '<i class="icon-check"></i>';
+    }
+
+    return status;
   };
 
   // ----------------------------------------------------------
@@ -185,12 +219,14 @@ var Dyfi = function (options) {
     _app = null;
     _el = null;
     _mainshock = null;
+    _product = null;
     _radioBar = null;
     _selected = null;
 
     _getContent = null;
     _getData = null;
     _getImages = null;
+    _getStatus = null;
 
     _this = null;
   };
