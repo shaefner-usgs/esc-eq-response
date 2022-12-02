@@ -659,12 +659,11 @@ var BeachBallView = function (options) {
     size = label.size;
 
     // measure actual top/right/bottom/left
-    bottom = 0;
-    left = 0;
-    right = 0;
-    top = 0;
     bottom = y - size.height;
     top = y + size.height;
+    left = 0;
+    right = 0;
+
     if (label.align === 'left') {
       left = x;
       right = x + size.width;
@@ -693,6 +692,14 @@ var BeachBallView = function (options) {
       right = right - _width;
     } else {
       right = 0;
+    }
+
+    // add padding for axis labels that get cutoff sometimes
+    if (bottom < 8) {
+      bottom = 8;
+    }
+    if (top < 8) {
+      top = 8;
     }
 
     // change size
