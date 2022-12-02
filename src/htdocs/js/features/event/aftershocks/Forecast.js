@@ -99,7 +99,7 @@ var Forecast = function (options) {
     return L.Util.template(
       '<li>' +
         '<a href="{url}" target="new">' +
-          '<h4>M {mag}+</h4>' +
+          '<h5>M {mag}+</h5>' +
           '<ul>' +
             '<li class="probability">{probability}</li>' +
             '<li class="likely">' +

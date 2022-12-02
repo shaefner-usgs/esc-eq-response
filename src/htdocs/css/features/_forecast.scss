@@ -49,7 +49,7 @@
             transition: all $effect-on-duration ease-out;
           }
 
-          h4 {
+          h5 {
             background: $accent-color-lightest;
             color: $text-color-darker;
             transition: all $effect-on-duration ease-out;
@@ -57,7 +57,7 @@
         }
 
         &:active {
-          h4 {
+          h5 {
             background: $accent-color;
             color: #fff;
           }
@@ -72,10 +72,11 @@
         transition: all $effect-off-duration ease-in;
       }
 
-      h4 {
+      h5 {
         background: $bg-color-darker;
         border-radius: $button-border-radius $button-border-radius 0 0;
         color: $text-color;
+        font-size: 1.25rem;
         margin: 0;
         padding: 4px 0;
         transition: all $effect-off-duration ease-in;
