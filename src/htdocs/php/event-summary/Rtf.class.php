@@ -681,7 +681,9 @@ class Rtf {
    * Section 5: Ground Shaking.
    */
   private function _createSection5() {
+    $dyfi = $this->_data->dyfi;
     $section5 = $this->_rtf->addSection();
+    $shakemap = $this->_data->shakemap;
 
     $section5->writeText(
       'Ground Shaking',
@@ -689,54 +691,54 @@ class Rtf {
       $this->_format->h2
     );
 
-    if ($this->_data->shakemap) {
+    if (!empty(get_object_vars($shakemap))) {
       $section5->writeText(
         'ShakeMap',
         $this->_font->h4,
         $this->_format->h4
       );
 
-      $smInfo = $this->_data->shakemapData;
-
       $section5->writeText(
-        'Max MMI: ' . strip_tags($smInfo->mmi),
+        'Max MMI: ' . strip_tags($shakemap->mmi),
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max PGA: ' . strip_tags($smInfo->pga),
+        'Max PGA: ' . strip_tags($shakemap->pga),
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max PGV: ' . strip_tags($smInfo->pgv),
+        'Max PGV: ' . strip_tags($shakemap->pgv),
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max SA (0.3s): ' . strip_tags($smInfo->sa03),
+        'Max SA (0.3s): ' . strip_tags($shakemap->sa03),
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max SA (1.0s): ' . strip_tags($smInfo->sa10),
+        'Max SA (1.0s): ' . strip_tags($shakemap->sa10),
         $this->_font->body,
         $this->_format->body
       );
       $section5->writeText(
-        'Max SA (3.0s): ' . strip_tags($smInfo->sa30),
+        'Max SA (3.0s): ' . strip_tags($shakemap->sa30),
         $this->_font->body,
-        $this->_format->body
+        $this->_format->p
       );
 
-      $section5->addImage(
-        $this->_getRemoteImage($this->_data->shakemap),
-        $this->_format->image,
-        12
-      );
+      if (property_exists($shakemap, 'img')) {
+        $section5->addImage(
+          $this->_getRemoteImage($shakemap->img),
+          $this->_format->image,
+          12
+        );
+      }
 
       $section5->writeText(
-        $this->_getStatus($smInfo->status),
+        $this->_getStatus($shakemap->status),
         $this->_font->body,
         $this->_format->body
       );
@@ -753,8 +755,6 @@ class Rtf {
       $this->_format->body
     );
 
-    $dyfi = $this->_data->dyfi;
-
     if (!empty(get_object_vars($dyfi))) {
       $section5->writeText(
         'Did You Feel It?',
@@ -769,7 +769,7 @@ class Rtf {
       $section5->writeText(
         'Max MMI: ' . $dyfi->maxmmi,
         $this->_font->body,
-        $this->_format->body
+        $this->_format->p
       );
 
       if (property_exists($dyfi, 'map')) {
@@ -786,6 +786,12 @@ class Rtf {
           12
         );
       }
+
+      $section5->writeText(
+        $this->_getStatus($dyfi->status),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
 
     $section5->writeText(
@@ -1180,7 +1186,7 @@ class Rtf {
         $this->_format->h4
       );
       $section9->writeText(
-        'Inital: ' . $shakeAlert->locationInitial,
+        'Initial: ' . $shakeAlert->locationInitial,
         $this->_font->body,
         $this->_format->body
       );
@@ -1225,11 +1231,7 @@ class Rtf {
           $this->_format->h4
         );
         $section9->writeText(
-          $shakeAlert->wea,
-          $this->_font->body,
-          $this->_format->body
-        );
-        $section9->writeText(
+          $shakeAlert->wea . ' ' .
           'WEA alerts are distributed to the MMI 4+ area if ShakeAlert Peak M ≥ 5.0.',
           $this->_font->body,
           $this->_format->p
