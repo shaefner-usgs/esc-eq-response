@@ -40,7 +40,6 @@ _DEFAULTS = {
  * @return _this {Object}
  *     {
  *       addData: {Function}
- *       addListeners: {Function}
  *       data: {Array}
  *       destroy: {Function}
  *       getContent: {Function}
@@ -48,7 +47,6 @@ _DEFAULTS = {
  *       getTooltip: {Function}
  *       mapLayer: {L.FeatureGroup}
  *       params: {Object}
- *       removeListeners: {Function}
  *     }
  */
 var Earthquakes = function (options) {
@@ -62,7 +60,6 @@ var Earthquakes = function (options) {
       _markerOptions,
 
       _addBubbles,
-      _addListeners,
       _filter,
       _getAge,
       _getData,
@@ -175,17 +172,6 @@ var Earthquakes = function (options) {
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
         '</a>';
     }
-  };
-
-  /**
-   * Event handler that adds the "Select" button's listener.
-   *
-   * @param e {Event}
-   */
-  _addListeners = function (e) {
-    var button = e.popup.getElement().querySelector('button');
-
-    button.addEventListener('click', _setMainshock);
   };
 
   /**
@@ -389,9 +375,16 @@ var Earthquakes = function (options) {
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var eq = _this.data.find(item => item.id === feature.id); // eqid
+    var button,
+        div = L.DomUtil.create('div'),
+        eq = _this.data.find(item => item.id === feature.id); // eqid
 
-    layer.bindPopup(_this.getContent(eq), {
+    div.innerHTML = _this.getContent(eq);
+    button = div.querySelector('button');
+
+    button.addEventListener('click', _setMainshock);
+
+    layer.bindPopup(div, {
       maxWidth: 375,
       minWidth: 250
     }).bindTooltip(_this.getTooltip(eq));
@@ -418,14 +411,15 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Event handler that removes the "Select" button's listener.
-   *
-   * @param e {Event}
+   * Remove the "Select" button listeners.
    */
-  _removeListeners = function (e) {
-    var button = e.popup.getElement().querySelector('button');
+  _removeListeners = function () {
+    _this.mapLayer.eachLayer(layer => {
+      var div = layer.getPopup().getContent(),
+          button = div.querySelector('button');
 
-    button.removeEventListener('click', _setMainshock);
+      button.removeEventListener('click', _setMainshock);
+    });
   };
 
   /**
@@ -459,19 +453,11 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    _this.mapLayer.on({
-      popupopen: _addListeners,
-      popupclose: _removeListeners
-    });
-  };
-
-  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
+    _removeListeners();
+
     _initialize = null;
 
     _app = null;
@@ -481,7 +467,6 @@ var Earthquakes = function (options) {
     _markerOptions = null;
 
     _addBubbles = null;
-    _addListeners = null;
     _filter = null;
     _getAge = null;
     _getData = null;
@@ -588,16 +573,6 @@ var Earthquakes = function (options) {
       '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
       eq
     );
-  };
-
-  /**
-   * Remove event listeners.
-   */
-  _this.removeListeners = function () {
-    _this.mapLayer.off({
-      popupopen: _addListeners,
-      popupclose: _removeListeners
-    });
   };
 
 
