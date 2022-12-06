@@ -38,6 +38,7 @@ var ShakeMap = function (options) {
       _radioBar,
       _selected,
 
+      _addBubble,
       _fetch,
       _getContent,
       _getData,
@@ -61,6 +62,19 @@ var ShakeMap = function (options) {
     _this.url = _getUrl();
 
     _fetch();
+  };
+
+  /**
+   * Add the intensity bubble to the Lightbox's title.
+   */
+  _addBubble = function () {
+    var bubble = '' +
+          `<span class="mmi${_mainshock.data.mmi} impact-bubble">` +
+            `<strong class="roman">${_mainshock.data.mmi}</strong>` +
+          '</span>',
+        h3 = document.getElementById('shakemap').querySelector('h3');
+
+    h3.innerHTML += bubble;
   };
 
   /**
@@ -371,6 +385,7 @@ var ShakeMap = function (options) {
     _radioBar = null;
     _selected = null;
 
+    _addBubble = null;
     _fetch = null;
     _getContent = null;
     _getData = null;
@@ -392,9 +407,10 @@ var ShakeMap = function (options) {
   };
 
   /**
-   * Set the selected RadioBar option.
+   * Add the bubble and set the selected RadioBar option.
    */
   _this.render = function () {
+    _addBubble();
     _radioBar.setOption.call(document.getElementById(_selected));
   };
 

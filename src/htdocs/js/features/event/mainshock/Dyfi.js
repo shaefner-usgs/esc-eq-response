@@ -37,6 +37,7 @@ var Dyfi = function (options) {
       _radioBar,
       _selected,
 
+      _addBubble,
       _getContent,
       _getData,
       _getImages,
@@ -62,6 +63,19 @@ var Dyfi = function (options) {
 
       _app.Features.addContent(_this); // no feed data => add manually
     }
+  };
+
+  /**
+   * Add the intensity bubble to the Lightbox's title.
+   */
+  _addBubble = function () {
+    var bubble = '' +
+          `<span class="mmi${_mainshock.data.cdi} impact-bubble">` +
+            `<strong class="roman">${_mainshock.data.cdi}</strong>` +
+          '</span>',
+        h3 = document.getElementById('dyfi').querySelector('h3');
+
+    h3.innerHTML += bubble;
   };
 
   /**
@@ -223,6 +237,7 @@ var Dyfi = function (options) {
     _radioBar = null;
     _selected = null;
 
+    _addBubble = null;
     _getContent = null;
     _getData = null;
     _getImages = null;
@@ -241,9 +256,10 @@ var Dyfi = function (options) {
   };
 
   /**
-   * Set the selected RadioBar option.
+   * Add the bubble and set the selected RadioBar option.
    */
   _this.render = function () {
+    _addBubble();
     _radioBar.setOption.call(document.getElementById(_selected));
   };
 
