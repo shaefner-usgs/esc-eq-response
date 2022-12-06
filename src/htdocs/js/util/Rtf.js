@@ -257,10 +257,10 @@ var Rtf = function (options) {
         magThreshold: _magThreshold,
         plots: _plots.historical
       },
-      historicalEvents: historicalEvents.events,
+      historicalEvents: historicalEvents.data,
       magDisplay: mainshock.data.magDisplay,
       magType: mainshock.data.magType,
-      nearbyCities: nearbyCities.cities,
+      nearbyCities: nearbyCities.data,
       notice: products.notice,
       pager: products.pager,
       pagerCities: pagerCities.data,

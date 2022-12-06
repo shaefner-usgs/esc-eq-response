@@ -13,8 +13,8 @@
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       data: {Array}
  *       destroy: {Function}
- *       events: {Array}
  *       id: {String}
  *       name: {String}
  *       url: {String}
@@ -35,7 +35,7 @@ var HistoricalEvents = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
-    _this.events = [];
+    _this.data = [];
     _this.id = 'historical-events';
     _this.name = 'Historical Events';
     _this.url = _getUrl();
@@ -87,7 +87,7 @@ var HistoricalEvents = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    _this.events = json;
+    _this.data = json;
   };
 
   /**

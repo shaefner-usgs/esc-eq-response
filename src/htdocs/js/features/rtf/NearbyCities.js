@@ -13,7 +13,7 @@
  * @return _this {Object}
  *     {
  *       addData: {Function}
- *       cities: {Array}
+ *       data: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String}
@@ -35,7 +35,7 @@ var NearbyCities = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
-    _this.cities = [];
+    _this.data = [];
     _this.id = 'nearby-cities';
     _this.name = 'Nearby Cities';
     _this.url = _getUrl();
@@ -87,7 +87,7 @@ var NearbyCities = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    _this.cities = json;
+    _this.data = json;
   };
 
   /**
