@@ -17,11 +17,13 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       addListeners: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
+ *       removeListeners: {Function}
  *       url: {String}
  *     }
  */
@@ -30,6 +32,7 @@ var ShakeAlert = function (options) {
       _initialize,
 
       _app,
+      _el,
 
       _fetch,
       _getCities,
@@ -324,6 +327,15 @@ var ShakeAlert = function (options) {
   };
 
   /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    _el = document.querySelector('#summaryPane .mainshock .shake-alert');
+
+    _el.addEventListener('click', _app.Features.showLightbox);
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
@@ -334,6 +346,7 @@ var ShakeAlert = function (options) {
     _initialize = null;
 
     _app = null;
+    _el = null;
 
     _fetch = null;
     _getCities = null;
@@ -347,6 +360,14 @@ var ShakeAlert = function (options) {
     _this = null;
   };
 
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    if (_el) {
+      _el.removeEventListener('click', _app.Features.showLightbox);
+    }
+  };
 
   _initialize(options);
   options = null;

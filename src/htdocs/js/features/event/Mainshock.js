@@ -566,23 +566,12 @@ var Mainshock = function (options) {
 
   /**
    * Add event listeners.
-   *
-   * Note: event listeners for the product Lightboxes are added by their
-   * respective Feature classes.
    */
   _this.addListeners = function () {
-    var el = document.querySelector('#summaryPane .mainshock .details'),
-        shakealert = el.querySelector('.shake-alert');
-
     _button = document.getElementById('download');
 
     // Create RTF Features (RTF document is created when all Features are ready)
     _button.addEventListener('click', _createFeatures);
-
-    // Show Feature's Lightboxes
-    if (shakealert) {
-      shakealert.addEventListener('click', _app.Features.showLightbox);
-    }
   };
 
   /**
