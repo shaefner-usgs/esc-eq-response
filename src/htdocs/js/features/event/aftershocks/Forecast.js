@@ -270,7 +270,7 @@ var Forecast = function (options) {
         '<h3>{name}</h3>' +
         '<p>Probability of one or more aftershocks in the specified time ' +
           'frame and magnitude range starting on ' +
-          '<time datetime="{isoTime}" class="user">{userTime} ({utcOffset})</time> ' +
+          '<time datetime="{isoTime}" class="user">{userTime} ({utcOffset})</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>. ' +
           'The likely number of aftershocks (95% confidence range) is listed ' +
           'below the probability.</p>' +
