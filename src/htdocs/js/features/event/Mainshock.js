@@ -112,7 +112,7 @@ var Mainshock = function (options) {
 
     if (_this.data.cdi) { // DYFI
       template +=
-        '<li>' +
+        '<li class="dyfi feature">' +
           '<strong>' +
             '<abbr title="Did You Feel It?">DYFI?</abbr>' +
           '</strong>' +
@@ -123,7 +123,7 @@ var Mainshock = function (options) {
 
     if (_this.data.mmi) { // ShakeMap
       template +=
-        '<li>' +
+        '<li class="shakemap feature">' +
           '<strong>ShakeMap</strong>' +
           '{mmiBubble}' +
           '<small>{level}</small>' +
@@ -252,7 +252,7 @@ var Mainshock = function (options) {
       template =
         '<div class="dyfi feature">' +
           '<h4>Did You Feel It?</h4>' +
-          '<a href="{dyfiImg}">' + img + '</a>' +
+          '<a href="{url}/dyfi">' + img + '</a>' +
         '</div>';
     }
 
@@ -331,7 +331,7 @@ var Mainshock = function (options) {
       template =
         '<div class="shakemap feature">' +
           '<h4>ShakeMap</h4>' +
-          '<a href="{shakemapImg}">' + img + '</a>' +
+          '<a href="{url}/shakemap">' + img + '</a>' +
         '</div>';
     }
 
