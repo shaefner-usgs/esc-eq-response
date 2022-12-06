@@ -36,6 +36,10 @@
         padding-right: 1.25rem;
       }
 
+      &.feature {
+        cursor: pointer;
+      }
+
       > small,
       > span {
         white-space: nowrap;
