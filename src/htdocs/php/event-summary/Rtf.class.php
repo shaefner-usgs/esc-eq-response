@@ -90,9 +90,12 @@ class Rtf {
     $this->_data->notice = trim($this->_data->notice);
 
     // Strip extra whitespace from PAGER summary
-    $this->_data->pagerComments->structComment = preg_replace(
-      '/\s+/', ' ', $this->_data->pagerComments->structComment
-    );
+    $pager = $this->_data->pager;
+    if (!empty(get_object_vars($pager))) {
+      $pager->structures = preg_replace(
+        '/\s+/', ' ', $pager->structures
+      );
+    }
 
     // Clean up / remove NULL values from historical events list
     foreach ($this->_data->historicalEvents as $key => $event) {
@@ -530,21 +533,22 @@ class Rtf {
         );
       }
 
-      $pagerComments = $this->_data->pagerComments;
-
-      if ($pagerComments->impact1 || $pagerComments->structComment) {
+      if (
+        property_exists($pager, 'impact') ||
+        property_exists($pager, 'structures')
+      ) {
         $section3->writeText(
           'Summary',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->writeText(
-          $pagerComments->impact1,
+          $pager->impact,
           $this->_font->body,
           $this->_format->p // margin below
         );
         $section3->writeText(
-          $pagerComments->structComment,
+          $pager->structures,
           $this->_font->body,
           $this->_format->body // no margin below (margins don't collapse)
         );
@@ -591,9 +595,15 @@ class Rtf {
         );
       }
 
-      if (!empty(get_object_vars($this->_data->pagerExposures))) {
+      if (!empty(get_object_vars($pager->exposures))) {
         $this->_createTableExposure($section3);
       }
+
+      $section3->writeText(
+        $this->_getStatus($pager->status),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
   }
 
@@ -1410,8 +1420,9 @@ class Rtf {
    *     RTF Document section
    */
   private function _createTableExposure($section) {
+    $pager = $this->_data->pager;
     $cities = array_filter( // keep values where mmi >=2
-      $this->_data->pagerCities,
+      $pager->cities,
       function($value) {
         if (intVal(round($value->mmi)) >= 2) {
           return $value;
@@ -1419,7 +1430,7 @@ class Rtf {
       }
     );
     $mmis = array_filter( // keep values where mmi >=2
-      $this->_data->pagerExposures->mmi,
+      $pager->exposures->mmi,
       function($value) {
         if ($value >= 2) {
           return $value;
@@ -1427,15 +1438,15 @@ class Rtf {
       }
     );
     $population = array_filter( // keep values where population > 0 and mmi >=2
-      $this->_data->pagerExposures->population,
+      $pager->exposures->population,
       function($value, $key) {
-        if ($value > 0 && $this->_data->pagerExposures->mmi[$key] >= 2) {
+        if ($value > 0 && $this->_data->pager->exposures->mmi[$key] >= 2) {
           return $value;
         }
       },
       ARRAY_FILTER_USE_BOTH
     );
-    $shaking = $this->_data->pagerExposures->shaking;
+    $shaking = $pager->exposures->shaking;
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
     if ($numRows > 1) { // table contains data (and not just a header row)

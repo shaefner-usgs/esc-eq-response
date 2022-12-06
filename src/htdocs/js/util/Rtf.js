@@ -216,9 +216,7 @@ var Rtf = function (options) {
         historicalEvents = _app.Features.getFeature('historical-events'),
         mainshock = _app.Features.getFeature('mainshock'),
         nearbyCities = _app.Features.getFeature('nearby-cities'),
-        pagerCities = _app.Features.getFeature('pager-cities'),
-        pagerComments = _app.Features.getFeature('pager-comments'),
-        pagerExposures = _app.Features.getFeature('pager-exposures'),
+        pager = _app.Features.getFeature('pager'),
         products = _getProducts(mainshock.data.products),
         shakeAlert = _app.Features.getFeature('shake-alert'),
         shakemap = _app.Features.getFeature('shakemap'),
@@ -262,13 +260,7 @@ var Rtf = function (options) {
       magType: mainshock.data.magType,
       nearbyCities: nearbyCities.data,
       notice: products.notice,
-      pager: products.pager,
-      pagerCities: pagerCities.data,
-      pagerComments: {
-        impact1: pagerComments.impact1,
-        structComment: pagerComments.structComment
-      },
-      pagerExposures: pagerExposures.data,
+      pager: pager.data,
       plotNames: _app.PlotsPane.names,
       shakeAlert: shakeAlert.data,
       shakemap: shakemap.data,
@@ -357,29 +349,18 @@ var Rtf = function (options) {
   };
 
   /**
-   * Check if Notice, PAGER and Tectonic products exist, and if they do, return
-   * select properties for each.
+   * Check if Notice and Tectonic products exist, and if they do, return select
+   * properties for each.
    *
    * @param products {Object}
    *
    * @return {Object}
    */
   _getProducts = function (products) {
-    var contents, notice, pager, product, tectonic;
+    var notice, tectonic;
 
     if (products['general-header']) {
       notice = products['general-header'][0].contents[''].bytes;
-    }
-
-    if (products.losspager) {
-      product = products.losspager[0];
-      contents = product.contents;
-      pager = {
-        alert: product.properties.alertlevel,
-        economic: contents['alertecon.png'].url,
-        exposure: contents['exposure.png'].url,
-        fatalities: contents['alertfatal.png'].url
-      };
     }
 
     if (products['general-text']) {
@@ -388,7 +369,6 @@ var Rtf = function (options) {
 
     return {
       notice: notice || '',
-      pager: pager || {},
       tectonic: tectonic || ''
     };
   };
