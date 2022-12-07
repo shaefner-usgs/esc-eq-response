@@ -103,16 +103,16 @@ var Lightbox = function (options) {
    * @return {String}
    */
   _getContent = function (data) {
-    var template =
+    return L.Util.template(
       '<div class="container">' +
         '<div class="close">' +
           '<a class="icon-close">×</a>' +
         '</div>' +
         '<h3>{title}</h3>' +
         '<div class="content">{content}</div>' +
-      '</div>';
-
-    return L.Util.template(template, data);
+      '</div>',
+      data
+    );
   };
 
   /**

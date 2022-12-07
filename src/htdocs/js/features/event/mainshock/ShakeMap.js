@@ -96,8 +96,7 @@ var ShakeMap = function (options) {
    * @return {String}
    */
   _getContent = function () {
-    var template,
-        data = Object.assign({}, _this.data, {
+    var data = Object.assign({}, _this.data, {
           radioBar: ''
         }),
         images = _getImages(),
@@ -117,7 +116,7 @@ var ShakeMap = function (options) {
       data.radioBar = _radioBar.getHtml();
     }
 
-    template =
+    return L.Util.template(
       '<div class="images">' +
         '{radioBar}' +
         imgsHtml +
@@ -148,9 +147,9 @@ var ShakeMap = function (options) {
             '<i class="icon-link"></i>' +
           '</a>' +
         '</p>' +
-      '</div>';
-
-    return L.Util.template(template, data);
+      '</div>',
+      data
+    );
   };
 
   /**

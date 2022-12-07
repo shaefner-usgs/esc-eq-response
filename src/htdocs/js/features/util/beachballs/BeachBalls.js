@@ -351,49 +351,48 @@ var BeachBalls = function (options) {
    * @return {String}
    */
   _this.getContent = function () {
-    var data = _getData(),
-        template =
-          '<div class="details">' +
-            '<dl class="props alt">' +
-              _getProps() +
-              '<dt>Catalog</dt>' +
-              '<dd class="catalog">{catalog}</dd>' +
-              '<dt>Data Source</dt>' +
-              '<dd class="source">{dataSource}</dd>' +
-              '<dt>Contributor</dt>' +
-              '<dd class="contributor">{contributor}</dd>' +
-            '</dl>' +
-            '<h4>Nodal Planes</h4>' +
-            '<table class="planes">' +
-              '<thead>' +
-                '<tr>' +
-                  '<th>Plane</th>' +
-                  '<th>Strike</th>' +
-                  '<th>Dip</th>' +
-                  '<th>Rake</th>' +
-                '</tr>' +
-              '</thead>' +
-              '<tbody>' +
-                '<tr>' +
-                  '<th>NP1</th>' +
-                  '<td>{np1Strike}</td>' +
-                  '<td>{np1Dip}</td>' +
-                  '<td>{np1Rake}</td>' +
-                '</tr>' +
-                '<tr>' +
-                  '<th>NP2</th>' +
-                  '<td>{np2Strike}</td>' +
-                  '<td>{np2Dip}</td>' +
-                  '<td>{np2Rake}</td>' +
-                '</tr>' +
-              '</tbody>' +
-            '</table>' +
-            _getAxes() +
-            '<p class="status"><span>{status}</span></p>' +
-          '</div>' +
-          '<div class="beachball"></div>';
-
-    return L.Util.template(template, data);
+    return L.Util.template(
+      '<div class="details">' +
+        '<dl class="props alt">' +
+          _getProps() +
+          '<dt>Catalog</dt>' +
+          '<dd class="catalog">{catalog}</dd>' +
+          '<dt>Data Source</dt>' +
+          '<dd class="source">{dataSource}</dd>' +
+          '<dt>Contributor</dt>' +
+          '<dd class="contributor">{contributor}</dd>' +
+        '</dl>' +
+        '<h4>Nodal Planes</h4>' +
+        '<table class="planes">' +
+          '<thead>' +
+            '<tr>' +
+              '<th>Plane</th>' +
+              '<th>Strike</th>' +
+              '<th>Dip</th>' +
+              '<th>Rake</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr>' +
+              '<th>NP1</th>' +
+              '<td>{np1Strike}</td>' +
+              '<td>{np1Dip}</td>' +
+              '<td>{np1Rake}</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<th>NP2</th>' +
+              '<td>{np2Strike}</td>' +
+              '<td>{np2Dip}</td>' +
+              '<td>{np2Rake}</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        _getAxes() +
+        '<p class="status"><span>{status}</span></p>' +
+      '</div>' +
+      '<div class="beachball"></div>',
+      _getData()
+    );
   };
 
   /**
