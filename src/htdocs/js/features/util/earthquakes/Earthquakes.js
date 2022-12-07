@@ -246,6 +246,7 @@ var Earthquakes = function (options) {
           magDisplay = AppUtil.round(props.mag, 1), // String
           mag = parseFloat(magDisplay) || 0,
           magType = props.magType || 'M',
+          status = props.status || '',
           template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
@@ -257,7 +258,7 @@ var Earthquakes = function (options) {
       if (props.place) {
         title += '—' + props.place;
       }
-      if (props.status.toLowerCase() === 'reviewed') {
+      if (status.toLowerCase() === 'reviewed') {
         statusIcon = '<i class="icon-check"></i>';
       }
 
@@ -303,7 +304,7 @@ var Earthquakes = function (options) {
         magType: magType,
         mmi: AppUtil.romanize(props.mmi), // ShakeMap
         radius: AppUtil.getRadius(mag),
-        status: props.status || '',
+        status: status,
         statusIcon: statusIcon || '',
         title: title,
         tsunami: props.tsunami || 0,
