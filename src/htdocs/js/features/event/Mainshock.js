@@ -132,7 +132,7 @@ var Mainshock = function (options) {
 
     if (_this.data.alert) { // PAGER
       template +=
-        '<li>' +
+        '<li class="pager feature">' +
           '<strong>' +
             '<abbr title="Prompt Assessment of Global Earthquakes for Response">PAGER</abbr>' +
           '</strong>' +
