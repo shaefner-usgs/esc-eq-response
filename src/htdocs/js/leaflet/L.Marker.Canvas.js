@@ -19,14 +19,14 @@ L.Marker.Canvas = L.Marker.extend({
   onAdd: function (map) {
     var marker,
         className = this.id,
-        canvas = document.querySelector('#mapPane canvas.' + className);
+        canvas = document.querySelector(`#mapPane span.${className}`);
 
     L.Marker.prototype.onAdd.call(this, map);
 
     if (canvas) {
       marker = document.querySelector('.map .' + className);
 
-      marker.appendChild(canvas); // move <canvas> to Marker
+      marker.appendChild(canvas); // move <canvas> container to Marker
     }
 
     map.on('moveend viewreset', this._update, this);
@@ -40,11 +40,11 @@ L.Marker.Canvas = L.Marker.extend({
    */
   onRemove: function (map) {
     var className = this.options.icon.options.className,
-        canvas = document.querySelector('.map canvas.' + className),
+        canvas = document.querySelector(`#mapPane span.${className}`),
         container = document.querySelector('#mapPane .container');
 
     if (canvas) {
-      container.appendChild(canvas); // put <canvas> back
+      container.appendChild(canvas); // put <canvas> container back
     }
 
     L.Marker.prototype.onRemove.call(this, map);
