@@ -407,10 +407,7 @@ var MapPane = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var canvasEls = _el.querySelectorAll('.container canvas');
-
-    // Purge canvas elements (FM, MT beachballs)
-    canvasEls.forEach(el => el.remove());
+    _el.querySelector('.container').innerHTML = '';
 
     _initialExtent = true;
     _rendered = false;
