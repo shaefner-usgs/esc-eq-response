@@ -62,6 +62,7 @@ var Earthquakes = function (options) {
       _addBubbles,
       _filter,
       _getAge,
+      _getBubbles,
       _getData,
       _getDirection,
       _getDuration,
@@ -223,6 +224,38 @@ var Earthquakes = function (options) {
     }
 
     return age;
+  };
+
+  /**
+   * Get the bubbles template.
+   *
+   * Wraps the Mainshock's DYFI, ShakeMap and PAGER bubbles in a <span>
+   * containing CSS classes needed by their Lightboxes.
+   *
+   * @param eq {Object}
+   *
+   * @return bubbles {String}
+   */
+  _getBubbles = function (eq) {
+    var bubbles = '{cdiBubble}{mmiBubble}{alertBubble}{tsunamiBubble}'; // default
+
+    if (eq.featureId === 'mainshock') {
+      bubbles = '';
+
+      if (eq.cdiBubble) {
+        bubbles += '<span class="dyfi feature">{cdiBubble}</span>';
+      }
+      if (eq.mmiBubble) {
+        bubbles += '<span class="shakemap feature">{mmiBubble}</span>';
+      }
+      if (eq.alertBubble) {
+        bubbles += '<span class="pager feature">{alertBubble}</span>';
+      }
+
+      bubbles += '{tsunamiBubble}';
+    }
+
+    return bubbles;
   };
 
   /**
@@ -470,6 +503,7 @@ var Earthquakes = function (options) {
     _addBubbles = null;
     _filter = null;
     _getAge = null;
+    _getBubbles = null;
     _getData = null;
     _getDirection = null;
     _getDuration = null;
@@ -489,19 +523,17 @@ var Earthquakes = function (options) {
    * @return {String}
    */
   _this.getContent = function (eq) {
-    var data = eq;
+    var data = Object.assign({}, eq);
 
     if (eq.featureId === 'mainshock') {
-      data = Object.assign({}, eq, {
-        id: '', // not needed and removing it avoids duplicating it in the DOM
-      });
+      data.id = ''; // not needed; removing it avoids duplicating it in the DOM
     }
 
     return L.Util.template(
       '<div id="{id}" class="earthquake {featureId}">' +
         '<h4>{title}</h4>' +
         '<div class="impact-bubbles">' +
-          '{cdiBubble}{mmiBubble}{alertBubble}{tsunamiBubble}' +
+          _getBubbles(eq) +
         '</div>' +
         '<dl class="props">' +
           '<dt class="time">Time</dt>' +
