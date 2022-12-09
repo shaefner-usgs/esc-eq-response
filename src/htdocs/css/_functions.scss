@@ -1,5 +1,27 @@
 @use 'sass:math';
 
+// Convert px to rem
+@function px-to-rem($px-value) {
+	@return ($px-value / 16) + rem;
+}
+
+// Convert rem to px
+@function rem-to-px($rem-value) {
+	@return ($rem-value * 16) + px;
+}
+
+// Replace characters in a string.
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+
+  @return if($index,
+    str-slice($string, 1, $index - 1) + $replace +
+    str-replace(str-slice($string, $index +
+    str-length($search)), $search, $replace),
+    $string
+  );
+}
+
 /**
  * Create an optimized SVG data URL.
  *
@@ -9,12 +31,6 @@
  *
  * .class {
  *   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg">...</svg>');
- * }
- *
- *   or
- *
- * .class {
- *   @include background-svg('<svg xmlns="http://www.w3.org/2000/svg">...</svg>');
  * }
  */
 @function svg-url($svg) {
@@ -59,21 +75,4 @@
   }
 
   @return url("data:image/svg+xml,#{$encoded}");
-}
-
-// Background image SVG mixin.
-@mixin background-svg($svg) {
-  background-image: svg-url($svg);
-}
-
-// Replace characters in a string.
-@function str-replace($string, $search, $replace: '') {
-  $index: str-index($string, $search);
-
-  @return if($index,
-    str-slice($string, 1, $index - 1) + $replace +
-    str-replace(str-slice($string, $index +
-    str-length($search)), $search, $replace),
-    $string
-  );
 }
