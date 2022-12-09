@@ -154,7 +154,7 @@ var PagerExposures = function (options) {
     if (rows) {
       html =
         '<h3>Population Exposure</h3>' +
-        '<table>' +
+        '<table class="exposures">' +
           '<thead>' +
             '<tr>' +
               '<th>' +
