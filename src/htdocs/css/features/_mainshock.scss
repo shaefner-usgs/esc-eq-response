@@ -218,6 +218,14 @@
       display: block;
       margin-bottom: 1rem;
     }
+    a,
+    h4 {
+      cursor: pointer;
+    }
+    h4 {
+      margin-bottom: 0;
+      padding-bottom: .5rem;
+    }
 
     canvas,
     img {
