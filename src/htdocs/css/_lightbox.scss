@@ -73,6 +73,10 @@
     }
   }
 
+  .content > h4:first-child {
+    margin-top: .25rem;
+  }
+
   .icon-close {
     @include close;
 
