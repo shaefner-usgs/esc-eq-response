@@ -80,9 +80,9 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
    */
   _addContent: function () {
     var feature = this._feature,
-        dependencies = this._app.Features.checkDependencies(feature);
+        status = this._app.Features.checkDependencies(feature);
 
-    if (dependencies === 'ready') {
+    if (status === 'ready') {
       if (feature.addData) {
         feature.addData(this._json);
       }
@@ -93,6 +93,8 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
           this._render(); // L.GeoJSON.DateLine: render on both sides of IDL
         }
       }
+
+      feature.status = 'ready';
 
       this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
     } else { // dependencies not ready
@@ -190,7 +192,6 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     try {
       response = await AppUtil.fetchWithTimeout(this._url.href);
       this._json = await response.clone().json();
-      feature.status = 'ready';
 
       this._addContent();
       this._app.StatusBar.removeItem(feature.id);
