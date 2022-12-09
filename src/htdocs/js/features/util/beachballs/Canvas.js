@@ -50,8 +50,6 @@ var Canvas = function (options) {
       if (options.className) {
         _canvas.classList.add(options.className);
       }
-
-      _canvas.classList.add('feature');
     }
     _context = _canvas.getContext('2d');
     _context.scale(scale, scale);

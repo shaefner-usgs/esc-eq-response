@@ -18,14 +18,12 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *     {
  *       addData: {Function}
- *       addListeners: {Function}
  *       count: {Integer}
  *       destroy: {Function}
  *       id: {String}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
  *       params: {Object}
- *       removeListeners: {Function}
  *       showLayer: {Boolean}
  *       title: {String}
  *       url: {String}
@@ -126,9 +124,7 @@ var CatalogSearch = function (options) {
     _earthquakes.addData(json);
     _app.SearchBar.setButton();
 
-    _this.addListeners = _earthquakes.addListeners;
     _this.count = _earthquakes.data.length;
-    _this.removeListeners = _earthquakes.removeListeners;
   };
 
   /**
