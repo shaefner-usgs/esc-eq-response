@@ -107,10 +107,6 @@ a.impact-bubble:hover {
     }
   }
 
-  + a {
-    margin-left: 5px;
-  }
-
   > abbr {
     border-bottom: 1px dotted #666;
     font-size: .75rem;
@@ -134,5 +130,11 @@ a.impact-bubble:hover {
   > a,
   > span {
     width: 25%;
+  }
+
+  a + a,
+  span + a,
+  span + span {
+    margin-left: 5px;
   }
 }
