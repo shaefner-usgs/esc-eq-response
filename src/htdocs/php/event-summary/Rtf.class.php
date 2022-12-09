@@ -554,19 +554,6 @@ class Rtf {
         );
       }
 
-      if (property_exists($pager, 'economic')) {
-        $section3->writeText(
-          'Estimated Economic Losses',
-          $this->_font->h4,
-          $this->_format->h4
-        );
-        $section3->addImage(
-          $this->_getRemoteImage($pager->economic),
-          $this->_format->image,
-          12
-        );
-      }
-
       if (property_exists($pager, 'fatalities')) {
         $section3->writeText(
           'Estimated Fatalities',
@@ -575,6 +562,19 @@ class Rtf {
         );
         $section3->addImage(
           $this->_getRemoteImage($pager->fatalities),
+          $this->_format->image,
+          12
+        );
+      }
+
+      if (property_exists($pager, 'economic')) {
+        $section3->writeText(
+          'Estimated Economic Losses',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+        $section3->addImage(
+          $this->_getRemoteImage($pager->economic),
           $this->_format->image,
           12
         );
