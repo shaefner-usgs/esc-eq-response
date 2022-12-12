@@ -501,10 +501,13 @@ var Mainshock = function (options) {
    * Update the Marker using the selected catalog's data.
    */
   _updateMarker = function () {
-    var marker = _this.mapLayer.getLayers()[0];
+    var content = document.createElement('div'),
+        marker = _this.mapLayer.getLayers()[0];
+
+    content.innerHTML = _earthquakes.getContent(_this.data);
 
     marker.setLatLng(_this.data.latLng);
-    marker.setPopupContent(_earthquakes.getContent(_this.data));
+    marker.setPopupContent(content);
     marker.setTooltipContent(_earthquakes.getTooltip(_this.data));
   };
 
