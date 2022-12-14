@@ -764,7 +764,7 @@ var Summary = function (options) {
         html += '</div>';
       }
 
-      html += '<div class="forecast content hide"></div>'; // placeholder
+      html += '<div class="forecast feature content hide"></div>'; // placeholder
 
       if (count > 1) {
         mostRecentEq = _data[count - 1];
