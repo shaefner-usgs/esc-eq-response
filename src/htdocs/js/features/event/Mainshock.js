@@ -60,6 +60,7 @@ var Mainshock = function (options) {
       _getBubbles,
       _getData,
       _getDyfi,
+      _getLinks,
       _getLossPager,
       _getNotice,
       _getShakeAlert,
@@ -275,6 +276,32 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Get the HTML template for external links.
+   *
+   * @return {String}
+   */
+  _getLinks = function () {
+    var url = 'https://jmfee-usgs.github.io/comcat-timeline/?eventId={id}';
+
+    return '' +
+      '<div class="links bubble">' +
+        '<h3>Links</h3>' +
+        '<ul>' +
+          '<li>' +
+            '<a href="{url}" class="external" target="new">Event Page' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</li>' +
+          '<li>' +
+            `<a href="${url}" class="external" target="new">Event Timeline` +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</li>' +
+        '</ul>' +
+      '</div>';
+  };
+
+  /**
    * Get the HTML template for 'loss PAGER'.
    *
    * @return template {String}
@@ -436,6 +463,7 @@ var Mainshock = function (options) {
             'loading">Download</button>' +
         '</div>' +
         _getTectonic() +
+        _getLinks() +
       '</div>',
       _this.data
     );
@@ -645,6 +673,7 @@ var Mainshock = function (options) {
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
+    _getLinks = null;
     _getLossPager = null;
     _getNotice = null;
     _getShakeAlert = null;
