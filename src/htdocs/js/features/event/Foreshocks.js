@@ -143,6 +143,7 @@ var Foreshocks = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
+    _earthquakes.addListeners();
     _summary.addListeners();
   };
 
@@ -172,6 +173,8 @@ var Foreshocks = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
+    _earthquakes.removeListeners();
+
     if (_summary) {
       _summary.removeListeners();
     }

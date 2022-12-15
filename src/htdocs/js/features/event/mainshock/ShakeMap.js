@@ -23,7 +23,6 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
- *       removeListeners: {Function}
  *       render: {Function}
  *       url: {String}
  *     }
@@ -33,7 +32,6 @@ var ShakeMap = function (options) {
       _initialize,
 
       _app,
-      _els,
       _mainshock,
       _radioBar,
       _selected,
@@ -52,7 +50,6 @@ var ShakeMap = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _els = [];
     _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'intensity';
 
@@ -354,23 +351,11 @@ var ShakeMap = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var el = document.querySelector('#summaryPane .mainshock');
-
-    _els = [
-      el.querySelector('.details .shakemap'),
-      el.querySelector('.thumbs .shakemap a')
-    ];
-
-    // Show the Lightbox
-    _els.forEach(el => {
-      if (el) {
-        el.addEventListener('click', _app.Features.showLightbox);
-      }
-    });
+    var ul = document.getElementById('shakemap-images');
 
     // Display the selected image
     if (_radioBar) {
-      _radioBar.addListeners(document.getElementById('shakemap-images'));
+      _radioBar.addListeners(ul);
     }
   };
 
@@ -388,7 +373,6 @@ var ShakeMap = function (options) {
     _initialize = null;
 
     _app = null;
-    _els = null;
     _mainshock = null;
     _radioBar = null;
     _selected = null;
@@ -403,17 +387,6 @@ var ShakeMap = function (options) {
     _getUrl = null;
 
     _this = null;
-  };
-
-  /**
-   * Remove event listeners.
-   */
-  _this.removeListeners = function () {
-    _els.forEach(el => {
-      if (el) {
-        el.removeEventListener('click', _app.Features.showLightbox);
-      }
-    });
   };
 
   /**

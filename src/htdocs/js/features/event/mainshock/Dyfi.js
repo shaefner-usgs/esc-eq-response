@@ -22,7 +22,6 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
- *       removeListeners: {Function}
  *       render: {Function}
  *     }
  */
@@ -31,7 +30,6 @@ var Dyfi = function (options) {
       _initialize,
 
       _app,
-      _els,
       _mainshock,
       _product,
       _radioBar,
@@ -48,7 +46,6 @@ var Dyfi = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _els = [];
     _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'block';
 
@@ -205,23 +202,11 @@ var Dyfi = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var el = document.querySelector('#summaryPane .mainshock');
-
-    _els = [
-      el.querySelector('.details .dyfi'),
-      el.querySelector('.thumbs .dyfi a')
-    ];
-
-    // Show the Lightbox
-    _els.forEach(el => {
-      if (el) {
-        el.addEventListener('click', _app.Features.showLightbox);
-      }
-    });
+    var ul = document.getElementById('dyfi-images');
 
     // Display the selected image
     if (_radioBar) {
-      _radioBar.addListeners(document.getElementById('dyfi-images'));
+      _radioBar.addListeners(ul);
     }
   };
 
@@ -239,7 +224,6 @@ var Dyfi = function (options) {
     _initialize = null;
 
     _app = null;
-    _els = null;
     _mainshock = null;
     _product = null;
     _radioBar = null;
@@ -252,17 +236,6 @@ var Dyfi = function (options) {
     _getStatus = null;
 
     _this = null;
-  };
-
-  /**
-   * Remove event listeners.
-   */
-  _this.removeListeners = function () {
-    _els.forEach(el => {
-      if (el) {
-        el.removeEventListener('click', _app.Features.showLightbox);
-      }
-    });
   };
 
   /**

@@ -29,7 +29,6 @@ _R2D = 180 / Math.PI;
  *
  * @param options {Object}
  *     {
- *       app: {Object}
  *       data: {Object}
  *       id: {String} optional
  *       mainshock: {Object}
@@ -38,13 +37,11 @@ _R2D = 180 / Math.PI;
  *
  * @return _this {Object}
  *     {
- *       addListeners: {Function}
  *       destroy: {Function}
  *       getContent: {Function}
  *       getMapLayer: {Function}
  *       getSummary: {Function}
  *       getTitle: {Function}
- *       removeListeners: {Function}
  *       render: {Function}
  *     }
  */
@@ -52,10 +49,8 @@ var BeachBalls = function (options) {
   var _this,
       _initialize,
 
-      _app,
       _beachballs,
       _data,
-      _els,
       _id,
       _mainshock,
       _name,
@@ -74,7 +69,6 @@ var BeachBalls = function (options) {
   _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
 
-    _app = options.app;
     _data = options.data;
     _id = options.id;
     _mainshock = options.mainshock;
@@ -108,7 +102,7 @@ var BeachBalls = function (options) {
         },
         selectors = { // BeachBall containers
           lightbox: `#${_id} .beachball`,
-          marker: '#mapPane .container',
+          marker: `#mapPane div.feature.${_id}`,
           thumb: `#summaryPane div.${_id} a`
         };
 
@@ -307,29 +301,13 @@ var BeachBalls = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    _els = [
-      document.querySelector(`#summaryPane div.${_id} > a`),
-      document.querySelector(`#mapPane canvas.${_id}`)
-    ];
-
-    _els.forEach(el =>
-      el.addEventListener('click', _app.Features.showLightbox)
-    );
-  };
-
-  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
     _initialize = null;
 
-    _app = null;
     _beachballs = null;
     _data = null;
-    _els = null;
     _id = null;
     _mainshock = null;
     _name = null;
@@ -452,17 +430,6 @@ var BeachBalls = function (options) {
     }
 
     return title;
-  };
-
-  /**
-   * Remove event listeners.
-   */
-  _this.removeListeners = function () {
-    _els.forEach(el => {
-      if (el) {
-        el.removeEventListener('click', _app.Features.showLightbox);
-      }
-    });
   };
 
   /**

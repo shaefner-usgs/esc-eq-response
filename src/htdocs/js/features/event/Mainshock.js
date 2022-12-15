@@ -52,8 +52,10 @@ var Mainshock = function (options) {
       _buttonTitle,
       _ddData,
       _earthquakes,
+      _els,
       _json,
 
+      _addPlaceholders,
       _createFeatures,
       _getBubbles,
       _getData,
@@ -68,7 +70,7 @@ var Mainshock = function (options) {
       _getUrl,
       _updateDetails,
       _updateHeader,
-      _updateMarker,
+      _updateMarkers,
       _updatePlots;
 
 
@@ -93,6 +95,19 @@ var Mainshock = function (options) {
     _ddData = {}; // double-difference data
 
     _this.mapLayer = _earthquakes.mapLayer;
+
+    _addPlaceholders();
+  };
+
+  /**
+   * Add the Beachball placeholders to the MapPane.
+   */
+  _addPlaceholders = function () {
+    var container = document.querySelector('#mapPane .container');
+
+    container.innerHTML =
+      '<div class="focal-mechanism feature"></div>' +
+      '<div class="moment-tensor feature"></div>';
   };
 
   /**
@@ -408,7 +423,7 @@ var Mainshock = function (options) {
           '<div class="focal-mechanism feature content hide"></div>' +
           '<div class="moment-tensor feature content hide"></div>' +
         '</div>' +
-        '<div class="pager-exposures bubble content hide"></div>' +
+        '<div class="pager-exposures feature content bubble hide"></div>' +
         _getLossPager() +
         '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
@@ -461,20 +476,20 @@ var Mainshock = function (options) {
    * (on the SelectBar) using the selected catalog's data.
    */
   _updateDetails = function () {
-    var newBalloon, newStrip,
-        elBalloon = document.getElementById('mainshock'),
-        elStrip = document.querySelector('#summaryPane .mainshock .products'),
-        oldBalloon = document.querySelector('#selectBar .mainshock'),
-        oldStrip = document.querySelector('#summaryPane .mainshock .details');
+    var balloon = document.querySelector('#selectBar .mainshock'),
+        mainshock = document.getElementById('mainshock'),
+        newBalloon = _earthquakes.getContent(_this.data),
+        newStrip = L.Util.template(_getStrip(), _this.data),
+        products = document.querySelector('#summaryPane .mainshock .products'),
+        strip = document.querySelector('#summaryPane .mainshock .details');
 
-    newBalloon = _earthquakes.getContent(_this.data);
-    newStrip = L.Util.template(_getStrip(), _this.data);
+    _this.removeListeners();
+    balloon.remove();
+    strip.remove();
 
-    oldBalloon.remove();
-    oldStrip.remove();
-
-    elBalloon.insertAdjacentHTML('afterbegin', newBalloon);
-    elStrip.insertAdjacentHTML('beforebegin', newStrip);
+    mainshock.insertAdjacentHTML('afterbegin', newBalloon);
+    products.insertAdjacentHTML('beforebegin', newStrip);
+    _this.addListeners();
   };
 
   /**
@@ -498,17 +513,28 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Update the Marker using the selected catalog's data.
+   * Update the Markers using the selected catalog's data.
    */
-  _updateMarker = function () {
-    var content = document.createElement('div'),
-        marker = _this.mapLayer.getLayers()[0];
+  _updateMarkers = function () {
+    var div = document.createElement('div'),
+        fm = _app.Features.getFeature('focal-mechanism'),
+        marker = _this.mapLayer.getLayers()[0],
+        mt = _app.Features.getFeature('moment-tensor');
 
-    content.innerHTML = _earthquakes.getContent(_this.data);
+    div.innerHTML = _earthquakes.getContent(_this.data);
 
     marker.setLatLng(_this.data.latLng);
-    marker.setPopupContent(content);
+    marker.setPopupContent(div);
     marker.setTooltipContent(_earthquakes.getTooltip(_this.data));
+
+    _earthquakes.updateListeners();
+
+    if (fm.mapLayer) {
+      fm.update(_this.data.latLng);
+    }
+    if (mt.mapLayer) {
+      mt.update(_this.data.latLng);
+    }
   };
 
   /**
@@ -569,12 +595,29 @@ var Mainshock = function (options) {
 
   /**
    * Add event listeners.
+   *
+   * Note: Leaflet map popup's listeners are added by the Earthquakes Class.
    */
   _this.addListeners = function () {
+    var selectors = [
+      '#mainshock .feature', // bubbles on SelectBar
+      '#mapPane .feature', // Beachballs
+      '#summaryPane .details .feature',
+      '#summaryPane .thumbs .feature'
+    ];
+
     _button = document.getElementById('download');
+    _els = document.querySelectorAll(selectors.join());
 
     // Create RTF Features (RTF document is created when all Features are ready)
     _button.addEventListener('click', _createFeatures);
+
+    // Open a Lightbox
+    _els.forEach(el =>
+      el.addEventListener('click', _app.Features.showLightbox)
+    );
+
+    _earthquakes.addListeners();
   };
 
   /**
@@ -594,8 +637,10 @@ var Mainshock = function (options) {
     _buttonTitle = null;
     _ddData = null;
     _earthquakes = null;
+    _els = null;
     _json = null;
 
+    _addPlaceholders = null;
     _createFeatures = null;
     _getBubbles = null;
     _getData = null;
@@ -610,7 +655,7 @@ var Mainshock = function (options) {
     _getUrl = null;
     _updateDetails = null;
     _updateHeader = null;
-    _updateMarker = null;
+    _updateMarkers = null;
     _updatePlots = null;
 
     _this = null;
@@ -646,6 +691,14 @@ var Mainshock = function (options) {
     if (_button) {
       _button.removeEventListener('click', _createFeatures);
     }
+
+    if (_els) {
+      _els.forEach(el =>
+        el.removeEventListener('click', _app.Features.showLightbox)
+      );
+    }
+
+    _earthquakes.removeListeners();
   };
 
   /**
@@ -655,9 +708,6 @@ var Mainshock = function (options) {
    * @param catalog {String <comcat|dd>}
    */
   _this.update = function (catalog) {
-    var fm = _app.Features.getFeature('focal-mechanism'),
-        mt = _app.Features.getFeature('moment-tensor');
-
     _this.data = _getData(); // default (ComCat data)
 
     if (catalog === 'dd') {
@@ -669,15 +719,8 @@ var Mainshock = function (options) {
 
     _updateDetails();
     _updateHeader();
-    _updateMarker();
+    _updateMarkers();
     _updatePlots();
-
-    if (fm.mapLayer) {
-      fm.update(_this.data.latLng);
-    }
-    if (mt.mapLayer) {
-      mt.update(_this.data.latLng);
-    }
   };
 
 

@@ -14,13 +14,11 @@ var BeachBalls = require('features/util/beachballs/BeachBalls');
  *
  * @return _this {Object}
  *     {
- *       addListeners: {Function}
  *       destroy: {Function}
  *       id: {String}
  *       lightbox: {String}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
- *       removeListeners: {Function}
  *       render: {Function}
  *       showLayer: {Boolean}
  *       summary: {String}
@@ -45,12 +43,10 @@ var FocalMechanism = function (options) {
 
     _app = options.app;
 
-    _this.addListeners = function () {};
     _this.id = 'focal-mechanism';
     _this.lightbox = '';
     _this.mapLayer = null;
     _this.name = 'Focal Mechanism';
-    _this.removeListeners = function () {};
     _this.render = function () {};
     _this.showLayer = false;
     _this.summary = '';
@@ -61,17 +57,14 @@ var FocalMechanism = function (options) {
 
     if (fm) {
       _beachballs = BeachBalls({
-        app: _app,
         data: _getData(fm),
         id: _this.id,
         mainshock: mainshock,
         name: _this.name
       });
 
-      _this.addListeners = _beachballs.addListeners;
       _this.lightbox = _beachballs.getContent();
       _this.mapLayer = _beachballs.getMapLayer();
-      _this.removeListeners = _beachballs.removeListeners;
       _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
 

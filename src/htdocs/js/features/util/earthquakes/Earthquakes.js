@@ -40,6 +40,7 @@ _DEFAULTS = {
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       addListeners: {Function}
  *       data: {Array}
  *       destroy: {Function}
  *       getContent: {Function}
@@ -47,6 +48,8 @@ _DEFAULTS = {
  *       getTooltip: {Function}
  *       mapLayer: {L.FeatureGroup}
  *       params: {Object}
+ *       removeListeners: {Function}
+ *       updateListeners: {Function}
  *     }
  */
 var Earthquakes = function (options) {
@@ -60,6 +63,7 @@ var Earthquakes = function (options) {
       _markerOptions,
 
       _addBubbles,
+      _addListeners,
       _filter,
       _getAge,
       _getBubbles,
@@ -172,6 +176,30 @@ var Earthquakes = function (options) {
           '<span class="hover"></span>' +
           '<img src="img/tsunami.png" alt="Tsunami Warning Center">' +
         '</a>';
+    }
+  };
+
+  /**
+   * Event handler that adds the event listeners to a map popup.
+   *
+   * @param e {Event} optional
+   * @param popup {Element} optional; default is null
+   *
+   * Note: popup option is required if not called by Leaflet's popupclose Event.
+   */
+  _addListeners = function (e, popup = null) {
+    var bubbles, button;
+
+    popup = popup || e.popup.getContent();
+    bubbles = popup.querySelectorAll('.impact-bubbles .feature');
+    button = popup.querySelector('button');
+
+    button.addEventListener('click', _setMainshock);
+
+    if (_feature.id === 'mainshock') {
+      bubbles.forEach(bubble =>
+        bubble.addEventListener('click', _app.Features.showLightbox)
+      );
     }
   };
 
@@ -372,10 +400,10 @@ var Earthquakes = function (options) {
    */
   _getDirection = function (latlon) {
     var bearing = _mainshock.data.latlon.bearing(latlon),
-        compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
+        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
         octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 
-    return compassPoints[octant];
+    return directions[octant];
   };
 
   /**
@@ -409,14 +437,10 @@ var Earthquakes = function (options) {
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
-    var button,
-        div = L.DomUtil.create('div'),
+    var div = L.DomUtil.create('div'),
         eq = _this.data.find(item => item.id === feature.id); // eqid
 
     div.innerHTML = _this.getContent(eq);
-    button = div.querySelector('button');
-
-    button.addEventListener('click', _setMainshock);
 
     layer.bindPopup(div, {
       maxWidth: 375,
@@ -445,15 +469,27 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Remove the "Select" button listeners.
+   * Event handler that removes the event listeners from a map popup.
+   *
+   * @param e {Event} optional
+   * @param popup {Element} optional; default is null
+   *
+   * Note: popup option is required if not called by Leaflet's popupclose Event.
    */
-  _removeListeners = function () {
-    _this.mapLayer.eachLayer(layer => {
-      var div = layer.getPopup().getContent(),
-          button = div.querySelector('button');
+  _removeListeners = function (e, popup = null) {
+    var bubbles, button;
 
-      button.removeEventListener('click', _setMainshock);
-    });
+    popup = popup || e.popup.getContent();
+    bubbles = popup.querySelectorAll('.impact-bubbles .feature');
+    button = popup.querySelector('button');
+
+    button.removeEventListener('click', _setMainshock);
+
+    if (_feature.id === 'mainshock') {
+      bubbles.forEach(bubble =>
+        bubble.removeEventListener('click', _app.Features.showLightbox)
+      );
+    }
   };
 
   /**
@@ -487,11 +523,19 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    _this.mapLayer.on({
+      popupopen: _addListeners,
+      popupclose: _removeListeners
+    });
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _removeListeners();
-
     _initialize = null;
 
     _app = null;
@@ -500,6 +544,7 @@ var Earthquakes = function (options) {
     _mainshock = null;
     _markerOptions = null;
 
+    _addListeners = null;
     _addBubbles = null;
     _filter = null;
     _getAge = null;
@@ -608,6 +653,27 @@ var Earthquakes = function (options) {
     );
   };
 
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    _this.mapLayer.off({
+      popupopen: _addListeners,
+      popupclose: _removeListeners
+    });
+  };
+
+  /**
+   * Update the Mainshock's event listeners if its popup is open.
+   */
+  _this.updateListeners = function () {
+    var popup = document.querySelector('.leaflet-popup-pane .mainshock');
+
+    if (popup) {
+      _removeListeners(null, popup);
+      _addListeners(null, popup);
+    }
+  };
 
   _initialize(options);
   options = null;
