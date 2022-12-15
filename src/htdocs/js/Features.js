@@ -298,7 +298,7 @@ var Features = function (options) {
     } else { // dependencies not ready
       _queue.push(setTimeout(() => {
         _createFeature(mode, module, opts);
-      }, 250));
+      }, 50));
     }
   };
 
