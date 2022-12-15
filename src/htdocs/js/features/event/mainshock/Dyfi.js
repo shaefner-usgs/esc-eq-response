@@ -103,24 +103,26 @@ var Dyfi = function (options) {
     }
 
     return L.Util.template(
-      '<div class="images">' +
-        '{radioBar}' +
-        imgsHtml +
-        '<p class="status"><span>{status}</span></p>' +
+      '<div class="wrapper">' +
+        '<div class="images">' +
+          '{radioBar}' +
+          imgsHtml +
+        '</div>' +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{maxmmi}</dd>' +
+            '<dt>Responses</dt>' +
+            '<dd>{responses}</dd>' +
+          '</dl>' +
+          '<p>' +
+            '<a href="{url}" class="external" target="new">Event Page DYFI?' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>' +
       '</div>' +
-      '<div class="details">' +
-        '<dl class="props alt">' +
-          '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-          '<dd>{maxmmi}</dd>' +
-          '<dt>Responses</dt>' +
-          '<dd>{responses}</dd>' +
-        '</dl>' +
-        '<p>' +
-          '<a href="{url}" class="external" target="new">Event Page DYFI?' +
-            '<i class="icon-link"></i>' +
-          '</a>' +
-        '</p>' +
-      '</div>',
+      '<p class="status"><span>{status}</span></p>',
       data
     );
   };

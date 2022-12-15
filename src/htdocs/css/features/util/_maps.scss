@@ -22,7 +22,7 @@
     border: 3px solid;
     border-radius: $content-border-radius;
     display: block;
-    margin: 0 1px .375rem 0; // 1px: fix border rendering issue when scrolled (webkit)
+    margin-right: 1px; // 1px: fix border rendering issue when scrolled (webkit)
     max-height: 650px;
     max-width: 100%;
 
@@ -33,13 +33,6 @@
 
   p {
     margin: 1.5rem 0 0;
-  }
-
-  .content {
-    align-items: flex-start;
-    display: flex;
-    gap: 2rem 1.5rem;
-    position: relative;
   }
 
   .details {
@@ -61,13 +54,20 @@
   .stations {
     margin-top: .5rem;
   }
+
+  .wrapper {
+    align-items: flex-start;
+    display: flex;
+    gap: 2rem 1.5rem;
+    position: relative;
+  }
 }
 
 @media only screen
 and (max-width: 950px) {
   #dyfi,
   #shakemap {
-    .content {
+    .wrapper {
       flex-flow: row wrap;
     }
   }

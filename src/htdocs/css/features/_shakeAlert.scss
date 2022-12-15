@@ -39,13 +39,6 @@
     }
   }
 
-  .content {
-    align-items: flex-start;
-    display: flex;
-    gap: 2rem;
-    position: relative;
-  }
-
   .issued {
     margin-top: 0;
   }
@@ -61,7 +54,15 @@
   }
 
   .wea {
+    margin-bottom: 0;
     max-width: 35rem;
+  }
+
+  .wrapper {
+    align-items: flex-start;
+    display: flex;
+    gap: 2rem;
+    position: relative;
   }
 }
 
@@ -81,7 +82,7 @@ and (max-width: $breakpoint-phone-width) {
       margin: 1rem auto 0;
     }
 
-    .content {
+    .wrapper {
       flex-flow: row wrap;
     }
 

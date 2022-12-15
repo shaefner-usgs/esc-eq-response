@@ -114,37 +114,39 @@ var ShakeMap = function (options) {
     }
 
     return L.Util.template(
-      '<div class="images">' +
-        '{radioBar}' +
-        imgsHtml +
-        '<p class="status"><span>{status}</span></p>' +
+      '<div class="wrapper">' +
+        '<div class="images">' +
+          '{radioBar}' +
+          imgsHtml +
+        '</div>' +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{mmi}</dd>' +
+            '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
+            '<dd>{pga}</dd>' +
+            '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
+            '<dd>{pgv}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA <em>(0.3s)</em></abbr></dt>' +
+            '<dd>{sa03}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA <em>(1.0s)</em></abbr></dt>' +
+            '<dd>{sa10}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA <em>(3.0s)</em></abbr></dt>' +
+            '<dd>{sa30}</dd>' +
+            '<dt class="stations">Seismic Stations</dt>' +
+            '<dd class="stations">{seismic}</dd>' +
+            '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
+            '<dd>{dyfi}</dd>' +
+          '</dl>' +
+          '<p>' +
+            '<a href="{url}" class="external" target="new">' +
+              'Event Page ShakeMap' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>' +
       '</div>' +
-      '<div class="details">' +
-        '<dl class="props alt">' +
-          '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-          '<dd>{mmi}</dd>' +
-          '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
-          '<dd>{pga}</dd>' +
-          '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
-          '<dd>{pgv}</dd>' +
-          '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA <em>(0.3s)</em></abbr></dt>' +
-          '<dd>{sa03}</dd>' +
-          '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA <em>(1.0s)</em></abbr></dt>' +
-          '<dd>{sa10}</dd>' +
-          '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA <em>(3.0s)</em></abbr></dt>' +
-          '<dd>{sa30}</dd>' +
-          '<dt class="stations">Seismic Stations</dt>' +
-          '<dd class="stations">{seismic}</dd>' +
-          '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
-          '<dd>{dyfi}</dd>' +
-        '</dl>' +
-        '<p>' +
-          '<a href="{url}" class="external" target="new">' +
-            'Event Page ShakeMap' +
-            '<i class="icon-link"></i>' +
-          '</a>' +
-        '</p>' +
-      '</div>',
+      '<p class="status"><span>{status}</span></p>',
       data
     );
   };

@@ -112,59 +112,61 @@ var ShakeAlert = function (options) {
    */
   _getContent = function () {
     return L.Util.template(
-      '<div class="details">' +
-        '<p class="issued">Message issued ' +
-          '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ({utcOffset})</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} (UTC)</time>' +
-          '<br>Last updated ' +
-          '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ({utcOffset})</time>' +
-          '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} (UTC)</time>' +
-        '</p>' +
-        '<h4>Alert Latency</h4>' +
-        '<dl class="props alt">' +
-          '<dt>Initial</dt>' +
-          '<dd>{latencyInitial} after origin</dd>' +
-          '<dt>Final</dt>' +
-          '<dd>{latencyFinal} after origin</dd>' +
-          '<dt>Late-alert Radius</dt>' +
-          '<dd>{radius}</dd>' +
-        '</dl>' +
-        '<h4>Magnitude Accuracy</h4>' +
-        '<dl class="props alt">' +
-          '<dt>Initial</dt>' +
-          '<dd>{magInitial}</dd>' +
-          '<dt>Final</dt>' +
-          '<dd>{magFinal}</dd>' +
-          '<dt>ANSS Report</dt>' +
-          '<dd>{magAnss} ({magSeconds} after origin)</dd>' +
-        '</dl>' +
-        '<h4>Location Accuracy <span>(relative to ANSS location)</span></h4>' +
-        '<dl class="props alt">' +
-          '<dt>Initial</dt>' +
-          '<dd>{locationInitial}</dd>' +
-          '<dt>Final</dt>' +
-          '<dd>{locationFinal}</dd>' +
-        '</dl>' +
-        '<h4>Number of Stations Reporting</h4>' +
-        '<ul>' +
-          '<li>{numStations10} within 10 km of epicenter</li>' +
-          '<li>{numStations100} within 100 km of epicenter</li>' +
-          '<li><strong>{numStations} used in final udpate</strong></li>' +
-        '</ul>' +
-        '<h4>Nearby Cities</h4>' +
-        _getCities() +
-        _getWeaAlert() +
-        '<p class="status"><span>{status}</span></p>' +
+      '<div class="wrapper">' +
+        '<div class="details">' +
+          '<p class="issued">Message issued ' +
+            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ({utcOffset})</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} (UTC)</time>' +
+            '<br>Last updated ' +
+            '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ({utcOffset})</time>' +
+            '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} (UTC)</time>' +
+          '</p>' +
+          '<h4>Alert Latency</h4>' +
+          '<dl class="props alt">' +
+            '<dt>Initial</dt>' +
+            '<dd>{latencyInitial} after origin</dd>' +
+            '<dt>Final</dt>' +
+            '<dd>{latencyFinal} after origin</dd>' +
+            '<dt>Late-alert Radius</dt>' +
+            '<dd>{radius}</dd>' +
+          '</dl>' +
+          '<h4>Magnitude Accuracy</h4>' +
+          '<dl class="props alt">' +
+            '<dt>Initial</dt>' +
+            '<dd>{magInitial}</dd>' +
+            '<dt>Final</dt>' +
+            '<dd>{magFinal}</dd>' +
+            '<dt>ANSS Report</dt>' +
+            '<dd>{magAnss} ({magSeconds} after origin)</dd>' +
+          '</dl>' +
+          '<h4>Location Accuracy <span>(relative to ANSS location)</span></h4>' +
+          '<dl class="props alt">' +
+            '<dt>Initial</dt>' +
+            '<dd>{locationInitial}</dd>' +
+            '<dt>Final</dt>' +
+            '<dd>{locationFinal}</dd>' +
+          '</dl>' +
+          '<h4>Number of Stations Reporting</h4>' +
+          '<ul>' +
+            '<li>{numStations10} within 10 km of epicenter</li>' +
+            '<li>{numStations100} within 100 km of epicenter</li>' +
+            '<li><strong>{numStations} used in final udpate</strong></li>' +
+          '</ul>' +
+          '<h4>Nearby Cities</h4>' +
+          _getCities() +
+          _getWeaAlert() +
+        '</div>' +
+        '<div class="logo">' +
+          '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
+          '<p>' +
+            '<a href="{url}" class="external" target="new">' +
+              'Event Page ShakeAlert' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>' +
       '</div>' +
-      '<div class="logo">' +
-        '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
-        '<p>' +
-          '<a href="{url}" class="external" target="new">' +
-            'Event Page ShakeAlert' +
-            '<i class="icon-link"></i>' +
-          '</a>' +
-        '</p>' +
-      '</div>',
+      '<p class="status"><span>{status}</span></p>',
       _this.data
     );
   };
