@@ -169,6 +169,10 @@ tr {
   border-bottom: 1px solid $border-color-lighter;
 }
 
+ul {
+  padding: 0 0 0 1.75rem;
+}
+
 .bubble {
   background: $bg-color;
   border-radius: $content-border-radius;
