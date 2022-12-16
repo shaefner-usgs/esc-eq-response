@@ -720,7 +720,7 @@ var Features = function (options) {
    */
   _this.removeFeature = function (feature, destroy = true) {
     if (_this.isFeature(feature)) {
-      if (feature.removeListeners && destroy) {
+      if (feature.removeListeners) {
         feature.removeListeners();
       }
 
