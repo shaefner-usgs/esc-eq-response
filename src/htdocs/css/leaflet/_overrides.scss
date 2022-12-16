@@ -95,10 +95,9 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
   }
   .leaflet-control-layers {
-    font-family: $font-family-headers;
-
     label {
       cursor: pointer;
+      font: 1.0625rem $font-family-headers;
       line-height: 1.3;
       margin: 6px 0;
 
