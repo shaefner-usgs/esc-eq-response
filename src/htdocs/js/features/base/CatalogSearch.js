@@ -18,12 +18,14 @@ var AppUtil = require('util/AppUtil'),
  * @return _this {Object}
  *     {
  *       addData: {Function}
+ *       addListeners: {Function}
  *       count: {Integer}
  *       destroy: {Function}
  *       id: {String}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
  *       params: {Object}
+ *       removeListeners: {Function}
  *       showLayer: {Boolean}
  *       title: {String}
  *       url: {String}
@@ -128,6 +130,13 @@ var CatalogSearch = function (options) {
   };
 
   /**
+   * Add event listeners.
+   */
+  _this.addListeners = function () {
+    _earthquakes.addListeners();
+  };
+
+  /**
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
@@ -143,6 +152,13 @@ var CatalogSearch = function (options) {
     _setTitle = null;
 
     _this = null;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    _earthquakes.removeListeners();
   };
 
 
