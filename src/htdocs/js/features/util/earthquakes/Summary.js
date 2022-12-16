@@ -77,7 +77,6 @@ var Summary = function (options) {
     _app = options.app;
     _data = options.earthquakes.data;
     _featureId = options.featureId;
-    _el = document.querySelector('#summaryPane .' + _featureId);
     _maxNumEqs = options.maxNumEqs;
     _params = options.earthquakes.params;
 
@@ -210,7 +209,7 @@ var Summary = function (options) {
   _filter = function () {
     var i,
         els = _slider.els,
-        feature = _app.Features.getFeature(this.id),
+        feature = _app.Features.getFeature(_featureId),
         value = Number(this.value);
 
     els.count.innerHTML = feature.bins.mag[value];
@@ -402,7 +401,7 @@ var Summary = function (options) {
     if (!singleMagBin) {
       _slider = Slider({
         filter: _filter,
-        id: _featureId,
+        id: _featureId + '-mag',
         label: 'Filter by magnitude',
         max: _this.bins.mag.length - 1,
         min: Math.floor(_params.magnitude),
@@ -676,10 +675,11 @@ var Summary = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
+    _el = document.querySelector('#summaryPane .' + _featureId);
     _tables = _el.querySelectorAll('table.list');
 
     if (_slider) {
-      _slider.addListeners(document.getElementById(_featureId));
+      _slider.addListeners(document.getElementById(_featureId + '-mag'));
     }
 
     if (_tables) {
