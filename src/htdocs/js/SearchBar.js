@@ -669,7 +669,7 @@ var SearchBar = function (options) {
   _this.searchCatalog = function () {
     if (_isValid()) { // checks custom dates
       _setParams();
-      _app.Features.refreshFeature('search');
+      _app.Features.refreshFeature('catalog-search');
 
       if (!document.body.classList.contains('mainshock')) {
         _app.MapPane.initBounds();
@@ -689,7 +689,7 @@ var SearchBar = function (options) {
         inputs = [_endtime, _starttime],
         params = {
           controls: _this.getParams(),
-          search: _app.Features.getFeature('search').params
+          search: _app.Features.getFeature('catalog-search').params
         },
         skip = [];
 

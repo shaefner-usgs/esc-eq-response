@@ -97,7 +97,7 @@ var Earthquakes = function (options) {
       weight: options.weight
     };
 
-    if (_feature.id === 'mainshock' || _feature.id === 'search') {
+    if (_feature.id === 'mainshock' || _feature.id === 'catalog-search') {
       _catalog = 'comcat'; // always ComCat, despite catalog param
     } else { // Aftershocks, Foreshocks, or Historical Seismicity
       _mainshock = _app.Features.getFeature('mainshock');
@@ -239,7 +239,7 @@ var Earthquakes = function (options) {
         pasthour = _this.params.now.minus({ hours: 1 }),
         pastweek = _this.params.now.minus({ weeks: 1 });
 
-    if (_feature.id.includes('aftershocks') || _feature.id === 'search') {
+    if (_feature.id.includes('aftershocks') || _feature.id === 'catalog-search') {
       if (datetime >= pasthour) {
         age = 'pasthour';
       } else if (datetime >= pastday) {

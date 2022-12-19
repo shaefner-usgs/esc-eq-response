@@ -49,7 +49,7 @@ var CatalogSearch = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
-    _this.id = 'search';
+    _this.id = 'catalog-search';
     _this.name = 'Catalog Search';
     _this.params = _app.SearchBar.getParams();
     _this.showLayer = options.showLayer;

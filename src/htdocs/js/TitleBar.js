@@ -69,7 +69,7 @@ var TitleBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var search = _app.Features.getFeature('search');
+    var search = _app.Features.getFeature('catalog-search');
 
     if (_app.Features.isFeature(search)) {
       _this.setTitle(search);
