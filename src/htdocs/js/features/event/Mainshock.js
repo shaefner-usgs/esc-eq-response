@@ -293,7 +293,7 @@ var Mainshock = function (options) {
             '</a>' +
           '</li>' +
           '<li>' +
-            `<a href="${url}" class="external" target="new">Event Timeline` +
+            '<a href="' + url + '" class="external" target="new">Event Timeline' +
               '<i class="icon-link"></i>' +
             '</a>' +
           '</li>' +
