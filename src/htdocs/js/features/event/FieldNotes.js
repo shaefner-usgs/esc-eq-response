@@ -5,7 +5,7 @@
 require('leaflet');
 
 var AppUtil = require('util/AppUtil'),
-    Lightbox = require('util/ui/Lightbox');
+    Lightbox = require('util/Lightbox');
 
 
 var _DEFAULTS = {

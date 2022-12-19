@@ -8,8 +8,8 @@ require('leaflet/L.Control.Rectangle'); // map control to draw a rectangle
 
 var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon'),
-    RadioBar = require('util/ui/RadioBar'),
-    Slider = require('util/ui/Slider');
+    RadioBar = require('util/controls/RadioBar'),
+    Slider = require('util/controls/Slider');
 
 
 var _CANV,

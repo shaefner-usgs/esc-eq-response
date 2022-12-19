@@ -3,7 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Slider = require('util/ui/Slider');
+    Slider = require('util/controls/Slider');
 
 
 /**

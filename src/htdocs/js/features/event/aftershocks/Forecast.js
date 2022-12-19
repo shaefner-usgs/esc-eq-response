@@ -4,7 +4,7 @@
 
 var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon'),
-    RadioBar = require('util/ui/RadioBar');
+    RadioBar = require('util/controls/RadioBar');
 
 
 /**

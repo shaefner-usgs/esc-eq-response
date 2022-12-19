@@ -2,7 +2,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    RadioBar = require('util/ui/RadioBar');
+    RadioBar = require('util/controls/RadioBar');
 
 
 var _SETTINGS = { // defaults
