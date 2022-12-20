@@ -215,6 +215,7 @@ var BeachBalls = function (options) {
           P: _getAxis('P'),
           T: _getAxis('T')
         },
+        depth = _tensor.depth || _mainshock.data.depth,
         duration = _data['sourcetime-duration'],
         moment = (_tensor.moment / _tensor.scale).toFixed(3) +
           `e+${_tensor.exponent} ${_tensor.units}`;
@@ -227,7 +228,7 @@ var BeachBalls = function (options) {
       catalog: _data.eventsource,
       contributor: _data.source,
       dataSource: _data['beachball-source'] || _data.source,
-      depth: AppUtil.round(_tensor.depth, 1) + ' km',
+      depth: AppUtil.round(depth, 1) + ' km',
       halfDuration: halfDuration || '–',
       magType: _data['derived-magnitude-type'] || '',
       magnitude: AppUtil.round(_tensor.magnitude, 2),
