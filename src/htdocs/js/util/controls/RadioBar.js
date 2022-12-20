@@ -34,6 +34,7 @@ var RadioBar = function (options) {
       _items,
       _selected,
 
+      _getOption,
       _removeListeners;
 
 
@@ -48,6 +49,24 @@ var RadioBar = function (options) {
     if (options.el) {
       _this.addListeners(options.el);
     }
+  };
+
+  /**
+   * Get the given item's optional content node, if it exists.
+   *
+   * @param id {String}
+   *     item's id value
+   *
+   * @return option {Element|null}
+   */
+  _getOption = function (id) {
+    var option = null;
+
+    if (id) {
+      option = document.querySelector('.option.' + id);
+    }
+
+    return option;
   };
 
   /**
@@ -86,6 +105,7 @@ var RadioBar = function (options) {
     _items = null;
     _selected = null;
 
+    _getOption = null;
     _removeListeners = null;
 
     _this = null;
@@ -132,7 +152,7 @@ var RadioBar = function (options) {
    * Unselect (and hide) all other options.
    */
   _this.setOption = function () {
-    var option = document.querySelector('.option.' + this.id),
+    var option = _getOption(this.id),
         sibling = this.parentNode.firstElementChild;
 
     // Selected option
@@ -145,7 +165,7 @@ var RadioBar = function (options) {
     // Unselected options
     while (sibling) {
       if (sibling !== this) {
-        option = document.querySelector('.option.' + sibling.id);
+        option = _getOption(sibling.id);
 
         sibling.classList.remove('selected');
 
