@@ -17,7 +17,7 @@ _COLORS = {
   pasthour: '#f00',
   pastday: '#f90',
   pastweek: '#ff0',
-  older: '#ffd'
+  older: '#ffffe6'
 };
 _DEFAULTS = {
   color: '#000', // stroke
