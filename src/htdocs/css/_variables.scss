@@ -16,6 +16,7 @@ $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
 $font-family-mmi: Tahoma, Verdana, Segoe, sans-serif;
 $font-size: 16px;
+$font-size-smaller: .875rem;
 
 $sidebar-toggle-duration: .25s;
 $sidebar-width: 400px;
@@ -35,6 +36,8 @@ $border-color: #ddd;
 $border-color-lighter: #efefef;
 $border-color-lightest: #f6f6f6;
 
+$control-color: #ddd;
+
 $invalid-color: #c00;
 
 $link-color: $accent-color;
@@ -46,6 +49,7 @@ $reset-button-color: #efefef;
 
 $text-color: #333;
 $text-color-darker: #000;
+$text-color-disabled: #ccc;
 $text-color-lighter: #555;
 $text-color-lightest: #999;
 
