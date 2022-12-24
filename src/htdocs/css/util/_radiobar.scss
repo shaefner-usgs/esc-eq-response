@@ -1,0 +1,44 @@
+@use '../variables' as *;
+
+ul.options {
+  align-items: center;
+  border: 1px solid $accent-color;
+  border-radius: $button-border-radius;
+  display: inline-flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    border-left: 1px solid $accent-color;
+    color: $accent-color;
+    cursor: pointer;
+    font: bold .8125rem $font-family-headers;
+    margin: 0;
+    padding: .25rem .5rem;
+    text-align: center;
+    text-transform: uppercase;
+    transition: all $effect-off-duration-shorter ease-in;
+
+    &:hover {
+      background: $accent-color-lightest;
+      transition: background $effect-on-duration ease-out;
+    }
+
+    &:first-child {
+      border: none;
+      border-radius: $button-border-radius 0 0 $button-border-radius;
+    }
+    &:last-child {
+      border-radius: 0 $button-border-radius $button-border-radius 0;
+    }
+
+    &.selected {
+      background: $accent-color;
+      border-radius: 0;
+      color: $bg-color;
+      cursor: auto;
+      transition: all $effect-on-duration ease-out;
+    }
+  }
+}

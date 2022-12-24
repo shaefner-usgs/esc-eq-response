@@ -1,0 +1,131 @@
+@use '../variables' as *;
+
+$thumb-d: 1.25rem;
+$track-bg: $control-color;
+$track-c: $accent-color;
+$track-h: .25rem;
+$track-w: 18rem;
+$dist: $track-w - $thumb-d;
+
+@mixin thumb() {
+  background: $bg-color;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  box-shadow: 0px 1px 2px #bbb;
+  height: $thumb-d;
+  width: $thumb-d;
+}
+
+@mixin track($color1, $color2) {
+  background: linear-gradient($color1, $color1) no-repeat $color2;
+  background-size: 25% 100%;
+  border: none;
+  border-radius: 5px;
+  height: $track-h;
+  width: $track-w;
+}
+
+
+input[type='range'] {
+  background: transparent;
+  cursor: pointer;
+  flex: 1;
+  font: inherit;
+  margin: 0;
+  min-height: $thumb-d;
+  outline: 0;
+  padding: 0;
+
+  &,
+  &::-webkit-slider-thumb {
+    appearance: none
+  }
+
+  &::-moz-focus-outer {
+    border: 0;
+  }
+
+  &::-moz-range-thumb {
+    @include thumb;
+  }
+  &::-ms-thumb {
+    margin-top: 0;
+    @include thumb;
+  }
+  &::-webkit-slider-thumb {
+    margin-top: .5 * ($track-h - $thumb-d);
+    @include thumb;
+  }
+
+  &::-moz-range-track {
+    @include track($track-c, $track-bg);
+  }
+  &::-ms-track {
+    @include track($track-c, $track-bg);
+  }
+  &::-webkit-slider-runnable-track {
+    @include track($track-c, $track-bg);
+  }
+
+  &::-ms-tooltip {
+    display: none;
+  }
+
+  ~ output {
+    background: none;
+    color: $text-color;
+    display: block;
+    left: .5 * $thumb-d;
+    line-height: 1;
+    padding: .25rem .5rem;
+    position: absolute;
+    top: 0;
+    transform: translate(calc((var(--val) - var(--min)) / (var(--max) - var(--min)) * #{$dist} - 50%));
+
+    &:after {
+      content: '+';
+    }
+  }
+}
+
+.inverted [type='range'] {
+  &::-moz-range-track {
+    @include track($track-bg, $track-c);
+  }
+  &::-ms-track {
+    @include track($track-bg, $track-c);
+  }
+  &::-webkit-slider-runnable-track {
+    @include track($track-bg, $track-c);
+  }
+}
+
+.max,
+.min {
+  color: $text-color-lighter;
+  font-size: .9rem;
+  font-weight: 300;
+  margin-top: 1.5rem;
+}
+.max {
+  padding-left: .75rem;
+}
+.min {
+  padding-right: .75rem;
+}
+
+.slider {
+  align-items: center;
+  display: flex;
+  height: 4.5rem;
+  position: relative;
+  width: $track-w;
+}
+
+.slider-container {
+  display: flex;
+}
+
+/* ---------------------------------------------
+   Range Sliders, adapted from:
+   https://css-tricks.com/sliding-nightmare-understanding-range-input/ */
