@@ -143,7 +143,7 @@ var SideBar = function (options) {
     if (toggled) {
       _app.MapPane.shiftMap();
 
-      if (_app.Pane.getSelected() === 'plotsPane') {
+      if (_app.Pane.getSelPane() === 'plotsPane') {
         _app.PlotsPane.resize();
       }
     }

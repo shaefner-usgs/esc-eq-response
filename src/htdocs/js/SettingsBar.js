@@ -331,7 +331,7 @@ var SettingsBar = function (options) {
     if (document.body.classList.contains('mainshock')) {
       catalogs = _catalogBar.getIds(),
       mainshock = _app.Features.getFeature('mainshock'),
-      pane = _app.Pane.getSelected(),
+      pane = _app.Pane.getSelPane(),
       prevCatalog = catalogs.find(item => item !== catalog),
       prevFeatures = _app.Features.getFeatures(prevCatalog),
       status = _app.Features.getStatus(catalog);

@@ -99,7 +99,7 @@ var NavBar = function (options) {
    * Event handler that switches to the Pane matching the URL hash.
    */
   _switchPane = function () {
-    var id = _app.Pane.getSelected();
+    var id = _app.Pane.getSelPane();
 
     _this.hideAll('panes');
     _showPane(id);
@@ -149,7 +149,7 @@ var NavBar = function (options) {
       _showSideBar(id);
     }
 
-    _showPane(_app.Pane.getSelected());
+    _showPane(_app.Pane.getSelPane());
   };
 
   /**

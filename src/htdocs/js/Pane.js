@@ -15,7 +15,7 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *     {
- *       getSelected: {Function}
+ *       getSelPane: {Function}
  *       render: {Function}
  *       reset: {Function}
  *       setScrollPosition: {Function}
@@ -88,7 +88,7 @@ var Pane = function (options) {
    * Event handler that saves the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
-    var id = _this.getSelected(),
+    var id = _this.getSelPane(),
         position = window.pageYOffset;
 
     clearTimeout(_throttler);
@@ -109,7 +109,7 @@ var Pane = function (options) {
    * @return id {String}
    *     Pane id
    */
-  _this.getSelected = function () {
+  _this.getSelPane = function () {
     var hash = location.hash,
         id = 'mapPane', // default
         paneExists = _el.querySelector('section' + hash);
