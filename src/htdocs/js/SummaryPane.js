@@ -95,12 +95,13 @@ var SummaryPane = function (options) {
    * Update the timestamp.
    */
   _updateTimestamp = function () {
-    var el = document.getElementById('updated'),
+    var datetime = Luxon.DateTime.now(),
+        el = document.getElementById('updated'),
         tz = AppUtil.getTimeZone(),
-        userTime = Luxon.DateTime.now()
-          .toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+        userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
 
     el.innerHTML = `${userTime} (${tz})`;
+    el.setAttribute('datetime', datetime.toISO());
   };
 
   // ----------------------------------------------------------
