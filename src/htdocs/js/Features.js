@@ -13,7 +13,6 @@ var Aftershocks = require('features/event/Aftershocks'),
     Historical = require('features/event/Historical'),
     HistoricalEvents = require('features/rtf/HistoricalEvents'),
     Lightbox = require('util/Lightbox'),
-    Luxon = require('luxon'),
     Mainshock = require('features/event//Mainshock'),
     MomentTensor = require('features/event/mainshock/MomentTensor'),
     NearbyCities = require('features/rtf/NearbyCities'),
@@ -127,8 +126,7 @@ var Features = function (options) {
       _initFeatures,
       _isReady,
       _removeCount,
-      _removeFeatures,
-      _updateTimeStamp;
+      _removeFeatures;
 
 
   _this = {};
@@ -435,26 +433,6 @@ var Features = function (options) {
     });
   };
 
-  /**
-   * Update the SettingsBar time stamp (Aftershocks and Catalog Search).
-   *
-   * @param feature {Object}
-   */
-  _updateTimeStamp = function (feature) {
-    var datetime, el, id, tz, userTime;
-
-    if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
-      datetime = Luxon.DateTime.now(),
-      id = feature.id.replace(/^dd-/, ''), // remove double-difference prefix
-      el = document.getElementById(id).parentNode.querySelector('time'),
-      tz = AppUtil.getTimeZone(),
-      userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
-
-      el.innerHTML = `${userTime} (${tz})`;
-      el.setAttribute('datetime', datetime.toISO());
-    }
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -473,8 +451,8 @@ var Features = function (options) {
     _app.MapPane.addContent(feature);
     _app.PlotsPane.addContent(feature);
     _app.SummaryPane.addContent(feature);
+    _app.SettingsBar.updateTimeStamp(feature);
     _addCount(feature);
-    _updateTimeStamp(feature);
 
     if (feature.content) { // SideBar content
       el = document.getElementById(feature.id);

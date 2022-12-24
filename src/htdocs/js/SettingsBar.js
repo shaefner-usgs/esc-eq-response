@@ -2,6 +2,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar'),
     Switch = require('util/controls/Switch');
 
@@ -37,6 +38,7 @@ var _SETTINGS = { // defaults
  *       setFocusedField: {Function}
  *       setTimer: {Function}
  *       setValues: {Function}
+ *       updateTimeStamp: {Function}
  *     }
  */
 var SettingsBar = function (options) {
@@ -583,6 +585,26 @@ var SettingsBar = function (options) {
     });
 
     _setStatus('enabled');
+  };
+
+  /**
+   * Update the auto refresh time stamp.
+   *
+   * @param feature {Object}
+   */
+  _this.updateTimeStamp = function (feature) {
+    var datetime, el, id, tz, userTime;
+
+    if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
+      datetime = Luxon.DateTime.now(),
+      id = feature.id.replace(/^dd-/, ''), // remove double-difference prefix
+      el = document.getElementById(id).parentNode.querySelector('time'),
+      tz = AppUtil.getTimeZone(),
+      userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+
+      el.innerHTML = `${userTime} (${tz})`;
+      el.setAttribute('datetime', datetime.toISO());
+    }
   };
 
 
