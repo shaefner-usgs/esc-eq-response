@@ -1,3 +1,4 @@
+@use 'mixins' as *;
 @use 'variables' as *;
 
 #settingsBar {
@@ -15,10 +16,13 @@
   .historical {
     margin-bottom: 1.75rem;
   }
+  .aftershocks {
+    margin-top: 1.75rem;
+  }
 
   .dd {
     color: $text-color-lighter;
-    font-size: .875rem;
+    font-size: $font-size-smaller;
     line-height: 1.2;
     margin: .125rem 0 0;
     opacity: 1;
@@ -30,6 +34,44 @@
       transition: all $effect-off-duration-shorter ease-in;
       visibility: hidden;
     }
+  }
+
+  .details {
+    margin: 0 0 1.25rem;
+    max-height: 6rem;
+    opacity: 1;
+    overflow: hidden;
+    transition: all .2s ease-in-out;
+
+    &.hide {
+      margin: 0;
+      max-height: 0;
+      opacity: 0;
+    }
+
+    p {
+      font-size: $font-size-smaller;
+      margin: .125rem 0 .25rem;
+    }
+
+    time {
+      display: block;
+      font-size: $font-size-smaller;
+      line-height: 1;
+      margin-top: .125rem;
+
+      &:before {
+        @include labels;
+
+        content: 'Updated';
+        font-size: $font-size-smaller;
+        margin-right: .375rem;
+      }
+    }
+  }
+
+  .refresh {
+    margin: .75rem 0;
   }
 
   .required {
@@ -47,13 +89,18 @@
 }
 
 body:not(.mainshock) {
+  #aftershocks ~ .details time {
+    display: none
+  }
+
   #settingsBar {
     .aftershocks,
     .foreshocks,
     .historical {
       h3,
       label {
-        color: $text-color-lightest;
+        color: $text-color-disabled;
+        cursor: default;
       }
     }
   }

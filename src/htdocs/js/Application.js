@@ -134,7 +134,11 @@ var Application = function (options) {
    */
   _resetQueryString = function () {
     var queryString,
-        inputs = document.querySelectorAll('#selectBar input, #settingsBar input'),
+        selectors = [
+          '#selectBar input',
+          '#settingsBar input[type=number]'
+        ],
+        inputs = document.querySelectorAll(selectors.join()),
         msParams = [],
         pairs = [],
         params = new URLSearchParams(location.search);

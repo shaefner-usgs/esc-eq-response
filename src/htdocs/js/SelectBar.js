@@ -79,6 +79,10 @@ var SelectBar = function (options) {
     if (_isEqidValid()) {
       AppUtil.setParam('eqid', _eqid.value);
       _app.Features.createFeatures();
+
+      if (AppUtil.getParam('aftershocks')) {
+        _app.SettingsBar.setTimer('aftershocks'); // set up auto refresh
+      }
     } else {
       message =
         '<h4>Error Loading Mainshock</h4>' +

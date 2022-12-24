@@ -73,7 +73,7 @@ var LegendBar = function (options) {
         fillColor: '#f00'
       },
       asOlder: {
-        fillColor: '#ffd'
+        fillColor: '#ffffe6'
       },
       asWeek: {
         fillColor: '#ff0'

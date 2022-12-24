@@ -138,6 +138,35 @@
               <li id="utc">UTC</li>
               <li id="user">User</li>
             </ul>
+            <h3>Auto Refresh</h3>
+            <div class="refresh">
+              <input type="checkbox" id="aftershocks" value="" class="switch">
+              <label for="aftershocks"><span>Aftershocks</span></label>
+              <div class="details hide">
+                <p>Every:</p>
+                <ul id="as-refresh" class="options">
+                  <li class="m5">5 mins</li>
+                  <li class="m15 selected">15 mins</li>
+                  <li class="m30">30 mins</li>
+                  <li class="m60">60 mins</li>
+                </ul>
+                <time></time>
+              </div>
+            </div>
+            <div class="refresh">
+              <input type="checkbox" id="catalog-search" value="" class="switch">
+              <label for="catalog-search"><span>Catalog Search</span></label>
+              <div class="details hide">
+                <p>Every:</p>
+                <ul id="cs-refresh" class="options">
+                  <li class="m5">5 mins</li>
+                  <li class="m15 selected">15 mins</li>
+                  <li class="m30">30 mins</li>
+                  <li class="m60">60 mins</li>
+                </ul>
+                <time></time>
+              </div>
+            </div>
             <div class="aftershocks dd-aftershocks">
               <h3>Aftershocks</h3>
               <label for="as-mag">Min magnitude</label>

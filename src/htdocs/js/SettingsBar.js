@@ -2,12 +2,15 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    RadioBar = require('util/controls/RadioBar');
+    RadioBar = require('util/controls/RadioBar'),
+    Switch = require('util/controls/Switch');
 
 
 var _SETTINGS = { // defaults
+  aftershocks: 'm15',
   'as-mag': 0,
   catalog: 'comcat',
+  'catalog-search': 'm15',
   'fs-days': 30,
   'fs-mag': 1,
   'hs-years': 10,
@@ -32,6 +35,7 @@ var _SETTINGS = { // defaults
  *       reset: {Function}
  *       resetCatalog: {Function}
  *       setFocusedField: {Function}
+ *       setTimer: {Function}
  *       setValues: {Function}
  *     }
  */
@@ -44,20 +48,25 @@ var SettingsBar = function (options) {
       _el,
       _focusedField,
       _throttlers,
+      _timers,
       _timezoneBar,
 
       _addFeatures,
       _addListeners,
       _addOffset,
       _getDefaults,
+      _getFeatureId,
       _hasChanged,
       _initButtons,
+      _initSwitches,
       _refreshFeature,
       _setCatalog,
       _setField,
       _setParam,
+      _setRefresh,
       _setStatus,
       _setTimeZone,
+      _swapTimer,
       _update;
 
 
@@ -70,12 +79,28 @@ var SettingsBar = function (options) {
     });
     _el = options.el;
     _throttlers = {};
+    _timers = {};
     _timezoneBar = RadioBar({
       el: document.getElementById('timezone')
     });
 
+    RadioBar({
+      el: document.getElementById('as-refresh')
+    });
+    RadioBar({
+      el: document.getElementById('cs-refresh')
+    });
+
+    Switch({
+      el: document.getElementById('aftershocks')
+    });
+    Switch({
+      el: document.getElementById('catalog-search')
+    });
+
     _addListeners();
     _addOffset();
+    _initSwitches();
     _setStatus('disabled');
   };
 
@@ -103,11 +128,18 @@ var SettingsBar = function (options) {
    */
   _addListeners = function () {
     var catalog = _el.querySelectorAll('#catalog li'),
-        inputs = _el.querySelectorAll('input'),
+        inputs = _el.querySelectorAll('input[type=number]'),
+        selectors = [
+          'input[type=checkbox] + label',
+          '#as-refresh',
+          '#cs-refresh'
+        ],
+        refresh = _el.querySelectorAll(selectors.join()),
         timezone = _el.querySelectorAll('#timezone li');
 
-    // Set the catalog and timezone options
+    // Set the catalog, timezone and refresh options
     catalog.forEach(button => button.addEventListener('click', _setCatalog));
+    refresh.forEach(button => button.addEventListener('click', _setRefresh));
     timezone.forEach(button => button.addEventListener('click', _setTimeZone));
 
     // Track changes to input fields
@@ -163,6 +195,23 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Get the Feature id from the URL parameter name.
+   *
+   * @param name {String}
+   *
+   * @return featureId {String}
+   */
+  _getFeatureId = function (name) {
+    var featureId = name;
+
+    if (name === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
+      featureId = 'dd-aftershocks';
+    }
+
+    return featureId;
+  };
+
+  /**
    * Check if the given Feature's settings have changed since it was last
    * fetched.
    *
@@ -180,7 +229,7 @@ var SettingsBar = function (options) {
         settings = _el.querySelector('.' + feature.id);
 
     if (settings) {
-      inputs = settings.querySelectorAll('input');
+      inputs = settings.querySelectorAll('input[type=number]');
 
       inputs.forEach(input => {
         var key = input.id.replace(/[a|f|h]s-/, '');
@@ -197,18 +246,46 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the initially selected catalog and timezone RadioBar buttons.
+   * Set the initially selected catalog, timezone and refresh buttons.
    */
   _initButtons = function () {
-    var catalog = AppUtil.getParam('catalog') || _SETTINGS['catalog'],
+    var aftershocks = AppUtil.getParam('aftershocks') || _SETTINGS['aftershocks'],
+        catalog = AppUtil.getParam('catalog') || _SETTINGS['catalog'],
+        search = AppUtil.getParam('catalog-search') || _SETTINGS['catalog-search'],
         timezone = AppUtil.getParam('timezone') || _SETTINGS['timezone'],
         buttons = [
+          _el.querySelector('#aftershocks ~ .details .' + aftershocks),
+          _el.querySelector('#catalog-search ~ .details .' + search),
           document.getElementById(catalog),
           document.getElementById(timezone)
         ];
 
     buttons.forEach(button => {
       button.click(); // set selected button in UI
+    });
+  };
+
+  /**
+   * Set the initial switch positions.
+   */
+  _initSwitches = function () {
+    var params = [
+      'aftershocks',
+      'catalog-search'
+    ];
+
+    params.forEach(param => {
+      var details;
+
+      if (AppUtil.getParam(param)) {
+        details = _el.querySelector(`#${param} ~ .details`);
+
+        if (details) {
+          details.classList.remove('hide');
+        }
+
+        document.getElementById(param).checked = true;
+      }
     });
   };
 
@@ -220,9 +297,10 @@ var SettingsBar = function (options) {
    *     Feature id
    */
   _refreshFeature = function (id) {
-    var feature = _app.Features.getFeature(id);
+    var feature = _app.Features.getFeature(id),
+        mainshock = document.body.classList.contains('mainshock');
 
-    if (document.body.classList.contains('mainshock')) {
+    if (mainshock || id === 'catalog-search') {
       // Immediately show loading status (don't wait for throttlers)
       _app.StatusBar.addItem({
         id: id,
@@ -258,15 +336,17 @@ var SettingsBar = function (options) {
 
       mainshock.update(catalog);
       mainshock.disableDownload();
+      _swapTimer();
 
       // Remove previous catalog's Features
       Object.keys(prevFeatures).forEach(id => {
         _app.Features.removeFeature(prevFeatures[id], false);
       });
 
-      if (status === 'ready') { // re-add selected catalog's Features
+      // Create (and add) or re-add selected catalog's Features
+      if (status === 'ready') {
         _addFeatures(catalog);
-      } else { // create (and add) new catalog's Features
+      } else {
         _app.Features.createFeatures(catalog);
       }
 
@@ -310,12 +390,44 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Event handler that sets the auto refresh option.
+   *
+   * @param e {Event}
+   */
+  _setRefresh = function (e) {
+    var div = e.target.closest('.refresh'),
+        input = div.querySelector('input'),
+        featureId = _getFeatureId(input.id),
+        name = input.id,
+        selected = div.querySelector('.selected'),
+        classList = Array.from(selected.classList),
+        tagName = e.target.tagName.toLowerCase(),
+        value = classList.find(className => className !== 'selected');
+
+    if (input.checked) {
+      if (tagName === 'li') { // interval changed
+        clearInterval(_timers[name]);
+      } else if (tagName !== 'ul') { // switch turned on
+        _refreshFeature(featureId);
+      } else { // RadioBar border clicked
+        return;
+      }
+
+      AppUtil.setParam(name, value);
+      _this.setTimer(name);
+    } else { // switch turned off
+      AppUtil.deleteParam(name);
+      clearInterval(_timers[name]);
+    }
+  };
+
+  /**
    * Set the status of the <input> fields and required notice.
    *
    * @param status {String <enabled|disabled>}
    */
   _setStatus = function (status) {
-    var inputs = _el.querySelectorAll('input'),
+    var inputs = _el.querySelectorAll('input[type=number]'),
         required = _el.querySelector('.required'),
         title = 'Disabled because no mainshock is selected';
 
@@ -358,6 +470,19 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Swap the Aftershocks auto-refresh timer, if it is set, to keep it in sync
+   * with the selected catalog.
+   */
+  _swapTimer = function () {
+    var param = AppUtil.getParam('aftershocks'); // auto refresh setting
+
+    if (param) {
+      clearInterval(_timers.aftershocks);
+      _this.setTimer('aftershocks');
+    }
+  };
+
+  /**
    * Event handler that updates the URL parameter and refreshes a Feature.
    */
   _update = function () {
@@ -392,14 +517,14 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via Features.js.
    */
   _this.reset = function () {
-    var inputs = _el.querySelectorAll('input');
+    var inputs = _el.querySelectorAll('input[type=number]');
 
     inputs.forEach(input =>
       input.value = ''
     );
-
     _focusedField = null;
 
+    clearInterval(_timers.aftershocks);
     _setStatus('disabled');
   };
 
@@ -420,6 +545,21 @@ var SettingsBar = function (options) {
     if (_focusedField) {
       document.getElementById(_focusedField).focus();
     }
+  };
+
+  /**
+   * Set the auto-refresh interval timer for the given Feature.
+   *
+   * @param name {String}
+   */
+  _this.setTimer = function (name) {
+    var id = _getFeatureId(name), // remove double-difference prefix
+        value = AppUtil.getParam(name),
+        interval = parseInt(value.replace(/\D/g, '')) * 60 * 1000;
+
+    clearInterval(_timers[name]); // ensure one timer per Feature
+
+    _timers[name] = setInterval(_refreshFeature, interval, id);
   };
 
   /**
