@@ -42,7 +42,7 @@
   .instructions,
   .utc {
     color: $text-color-lighter;
-    font-size: .875rem;
+    font-size: $font-size-smaller;
     margin: 0;
     opacity: 1;
     transition: opacity $effect-on-duration ease-out;

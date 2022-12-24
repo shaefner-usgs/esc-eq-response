@@ -224,7 +224,7 @@ ul {
 
   i {
     color: color.scale($link-color, $lightness: 25%);
-    font-size: .875rem;
+    font-size: $font-size-smaller;
     opacity: 0;
     position: absolute;
     right: -.625rem;
