@@ -589,7 +589,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Update the given Feature's auto refresh time stamp.
+   * Update the given Feature's timestamp.
    *
    * @param feature {Object}
    */
@@ -597,7 +597,7 @@ var SettingsBar = function (options) {
     var datetime, el, id, tz, userTime;
 
     if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
-      datetime = Luxon.DateTime.now(),
+      datetime = Luxon.DateTime.fromMillis(feature.updated),
       id = feature.id.replace(/^dd-/, ''), // remove double-difference prefix
       el = document.getElementById(id).parentNode.querySelector('time'),
       tz = AppUtil.getTimeZone(),

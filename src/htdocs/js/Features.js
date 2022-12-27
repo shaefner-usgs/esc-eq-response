@@ -166,7 +166,7 @@ var Features = function (options) {
 
   /**
    * Add the given Feature to the Map/Plots/SummaryPanes. This is typically a
-   * placeholder where fetched data is subsequently added when it is ready.
+   * placeholder where content is subsequently added when it is ready.
    *
    * @param feature {Object}
    */
@@ -239,6 +239,7 @@ var Features = function (options) {
    *
    *         mode: {String <base|comcat|dd|event|rtf>} display mode
    *         status: {String} loading status
+   *         updated: {String} fetch time (milliseconds)
    *
    *       Common props:
    *

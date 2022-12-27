@@ -95,6 +95,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       }
 
       feature.status = 'ready';
+      feature.updated = Date.now();
 
       this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
     } else { // dependencies not ready
