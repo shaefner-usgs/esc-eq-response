@@ -141,7 +141,7 @@ var SettingsBar = function (options) {
 
     // Set the catalog, timezone and refresh options
     catalog.forEach(button => button.addEventListener('click', _setCatalog));
-    refresh.forEach(button => button.addEventListener('click', _setRefresh));
+    refresh.forEach(target => target.addEventListener('click', _setRefresh));
     timezone.forEach(button => button.addEventListener('click', _setTimeZone));
 
     // Track changes to input fields
@@ -207,7 +207,7 @@ var SettingsBar = function (options) {
     var featureId = name;
 
     if (name === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
-      featureId = 'dd-aftershocks';
+      featureId = 'dd-aftershocks'; // add double-difference prefix
     }
 
     return featureId;
@@ -485,7 +485,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Event handler that updates the URL parameter and refreshes a Feature.
+   * Event handler that refreshes a Feature and updates its URL parameter.
    */
   _update = function () {
     var classList = Array.from(this.closest('div').classList),
@@ -531,7 +531,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Reset the Earthquake Catalog setting to ComCat (default).
+   * Reset the earthquake catalog setting to ComCat (default).
    */
   _this.resetCatalog = function () {
     var comcat = document.getElementById('comcat');
@@ -550,12 +550,13 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the auto-refresh interval timer for the given Feature.
+   * Set an auto-refresh interval timer for the Feature matching the given name.
    *
    * @param name {String}
+   *     URL parameter name
    */
   _this.setTimer = function (name) {
-    var id = _getFeatureId(name), // remove double-difference prefix
+    var id = _getFeatureId(name),
         value = AppUtil.getParam(name),
         interval = parseInt(value.replace(/\D/g, '')) * 60 * 1000;
 
@@ -588,7 +589,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Update the auto refresh time stamp.
+   * Update the given Feature's auto refresh time stamp.
    *
    * @param feature {Object}
    */
