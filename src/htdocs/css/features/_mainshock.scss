@@ -1,5 +1,5 @@
-@use '../mixins' as *;
-@use '../variables' as *;
+@use '../util/mixins' as *;
+@use '../util/variables' as *;
 
 #summaryPane {
   #download {
