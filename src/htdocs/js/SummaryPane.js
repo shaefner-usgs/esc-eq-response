@@ -93,9 +93,11 @@ var SummaryPane = function (options) {
 
   /**
    * Update the timestamp.
+   *
+   * @param timestamp {Integer}
    */
-  _updateTimestamp = function () {
-    var datetime = Luxon.DateTime.now(),
+  _updateTimestamp = function (timestamp) {
+    var datetime = Luxon.DateTime.fromMillis(timestamp),
         el = document.getElementById('updated'),
         tz = AppUtil.getTimeZone(),
         userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
@@ -117,6 +119,10 @@ var SummaryPane = function (options) {
     var el, selectors,
         status = _app.Features.getStatus();
 
+    if (feature.id === 'mainshock') {
+      _updateTimestamp(feature.updated);
+    }
+
     if (feature.summary) {
       selectors = `
         div.${feature.id}.content,
@@ -128,7 +134,6 @@ var SummaryPane = function (options) {
       el.classList.remove('hide'); // un-hide placeholder
 
       _embedFeatures(feature);
-      _updateTimestamp();
     }
 
     if (status === 'ready') {
