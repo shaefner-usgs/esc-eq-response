@@ -1,22 +1,21 @@
 @use 'sass:color';
 
+@use 'tablesort'; // located in node_modules/tablesort
+
 @use 'features';
 @use 'leaflet';
 @use 'util';
 
-@use 'controls';
-@use 'flatpickr';
+@use 'util/mixins' as *;
+@use 'util/variables' as *;
+
 @use 'header';
 @use 'icons';
 @use 'impactBubbles';
 @use 'infoBar';
 @use 'legendBar';
-@use 'lightbox';
-@use 'loaders';
 @use 'mapPane';
-@use 'mixins' as *;
 @use 'navBar';
-@use 'plotly';
 @use 'plotsPane';
 @use 'searchBar';
 @use 'selectBar';
@@ -26,8 +25,6 @@
 @use 'statusBar';
 @use 'summaryPane';
 @use 'titleBar';
-@use 'tablesort'; // located in node_modules/tablesort
-@use 'variables' as *;
 
 *,
 *:before,

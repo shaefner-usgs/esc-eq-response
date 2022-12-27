@@ -1,3 +1,5 @@
+@use 'util';
+
 @use 'fieldnotes';
 @use 'forecast';
 @use 'mainshock';
@@ -5,6 +7,4 @@
 @use 'shakeAlert';
 @use 'shakemapStations';
 @use 'significantEqs';
-@use 'util/beachballs';
-@use 'util/earthquakes';
-@use 'util/maps';
+
