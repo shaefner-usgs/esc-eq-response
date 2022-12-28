@@ -81,7 +81,7 @@ var SelectBar = function (options) {
       _app.Features.createFeatures();
 
       if (AppUtil.getParam('aftershocks')) {
-        _app.SettingsBar.setTimer('aftershocks'); // set up auto refresh
+        _app.SettingsBar.setInterval('aftershocks'); // set up auto refresh
       }
     } else {
       message =

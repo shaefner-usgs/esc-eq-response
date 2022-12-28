@@ -36,7 +36,7 @@ var _SETTINGS = { // defaults
  *       reset: {Function}
  *       resetCatalog: {Function}
  *       setFocusedField: {Function}
- *       setTimer: {Function}
+ *       setInterval: {Function}
  *       setValues: {Function}
  *       updateTimeStamp: {Function}
  *     }
@@ -58,6 +58,7 @@ var SettingsBar = function (options) {
       _addOffset,
       _getDefaults,
       _getFeatureId,
+      _getInterval,
       _hasChanged,
       _initButtons,
       _initSwitches,
@@ -67,6 +68,7 @@ var SettingsBar = function (options) {
       _setParam,
       _setRefresh,
       _setStatus,
+      _setTimeout,
       _setTimeZone,
       _swapTimer,
       _update;
@@ -197,9 +199,10 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get the Feature id from the URL parameter name.
+   * Get the Feature id from the given name.
    *
    * @param name {String}
+   *     URL parameter name
    *
    * @return featureId {String}
    */
@@ -211,6 +214,21 @@ var SettingsBar = function (options) {
     }
 
     return featureId;
+  };
+
+  /**
+   * Get the refresh interval (in milliseconds) from the URL parameter value
+   * with the given name.
+   *
+   * @param name {String}
+   *     URL parameter name
+   *
+   * @return {Integer}
+   */
+  _getInterval = function (name) {
+    var value = AppUtil.getParam(name);
+
+    return parseInt(value.replace(/\D/g, '')) * 60 * 1000; // strip 'm'
   };
 
   /**
@@ -309,10 +327,7 @@ var SettingsBar = function (options) {
         name: feature.name
       });
 
-      if (_throttlers[id]) {
-        clearTimeout(_throttlers[id]);
-      }
-
+      clearTimeout(_throttlers[id]); // ensure a single timer per Feature is set
       _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
 
       _app.PlotsPane.rendered = false; // flag to (re-)render plots
@@ -392,7 +407,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Event handler that sets the auto refresh option.
+   * Event handler that sets the auto-refresh option.
    *
    * @param e {Event}
    */
@@ -407,16 +422,16 @@ var SettingsBar = function (options) {
         value = classList.find(className => className !== 'selected');
 
     if (input.checked) {
+      AppUtil.setParam(name, value);
+
       if (tagName === 'li') { // interval changed
-        clearInterval(_timers[name]);
+        _setTimeout(name);
       } else if (tagName !== 'ul') { // switch turned on
         _refreshFeature(featureId);
+        _this.setInterval(name);
       } else { // RadioBar border clicked
         return;
       }
-
-      AppUtil.setParam(name, value);
-      _this.setTimer(name);
     } else { // switch turned off
       AppUtil.deleteParam(name);
       clearInterval(_timers[name]);
@@ -451,6 +466,40 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Set a one-off (non-recurring) refresh timer for the Feature matching the
+   * given name. Then start an auto-refresh interval timer when the timeout
+   * finishes.
+   *
+   * @param name {String}
+   *     URL parameter name
+   */
+  _setTimeout = function (name) {
+    var elapsed,
+        id = _getFeatureId(name),
+        interval = _getInterval(name),
+        delay = interval, // default
+        feature = _app.Features.getFeature(id);
+
+    // Set delay based on elapsed time in the current auto-refresh cycle
+    if (!AppUtil.isEmpty(feature)) {
+      delay = 0;
+      elapsed = Date.now() - feature.updated;
+
+      if (elapsed < interval) {
+        delay = interval - elapsed;
+      }
+    }
+
+    clearInterval(_timers[name]); // cancel existing interval timer first
+    clearTimeout(_timers.oneOff); // ensure a single timer is set
+
+    _timers.oneOff = setTimeout(function() {
+      _refreshFeature(id);
+      _this.setInterval(name);
+    }, delay);
+  };
+
+  /**
    * Event handler that sets the timezone option.
    */
   _setTimeZone = function () {
@@ -476,11 +525,10 @@ var SettingsBar = function (options) {
    * with the selected catalog.
    */
   _swapTimer = function () {
-    var param = AppUtil.getParam('aftershocks'); // auto refresh setting
+    var param = AppUtil.getParam('aftershocks'); // auto-refresh setting
 
     if (param) {
-      clearInterval(_timers.aftershocks);
-      _this.setTimer('aftershocks');
+      _setTimeout('aftershocks');
     }
   };
 
@@ -527,6 +575,7 @@ var SettingsBar = function (options) {
     _focusedField = null;
 
     clearInterval(_timers.aftershocks);
+    clearTimeout(_timers.oneOff);
     _setStatus('disabled');
   };
 
@@ -555,12 +604,11 @@ var SettingsBar = function (options) {
    * @param name {String}
    *     URL parameter name
    */
-  _this.setTimer = function (name) {
+  _this.setInterval = function (name) {
     var id = _getFeatureId(name),
-        value = AppUtil.getParam(name),
-        interval = parseInt(value.replace(/\D/g, '')) * 60 * 1000;
+        interval = _getInterval(name);
 
-    clearInterval(_timers[name]); // ensure one timer per Feature
+    clearInterval(_timers[name]); // ensure a single timer per Feature is set
 
     _timers[name] = setInterval(_refreshFeature, interval, id);
   };
