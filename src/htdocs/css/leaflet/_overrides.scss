@@ -22,6 +22,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
   .leaflet-container {
     font: $font-size $font-family;
+    outline: none;
   }
 
   .leaflet-control-attribution,
