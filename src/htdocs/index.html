@@ -35,7 +35,7 @@
     <main id="pane">
       <section id="mapPane" class="pane hide">
         <div class="container"></div>
-        <div class="map"></div>
+        <div id="map"></div>
       </section>
       <section id="plotsPane" class="pane hide">
         <div class="container"></div>
@@ -111,7 +111,9 @@
               <li id="ca-nv">California-Nevada</li>
               <li id="customRegion">Custom</li>
             </ul>
-            <div class="customRegion option hide"></div>
+            <div class="customRegion option hide">
+              <div id="region-map"></div>
+            </div>
             <p class="instructions hide">Click and drag to draw a new custom
               region.</p>
             <button type="button" id="search">Search</button>

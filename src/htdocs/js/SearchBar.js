@@ -211,7 +211,7 @@ var SearchBar = function (options) {
   _initMap = function () {
     var zoomControl;
 
-    _map = L.map(_el.querySelector('.customRegion'), {
+    _map = L.map('region-map', {
       editable: true,
       layers: [
         L.greyscaleLayer(),

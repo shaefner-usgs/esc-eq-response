@@ -193,7 +193,7 @@ var MapPane = function (options) {
     var zoomControl,
         layers = _getLayers();
 
-    _this.map = L.map(_el.querySelector('.map'), {
+    _this.map = L.map('map', {
       layers: layers.defaults,
       minZoom: 1
     });

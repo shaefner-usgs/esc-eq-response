@@ -24,7 +24,7 @@ L.Marker.Canvas = L.Marker.extend({
     L.Marker.prototype.onAdd.call(this, map);
 
     if (canvas) {
-      marker = document.querySelector('.map .' + className);
+      marker = document.querySelector('#map .' + className);
 
       marker.appendChild(canvas); // move <canvas> container to Marker
     }

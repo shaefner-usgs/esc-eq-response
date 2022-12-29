@@ -1,10 +1,9 @@
 @use 'util/variables' as *;
 
-#mapPane,
-.map {
+#map,
+#mapPane {
   height: 100%;
 }
-
 #mapPane {
   padding: 0;
 
