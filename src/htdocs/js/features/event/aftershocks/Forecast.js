@@ -277,7 +277,7 @@ var Forecast = function (options) {
         '{radioBar}' +
         '{probabilities}' +
         '{parameters}' +
-        '<p><strong>Model</strong>: {model}</p>',
+        '<p class="model"><strong>Model</strong>: {model}</p>',
         data
       );
     }
