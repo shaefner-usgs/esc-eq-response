@@ -156,9 +156,7 @@ var Features = function (options) {
       count = `<span class="count">${feature.count}</span>`;
     }
 
-    els.forEach(el => {
-      el.innerHTML = feature.name + count;
-    });
+    els.forEach(el => el.innerHTML = feature.name + count);
 
     // Layer control's count is handled by its Leaflet plugin
     _app.MapPane.layerControl.addCount(count, feature.id);
@@ -467,6 +465,10 @@ var Features = function (options) {
     }
     if (feature.addListeners) {
       feature.addListeners();
+    }
+
+    if (feature.id === 'mainshock') {
+      el.classList.remove('hide');
     }
 
     if (feature.mode === 'rtf') {

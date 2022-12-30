@@ -172,7 +172,10 @@ var SelectBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    var significantEqs = _app.Features.getFeature('significant-eqs');
+    var el = document.getElementById('mainshock'), // Mainshock details
+        significantEqs = _app.Features.getFeature('significant-eqs');
+
+    el.classList.add('hide');
 
     if (_app.Features.isFeature(significantEqs)) {
       significantEqs.update(); // unselects all Events
