@@ -214,7 +214,7 @@ var Pager = function (options) {
           '</span>',
         h3 = document.getElementById('pager').querySelector('h3');
 
-    h3.innerHTML += bubble;
+    h3.innerHTML = h3.textContent + bubble;
   };
 
 

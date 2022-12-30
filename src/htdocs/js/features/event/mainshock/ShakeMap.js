@@ -72,7 +72,7 @@ var ShakeMap = function (options) {
           '</span>',
         h3 = document.getElementById('shakemap').querySelector('h3');
 
-    h3.innerHTML += bubble;
+    h3.innerHTML = h3.textContent + bubble;
   };
 
   /**
