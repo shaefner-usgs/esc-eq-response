@@ -8,9 +8,11 @@ $button-text-shadow: 1px 1px 3px #444;
 
 $content-border-radius: 12px;
 
-$effect-off-duration: .25s;
+$effect-duration: .25s;
+$effect-off-duration: $effect-duration;
 $effect-off-duration-shorter: .15s;
 $effect-on-duration: .05s;
+$effect-slide-duration: .175s;
 
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
@@ -18,7 +20,6 @@ $font-family-mmi: Tahoma, Verdana, Segoe, sans-serif;
 $font-size: 16px;
 $font-size-smaller: .875rem;
 
-$sidebar-toggle-duration: .25s;
 $sidebar-width: 400px;
 
 /* Colors */

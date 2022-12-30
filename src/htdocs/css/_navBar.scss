@@ -31,8 +31,7 @@
       padding: .6rem .85rem;
       text-decoration: none;
       text-transform: uppercase;
-      transition: $effect-off-duration-shorter ease-in;
-      transition-property: background, border, color;
+      transition: all $effect-off-duration-shorter ease-in;
 
       &:hover {
         border-color: $accent-color;

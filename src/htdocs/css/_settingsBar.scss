@@ -20,43 +20,35 @@
     margin-top: 1.75rem;
   }
 
-  .dd {
+  .dd,
+  .details {
     color: $text-color-lighter;
     font-size: $font-size-smaller;
-    line-height: 1.2;
-    margin: .125rem 0 0;
-    opacity: 1;
-    transition: opacity $effect-on-duration ease-out;
-
-    &.hide {
-      height: 0;
-      opacity: 0;
-      transition: all $effect-off-duration-shorter ease-in;
-      visibility: hidden;
-    }
-  }
-
-  .details {
-    margin: 0 0 1.25rem;
-    max-height: 6rem;
     opacity: 1;
     overflow: hidden;
-    transition: all .2s ease-in-out;
+    transition: all $effect-slide-duration ease-in-out;
 
     &.hide {
       margin: 0;
       max-height: 0;
       opacity: 0;
     }
+  }
+  .dd {
+    line-height: 1.2;
+    margin: .125rem 0 0;
+    max-height: 1.5rem;
+  }
+  .details {
+    margin: 0 0 1.25rem;
+    max-height: 6rem;
 
     p {
-      font-size: $font-size-smaller;
       margin: .125rem 0 .25rem;
     }
 
     time {
       display: block;
-      font-size: $font-size-smaller;
       line-height: 1;
       margin-top: .25rem;
 

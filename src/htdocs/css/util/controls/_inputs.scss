@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @use '../variables' as *;
 
 /* Check boxes, radio inputs
@@ -57,7 +59,7 @@ input[type="number"] {
   margin: 0 1px 3px 0;
   outline: none;
   padding: 6px 0 6px 6px;
-  transition: all .25s ease-in-out;
+  transition: all $effect-duration ease-in-out;
   width: 100%;
 
   &:autofill {
@@ -65,19 +67,24 @@ input[type="number"] {
   }
 
   &:focus,
-  &.active { // for Flatpickr inputs
+  &.active { // .active is for Flatpickr inputs
     border: 1px solid $accent-color;
     box-shadow: 0 0 3px $accent-color;
   }
 }
 
 // Invalid Flatpickr inputs
+.hide .invalid > input[type="text"] {
+  background: color.scale($invalid-color, $alpha: -90%);
+  box-shadow: 0 0 8px 2px $invalid-color;
+}
+
 .invalid > input[type="text"] {
   border: 1px solid $invalid-color;
   box-shadow: 0 0 3px $invalid-color;
 }
 
-// Only flag invalid fields when a Mainshock is selected
+// Flag invalid inputs when a Mainshock is selected
 .mainshock {
   input[type="text"]:invalid,
   input[type="number"]:invalid {

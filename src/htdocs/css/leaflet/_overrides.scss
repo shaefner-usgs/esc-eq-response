@@ -17,7 +17,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
 
   .leaflet-center,
   .leaflet-right {
-    transition: padding $sidebar-toggle-duration ease;
+    transition: padding $effect-duration ease;
   }
 
   .leaflet-container {

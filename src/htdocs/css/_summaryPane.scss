@@ -2,7 +2,7 @@
 @use 'util/variables' as *;
 
 #summaryPane {
-  transition: margin $sidebar-toggle-duration ease;
+  transition: margin $effect-duration ease;
 
   p {
     max-width: 55rem;

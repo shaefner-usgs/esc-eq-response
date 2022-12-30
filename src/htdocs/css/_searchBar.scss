@@ -5,10 +5,6 @@
     margin: 1rem 0 1.5rem;
   }
 
-  div.hide {
-    display: none;
-  }
-
   p.note {
     margin-top: 1.5rem;
   }
@@ -17,7 +13,7 @@
     right: 0; // align end date calendar to right edge
   }
 
-  .customRegion {
+  #region-map {
     height: 300px;
     margin: 1.25rem 0 0;
   }
@@ -58,6 +54,25 @@
   .leaflet-path-draggable {
     fill: $accent-color;
     stroke: $accent-color;
+  }
+
+  .option {
+    max-height: 20rem;
+    opacity: 1;
+    transition: all $effect-slide-duration ease-in-out;
+
+    &.customPeriod {
+      max-height: 6rem;
+    }
+    &.customRegion {
+      overflow: hidden; // Note: breaks Flatpickr if applied to period option
+    }
+
+    &.hide {
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden; // mitigates not setting overflow: hidden for period
+    }
   }
 
   .slider-container {

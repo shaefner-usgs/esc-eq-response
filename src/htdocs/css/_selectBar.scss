@@ -35,12 +35,15 @@
   #mainshock {
     margin-top: 1rem;
     max-height: 350px;
+    opacity: 1;
     overflow: hidden;
-    transition: max-height .3s ease-out;
+    transition: all $effect-slide-duration ease-in-out;
 
     &.hide {
+      margin: 0;
       max-height: 0;
-      transition: max-height .1s ease-in;
+      opacity: 0;
+      transition: none;
     }
   }
 }

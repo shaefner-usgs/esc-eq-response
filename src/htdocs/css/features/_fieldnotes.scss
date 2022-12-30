@@ -59,12 +59,13 @@
 
     .props {
       max-height: 400px;
+      opacity: 1;
       overflow: hidden;
-      transition: max-height .3s ease-out;
+      transition: all $effect-slide-duration ease-in-out;
 
       &.hide {
         max-height: 0;
-        transition: max-height .1s ease-in;
+        opacity: 0;
       }
     }
 
@@ -83,7 +84,7 @@
         position: absolute;
         top: .25rem;
         transform: rotate(0deg);
-        transition: transform .3s ease-in-out;
+        transition: transform $effect-duration ease-in-out;
         width: 0;
       }
 

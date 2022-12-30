@@ -10,7 +10,7 @@
   position: fixed;
   right: 0;
   top: var(--padding-header);
-  transition: margin $sidebar-toggle-duration ease;
+  transition: margin $effect-duration ease;
   width: $sidebar-width;
   z-index: 1000;
 
@@ -57,10 +57,11 @@
   .icon-close {
     @include close;
 
+    opacity: 0;
     position: fixed;
     right: $sidebar-width * -1;
     top: 7.625rem;
-    transition: right $sidebar-toggle-duration ease;
+    transition: right $effect-duration ease;
     z-index: 10000;
   }
 
@@ -86,7 +87,10 @@ body.sidebar {
     margin-right: 0;
 
     .icon-close {
+      opacity: 1;
       right: .5rem;
+      transition: background $effect-off-duration-shorter ease-in,
+        opacity $effect-duration ease;
     }
   }
 

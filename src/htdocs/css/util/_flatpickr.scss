@@ -28,7 +28,7 @@
     border: 1px solid $accent-color;
     border-radius: $button-border-radius;
     box-shadow: 0 0 3px $accent-color;
-    transition: all .25s ease-in-out;
+    transition: all $effect-duration ease-in-out;
     z-index: 1001 !important; // stack above map
 
     &.arrowBottom:before {

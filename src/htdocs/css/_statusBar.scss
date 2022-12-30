@@ -11,7 +11,7 @@
 
   &.hide {
     height: 0;
-    transition: height .25s ease-in .25s;
+    transition: height $effect-duration ease-in .25s;
   }
 
   div {
@@ -84,11 +84,12 @@
     opacity: 0.75;
     position: absolute;
     top: 5px;
-    transition: opacity .25s ease-in-out;
+    transition: opacity $effect-off-duration-shorter ease-in;
     width: 32px;
 
     &:hover {
       opacity: 1;
+      transition: opacity $effect-on-duration ease-out;
     }
   }
 

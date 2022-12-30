@@ -24,7 +24,7 @@
       margin: 0;
       padding: 0;
       position: relative;
-      transition: all .2s ease-in-out;
+      transition: all $effect-slide-duration ease-in-out;
       width: 2.25rem;
 
       &:before {
