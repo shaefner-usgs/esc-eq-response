@@ -19,7 +19,6 @@ var AppUtil = require('util/AppUtil'),
  *       addData: {Function}
  *       addListeners: {Function}
  *       content: {String}
- *       destroy: {Function}
  *       id: {String}
  *       name: {String)
  *       update: {Function}
@@ -178,23 +177,6 @@ var SignificantEqs = function (options) {
     _lis.forEach(li =>
       li.addEventListener('click', _setMainshock)
     );
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
-   */
-  _this.destroy = function () {
-    _initialize = null;
-
-    _app = null;
-    _lis = null;
-
-    _fetch = null;
-    _getContent = null;
-    _getItem = null;
-    _setMainshock = null;
-
-    _this = null;
   };
 
   /**
