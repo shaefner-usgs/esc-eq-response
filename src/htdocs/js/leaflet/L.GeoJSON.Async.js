@@ -80,9 +80,9 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
    */
   _addContent: function () {
     var feature = this._feature,
-        status = this._app.Features.checkDependencies(feature);
+        dependencies = this._app.Features.checkDependencies(feature);
 
-    if (status === 'ready') {
+    if (dependencies === 'ready') {
       if (feature.addData) {
         feature.addData(this._json);
       }
@@ -95,7 +95,6 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       }
 
       feature.status = 'ready';
-      feature.updated = Date.now();
 
       this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
     } else { // dependencies not ready
@@ -193,6 +192,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     try {
       response = await AppUtil.fetchWithTimeout(this._url.href);
       this._json = await response.clone().json();
+      feature.updated = Date.now();
 
       this._addContent();
       this._app.StatusBar.removeItem(feature.id);
