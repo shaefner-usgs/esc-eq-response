@@ -46,6 +46,7 @@ var Aftershocks = function (options) {
       _earthquakes,
       _summary,
 
+      _destroy,
       _getPlaceholder,
       _getUrl;
 
@@ -78,6 +79,20 @@ var Aftershocks = function (options) {
 
     _this.mapLayer = _earthquakes.mapLayer;
     _this.placeholder = _getPlaceholder();
+  };
+
+  /**
+   * Destroy this Feature's sub-Classes.
+   */
+  _destroy = function () {
+    _earthquakes.destroy();
+
+    if (!AppUtil.isEmpty(_this.plots)) {
+      _this.plots.destroy();
+    }
+    if (_summary) {
+      _summary.destroy();
+    }
   };
 
   /**
@@ -155,14 +170,7 @@ var Aftershocks = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _earthquakes.destroy();
-
-    if (!AppUtil.isEmpty(_this.plots)) {
-      _this.plots.destroy();
-    }
-    if (_summary) {
-      _summary.destroy();
-    }
+    _destroy();
 
     _initialize = null;
 
@@ -170,6 +178,7 @@ var Aftershocks = function (options) {
     _earthquakes = null;
     _summary = null;
 
+    _destroy = null;
     _getPlaceholder = null;
     _getUrl = null;
 
