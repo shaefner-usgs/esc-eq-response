@@ -12,7 +12,6 @@ var AppUtil = require('util/AppUtil'),
  *     {
  *       app: {Object} Application
  *       showLayer: {Boolean}
- *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
