@@ -10,9 +10,9 @@
  *
  * @param options {Object}
  *     {
- *       content: {String}
- *       id: {String} required
- *       title: {String}
+ *       content: {String} optional
+ *       id: {String}
+ *       title: {String} optional
  *     }
  *
  * @return _this {Object}
