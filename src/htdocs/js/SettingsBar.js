@@ -417,9 +417,10 @@ var SettingsBar = function (options) {
         featureId = _getFeatureId(input.id),
         name = input.id,
         selected = div.querySelector('.selected'),
-        classList = Array.from(selected.classList),
         tagName = e.target.tagName.toLowerCase(),
-        value = classList.find(className => className !== 'selected');
+        value = Array.from(selected.classList).find(className =>
+          className !== 'selected'
+        );
 
     if (input.checked) {
       AppUtil.setParam(name, value);

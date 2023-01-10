@@ -62,8 +62,9 @@ var SummaryPane = function (options) {
       _subFeatures[featureId] = [];
 
       subFeatures.forEach(subFeature => {
-        var classList = Array.from(subFeature.classList),
-            id = classList.find(className => className !== 'content');
+        var id = Array.from(subFeature.classList).find(className =>
+          className !== 'content'
+        );
 
         _subFeatures[featureId].push(id); // store cached sub-Features by id
         container.appendChild(subFeature);
