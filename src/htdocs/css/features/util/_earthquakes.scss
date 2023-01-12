@@ -132,7 +132,11 @@
 
     th {
       color: $text-color-lighter;
-      position: relative;
+
+      &.sort-header span:after,
+      &.sort-header span:before {
+        border-color: $text-color-lighter transparent;
+      }
 
       &.sort-header:hover {
         color: $text-color;
@@ -172,11 +176,6 @@
           color: #fff !important;
         }
       }
-    }
-
-    .sort-header span:after,
-    .sort-header span:before {
-      border-color: $text-color-lighter transparent;
     }
   }
 }
