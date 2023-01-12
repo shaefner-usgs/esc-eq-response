@@ -201,7 +201,7 @@ var Rtf = function (options) {
    */
   _getData = function () {
     var data,
-        prefix = (AppUtil.getParam('catalog') === 'dd' ? 'dd-' : ''),
+        prefix = (AppUtil.getParam('catalog') === 'dd') ? 'dd-' : '',
         aftershocks = _app.Features.getFeature(`${prefix}aftershocks`),
         dyfi = _app.Features.getFeature('dyfi'),
         el = document.getElementById('summaryPane'),

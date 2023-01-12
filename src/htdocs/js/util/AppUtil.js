@@ -127,9 +127,9 @@ AppUtil.fetchWithTimeout = async function (resource, options = {}) {
  */
 AppUtil.formatLatLon = function (coords) {
   var lat = Math.abs(coords[1]).toFixed(3),
-      latHemisphere = (coords[1] < 0 ? 'S' : 'N'),
+      latHemisphere = (coords[1] < 0) ? 'S' : 'N',
       lon = Math.abs(coords[0]).toFixed(3),
-      lonHemisphere = (coords[0] < 0 ? 'W' : 'E');
+      lonHemisphere = (coords[0] < 0) ? 'W' : 'E';
 
   return `${lat}°${latHemisphere}, ${lon}°${lonHemisphere}`;
 };

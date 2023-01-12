@@ -220,7 +220,7 @@ var SummaryPane = function (options) {
           sortUp = thHidden.classList.contains('sort-up');
 
           if (sortDown || sortUp) {
-            indicator = (sortDown ? 'sort-down' : 'sort-up');
+            indicator = sortDown ? 'sort-down' : 'sort-up';
 
             thHidden.classList.remove(indicator);
             thVisible.classList.add(indicator);
