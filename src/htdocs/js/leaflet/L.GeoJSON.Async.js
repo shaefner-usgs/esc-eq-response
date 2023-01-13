@@ -55,7 +55,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       this._feature.status = 'ready'; // data loaded on demand by user, don't wait
     }
 
-    // Remove non-L.GeoJSON options
+    // Delete non-L.GeoJSON options
     delete options.app;
     delete options.feature;
     delete options.host;
@@ -97,6 +97,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       feature.status = 'ready';
 
       this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
+      this._deleteProps();
     } else { // dependencies not ready
       setTimeout(() => {
         this._addContent();
@@ -167,6 +168,17 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   },
 
   /**
+   * Delete 'foreign' (non-Leaflet) properties.
+   */
+  _deleteProps: function () {
+    delete this._app;
+    delete this._feature;
+    delete this._host;
+    delete this._json;
+    delete this._url;
+  },
+
+  /**
    * Fetch the JSON data.
    *
    * If Feature.deferFetch is set to true and the Feature's map layer is
@@ -194,8 +206,8 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       this._json = await response.clone().json();
       feature.updated = Date.now();
 
-      this._addContent();
       this._app.StatusBar.removeItem(feature.id);
+      this._addContent();
     } catch (error) {
       feature.status = 'error';
 
