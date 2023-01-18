@@ -329,8 +329,6 @@ var SettingsBar = function (options) {
 
       clearTimeout(_throttlers[id]); // ensure a single timer per Feature is set
       _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
-
-      _app.PlotsPane.rendered = false; // flag to (re-)render plots
     }
   };
 
@@ -370,8 +368,9 @@ var SettingsBar = function (options) {
       if (pane !== 'mapPane') {
         _app.Pane.setScrollPosition(pane);
       }
-
-      _app.PlotsPane.rendered = false; // flag to (re-)render plots
+      if (pane !== 'plotsPane') {
+        _app.PlotsPane.rendered = false; // flag to (re-)render plots
+      }
     }
   };
 
