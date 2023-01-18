@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @use 'util/variables' as *;
 
 #searchBar {
@@ -59,7 +61,7 @@
   .option {
     opacity: 1;
     transition: $effect-slide-duration ease-in-out;
-    transition-property: max-height, opacity;
+    transition-property: margin, max-height, opacity;
 
     &.customPeriod {
       max-height: 6rem;
@@ -72,10 +74,20 @@
     &.hide {
       max-height: 0;
       opacity: 0;
-      visibility: hidden; // mitigates not setting overflow: hidden
 
       &.customPeriod {
         margin-top: -.5rem; // compensate for not setting overflow: hidden
+        visibility: hidden; // helps mitigate not setting overflow: hidden
+      }
+
+      input {
+        transition: none; // fix jankiness due to not setting overflow: hidden
+      }
+
+      // Flash invalid fields when custom period is toggled on
+      .invalid > input[type="text"] {
+        background: color.scale($invalid-color, $alpha: -90%);
+        box-shadow: 0 0 8px 2px $invalid-color;
       }
     }
   }
