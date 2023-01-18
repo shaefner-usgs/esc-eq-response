@@ -168,13 +168,12 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   },
 
   /**
-   * Delete 'foreign' (non-Leaflet) properties.
+   * Delete unneeded 'foreign' (non-Leaflet) properties.
    */
   _deleteProps: function () {
     delete this._app;
     delete this._feature;
     delete this._host;
-    delete this._json;
     delete this._url;
   },
 
