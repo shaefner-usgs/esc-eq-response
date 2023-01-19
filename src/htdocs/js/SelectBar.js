@@ -106,12 +106,18 @@ var SelectBar = function (options) {
    */
   _hardReset = function (e) {
     var input = _el.querySelector('input'),
+        map = _app.MapPane.map,
+        search = _app.Features.getFeature('catalog-search').mapLayer,
         sidebar = document.getElementById('sideBar');
 
     input.value = '';
     sidebar.scrollTop = 0;
 
     e.preventDefault();
+
+    if (!map.hasLayer(search)) {
+      map.addLayer(search);
+    }
 
     _setStatus('disabled');
     _app.reset();
