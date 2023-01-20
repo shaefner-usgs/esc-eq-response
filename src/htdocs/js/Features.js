@@ -100,6 +100,7 @@ _MODULES = {
  *       isFeature: {Function}
  *       postInit: {Function)
  *       refreshFeature: {Function}
+ *       reloadFeature: {Function}
  *       removeFeature: {Function}
  *       reset: {Function}
  *       showLightbox: {Function}
@@ -123,6 +124,7 @@ var Features = function (options) {
       _createFeature,
       _createRtf,
       _getMode,
+      _getOptions,
       _initFeatures,
       _isReady,
       _removeCount,
@@ -229,7 +231,6 @@ var Features = function (options) {
    *     {
    *       Required props:
    *
-   *         destroy: {Function} free references
    *         id: {String} unique id
    *         name: {String} display name
    *
@@ -248,6 +249,7 @@ var Features = function (options) {
    *         deferFetch: {Boolean} fetch data on demand when map layer turned 'on'
    *           Note: only Features with a map layer; showLayer prop must be false
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
+   *         destroy: {Function} free references
    *         json: {String} JSON feed data (Mainshock only)
    *         lightbox: {String} HTML content of Feature's Lightbox
    *         mapLayer: {L.Layer} Leaflet layer added to MapPane
@@ -263,7 +265,7 @@ var Features = function (options) {
    *         url: {String} URL of data feed
    *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
    *     }
-   * @param opts {Object} default is {}
+   * @param opts {Object} optional; default is {}
    */
   _createFeature = function (mode, module, opts = {}) {
     var feature,
@@ -334,6 +336,38 @@ var Features = function (options) {
     });
 
     return match;
+  };
+
+  /**
+   * Get the given Feature's options to preserve during a refresh.
+   *
+   * @param feature {Object}
+   *
+   * @return options {Object}
+   */
+  _getOptions = function (feature) {
+    var th,
+        magThreshold = sessionStorage.getItem(feature.id + '-mag'),
+        options = {
+          showLayer: feature.showLayer
+        },
+        table = document.querySelector(`#summaryPane .${feature.id} .sortable`);
+
+    if (magThreshold) {
+      options.magThreshold = Number(magThreshold);
+    }
+    if (table) {
+      th = table.querySelector('.sort-down, .sort-up');
+
+      Object.assign(options, {
+        sortField: Array.from(th.classList).find(className =>
+          !className.includes('sort-')
+        ),
+        sortOrder: th.classList.contains('sort-down') ? 'asc' : 'desc'
+      });
+    }
+
+    return options;
   };
 
   /**
@@ -420,13 +454,18 @@ var Features = function (options) {
   };
 
   /**
-   * Remove all Features, except 'base' Features.
+   * Remove all Features, except 'base' Features. Also remove their associated
+   * storage items.
    */
   _removeFeatures = function () {
     Object.keys(_features).forEach(mode => {
       if (mode !== 'base') {
         Object.keys(_features[mode]).forEach(id => {
           _this.removeFeature(_this.getFeature(id));
+
+          // Remove potentially saved values of Feature's Sliders
+          sessionStorage.removeItem(id + '-depth');
+          sessionStorage.removeItem(id + '-mag');
         });
       }
     });
@@ -440,7 +479,7 @@ var Features = function (options) {
    * Add the given Feature's content (i.e. the fetched data). Also render and
    * add its event listeners and Lightbox, if applicable.
    *
-   * Optionally create the RTF document when all of its Features are ready.
+   * Optionally create the RTF document depending on the Feature's mode.
    *
    * @param feature {Object}
    */
@@ -641,7 +680,7 @@ var Features = function (options) {
         var feature = _this.getFeature(id);
 
         if (feature.status !== 'ready') {
-          status = feature.status; // error, initialized or loading
+          status = feature.status;
         }
       });
 
@@ -693,22 +732,31 @@ var Features = function (options) {
    *     Feature id
    */
   _this.refreshFeature = function (id) {
-    var prevFeature,
-        feature = _this.getFeature(id),
+    var feature = _this.getFeature(id),
         mode = _getMode(id),
-        module = _modules[id],
-        showLayer = feature.showLayer; // use cached value
+        options = _getOptions(feature),
+        prevFeature = _cacheFeature(feature);
 
-    if (feature.mode === 'event') {
+    prevFeature.status = 'refreshing';
+
+    if (mode !== 'base') {
       _this.getFeature('mainshock').disableDownload();
     }
 
-    prevFeature = _cacheFeature(feature);
-
     _this.removeFeature(prevFeature);
-    _createFeature(mode, module, {
-      showLayer: showLayer
-    });
+    _createFeature(mode, _modules[id], options);
+  };
+
+  /**
+   * Reload a Feature after a failed request.
+   *
+   * @param id {String}
+   *     Feature id
+   * @param mode {String}
+   *     display mode
+   */
+  _this.reloadFeature = function (id, mode) {
+    _createFeature(mode, _modules[id]);
   };
 
   /**
@@ -723,6 +771,8 @@ var Features = function (options) {
    *     set to false when swapping between catalogs
    */
   _this.removeFeature = function (feature, destroy = true) {
+    var id = feature.id;
+
     if (_this.isFeature(feature)) {
       if (feature.removeListeners) {
         feature.removeListeners();
@@ -732,17 +782,18 @@ var Features = function (options) {
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
 
-      // Mainshock details in SelectBar
-      if (feature.id === 'mainshock') {
-        document.getElementById('mainshock').innerHTML = '';
+      // SelectBar
+      if (id === 'mainshock') {
+        document.getElementById(id).innerHTML = ''; // Mainshock details
+      } else if (id === 'significant-eqs') {
+        document.getElementById(id).innerHTML = ''; // loader
       }
 
-      // Purge Feature unless swapping between catalogs
-      if (destroy) {
+      if (destroy) { // set to false when swapping catalogs
         feature.destroy();
         _removeCount(feature);
 
-        delete _features[feature.mode][feature.id];
+        delete _features[feature.mode][id];
       }
     }
   };
