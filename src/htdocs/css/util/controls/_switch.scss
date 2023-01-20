@@ -5,10 +5,12 @@
   input.switch {
     display: none;
 
+    &:active + label {
+      color: $text-color-darker;
+    }
     &:checked + label {
       background: $accent-color;
       border-color: $accent-color;
-      color: $text-color-darker;
       padding-left: 1rem;
       width: 1.25rem;
     }

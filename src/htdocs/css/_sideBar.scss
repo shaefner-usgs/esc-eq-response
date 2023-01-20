@@ -38,6 +38,10 @@
     display: block;
     margin: 1.25rem 0 0;
     padding-bottom: .25rem;
+
+    &:active {
+      color: #444;
+    }
   }
 
   section.hide {
