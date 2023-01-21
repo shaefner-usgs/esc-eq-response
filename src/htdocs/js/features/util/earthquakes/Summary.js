@@ -9,7 +9,10 @@ var AppUtil = require('util/AppUtil'),
 
 
 var _DEFAULTS = {
-  maxNumEqs: 25
+  magThreshold: null,
+  maxNumEqs: 25,
+  sortField: 'utcTime',
+  sortOrder: 'desc'
 };
 
 
@@ -23,6 +26,9 @@ var _DEFAULTS = {
  *       app: {Object}
  *       earthquakes: {Object}
  *       featureId: {String}
+ *       magThreshold: {Integer} optional
+ *       sortField: {String} optional
+ *       sortOrder: {String} optional
  *     }
  *
  * @return _this {Object}
@@ -39,13 +45,16 @@ var Summary = function (options) {
       _initialize,
 
       _app,
-      _data,
       _el,
+      _eqs,
       _featureId,
       _magThreshold,
       _maxNumEqs,
       _params,
+      _reverseSort,
       _slider,
+      _sortField,
+      _sortOrder,
       _tables,
 
       _addTitles,
@@ -54,7 +63,9 @@ var Summary = function (options) {
       _createBins,
       _filter,
       _getBinnedTable,
+      _getData,
       _getListTable,
+      _getRows,
       _getSlider,
       _getSubHeader,
       _getTemplate,
@@ -75,10 +86,14 @@ var Summary = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
-    _data = options.earthquakes.data;
+    _eqs = options.earthquakes.data;
     _featureId = options.featureId;
+    _magThreshold = options.magThreshold; // default
     _maxNumEqs = options.maxNumEqs;
     _params = options.earthquakes.params;
+    _reverseSort = false;
+    _sortField = options.sortField;
+    _sortOrder = options.sortOrder;
 
     _createBins(); // creates, populates _this.bins
   };
@@ -170,7 +185,7 @@ var Summary = function (options) {
 
     _this.bins = {};
 
-    _data.forEach(eq => {
+    _eqs.forEach(eq => {
       if (_featureId.includes('aftershocks')) {
         var days = Math.ceil(
           Luxon.Interval
@@ -285,6 +300,37 @@ var Summary = function (options) {
   };
 
   /**
+   * Get the data for an earthquake list table.
+   *
+   * @param fields {Object}
+   * @param type {String}
+   *
+   * @return data {Object}
+   */
+  _getData = function (fields, type) {
+    var thClasses,
+        tableClasses = ['list'],
+        data = {
+          rows: _getRows(tableClasses, type), // must be before classNames prop
+          classNames: tableClasses.join(' '),
+          utcOffset: _app.utcOffset
+        };
+
+    // Get the classLists for the <th>s
+    Object.keys(fields).forEach(field => {
+      thClasses = [field];
+
+      if (field === _sortField) {
+        thClasses.push('sort-default');
+      }
+
+      data[field] = thClasses.join(' ');
+    });
+
+    return data;
+  };
+
+  /**
    * Get the HTML <table> for the given type of earthquake list.
    *
    * @param type {String <all|mostRecent>} default is 'all'
@@ -293,74 +339,19 @@ var Summary = function (options) {
    * @return {String}
    */
   _getListTable = function (type = 'all') {
-    var data,
-        eqs = _data, // default
-        fields = [
-          'depth',
-          'distance',
-          'eqid',
-          'location',
-          'mag',
-          'userTime',
-          'utcTime'
-        ],
-        magThreshold = _magThreshold, // default
-        rows = '',
-        sortByField = 'utcTime', // default
-        tableClasses = ['list'],
-        thClasses = {};
-
-    if (_featureId.includes('historical')) {
-      sortByField = 'mag';
-    }
-    if (type === 'mostRecent') {
-      eqs = [eqs[eqs.length - 1]];
-      magThreshold = 0; // always show most recent eq
-    }
-    if (eqs.length > 1) {
-      tableClasses.push('sortable');
-    }
-
-    // Table rows
-    eqs.forEach(eq => {
-      var magInt = eq.magInt;
-
-      rows += L.Util.template(
-        '<tr class="m{magInt}" title="View earthquake on map">' +
-          '<td class="mag" data-sort="{mag}"><span>{magType} </span>{magDisplay}</td>' +
-          '<td class="userTime" data-sort="{isoTime}">{userTimeDisplay}</td>' +
-          '<td class="utcTime" data-sort="{isoTime}">{utcTimeDisplay}</td>' +
-          '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
-          '<td class="location">{location}</td>' +
-          '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
-          '<td class="eqid">{id}</td>' +
-        '</tr>',
-        eq
-      );
-
-      if (
-        magInt >= magThreshold &&
-        tableClasses.indexOf('m' + magInt) === -1
-      ) {
-        tableClasses.push('m' + magInt); // display mag level by default
-      }
-    });
-
-    data = {
-      classNames: tableClasses.join(' '),
-      rows: rows,
-      utcOffset: _app.utcOffset
+    var fields = { // default sort orders
+      depth: 'asc',
+      distance: 'asc',
+      eqid: 'asc',
+      location: 'asc',
+      mag: 'desc',
+      userTime: 'desc',
+      utcTime: 'desc'
     };
 
-    fields.forEach(field => {
-      thClasses[field] = [field];
-
-      if (field === sortByField) {
-        thClasses[field].push('sort-default');
-      }
-
-      data[field] = thClasses[field].join(' ');
-    });
+    if (fields[_sortField] !== _sortOrder) {
+      _reverseSort = true;
+    }
 
     return L.Util.template(
       '<div class="wrapper">' +
@@ -383,8 +374,55 @@ var Summary = function (options) {
           '</tbody>' +
         '</table>' +
       '</div>',
-      data
+      _getData(fields, type)
     );
+  };
+
+  /**
+   * Get the HTML <tr>s for an earthquake list and add the default classNames to
+   * the tableClasses Array.
+   *
+   * @param tableClasses {Array}
+   * @param type {String}
+   *
+   * @return rows {String}
+   */
+  _getRows = function (tableClasses, type) {
+    var eqs = _eqs,
+        magThreshold = _magThreshold,
+        rows = '';
+
+    if (type === 'mostRecent') {
+      eqs = [eqs[eqs.length - 1]];
+      magThreshold = 0; // always show most recent eq
+    }
+    if (eqs.length > 1) {
+      tableClasses.push('sortable');
+    }
+
+    eqs.forEach(eq => {
+      rows += L.Util.template(
+        '<tr class="m{magInt}" title="View earthquake on map">' +
+          '<td class="mag" data-sort="{mag}"><span>{magType} </span>{magDisplay}</td>' +
+          '<td class="userTime" data-sort="{isoTime}">{userTimeDisplay}</td>' +
+          '<td class="utcTime" data-sort="{isoTime}">{utcTimeDisplay}</td>' +
+          '<td class="depth" data-sort="{depth}">{depthDisplay}</td>' +
+          '<td class="location">{location}</td>' +
+          '<td class="distance" data-sort="{distance}">{distanceDisplay}</td>' +
+          '<td class="eqid">{id}</td>' +
+        '</tr>',
+        eq
+      );
+
+      if (
+        eq.magInt >= magThreshold &&
+        tableClasses.indexOf('m' + eq.magInt) === -1
+      ) {
+        tableClasses.push('m' + eq.magInt); // show mag level by default
+      }
+    });
+
+    return rows;
   };
 
   /**
@@ -449,24 +487,28 @@ var Summary = function (options) {
 
   /**
    * Get the magnitude threshold where no more than _maxNumEqs will be visible
-   * by default.
+   * by default, or return _magThreshold if it is set and <= maxMag.
    *
-   * @return threshold {Number}
+   * @return threshold {Integer}
    */
   _getThreshold = function () {
     var magBins = _this.bins.mag,
         maxMag = magBins.length - 1, // 0-based Array
         threshold = maxMag; // default
 
-    magBins.some((number, magInt) => {
-      if (number <= _maxNumEqs) {
-        threshold = magInt;
+    if (Number.isInteger(_magThreshold) &&_magThreshold <= maxMag) {
+      threshold = _magThreshold;
+    } else {
+      magBins.some((number, magInt) => {
+        if (number <= _maxNumEqs) {
+          threshold = magInt;
 
-        return true;
-      }
-    });
+          return true;
+        }
+      });
+    }
 
-    if (threshold < _params.magnitude) { // happens when there's no smaller eqs
+    if (threshold < _params.magnitude) { // no/few smaller-mag eqs
       threshold = Math.floor(_params.magnitude);
     }
 
@@ -526,7 +568,8 @@ var Summary = function (options) {
    * @param table {Element}
    */
   _initSort = function (table) {
-    var cleanNumber = function (i) {
+    var th,
+        cleanNumber = function (i) {
           return i.replace(/[^\-?0-9.]/g, '');
         },
         compareNumber = function (a, b) {
@@ -550,6 +593,11 @@ var Summary = function (options) {
     });
 
     Tablesort(table);
+
+    if (_reverseSort) { // set initial sort direction to opposite of default
+      th = table.querySelector('th.' + _sortField);
+      th.click();
+    }
   };
 
   /**
@@ -581,6 +629,8 @@ var Summary = function (options) {
 
       // Suppress click event if user is selecting text
       if (!isTextSelected) {
+        location.href = '#mapPane';
+
         _app.MapPane.openPopup(eqid, featureId);
       }
     }
@@ -714,13 +764,16 @@ var Summary = function (options) {
     _initialize = null;
 
     _app = null;
-    _data = null;
     _el = null;
+    _eqs = null;
     _featureId = null;
     _magThreshold = null;
     _maxNumEqs = null;
     _params = null;
+    _reverseSort = null;
     _slider = null;
+    _sortField = null;
+    _sortOrder = null;
     _tables = null;
 
     _addTitles = null;
@@ -729,7 +782,9 @@ var Summary = function (options) {
     _createBins = null;
     _filter = null;
     _getBinnedTable = null;
+    _getData = null;
     _getListTable = null;
+    _getRows = null;
     _getSlider = null;
     _getSubHeader = null;
     _getTemplate = null;
@@ -753,7 +808,7 @@ var Summary = function (options) {
    */
   _this.getContent = function () {
     var duration, interval, mostRecentEq,
-        count = _data.length,
+        count = _eqs.length,
         html = '';
 
     if (_featureId.includes('aftershocks')) {
@@ -767,7 +822,7 @@ var Summary = function (options) {
       html += '<div class="forecast feature content hide"></div>'; // placeholder
 
       if (count > 1) {
-        mostRecentEq = _data[count - 1];
+        mostRecentEq = _eqs[count - 1];
         interval = Luxon.Interval.fromDateTimes(
           mostRecentEq.datetime,
           Luxon.DateTime.utc()
