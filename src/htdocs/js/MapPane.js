@@ -9,7 +9,7 @@ require('leaflet/L.Control.Zoom');
 require('leaflet/L.DarkLayer');
 require('leaflet/L.FaultsLayer');
 require('leaflet/L.GreyscaleLayer');
-require('leaflet/L.GeoJSON.async');
+require('leaflet/L.GeoJSON.Async');
 require('leaflet/L.Map');
 require('leaflet/L.Map.BoxZoom');
 require('leaflet/L.Popup');
@@ -54,6 +54,8 @@ var MapPane = function (options) {
       _bounds,
       _el,
       _initialExtent,
+      _isRefreshing,
+      _prevFeatures,
       _rendered,
 
       _addControls,
@@ -62,6 +64,8 @@ var MapPane = function (options) {
       _getBounds,
       _getLayers,
       _initMap,
+      _removeLayer,
+      _restorePopup,
       _setBounds,
       _setFlag,
       _trackExtent;
@@ -73,6 +77,8 @@ var MapPane = function (options) {
     _app = options.app;
     _el = options.el;
     _initialExtent = true;
+    _isRefreshing = {};
+    _prevFeatures = {};
     _rendered = false;
 
     _initMap();
@@ -211,6 +217,35 @@ var MapPane = function (options) {
   };
 
   /**
+   * Remove the given Feature from the map. Also cache its showLayer prop.
+   *
+   * @param feature {Object}
+   */
+  _removeLayer = function (feature) {
+    var showLayer = feature.showLayer;
+
+    _this.map.removeLayer(feature.mapLayer); // sets showLayer prop to false
+
+    feature.showLayer = showLayer;
+  };
+
+  /**
+   * Re-open an existing popup when its map layer is refreshed.
+   *
+   * @param id {String}
+   *     Feature id
+   */
+  _restorePopup = function (id) {
+    var mapLayer = _prevFeatures[id].mapLayer;
+
+    mapLayer.eachLayer(layer => {
+      if (layer.isPopupOpen()) {
+        _this.openPopup(layer.feature.id, id);
+      }
+    });
+  };
+
+  /**
    * Extend _bounds to contain the given Feature. If it's the Mainshock,
    * initialize _bounds centered on it.
    *
@@ -252,9 +287,11 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set the map's bounds (and set the view once all Features are ready).
+   * Set the map's bounds (and set the view once all Features are ready). If the
+   * Feature is being refreshed, remove the 'old' layer and restore its popup.
    *
-   * Note: the Feature's content is added to the map layer by L.GeoJSON.async.
+   * Note: the Feature's content is added to the existing (empty) map layer by
+   * L.GeoJSON.async.
    */
   _this.addContent = function (feature) {
     var status = _app.Features.getStatus();
@@ -279,6 +316,13 @@ var MapPane = function (options) {
 
         _trackExtent();
       });
+    }
+
+    if (_isRefreshing[feature.id]) {
+      _restorePopup(feature.id);
+      _removeLayer(_prevFeatures[feature.id]);
+
+      _isRefreshing[feature.id] = false;
     }
   };
 
@@ -337,8 +381,8 @@ var MapPane = function (options) {
   };
 
   /**
-   * Open the map popup matching the given eqid and Feature when the user
-   * selects an eq from the Plots/SummaryPanes. Also switch to the MapPane.
+   * Open the map popup matching the given eqid and featureId when the user
+   * selects an eq from the Plots/SummaryPanes.
    *
    * @param eqid {String}
    * @param featureId {String}
@@ -354,33 +398,34 @@ var MapPane = function (options) {
       }
     });
 
-    // Ensure Feature layer is "on" so its popup can be displayed
-    if (!_this.map.hasLayer(layer)) {
-      _this.map.addLayer(layer);
-    }
+    if (marker) {
+      if (!_this.map.hasLayer(layer)) {
+        _this.map.addLayer(layer); // ensure Feature layer is "on"
+      }
 
-    _this.map.once('visible', () => {
       marker.openPopup();
-      marker.getPopup().update(); // render popup properly
-    });
-
-    location.href = '#mapPane';
+    }
   };
 
   /**
-   * Remove a Feature from the map and layer control.
+   * Remove the given Feature from the map and layer control. If the Feature is
+   * being refreshed, defer and instead remove it from the map when the new
+   * layer is added.
    *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
-    var showLayer = feature.showLayer; // cache value
+    _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
 
     if (feature.mapLayer) {
-      _this.map.removeLayer(feature.mapLayer); // sets showLayer prop to false
       _this.layerControl.removeLayer(feature.mapLayer);
-    }
 
-    feature.showLayer = showLayer; // set back to cached value
+      if (_isRefreshing[feature.id]) {
+        _prevFeatures[feature.id] = feature; // cache Feature
+      } else {
+        _removeLayer(feature);
+      }
+    }
   };
 
   /**
@@ -388,7 +433,6 @@ var MapPane = function (options) {
    */
   _this.render = function () {
     _this.map.invalidateSize(); // updates map if its container size has changed
-    _this.map.fire('visible'); // flag for popups opened programmatically
 
     // Update popup (useful when swapping catalogs w/ Mainshock's popup open)
     if (_this.map._popup) {
@@ -410,6 +454,8 @@ var MapPane = function (options) {
     _el.querySelector('.container').innerHTML = '';
 
     _initialExtent = true;
+    _isRefreshing = {};
+    _prevFeatures = {};
     _rendered = false;
 
     _this.initBounds();
