@@ -96,18 +96,24 @@ var SummaryPane = function (options) {
   };
 
   /**
-   * Get the given Feature's summary content for a refresh.
+   * Get the given Feature's summary content (if applicable) for a refresh.
    *
    * @param feature {Object}
    *
-   * @return {String}
+   * @return summary {String}
    */
   _getSummary = function (feature) {
-    return L.Util.template(
-      '<p class="description">{description}</p>' +
-      '{summary}',
-      feature
-    );
+    var summary = '';
+
+    if (Object.prototype.hasOwnProperty.call(feature, 'summary')) {
+      summary = L.Util.template(
+        '<p class="description">{description}</p>' +
+        '{summary}',
+        feature
+      );
+    }
+
+    return summary;
   };
 
   /**
@@ -136,21 +142,23 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var selectors = `
+    var summary,
+        selectors = `
           div.${feature.id}.content,
           div.${feature.id} .content
         `,
         el = _el.querySelector(selectors),
         status = _app.Features.getStatus();
 
-    if (feature.id === 'mainshock') {
-      _updateTimestamp(feature.updated);
-    }
-
     if (_isRefreshing[feature.id]) {
-      _cacheFeatures(feature);
+      summary = _getSummary(feature);
 
-      el.innerHTML = _getSummary(feature);
+      if (summary) {
+        _cacheFeatures(feature);
+
+        el.innerHTML = summary;
+      }
+
       _isRefreshing[feature.id] = false;
     } else if (feature.summary) {
       el.insertAdjacentHTML('beforeend', feature.summary);
@@ -159,6 +167,9 @@ var SummaryPane = function (options) {
 
     _embedFeatures(feature);
 
+    if (feature.id === 'mainshock') {
+      _updateTimestamp(feature.updated);
+    }
     if (status === 'ready') {
       _app.Features.getFeature('mainshock').enableDownload();
     }
