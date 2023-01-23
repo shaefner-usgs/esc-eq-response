@@ -10,7 +10,7 @@ var AppUtil = require('util/AppUtil'),
 
 var _DEFAULTS = {
   magThreshold: null,
-  maxNumEqs: 25,
+  maxNumEqs: 35,
   sortField: 'utcTime',
   sortOrder: 'desc'
 };
@@ -496,8 +496,10 @@ var Summary = function (options) {
         maxMag = magBins.length - 1, // 0-based Array
         threshold = maxMag; // default
 
-    if (Number.isInteger(_magThreshold) &&_magThreshold <= maxMag) {
-      threshold = _magThreshold;
+    if (Number.isInteger(_magThreshold)) { // user-set value
+      if (_magThreshold <= maxMag) {
+        threshold = _magThreshold;
+      }
     } else {
       magBins.some((number, magInt) => {
         if (number <= _maxNumEqs) {
