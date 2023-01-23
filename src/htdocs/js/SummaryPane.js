@@ -136,32 +136,28 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var el, selectors,
+    var selectors = `
+          div.${feature.id}.content,
+          div.${feature.id} .content
+        `,
+        el = _el.querySelector(selectors),
         status = _app.Features.getStatus();
 
     if (feature.id === 'mainshock') {
       _updateTimestamp(feature.updated);
     }
 
-    if (feature.summary) {
-      selectors = `
-        div.${feature.id}.content,
-        div.${feature.id} .content
-      `;
-      el = _el.querySelector(selectors);
+    if (_isRefreshing[feature.id]) {
+      _cacheFeatures(feature);
 
-      if (_isRefreshing[feature.id]) {
-        _cacheFeatures(feature);
-
-        el.innerHTML = _getSummary(feature);
-        _isRefreshing[feature.id] = false;
-      } else {
-        el.insertAdjacentHTML('beforeend', feature.summary);
-        el.classList.remove('hide'); // un-hide placeholder if hidden
-      }
-
-      _embedFeatures(feature);
+      el.innerHTML = _getSummary(feature);
+      _isRefreshing[feature.id] = false;
+    } else if (feature.summary) {
+      el.insertAdjacentHTML('beforeend', feature.summary);
+      el.classList.remove('hide'); // un-hide placeholder if hidden
     }
+
+    _embedFeatures(feature);
 
     if (status === 'ready') {
       _app.Features.getFeature('mainshock').enableDownload();
