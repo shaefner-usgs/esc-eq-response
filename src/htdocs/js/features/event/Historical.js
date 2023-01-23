@@ -13,7 +13,10 @@ var AppUtil = require('util/AppUtil'),
  * @param options {Object}
  *     {
  *       app: {Object} Application
+ *       magThreshold: {Integer} optional
  *       showLayer: {Boolean}
+ *       sortField: {String} optional
+ *       sortOrder: {String} optional
  *       zoomToLayer: {Boolean}
  *     }
  *
@@ -24,6 +27,7 @@ var AppUtil = require('util/AppUtil'),
  *       bins: {Object}
  *       count: {Integer}
  *       data: {Array}
+ *       description: {String}
  *       destroy: {Function}
  *       id: {String}
  *       mapLayer: {L.FeatureGroup}
@@ -45,6 +49,7 @@ var Historical = function (options) {
       _app,
       _earthquakes,
       _summary,
+      _summaryOpts,
 
       _destroy,
       _getPlaceholder,
@@ -77,7 +82,14 @@ var Historical = function (options) {
       app: _app,
       feature: _this
     });
+    _summaryOpts = Object.assign({
+      sortField: 'mag' // Feature's default
+    }, options, {
+      earthquakes: _earthquakes,
+      featureId: _this.id
+    });
 
+    _this.description = _earthquakes.getDescription();
     _this.mapLayer = _earthquakes.mapLayer;
     _this.placeholder = _getPlaceholder();
   };
@@ -102,11 +114,9 @@ var Historical = function (options) {
    * @return {String}
    */
   _getPlaceholder = function () {
-    var description = _earthquakes.getDescription();
-
     return '' +
       '<div class="bubble content">' +
-        `<p class="description">${description}</p>` +
+        `<p class="description">${_this.description}</p>` +
       '</div>';
   };
 
@@ -145,11 +155,7 @@ var Historical = function (options) {
   _this.addData = function (json) {
     _earthquakes.addData(json);
 
-    _summary = Summary({
-      app: _app,
-      earthquakes: _earthquakes,
-      featureId: _this.id
-    });
+    _summary = Summary(_summaryOpts);
 
     _this.bins = _summary.bins;
     _this.count = _earthquakes.data.length;
@@ -164,6 +170,8 @@ var Historical = function (options) {
 
   /**
    * Add event listeners.
+   *
+   * Note: listeners for plots are added by PlotsPane after they are rendered.
    */
   _this.addListeners = function () {
     _earthquakes.addListeners();
@@ -181,6 +189,7 @@ var Historical = function (options) {
     _app = null;
     _earthquakes = null;
     _summary = null;
+    _summaryOpts = null;
 
     _destroy = null;
     _getPlaceholder = null;

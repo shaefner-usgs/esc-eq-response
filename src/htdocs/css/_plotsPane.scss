@@ -1,12 +1,26 @@
 #plotsPane {
   height: 100%;
 
+  div {
+    &.cumulative {
+      height: 33vh;
+    }
+
+    &.hypocenters {
+      height: 76vh;
+    }
+
+    &.magtime {
+      height: 33vh;
+    }
+  }
+
   h3 {
     margin: 1.625rem 0 1.25rem;
   }
 
   output:after {
-    content: '';
+    content: ' km';
   }
 
   .container {
@@ -14,20 +28,12 @@
     flex-direction: column;
   }
 
-  .cumulative {
-    height: 33vh;
-  }
-
-  .hypocenters {
-    height: 76vh;
+  .hide { // plots + associated headers
+    display: none;
   }
 
   .js-plotly-plot {
     width: 100%;
-  }
-
-  .magtime {
-    height: 33vh;
   }
 
   /* Rendering order of Features */

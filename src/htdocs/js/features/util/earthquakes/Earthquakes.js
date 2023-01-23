@@ -72,6 +72,7 @@ var Earthquakes = function (options) {
       _getDuration,
       _onEachFeature,
       _pointToLayer,
+      _popupopen,
       _removeListeners,
       _setMainshock;
 
@@ -180,12 +181,12 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Event handler that adds the event listeners to a map popup.
+   * Add event listeners to a map popup.
    *
    * @param e {Event} optional
    * @param popup {Element} optional; default is null
    *
-   * Note: popup option is required if not called by Leaflet's popupclose Event.
+   * Note: either the Leaflet popupopen Event (e) or popup option is required.
    */
   _addListeners = function (e, popup = null) {
     var bubbles, button;
@@ -469,12 +470,24 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Event handler that removes the event listeners from a map popup.
+   * Leaflet event handler that is fired when a popup is opened.
+   *
+   * @param e {Event} optional
+   */
+  _popupopen = function (e) {
+    var marker = e.layer;
+
+    marker.openPopup(marker.getLatLng()); // position at marker center
+    _addListeners(e);
+  };
+
+  /**
+   * Remove event listeners from a map popup.
    *
    * @param e {Event} optional
    * @param popup {Element} optional; default is null
    *
-   * Note: popup option is required if not called by Leaflet's popupclose Event.
+   * Note: either the Leaflet popupclose Event (e) or popup option is required.
    */
   _removeListeners = function (e, popup = null) {
     var bubbles, button;
@@ -527,7 +540,7 @@ var Earthquakes = function (options) {
    */
   _this.addListeners = function () {
     _this.mapLayer.on({
-      popupopen: _addListeners,
+      popupopen: _popupopen,
       popupclose: _removeListeners
     });
   };
@@ -658,13 +671,15 @@ var Earthquakes = function (options) {
    */
   _this.removeListeners = function () {
     _this.mapLayer.off({
-      popupopen: _addListeners,
+      popupopen: _popupopen,
       popupclose: _removeListeners
     });
   };
 
   /**
    * Update the Mainshock's event listeners if its popup is open.
+   *
+   * Note: necessary when swapping between catalogs.
    */
   _this.updateListeners = function () {
     var popup = document.querySelector('.leaflet-popup-pane .mainshock');

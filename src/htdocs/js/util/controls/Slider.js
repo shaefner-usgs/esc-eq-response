@@ -107,6 +107,7 @@ var Slider = function (options) {
    */
   _update = function () {
     _this.setValue();
+    sessionStorage.setItem(_el.id, _el.value);
 
     if (_filter) {
       _filter.call(this);
@@ -189,7 +190,7 @@ var Slider = function (options) {
    */
   _this.setValue = function () {
     var newStyles = '',
-        oldStyles = /`#${input.id}[^#]+`/g,
+        oldStyles = new RegExp(`#${_el.id}[^#]+`, 'g'),
         value = _getValue(),
         vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 

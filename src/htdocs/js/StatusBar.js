@@ -46,8 +46,10 @@ var StatusBar = function (options) {
    * @param div {Element}
    * @param id {String}
    *     Feature id
+   * @param mode {String}
+   *     display mode
    */
-  _addListeners = function (div, id) {
+  _addListeners = function (div, id, mode) {
     var close = div.querySelector('.close'),
         reload = div.querySelector('.reload');
 
@@ -68,7 +70,7 @@ var StatusBar = function (options) {
         if (id === 'search') {
           _app.SearchBar.searchCatalog();
         } else {
-          _app.Features.refreshFeature(id);
+          _app.Features.reloadFeature(id, mode);
         }
       });
     }
@@ -144,6 +146,7 @@ var StatusBar = function (options) {
    *     {
    *       id: {String} Feature id
    *       message: {String}
+   *       mode: {String} display mode
    *       status: {Mixed <Number|String>} status code or 'invalid'
    *     }
    */
@@ -168,7 +171,7 @@ var StatusBar = function (options) {
     // Remove any leftover items with this id, then add it
     _this.removeItem(error.id);
     _el.appendChild(div);
-    _addListeners(div, error.id);
+    _addListeners(div, error.id, error.mode);
     _show();
   };
 

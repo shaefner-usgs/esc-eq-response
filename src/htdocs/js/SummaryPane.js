@@ -32,10 +32,12 @@ var SummaryPane = function (options) {
 
       _app,
       _el,
+      _isRefreshing,
       _subFeatures,
 
       _cacheFeatures,
       _embedFeatures,
+      _getSummary,
       _updateTimestamp;
 
 
@@ -44,6 +46,7 @@ var SummaryPane = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
+    _isRefreshing = {};
     _subFeatures = {};
   };
 
@@ -93,6 +96,21 @@ var SummaryPane = function (options) {
   };
 
   /**
+   * Get the given Feature's summary content for a refresh.
+   *
+   * @param feature {Object}
+   *
+   * @return {String}
+   */
+  _getSummary = function (feature) {
+    return L.Util.template(
+      '<p class="description">{description}</p>' +
+      '{summary}',
+      feature
+    );
+  };
+
+  /**
    * Update the timestamp.
    *
    * @param timestamp {Integer}
@@ -112,30 +130,34 @@ var SummaryPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the given Feature's summary.
+   * Add the given Feature's summary. If the Feature is being refreshed,
+   * replace the existing summary.
    *
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var el, selectors,
+    var selectors = `
+          div.${feature.id}.content,
+          div.${feature.id} .content
+        `,
+        el = _el.querySelector(selectors),
         status = _app.Features.getStatus();
 
     if (feature.id === 'mainshock') {
       _updateTimestamp(feature.updated);
     }
 
-    if (feature.summary) {
-      selectors = `
-        div.${feature.id}.content,
-        div.${feature.id} .content
-      `;
-      el = _el.querySelector(selectors);
+    if (_isRefreshing[feature.id]) {
+      _cacheFeatures(feature);
 
+      el.innerHTML = _getSummary(feature);
+      _isRefreshing[feature.id] = false;
+    } else if (feature.summary) {
       el.insertAdjacentHTML('beforeend', feature.summary);
-      el.classList.remove('hide'); // un-hide placeholder
-
-      _embedFeatures(feature);
+      el.classList.remove('hide'); // un-hide placeholder if hidden
     }
+
+    _embedFeatures(feature);
 
     if (status === 'ready') {
       _app.Features.getFeature('mainshock').enableDownload();
@@ -144,7 +166,7 @@ var SummaryPane = function (options) {
 
   /**
    * Add the given Feature's placeholder to the DOM. The summary is appended to
-   * .content when the fetched data is ready.
+   * el.content when the fetched data is ready.
    *
    * @param feature {Object}
    */
@@ -153,6 +175,7 @@ var SummaryPane = function (options) {
 
     if (
       feature.placeholder &&
+      !_isRefreshing[feature.id] &&
       Object.prototype.hasOwnProperty.call(feature, 'summary')
     ) {
       el = _el.querySelector('.container');
@@ -170,7 +193,11 @@ var SummaryPane = function (options) {
 
   /**
    * Remove the given Feature, but leave its placeholder intact if it is a
-   * "sub-Feature" that is nested within another Feature.
+   * "sub-Feature" that is nested within another Feature. Also preserve any
+   * nested Features.
+   *
+   * If the Feature is being refreshed, defer and instead remove it when the new
+   * Feature is added.
    *
    * @param feature {Object}
    */
@@ -178,7 +205,9 @@ var SummaryPane = function (options) {
     var el = _el.querySelector('.' + feature.id),
         isNested = Boolean(_el.closest('.feature'));
 
-    if (el) {
+    _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
+
+    if (el && !_isRefreshing[feature.id]) {
       if (isNested) {
         el.innerHTML = ''; // nested sub-Feature
       } else {
@@ -194,6 +223,7 @@ var SummaryPane = function (options) {
   _this.reset = function () {
     _el.querySelector('.container').innerHTML = '';
 
+    _isRefreshing = {};
     _subFeatures = {};
   };
 

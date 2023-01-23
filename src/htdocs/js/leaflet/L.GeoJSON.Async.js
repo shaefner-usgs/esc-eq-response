@@ -146,6 +146,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     this._app.StatusBar.addError({
       id: feature.id,
       message: message,
+      mode: feature.mode,
       status: response.status
     });
   },
@@ -216,28 +217,15 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         type = 'notfound';
 
         this._app.Features.clearQueue();
-        this._app.Features.removeFeature(feature);
       } else {
         text = await response.text();
       }
 
       this._addError(error, response, text, type);
-      this._removeLoader();
+      this._app.Features.removeFeature(feature);
 
       console.error(error);
     }
-  },
-
-  /**
-   * Remove the loader next to the Feature's name when fetching fails.
-   */
-  _removeLoader: function () {
-    var feature = this._feature,
-        els = this._app.Features.getHeaders(feature.id);
-
-    els.forEach(el => el.innerHTML = feature.name);
-
-    this._app.MapPane.layerControl.removeLoader(feature.id);
   }
 });
 

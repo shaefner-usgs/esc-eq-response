@@ -21,7 +21,9 @@ var AppUtil = require('util/AppUtil'),
  *     {
  *       addListeners: {Function}
  *       destroy: {Function}
+ *       filter: {Function}
  *       getParams: {Function}
+ *       getSlider: {Function}
  *       getTrace: {Function}
  *       removeListeners: {Function}
  *     }
@@ -39,13 +41,11 @@ var Plots = function (options) {
 
       _addContainer,
       _addMainshock,
-      _filter,
       _formatData,
       _getConfig,
       _getData,
       _getLayout,
       _getRatio,
-      _getSlider,
       _getTraceData,
       _openPopup,
       _update;
@@ -72,18 +72,18 @@ var Plots = function (options) {
     var h3,
         el = document.getElementById('plotsPane'),
         parent = el.querySelector(`.${_featureId} .bubble`),
-        container = parent.querySelector('.' + id);
+        container = parent.querySelector('div.' + id);
 
     if (!container) {
       container = document.createElement('div');
-      h3 = `<h3>${_app.PlotsPane.names[id]}</h3>`;
+      h3 = `<h3 class="${id}">${_app.PlotsPane.names[id]}</h3>`;
 
       parent.appendChild(container);
       container.classList.add(id);
       container.insertAdjacentHTML('beforebegin', h3);
 
       if (id === 'hypocenters') {
-        container.insertAdjacentHTML('afterend', _getSlider());
+        container.insertAdjacentHTML('afterend', _this.getSlider());
       }
     }
 
@@ -120,35 +120,6 @@ var Plots = function (options) {
       data.x.push(x);
       data.y.push(data.y.length + 1);
     }
-  };
-
-  /**
-   * Filter the Hypocenters data by depth.
-   */
-  _filter = function () {
-    var params = _this.getParams('hypocenters'),
-        data = params.data.find(trace => trace.featureId === _featureId),
-        depth = this.value, // Slider's current depth value
-        filtered = {},
-        keep = [];
-
-    data.z.filter((value, index) => {
-      if (value > depth) {
-        keep.push(index); // array indices of values to keep
-      }
-    });
-
-    ['eqid', 'text', 'x', 'y', 'z'].forEach(key => {
-      filtered[key] = [];
-
-      keep.forEach(index => {
-        filtered[key].push(data[key][index]);
-      });
-
-      data[key] = filtered[key];
-    });
-
-    _update(data);
   };
 
   /**
@@ -389,33 +360,6 @@ var Plots = function (options) {
   };
 
   /**
-   * Get the HTML content for the depth range Slider (filter).
-   *
-   * @return html {String}
-   */
-  _getSlider = function () {
-    var depths = _data.depth,
-        extent = AppUtil.extent(depths),
-        html = '',
-        min = Math.floor(extent[0]);
-
-    if (depths.length > 2) {
-      _slider = Slider({
-        filter: _filter,
-        id: _featureId + '-depth',
-        label: 'Filter by depth (km)',
-        max: Math.ceil(extent[1]),
-        min: min,
-        val: min
-      });
-
-      html = _slider.getHtml();
-    }
-
-    return html;
-  };
-
-  /**
    * Get the Plotly trace data for the given plot type.
    *
    * @param id {String <cumulative|hypocenters|magtime>}
@@ -510,11 +454,12 @@ var Plots = function (options) {
       featureId = 'mainshock';
     }
 
+    location.href = '#mapPane';
     _app.MapPane.openPopup(eqids[index], featureId);
   };
 
   /**
-   * Update the Hypocenters plot with the given trace.
+   * Update the hypocenters plot with the given (filtered) trace data.
    *
    * @param trace {Object}
    */
@@ -539,17 +484,22 @@ var Plots = function (options) {
   /**
    * Add event listeners.
    *
-   * @param plot {Element}
+   * @param params {Object}
+   *     Plotly parameters
    */
-  _this.addListeners = function (plot) {
-    var input = document.getElementById(`${_featureId}-depth`);
+  _this.addListeners = function (params) {
+    var input = document.getElementById(_featureId + '-depth');
 
-    if (input) {
-      _slider.addListeners(input);
-      _slider.setValue(); // also set the initial state
-    }
+    _slider.addListeners(input);
+    _slider.setValue(); // also set the initial state
 
-    plot.on('plotly_click', _openPopup);
+    Object.keys(params).forEach(id => {
+      var plot = params[id].graphDiv;
+
+      if (id !== 'hypocenters') {
+        plot.on('plotly_click', _openPopup);
+      }
+    });
   };
 
   /**
@@ -571,18 +521,45 @@ var Plots = function (options) {
 
     _addContainer = null;
     _addMainshock = null;
-    _filter = null;
     _formatData = null;
     _getConfig = null;
     _getData = null;
     _getLayout = null;
     _getRatio = null;
-    _getSlider = null;
     _getTraceData = null;
     _openPopup = null;
     _update = null;
 
     _this = null;
+  };
+
+  /**
+   * Filter the hypocenters data by depth.
+   */
+  _this.filter = function () {
+    var params = _this.getParams('hypocenters'),
+        data = params.data.find(trace => trace.featureId === _featureId),
+        depth = this.value, // Slider's current value
+        filtered = {},
+        keep = [];
+
+    data.z.filter((value, index) => {
+      if (value > depth) {
+        keep.push(index); // array indices of values to keep
+      }
+    });
+
+    ['eqid', 'text', 'x', 'y', 'z'].forEach(key => {
+      filtered[key] = [];
+
+      keep.forEach(index =>
+        filtered[key].push(data[key][index])
+      );
+
+      data[key] = filtered[key];
+    });
+
+    _update(data);
   };
 
   /**
@@ -602,6 +579,38 @@ var Plots = function (options) {
       layout: _getLayout(id),
       rendered: false
     };
+  };
+
+  /**
+   * Get the HTML content for the depth range Slider (filter).
+   *
+   * @param value {Integer} default is null
+   *     Slider's initial setting
+   *
+   * @return {String}
+   */
+  _this.getSlider = function (value = null) {
+    var depths = _data.depth,
+        extent = AppUtil.extent(depths),
+        max = Math.ceil(extent[1]) || 9,
+        min = Math.floor(extent[0]) || 0;
+
+    if (Number.isInteger(value) && value < min) {
+      value = min;
+    } else if (Number.isInteger(value) && value > max) {
+      value = max;
+    }
+
+    _slider = Slider({
+      filter: _this.filter,
+      id: _featureId + '-depth',
+      label: 'Filter by depth',
+      max: max,
+      min: min,
+      val: value || min
+    });
+
+    return _slider.getHtml();
   };
 
   /**
