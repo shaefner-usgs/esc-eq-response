@@ -2,8 +2,6 @@
 'use strict';
 
 
-require('leaflet');
-
 var AppUtil = require('util/AppUtil'),
     Lightbox = require('util/Lightbox');
 

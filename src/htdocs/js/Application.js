@@ -1,6 +1,8 @@
 'use strict';
 
 
+require('leaflet');
+
 var Features = require('Features'),
     LegendBar = require('LegendBar'),
     MapPane = require('MapPane'),
