@@ -22,6 +22,7 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
+ *       removeListeners: {String}
  *       render: {Function}
  *     }
  */
@@ -36,6 +37,7 @@ var Dyfi = function (options) {
       _selected,
 
       _addBubble,
+      _destroy,
       _getContent,
       _getData,
       _getImages,
@@ -74,6 +76,18 @@ var Dyfi = function (options) {
         h3 = document.getElementById('dyfi').querySelector('h3');
 
     h3.innerHTML = h3.textContent + bubble;
+  };
+
+  /**
+   * Destroy this Feature's sub-Classes.
+   */
+  _destroy = function () {
+    if (_this.lightbox) {
+      _app.Features.getLightbox(_this.id).destroy();
+    }
+    if (_radioBar) {
+      _radioBar.destroy();
+    }
   };
 
   /**
@@ -204,11 +218,9 @@ var Dyfi = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var ul = document.getElementById('dyfi-images');
-
     // Display the selected image
     if (_radioBar) {
-      _radioBar.addListeners(ul);
+      _radioBar.addListeners(document.getElementById('dyfi-images'));
     }
   };
 
@@ -216,12 +228,7 @@ var Dyfi = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    if (_this.lightbox) {
-      _app.Features.getLightbox(_this.id).destroy();
-    }
-    if (_radioBar) {
-      _radioBar.destroy(); // also removes its listeners
-    }
+    _destroy();
 
     _initialize = null;
 
@@ -232,12 +239,22 @@ var Dyfi = function (options) {
     _selected = null;
 
     _addBubble = null;
+    _destroy = null;
     _getContent = null;
     _getData = null;
     _getImages = null;
     _getStatus = null;
 
     _this = null;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    if (_radioBar) {
+      _radioBar.removeListeners();
+    }
   };
 
   /**
