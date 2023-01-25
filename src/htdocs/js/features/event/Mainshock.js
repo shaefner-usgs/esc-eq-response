@@ -57,6 +57,7 @@ var Mainshock = function (options) {
 
       _addPlaceholders,
       _createFeatures,
+      _destroy,
       _getBubbles,
       _getData,
       _getDyfi,
@@ -116,6 +117,14 @@ var Mainshock = function (options) {
    */
   _createFeatures = function () {
     _app.Features.createFeatures('rtf');
+  };
+
+  /**
+   * Destroy this Feature's sub-Classes.
+   */
+  _destroy = function () {
+    _earthquakes.destroy();
+    _this.plots.destroy();
   };
 
   /**
@@ -652,11 +661,7 @@ var Mainshock = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _earthquakes.destroy();
-
-    if (!AppUtil.isEmpty(_this.plots)) {
-      _this.plots.destroy();
-    }
+    _destroy();
 
     _initialize = null;
 
@@ -670,6 +675,7 @@ var Mainshock = function (options) {
 
     _addPlaceholders = null;
     _createFeatures = null;
+    _destroy = null;
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
