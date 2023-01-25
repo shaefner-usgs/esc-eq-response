@@ -22,8 +22,9 @@
  *       destroy: {Function}
  *       getHtml: {Function}
  *       getIds: {Function}
+ *       removeListeners: {Function}
  *       setOption: {Function}
- *     {
+ *     }
  */
 var RadioBar = function (options) {
   var _this,
@@ -34,8 +35,7 @@ var RadioBar = function (options) {
       _items,
       _selected,
 
-      _getOption,
-      _removeListeners;
+      _getOption;
 
 
   _this = {};
@@ -69,13 +69,6 @@ var RadioBar = function (options) {
     return option;
   };
 
-  /**
-   * Remove event listeners.
-   */
-  _removeListeners = function () {
-    _buttons.forEach(button => button.removeEventListener('click', _this.setOption));
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -96,8 +89,6 @@ var RadioBar = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _removeListeners();
-
     _initialize = null;
 
     _buttons = null;
@@ -106,7 +97,6 @@ var RadioBar = function (options) {
     _selected = null;
 
     _getOption = null;
-    _removeListeners = null;
 
     _this = null;
   };
@@ -145,6 +135,13 @@ var RadioBar = function (options) {
     _buttons.forEach(button => ids.push(button.id));
 
     return ids;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    _buttons.forEach(button => button.removeEventListener('click', _this.setOption));
   };
 
   /**
