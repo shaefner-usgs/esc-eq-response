@@ -94,10 +94,7 @@ var Foreshocks = function (options) {
    */
   _destroy = function () {
     _earthquakes.destroy();
-
-    if (_summary) {
-      _summary.destroy();
-    }
+    _summary.destroy();
   };
 
   /**
@@ -188,10 +185,7 @@ var Foreshocks = function (options) {
    */
   _this.removeListeners = function () {
     _earthquakes.removeListeners();
-
-    if (_summary) {
-      _summary.removeListeners();
-    }
+    _summary.removeListeners();
   };
 
 

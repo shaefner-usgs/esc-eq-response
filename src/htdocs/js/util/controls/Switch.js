@@ -19,7 +19,8 @@
  *       addListeners: {Function}
  *       destroy: {Function}
  *       getHtml: {Function}
- *     {
+ *       removeListeners: {Function}
+ *     }
  */
 var Switch = function (options) {
   var _this,
@@ -30,7 +31,6 @@ var Switch = function (options) {
       _label,
       _name,
 
-      _removeListeners,
       _toggle;
 
 
@@ -44,13 +44,6 @@ var Switch = function (options) {
     if (_el) {
       _this.addListeners();
     }
-  };
-
-  /**
-   * Remove event listeners.
-   */
-  _removeListeners = function () {
-    _label.removeEventListener('click', _toggle);
   };
 
   /**
@@ -95,8 +88,6 @@ var Switch = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _removeListeners();
-
     _initialize = null;
 
     _el = null;
@@ -104,7 +95,6 @@ var Switch = function (options) {
     _label = null;
     _name = null;
 
-    _removeListeners = null;
     _toggle = null;
 
     _this = null;
@@ -119,6 +109,13 @@ var Switch = function (options) {
     return '' +
       `<input type="checkbox" id="${_id}" value="" class="switch">` +
       `<label for="${_id}"><span>${_name}</span></label>`;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    _label.removeEventListener('click', _toggle);
   };
 
 

@@ -49,14 +49,15 @@ var FieldNotes = function (options) {
       _lightbox,
       _markerOptions,
 
-      _addListeners,
+      _addPopupListeners,
       _getList,
       _getPopup,
       _getUrl,
       _onEachFeature,
+      _onPopupClose,
       _onPopupOpen,
       _pointToLayer,
-      _removeListeners,
+      _removePopupListeners,
       _showLightbox,
       _toggleProps,
       _updatePopup;
@@ -98,19 +99,17 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Event handler that adds a Popup's event listeners.
+   * Add event listeners to the given Popup.
    *
-   * @param e {Event}
+   * @param popup {Element}
    */
-  _addListeners = function (e) {
-    var popup = e.popup.getElement(),
-        photo = popup.querySelector('.photo'),
+  _addPopupListeners = function (popup) {
+    var photo = popup.querySelector('.photo'),
         toggle = popup.querySelector('.toggle a');
 
     if (photo) {
       photo.addEventListener('click', _showLightbox);
     }
-
     if (toggle) {
       toggle.addEventListener('click', _toggleProps);
     }
@@ -151,7 +150,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Get the Leaflet popup content for a Marker.
+   * Get the Leaflet Popup content for a Marker.
    *
    * @param data {Object}
    *
@@ -212,7 +211,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Add Leaflet popups and tooltips.
+   * Add Leaflet Popups and Tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -233,10 +232,19 @@ var FieldNotes = function (options) {
     layer
       .bindPopup(_getPopup(props), {
         className: 'fieldnotes',
-        maxWidth: 398, // fits 4X3 images 'flush' in popup (max-height is 300px)
+        maxWidth: 398, // fits 4X3 images 'flush' in Popup (max-height is 300px)
         minWidth: 320
       })
       .bindTooltip(props.title);
+  };
+
+  /**
+   * Event handler for closing a Popup.
+   *
+   * @param e {Event}
+   */
+  _onPopupClose = function (e) {
+    _removePopupListeners(e.popup.getElement());
   };
 
   /**
@@ -245,8 +253,21 @@ var FieldNotes = function (options) {
    * @param e {Event}
    */
   _onPopupOpen = function (e) {
-    _addListeners(e);
-    _updatePopup(e);
+    var content, image,
+        props = e.layer.feature.properties,
+        imgSrc = props.attachment;
+
+    _addPopupListeners(e.popup.getElement());
+
+    if (imgSrc) {
+      content = `<img src="${imgSrc}" alt="enlarged photo">`;
+      image = new Image();
+
+      _lightbox.setContent(content).setTitle(props.title);
+
+      image.src = imgSrc;
+      image.onload = () => _updatePopup(e.popup);
+    }
   };
 
   /**
@@ -262,19 +283,17 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Event handler that removes a Popup's event listeners.
+   * Remove event listeners from the given Popup.
    *
-   * @param e {Event}
+   * @param popup {Element}
    */
-  _removeListeners = function (e) {
-    var popup = e.popup.getElement(),
-        photo = popup.querySelector('.photo'),
+  _removePopupListeners = function (popup) {
+    var photo = popup.querySelector('.photo'),
         toggle = popup.querySelector('.toggle a');
 
     if (photo) {
       photo.removeEventListener('click', _showLightbox);
     }
-
     if (toggle) {
       toggle.removeEventListener('click', _toggleProps);
     }
@@ -307,28 +326,18 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Event handler that updates the popup and sets its Lightbox content if it
-   * includes a photo.
+   * Pan map to contain Popup after the image loads.
    *
-   * @param e {Event}
+   * Note: listeners must be removed and re-added.
+   *
+   * @param popup {L.Popup}
    */
-  _updatePopup = function (e) {
-    var image,
-        props = e.layer.feature.properties,
-        url = props.attachment;
+  _updatePopup = function (popup) {
+    var el = popup.getElement();
 
-    if (url) { // Popup includes a photo
-      image = new Image();
-      image.src = url;
-      image.onload = function () {
-        _removeListeners(e);
-        e.popup.update(); // pan map to contain popup after image loads
-        _addListeners(e);
-      };
-
-      _lightbox.setContent(`<img src="${image.src}" alt="enlarged photo">`)
-        .setTitle(props.title);
-    }
+    _removePopupListeners(el);
+    popup.update();
+    _addPopupListeners(el);
   };
 
   // ----------------------------------------------------------
@@ -362,7 +371,7 @@ var FieldNotes = function (options) {
   _this.addListeners = function () {
     _this.mapLayer.on({
       popupopen: _onPopupOpen,
-      popupclose: _removeListeners
+      popupclose: _onPopupClose
     });
   };
 
@@ -380,14 +389,15 @@ var FieldNotes = function (options) {
     _lightbox = null;
     _markerOptions = null;
 
-    _addListeners = null;
+    _addPopupListeners = null;
     _getList = null;
     _getPopup = null;
     _getUrl = null;
     _onEachFeature = null;
+    _onPopupClose = null;
     _onPopupOpen = null;
     _pointToLayer = null;
-    _removeListeners = null;
+    _removePopupListeners = null;
     _showLightbox = null;
     _toggleProps = null;
     _updatePopup = null;
@@ -401,7 +411,7 @@ var FieldNotes = function (options) {
   _this.removeListeners = function () {
     _this.mapLayer.off({
       popupopen: _onPopupOpen,
-      popupclose: _removeListeners
+      popupclose: _onPopupClose
     });
   };
 

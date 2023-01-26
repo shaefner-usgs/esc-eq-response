@@ -23,6 +23,7 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
+ *       removeListeners: {String}
  *       render: {Function}
  *       url: {String}
  *     }
@@ -37,6 +38,7 @@ var ShakeMap = function (options) {
       _selected,
 
       _addBubble,
+      _destroy,
       _fetch,
       _getContent,
       _getData,
@@ -73,6 +75,18 @@ var ShakeMap = function (options) {
         h3 = document.getElementById('shakemap').querySelector('h3');
 
     h3.innerHTML = h3.textContent + bubble;
+  };
+
+  /**
+   * Destroy this Feature's sub-Classes.
+   */
+  _destroy = function () {
+    if (_this.lightbox) {
+      _app.Features.getLightbox(_this.id).destroy();
+    }
+    if (_radioBar) {
+      _radioBar.destroy();
+    }
   };
 
   /**
@@ -353,11 +367,9 @@ var ShakeMap = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var ul = document.getElementById('shakemap-images');
-
     // Display the selected image
     if (_radioBar) {
-      _radioBar.addListeners(ul);
+      _radioBar.addListeners(document.getElementById('shakemap-images'));
     }
   };
 
@@ -365,12 +377,7 @@ var ShakeMap = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    if (_this.lightbox) {
-      _app.Features.getLightbox(_this.id).destroy();
-    }
-    if (_radioBar) {
-      _radioBar.destroy(); // also removes its listeners
-    }
+    _destroy();
 
     _initialize = null;
 
@@ -380,6 +387,7 @@ var ShakeMap = function (options) {
     _selected = null;
 
     _addBubble = null;
+    _destroy = null;
     _fetch = null;
     _getContent = null;
     _getData = null;
@@ -389,6 +397,15 @@ var ShakeMap = function (options) {
     _getUrl = null;
 
     _this = null;
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    if (_radioBar) {
+      _radioBar.removeListeners();
+    }
   };
 
   /**

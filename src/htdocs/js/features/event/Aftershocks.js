@@ -96,13 +96,8 @@ var Aftershocks = function (options) {
    */
   _destroy = function () {
     _earthquakes.destroy();
-
-    if (!AppUtil.isEmpty(_this.plots)) {
-      _this.plots.destroy();
-    }
-    if (_summary) {
-      _summary.destroy();
-    }
+    _summary.destroy();
+    _this.plots.destroy();
   };
 
   /**
@@ -197,10 +192,7 @@ var Aftershocks = function (options) {
    */
   _this.removeListeners = function () {
     _earthquakes.removeListeners();
-
-    if (_summary) {
-      _summary.removeListeners();
-    }
+    _summary.removeListeners();
   };
 
 

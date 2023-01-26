@@ -358,7 +358,7 @@ var Forecast = function (options) {
    */
   _this.destroy = function () {
     if (_radioBar) {
-      _radioBar.destroy(); // also removes its listeners
+      _radioBar.destroy();
     }
 
     _initialize = null;
@@ -386,7 +386,8 @@ var Forecast = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    if (_toggle) {
+    if (_el) {
+      _radioBar.removeListeners();
       _toggle.removeEventListener('click', _toggleParams);
     }
   };

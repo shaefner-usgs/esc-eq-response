@@ -25,8 +25,9 @@
  *       addListeners: {Function}
  *       destroy: {Function}
  *       getHtml: {Function}
+ *       removeListeners: {Function}
  *       setValue: {Function}
- *     {
+ *     }
  */
 var Slider = function (options) {
   var _this,
@@ -40,7 +41,6 @@ var Slider = function (options) {
       _style,
 
       _getValue,
-      _removeListeners,
       _update;
 
 
@@ -93,15 +93,6 @@ var Slider = function (options) {
   };
 
   /**
-   * Remove event listeners.
-   */
-  _removeListeners = function () {
-    if (_el) {
-      _el.removeEventListener('input', _update);
-    }
-  };
-
-  /**
    * Event handler that updates the Slider track and optionally filters the
    * displayed content.
    */
@@ -139,8 +130,6 @@ var Slider = function (options) {
    * Destroy this Class to aid in garbage collection.
    */
   _this.destroy = function () {
-    _removeListeners();
-
     _initialize = null;
 
     _data = null;
@@ -151,7 +140,6 @@ var Slider = function (options) {
     _style = null;
 
     _getValue = null;
-    _removeListeners = null;
     _update = null;
 
     _this = null;
@@ -182,6 +170,15 @@ var Slider = function (options) {
     }
 
     return L.Util.template(template, _data);
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _this.removeListeners = function () {
+    if (_el) {
+      _el.removeEventListener('input', _update);
+    }
   };
 
   /**

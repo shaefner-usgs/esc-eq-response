@@ -84,16 +84,13 @@ var PlotsPane = function (options) {
    * @param featureId {String}
    */
   _configPlots = function (featureId) {
-    var button, div, feature, params;
+    var feature;
 
     if (!_configured[featureId]) {
-      params = _this.params[featureId];
-      div = params.hypocenters.graphDiv;
-      button = div.querySelector('[data-attr="resetLastSave"]');
       feature = _app.Features.getFeature(featureId);
 
-      feature.plots.addListeners(params);
-      _swapButton(button);
+      feature.plots.addListeners();
+      _swapButton(featureId);
 
       _configured[featureId] = true;
     }
@@ -174,11 +171,14 @@ var PlotsPane = function (options) {
    * Change the 'Reset camera' button to 'Autoscale' for consistency between
    * plots.
    *
-   * @param button {Element}
+   * @param featureId {String}
    */
-  _swapButton = function (button) {
-    var path = button.querySelector('path');
+  _swapButton = function (featureId) {
+    var plot = _el.querySelector(`.${featureId} div.hypocenters`),
+        button = plot.querySelector('[data-attr="resetLastSave"]'),
+        path = button.querySelector('path');
 
+    button.setAttribute('data-title', 'Autoscale');
     path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
       '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
       'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
@@ -186,7 +186,6 @@ var PlotsPane = function (options) {
       '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
       '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
       '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
-    button.setAttribute('data-title', 'Autoscale');
   };
 
   /**
@@ -325,7 +324,7 @@ var PlotsPane = function (options) {
 
   /**
    * Remove the given Feature. If the Feature is being refreshed, leave it
-   * intact, but remove its listeners.
+   * intact, but remove its listeners, which get re-added upon refresh.
    *
    * @param feature {Object}
    */
@@ -336,17 +335,12 @@ var PlotsPane = function (options) {
     _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
 
     if (el) {
-      plots = el.querySelectorAll('.js-plotly-plot');
-
-      plots.forEach(plot => {
-        feature.plots.removeListeners(plot);
-
-        if (!_isRefreshing[feature.id]) {
-          Plotly.purge(plot);
-        }
-      });
+      feature.plots.removeListeners();
 
       if (!_isRefreshing[feature.id]) {
+        plots = el.querySelectorAll('.js-plotly-plot');
+
+        plots.forEach(plot => Plotly.purge(plot));
         el.parentNode.removeChild(el);
       }
     }
