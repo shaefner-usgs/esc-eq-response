@@ -60,7 +60,10 @@ var Pane = function (options) {
    * Wrapper method that renders the plots (and displays the rendering status).
    */
   _renderPlots = function () {
-    if (!_app.PlotsPane.rendered) {
+    if (
+      document.body.classList.contains('mainshock') &&
+      !_app.PlotsPane.rendered
+    ) {
       _app.StatusBar.addItem({
         id: 'rendering',
         name: 'Plots'
