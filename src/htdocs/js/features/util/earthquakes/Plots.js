@@ -36,6 +36,7 @@ var Plots = function (options) {
       _data,
       _featureId,
       _mainshock,
+      _plots,
       _slider,
       _zRatio,
 
@@ -483,23 +484,21 @@ var Plots = function (options) {
 
   /**
    * Add event listeners.
-   *
-   * @param params {Object}
-   *     Plotly parameters
    */
-  _this.addListeners = function (params) {
-    var input = document.getElementById(_featureId + '-depth');
+  _this.addListeners = function () {
+    var div = document.querySelector('#plotsPane .' + _featureId),
+        input = document.getElementById(_featureId + '-depth');
 
-    _slider.addListeners(input);
-    _slider.setValue(); // also set the initial state
+    _plots = div.querySelectorAll('.js-plotly-plot');
 
-    Object.keys(params).forEach(id => {
-      var plot = params[id].graphDiv;
-
-      if (id !== 'hypocenters') {
+    _plots.forEach(plot => {
+      if (!plot.classList.contains('hypocenters')) {
         plot.on('plotly_click', _openPopup);
       }
     });
+
+    _slider.addListeners(input);
+    _slider.setValue(); // also set the initial state
   };
 
   /**
@@ -507,7 +506,7 @@ var Plots = function (options) {
    */
   _this.destroy = function () {
     if (_slider) {
-      _slider.destroy(); // also removes its listeners
+      _slider.destroy();
     }
 
     _initialize = null;
@@ -516,6 +515,7 @@ var Plots = function (options) {
     _data = null;
     _featureId = null;
     _mainshock = null;
+    _plots = null;
     _slider = null;
     _zRatio = null;
 
@@ -673,11 +673,17 @@ var Plots = function (options) {
 
   /**
    * Remove event listeners.
-   *
-   * @param plot {Element}
    */
-  _this.removeListeners = function (plot) {
-    plot.removeListener('plotly_click', _openPopup);
+  _this.removeListeners = function () {
+    if (_plots) {
+      _plots.forEach(plot => {
+        if (!plot.classList.contains('hypocenters')) {
+          plot.removeListener('plotly_click', _openPopup);
+        }
+      });
+    }
+
+    _slider.removeListeners();
   };
 
 
