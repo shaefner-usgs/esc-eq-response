@@ -165,7 +165,8 @@
       }
     }
 
-    .feature.hide { // missing product
+    .bubble.hide,
+    .feature.hide { // missing product(s)
       display: none;
     }
   }
