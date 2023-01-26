@@ -123,6 +123,7 @@ var Features = function (options) {
       _cacheFeature,
       _createFeature,
       _createRtf,
+      _flagCount,
       _getMode,
       _getOptions,
       _initFeatures,
@@ -156,17 +157,14 @@ var Features = function (options) {
 
     if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
       count = `<span class="count">${feature.count}</span>`;
-
-      // Add a flag so the animation is only played once
-      setTimeout(() => {
-        els.forEach(el => el.querySelector('.count').classList.add('played'));
-      }, 500);
     }
 
     els.forEach(el => el.innerHTML = feature.name + count);
 
     // Layer control's count is handled by its Leaflet plugin
     _app.MapPane.layerControl.addCount(count, feature.id);
+
+    _flagCount(feature.id, els);
   };
 
   /**
@@ -319,6 +317,28 @@ var Features = function (options) {
         app: _app
       });
     }
+  };
+
+  /**
+   * Add a flag so the count animation is played only once.
+   *
+   * @param id {String}
+   *     Feature id
+   * @param headers {NodeList}
+   */
+  _flagCount = function (id, headers) {
+    var subheaders = document.querySelectorAll(`#summaryPane .${id} h3`),
+        els = Array.from(headers).concat(Array.from(subheaders));
+
+    setTimeout(() => {
+      els.forEach(el => {
+        var count = el.querySelector('.count');
+
+        if (count) {
+          count.classList.add('played');
+        }
+      });
+    }, 500);
   };
 
   /**
