@@ -492,7 +492,7 @@ var Plots = function (options) {
     _plots = div.querySelectorAll('.js-plotly-plot');
 
     _plots.forEach(plot => {
-      if (!plot.classList.contains('hypocenters')) {
+      if (!plot.classList.contains('hypocenters')) { // 2d plots only
         plot.on('plotly_click', _openPopup);
       }
     });
@@ -677,7 +677,10 @@ var Plots = function (options) {
   _this.removeListeners = function () {
     if (_plots) {
       _plots.forEach(plot => {
-        if (!plot.classList.contains('hypocenters')) {
+        if (
+          plot.removeListener && // plot is rendered
+          !plot.classList.contains('hypocenters') // 2d plots only
+        ) {
           plot.removeListener('plotly_click', _openPopup);
         }
       });

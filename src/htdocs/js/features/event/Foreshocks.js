@@ -185,7 +185,10 @@ var Foreshocks = function (options) {
    */
   _this.removeListeners = function () {
     _earthquakes.removeListeners();
-    _summary.removeListeners();
+
+    if (_summary) { // check in case async fetch hasn't finished yet
+      _summary.removeListeners();
+    }
   };
 
 
