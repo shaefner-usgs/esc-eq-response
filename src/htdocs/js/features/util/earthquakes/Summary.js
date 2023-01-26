@@ -57,8 +57,8 @@ var Summary = function (options) {
       _sortOrder,
       _tables,
 
-      _addTitles,
       _addEqToBins,
+      _addTitles,
       _configTable,
       _createBins,
       _filter,
@@ -96,19 +96,6 @@ var Summary = function (options) {
     _sortOrder = options.sortOrder;
 
     _createBins(); // creates, populates _this.bins
-  };
-
-  /**
-   * Add title attrs. to the given table's headers to reveal sort capability.
-   *
-   * @param table {Element}
-   */
-  _addTitles = function (table) {
-    var ths = table.querySelectorAll('th');
-
-    ths.forEach(th =>
-      th.setAttribute('title', 'Sort by ' + th.textContent)
-    );
   };
 
   /**
@@ -153,6 +140,19 @@ var Summary = function (options) {
         _this.bins.mag[i] ++;
       }
     }
+  };
+
+  /**
+   * Add title attrs. to the given table's headers to reveal sort capability.
+   *
+   * @param table {Element}
+   */
+  _addTitles = function (table) {
+    var ths = table.querySelectorAll('th');
+
+    ths.forEach(th =>
+      th.setAttribute('title', 'Sort by ' + th.textContent)
+    );
   };
 
   /**
@@ -760,7 +760,7 @@ var Summary = function (options) {
    */
   _this.destroy = function () {
     if (_slider) {
-      _slider.destroy(); // also removes its listeners
+      _slider.destroy();
     }
 
     _initialize = null;
@@ -778,8 +778,8 @@ var Summary = function (options) {
     _sortOrder = null;
     _tables = null;
 
-    _addTitles = null;
     _addEqToBins = null;
+    _addTitles = null;
     _configTable = null;
     _createBins = null;
     _filter = null;
@@ -859,6 +859,9 @@ var Summary = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
+    if (_slider) {
+      _slider.removeListeners();
+    }
     if (_tables) {
       _tables.forEach(table => {
         var ths = table.querySelectorAll('th');
