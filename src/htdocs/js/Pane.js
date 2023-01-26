@@ -1,9 +1,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Render/handle the app's Panes and remember each Pane's scroll position.
  *
@@ -63,10 +60,7 @@ var Pane = function (options) {
    * Wrapper method that renders the plots (and displays the rendering status).
    */
   _renderPlots = function () {
-    if (
-      !AppUtil.isEmpty(_app.PlotsPane.params) &&
-      !_app.PlotsPane.rendered
-    ) {
+    if (!_app.PlotsPane.rendered) {
       _app.StatusBar.addItem({
         id: 'rendering',
         name: 'Plots'
