@@ -323,7 +323,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get Arrays of the <div> containers with 2d plots, grouped by Feature.
+   * Get Arrays of the visible 2d plots' <div> containers, grouped by Feature.
    *
    * @return divs {Object}
    *     {
@@ -332,14 +332,20 @@ var Rtf = function (options) {
    *     }
    */
   _getPlotDivs = function () {
-    var divs = {},
+    var plot,
+        divs = {},
         params = _app.PlotsPane.params;
 
     Object.keys(params).forEach(featureId => {
       divs[featureId] = [];
 
       Object.keys(params[featureId]).forEach(id => {
-        if (id !== 'hypocenters') { // skip 3d plots
+        plot = document.querySelector(`#plotsPane .${featureId} div.${id}`);
+
+        if (
+          !plot.classList.contains('hide') &&
+          id !== 'hypocenters'
+        ) { // skip 'empty' and 3d plots
           divs[featureId].push(params[featureId][id].graphDiv);
         }
       });
