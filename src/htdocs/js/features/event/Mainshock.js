@@ -69,6 +69,7 @@ var Mainshock = function (options) {
       _getStrip,
       _getSummary,
       _getTectonic,
+      _getText,
       _getUrl,
       _updateDetails,
       _updateHeader,
@@ -187,7 +188,7 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _getData = function (json = _json) {
-    var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg, tectonic,
+    var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg,
         data = _earthquakes.data[0], // formatted JSON feed data
         datetime = data.datetime,
         products = json.properties.products,
@@ -201,8 +202,7 @@ var Mainshock = function (options) {
         pager = products.losspager,
         plurality = 's', // default
         shakeAlert = products['shake-alert'],
-        shakemap = products.shakemap,
-        text = products['general-text'];
+        shakemap = products.shakemap;
 
     _json = json; // cache feed data
 
@@ -232,9 +232,6 @@ var Mainshock = function (options) {
         shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
       }
     }
-    if (Array.isArray(text)) {
-      tectonic = text[0].contents[''].bytes;
-    }
 
     if (Number(data.felt) === 1) {
       plurality = '';
@@ -253,7 +250,7 @@ var Mainshock = function (options) {
       products: products,
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapImg: shakemapImg || '',
-      tectonic: tectonic || '',
+      tectonic: _getText(products['general-text']),
       userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
       userDayofWeek: datetime.toLocal().toFormat(format),
       userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
@@ -498,6 +495,33 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Get the tectonic summary text, replacing any image placeholders with their
+   * absolute URLs.
+   *
+   * @param product {Object}
+   *
+   * @return text {String}
+   */
+  _getText = function (product) {
+    var contents, regex,
+        text = ''; // default
+
+    if (product) {
+      contents = product[0].contents;
+      regex = /(\.gif|\.jpg|\.png)$/;
+      text = contents[''].bytes || '';
+
+      Object.keys(contents).forEach(name => {
+        if (regex.test(name)) {
+          text = text.replace(name, contents[name].url);
+        }
+      });
+    }
+
+    return text;
+  };
+
+  /**
    * Get the JSON feed's URL.
    *
    * @return {String}
@@ -687,6 +711,7 @@ var Mainshock = function (options) {
     _getStrip = null;
     _getSummary = null;
     _getTectonic = null;
+    _getText = null;
     _getUrl = null;
     _updateDetails = null;
     _updateHeader = null;
