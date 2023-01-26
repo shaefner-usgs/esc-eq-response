@@ -189,7 +189,6 @@ ul {
 }
 
 .count {
-  animation: opacify $effect-duration ease-out;
   font-size: .8em;
   margin-left: .3em;
 
@@ -198,6 +197,10 @@ ul {
   }
   &:before {
     content: "(";
+  }
+
+  &:not(.played) {
+    animation: opacify $effect-duration ease-out;
   }
 }
 

@@ -156,6 +156,11 @@ var Features = function (options) {
 
     if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
       count = `<span class="count">${feature.count}</span>`;
+
+      // Add a flag so the animation is only played once
+      setTimeout(() => {
+        els.forEach(el => el.querySelector('.count').classList.add('played'));
+      }, 500);
     }
 
     els.forEach(el => el.innerHTML = feature.name + count);
