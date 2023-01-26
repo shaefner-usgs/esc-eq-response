@@ -10,7 +10,7 @@ var AppUtil = require('util/AppUtil'),
 
 var _DEFAULTS = {
   magThreshold: null,
-  maxNumEqs: 35,
+  maxNumEqs: 25,
   sortField: 'utcTime',
   sortOrder: 'desc'
 };
