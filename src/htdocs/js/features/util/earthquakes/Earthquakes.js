@@ -63,7 +63,7 @@ var Earthquakes = function (options) {
       _markerOptions,
 
       _addBubbles,
-      _addListeners,
+      _addPopupListeners,
       _filter,
       _getAge,
       _getBubbles,
@@ -71,9 +71,10 @@ var Earthquakes = function (options) {
       _getDirection,
       _getDuration,
       _onEachFeature,
+      _onPopupClose,
+      _onPopupOpen,
       _pointToLayer,
-      _popupopen,
-      _removeListeners,
+      _removePopupListeners,
       _setMainshock;
 
 
@@ -181,19 +182,13 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Add event listeners to a map popup.
+   * Add event listeners to the given Popup.
    *
-   * @param e {Event} optional
-   * @param popup {Element} optional; default is null
-   *
-   * Note: either the Leaflet popupopen Event (e) or popup option is required.
+   * @param popup {Element}
    */
-  _addListeners = function (e, popup = null) {
-    var bubbles, button;
-
-    popup = popup || e.popup.getContent();
-    bubbles = popup.querySelectorAll('.impact-bubbles .feature');
-    button = popup.querySelector('button');
+  _addPopupListeners = function (popup) {
+    var bubbles = popup.querySelectorAll('.impact-bubbles .feature'),
+        button = popup.querySelector('button');
 
     button.addEventListener('click', _setMainshock);
 
@@ -259,7 +254,7 @@ var Earthquakes = function (options) {
    * Get the bubbles template.
    *
    * Wraps the Mainshock's DYFI, ShakeMap and PAGER bubbles in a <span>
-   * containing CSS classes needed by their Lightboxes.
+   * containing CSS classes needed for their Lightbox links.
    *
    * @param eq {Object}
    *
@@ -431,7 +426,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Add Leaflet popups and tooltips.
+   * Add Leaflet Popups and Tooltips.
    *
    * @param feature {Object}
    *     geoJSON feature
@@ -447,6 +442,27 @@ var Earthquakes = function (options) {
       maxWidth: 375,
       minWidth: 250
     }).bindTooltip(_this.getTooltip(eq));
+  };
+
+  /**
+   * Event handler for closing a Popup.
+   *
+   * @param e {Event}
+   */
+  _onPopupClose = function (e) {
+    _removePopupListeners(e.popup.getElement());
+  };
+
+  /**
+   * Event handler for opening a Popup.
+   *
+   * @param e {Event}
+   */
+  _onPopupOpen = function (e) {
+    var marker = e.layer;
+
+    marker.openPopup(marker.getLatLng()); // position at marker center
+    _addPopupListeners(e.popup.getElement());
   };
 
   /**
@@ -470,31 +486,13 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Leaflet event handler that is fired when a popup is opened.
+   * Remove event listeners from the given Popup.
    *
-   * @param e {Event} optional
+   * @param popup {Element}
    */
-  _popupopen = function (e) {
-    var marker = e.layer;
-
-    marker.openPopup(marker.getLatLng()); // position at marker center
-    _addListeners(e);
-  };
-
-  /**
-   * Remove event listeners from a map popup.
-   *
-   * @param e {Event} optional
-   * @param popup {Element} optional; default is null
-   *
-   * Note: either the Leaflet popupclose Event (e) or popup option is required.
-   */
-  _removeListeners = function (e, popup = null) {
-    var bubbles, button;
-
-    popup = popup || e.popup.getContent();
-    bubbles = popup.querySelectorAll('.impact-bubbles .feature');
-    button = popup.querySelector('button');
+  _removePopupListeners = function (popup) {
+    var bubbles = popup.querySelectorAll('.impact-bubbles .feature'),
+        button = popup.querySelector('button');
 
     button.removeEventListener('click', _setMainshock);
 
@@ -540,8 +538,8 @@ var Earthquakes = function (options) {
    */
   _this.addListeners = function () {
     _this.mapLayer.on({
-      popupopen: _popupopen,
-      popupclose: _removeListeners
+      popupopen: _onPopupOpen,
+      popupclose: _onPopupClose
     });
   };
 
@@ -557,8 +555,8 @@ var Earthquakes = function (options) {
     _mainshock = null;
     _markerOptions = null;
 
-    _addListeners = null;
     _addBubbles = null;
+    _addPopupListeners = null;
     _filter = null;
     _getAge = null;
     _getBubbles = null;
@@ -566,15 +564,17 @@ var Earthquakes = function (options) {
     _getDirection = null;
     _getDuration = null;
     _onEachFeature = null;
+    _onPopupClose = null;
+    _onPopupOpen = null;
     _pointToLayer = null;
-    _removeListeners = null;
+    _removePopupListeners = null;
     _setMainshock = null;
 
     _this = null;
   };
 
   /**
-   * Get the HTML content for the given earthquake's Leaflet popup.
+   * Get the HTML content for the given earthquake's Leaflet Popup.
    *
    * @param eq {Object}
    *
@@ -651,7 +651,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the HTML content for the given earthquake's Leaflet tooltip.
+   * Get the HTML content for the given earthquake's Leaflet Tooltip.
    *
    * @param eq {Object}
    *
@@ -671,13 +671,13 @@ var Earthquakes = function (options) {
    */
   _this.removeListeners = function () {
     _this.mapLayer.off({
-      popupopen: _popupopen,
-      popupclose: _removeListeners
+      popupopen: _onPopupOpen,
+      popupclose: _onPopupClose
     });
   };
 
   /**
-   * Update the Mainshock's event listeners if its popup is open.
+   * Update the Mainshock's event listeners if its Popup is open.
    *
    * Note: necessary when swapping between catalogs.
    */
@@ -685,10 +685,11 @@ var Earthquakes = function (options) {
     var popup = document.querySelector('.leaflet-popup-pane .mainshock');
 
     if (popup) {
-      _removeListeners(null, popup);
-      _addListeners(null, popup);
+      _removePopupListeners(popup);
+      _addPopupListeners(popup);
     }
   };
+
 
   _initialize(options);
   options = null;
