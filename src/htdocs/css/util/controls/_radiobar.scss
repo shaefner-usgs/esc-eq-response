@@ -10,6 +10,7 @@ ul.options {
   padding: 0;
 
   li {
+    background: $bg-color;
     border-left: 1px solid $accent-color;
     color: $accent-color;
     cursor: pointer;
