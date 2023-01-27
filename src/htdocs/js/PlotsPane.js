@@ -334,15 +334,11 @@ var PlotsPane = function (options) {
 
     _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
 
-    if (el) {
-      feature.plots.removeListeners();
+    if (el && !_isRefreshing[feature.id]) {
+      plots = el.querySelectorAll('.js-plotly-plot');
 
-      if (!_isRefreshing[feature.id]) {
-        plots = el.querySelectorAll('.js-plotly-plot');
-
-        plots.forEach(plot => Plotly.purge(plot));
-        el.parentNode.removeChild(el);
-      }
+      plots.forEach(plot => Plotly.purge(plot));
+      el.parentNode.removeChild(el);
     }
   };
 

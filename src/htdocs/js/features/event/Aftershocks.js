@@ -96,8 +96,13 @@ var Aftershocks = function (options) {
    */
   _destroy = function () {
     _earthquakes.destroy();
-    _summary.destroy();
-    _this.plots.destroy();
+
+    if (_summary) {
+      _summary.destroy();
+    }
+    if (!AppUtil.isEmpty(_this.plots)) {
+      _this.plots.destroy();
+    }
   };
 
   /**
@@ -160,7 +165,7 @@ var Aftershocks = function (options) {
   /**
    * Add event listeners.
    *
-   * Note: listeners for plots are added by PlotsPane after they are rendered.
+   * Note: listeners for plots are added by PlotsPane when they are rendered.
    */
   _this.addListeners = function () {
     _earthquakes.addListeners();
@@ -193,8 +198,11 @@ var Aftershocks = function (options) {
   _this.removeListeners = function () {
     _earthquakes.removeListeners();
 
-    if (_summary) { // check in case async fetch hasn't finished yet
+    if (_summary) {
       _summary.removeListeners();
+    }
+    if (!AppUtil.isEmpty(_this.plots)) {
+      _this.plots.removeListeners();
     }
   };
 

@@ -94,7 +94,10 @@ var Foreshocks = function (options) {
    */
   _destroy = function () {
     _earthquakes.destroy();
-    _summary.destroy();
+
+    if (_summary) {
+      _summary.destroy();
+    }
   };
 
   /**
