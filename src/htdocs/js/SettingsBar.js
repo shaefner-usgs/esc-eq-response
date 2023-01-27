@@ -165,9 +165,13 @@ var SettingsBar = function (options) {
    * Add the current UTC offset to 'User' timezone button.
    */
   _addOffset = function () {
-    var button = document.getElementById('user');
+    var button = document.getElementById('user'),
+        minutes = new Date().getTimezoneOffset(),
+        hours = Math.abs(minutes / 60),
+        sign = (minutes > 0 ? '-' : '+'),
+        utcOffset = `UTC${sign}${hours}`;
 
-    button.innerText += ` (${_app.utcOffset})`;
+    button.innerText += ` (${utcOffset})`;
   };
 
   /**

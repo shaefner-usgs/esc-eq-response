@@ -79,10 +79,12 @@ var DdMainshock = function (options) {
         format = 'LLL d, yyyy TT',
         mag = AppUtil.round(props.mag, 1),
         magType = props.magType || 'M',
-        template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
+        template =
+          '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+        utcOffset = datetime.toLocal().toFormat('Z'),
         userTimeDisplay = datetime.toLocal().toFormat(format) +
-          ` <span class="tz">(${_app.utcOffset})</span>`,
+          ` <span class="tz">(UTC${utcOffset})</span>`,
         utcTimeDisplay = datetime.toFormat(format) +
           ' <span class="tz">(UTC)</span>';
 

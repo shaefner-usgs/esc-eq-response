@@ -170,7 +170,7 @@ class Rtf {
     if ($time->zone === 'user') {
       $fields = array_merge(
         array_slice($fields, 0, 1),
-        ['userTimeDisplay' => "Time ($time->utcOffset)"],
+        ['userTimeDisplay' => "Time (User)"],
         array_slice($fields, 2)
       );
     }
@@ -891,7 +891,7 @@ class Rtf {
       );
 
       $section6->writeText(
-        'The probability of one or more aftershocks of at least magnitude M ' .
+        'Probability of one or more aftershocks of at least magnitude M ' .
           'within the given time frame:',
         $this->_font->body,
         $this->_format->body
@@ -917,7 +917,7 @@ class Rtf {
       $zoneDisplay = 'UTC';
 
       if ($zone === 'user') {
-        $zoneDisplay = $forecast->utcOffset;
+        $zoneDisplay = 'UTC' . $forecast->utcOffset;
       }
       $section6->writeText(
         "<strong>Forecast starts</strong>: $datetime ($zoneDisplay)",
@@ -1134,7 +1134,7 @@ class Rtf {
       $zoneDisplay = 'UTC';
 
       if ($zone === 'user') {
-        $zoneDisplay = $shakeAlert->utcOffset;
+        $zoneDisplay = 'UTC' . $shakeAlert->utcOffset;
       }
 
       $section9->writeText(

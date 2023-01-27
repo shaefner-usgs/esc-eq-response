@@ -269,7 +269,6 @@ var Rtf = function (options) {
         local: mainshock.data.localTime,
         user: mainshock.data.userTimeDisplay,
         utc: mainshock.data.utcTimeDisplay,
-        utcOffset: _app.utcOffset,
         zone: zone
       },
       title: mainshock.data.title,

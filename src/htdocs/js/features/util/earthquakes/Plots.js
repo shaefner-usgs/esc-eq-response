@@ -260,7 +260,7 @@ var Plots = function (options) {
         zoneDisplay = 'UTC';
 
     if (timezone === 'user') {
-      zoneDisplay = _app.utcOffset;
+      zoneDisplay = 'User';
     }
 
     if (id === 'hypocenters') {

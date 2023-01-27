@@ -420,7 +420,7 @@ var Mainshock = function (options) {
           '<li class="user time">' +
             '<strong>Time</strong>' +
             '<span>{userTime}</span>' +
-            '<small>' + _app.utcOffset + '</small>' +
+            '<small>UTC{utcOffset}</small>' +
           '</li>' +
           '<li class="depth">' +
             '<strong>Depth</strong>' +

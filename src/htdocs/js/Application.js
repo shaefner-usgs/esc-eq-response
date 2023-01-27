@@ -61,7 +61,6 @@ var Features = require('Features'),
  *       headerHeight: {Number}
  *       reset: {Function}
  *       sideBarWidth: {Number}
- *       utcOffset: {String}
  *     }
  */
 var Application = function (options) {
@@ -78,16 +77,11 @@ var Application = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    var minutes = new Date().getTimezoneOffset(),
-        hours = Math.abs(minutes / 60),
-        sign = (minutes > 0 ? '-' : '+');
-
     _els = options;
     _rendered = false;
 
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
-    _this.utcOffset = `UTC${sign}${hours}`;
 
     _initClasses();
   };

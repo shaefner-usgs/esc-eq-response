@@ -307,8 +307,9 @@ var Earthquakes = function (options) {
           template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
+          utcOffset = datetime.toLocal().toFormat('Z'),
           userTimeDisplay = datetime.toLocal().toFormat(format) +
-            ` <span class="tz">(${_app.utcOffset})</span>`,
+            ` <span class="tz">(UTC${utcOffset})</span>`,
           utcTimeDisplay = datetime.toFormat(format) +
             ' <span class="tz">(UTC)</span>';
 
@@ -367,6 +368,7 @@ var Earthquakes = function (options) {
         tsunami: props.tsunami || 0,
         url: props.url,
         userTimeDisplay: userTimeDisplay,
+        utcOffset: utcOffset,
         utcTimeDisplay: utcTimeDisplay
       };
 

@@ -93,8 +93,8 @@ var SignificantEqs = function (options) {
           place: props.place,
           selected: selected,
           userTime: datetime.toLocal().toFormat(format),
-          utcTime: datetime.toFormat(format),
-          utcOffset: _app.utcOffset
+          utcOffset: datetime.toLocal().toFormat('Z'),
+          utcTime: datetime.toFormat(format)
         };
         html += _getItem(eq);
       });
@@ -123,7 +123,7 @@ var SignificantEqs = function (options) {
         '</div>' +
         '<div>' +
           '<h4>{place}</h4>' +
-          '<time datetime="{isoTime}" class="user">{userTime} ({utcOffset})</time>' +
+          '<time datetime="{isoTime}" class="user">{userTime} (UTC{utcOffset})</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
         '</div>' +
       '</li>',

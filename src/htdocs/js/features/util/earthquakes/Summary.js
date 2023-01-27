@@ -308,17 +308,15 @@ var Summary = function (options) {
    * @return data {Object}
    */
   _getData = function (fields, type) {
-    var thClasses,
-        tableClasses = ['list'],
+    var tableClasses = ['list'],
         data = {
           rows: _getRows(tableClasses, type), // must be before classNames prop
-          classNames: tableClasses.join(' '),
-          utcOffset: _app.utcOffset
+          classNames: tableClasses.join(' ')
         };
 
     // Get the classLists for the <th>s
     Object.keys(fields).forEach(field => {
-      thClasses = [field];
+      var thClasses = [field];
 
       if (field === _sortField) {
         thClasses.push('sort-default');
@@ -359,7 +357,7 @@ var Summary = function (options) {
           '<thead>' +
             '<tr class="no-sort">' +
               '<th class="{mag}" data-sort-method="number" data-sort-order="desc">Mag</th>' +
-              '<th class="{userTime}" data-sort-order="desc">Time <em>({utcOffset})</em></th>' +
+              '<th class="{userTime}" data-sort-order="desc">Time <em>(User)</em></th>' +
               '<th class="{utcTime}" data-sort-order="desc">Time <em>(UTC)</em></th>' +
               '<th class="{depth}" data-sort-method="number">Depth</th>' +
               '<th class="{location}">Location</th>' +

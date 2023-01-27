@@ -115,10 +115,10 @@ var ShakeAlert = function (options) {
       '<div class="wrapper">' +
         '<div class="details">' +
           '<p class="issued">Message issued ' +
-            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ({utcOffset})</time>' +
+            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} (UTC{utcOffset})</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} (UTC)</time>' +
             '<br>Last updated ' +
-            '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ({utcOffset})</time>' +
+            '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} (UTC{utcOffset})</time>' +
             '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} (UTC)</time>' +
           '</p>' +
           '<h4>Alert Latency</h4>' +
@@ -224,7 +224,7 @@ var ShakeAlert = function (options) {
       url: mainshock.data.url + '/shake-alert',
       userTime: datetime.toLocal().toFormat(format),
       userUpdateTime: updateTime.toLocal().toFormat(format),
-      utcOffset: _app.utcOffset,
+      utcOffset: datetime.toLocal().toFormat('Z'),
       utcTime: datetime.toFormat(format),
       utcUpdateTime: updateTime.toFormat(format),
       wea: props.wea_report || ''
