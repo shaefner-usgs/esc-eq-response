@@ -239,6 +239,7 @@ var Features = function (options) {
    *
    *       Auto-set props:
    *
+   *         isRefreshing: {Boolean}
    *         mode: {String <base|comcat|dd|event|rtf>} display mode
    *         status: {String} loading status
    *         updated: {String} fetch time (milliseconds)
@@ -271,7 +272,7 @@ var Features = function (options) {
    * @param opts {Object} optional; default is {}
    */
   _createFeature = function (mode, module, opts = {}) {
-    var feature,
+    var feature, isRefreshing,
         status = 'initialized'; // default
 
     if (_isReady(mode)) { // create Feature when dependencies are ready
@@ -279,6 +280,7 @@ var Features = function (options) {
         app: _app
       });
       feature = module(opts);
+      isRefreshing = opts.isRefreshing || false;
 
       if (!feature.url) {
         status = 'ready';
@@ -287,6 +289,7 @@ var Features = function (options) {
       }
 
       Object.assign(feature, {
+        isRefreshing: isRefreshing,
         mode: mode,
         status: status
       });
@@ -364,7 +367,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get the given Feature's options to preserve during a refresh.
+   * Get options for refreshing the given Feature.
    *
    * @param feature {Object}
    *
@@ -374,6 +377,7 @@ var Features = function (options) {
     var th,
         magThreshold = sessionStorage.getItem(feature.id + '-mag'),
         options = {
+          isRefreshing: true,
           showLayer: feature.showLayer
         },
         table = document.querySelector(`#summaryPane .${feature.id} .sortable`);
@@ -762,7 +766,7 @@ var Features = function (options) {
         options = _getOptions(feature),
         prevFeature = _cacheFeature(feature);
 
-    prevFeature.status = 'refreshing';
+    prevFeature.isRefreshing = true;
 
     if (mode !== 'base') {
       _this.getFeature('mainshock').disableDownload();

@@ -37,7 +37,6 @@ var PlotsPane = function (options) {
       _configured,
       _el,
       _ids,
-      _isRefreshing,
 
       _configPlots,
       _getParams,
@@ -61,7 +60,6 @@ var PlotsPane = function (options) {
       'cumulative',
       'hypocenters'
     ];
-    _isRefreshing = {};
 
     _this.names = {
       cumulative: 'Cumulative Earthquakes',
@@ -163,8 +161,6 @@ var PlotsPane = function (options) {
     _updateFilter(feature);
     _updateParams(feature);
     feature.plots.addListeners(_this.params[feature.id]);
-
-    _isRefreshing[feature.id] = false;
   };
 
   /**
@@ -275,7 +271,7 @@ var PlotsPane = function (options) {
 
     // Skip the Mainshock (it's included in other Features' plots)
     if (feature.plots && feature.id !== 'mainshock') {
-      if (_isRefreshing[feature.id]) {
+      if (feature.isRefreshing) {
         _refresh(feature);
       } else {
         _ids.forEach(id => {
@@ -305,7 +301,7 @@ var PlotsPane = function (options) {
   _this.addFeature = function (feature) {
     var el, html;
 
-    if (!_isRefreshing[feature.id]) {
+    if (!feature.isRefreshing) {
       // Skip the Mainshock (it's included in other Features' plots)
       if (feature.plots && feature.id !== 'mainshock') {
         el = _el.querySelector('.container');
@@ -323,8 +319,8 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Remove the given Feature. If the Feature is being refreshed, leave it
-   * intact, but remove its listeners, which get re-added upon refresh.
+   * Remove the given Feature. If the Feature is being refreshed, defer and
+   * instead update the plots when the new Feature is ready.
    *
    * @param feature {Object}
    */
@@ -332,9 +328,7 @@ var PlotsPane = function (options) {
     var plots,
         el = _el.querySelector('.' + feature.id);
 
-    _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
-
-    if (el && !_isRefreshing[feature.id]) {
+    if (el && !feature.isRefreshing) {
       plots = el.querySelectorAll('.js-plotly-plot');
 
       plots.forEach(plot => Plotly.purge(plot));
@@ -380,7 +374,6 @@ var PlotsPane = function (options) {
     _el.querySelector('.container').innerHTML = '';
 
     _configured = {};
-    _isRefreshing = {};
 
     _this.params = {};
     _this.rendered = false;

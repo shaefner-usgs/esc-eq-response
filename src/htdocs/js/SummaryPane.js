@@ -32,7 +32,6 @@ var SummaryPane = function (options) {
 
       _app,
       _el,
-      _isRefreshing,
       _subFeatures,
 
       _cacheFeatures,
@@ -46,7 +45,6 @@ var SummaryPane = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
-    _isRefreshing = {};
     _subFeatures = {};
   };
 
@@ -150,7 +148,7 @@ var SummaryPane = function (options) {
         el = _el.querySelector(selectors),
         status = _app.Features.getStatus();
 
-    if (_isRefreshing[feature.id]) {
+    if (feature.isRefreshing) {
       summary = _getSummary(feature);
 
       if (summary) {
@@ -158,8 +156,6 @@ var SummaryPane = function (options) {
 
         el.innerHTML = summary;
       }
-
-      _isRefreshing[feature.id] = false;
     } else if (feature.summary) {
       el.insertAdjacentHTML('beforeend', feature.summary);
       el.classList.remove('hide'); // un-hide placeholder if hidden
@@ -185,8 +181,7 @@ var SummaryPane = function (options) {
     var el, html;
 
     if (
-      feature.placeholder &&
-      !_isRefreshing[feature.id] &&
+      feature.placeholder && !feature.isRefreshing &&
       Object.prototype.hasOwnProperty.call(feature, 'summary')
     ) {
       el = _el.querySelector('.container');
@@ -207,8 +202,8 @@ var SummaryPane = function (options) {
    * "sub-Feature" that is nested within another Feature. Also preserve any
    * nested Features.
    *
-   * If the Feature is being refreshed, defer and instead remove it when the new
-   * Feature is added.
+   * If the Feature is being refreshed, defer and instead replace it with the
+   * new Feature when it is ready.
    *
    * @param feature {Object}
    */
@@ -216,9 +211,7 @@ var SummaryPane = function (options) {
     var el = _el.querySelector('.' + feature.id),
         isNested = Boolean(_el.closest('.feature'));
 
-    _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
-
-    if (el && !_isRefreshing[feature.id]) {
+    if (el && !feature.isRefreshing) {
       if (isNested) {
         el.innerHTML = ''; // nested sub-Feature
       } else {
@@ -234,7 +227,6 @@ var SummaryPane = function (options) {
   _this.reset = function () {
     _el.querySelector('.container').innerHTML = '';
 
-    _isRefreshing = {};
     _subFeatures = {};
   };
 

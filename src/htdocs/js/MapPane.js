@@ -54,7 +54,6 @@ var MapPane = function (options) {
       _bounds,
       _el,
       _initialExtent,
-      _isRefreshing,
       _prevFeatures,
       _rendered,
 
@@ -77,7 +76,6 @@ var MapPane = function (options) {
     _app = options.app;
     _el = options.el;
     _initialExtent = true;
-    _isRefreshing = {};
     _prevFeatures = {};
     _rendered = false;
 
@@ -318,11 +316,9 @@ var MapPane = function (options) {
       });
     }
 
-    if (_isRefreshing[feature.id]) {
+    if (feature.isRefreshing) {
       _restorePopup(feature.id);
       _removeLayer(_prevFeatures[feature.id]);
-
-      _isRefreshing[feature.id] = false;
     }
   };
 
@@ -409,18 +405,16 @@ var MapPane = function (options) {
 
   /**
    * Remove the given Feature from the map and layer control. If the Feature is
-   * being refreshed, defer and instead remove it from the map when the new
-   * layer is added.
+   * being refreshed, defer and instead replace the map layer when the new
+   * Feature is ready.
    *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
-    _isRefreshing[feature.id] = (feature.status === 'refreshing') ? true : false;
-
     if (feature.mapLayer) {
       _this.layerControl.removeLayer(feature.mapLayer);
 
-      if (_isRefreshing[feature.id]) {
+      if (feature.isRefreshing) {
         _prevFeatures[feature.id] = feature; // cache Feature
       } else {
         _removeLayer(feature);
@@ -454,7 +448,6 @@ var MapPane = function (options) {
     _el.querySelector('.container').innerHTML = '';
 
     _initialExtent = true;
-    _isRefreshing = {};
     _prevFeatures = {};
     _rendered = false;
 

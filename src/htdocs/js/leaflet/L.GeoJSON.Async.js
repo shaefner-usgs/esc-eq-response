@@ -98,6 +98,8 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
 
       this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
       this._deleteProps();
+
+      feature.isRefreshing = false; // reset flag if Feature was refreshing
     } else { // dependencies not ready
       setTimeout(() => {
         this._addContent();
