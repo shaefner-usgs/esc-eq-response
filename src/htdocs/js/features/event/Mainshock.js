@@ -225,12 +225,7 @@ var Mainshock = function (options) {
     }
     if (Array.isArray(shakemap)) {
       hide = ''; // show
-
-      if (shakemap[0].contents['download/tvmap.jpg']) {
-        shakemapImg = shakemap[0].contents['download/tvmap.jpg'].url;
-      } else if (shakemap[0].contents['download/intensity.jpg'].url) {
-        shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
-      }
+      shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
     }
 
     if (Number(data.felt) === 1) {
