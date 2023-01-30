@@ -34,6 +34,7 @@ var ShakeMap = function (options) {
 
       _app,
       _mainshock,
+      _product,
       _radioBar,
       _selected,
 
@@ -53,6 +54,7 @@ var ShakeMap = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
+    _product = _mainshock.data.products.shakemap[0];
     _selected = 'intensity';
 
     _this.data = {};
@@ -61,7 +63,14 @@ var ShakeMap = function (options) {
     _this.name = 'ShakeMap';
     _this.url = _getUrl();
 
-    _fetch();
+    if (_this.url) {
+      _fetch();
+    } else { // no feed data => add manually
+      _this.data = _getData();
+      _this.lightbox = _getContent();
+
+      _app.Features.addContent(_this);
+    }
   };
 
   /**
@@ -93,12 +102,10 @@ var ShakeMap = function (options) {
    * Fetch the feed data.
    */
   _fetch = function () {
-    if (_this.url) {
-      L.geoJSON.async(_this.url, {
-        app: _app,
-        feature: _this
-      });
-    }
+    L.geoJSON.async(_this.url, {
+      app: _app,
+      feature: _this
+    });
   };
 
   /**
@@ -168,21 +175,24 @@ var ShakeMap = function (options) {
   /**
    * Get the data used to create the content.
    *
-   * @param json {Object}
+   * @param json {Object} default is null
    *
    * @return {Object}
    */
-  _getData = function (json) {
-    var dyfi, mmi, pga, pgv, sa03, sa10, sa30, seismic,
-        info = json.input.event_information,
-        product = _mainshock.data.products.shakemap[0],
-        props = _getProps(json.output.ground_motions);
+  _getData = function (json = null) {
+    var dyfi, info, mmi, pga, pgv, sa03, sa10, sa30, seismic,
+        props = {};
 
-    if (info.intensity_observations) {
-      dyfi = info.intensity_observations;
-    }
-    if (info.seismic_stations) {
-      seismic = info.seismic_stations;
+    if (json) {
+      info = json.input.event_information;
+      props = _getProps(json.output.ground_motions);
+
+      if (info.intensity_observations) {
+        dyfi = info.intensity_observations;
+      }
+      if (info.seismic_stations) {
+        seismic = info.seismic_stations;
+      }
     }
 
     if (props.mmi) {
@@ -239,7 +249,7 @@ var ShakeMap = function (options) {
       sa10: sa10 || '–',
       sa30: sa30 || '–',
       seismic: seismic||  '–',
-      status: _getStatus(product),
+      status: _getStatus(),
       url: _mainshock.data.url + '/shakemap'
     };
   };
@@ -261,14 +271,13 @@ var ShakeMap = function (options) {
           id: 'intensity',
           name: 'Intensity',
           url: _mainshock.data.shakemapImg
-        }],
-        shakemap = _mainshock.data.products.shakemap[0];
+        }];
 
     filenames.forEach(filename => {
       var id, name, secs,
           path = 'download/' + filename;
 
-      if (shakemap.contents[path]) {
+      if (_product.contents[path]) {
         id = filename.replace(/\.jpg$/, '');
         name = id.toUpperCase();
 
@@ -280,7 +289,7 @@ var ShakeMap = function (options) {
         images.push({
           id: id,
           name: name,
-          url: shakemap.contents[path].url
+          url: _product.contents[path].url
         });
       }
     });
@@ -311,14 +320,12 @@ var ShakeMap = function (options) {
   /**
    * Get the review status.
    *
-   * @param product {Object}
-   *
    * @return status {String}
    */
-  _getStatus = function (product) {
+  _getStatus = function () {
     var status = 'not reviewed'; // default
 
-    status = (product.properties['review-status'] || status).toLowerCase();
+    status = (_product.properties['review-status'] || status).toLowerCase();
 
     if (status === 'reviewed') {
       status += '<i class="icon-check"></i>';
@@ -383,6 +390,7 @@ var ShakeMap = function (options) {
 
     _app = null;
     _mainshock = null;
+    _product = null;
     _radioBar = null;
     _selected = null;
 
