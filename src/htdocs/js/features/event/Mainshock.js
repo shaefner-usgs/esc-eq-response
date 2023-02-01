@@ -125,7 +125,10 @@ var Mainshock = function (options) {
    */
   _destroy = function () {
     _earthquakes.destroy();
-    _this.plots.destroy();
+
+    if (!AppUtil.isEmpty(_this.plots)) {
+      _this.plots.destroy();
+    }
   };
 
   /**
