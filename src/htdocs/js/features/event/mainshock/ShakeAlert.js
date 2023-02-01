@@ -30,6 +30,8 @@ var ShakeAlert = function (options) {
       _initialize,
 
       _app,
+      _mainshock,
+      _product,
 
       _fetch,
       _getCities,
@@ -45,6 +47,11 @@ var ShakeAlert = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
+    _mainshock = _app.Features.getFeature('mainshock');
+
+    if (_mainshock.data.products['shake-alert']) {
+      _product = _mainshock.data.products['shake-alert'][0];
+    }
 
     _this.data = {};
     _this.id = 'shake-alert';
@@ -184,12 +191,10 @@ var ShakeAlert = function (options) {
         final = json.final_alert.properties,
         format = 'LLL d, yyyy TT',
         initial = json.initial_alert.properties,
-        mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.products['shake-alert'][0],
         radius = '',
         time = props.time.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
         datetime = Luxon.DateTime.fromISO(time).toUTC(),
-        updateTime = Luxon.DateTime.fromSeconds(product.updateTime/1000).toUTC();
+        updateTime = Luxon.DateTime.fromSeconds(_product.updateTime/1000).toUTC();
 
     json.initial_alert.features.forEach(feature => {
       if (feature.id === 'acircle_0.0') {
@@ -220,8 +225,8 @@ var ShakeAlert = function (options) {
       numStations10: props.num_stations_10km,
       numStations100: props.num_stations_100km,
       radius: radius,
-      status: _getStatus(product),
-      url: mainshock.data.url + '/shake-alert',
+      status: _getStatus(),
+      url: _mainshock.data.url + '/shake-alert',
       userTime: datetime.toLocal().toFormat(format),
       userUpdateTime: updateTime.toLocal().toFormat(format),
       utcOffset: datetime.toLocal().toFormat('Z'),
@@ -253,14 +258,12 @@ var ShakeAlert = function (options) {
   /**
    * Get the review status.
    *
-   * @param product {Object}
-   *
    * @return status {String}
    */
-  _getStatus = function (product) {
+  _getStatus = function () {
     var status = 'not reviewed'; // default
 
-    status = (product.properties['review-status'] || status).toLowerCase();
+    status = (_product.properties['review-status'] || status).toLowerCase();
 
     if (status === 'reviewed') {
       status += '<i class="icon-check"></i>';
@@ -276,12 +279,10 @@ var ShakeAlert = function (options) {
    */
   _getUrl = function () {
     var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
         url = '';
 
-    if (products['shake-alert']) {
-      contents = products['shake-alert'][0].contents;
+    if (_product) {
+      contents = _product.contents;
 
       if (contents['summary.json']) {
         url = contents['summary.json'].url;
@@ -336,6 +337,8 @@ var ShakeAlert = function (options) {
     _initialize = null;
 
     _app = null;
+    _mainshock = null;
+    _product = null;
 
     _fetch = null;
     _getCities = null;
