@@ -96,14 +96,14 @@ var Dyfi = function (options) {
    * @return {String}
    */
   _getContent = function () {
-    var data = Object.assign({}, _this.data, {
-          radioBar: ''
-        }),
+    var data,
         images = _getImages(),
-        imgsHtml = '';
+        imgs = '',
+        radioBar = '';
 
     images.forEach(image => {
-      imgsHtml += `<img src="${image.url}" class="mmi{cdi} ${image.id} option" alt="DYFI ${image.name}">`;
+      imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
+        `class="mmi{cdi} ${image.id} option">`;
     });
 
     if (images.length > 1) {
@@ -113,14 +113,18 @@ var Dyfi = function (options) {
         selected: _selected
       });
 
-      data.radioBar = _radioBar.getHtml();
+      radioBar = _radioBar.getHtml();
     }
+
+    data = Object.assign({}, _this.data, {
+      radioBar: radioBar
+    });
 
     return L.Util.template(
       '<div class="wrapper">' +
         '<div class="images">' +
           '{radioBar}' +
-          imgsHtml +
+          imgs +
         '</div>' +
         '<div class="details">' +
           '<dl class="props alt">' +
@@ -262,7 +266,10 @@ var Dyfi = function (options) {
    */
   _this.render = function () {
     _addBubble();
-    _radioBar.setOption.call(document.getElementById(_selected));
+
+    if (_radioBar) {
+      _radioBar.setOption.call(document.getElementById(_selected));
+    }
   };
 
 
