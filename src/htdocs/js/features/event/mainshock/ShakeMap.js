@@ -39,6 +39,7 @@ var ShakeMap = function (options) {
       _selected,
 
       _addBubble,
+      _compare,
       _destroy,
       _fetch,
       _getContent,
@@ -54,8 +55,11 @@ var ShakeMap = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _product = _mainshock.data.products.shakemap[0];
     _selected = 'intensity';
+
+    if (_mainshock.data.products.shakemap) {
+      _product = _mainshock.data.products.shakemap[0];
+    }
 
     _this.data = {};
     _this.id = 'shakemap';
@@ -65,11 +69,11 @@ var ShakeMap = function (options) {
 
     if (_this.url) {
       _fetch();
-    } else { // no feed data => add manually
+    } else if (_product) { // has ShakeMap, but there's no feed data
       _this.data = _getData();
       _this.lightbox = _getContent();
 
-      _app.Features.addContent(_this);
+      _app.Features.addContent(_this); // add manually
     }
   };
 
@@ -84,6 +88,24 @@ var ShakeMap = function (options) {
         h3 = document.getElementById('shakemap').querySelector('h3');
 
     h3.innerHTML = h3.textContent + bubble;
+  };
+
+  /**
+   * Comparison function to sort the Array of images by their id values (ASC).
+   *
+   * @params a, b {Objects}
+   *
+   * @return {Integer}
+   */
+  _compare = function (a, b) {
+    if (a.id < b.id) {
+      return -1;
+    }
+    if (a.id > b.id) {
+      return 1;
+    }
+
+    return 0;
   };
 
   /**
@@ -114,14 +136,14 @@ var ShakeMap = function (options) {
    * @return {String}
    */
   _getContent = function () {
-    var data = Object.assign({}, _this.data, {
-          radioBar: ''
-        }),
+    var data,
         images = _getImages(),
-        imgsHtml = '';
+        imgs = '',
+        radioBar = '';
 
     images.forEach(image => {
-      imgsHtml += `<img src="${image.url}" class="mmi{mmiValue} ${image.id} option" alt="ShakeMap ${image.name}">`;
+      imgs += `<img src="${image.url}" alt="ShakeMap ${image.name}" ` +
+        `class="mmi{mmiValue} ${image.id} option">`;
     });
 
     if (images.length > 1) {
@@ -131,14 +153,18 @@ var ShakeMap = function (options) {
         selected: _selected
       });
 
-      data.radioBar = _radioBar.getHtml();
+      radioBar = _radioBar.getHtml();
     }
+
+    data = Object.assign({}, _this.data, {
+      radioBar: radioBar
+    });
 
     return L.Util.template(
       '<div class="wrapper">' +
         '<div class="images">' +
           '{radioBar}' +
-          imgsHtml +
+          imgs +
         '</div>' +
         '<div class="details">' +
           '<dl class="props alt">' +
@@ -255,46 +281,53 @@ var ShakeMap = function (options) {
   };
 
   /**
-   * Get the list of images.
+   * Get the list of images (names and perhaps case are inconsistent in feed).
    *
    * @return images {Array}
    */
   _getImages = function () {
-    var filenames = [
-          'pga.jpg',
-          'pgv.jpg',
-          'psa0p3.jpg',
-          'psa1p0.jpg',
-          'psa3p0.jpg'
-        ],
-        images = [{ // default image
+    var images = [{ // default image
           id: 'intensity',
           name: 'Intensity',
           url: _mainshock.data.shakemapImg
-        }];
+        }],
+        regexes = [ // used to find images
+          /^pga\.jpg$/i,
+          /^pgv\.jpg$/i,
+          /^psa0p?3\.jpg$/i,
+          /^psa1p?0\.jpg$/i,
+          /^psa3p?0\.jpg$/i,
+          /^tvmap\.jpg$/i
+        ];
 
-    filenames.forEach(filename => {
-      var id, name, secs,
-          path = 'download/' + filename;
+    Object.keys(_product.contents).forEach(key => {
+      var filename = key.replace('download/', '');
 
-      if (_product.contents[path]) {
-        id = filename.replace(/\.jpg$/, '');
-        name = id.toUpperCase();
+      regexes.forEach(regex => {
+        var id, name, secs;
 
-        if (filename.startsWith('psa')) {
-          secs = filename.match(/^psa(.*)\.jpg$/)[1].replace('p', '.');
-          name = `PSA <em>(${secs}<span>s</span>)</em>`;
+        if (regex.test(filename)) {
+          id = filename.replace('.jpg', '').toLowerCase();
+          name = id.toUpperCase(); // default
+
+          if (id.startsWith('psa')) {
+            secs = id.replace('psa', ''); // will be e.g. '10' or '1p0'
+            secs = secs[0] + '.' + secs[secs.length - 1]; // want e.g. '1.0'
+            name = `PSA <em>(${secs}<span>s</span>)</em>`;
+          } else if (id === 'tvmap') {
+            name = 'TV map';
+          }
+
+          images.push({
+            id: id,
+            name: name,
+            url: _product.contents[key].url
+          });
         }
-
-        images.push({
-          id: id,
-          name: name,
-          url: _product.contents[path].url
-        });
-      }
+      });
     });
 
-    return images;
+    return images.sort(_compare);
   };
 
   /**
@@ -341,12 +374,10 @@ var ShakeMap = function (options) {
    */
   _getUrl = function () {
     var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
         url = '';
 
-    if (products.shakemap) {
-      contents = products.shakemap[0].contents;
+    if (_product) {
+      contents = _product.contents;
 
       if (contents['download/info.json']) {
         url = contents['download/info.json'].url;
@@ -395,6 +426,7 @@ var ShakeMap = function (options) {
     _selected = null;
 
     _addBubble = null;
+    _compare = null;
     _destroy = null;
     _fetch = null;
     _getContent = null;
@@ -421,7 +453,10 @@ var ShakeMap = function (options) {
    */
   _this.render = function () {
     _addBubble();
-    _radioBar.setOption.call(document.getElementById(_selected));
+
+    if (_radioBar) {
+      _radioBar.setOption.call(document.getElementById(_selected));
+    }
   };
 
 
