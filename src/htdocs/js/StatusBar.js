@@ -155,6 +155,7 @@ var StatusBar = function (options) {
         div = document.createElement('div');
 
     if (
+      error.id !== 'rtf' &&
       error.status !== 200 &&
       error.status !== 400 &&
       error.status !== 404 &&
