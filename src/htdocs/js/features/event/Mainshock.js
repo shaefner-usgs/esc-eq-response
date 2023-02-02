@@ -61,6 +61,7 @@ var Mainshock = function (options) {
       _getBubbles,
       _getData,
       _getDyfi,
+      _getImage,
       _getLinks,
       _getLossPager,
       _getNotice,
@@ -210,8 +211,11 @@ var Mainshock = function (options) {
     _json = json; // cache feed data
 
     if (Array.isArray(dyfi)) {
-      dyfiImg = dyfi[0].contents[dyfi[0].code + '_ciim_geo.jpg'].url;
-      hide = ''; // show
+      dyfiImg = _getImage(dyfi[0]);
+
+      if (dyfiImg) {
+        hide = ''; // show
+      }
     }
     if (Array.isArray(fm) || Array.isArray(mt)) {
       hide = ''; // show
@@ -277,6 +281,29 @@ var Mainshock = function (options) {
     }
 
     return template;
+  };
+
+  /**
+   * Get the URL of the 'primary' DYFI image.
+   *
+   * @param dyfi {Object}
+   *
+   * @return url {String}
+   */
+  _getImage = function (dyfi) {
+    var images = [ // note: images listed in order of preference
+          dyfi.contents[dyfi.code + '_ciim.jpg'], // zip
+          dyfi.contents[dyfi.code + '_ciim_geo.jpg'] // intensity (preferred)
+        ],
+        url = '';
+
+    images.forEach(image => {
+      if (image) {
+        url = image.url;
+      }
+    });
+
+    return url;
   };
 
   /**
@@ -701,6 +728,7 @@ var Mainshock = function (options) {
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
+    _getImage = null;
     _getLinks = null;
     _getLossPager = null;
     _getNotice = null;

@@ -51,13 +51,16 @@ var Dyfi = function (options) {
     _mainshock = _app.Features.getFeature('mainshock');
     _selected = 'block';
 
+    if (_mainshock.data.products.dyfi) {
+      _product = _mainshock.data.products.dyfi[0];
+    }
+
     _this.data = {},
     _this.id = 'dyfi';
     _this.lightbox = '';
     _this.name = 'Did You Feel It?';
 
-    if (_mainshock.data.dyfiImg) {
-      _product = _mainshock.data.products.dyfi[0];
+    if (_product) {
       _this.data = _getData();
       _this.lightbox = _getContent();
 
@@ -97,6 +100,7 @@ var Dyfi = function (options) {
    */
   _getContent = function () {
     var data,
+        div = '',
         images = _getImages(),
         imgs = '',
         radioBar = '';
@@ -105,6 +109,14 @@ var Dyfi = function (options) {
       imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
         `class="mmi{cdi} ${image.id} option">`;
     });
+
+    if (imgs) {
+      div =
+        '<div class="images">' +
+          '{radioBar}' +
+          imgs +
+        '</div>';
+    }
 
     if (images.length > 1) {
       _radioBar = RadioBar({
@@ -122,10 +134,7 @@ var Dyfi = function (options) {
 
     return L.Util.template(
       '<div class="wrapper">' +
-        '<div class="images">' +
-          '{radioBar}' +
-          imgs +
-        '</div>' +
+        div +
         '<div class="details">' +
           '<dl class="props alt">' +
             '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
@@ -170,24 +179,28 @@ var Dyfi = function (options) {
    * @return images {Array}
    */
   _getImages = function () {
-    var filename = _mainshock.data.id + '_ciim.jpg',
-        images = [{ // default image
-          id: 'block',
-          name: 'Intensity Map',
-          url: _this.data.map
-        }];
+    var images = [],
+        intensity = _product.code + '_ciim_geo.jpg',
+        zip = _product.code + '_ciim.jpg';
 
-    if (_product.contents[filename]) {
+    if (_product.contents[intensity]) {
+      images.push({
+        id: 'block',
+        name: 'Intensity map',
+        url: _product.contents[intensity].url
+      });
+    }
+    if (_product.contents[zip]) {
       images.push({
         id: 'zip',
-        name: 'ZIP Code Map',
-        url: _product.contents[filename].url
+        name: 'ZIP Code map',
+        url: _product.contents[zip].url
       });
     }
     if (_this.data.plot) {
       images.push({
         id: 'plot',
-        name: 'Intensity vs. Distance',
+        name: 'Intensity vs. Distance plot',
         url: _this.data.plot
       });
     }
