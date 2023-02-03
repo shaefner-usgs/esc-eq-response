@@ -64,9 +64,16 @@ var StatusBar = function (options) {
     // Reload a Feature
     if (reload) {
       reload.addEventListener('click', e => {
+        var feature = _app.Features.getFeature(id);
+
         e.preventDefault();
         _this.removeItem(id);
-        _app.Features.reloadFeature(id, mode);
+
+        if (feature.isRefreshing) {
+          _app.Features.refreshFeature(id);
+        } else {
+          _app.Features.reloadFeature(id, mode);
+        }
       });
     }
   };
