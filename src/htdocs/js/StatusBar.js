@@ -66,12 +66,7 @@ var StatusBar = function (options) {
       reload.addEventListener('click', e => {
         e.preventDefault();
         _this.removeItem(id);
-
-        if (id === 'search') {
-          _app.SearchBar.searchCatalog();
-        } else {
-          _app.Features.reloadFeature(id, mode);
-        }
+        _app.Features.reloadFeature(id, mode);
       });
     }
   };
