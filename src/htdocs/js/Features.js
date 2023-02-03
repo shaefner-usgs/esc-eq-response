@@ -114,13 +114,11 @@ var Features = function (options) {
       _features,
       _lightboxes,
       _modules,
-      _prevFeatures,
       _queue,
 
       _addCount,
       _addFeature,
       _addLightbox,
-      _cacheFeature,
       _createFeature,
       _createRtf,
       _flagCount,
@@ -138,7 +136,6 @@ var Features = function (options) {
     _app = options.app;
     _lightboxes = {};
     _modules = {};
-    _prevFeatures = {};
     _queue = [];
 
     _initFeatures();
@@ -202,25 +199,6 @@ var Features = function (options) {
       id: id,
       title: feature.title || feature.name
     });
-  };
-
-  /**
-   * Cache an existing Feature (in an Array due to the potential of 'stacked'
-   * Fetch requests). This is used to purge the 'previous' Feature when a
-   * refresh completes.
-   *
-   * @param feature {Object}
-   *
-   * @return feature {Object}
-   */
-  _cacheFeature = function (feature) {
-    if (!_prevFeatures[feature.id]) {
-      _prevFeatures[feature.id] = [];
-    }
-
-    _prevFeatures[feature.id].push(feature);
-
-    return _prevFeatures[feature.id].shift(); // 'oldest' Feature in Array
   };
 
   /**
@@ -763,16 +741,15 @@ var Features = function (options) {
   _this.refreshFeature = function (id) {
     var feature = _this.getFeature(id),
         mode = _getMode(id),
-        options = _getOptions(feature),
-        prevFeature = _cacheFeature(feature);
+        options = _getOptions(feature);
 
-    prevFeature.isRefreshing = true;
+    feature.isRefreshing = true;
 
     if (mode !== 'base') {
       _this.getFeature('mainshock').disableDownload();
     }
 
-    _this.removeFeature(prevFeature);
+    _this.removeFeature(feature);
     _createFeature(mode, _modules[id], options);
   };
 
@@ -836,7 +813,6 @@ var Features = function (options) {
     _initFeatures();
 
     _lightboxes = {};
-    _prevFeatures = {};
   };
 
   /**
