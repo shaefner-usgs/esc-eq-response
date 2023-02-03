@@ -115,7 +115,7 @@ var SelectBar = function (options) {
 
     e.preventDefault();
 
-    if (!map.hasLayer(search)) {
+    if (search && !map.hasLayer(search)) {
       map.addLayer(search);
     }
 
