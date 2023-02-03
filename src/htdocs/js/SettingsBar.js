@@ -62,7 +62,6 @@ var SettingsBar = function (options) {
       _hasChanged,
       _initButtons,
       _initSwitches,
-      _refreshFeature,
       _setCatalog,
       _setField,
       _setParam,
@@ -122,7 +121,7 @@ var SettingsBar = function (options) {
       _app.Features.addFeature(feature);
 
       if (_hasChanged(feature)) {
-        _refreshFeature(id);
+        _app.Features.refreshFeature(id);
       }
     });
   };
@@ -314,29 +313,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Refresh a Feature, throttling stacked requests when user changes Feature's
-   * settings rapidly.
-   *
-   * @param id {String}
-   *     Feature id
-   */
-  _refreshFeature = function (id) {
-    var feature = _app.Features.getFeature(id),
-        mainshock = document.body.classList.contains('mainshock');
-
-    if (mainshock || id === 'catalog-search') {
-      // Immediately show loading status (don't wait for throttlers)
-      _app.StatusBar.addItem({
-        id: id,
-        name: feature.name
-      });
-
-      clearTimeout(_throttlers[id]); // ensure a single timer per Feature is set
-      _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
-    }
-  };
-
-  /**
    * Event handler that sets the earthquake catalog option.
    */
   _setCatalog = function () {
@@ -431,7 +407,7 @@ var SettingsBar = function (options) {
       if (tagName === 'li') { // interval changed
         _setTimeout(name);
       } else if (tagName !== 'ul') { // switch turned on
-        _refreshFeature(featureId);
+        _app.Features.refreshFeature(featureId);
         _this.setInterval(name);
       } else { // RadioBar border clicked
         return;
@@ -498,7 +474,7 @@ var SettingsBar = function (options) {
     clearTimeout(_timers.oneOff); // ensure a single timer is set
 
     _timers.oneOff = setTimeout(function() {
-      _refreshFeature(id);
+      _app.Features.refreshFeature(id);
       _this.setInterval(name);
     }, delay);
   };
@@ -540,17 +516,29 @@ var SettingsBar = function (options) {
    * Event handler that refreshes a Feature and updates its URL parameter.
    */
   _update = function () {
-    var classList = Array.from(this.closest('div').classList),
-        id = classList.find(className => !className.includes('dd-'));
+    var feature,
+        classList = Array.from(this.closest('div').classList),
+        id = classList.find(className => !className.includes('dd-')),
+        mainshock = document.body.classList.contains('mainshock');
 
     if (AppUtil.getParam('catalog') === 'dd') {
       id = classList.find(className => className.includes('dd-'));
     }
 
+    feature = _app.Features.getFeature(id);
+
     AppUtil.updateParam(this.id); // <input> id
 
-    if (this.value !== '') {
-      _refreshFeature(id);
+    if (mainshock && this.value !== '') {
+      // Throttle stacked requests if user changes settings rapidly
+      clearTimeout(_throttlers[id]); // ensure one timer per Feature
+      _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
+
+      // Show loading status immediately (don't wait for throttlers)
+      _app.StatusBar.addItem({
+        id: id,
+        name: feature.name
+      });
     }
   };
 
@@ -614,7 +602,7 @@ var SettingsBar = function (options) {
 
     clearInterval(_timers[name]); // ensure a single timer per Feature is set
 
-    _timers[name] = setInterval(_refreshFeature, interval, id);
+    _timers[name] = setInterval(_app.Features.refreshFeature, interval, id);
   };
 
   /**
