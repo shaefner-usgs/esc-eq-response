@@ -49,7 +49,6 @@ _SETTINGS = { // defaults
  *       getParams: {Function}
  *       postInit: {Function}
  *       render: {Function}
- *       searchCatalog: {Function}
  *       setButton: {Function}
  *     }
  */
@@ -84,6 +83,7 @@ var SearchBar = function (options) {
       _onDateClose,
       _onEndOpen,
       _onStartOpen,
+      _searchCatalog,
       _setControls,
       _setMinutes,
       _setNow,
@@ -190,7 +190,7 @@ var SearchBar = function (options) {
     _searchButton.addEventListener('click', () => {
       location.href = '#mapPane';
 
-      _this.searchCatalog();
+      _searchCatalog();
     });
   };
 
@@ -363,6 +363,21 @@ var SearchBar = function (options) {
     this.set('maxDate', maxDate);
     _setUtcDay(this.days);
     _setUtcMonth(this);
+  };
+
+  /**
+   * Event handler that searches the earthquake catalog and displays the results.
+   */
+  _searchCatalog = function () {
+    if (_isValid()) { // checks custom dates
+      _setParams();
+      _app.Features.refreshFeature('catalog-search');
+
+      if (!document.body.classList.contains('mainshock')) {
+        _app.MapPane.initBounds();
+        _app.MapPane.setView();
+      }
+    }
   };
 
   /**
@@ -661,21 +676,6 @@ var SearchBar = function (options) {
   _this.render = function () {
     _map.invalidateSize();
     _setView();
-  };
-
-  /**
-   * Event handler that searches the earthquake catalog and displays the results.
-   */
-  _this.searchCatalog = function () {
-    if (_isValid()) { // checks custom dates
-      _setParams();
-      _app.Features.refreshFeature('catalog-search');
-
-      if (!document.body.classList.contains('mainshock')) {
-        _app.MapPane.initBounds();
-        _app.MapPane.setView();
-      }
-    }
   };
 
   /**
