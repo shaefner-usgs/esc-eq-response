@@ -369,9 +369,16 @@ var SearchBar = function (options) {
    * Event handler that searches the earthquake catalog and displays the results.
    */
   _searchCatalog = function () {
+    var search = _app.Features.getFeature('catalog-search');
+
     if (_isValid()) { // checks custom dates
+      if (_app.Features.isFeature(search)) {
+        _app.Features.refreshFeature('catalog-search');
+      } else {
+        _app.Features.reloadFeature('catalog-search', 'base');
+      }
+
       _setParams();
-      _app.Features.refreshFeature('catalog-search');
 
       if (!document.body.classList.contains('mainshock')) {
         _app.MapPane.initBounds();
