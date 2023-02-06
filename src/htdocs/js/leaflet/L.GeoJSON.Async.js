@@ -117,7 +117,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
    * @param error {Object}
    * @param response {Object}
    * @param text {String}
-   * @param type {String <notfound|timeout>}
+   * @param type {String <network|notfound|timeout>}
    */
   _addError: function (error, response, text, type) {
     var feature = this._feature,
@@ -130,6 +130,8 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else if (type === 'timeout') {
       message += `<li>Request timed out (can’t connect to ${host})</li>`;
+    } else if (type === 'network') {
+      message += '<li>Network error (perhaps blocked by CORS policy)</li>';
     } else {
       if (text.match('limit of 20000')) {
         message += '<li>Modify the parameters to match fewer earthquakes ' +
@@ -215,6 +217,8 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
 
       if (error.name === 'AbortError') {
         type = 'timeout';
+      } else if (error.name === 'TypeError') {
+        type = 'network';
       } else if (response.status === 404 && feature.id === 'mainshock') {
         type = 'notfound';
 
