@@ -117,7 +117,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
    * @param error {Object}
    * @param response {Object}
    * @param text {String}
-   * @param type {String <network|notfound|timeout>}
+   * @param type {String <timeout|network|notfound>}
    */
   _addError: function (error, response, text, type) {
     var feature = this._feature,
@@ -126,12 +126,12 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
 
     message += '<ul>';
 
-    if (type === 'notfound') {
-      message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
-    } else if (type === 'timeout') {
+    if (type === 'timeout') {
       message += `<li>Request timed out (can’t connect to ${host})</li>`;
     } else if (type === 'network') {
-      message += '<li>Network error (perhaps blocked by CORS policy)</li>';
+      message += '<li>Failed to load (maybe blocked by CORS policy)</li>';
+    } else if (type === 'notfound') {
+      message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else {
       if (text.match('limit of 20000')) {
         message += '<li>Modify the parameters to match fewer earthquakes ' +
