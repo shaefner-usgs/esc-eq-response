@@ -213,6 +213,7 @@ var Features = function (options) {
    *     {
    *       Required props:
    *
+   *         destroy: {Function} free references
    *         id: {String} unique id
    *         name: {String} display name
    *
@@ -233,7 +234,6 @@ var Features = function (options) {
    *         deferFetch: {Boolean} fetch data on demand when map layer turned 'on'
    *           Note: only Features with a map layer; showLayer prop must be false
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
-   *         destroy: {Function} free references
    *         json: {String} JSON feed data (Mainshock only)
    *         lightbox: {String} HTML content of Feature's Lightbox
    *         mapLayer: {L.Layer} Leaflet layer added to MapPane
