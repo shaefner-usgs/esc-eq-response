@@ -202,16 +202,13 @@ var SummaryPane = function (options) {
    * "sub-Feature" that is nested within another Feature. Also preserve any
    * nested Features.
    *
-   * If the Feature is being refreshed, defer and instead replace it with the
-   * new Feature when it is ready.
-   *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
     var el = _el.querySelector('.' + feature.id),
         isNested = Boolean(_el.closest('.feature'));
 
-    if (el && !feature.isRefreshing) {
+    if (el) {
       if (isNested) {
         el.innerHTML = ''; // nested sub-Feature
       } else {

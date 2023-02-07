@@ -103,6 +103,7 @@ _MODULES = {
  *       reloadFeature: {Function}
  *       removeFeature: {Function}
  *       reset: {Function}
+ *       restoreFeature: {Function}
  *       showLightbox: {Function}
  *     }
  */
@@ -217,8 +218,9 @@ var Features = function (options) {
    *
    *       Auto-set props:
    *
-   *         isRefreshing: {Boolean}
+   *         isRefreshing: {Boolean} refresh status
    *         mode: {String <base|comcat|dd|event|rtf>} display mode
+   *         prevFeature: {Object} existing Feature before a refresh
    *         status: {String} loading status
    *         updated: {String} fetch time (milliseconds)
    *
@@ -247,18 +249,17 @@ var Features = function (options) {
    *         url: {String} URL of data feed
    *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
    *     }
-   * @param opts {Object} optional; default is {}
+   * @param options {Object} optional; default is {}
    */
-  _createFeature = function (mode, module, opts = {}) {
-    var feature, isRefreshing,
+  _createFeature = function (mode, module, options = {}) {
+    var feature,
         status = 'initialized'; // default
 
     if (_isReady(mode)) { // create Feature when dependencies are ready
-      opts = Object.assign({}, _DEFAULTS, opts, {
+      options = Object.assign({}, _DEFAULTS, options, {
         app: _app
       });
-      feature = module(opts);
-      isRefreshing = opts.isRefreshing || false;
+      feature = module(options);
 
       if (!feature.url) {
         status = 'ready';
@@ -267,8 +268,9 @@ var Features = function (options) {
       }
 
       Object.assign(feature, {
-        isRefreshing: isRefreshing,
+        isRefreshing: options.isRefreshing || false,
         mode: mode,
+        prevFeature: options.prevFeature || {},
         status: status
       });
 
@@ -282,7 +284,7 @@ var Features = function (options) {
       _addFeature(feature);
     } else { // dependencies not ready
       _queue.push(setTimeout(() => {
-        _createFeature(mode, module, opts);
+        _createFeature(mode, module, options);
       }, 50));
     }
   };
@@ -345,7 +347,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get options for refreshing the given Feature.
+   * Get the given Feature's refresh options.
    *
    * @param feature {Object}
    *
@@ -356,6 +358,7 @@ var Features = function (options) {
         magThreshold = sessionStorage.getItem(feature.id + '-mag'),
         options = {
           isRefreshing: true,
+          prevFeature: feature,
           showLayer: feature.showLayer
         },
         table = document.querySelector(`#summaryPane .${feature.id} .sortable`);
@@ -733,7 +736,7 @@ var Features = function (options) {
   };
 
   /**
-   * Refresh the given Feature.
+   * Refresh (update) the given Feature.
    *
    * @param id {Object}
    *     Feature id
@@ -749,12 +752,15 @@ var Features = function (options) {
       _this.getFeature('mainshock').disableDownload();
     }
 
-    _this.removeFeature(feature);
+    if (feature.mapLayer) { // layer control item is replaced by loader
+      _app.MapPane.layerControl.removeLayer(feature.mapLayer);
+    }
+
     _createFeature(mode, _modules[id], options);
   };
 
   /**
-   * Reload a Feature after a failed request.
+   * Re-create the given Feature after a failed request.
    *
    * @param id {String}
    *     Feature id
@@ -774,16 +780,12 @@ var Features = function (options) {
    *
    * @param feature {Object}
    * @param destroy {Boolean} default is true
-   *     set to false when swapping between catalogs
+   *     set to false when swapping catalogs
    */
   _this.removeFeature = function (feature, destroy = true) {
     var id = feature.id;
 
     if (_this.isFeature(feature)) {
-      if (feature.removeListeners) {
-        feature.removeListeners();
-      }
-
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
@@ -792,12 +794,16 @@ var Features = function (options) {
       if (id === 'mainshock') {
         document.getElementById(id).innerHTML = ''; // Mainshock details
       } else if (id === 'significant-eqs') {
-        document.getElementById(id).innerHTML = ''; // loader
+        document.getElementById(id).innerHTML = ''; // removes loader
       }
 
-      if (destroy) { // set to false when swapping catalogs
-        feature.destroy();
+      if (destroy) {
+        if (feature.removeListeners) {
+          feature.removeListeners();
+        }
+
         _removeCount(feature);
+        feature.destroy();
 
         delete _features[feature.mode][id];
       }
@@ -813,6 +819,25 @@ var Features = function (options) {
     _initFeatures();
 
     _lightboxes = {};
+    _queue = [];
+  };
+
+  /**
+   * Restore the given Feature to its previous state, after a failed refresh.
+   *
+   * @param feature {Object}
+   */
+  _this.restoreFeature = function (feature) {
+    var id = feature.id,
+        mode = _getMode(id),
+        prevFeature = feature.prevFeature;
+
+    _addCount(prevFeature);
+    _app.MapPane.layerControl.removeLayer(feature.mapLayer);
+    _app.MapPane.layerControl.addOverlay(prevFeature.mapLayer, feature.name);
+
+    _features[mode][id] = prevFeature;
+    _features[mode][id].prevFeature = {};
   };
 
   /**

@@ -54,7 +54,6 @@ var MapPane = function (options) {
       _bounds,
       _el,
       _initialExtent,
-      _prevFeatures,
       _rendered,
 
       _addControls,
@@ -76,7 +75,6 @@ var MapPane = function (options) {
     _app = options.app;
     _el = options.el;
     _initialExtent = true;
-    _prevFeatures = {};
     _rendered = false;
 
     _initMap();
@@ -230,15 +228,14 @@ var MapPane = function (options) {
   /**
    * Re-open an existing popup when its map layer is refreshed.
    *
-   * @param id {String}
-   *     Feature id
+   * @param feature {Object}
    */
-  _restorePopup = function (id) {
-    var mapLayer = _prevFeatures[id].mapLayer;
+  _restorePopup = function (feature) {
+    var mapLayer = feature.prevFeature.mapLayer;
 
     mapLayer.eachLayer(layer => {
       if (layer.isPopupOpen()) {
-        _this.openPopup(layer.feature.id, id);
+        _this.openPopup(layer.feature.id, feature.id);
       }
     });
   };
@@ -317,8 +314,8 @@ var MapPane = function (options) {
     }
 
     if (feature.isRefreshing) {
-      _restorePopup(feature.id);
-      _removeLayer(_prevFeatures[feature.id]);
+      _restorePopup(feature);
+      _removeLayer(feature.prevFeature);
     }
   };
 
@@ -404,21 +401,14 @@ var MapPane = function (options) {
   };
 
   /**
-   * Remove the given Feature from the map and layer control. If the Feature is
-   * being refreshed, defer and instead replace the map layer when the new
-   * Feature is ready.
+   * Remove the given Feature from the map and layer control.
    *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
     if (feature.mapLayer) {
       _this.layerControl.removeLayer(feature.mapLayer);
-
-      if (feature.isRefreshing) {
-        _prevFeatures[feature.id] = feature; // cache Feature
-      } else {
-        _removeLayer(feature);
-      }
+      _removeLayer(feature);
     }
   };
 
@@ -448,7 +438,6 @@ var MapPane = function (options) {
     _el.querySelector('.container').innerHTML = '';
 
     _initialExtent = true;
-    _prevFeatures = {};
     _rendered = false;
 
     _this.initBounds();

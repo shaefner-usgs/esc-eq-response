@@ -319,8 +319,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Remove the given Feature. If the Feature is being refreshed, defer and
-   * instead update the plots when the new Feature is ready.
+   * Remove the given Feature.
    *
    * @param feature {Object}
    */
@@ -328,7 +327,7 @@ var PlotsPane = function (options) {
     var plots,
         el = _el.querySelector('.' + feature.id);
 
-    if (el && !feature.isRefreshing) {
+    if (el) {
       plots = el.querySelectorAll('.js-plotly-plot');
 
       plots.forEach(plot => Plotly.purge(plot));
