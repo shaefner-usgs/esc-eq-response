@@ -51,7 +51,7 @@ _MODULES = {
     Historical
   ],
   dd: [ // 'event' Features added when Double-difference catalog is selected
-    DdMainshock, // must be first
+    DdMainshock,
     Aftershocks,
     Foreshocks,
     Historical
@@ -410,20 +410,13 @@ var Features = function (options) {
    * @return {Boolean}
    */
   _isReady = function (mode) {
-    var ddMainshock = _this.getFeature('dd-mainshock'),
-        mainshock = _this.getFeature('mainshock'),
+    var mainshock = _this.getFeature('mainshock'),
         significantEqs = _this.getFeature('significant-eqs');
 
     if (
       mode === 'base' || // no dependencies
       mode === 'comcat' && mainshock.status === 'ready' ||
-      mode === 'dd' && (
-        ( // first create the DD Mainshock (once the Mainshock is ready)...
-          mainshock.status === 'ready' &&
-          !_this.isFeature(ddMainshock)
-        ) ||
-        ddMainshock.status === 'ready' // then create the other dd Features
-      ) ||
+      mode === 'dd' && mainshock.status === 'ready' ||
       mode === 'event' && (
         ( // first create the Mainshock (once SignificantEqs is ready)...
           significantEqs.status ===  'ready' &&
@@ -587,7 +580,7 @@ var Features = function (options) {
       _createFeature(mode, module);
     });
 
-    // Add the selected catalog's Features
+    // Add the catalog-specific Features
     if (mode === 'event') {
       _this.createFeatures(catalog);
     }
@@ -768,7 +761,11 @@ var Features = function (options) {
    *     display mode
    */
   _this.reloadFeature = function (id, mode) {
-    _createFeature(mode, _modules[id]);
+    if (id === 'mainshock') {
+      _this.createFeatures(mode);
+    } else {
+      _createFeature(mode, _modules[id]);
+    }
   };
 
   /**

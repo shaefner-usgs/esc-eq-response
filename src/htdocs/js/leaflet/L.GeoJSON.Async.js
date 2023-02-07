@@ -178,6 +178,10 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   _cleanup: function () {
     var feature = this._feature;
 
+    if (feature.id === 'mainshock') {
+      this._app.Features.clearQueue();
+    }
+
     if (feature.isRefreshing) {
       this._app.Features.restoreFeature(feature);
 
@@ -238,8 +242,6 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         type = 'network';
       } else if (response.status === 404 && feature.id === 'mainshock') {
         type = 'notfound';
-
-        this._app.Features.clearQueue();
       } else {
         text = await response.text();
       }
