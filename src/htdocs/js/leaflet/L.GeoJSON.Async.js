@@ -173,6 +173,23 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   },
 
   /**
+   * Clean up after a failed fetch request.
+   */
+  _cleanup: function () {
+    var feature = this._feature;
+
+    if (feature.isRefreshing) {
+      this._app.Features.restoreFeature(feature);
+
+      if (feature.destroy) {
+        feature.destroy();
+      }
+    } else {
+      this._app.Features.removeFeature(feature);
+    }
+  },
+
+  /**
    * Delete unneeded 'foreign' (non-Leaflet) properties.
    */
   _deleteProps: function () {
@@ -228,7 +245,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       }
 
       this._addError(error, response, text, type);
-      this._app.Features.removeFeature(feature);
+      this._cleanup();
 
       console.error(error);
     }
