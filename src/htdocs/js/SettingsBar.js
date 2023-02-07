@@ -461,7 +461,7 @@ var SettingsBar = function (options) {
         feature = _app.Features.getFeature(id);
 
     // Set delay based on elapsed time in the current auto-refresh cycle
-    if (!AppUtil.isEmpty(feature)) {
+    if (_app.Features.isFeature(feature)) {
       delay = 0;
       elapsed = Date.now() - feature.updated;
 

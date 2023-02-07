@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Create the PAGER Feature, a sub-Feature of the Mainshock (and super-Feature
  * of PAGER Cities and PAGER Exposures).
@@ -96,7 +93,7 @@ var Pager = function (options) {
     if (_this.data.impact || _this.data.structures) {
       summary = '<h4>Summary</h4><p>{impact}</p><p>{structures}</p>';
     }
-    if (!AppUtil.isEmpty(exposures)) {
+    if (_app.Features.isFeature(exposures)) {
       table = exposures.summary.replace('<h3>Population Exposure</h3>', '');
     }
 
