@@ -694,36 +694,39 @@ var SearchBar = function (options) {
     var customPeriod = document.getElementById('customPeriod')
           .classList.contains('selected'),
         inputs = [_endtime, _starttime],
+        search = _app.Features.getFeature('catalog-search'),
         params = {
           controls: _this.getParams(),
-          search: _app.Features.getFeature('catalog-search').params
+          search: search.params
         },
         skip = [];
 
-    // Times may differ slightly (by seconds), but it's irrelevant
+    // Skip times which may differ slightly (by seconds) and are not relevant
     if (params.controls.period.match(/day|week|month/)) {
       skip = ['endtime', 'starttime'];
     }
 
-    if (AppUtil.shallowEqual(params.controls, params.search, skip)) {
-      _searchButton.textContent = 'Refresh';
-    } else {
-      _searchButton.textContent = 'Search';
-    }
+    if (_app.Features.isFeature(search)) {
+      if (AppUtil.shallowEqual(params.controls, params.search, skip)) {
+        _searchButton.textContent = 'Refresh';
+      } else {
+        _searchButton.textContent = 'Search';
+      }
 
-    _searchButton.removeAttribute('disabled');
-    _searchButton.removeAttribute('title');
+      _searchButton.removeAttribute('disabled');
+      _searchButton.removeAttribute('title');
 
-    if (customPeriod) {
-      inputs.forEach(input => {
-        var div = input.closest('div'),
-            invalid = div.classList.contains('invalid') || input.value === '';
+      if (customPeriod) {
+        inputs.forEach(input => {
+          var div = input.closest('div'),
+              invalid = div.classList.contains('invalid') || input.value === '';
 
-        if (invalid) {
-          _searchButton.setAttribute('disabled', 'disabled');
-          _searchButton.setAttribute('title', 'Disabled because custom dates are invalid');
-        }
-      });
+          if (invalid) {
+            _searchButton.setAttribute('disabled', 'disabled');
+            _searchButton.setAttribute('title', 'Disabled because custom dates are invalid');
+          }
+        });
+      }
     }
   };
 
