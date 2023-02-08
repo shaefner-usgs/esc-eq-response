@@ -198,7 +198,7 @@ var SearchBar = function (options) {
    * Cancel the new custom region Leaflet control if it's active.
    */
   _cancelRegion = function () {
-    var control = _el.querySelector('.leaflet-control-edit a');
+    var control = _el.querySelector('.leaflet-control-region a');
 
     if (control.classList.contains('selected')) {
       control.click(); // exit new custom region mode

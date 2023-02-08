@@ -49,7 +49,7 @@ var SideBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var close = _el.querySelector('.icon-close');
+    var close = _el.querySelector('a.icon-close');
 
     // Close the SideBar
     close.addEventListener('click', () =>
