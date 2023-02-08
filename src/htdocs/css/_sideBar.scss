@@ -22,6 +22,16 @@
     display: none; // Chrome, Safari, and Opera
   }
 
+  a.icon-close {
+    @include close;
+
+    opacity: 0;
+    position: fixed;
+    right: $sidebar-width * -1;
+    top: 7.625rem;
+    z-index: 10000;
+  }
+
   h2 {
     font-size: 1.75rem;
     margin: .25rem 0 1rem;
@@ -58,17 +68,6 @@
     text-decoration: none;
   }
 
-  .icon-close {
-    @include close;
-
-    opacity: 0;
-    position: fixed;
-    right: $sidebar-width * -1;
-    top: 7.625rem;
-    transition: right $effect-duration ease;
-    z-index: 10000;
-  }
-
   .note {
     border-top: 1px solid $border-color-lighter;
     margin: 2.75rem 0 0;
@@ -90,11 +89,10 @@ body.sidebar {
     border-left: 1px solid $border-color-lighter;
     margin-right: 0;
 
-    .icon-close {
+    a.icon-close {
       opacity: 1;
       right: .5rem;
-      transition: background $effect-off-duration-shorter ease-in,
-        opacity $effect-duration ease;
+      transition: background .5s ease-out, opacity .5s ease-out;
     }
   }
 
