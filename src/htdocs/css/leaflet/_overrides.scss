@@ -51,49 +51,16 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     }
   }
 
-  .leaflet-control-edit,
   .leaflet-control-layers,
+  .leaflet-control-region,
   .leaflet-control-zoom {
     border: 1px solid $accent-color;
     border-radius: $button-border-radius;
-    box-shadow: none;
   }
-  .leaflet-control-edit a,
   .leaflet-control-layers,
+  .leaflet-control-region a,
   .leaflet-control-zoom a {
     background: $bg-color-alpha;
-  }
-  .leaflet-control-edit a,
-  .leaflet-control-zoom a {
-    transition: all $effect-off-duration-shorter ease-in;
-
-    &:hover {
-      background: $accent-color-lightest;
-      transition: all $effect-on-duration ease-out;
-    }
-    &:active, &.selected {
-      background: $accent-color;
-      border-radius: 0 !important; // clean up rendering issue
-      transition: all $effect-on-duration ease-out;
-    }
-  }
-  .leaflet-control-zoom a {
-    border-radius: 0;
-    color: $accent-color;
-
-    &:active {
-      color: $bg-color;
-    }
-
-    &:first-child {
-      border-bottom-color: $separator-color;
-      border-top-left-radius: $button-border-radius - 1;
-      border-top-right-radius: $button-border-radius - 1;
-    }
-    &:last-child {
-      border-bottom-left-radius: $button-border-radius - 1;
-      border-bottom-right-radius: $button-border-radius - 1;
-    }
   }
   .leaflet-control-layers {
     label {
@@ -107,6 +74,32 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
         align-items: center;
         display: flex;
       }
+    }
+  }
+  .leaflet-control-region a,
+  .leaflet-control-zoom a {
+    border-radius: 0;
+    color: $accent-color;
+    transition: all $effect-off-duration-shorter ease-in;
+
+    &:hover {
+      background: $accent-color-lightest;
+      transition: all $effect-on-duration ease-out;
+    }
+    &:active, &.selected {
+      background: $accent-color;
+      color: $bg-color;
+      transition: all $effect-on-duration ease-out;
+    }
+
+    &:first-child {
+      border-bottom-color: $separator-color;
+      border-top-left-radius: $button-border-radius - 1;
+      border-top-right-radius: $button-border-radius - 1;
+    }
+    &:last-child {
+      border-bottom-left-radius: $button-border-radius - 1;
+      border-bottom-right-radius: $button-border-radius - 1;
     }
   }
 
