@@ -22,7 +22,8 @@ L.Control.Rectangle = L.Control.extend({
 
     this._instructions = document.querySelector('#searchBar .instructions');
     this._region = options.region;
-    this._title = 'Create a new custom region'; // default
+    this._addButtonTitle = 'Create a new custom region'; // default
+    this._removeButtonTitle = 'Remove the custom region'; // default
   },
 
   /**
@@ -33,22 +34,32 @@ L.Control.Rectangle = L.Control.extend({
    * @return container {Element}
    */
   onAdd: function (map) {
-    var divClasses = [
+    var className = 'leaflet-control-region',
+        divClasses = [
+          className,
           'leaflet-bar',
-          'leaflet-control',
-          'leaflet-control-edit'
+          'leaflet-control'
         ],
         container = L.DomUtil.create('div', divClasses.join(' '));
 
-    this._button = L.DomUtil.create('a', '', container);
-    this._button.href = '#';
-    this._button.innerHTML = '<div class="box"></div>';
-    this._button.title = this._title;
+    this._addButton = this._createButton({
+      className: `${className}-add`,
+      container: container,
+      fn: this._addRegion,
+      html: '<div class="box"></div>',
+      title: this._addButtonTitle
+    });
+
+    this._removeButton = this._createButton({
+      className: `${className}-remove`,
+      container: container,
+      fn: this._removeRegion,
+      html: '<span class="icon-close">×</span>',
+      title: this._removeButtonTitle
+    });
 
     map.on('editable:dragend editable:vertex:mousedown', this._setButton, this);
     map.on('editable:drawing:commit', this._onCommit, this);
-
-    L.DomEvent.on(this._button, 'click', this._onClick, this);
 
     return container;
   },
@@ -61,41 +72,61 @@ L.Control.Rectangle = L.Control.extend({
   onRemove: function (map) {
     map.off('editable:dragend editable:vertex:mousedown', this._setButton, this);
     map.off('editable:drawing:commit', this._onCommit, this);
-
-    L.DomEvent.off(this._button, 'click', this._onClick, this);
   },
 
   /**
-   * Click handler for the new custom region button.
-   *
-   * @param e {Event}
+   * Click handler for the add new custom region button.
    */
-  _onClick: function (e) {
-    var selected;
+  _addRegion: function () {
+    var selected,
+        map = this._map;
 
-    e.preventDefault(); // prevent Leaflet from changing location.hash to '#'
-
-    this._button.classList.toggle('selected');
+    this._addButton.classList.toggle('selected');
     this._instructions.classList.toggle('hide');
+    this._removeButton.classList.remove('selected');
 
-    selected = this._button.classList.contains('selected');
+    selected = this._addButton.classList.contains('selected');
 
     if (selected) {
-      this._button.title = 'Cancel and restore previous region';
-      this._newRegion = this._map.editTools.startRectangle();
+      this._addButton.title = 'Cancel and restore previous region';
+      this._newRegion = map.editTools.startRectangle();
 
-      this._map.removeLayer(this._region);
+      map.removeLayer(this._region);
+      this._removeButton.classList.add('leaflet-disabled');
     } else {
-      this._button.title = this._title;
+      this._addButton.title = this._addButtonTitle;
 
-      // Recreate cached region Rectangle b/c it loses its dragging ability
-      this._region = L.rectangle(this._region.getBounds());
-
-      this._map.editTools.stopDrawing();
-      this._map.removeLayer(this._newRegion);
-      this._map.addLayer(this._region);
-      this._region.enableEdit();
+      map.editTools.stopDrawing();
+      map.removeLayer(this._newRegion);
+      this._recreateRegion();
+      this._removeButton.classList.remove('leaflet-disabled');
     }
+  },
+
+  /**
+   * Create a control button and add its listeners.
+   *
+   * @param opts {Object}
+   *
+   * @return button {Element}
+   */
+  _createButton: function (opts) {
+    var button = L.DomUtil.create('a', opts.className, opts.container);
+
+    button.href = '#';
+    button.innerHTML = opts.html;
+    button.title = opts.title;
+
+    // Force screen readers to read this as e.g. "Zoom in - button"
+    button.setAttribute('role', 'button');
+    button.setAttribute('aria-label', opts.title);
+
+    L.DomEvent.disableClickPropagation(button);
+    L.DomEvent.on(button, 'click', L.DomEvent.stop);
+    L.DomEvent.on(button, 'click', opts.fn, this);
+    L.DomEvent.on(button, 'click', this._refocusOnMap, this);
+
+    return button;
   },
 
   /**
@@ -106,14 +137,52 @@ L.Control.Rectangle = L.Control.extend({
   _onCommit: function (e) {
     var classList = e.originalEvent.target.classList;
 
-    // Ignore clicks on active control which triggers its own 'commit' event
+    // Ignore clicks on active control which triggers its own 'commit' Event
     if (!classList.contains('box') && !classList.contains('selected')) {
-      this._button.title = this._title;
+      this._addButton.title = this._addButtonTitle;
       this._region = this._newRegion;
 
-      this._button.classList.remove('selected');
+      this._addButton.classList.remove('selected');
       this._instructions.classList.add('hide');
       this.options.app.SearchBar.setButton();
+    }
+
+    this._removeButton.classList.remove('leaflet-disabled');
+  },
+
+  /**
+   * Recreate the region Rectangle (and add it back to the map) b/c it loses its
+   * draggability when it is removed from the map.
+   */
+  _recreateRegion: function () {
+    this._region = L.rectangle(this._region.getBounds());
+
+    this._map.addLayer(this._region);
+    this._region.enableEdit();
+  },
+
+  /**
+   * Click handler for the remove custom region button.
+   */
+  _removeRegion: function () {
+    var selected;
+
+    if (this._removeButton.classList.contains('leaflet-disabled')) {
+      return;
+    }
+
+    this._removeButton.classList.toggle('selected');
+
+    selected = this._removeButton.classList.contains('selected');
+
+    if (selected) {
+      this._removeButton.title = 'Restore the custom region';
+
+      this._map.removeLayer(this._region);
+    } else {
+      this._removeButton.title = this._removeButtonTitle;
+
+      this._recreateRegion();
     }
   },
 
