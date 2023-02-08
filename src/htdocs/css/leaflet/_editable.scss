@@ -1,6 +1,6 @@
 @use '../util/variables' as *;
 
-.leaflet-control-edit {
+.leaflet-control-region {
   a {
     align-items: center;
     display: flex;
@@ -20,5 +20,9 @@
     border: 2px solid $accent-color;
     height: 14px;
     width: 14px;
+  }
+
+  .icon-close {
+    font: normal 22px Tahoma, Verdana, sans-serif;
   }
 }
