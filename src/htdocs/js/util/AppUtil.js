@@ -104,7 +104,7 @@ AppUtil.extent = function (values) {
  *     fetch() settings, with an additional prop for timeout in milliseconds
  */
 AppUtil.fetchWithTimeout = async function (resource, options = {}) {
-  const { timeout = 10000 } = options;
+  const { timeout = 30000 } = options;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
