@@ -46,10 +46,10 @@ var StatusBar = function (options) {
    * @param div {Element}
    * @param id {String}
    *     Feature id
-   * @param mode {String}
+   * @param mode {String} optional; default is ''
    *     display mode
    */
-  _addListeners = function (div, id, mode) {
+  _addListeners = function (div, id, mode = '') {
     var close = div.querySelector('.close'),
         reload = div.querySelector('.reload');
 
@@ -148,8 +148,10 @@ var StatusBar = function (options) {
    *     {
    *       id: {String} Feature id
    *       message: {String}
-   *       mode: {String} display mode
-   *       status: {Mixed <Number|String>} status code or 'invalid'
+   *       mode: {String} optional (req'd for reload button)
+   *           display mode
+   *       status: {Mixed <Number|String>} optional (req'd for reload button)
+   *           status code or 'invalid'
    *     }
    */
   _this.addError = function (error) {
