@@ -85,6 +85,7 @@ L.Control.Rectangle = L.Control.extend({
     this._instructions.classList.toggle('hide');
     this._removeButton.classList.remove('selected');
 
+    this._removeButton.title = this._removeButtonTitle;
     selected = this._addButton.classList.contains('selected');
 
     if (selected) {
