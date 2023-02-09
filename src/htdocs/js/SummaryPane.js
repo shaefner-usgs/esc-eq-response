@@ -208,7 +208,7 @@ var SummaryPane = function (options) {
     var el = _el.querySelector('.' + feature.id),
         isNested = Boolean(_el.closest('.feature'));
 
-    if (el) {
+    if (el && !el.closest('.details')) { // don't remove item in details strip
       if (isNested) {
         el.innerHTML = ''; // nested sub-Feature
       } else {
