@@ -811,7 +811,6 @@ var Features = function (options) {
     _initFeatures();
 
     _lightboxes = {};
-    _queue = [];
   };
 
   /**
@@ -844,7 +843,10 @@ var Features = function (options) {
         );
 
     e.preventDefault();
-    _lightboxes[id].show();
+
+    if (_lightboxes[id]) {
+      _lightboxes[id].show();
+    }
   };
 
 
