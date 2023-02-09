@@ -113,7 +113,7 @@ var SideBar = function (options) {
    */
   _this.toggle = function (state) {
     var selected = document.querySelector('#navSub .selected'),
-        id = selected.className.match(/icon-(\w+)/)[1],
+        id = selected.className.match(/icon-(\w+)/)[1] + 'Bar',
         el = document.getElementById(id),
         toggled = true; // default; whether or not SideBar visibility changed
 

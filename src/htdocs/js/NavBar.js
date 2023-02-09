@@ -56,7 +56,7 @@ var NavBar = function (options) {
     lis.forEach(li => {
       li.addEventListener('click', () => {
         var button = li.querySelector('i'),
-            id = button.className.match(/icon-(\w+)/)[1];
+            id = button.className.match(/icon-(\w+)/)[1] + 'Bar';
 
         _this.switchSideBar(id);
       });
@@ -86,7 +86,7 @@ var NavBar = function (options) {
    *     SideBar id
    */
   _showSideBar = function (id) {
-    var button = _el.querySelector('.icon-' + id),
+    var button = _el.querySelector('.icon-' + id.replace('Bar', '')),
         sideBar = document.getElementById(id);
 
     button.classList.add('selected');
@@ -128,7 +128,7 @@ var NavBar = function (options) {
       if (el.classList.contains('pane')) {
         button = _el.querySelector('[href="#' + id + '"]');
       } else { // sidebars
-        button = _el.querySelector('.icon-' + id);
+        button = _el.querySelector('.icon-' + id.replace('Bar', ''));
       }
 
       button.classList.remove('selected');
