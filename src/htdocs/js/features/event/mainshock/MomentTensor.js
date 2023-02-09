@@ -40,7 +40,7 @@ var MomentTensor = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
-    var mt, mainshock;
+    var mainshock, product;
 
     _app = options.app;
 
@@ -55,11 +55,11 @@ var MomentTensor = function (options) {
     _this.zoomToLayer = false;
 
     mainshock = _app.Features.getFeature('mainshock');
-    mt = mainshock.data.products[_this.id];
+    product = mainshock.data.products[_this.id];
 
-    if (mt) {
+    if (product) {
       _beachballs = BeachBalls({
-        data: _getData(mt),
+        data: _getData(product),
         id: _this.id,
         mainshock: mainshock,
         name: _this.name
