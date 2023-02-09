@@ -129,7 +129,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     if (type === 'timeout') {
       message += `<li>Request timed out (can’t connect to ${host})</li>`;
     } else if (type === 'network') {
-      message += '<li>Failed to load (maybe blocked by CORS policy)</li>';
+      message += `<li>${error.message}</li>`;
     } else if (type === 'notfound') {
       message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else {
