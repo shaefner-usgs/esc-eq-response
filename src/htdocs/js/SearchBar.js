@@ -75,7 +75,6 @@ var SearchBar = function (options) {
       _addButton,
       _addControl,
       _addListeners,
-      _cancelRegion,
       _initMap,
       _initPickers,
       _isValid,
@@ -87,6 +86,7 @@ var SearchBar = function (options) {
       _setControls,
       _setMinutes,
       _setNow,
+      _setOption,
       _setParams,
       _setRegion,
       _setUtcDay,
@@ -176,7 +176,7 @@ var SearchBar = function (options) {
 
     // Keep search button status in sync and set custom region options
     opts.forEach(button => button.addEventListener('click', _this.setButton));
-    regionOpts.forEach(button => button.addEventListener('click', _setRegion));
+    regionOpts.forEach(button => button.addEventListener('click', _setOption));
 
     slider.addEventListener('input', _this.setButton);
 
@@ -192,17 +192,6 @@ var SearchBar = function (options) {
 
       _searchCatalog();
     });
-  };
-
-  /**
-   * Cancel the new custom region Leaflet control if it's active.
-   */
-  _cancelRegion = function () {
-    var control = _el.querySelector('.leaflet-control-region a');
-
-    if (control.classList.contains('selected')) {
-      control.click(); // exit new custom region mode
-    }
   };
 
   /**
@@ -487,6 +476,17 @@ var SearchBar = function (options) {
   };
 
   /**
+   * Event handler that sets the options for the selected region.
+   */
+  _setOption = function () {
+    if (this.id === 'customRegion') {
+      _this.render();
+    } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
+      _setRegion();
+    }
+  };
+
+  /**
    * Set the URL parameters to match the UI controls. Don't set a parameter if
    * its control is set to its default value; delete unneeded time parameters.
    */
@@ -510,14 +510,16 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler that sets a selected region's custom options.
+   * Set the custom region to its cached value if its Leaflet control is active.
    */
   _setRegion = function () {
-    if (this.id === 'customRegion') {
-      _this.render();
-    } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
-      _cancelRegion();
-    }
+    var controls = _el.querySelectorAll('.leaflet-control-region a');
+
+    controls.forEach(control => {
+      if (control.classList.contains('selected')) {
+        control.click(); // exit custom region edit mode
+      }
+    });
   };
 
   /**
@@ -648,7 +650,7 @@ var SearchBar = function (options) {
     if (params.region === 'ca-nv') {
       Object.assign(params, _CANV);
     } else if (params.region === 'customRegion') {
-      _cancelRegion(); // can't get params while active
+      _setRegion(); // ensure custom region control is not active
 
       _map.eachLayer(layer => {
         if (layer.getBounds) { // only the region layer has bounds
@@ -674,7 +676,7 @@ var SearchBar = function (options) {
     _periodBar.setOption.call(_period);
     _regionBar.setOption.call(_region);
 
-    _setRegion.call(_region);
+    _setOption.call(_region);
   };
 
   /**
