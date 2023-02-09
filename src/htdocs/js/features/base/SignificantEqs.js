@@ -198,13 +198,18 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Update the list. Select the Mainshock with the given id if it is in the
+   * Update the list: select the Mainshock with the given id if it is in the
    * list and unselect all other earthquakes.
+   *
+   * Note: if the feed hasn't been fetched yet, the Mainshock will gets selected
+   * when the list is initially created.
    *
    * @param selected {String} default is ''
    *     Mainshock id
    */
   _this.update = function (selected = '') {
+    if (!_lis) return; // feed hasn't been fetched yet
+
     _lis.forEach(li => {
       if (li.id === selected) {
         li.classList.add('selected');

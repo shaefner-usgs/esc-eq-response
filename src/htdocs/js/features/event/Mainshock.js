@@ -665,7 +665,9 @@ var Mainshock = function (options) {
     _app.SettingsBar.setValues();
     _app.TitleBar.setTitle(_this);
 
-    significantEqs.update(json.id); // selects Mainshock if in list
+    if (_app.Features.isFeature(significantEqs)) {
+      significantEqs.update(json.id); // selects Mainshock if in list
+    }
   };
 
   /**

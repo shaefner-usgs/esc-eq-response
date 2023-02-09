@@ -401,28 +401,23 @@ var Features = function (options) {
 
   /**
    * Determine if a Feature with the given display mode is ready to be fetched.
-   * SignificantEqs must be fetched before the Mainshock and all 'event',
-   * 'comcat', and 'dd' mode Features are dependent on their respective
-   * Mainshocks being fetched first.
+   * All 'event', 'comcat', and 'dd' mode Features are dependent on the
+   * Mainshock being fetched first.
    *
    * @param mode {String <base|comcat|dd|event|rtf>}
    *
    * @return {Boolean}
    */
   _isReady = function (mode) {
-    var mainshock = _this.getFeature('mainshock'),
-        significantEqs = _this.getFeature('significant-eqs');
+    var mainshock = _this.getFeature('mainshock');
 
     if (
       mode === 'base' || // no dependencies
       mode === 'comcat' && mainshock.status === 'ready' ||
       mode === 'dd' && mainshock.status === 'ready' ||
       mode === 'event' && (
-        ( // first create the Mainshock (once SignificantEqs is ready)...
-          significantEqs.status ===  'ready' &&
-          !_this.isFeature(mainshock)
-        ) ||
-        mainshock.status === 'ready' // then create the other Mainshock Features
+        !_this.isFeature(mainshock) || // first create the Mainshock...
+        mainshock.status === 'ready' // then create the other 'event' Features
       ) ||
       mode === 'rtf' // other Features will always be ready
     ) {
