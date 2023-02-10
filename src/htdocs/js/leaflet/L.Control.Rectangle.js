@@ -20,9 +20,9 @@ L.Control.Rectangle = L.Control.extend({
   initialize: function (options) {
     L.setOptions(this, options);
 
+    this._addButtonTitle = 'Create a new custom region'; // default
     this._instructions = document.querySelector('#searchBar .instructions');
     this._region = options.region;
-    this._addButtonTitle = 'Create a new custom region'; // default
     this._removeButtonTitle = 'Remove the custom region'; // default
   },
 
@@ -166,11 +166,10 @@ L.Control.Rectangle = L.Control.extend({
    * Click handler for the remove custom region button.
    */
   _removeRegion: function () {
-    var selected;
+    var selected,
+        disabled = this._removeButton.classList.contains('leaflet-disabled');
 
-    if (this._removeButton.classList.contains('leaflet-disabled')) {
-      return;
-    }
+    if (disabled) return;
 
     this._removeButton.classList.toggle('selected');
 
