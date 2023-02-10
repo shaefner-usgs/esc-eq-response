@@ -5,7 +5,7 @@
 var AppUtil = require('util/AppUtil');
 
 
-var _OPTS = { // default SVG options
+var _DEFAULTS = {
   color: '#000',
   fillColor: '#fff',
   fillOpacity: 0.85,
@@ -77,7 +77,7 @@ var Svg = function () {
           'fill="{fillColor}" fill-opacity="{fillOpacity}" stroke="{color}" ' +
           'stroke-opacity="{opacity}" stroke-width="1" />';
 
-    opts = Object.assign({}, _OPTS, opts);
+    opts = Object.assign({}, _DEFAULTS, opts);
     size = Math.ceil(opts.radius * 2 + 2);
 
     Object.assign(opts, {
@@ -128,7 +128,7 @@ var Svg = function () {
           'stroke-opacity="{opacity}" stroke-width="2" stroke-linecap="round" ' +
           'd="M1.5,1.5c2.6,0.4,5.9,1.3,8,4c1.4,1.8,1.5,3.4,2,5c0.9,3,3.1,6.9,9,11" />';
 
-    opts = Object.assign({}, _OPTS, opts);
+    opts = Object.assign({}, _DEFAULTS, opts);
 
     _setProps(svg, template, opts);
 
@@ -148,7 +148,7 @@ var Svg = function () {
           'fill-opacity="{fillOpacity}" stroke="{color}" ' +
           'stroke-opacity="{opacity}" stroke-width="1" />';
 
-    opts = Object.assign({}, _OPTS, opts);
+    opts = Object.assign({}, _DEFAULTS, opts);
 
     _setProps(svg, template, opts);
 

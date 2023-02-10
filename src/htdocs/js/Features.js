@@ -26,16 +26,8 @@ var Aftershocks = require('features/event/Aftershocks'),
     SignificantEqs = require('features/base/SignificantEqs');
 
 
-var _DEFAULTS,
-    _MODULES;
-
-/**
- * Default settings for new Features.
- */
-_DEFAULTS = {
-  showLayer: true,
-  zoomToLayer: true
-};
+var _MODULES,
+    _SETTINGS;
 
 /**
  * Feature modules, organized by display mode.
@@ -74,6 +66,14 @@ _MODULES = {
     HistoricalEvents,
     NearbyCities
   ]
+};
+
+/**
+ * Default settings for new Features.
+ */
+_SETTINGS = {
+  showLayer: true,
+  zoomToLayer: true
 };
 
 
@@ -256,7 +256,7 @@ var Features = function (options) {
         status = 'initialized'; // default
 
     if (_isReady(mode)) { // create Feature when dependencies are ready
-      options = Object.assign({}, _DEFAULTS, options, {
+      options = Object.assign({}, _SETTINGS, options, {
         app: _app
       });
       feature = module(options);
@@ -493,6 +493,10 @@ var Features = function (options) {
     if (feature.content) { // SideBar content
       el = document.getElementById(feature.id);
       el.innerHTML = feature.content;
+
+      if (feature.id === 'mainshock') {
+        el.classList.remove('hide');
+      }
     }
     if (feature.lightbox) {
       _addLightbox(feature);
@@ -502,10 +506,6 @@ var Features = function (options) {
     }
     if (feature.addListeners) {
       feature.addListeners();
-    }
-
-    if (feature.id === 'mainshock') {
-      el.classList.remove('hide');
     }
 
     if (feature.mode === 'rtf') {
