@@ -759,7 +759,9 @@ var Features = function (options) {
     if (id === 'mainshock') {
       _this.createFeatures(mode);
     } else {
-      _createFeature(mode, _modules[id]);
+      _createFeature(mode, _modules[id], {
+        deferFetch: false // always reload immediately
+      });
     }
   };
 

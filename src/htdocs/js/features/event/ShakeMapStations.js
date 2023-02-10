@@ -6,19 +6,20 @@ var AppUtil = require('util/AppUtil');
 
 
 var _DEFAULTS,
-    _FLAG_DESCRIPTIONS;
+    _FLAGS;
 
-_FLAG_DESCRIPTIONS = {
+_DEFAULTS = {
+  deferFetch: true,
+  iconAnchor: [7, 5],
+  iconSize: [14, 10],
+  popupAnchor: [0, -5],
+};
+_FLAGS = {
   G: 'Glitch (clipped or below noise)',
   I: 'Incomplete time series',
   M: 'Manually flagged',
   N: 'Not in list of known stations',
   T: 'Outlier'
-};
-_DEFAULTS = {
-  iconAnchor: [7, 5],
-  iconSize: [14, 10],
-  popupAnchor: [0, -5]
 };
 
 
@@ -28,6 +29,8 @@ _DEFAULTS = {
  * @param options {Object}
  *     {
  *       app: {Object} Application
+ *       deferFetch: {Boolean} set to false on reload after failed request
+ *       showLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
@@ -74,12 +77,16 @@ var ShakeMapStations = function (options) {
       popupAnchor: options.popupAnchor
     };
 
+    if (options.deferFetch) {
+      options.showLayer = false;
+    }
+
     _this.count = 0;
-    _this.deferFetch = true;
+    _this.deferFetch = options.deferFetch;
     _this.id = 'shakemap-stations';
     _this.mapLayer = null; // default
     _this.name = 'ShakeMap Stations';
-    _this.showLayer = false;
+    _this.showLayer = options.showLayer;
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
@@ -145,8 +152,8 @@ var ShakeMapStations = function (options) {
         html = '<span class="station-flag">' + value;
 
         // display flag with title text
-        if (_FLAG_DESCRIPTIONS[flag]) {
-          html += ` <abbr title="${_FLAG_DESCRIPTIONS[flag]}">(${flag})</abbr>`;
+        if (_FLAGS[flag]) {
+          html += ` <abbr title="${_FLAGS[flag]}">(${flag})</abbr>`;
         } else {
           html += ` (${flag})`;
         }
