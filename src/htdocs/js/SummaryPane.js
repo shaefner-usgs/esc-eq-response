@@ -205,12 +205,14 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
-    var el = _el.querySelector('.' + feature.id),
-        isNested = Boolean(_el.closest('.feature'));
+    var isNested,
+        el = _el.querySelector('.' + feature.id);
 
-    if (el && !el.closest('.details')) { // don't remove item in details strip
+    if (el && !el.closest('.details.bubble')) { // leave item in details strip
+      isNested = Boolean(el.closest('.feature'));
+
       if (isNested) {
-        el.innerHTML = ''; // nested sub-Feature
+        el.innerHTML = ''; // leave placeholder intact
       } else {
         _cacheFeatures(feature);
         el.parentNode.removeChild(el);
