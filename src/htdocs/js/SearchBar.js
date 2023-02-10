@@ -241,6 +241,8 @@ var SearchBar = function (options) {
       onYearChange: function() {
         _setUtcDay(this.days);
       },
+      nextArrow: '<i class="icon-next"></i>',
+      prevArrow: '<i class="icon-prev"></i>',
       static: true,
       time_24hr: true
     };
