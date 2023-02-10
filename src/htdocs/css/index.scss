@@ -16,6 +16,7 @@
 @use 'legendBar';
 @use 'mapPane';
 @use 'navBar';
+@use 'plotly';
 @use 'plotsPane';
 @use 'searchBar';
 @use 'selectBar';
@@ -297,11 +298,4 @@ ul {
   }
 }
 
-@keyframes opacify {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
+@include opacify;
