@@ -209,7 +209,7 @@ var SummaryPane = function (options) {
         el = _el.querySelector('.' + feature.id);
 
     if (el && !el.closest('.details.bubble')) { // leave item in details strip
-      isNested = Boolean(el.closest('.feature'));
+      isNested = Boolean(el.parentNode.closest('.feature'));
 
       if (isNested) {
         el.innerHTML = ''; // leave placeholder intact
