@@ -1,5 +1,6 @@
 @use 'sass:color';
 
+@use 'mixins' as *;
 @use 'variables' as *;
 
 /* Flatpickr overrides and 'Now' button additions */
@@ -84,6 +85,7 @@
 
     &.selected,
     &.selected:hover {
+      animation: opacify $effect-on-duration ease-out;
       background: $accent-color !important;
       border-color: $accent-color !important;
       color: $bg-color !important;
@@ -114,40 +116,19 @@
 
     .flatpickr-prev-month,
     .flatpickr-next-month {
-      background: $bg-color;
-      border-radius: 50%;
-      height: 24px;
-      line-height: 19px;
-      padding: 5px;
-      top: 6px;
-      transition: all $effect-off-duration ease-in;
+      color: $accent-color;
+      line-height: 1;
+      top: 0;
 
-      &:hover {
-        background: $accent-color-lightest;
-        transition: all $effect-on-duration ease-out;
-      }
-
-      &:active {
-        background: $accent-color;
-        transition: all $effect-on-duration ease-out;
-
-        svg {
-          stroke: #fff;
-          transition: stroke $effect-on-duration ease-out;
-        }
-      }
-
-      svg {
-        stroke: $accent-color;
-        stroke-width: 1px;
-        transition: none;
+      i {
+        font-size: 1rem;
       }
     }
     .flatpickr-prev-month {
-      left: 5px;
+      left: 2px;
     }
     .flatpickr-next-month {
-      right: 5px;
+      right: 2px;
     }
   }
 
@@ -243,6 +224,12 @@
       &.arrowUp:after {
         transition: all $effect-off-duration ease-in;
       }
+      &.arrowDown:after {
+          border-top-color: $accent-color;
+      }
+      &.arrowUp:after {
+          border-bottom-color: $accent-color;
+      }
 
       &:hover {
         background: $accent-color-lighter;
@@ -273,3 +260,5 @@
     }
   }
 }
+
+@include opacify;
