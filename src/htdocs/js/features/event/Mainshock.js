@@ -381,7 +381,7 @@ var Mainshock = function (options) {
         '<li class="shake-alert feature">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
           '<a href="{url}/shake-alert" target="new">' +
-            '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
+            '<i class="icon-warning"></i>' +
           '</a>' +
           '<small>{shakeAlertStatus}</small>' +
         '</li>';
