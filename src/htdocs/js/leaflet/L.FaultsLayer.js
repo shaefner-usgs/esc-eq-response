@@ -11,7 +11,7 @@ require('leaflet-mouseover-layer');
  * @return layer {L.LayerGroup}
  */
 L.FaultsLayer = function () {
-  var urlPrefix = 'https://bayquakealliance.org/faults/tiles/',
+  var urlPrefix = 'https://escweb.wr.usgs.gov/faults/tiles/',
       faults = L.mouseOverLayer({
         dataUrl: urlPrefix + 'faults/{z}/{x}/{y}.grid.json?callback={cb}',
         tileOpts: {
