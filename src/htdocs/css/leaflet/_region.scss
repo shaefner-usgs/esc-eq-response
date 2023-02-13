@@ -17,12 +17,26 @@
   }
 
   .box {
+    align-items: center;
     border: 2px solid $accent-color;
-    height: 14px;
-    width: 14px;
+    display: flex;
+    height: 15px;
+    justify-content: center;
+    position: relative;
+    width: 15px;
   }
 
   .icon-close {
-    font: normal 22px Tahoma, Verdana, sans-serif;
+    font: normal 11px Tahoma, Verdana, sans-serif;
+    line-height: 1.25;
+    position: absolute;
+    top: -2px;
+  }
+
+  // Disable the surrounding box as well as its 'x' button
+  .leaflet-disabled .box,
+  .leaflet-disabled:active .box,
+  .leaflet-disabled .box:active {
+    border-color: $accent-color-disabled;
   }
 }

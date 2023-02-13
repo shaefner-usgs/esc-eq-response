@@ -54,7 +54,7 @@ L.Control.Rectangle = L.Control.extend({
       className: `${className}-remove`,
       container: container,
       fn: this._removeRegion,
-      html: '<span class="icon-close">×</span>',
+      html: '<div class="box"><span class="icon-close">×</span></div>',
       title: this._removeButtonTitle
     });
 
