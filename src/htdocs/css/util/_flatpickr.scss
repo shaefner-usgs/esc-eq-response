@@ -214,6 +214,26 @@
         border: none;
         box-shadow: none;
       }
+
+      &[disabled] {
+        ~ span {
+          cursor: auto;
+
+          &:hover,
+          &:active {
+            background: $accent-color-lightest;
+          }
+        }
+
+        ~ .arrowDown:after,
+        ~ .arrowDown:active:after {
+          border-top-color: #bbb;
+        }
+        ~ .arrowUp:after,
+        ~ .arrowUp:active:after {
+          border-bottom-color: #bbb;
+        }
+      }
     }
 
     span { // up, down arrows
@@ -225,10 +245,10 @@
         transition: all $effect-off-duration ease-in;
       }
       &.arrowDown:after {
-          border-top-color: $accent-color;
+        border-top-color: $accent-color;
       }
       &.arrowUp:after {
-          border-bottom-color: $accent-color;
+        border-bottom-color: $accent-color;
       }
 
       &:hover {
