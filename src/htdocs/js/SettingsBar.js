@@ -37,6 +37,7 @@ var _SETTINGS = { // defaults
  *       resetCatalog: {Function}
  *       setFocusedField: {Function}
  *       setInterval: {Function}
+ *       setStatus: {Function}
  *       setValues: {Function}
  *       updateTimeStamp: {Function}
  *     }
@@ -52,6 +53,7 @@ var SettingsBar = function (options) {
       _throttlers,
       _timers,
       _timezoneBar,
+      _title,
 
       _addFeatures,
       _addListeners,
@@ -59,6 +61,7 @@ var SettingsBar = function (options) {
       _getDefaults,
       _getFeatureId,
       _getInterval,
+      _getTitle,
       _hasChanged,
       _initButtons,
       _initSwitches,
@@ -66,7 +69,6 @@ var SettingsBar = function (options) {
       _setField,
       _setParam,
       _setRefresh,
-      _setStatus,
       _setTimeout,
       _setTimeZone,
       _swapTimer,
@@ -104,7 +106,6 @@ var SettingsBar = function (options) {
     _addListeners();
     _addOffset();
     _initSwitches();
-    _setStatus('disabled');
   };
 
   /**
@@ -232,6 +233,31 @@ var SettingsBar = function (options) {
     var value = AppUtil.getParam(name);
 
     return parseInt(value.replace(/\D/g, '')) * 60 * 1000; // strip 'm'
+  };
+
+  /**
+   * Get the title attribute for the given Feature's inputs.
+   *
+   * @param feature {Object}
+   *
+   * @return title {String}
+   *     hint to user explaining why Feature's settings are disabled
+   */
+  _getTitle = function (feature) {
+    var input, title;
+
+    if (!_title) {
+      input = _el.querySelector('input[type=number]'); // first input w/ title
+      _title = input.title; // cache initial value
+    }
+
+    if (document.body.classList.contains('mainshock')) {
+      title = `Disabled because ${feature.name} failed to load`;
+    } else {
+      title = _title;
+    }
+
+    return title;
   };
 
   /**
@@ -419,33 +445,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the status of the <input> fields and required notice.
-   *
-   * @param status {String <enabled|disabled>}
-   */
-  _setStatus = function (status) {
-    var inputs = _el.querySelectorAll('input[type=number]'),
-        required = _el.querySelector('.required'),
-        title = 'Disabled because no mainshock is selected';
-
-    inputs.forEach(input => {
-      if (status === 'enabled') {
-        input.removeAttribute('disabled');
-        input.removeAttribute('title');
-      } else {
-        input.setAttribute('disabled', 'disabled');
-        input.setAttribute('title', title);
-      }
-    });
-
-    if (status === 'enabled') {
-      required.classList.remove('hide');
-    } else {
-      required.classList.add('hide');
-    }
-  };
-
-  /**
    * Set a one-off (non-recurring) refresh timer for the Feature matching the
    * given name. Then start an auto-refresh interval timer when the timeout
    * finishes.
@@ -561,14 +560,17 @@ var SettingsBar = function (options) {
   _this.reset = function () {
     var inputs = _el.querySelectorAll('input[type=number]');
 
-    inputs.forEach(input =>
-      input.value = ''
-    );
+    inputs.forEach(input => {
+      input.value = '';
+
+      if (_title) { // set back to initial value if title attr changed
+        input.title = _title;
+      }
+    });
     _focusedField = null;
 
     clearInterval(_timers.aftershocks);
     clearTimeout(_timers.oneOff);
-    _setStatus('disabled');
   };
 
   /**
@@ -606,6 +608,35 @@ var SettingsBar = function (options) {
   };
 
   /**
+   * Set the status of the given Feature's configuration options.
+   *
+   * @param feature {Object}
+   * @param status {String <disabled|enabled>} default is 'disabled'
+   */
+  _this.setStatus = function (feature, status = 'disabled') {
+    var inputs, title,
+        div = _el.querySelector('.' + feature.id);
+
+    if (div) { // Feature has config options
+      inputs = div.querySelectorAll('input[type=number]');
+      title = _getTitle(feature);
+
+      div.classList.remove('disabled', 'enabled');
+      div.classList.add(status);
+
+      inputs.forEach(input => {
+        if (status === 'disabled') {
+          input.setAttribute('disabled', 'disabled');
+          input.setAttribute('title', title);
+        } else {
+          input.removeAttribute('disabled');
+          input.removeAttribute('title');
+        }
+      });
+    }
+  };
+
+  /**
    * Set the input field values to the selected Mainshock's defaults. URL
    * parameter values (if present) override the defaults.
    */
@@ -624,8 +655,6 @@ var SettingsBar = function (options) {
         }
       }
     });
-
-    _setStatus('enabled');
   };
 
   /**

@@ -487,6 +487,7 @@ var Features = function (options) {
     _app.MapPane.addContent(feature);
     _app.PlotsPane.addContent(feature);
     _app.SummaryPane.addContent(feature);
+    _app.SettingsBar.setStatus(feature, 'enabled');
     _app.SettingsBar.updateTimeStamp(feature);
     _addCount(feature);
 
@@ -783,6 +784,7 @@ var Features = function (options) {
       _app.MapPane.removeFeature(feature);
       _app.PlotsPane.removeFeature(feature);
       _app.SummaryPane.removeFeature(feature);
+      _app.SettingsBar.setStatus(feature, 'disabled');
 
       // SelectBar
       if (id === 'mainshock') {

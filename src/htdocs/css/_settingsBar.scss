@@ -63,6 +63,23 @@
     }
   }
 
+  .disabled,
+  .enabled {
+    h3,
+    input,
+    label {
+      transition: color $effect-duration ease-in-out;
+    }
+  }
+  .disabled {
+    h3,
+    input,
+    label, label:active {
+      color: $text-color-disabled;
+      cursor: auto;
+    }
+  }
+
   .refresh {
     margin: .75rem 0;
   }
@@ -70,10 +87,6 @@
   .required {
     color: $invalid-color;
     margin-bottom: 0;
-
-    &.hide {
-      display: none;
-    }
   }
 
   .timezone {
@@ -82,19 +95,8 @@
 }
 
 body:not(.mainshock) {
-  #aftershocks ~ .details time {
+  #aftershocks ~ .details time,
+  #settingsBar .required {
     display: none
-  }
-
-  #settingsBar {
-    .aftershocks,
-    .foreshocks,
-    .historical {
-      h3,
-      label {
-        color: $text-color-disabled;
-        cursor: default;
-      }
-    }
   }
 }
