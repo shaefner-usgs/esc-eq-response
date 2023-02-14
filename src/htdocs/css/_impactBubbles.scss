@@ -57,14 +57,11 @@ a.impact-bubble:hover {
   &.mmiIX {
     background: $mmiIX-color;
   }
-  &.mmiX {
-    background: $mmiX-color;
-  }
-  &.mmiXI {
-    background: $mmiXI-color;
-  }
+  &.mmiX,
+  &.mmiX\+,
+  &.mmiXI,
   &.mmiXII {
-    background: $mmiXII-color;
+    background: $mmiX-color;
   }
 
   &.pager-alertlevel-green {

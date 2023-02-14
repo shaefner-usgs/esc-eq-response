@@ -294,14 +294,11 @@
     &.mmiIX {
       border-color: $mmiIX-color;
     }
-    &.mmiX {
-      border-color: $mmiX-color;
-    }
-    &.mmiXI {
-      border-color: $mmiXI-color;
-    }
+    &.mmiX,
+    &.mmiX\+,
+    &.mmiXI,
     &.mmiXII {
-      border-color: $mmiXII-color;
+      border-color: $mmiX-color;
     }
   }
 }

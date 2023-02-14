@@ -72,14 +72,11 @@
   .station-mmiIX:before {
     border-bottom-color: $mmiIX-color;
   }
-  .station-mmiX:before {
-    border-bottom-color: $mmiX-color;
-  }
-  .station-mmiXI:before {
-    border-bottom-color: $mmiXI-color;
-  }
+  .station-mmiX:before,
+  .station-mmiX\+:before,
+  .station-mmiXI:before,
   .station-mmiXII:before {
-    border-bottom-color: $mmiXII-color;
+    border-bottom-color: $mmiX-color;
   }
 
   .station-summary {
