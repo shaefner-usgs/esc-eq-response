@@ -88,6 +88,7 @@ var SettingsBar = function (options) {
     _timezoneBar = RadioBar({
       el: document.getElementById('timezone')
     });
+    _title = _el.querySelector('input[type=number]').title; // first input
 
     RadioBar({
       el: document.getElementById('as-refresh')
@@ -142,9 +143,15 @@ var SettingsBar = function (options) {
         timezone = _el.querySelectorAll('#timezone li');
 
     // Set the catalog, timezone and refresh options
-    catalog.forEach(button => button.addEventListener('click', _setCatalog));
-    refresh.forEach(target => target.addEventListener('click', _setRefresh));
-    timezone.forEach(button => button.addEventListener('click', _setTimeZone));
+    catalog.forEach(button =>
+      button.addEventListener('click', _setCatalog)
+    );
+    refresh.forEach(target =>
+      target.addEventListener('click', _setRefresh)
+    );
+    timezone.forEach(button =>
+      button.addEventListener('click', _setTimeZone)
+    );
 
     // Track changes to input fields
     inputs.forEach(input => {
@@ -244,17 +251,10 @@ var SettingsBar = function (options) {
    *     hint to user explaining why Feature's settings are disabled
    */
   _getTitle = function (feature) {
-    var input, title;
-
-    if (!_title) {
-      input = _el.querySelector('input[type=number]'); // first input w/ title
-      _title = input.title; // cache initial value
-    }
+    var title = _title; // default
 
     if (document.body.classList.contains('mainshock')) {
       title = `Disabled because ${feature.name} failed to load`;
-    } else {
-      title = _title;
     }
 
     return title;
@@ -614,12 +614,11 @@ var SettingsBar = function (options) {
    * @param status {String <disabled|enabled>} default is 'disabled'
    */
   _this.setStatus = function (feature, status = 'disabled') {
-    var inputs, title,
+    var inputs,
         div = _el.querySelector('.' + feature.id);
 
     if (div) { // Feature has config options
       inputs = div.querySelectorAll('input[type=number]');
-      title = _getTitle(feature);
 
       div.classList.remove('disabled', 'enabled');
       div.classList.add(status);
@@ -627,7 +626,7 @@ var SettingsBar = function (options) {
       inputs.forEach(input => {
         if (status === 'disabled') {
           input.setAttribute('disabled', 'disabled');
-          input.setAttribute('title', title);
+          input.setAttribute('title', _getTitle(feature));
         } else {
           input.removeAttribute('disabled');
           input.removeAttribute('title');
