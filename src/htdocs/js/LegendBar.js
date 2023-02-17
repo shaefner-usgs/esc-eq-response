@@ -45,8 +45,12 @@ var LegendBar = function (options) {
           color: '#c00',
           opacity: '0.5'
         }),
-        range = svg.createCircleRange(),
-        triangle = svg.createTriangle();
+        range = svg.createCircleRange({
+          fillOpacity: '0'
+        }),
+        triangle = svg.createTriangle({
+          fillOpacity: '0'
+        });
 
     Object.keys(colors).forEach(key => {
       var circle = svg.createCircle(colors[key]);
