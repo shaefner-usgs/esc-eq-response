@@ -66,11 +66,11 @@ var Svg = function () {
   /**
    * Create an <svg> circle.
    *
-   * @param opts {Object}
+   * @param opts {Object} optional; default is {}
    *
    * @return svg {Element}
    */
-  _this.createCircle = function (opts) {
+  _this.createCircle = function (opts = {}) {
     var size,
         svg = _createElement(),
         template = '<circle cx="{origin}" cy="{origin}" r="{radius}" ' +
@@ -94,18 +94,19 @@ var Svg = function () {
   /**
    * Create a range of <svg> circles as an ordered list.
    *
+   * @param opts {Object} optional; default is {}
+   *
    * @return ol {Element}
    */
-  _this.createCircleRange = function () {
+  _this.createCircleRange = function (opts = {}) {
     var circle, li,
         ol = document.createElement('ol');
 
     ol.classList.add('mags');
 
     for (var i = 0; i <= 7; i ++) {
-      circle = _this.createCircle({
-        radius: AppUtil.getRadius(i)
-      });
+      opts.radius = AppUtil.getRadius(i);
+      circle = _this.createCircle(opts);
       li = document.createElement('li');
 
       li.appendChild(circle);
@@ -118,11 +119,11 @@ var Svg = function () {
   /**
    * Create an <svg> line segment.
    *
-   * @param opts {Object}
+   * @param opts {Object} optional; default is {}
    *
    * @return svg {Element}
    */
-  _this.createLine = function (opts) {
+  _this.createLine = function (opts = {}) {
     var svg = _createElement(),
         template = '<path fill="#fff" stroke="{color}" ' +
           'stroke-opacity="{opacity}" stroke-width="2" stroke-linecap="round" ' +
@@ -138,11 +139,11 @@ var Svg = function () {
   /**
    * Create an <svg> triangle.
    *
-   * @param opts {Object}
+   * @param opts {Object} optional; default is {}
    *
    * @return svg {Element}
    */
-  _this.createTriangle = function (opts) {
+  _this.createTriangle = function (opts = {}) {
     var svg = _createElement(),
         template = '<polygon points="10,3 19,18 1,18" fill="{fillColor}" ' +
           'fill-opacity="{fillOpacity}" stroke="{color}" ' +
