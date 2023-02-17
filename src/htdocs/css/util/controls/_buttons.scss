@@ -67,10 +67,10 @@ button {
 
   &[disabled] {
     background: $bg-color;
+    border-color: $accent-color-disabled;
     box-shadow: none;
-    color: $accent-color;
+    color: $accent-color-disabled;
     cursor: not-allowed;
-    opacity: .3;
     text-shadow: none;
   }
 
@@ -90,9 +90,9 @@ button {
     &:active {
       box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
     }
-  }
 
-  &.dim {
-    opacity: .5;
+    &.dim {
+      opacity: .5;
+    }
   }
 }
