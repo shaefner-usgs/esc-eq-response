@@ -735,17 +735,19 @@ var Features = function (options) {
         mode = _getMode(id),
         options = _getOptions(feature);
 
-    feature.isRefreshing = true;
+    if (_this.isFeature(feature)) {
+      feature.isRefreshing = true;
 
-    if (mode !== 'base') {
-      _this.getFeature('mainshock').disableDownload();
+      if (mode !== 'base') {
+        _this.getFeature('mainshock').disableDownload();
+      }
+
+      if (feature.mapLayer) { // layer control item is replaced by loader
+        _app.MapPane.layerControl.removeLayer(feature.mapLayer);
+      }
+
+      _createFeature(mode, _modules[id], options);
     }
-
-    if (feature.mapLayer) { // layer control item is replaced by loader
-      _app.MapPane.layerControl.removeLayer(feature.mapLayer);
-    }
-
-    _createFeature(mode, _modules[id], options);
   };
 
   /**
