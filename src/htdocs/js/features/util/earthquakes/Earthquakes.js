@@ -303,7 +303,7 @@ var Earthquakes = function (options) {
           magDisplay = AppUtil.round(props.mag, 1), // String
           mag = parseFloat(magDisplay) || 0,
           magType = props.magType || 'M',
-          status = props.status || '',
+          status = (props.status || '').toLowerCase(),
           template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
@@ -316,7 +316,7 @@ var Earthquakes = function (options) {
       if (props.place) {
         title += '—' + props.place;
       }
-      if (status.toLowerCase() === 'reviewed') {
+      if (status === 'reviewed') {
         statusIcon = '<i class="icon-check"></i>';
       }
 
