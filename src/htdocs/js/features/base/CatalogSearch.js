@@ -62,8 +62,6 @@ var CatalogSearch = function (options) {
     });
 
     _this.mapLayer = _earthquakes.mapLayer;
-
-    _setTitle();
   };
 
   /**
@@ -122,6 +120,7 @@ var CatalogSearch = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
+    _setTitle();
     _earthquakes.addData(json);
     _app.SearchBar.setButton();
 
