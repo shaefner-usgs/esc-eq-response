@@ -78,6 +78,13 @@
       color: $text-color-disabled;
       cursor: auto;
     }
+    input {
+      cursor: not-allowed;
+    }
+
+    .breather span {
+      background: #ccc;
+    }
   }
 
   .refresh {
