@@ -128,7 +128,7 @@ var SideBar = function (options) {
       }
 
       if (id === 'searchBar') {
-        _app.SearchBar.render();
+        _app.SearchBar.renderMap();
       } else if (id === 'settingsBar') {
         _app.SettingsBar.setFocusedField();
       }
