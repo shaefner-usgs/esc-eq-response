@@ -38,7 +38,7 @@ _SETTINGS = { // defaults
 
 /**
  * Search the earthquake catalog and initialize/handle the search UI, including
- * the date pickers and Leaflet map instance.
+ * the Flatpickr date pickers and Leaflet map instance.
  *
  * @param options {Object}
  *     {
@@ -50,7 +50,7 @@ _SETTINGS = { // defaults
  *     {
  *       getParams: {Function}
  *       postInit: {Function}
- *       render: {Function}
+ *       renderMap: {Function}
  *       setButton: {Function}
  *     }
  */
@@ -63,6 +63,7 @@ var SearchBar = function (options) {
       _el,
       _endtime,
       _map,
+      _mapRendered,
       _minmagnitude,
       _now,
       _nowButton,
@@ -71,16 +72,14 @@ var SearchBar = function (options) {
       _region,
       _regionBar,
       _regionLayer,
-      _rendered,
       _searchButton,
       _starttime,
 
       _addButton,
       _addControl,
       _addListeners,
-      _getOrdinalDay,
+      _disableTransition,
       _getUrlParams,
-      _highlightDay,
       _initCalendars,
       _initControls,
       _initMap,
@@ -88,15 +87,15 @@ var SearchBar = function (options) {
       _onDateChange,
       _onDateClose,
       _onEndOpen,
+      _onMinuteChange,
       _onStartOpen,
+      _onTimeChange,
       _searchCatalog,
-      _setMinutes,
       _setNow,
       _setOption,
       _setRegion,
       _setUrlParams,
       _setUtcDay,
-      _setUtcMonth,
       _setValidity,
       _setView;
 
@@ -107,7 +106,8 @@ var SearchBar = function (options) {
     _app = options.app;
     _el = options.el;
     _endtime = document.getElementById('endtime');
-    _now = Luxon.DateTime.now();
+    _mapRendered = false;
+    _now = _NOW;
     _periodBar = RadioBar({
       el: document.getElementById('period')
     });
@@ -118,7 +118,6 @@ var SearchBar = function (options) {
       [49.5, -66],
       [24.5, -125]
     ]);
-    _rendered = false;
     _searchButton = document.getElementById('search');
     _starttime = document.getElementById('starttime');
 
@@ -161,18 +160,22 @@ var SearchBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var arrows = _el.querySelectorAll('.flatpickr-minute ~ span'),
+    var arrows = _el.querySelectorAll('.flatpickr-time .numInputWrapper span'),
         labels = _el.querySelectorAll('label'),
         opts = _el.querySelectorAll('#period li, #region li'),
         regionOpts = _el.querySelectorAll('#region li'),
         slider = _el.querySelector('.slider input');
 
-    // Set date picker's minutes value
-    arrows.forEach(arrow =>
-      arrow.addEventListener('click', _setMinutes)
-    );
+    // Set date picker's time options
+    arrows.forEach(arrow => {
+      arrow.addEventListener('click', _onTimeChange);
 
-    // Open date picker
+      if (arrow.parentNode.querySelector('.flatpickr-minute')) {
+        arrow.addEventListener('click', _onMinuteChange);
+      }
+    });
+
+    // Open date picker from <label>s too
     labels.forEach(label =>
       label.addEventListener('click', () => {
         var id = label.getAttribute('for');
@@ -207,27 +210,18 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Get the current local and UTC day of the year.
+   * Temporarily disable the janky transition caused by Flatpickr resetting the
+   * current day to local time followed by immediately reverting it back to UTC
+   * time.
    *
-   * @return doy {Object}
+   * @param el {Element}
    */
-  _getOrdinalDay = function () {
-    var doy = {
-          local: Number(_now.toFormat('o')),
-          utc: Number(_now.toUTC().toFormat('o'))
-        },
-        offset = Number(_now.toFormat('Z'));
+  _disableTransition = function (el) {
+    el.style.transitionProperty = 'none';
 
-    // Normalize days spanning two calendar years
-    if (doy.local !== doy.utc) {
-      if (offset > 1 && doy.local === 1) {
-        doy.local = 366;
-      } else if (offset < 1 && doy.utc === 1) {
-        doy.utc = 366;
-      }
-    }
-
-    return doy;
+    setTimeout(() =>
+      el.style.transitionProperty = 'background, color', 500
+    );
   };
 
   /**
@@ -250,28 +244,6 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Highlight the current UTC day. This is a bit of a hack, because _setUtcDay
-   * already handles this, but it fails when it falls on the first day of the
-   * month.
-   *
-   * @param calendar {Object}
-   * @param today {Element} optional; default is null
-   */
-  _highlightDay = function (calendar, today = null) {
-    var days, el,
-        date = _now.toUTC().toLocaleString(Luxon.DateTime.DATE_FULL);
-
-    today = today || calendar.days.querySelector(`[aria-label="${date}"]`);
-
-    if (today && !today.classList.contains('nextMonthDay')) {
-      days = calendar.days.querySelectorAll('.flatpickr-day');
-      el = Array.from(days).find(el => el.textContent === today.textContent);
-
-      el.classList.add('today');
-    }
-  };
-
-  /**
    * Create the Flatpickr calendar instances.
    */
   _initCalendars = function () {
@@ -285,12 +257,10 @@ var SearchBar = function (options) {
       onChange: _onDateChange,
       onClose: _onDateClose,
       onMonthChange: function() {
-        _setUtcDay(this);
-        _highlightDay(this);
+        _setUtcDay(this, false);
       },
       onYearChange: function() {
-        _setUtcDay(this);
-        _highlightDay(this);
+        _setUtcDay(this, false);
       },
       nextArrow: '<i class="icon-next"></i>',
       prevArrow: '<i class="icon-prev"></i>',
@@ -407,7 +377,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler for changing a calendar's date.
+   * Event handler for changing a calendar's date or time.
    *
    * @param selDates {Array}
    * @param dateStr {String}
@@ -449,11 +419,35 @@ var SearchBar = function (options) {
     this.set('maxDate', _now.toUTC().toISO().slice(0, -5));
     this.set('minDate', minDate);
     _setUtcDay(this);
-    _setUtcMonth(this);
 
     // Flatpickr lib strips 'Now' from <input>; put it back
     if (_nowButton.classList.contains('selected')) {
       _setNow();
+    }
+  };
+
+  /**
+   * Event handler that sets the minutes value to a multiple of 5. It gets out
+   * of sync when the max time allowed is not a multiple of 5.
+   */
+  _onMinuteChange = function () {
+    var minutes,
+        input = this.closest('.numInputWrapper').querySelector('input'),
+        value = Number(input.value),
+        remainder = value % 5;
+
+    if (remainder) {
+      if (this.className === 'arrowUp') {
+        minutes = String(value - remainder);
+      } else { // down arrow clicked
+        minutes = String(value + 5 - remainder);
+      }
+
+      if (minutes.length === 1) {
+        minutes = '0' + minutes;
+      }
+
+      input.value = minutes;
     }
   };
 
@@ -472,7 +466,36 @@ var SearchBar = function (options) {
 
     this.set('maxDate', maxDate);
     _setUtcDay(this);
-    _setUtcMonth(this);
+  };
+
+  /**
+   * Event handler for changing a calendar's time.
+   *
+   * @param e {Event}
+   */
+  _onTimeChange = function (e) {
+    var maxDateStr, selDate, time, utcDateStr,
+        el = e.target.closest('.flatpickr-wrapper'),
+        id = el.querySelector('.flatpickr-input').id,
+        calendar = _calendars[id],
+        selected = el.querySelector('.flatpickr-days .selected');
+
+    // Select current UTC date when user changes time before picking a date
+    setTimeout(() => { // ensure Flatpickr Events fire first
+      selDate = calendar.selectedDates[0]; // js Date Object
+
+      if (selDate && !selected) {
+        maxDateStr = _now.toUTC().toISO().slice(0, -5);
+        time = selDate.toTimeString().substring(0, 8);
+        utcDateStr = _now.toUTC().toISODate() + 'T' + time;
+
+        if (utcDateStr > maxDateStr) {
+          utcDateStr = maxDateStr; // maxDate: now
+        }
+
+        calendar.setDate(utcDateStr, true);
+      }
+    });
   };
 
   /**
@@ -498,31 +521,6 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler that sets the minutes value to a multiple of 5. It gets out
-   * of sync when the max time allowed is not a multiple of 5.
-   */
-  _setMinutes = function () {
-    var minutes,
-        input = this.closest('.numInputWrapper').querySelector('input'),
-        value = Number(input.value),
-        remainder = value % 5;
-
-    if (remainder) {
-      if (this.className === 'arrowUp') {
-        minutes = String(value - remainder);
-      } else { // down arrow clicked
-        minutes = String(value + 5 - remainder);
-      }
-
-      if (minutes.length === 1) {
-        minutes = '0' + minutes;
-      }
-
-      input.value = minutes;
-    }
-  };
-
-  /**
    * Set the end time to 'Now' on the 'endtime' calendar and its <input> field.
    */
   _setNow = function () {
@@ -534,7 +532,7 @@ var SearchBar = function (options) {
     _endtime.value = 'now';
 
     _nowButton.classList.add('selected');
-    _setUtcMonth(calendar);
+    _setUtcDay(calendar);
     _setValidity(_endtime);
   };
 
@@ -543,7 +541,7 @@ var SearchBar = function (options) {
    */
   _setOption = function () {
     if (this.id === 'customRegion') {
-      _this.render();
+      _this.renderMap();
     } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
       _setRegion();
     }
@@ -588,64 +586,35 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the given calendar's highlighted day to the current UTC day (which
-   * might be the previous/following day).
+   * Set the given calendar's highlighted day (today) to the current UTC day.
    *
    * @param calendar {Object}
+   * @param jumpToDate {Boolean} default is true
+   *     used as an override when user changes calendar's month or year
    */
-  _setUtcDay = function (calendar) {
-    var doy, pass, tomorrow, yesterday,
-        today = calendar.days.querySelector('.today');
+  _setUtcDay = function (calendar, jumpToDate = true) {
+    var date = _now.toUTC().toLocaleString(Luxon.DateTime.DATE_FULL),
+        days = calendar.days,
+        selected = days.querySelector('.selected'),
+        today = days.querySelector('.today'),
+        todayUtc = days.querySelector(`[aria-label="${date}"]`);
 
-    if (today) { // current month is selected
-      doy = _getOrdinalDay();
-      pass = (today.textContent === _now.toFormat('d')); // only change once
-      tomorrow = today.nextElementSibling;
-      yesterday = today.previousElementSibling;
+    // Set the calendar month and year to the current UTC day, if applicable
+    if (jumpToDate && !selected && (today || todayUtc)) {
+      calendar.jumpToDate(_now.toUTC().toISO().slice(0, -5));
 
-      if (doy.local !== doy.utc && pass) {
-        today.style.transitionProperty = 'none'; // disable janky transition
-        today.classList.remove('today');
-
-        if (doy.utc > doy.local && tomorrow) {
-          tomorrow.classList.add('today');
-        } else if (yesterday) {
-          yesterday.classList.add('today');
-        }
-
-        setTimeout(() => // restore transition
-          today.style.transitionProperty = 'background, color', 500
-        );
-      }
+      // Must set again after changing the calendar view
+      days = calendar.days;
+      today = days.querySelector('.today');
+      todayUtc = days.querySelector(`[aria-label="${date}"]`);
     }
-  };
 
-  /**
-   * Set the given calendar to the current UTC month (which might be the
-   * previous/following month).
-   *
-   * @param calendar {Object}
-   */
-  _setUtcMonth = function (calendar) {
-    var offset,
-        container = calendar.calendarContainer,
-        selected = container.querySelector('.flatpickr-day.selected'),
-        today = container.querySelector('.today');
+    if (todayUtc && !todayUtc.classList.contains('today')) { // only set once
+      todayUtc.classList.add('today');
 
-    if (selected) return; // show default (selected date's) month instead
-
-    if (today) {
-      if (today.classList.contains('prevMonthDay')) {
-        calendar.changeMonth(-1);
-      } else if (today.classList.contains('nextMonthDay')) {
-        calendar.changeMonth(1);
-        _highlightDay(calendar, today);
-      }
-    } else { // 'Now' button selected
-      offset = _now.toFormat('Z');
-
-      if (offset > 1) { // UTC day is last Saturday of prev month
-        calendar.changeMonth(-1);
+      if (today) {
+        _disableTransition(today);
+        today.classList.remove('today');
       }
     }
   };
@@ -683,13 +652,13 @@ var SearchBar = function (options) {
 
     if (map.classList.contains('hide')) return; // map not visible
 
-    if (sidebar === 'searchBar' && !_rendered) {
+    if (sidebar === 'searchBar' && !_mapRendered) {
       _map.fitBounds(_regionLayer.getBounds(), {
         animate: false,
         padding: [32, 0]
       });
 
-      _rendered = true;
+      _mapRendered = true;
     }
   };
 
@@ -763,7 +732,7 @@ var SearchBar = function (options) {
   /**
    * Render the region map so it displays correctly.
    */
-  _this.render = function () {
+  _this.renderMap = function () {
     _map.invalidateSize();
     _setView();
   };
