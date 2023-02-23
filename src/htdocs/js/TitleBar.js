@@ -73,6 +73,10 @@ var TitleBar = function (options) {
 
     if (_app.Features.isFeature(search)) {
       _this.setTitle(search);
+    } else {
+      _this.setTitle({
+        title: _defaults.title
+      });
     }
   };
 
