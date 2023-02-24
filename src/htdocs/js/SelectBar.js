@@ -80,8 +80,8 @@ var SelectBar = function (options) {
       AppUtil.setParam('eqid', _eqid.value);
       _app.Features.createFeatures();
 
-      if (AppUtil.getParam('aftershocks')) {
-        _app.SettingsBar.setInterval('aftershocks'); // set up auto refresh
+      if (AppUtil.getParam('as-refresh')) {
+        _app.SettingsBar.setInterval('as-refresh'); // Aftershocks auto refresh
       }
     } else {
       message =
