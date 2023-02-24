@@ -20,6 +20,7 @@
  *       destroy: {Function}
  *       getHtml: {Function}
  *       removeListeners: {Function}
+ *       setValue: {Function}
  *     }
  */
 var Switch = function (options) {
@@ -52,19 +53,9 @@ var Switch = function (options) {
    * @param e {Event}
    */
   _toggle = function (e) {
-    var details = _el.parentNode.querySelector('.details');
-
     e.preventDefault();
 
-    if (_el.checked) {
-      _el.checked = false;
-    } else {
-      _el.checked = true;
-    }
-
-    if (details) {
-      details.classList.toggle('hide');
-    }
+    _this.setValue(!_el.checked);
   };
 
   // ----------------------------------------------------------
@@ -116,6 +107,29 @@ var Switch = function (options) {
    */
   _this.removeListeners = function () {
     _label.removeEventListener('click', _toggle);
+  };
+
+  /**
+   * Set the Switch on or off.
+   *
+   * @param checked {Boolean} default is true
+   *
+   * @return _this {Object}
+   */
+  _this.setValue = function (checked = true) {
+    var details = _el.parentNode.querySelector('input ~ .details');
+
+    if (details) {
+      if (checked) {
+        details.classList.remove('hide');
+      } else {
+        details.classList.add('hide');
+      }
+    }
+
+    _el.checked = checked;
+
+    return _this; // enable chaining
   };
 
 
