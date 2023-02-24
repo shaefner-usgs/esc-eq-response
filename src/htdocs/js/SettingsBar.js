@@ -7,13 +7,17 @@ var AppUtil = require('util/AppUtil'),
     Switch = require('util/controls/Switch');
 
 
-var _SETTINGS = { // defaults
-  aftershocks: 'm15',
+var _DEFAULTS = {
+  'as-dist': null,
   'as-mag': 0,
+  'as-refresh': 'm15',
   catalog: 'comcat',
-  'catalog-search': 'm15',
+  'cs-refresh': 'm15',
   'fs-days': 30,
+  'fs-dist': null,
   'fs-mag': 1,
+  'hs-dist': null,
+  'hs-mag': null,
   'hs-years': 10,
   timezone: 'utc'
 };
@@ -21,8 +25,8 @@ var _SETTINGS = { // defaults
 
 /**
  * Refresh Features and swap between catalogs and timezones when the settings
- * are changed. Also set the URL parameters to match the application's state
- * and set default values based on the selected Mainshock.
+ * are changed. Also set the URL parameters to match the current settings and
+ * set default values based on the selected Mainshock.
  *
  * @param options {Object}
  *     {
@@ -50,8 +54,10 @@ var SettingsBar = function (options) {
       _catalogBar,
       _el,
       _focusedField,
+      _inputs,
       _throttlers,
       _timers,
+      _timezone,
       _timezoneBar,
       _title,
 
@@ -61,10 +67,10 @@ var SettingsBar = function (options) {
       _getDefaults,
       _getFeatureId,
       _getInterval,
+      _getParams,
       _getTitle,
       _hasChanged,
-      _initButtons,
-      _initSwitches,
+      _initControls,
       _setCatalog,
       _setField,
       _setParam,
@@ -79,34 +85,16 @@ var SettingsBar = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _catalogBar = RadioBar({
-      el: document.getElementById('catalog')
-    });
     _el = options.el;
+    _inputs = _el.querySelectorAll('input[type=number]');
     _throttlers = {};
     _timers = {};
-    _timezoneBar = RadioBar({
-      el: document.getElementById('timezone')
-    });
-    _title = _el.querySelector('input[type=number]').title; // first input
+    _timezone = document.getElementById('timezone');
+    _title = _inputs[0].title; // first input (all title attrs identical)
 
-    RadioBar({
-      el: document.getElementById('as-refresh')
-    });
-    RadioBar({
-      el: document.getElementById('cs-refresh')
-    });
-
-    Switch({
-      el: document.getElementById('aftershocks')
-    });
-    Switch({
-      el: document.getElementById('catalog-search')
-    });
-
+    _initControls();
     _addListeners();
     _addOffset();
-    _initSwitches();
   };
 
   /**
@@ -132,29 +120,28 @@ var SettingsBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var catalog = _el.querySelectorAll('#catalog li'),
-        inputs = _el.querySelectorAll('input[type=number]'),
+    var catalogs = _el.querySelectorAll('#catalog li'),
         selectors = [
           'input[type=checkbox] + label',
-          '#as-refresh',
-          '#cs-refresh'
+          '#aftershocks',
+          '#catalog-search'
         ],
         refresh = _el.querySelectorAll(selectors.join()),
-        timezone = _el.querySelectorAll('#timezone li');
+        timezones = _el.querySelectorAll('#timezone li');
 
-    // Set the catalog, timezone and refresh options
-    catalog.forEach(button =>
-      button.addEventListener('click', _setCatalog)
+    // Set the catalog, refresh and timezone options
+    catalogs.forEach(catalog =>
+      catalog.addEventListener('click', _setCatalog)
     );
     refresh.forEach(target =>
       target.addEventListener('click', _setRefresh)
     );
-    timezone.forEach(button =>
-      button.addEventListener('click', _setTimeZone)
+    timezones.forEach(timezone =>
+      timezone.addEventListener('click', _setTimeZone)
     );
 
     // Track changes to input fields
-    inputs.forEach(input => {
+    _inputs.forEach(input => {
       input.addEventListener('focus', _setField);
       input.addEventListener('input', _update);
     });
@@ -201,7 +188,7 @@ var SettingsBar = function (options) {
         ruptureArea = Math.pow(10, mag - 4),
         ruptureLength = Math.pow(ruptureArea, 0.7);
 
-    return Object.assign({}, _SETTINGS, {
+    return Object.assign({}, _DEFAULTS, {
       'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
       'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
@@ -210,21 +197,25 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Get the Feature id from the given name.
+   * Get the Feature id from the given refresh parameter's name.
    *
    * @param name {String}
    *     URL parameter name
    *
-   * @return featureId {String}
+   * @return id {String}
    */
   _getFeatureId = function (name) {
-    var featureId = name;
+    var ids = {
+          'as-refresh': 'aftershocks',
+          'cs-refresh': 'catalog-search'
+        },
+        id = ids[name];
 
-    if (name === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
-      featureId = 'dd-aftershocks'; // add double-difference prefix
+    if (id === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
+      id = 'dd-aftershocks';
     }
 
-    return featureId;
+    return id;
   };
 
   /**
@@ -240,6 +231,25 @@ var SettingsBar = function (options) {
     var value = AppUtil.getParam(name);
 
     return parseInt(value.replace(/\D/g, '')) * 60 * 1000; // strip 'm'
+  };
+
+  /**
+   * Get the relevant URL parameter key-value pairs from the current URL.
+   *
+   * @return params {Object}
+   */
+  _getParams = function () {
+    var params = {};
+
+    Object.keys(_DEFAULTS).forEach(name => {
+      var value = AppUtil.getParam(name);
+
+      if (value) {
+        params[name] = value;
+      }
+    });
+
+    return params;
   };
 
   /**
@@ -295,47 +305,40 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the initially selected catalog, timezone and refresh buttons.
+   * Create the UI controls and set them to match the URL parameter values (or
+   * the default value if a parameter is not set).
    */
-  _initButtons = function () {
-    var aftershocks = AppUtil.getParam('aftershocks') || _SETTINGS['aftershocks'],
-        catalog = AppUtil.getParam('catalog') || _SETTINGS['catalog'],
-        search = AppUtil.getParam('catalog-search') || _SETTINGS['catalog-search'],
-        timezone = AppUtil.getParam('timezone') || _SETTINGS['timezone'],
-        buttons = [
-          _el.querySelector('#aftershocks ~ .details .' + aftershocks),
-          _el.querySelector('#catalog-search ~ .details .' + search),
-          document.getElementById(catalog),
-          document.getElementById(timezone)
-        ];
+  _initControls = function () {
+    var params = _getParams(),
+        settings = Object.assign({}, _DEFAULTS, params),
+        aftershocks = _el.querySelector('#aftershocks .' + settings['as-refresh']),
+        catalog = document.getElementById(settings.catalog),
+        search = _el.querySelector('#catalog-search .' + settings['cs-refresh']),
+        timezone = document.getElementById(settings.timezone);
 
-    buttons.forEach(button => {
-      button.click(); // set selected button in UI
-    });
-  };
+    _catalogBar = RadioBar({
+      el: document.getElementById('catalog')
+    }).setOption.call(catalog);
 
-  /**
-   * Set the initial switch positions.
-   */
-  _initSwitches = function () {
-    var params = [
-      'aftershocks',
-      'catalog-search'
-    ];
+    _timezoneBar = RadioBar({
+      el: _timezone
+    }).setOption.call(timezone);
 
-    params.forEach(param => {
-      var details;
+    RadioBar({
+      el: document.getElementById('aftershocks')
+    }).setOption.call(aftershocks);
 
-      if (AppUtil.getParam(param)) {
-        details = _el.querySelector(`#${param} ~ .details`);
+    RadioBar({
+      el: document.getElementById('catalog-search')
+    }).setOption.call(search);
 
-        if (details) {
-          details.classList.remove('hide');
-        }
+    Switch({
+      el: document.getElementById('as-refresh')
+    }).setValue(Boolean(params['as-refresh']));
 
-        document.getElementById(param).checked = true;
-      }
-    });
+    Switch({
+      el: document.getElementById('cs-refresh')
+    }).setValue(Boolean(params['cs-refresh']));
   };
 
   /**
@@ -404,7 +407,7 @@ var SettingsBar = function (options) {
    * @param value {String}
    */
   _setParam = function (name, value) {
-    if (value === _SETTINGS[name]) { // default
+    if (value === _DEFAULTS[name]) {
       AppUtil.deleteParam(name, value);
     } else {
       AppUtil.setParam(name, value);
@@ -424,7 +427,7 @@ var SettingsBar = function (options) {
         selected = div.querySelector('.selected'),
         tagName = e.target.tagName.toLowerCase(),
         value = Array.from(selected.classList).find(className =>
-          className !== 'selected'
+          className !== 'selected' // e.g. 'm15'
         );
 
     if (input.checked) {
@@ -446,8 +449,7 @@ var SettingsBar = function (options) {
 
   /**
    * Set a one-off (non-recurring) refresh timer for the Feature matching the
-   * given name. Then start an auto-refresh interval timer when the timeout
-   * finishes.
+   * given name. Then start an interval timer when the one-off timer finishes.
    *
    * @param name {String}
    *     URL parameter name
@@ -504,10 +506,10 @@ var SettingsBar = function (options) {
    * with the selected catalog.
    */
   _swapTimer = function () {
-    var param = AppUtil.getParam('aftershocks'); // auto-refresh setting
+    var param = AppUtil.getParam('as-refresh');
 
     if (param) {
-      _setTimeout('aftershocks');
+      _setTimeout('as-refresh');
     }
   };
 
@@ -549,7 +551,13 @@ var SettingsBar = function (options) {
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _initButtons();
+    var tz = _timezone.querySelector('.selected').id;
+
+    document.body.classList.add(tz);
+
+    if (AppUtil.getParam('cs-refresh')) {
+      _this.setInterval('cs-refresh'); // Catalog Search auto refresh
+    }
   };
 
   /**
@@ -558,9 +566,7 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via Features.js.
    */
   _this.reset = function () {
-    var inputs = _el.querySelectorAll('input[type=number]');
-
-    inputs.forEach(input => {
+    _inputs.forEach(input => {
       input.value = '';
 
       if (_title) { // set back to initial value if title attr changed
@@ -569,7 +575,7 @@ var SettingsBar = function (options) {
     });
     _focusedField = null;
 
-    clearInterval(_timers.aftershocks);
+    clearInterval(_timers['as-refresh']);
     clearTimeout(_timers.oneOff);
   };
 
@@ -608,20 +614,20 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the status of the given Feature's configuration options.
+   * Set the status of the given Feature's settings.
    *
    * @param feature {Object}
    * @param status {String <disabled|enabled>} default is 'disabled'
    */
   _this.setStatus = function (feature, status = 'disabled') {
     var inputs,
-        div = _el.querySelector('.' + feature.id);
+        settings = _el.querySelector('.' + feature.id);
 
-    if (div) { // Feature has config options
-      inputs = div.querySelectorAll('input[type=number]');
+    if (settings) {
+      inputs = settings.querySelectorAll('input[type=number]');
 
-      div.classList.remove('disabled', 'enabled');
-      div.classList.add(status);
+      settings.classList.remove('disabled', 'enabled');
+      settings.classList.add(status);
 
       inputs.forEach(input => {
         if (status === 'disabled') {
@@ -640,24 +646,19 @@ var SettingsBar = function (options) {
    * parameter values (if present) override the defaults.
    */
   _this.setValues = function () {
-    var defaults = _getDefaults();
+    var params = Object.assign({}, _getDefaults(), _getParams());
 
-    Object.keys(defaults).forEach(key => {
-      var input = document.getElementById(key),
-          param = AppUtil.getParam(key);
+    Object.keys(params).forEach(name => {
+      var input = document.getElementById(name);
 
       if (input) {
-        if (param) {
-          input.value = param;
-        } else {
-          input.value = defaults[key];
-        }
+        input.value = params[name];
       }
     });
   };
 
   /**
-   * Update the given Feature's timestamp.
+   * Update the given Feature's refresh timestamp.
    *
    * @param feature {Object}
    */
