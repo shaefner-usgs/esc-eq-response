@@ -147,6 +147,8 @@ var RadioBar = function (options) {
   /**
    * Highlight the selected option's button (+ show its content, if applicable).
    * Unselect (and hide) all other options.
+   *
+   * @return _this {Object}
    */
   _this.setOption = function () {
     var option = _getOption(this.id),
@@ -173,6 +175,8 @@ var RadioBar = function (options) {
 
       sibling = sibling.nextElementSibling;
     }
+
+    return _this; // enable chaining
   };
 
 
