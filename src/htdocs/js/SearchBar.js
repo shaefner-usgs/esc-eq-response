@@ -13,8 +13,8 @@ var AppUtil = require('util/AppUtil'),
 
 
 var _CANV,
-    _NOW,
-    _SETTINGS;
+    _DEFAULTS,
+    _NOW;
 
 _CANV = {
   maxlatitude: 42.1,
@@ -23,7 +23,7 @@ _CANV = {
   minlongitude: -124.6
 };
 _NOW = Luxon.DateTime.now();
-_SETTINGS = { // defaults
+_DEFAULTS = {
   endtime: _NOW.toUTC().toISO().slice(0, -5),
   maxlatitude: 90,
   maxlongitude: 180,
@@ -37,8 +37,8 @@ _SETTINGS = { // defaults
 
 
 /**
- * Search the earthquake catalog and initialize/handle the search UI, including
- * the Flatpickr date pickers and Leaflet map instance.
+ * Search the earthquake catalog and display the results on the map. Also set
+ * the URL parameters to match the search parameters.
  *
  * @param options {Object}
  *     {
@@ -67,10 +67,7 @@ var SearchBar = function (options) {
       _minmagnitude,
       _now,
       _nowButton,
-      _period,
-      _periodBar,
       _region,
-      _regionBar,
       _regionLayer,
       _searchButton,
       _starttime,
@@ -79,7 +76,7 @@ var SearchBar = function (options) {
       _addControl,
       _addListeners,
       _disableTransition,
-      _getUrlParams,
+      _getParams,
       _initCalendars,
       _initControls,
       _initMap,
@@ -93,8 +90,8 @@ var SearchBar = function (options) {
       _searchCatalog,
       _setNow,
       _setOption,
+      _setParams,
       _setRegion,
-      _setUrlParams,
       _setUtcDay,
       _setValidity,
       _setView;
@@ -107,13 +104,9 @@ var SearchBar = function (options) {
     _el = options.el;
     _endtime = document.getElementById('endtime');
     _mapRendered = false;
+    _minmagnitude = document.getElementById('minmagnitude');
     _now = _NOW;
-    _periodBar = RadioBar({
-      el: document.getElementById('period')
-    });
-    _regionBar = RadioBar({
-      el: document.getElementById('region')
-    });
+    _region = document.getElementById('region');
     _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
       [24.5, -125]
@@ -162,11 +155,11 @@ var SearchBar = function (options) {
   _addListeners = function () {
     var arrows = _el.querySelectorAll('.flatpickr-time .numInputWrapper span'),
         labels = _el.querySelectorAll('label'),
-        opts = _el.querySelectorAll('#period li, #region li'),
-        regionOpts = _el.querySelectorAll('#region li'),
+        options = _el.querySelectorAll('#period li, #region li'),
+        regions = _el.querySelectorAll('#region li'),
         slider = _el.querySelector('.slider input');
 
-    // Set date picker's time options
+    // Set date picker's time handlers
     arrows.forEach(arrow => {
       arrow.addEventListener('click', _onTimeChange);
 
@@ -185,14 +178,14 @@ var SearchBar = function (options) {
     );
 
     // Keep search button status in sync
-    opts.forEach(button =>
-      button.addEventListener('click', _this.setButton)
+    options.forEach(option =>
+      option.addEventListener('click', _this.setButton)
     );
     slider.addEventListener('input', _this.setButton);
 
-    // Set custom region options
-    regionOpts.forEach(button =>
-      button.addEventListener('click', _setOption)
+    // Set custom region option
+    regions.forEach(region =>
+      region.addEventListener('click', _setOption)
     );
 
     // Set the end time to 'now'
@@ -225,14 +218,14 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Get the URL parameter key-value pairs from the current URL.
+   * Get the relevant URL parameter key-value pairs from the current URL.
    *
    * @return params {Object}
    */
-  _getUrlParams = function () {
+  _getParams = function () {
     var params = {};
 
-    Object.keys(_SETTINGS).forEach(name => {
+    Object.keys(_DEFAULTS).forEach(name => {
       var value = AppUtil.getParam(name);
 
       if (value) {
@@ -288,28 +281,31 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Initialize the UI controls and set them to match the URL parameter values
-   * (or the default value if a parameter is not set).
-   *
-   * Note: The selected RadioBar options are set via _this.postInit().
+   * Create the UI controls and set them to match the URL parameter values (or
+   * the default value if a parameter is not set).
    */
   _initControls = function () {
-    var params = _getUrlParams(),
-        settings = Object.assign({}, _SETTINGS, params),
-        slider = Slider({
-          el: document.getElementById('minmagnitude')
-        });
+    var settings = Object.assign({}, _DEFAULTS, _getParams()),
+        period = document.getElementById(settings.period),
+        region = document.getElementById(settings.region);
 
-    _minmagnitude = document.getElementById('minmagnitude');
-    _period = document.getElementById(settings.period);
-    _region = document.getElementById(settings.region);
+    RadioBar({
+      el: document.getElementById('period')
+    }).setOption.call(period);
+
+    RadioBar({
+      el: _region
+    }).setOption.call(region);
 
     // Set magnitude
     _minmagnitude.value = settings.minmagnitude;
-    slider.setValue();
+
+    Slider({
+      el: _minmagnitude
+    }).setValue();
 
     // Set custom dates
-    if (_period.id === 'customPeriod') {
+    if (period.id === 'customPeriod') {
       if (settings.endtime === 'now') {
         _setNow();
       } else {
@@ -320,7 +316,7 @@ var SearchBar = function (options) {
     }
 
     // Set custom region polygon
-    if (_region.id === 'customRegion') {
+    if (region.id === 'customRegion') {
       _regionLayer = L.rectangle([
         [settings.maxlatitude, settings.maxlongitude],
         [settings.minlatitude, settings.minlongitude]
@@ -511,7 +507,7 @@ var SearchBar = function (options) {
         _app.Features.reloadFeature('catalog-search', 'base');
       }
 
-      _setUrlParams();
+      _setParams();
 
       if (!document.body.classList.contains('mainshock')) {
         _app.MapPane.initBounds();
@@ -537,13 +533,38 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the options for the selected region.
+   * Event handler that sets the options for the selected region.
    */
   _setOption = function () {
     if (this.id === 'customRegion') {
       _this.renderMap();
     } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
       _setRegion();
+    }
+  };
+
+  /**
+   * Set the URL parameters to match the UI controls.
+   *
+   * Don't set a parameter if its control is set to its default value; delete
+   * unneeded parameters.
+   */
+  _setParams = function () {
+    var params = _this.getParams();
+
+    Object.keys(params).forEach(name => {
+      var value = params[name];
+
+      if (value === _DEFAULTS[name]) {
+        AppUtil.deleteParam(name);
+      } else {
+        AppUtil.setParam(name, value);
+      }
+    });
+
+    if (params.period !== 'customPeriod') {
+      AppUtil.deleteParam('endtime');
+      AppUtil.deleteParam('starttime');
     }
   };
 
@@ -558,31 +579,6 @@ var SearchBar = function (options) {
         control.click(); // exit custom region edit mode
       }
     });
-  };
-
-  /**
-   * Set the URL parameters to match the UI controls.
-   *
-   * Don't set a parameter if its control is set to its default value and also
-   * delete unneeded parameters.
-   */
-  _setUrlParams = function () {
-    var params = _this.getParams();
-
-    Object.keys(params).forEach(name => {
-      var value = params[name];
-
-      if (value === _SETTINGS[name]) {
-        AppUtil.deleteParam(name);
-      } else {
-        AppUtil.setParam(name, value);
-      }
-    });
-
-    if (params.period !== 'customPeriod') {
-      AppUtil.deleteParam('endtime');
-      AppUtil.deleteParam('starttime');
-    }
   };
 
   /**
@@ -667,7 +663,7 @@ var SearchBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get the search parameters from the UI controls and _SETTINGS.
+   * Get the search parameters from the UI controls and _DEFAULTS.
    *
    * @return {Object}
    */
@@ -716,17 +712,14 @@ var SearchBar = function (options) {
       });
     }
 
-    return Object.assign({}, _SETTINGS, params);
+    return Object.assign({}, _DEFAULTS, params);
   };
 
   /**
    * Initialization that depends on other Classes being ready before running.
    */
   _this.postInit = function () {
-    _periodBar.setOption.call(_period);
-    _regionBar.setOption.call(_region);
-
-    _setOption.call(_region);
+    _setOption.call(_region.querySelector('.selected'));
   };
 
   /**
