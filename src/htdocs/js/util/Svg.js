@@ -2,9 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 var _DEFAULTS = {
   color: '#000',
   fillColor: '#fff',
@@ -22,7 +19,6 @@ var _DEFAULTS = {
  * @return _this {Object}
  *     {
  *       createCircle: {Function}
- *       createCircleRange: {Function}
  *       createLine: {Function}
  *       createTriangle: {Function}
  *     }
@@ -89,31 +85,6 @@ var Svg = function () {
     _setProps(svg, template, opts);
 
     return svg;
-  };
-
-  /**
-   * Create a range of <svg> circles as an ordered list.
-   *
-   * @param opts {Object} optional; default is {}
-   *
-   * @return ol {Element}
-   */
-  _this.createCircleRange = function (opts = {}) {
-    var circle, li,
-        ol = document.createElement('ol');
-
-    ol.classList.add('mags');
-
-    for (var i = 0; i <= 7; i ++) {
-      opts.radius = AppUtil.getRadius(i);
-      circle = _this.createCircle(opts);
-      li = document.createElement('li');
-
-      li.appendChild(circle);
-      ol.appendChild(li);
-    }
-
-    return ol;
   };
 
   /**

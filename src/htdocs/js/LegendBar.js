@@ -1,7 +1,8 @@
 'use strict';
 
 
-var Svg = require('util/Svg');
+var AppUtil = require('util/AppUtil'),
+    Svg = require('util/Svg');
 
 
 /**
@@ -24,6 +25,7 @@ var LegendBar = function (options) {
       _el,
 
       _addSvgElements,
+      _createMagRange,
       _getColors;
 
 
@@ -45,7 +47,7 @@ var LegendBar = function (options) {
           color: '#c00',
           opacity: '0.5'
         }),
-        range = svg.createCircleRange({
+        range = _createMagRange(svg, {
           fillOpacity: '0'
         }),
         triangle = svg.createTriangle({
@@ -61,6 +63,32 @@ var LegendBar = function (options) {
     _el.querySelector('.faults').appendChild(line);
     _el.querySelector('.magnitude').appendChild(range);
     _el.querySelector('.shakemap').appendChild(triangle);
+  };
+
+  /**
+   * Create a range of <svg> circles as an ordered list.
+   *
+   * @param svg {Object}
+   * @param opts {Object} optional; default is {}
+   *
+   * @return ol {Element}
+   */
+  _createMagRange = function (svg, opts = {}) {
+    var circle, li,
+        ol = document.createElement('ol');
+
+    ol.classList.add('mags');
+
+    for (var i = 0; i <= 7; i ++) {
+      opts.radius = AppUtil.getRadius(i);
+      circle = svg.createCircle(opts);
+      li = document.createElement('li');
+
+      li.appendChild(circle);
+      ol.appendChild(li);
+    }
+
+    return ol;
   };
 
   /**
