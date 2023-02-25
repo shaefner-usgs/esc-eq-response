@@ -291,11 +291,11 @@ var SearchBar = function (options) {
 
     RadioBar({
       el: document.getElementById('period')
-    }).setOption.call(period);
+    }).setOption(period);
 
     RadioBar({
       el: _region
-    }).setOption.call(region);
+    }).setOption(region);
 
     // Set magnitude
     _minmagnitude.value = settings.minmagnitude;

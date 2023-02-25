@@ -318,19 +318,19 @@ var SettingsBar = function (options) {
 
     _catalogBar = RadioBar({
       el: document.getElementById('catalog')
-    }).setOption.call(catalog);
+    }).setOption(catalog);
 
     _timezoneBar = RadioBar({
       el: _timezone
-    }).setOption.call(timezone);
+    }).setOption(timezone);
 
     RadioBar({
       el: document.getElementById('aftershocks')
-    }).setOption.call(aftershocks);
+    }).setOption(aftershocks);
 
     RadioBar({
       el: document.getElementById('catalog-search')
-    }).setOption.call(search);
+    }).setOption(search);
 
     Switch({
       el: document.getElementById('as-refresh')
@@ -585,7 +585,7 @@ var SettingsBar = function (options) {
   _this.resetCatalog = function () {
     var comcat = document.getElementById('comcat');
 
-    _catalogBar.setOption.call(comcat);
+    _catalogBar.setOption(comcat);
     AppUtil.deleteParam('catalog');
   };
 

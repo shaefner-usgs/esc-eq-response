@@ -82,7 +82,9 @@ var RadioBar = function (options) {
   _this.addListeners = function (el) {
     _buttons = el.querySelectorAll('li');
 
-    _buttons.forEach(button => button.addEventListener('click', _this.setOption));
+    _buttons.forEach(button => button.addEventListener('click', () => {
+      _this.setOption(button);
+    }));
   };
 
   /**
@@ -141,21 +143,25 @@ var RadioBar = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    _buttons.forEach(button => button.removeEventListener('click', _this.setOption));
+    _buttons.forEach(button => button.removeEventListener('click', () => {
+      _this.setOption(button);
+    }));
   };
 
   /**
    * Highlight the selected option's button (+ show its content, if applicable).
    * Unselect (and hide) all other options.
    *
+   * @param el {Element}
+   *
    * @return _this {Object}
    */
-  _this.setOption = function () {
-    var option = _getOption(this.id),
-        sibling = this.parentNode.firstElementChild;
+  _this.setOption = function (el) {
+    var option = _getOption(el.id),
+        sibling = el.parentNode.firstElementChild;
 
     // Selected option
-    this.classList.add('selected'); // button
+    el.classList.add('selected'); // button
 
     if (option) {
       option.classList.remove('hide'); // content
@@ -163,7 +169,7 @@ var RadioBar = function (options) {
 
     // Unselected options
     while (sibling) {
-      if (sibling !== this) {
+      if (sibling !== el) {
         option = _getOption(sibling.id);
 
         sibling.classList.remove('selected');

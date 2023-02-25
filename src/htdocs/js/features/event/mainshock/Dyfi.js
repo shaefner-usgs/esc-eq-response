@@ -281,7 +281,7 @@ var Dyfi = function (options) {
     _addBubble();
 
     if (_radioBar) {
-      _radioBar.setOption.call(document.getElementById(_selected));
+      _radioBar.setOption(document.getElementById(_selected));
     }
   };
 
