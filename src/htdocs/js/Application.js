@@ -119,7 +119,7 @@ var Application = function (options) {
       }
     });
 
-    // Run post-initialization code now that all Classes are ready
+    // Run post-initialization now that all Classes are ready
     postInits.forEach(name =>
       name.postInit()
     );

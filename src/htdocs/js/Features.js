@@ -718,7 +718,7 @@ var Features = function (options) {
   };
 
   /**
-   * Initialization that depends on other Classes being ready before running.
+   * Initialization that depends on the app's other Classes being ready first.
    */
   _this.postInit = function () {
     _this.createFeatures('base');
