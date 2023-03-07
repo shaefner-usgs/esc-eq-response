@@ -95,7 +95,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
    */
   reset: function () {
     this._displayNames = {
-      search: this._displayNames.search
+      'catalog-search': this._displayNames['catalog-search']
     };
   },
 
