@@ -1,14 +1,13 @@
 @use 'variables' as *;
 
 @mixin close() {
-  background: #fff;
+  background: $bg-color;
   border-radius: 50%;
   color: $accent-color;
   cursor: pointer;
   font: bold 16px Tahoma, Verdana, sans-serif;
   height: 23px;
   line-height: 1.35;
-  padding: 0;
   right: 2px;
   top: 2px;
   text-align: center;
