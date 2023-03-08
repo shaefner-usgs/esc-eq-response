@@ -515,12 +515,16 @@ var SettingsBar = function (options) {
 
   /**
    * Event handler that refreshes a Feature and updates its URL parameter.
+   *
+   * @param e {Event}
    */
-  _update = function () {
-    var feature,
-        classList = Array.from(this.closest('div').classList),
-        id = classList.find(className => !className.includes('dd-')),
-        mainshock = document.body.classList.contains('mainshock');
+  _update = function (e) {
+    var classList, feature, id;
+
+    if (e.data && !Number.isInteger(Number(e.data))) return;
+
+    classList = Array.from(this.closest('div').classList);
+    id = classList.find(className => !className.includes('dd-'));
 
     if (AppUtil.getParam('catalog') === 'dd') {
       id = classList.find(className => className.includes('dd-'));
@@ -528,9 +532,9 @@ var SettingsBar = function (options) {
 
     feature = _app.Features.getFeature(id);
 
-    AppUtil.updateParam(this.id); // <input> id
+    AppUtil.setParam(this.id, this.value);
 
-    if (mainshock && this.value !== '') {
+    if (this.value !== '') {
       // Throttle stacked requests if user changes settings rapidly
       clearTimeout(_throttlers[id]); // ensure one timer per Feature
       _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
