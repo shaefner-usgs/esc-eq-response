@@ -1,7 +1,7 @@
 @use 'util/variables' as *;
 
 header {
-  background: $accent-color-lightest;
+  background: linear-gradient($bg-color, $accent-color-lighter);
   border-bottom: 2px solid $accent-color;
   left: 0;
   padding: .5rem var(--padding-gutter) 0;
