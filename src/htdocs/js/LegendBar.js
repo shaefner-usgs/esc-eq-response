@@ -55,7 +55,9 @@ var LegendBar = function (options) {
         });
 
     Object.keys(colors).forEach(key => {
-      var circle = svg.createCircle(colors[key]);
+      var circle = svg.createCircle({
+        fillColor: colors[key]
+      });
 
       _el.querySelector('.' + key).appendChild(circle);
     });
@@ -98,27 +100,13 @@ var LegendBar = function (options) {
    */
   _getColors = function () {
     return {
-      asDay: {
-        fillColor: '#f90'
-      },
-      asHour: {
-        fillColor: '#f00'
-      },
-      asOlder: {
-        fillColor: '#ffffe6'
-      },
-      asWeek: {
-        fillColor: '#ff0'
-      },
-      foreshocks: {
-        fillColor: '#99a'
-      },
-      historical: {
-        fillColor: '#dde'
-      },
-      mainshock: {
-        fillColor: '#00f'
-      },
+      day: '#f90',
+      foreshocks: '#99a',
+      historical: '#dde',
+      hour: '#f00',
+      mainshock: '#00f',
+      older: '#ffffe6',
+      week: '#ff0'
     };
   };
 
