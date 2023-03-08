@@ -12,6 +12,7 @@ require('leaflet/L.GreyscaleLayer');
 require('leaflet/L.GeoJSON.Async');
 require('leaflet/L.Map');
 require('leaflet/L.Map.BoxZoom');
+require('leaflet/L.Marker.Canvas');
 require('leaflet/L.Popup');
 require('leaflet/L.SatelliteLayer');
 require('leaflet/L.TerrainLayer');
