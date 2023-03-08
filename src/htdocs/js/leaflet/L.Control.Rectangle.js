@@ -89,7 +89,7 @@ L.Control.Rectangle = L.Control.extend({
     selected = this._addButton.classList.contains('selected');
 
     if (selected) {
-      this._addButton.title = 'Cancel and restore previous region';
+      this._addButton.title = 'Cancel and restore custom region';
       this._newRegion = map.editTools.startRectangle();
 
       map.removeLayer(this._region);
@@ -176,7 +176,7 @@ L.Control.Rectangle = L.Control.extend({
     selected = this._removeButton.classList.contains('selected');
 
     if (selected) {
-      this._removeButton.title = 'Restore the custom region';
+      this._removeButton.title = 'Cancel and restore custom region';
 
       this._map.removeLayer(this._region);
     } else {
