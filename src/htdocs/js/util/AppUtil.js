@@ -387,19 +387,5 @@ AppUtil.stripslashes = function (str) {
   });
 };
 
-/**
- * Update the given URL parameter with the corresponding input field's value.
- *
- * @param name {String}
- */
-AppUtil.updateParam = function (name) {
-  var input = document.getElementById(name),
-      value = input.value.replace(/\s+/g, ''); // strip whitespace
-
-  input.value = value;
-
-  AppUtil.setParam(name, value);
-};
-
 
 module.exports = AppUtil;
