@@ -6,9 +6,15 @@
     display: flex;
     justify-content: center;
 
-    &:active, &.selected {
+    &:active,
+    &.selected {
       .box {
         border-color: $bg-color;
+      }
+
+      .icon-close {
+        background: $bg-color;
+        color: $accent-color;
       }
     }
     &:hover {
@@ -27,16 +33,27 @@
   }
 
   .icon-close {
-    font: normal 11px Tahoma, Verdana, sans-serif;
-    line-height: 1.25;
+    background: $accent-color;
+    border-radius: 50%;
+    color: $bg-color;
+    font: normal 10px Tahoma, Verdana, sans-serif;
+    height: 12px;
+    line-height: 1.1;
     position: absolute;
-    top: -2px;
+    right: -5px;
+    text-align: center;
+    top: -6px;
+    width: 12px;
   }
 
-  // Disable the surrounding box as well as its 'x' button
+  // Disabled controls
   .leaflet-disabled .box,
-  .leaflet-disabled:active .box,
-  .leaflet-disabled .box:active {
+  .leaflet-disabled:active .box {
     border-color: $accent-color-disabled;
+  }
+  .leaflet-disabled .icon-close,
+  .leaflet-disabled:active .icon-close {
+    background: $accent-color-disabled;
+    color: $bg-color;
   }
 }
