@@ -55,8 +55,9 @@ var SettingsBar = function (options) {
       _el,
       _focusedField,
       _inputs,
+      _intervals,
       _throttlers,
-      _timers,
+      _timeouts,
       _timezone,
       _timezoneBar,
       _title,
@@ -87,8 +88,9 @@ var SettingsBar = function (options) {
     _app = options.app;
     _el = options.el;
     _inputs = _el.querySelectorAll('input[type=number]');
+    _intervals = {};
     _throttlers = {};
-    _timers = {};
+    _timeouts = {};
     _timezone = document.getElementById('timezone');
     _title = _inputs[0].title; // first input (all title attrs identical)
 
@@ -443,13 +445,14 @@ var SettingsBar = function (options) {
       }
     } else { // switch turned off
       AppUtil.deleteParam(name);
-      clearInterval(_timers[name]);
+      clearInterval(_intervals[name]);
+      clearTimeout(_timeouts[name]);
     }
   };
 
   /**
    * Set a one-off (non-recurring) refresh timer for the Feature matching the
-   * given name. Then start an interval timer when the one-off timer finishes.
+   * given name. Then start an interval timer when it finishes.
    *
    * @param name {String}
    *     URL parameter name
@@ -471,10 +474,10 @@ var SettingsBar = function (options) {
       }
     }
 
-    clearInterval(_timers[name]); // cancel existing interval timer first
-    clearTimeout(_timers.oneOff); // ensure a single timer is set
+    clearInterval(_intervals[name]); // cancel existing interval timer first
+    clearTimeout(_timeouts[name]); // ensure a single timer is set
 
-    _timers.oneOff = setTimeout(function() {
+    _timeouts[name] = setTimeout(function() {
       _app.Features.refreshFeature(id);
       _this.setInterval(name);
     }, delay);
@@ -579,8 +582,8 @@ var SettingsBar = function (options) {
     });
     _focusedField = null;
 
-    clearInterval(_timers['as-refresh']);
-    clearTimeout(_timers.oneOff);
+    clearInterval(_intervals['as-refresh']);
+    clearTimeout(_timeouts['as-refresh']);
   };
 
   /**
@@ -612,9 +615,9 @@ var SettingsBar = function (options) {
     var id = _getFeatureId(name),
         interval = _getInterval(name);
 
-    clearInterval(_timers[name]); // ensure a single timer per Feature is set
+    clearInterval(_intervals[name]); // ensure a single timer per Feature is set
 
-    _timers[name] = setInterval(_app.Features.refreshFeature, interval, id);
+    _intervals[name] = setInterval(_app.Features.refreshFeature, interval, id);
   };
 
   /**
