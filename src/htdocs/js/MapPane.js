@@ -385,6 +385,10 @@ var MapPane = function (options) {
     var marker,
         layer = _app.Features.getFeature(featureId).mapLayer;
 
+    if (!_rendered) {
+      _this.render();
+    }
+
     // Find the marker
     layer.eachLayer(eq => {
       if (eq.feature.id === eqid) {
