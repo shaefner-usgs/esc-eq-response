@@ -57,7 +57,7 @@ var StatusBar = function (options) {
     if (close) {
       close.addEventListener('click', e => {
         e.preventDefault();
-        _this.removeItem(id);
+        _this.removeItem(id, false);
       });
     }
 
@@ -67,7 +67,7 @@ var StatusBar = function (options) {
         var feature = _app.Features.getFeature(id);
 
         e.preventDefault();
-        _this.removeItem(id);
+        _this.removeItem(id, false);
 
         if (feature.isRefreshing) {
           _app.Features.refreshFeature(id);
@@ -218,8 +218,10 @@ var StatusBar = function (options) {
    *
    * @param id {String}
    *     Feature id
+   * @param delay {Boolean} default is true
+   *     Delays removal so CSS transition can finish first
    */
-  _this.removeItem = function (id) {
+  _this.removeItem = function (id, delay = true) {
     var items = _el.querySelectorAll('.' + id); // also remove duplicate items
 
     items.forEach(item => {
@@ -229,8 +231,11 @@ var StatusBar = function (options) {
       } else if (_el.children.length === 1) {
         _hide();
 
-        // Don't remove item until CSS transition is complete
-        setTimeout(_removeNode, 1500, item);
+        if (delay) {
+          setTimeout(_removeNode, 1500, item);
+        } else {
+          _removeNode(item);
+        }
       } else {
         _removeNode(item);
       }
