@@ -16,7 +16,7 @@
   }
 
   .exposure {
-    div {
+    > div {
       align-items: flex-start;
       display: flex;
       flex-flow: row wrap;
@@ -29,6 +29,10 @@
 
     img {
       margin-top: .5rem;
+    }
+
+    p {
+      margin: 0;
     }
 
     table {
