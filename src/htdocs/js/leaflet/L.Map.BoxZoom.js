@@ -39,19 +39,29 @@ L.Map.BoxZoom.include({
   /**
    * Override for _onMouseUp.
    *
-   * @return {Object}
+   * @return padding {Object}
    */
   _override: function () {
-    var offsetX = 0,
-        offsetY = document.querySelector('header').offsetHeight;
+    var offsetX, offsetY,
+        main = this._container.closest('main'),
+        padding = { // default
+          padding: [0, 0]
+        };
 
-    if (AppUtil.getParam('sidebar')) {
-      offsetX = document.getElementById('sideBar').offsetWidth;
+    if (main) { // 'main' map (MapPane)
+      offsetX = 0;
+      offsetY = document.querySelector('header').offsetHeight;
+
+      if (AppUtil.getParam('sidebar')) {
+        offsetX = document.getElementById('sideBar').offsetWidth;
+      }
+
+      padding = {
+        paddingBottomRight: [offsetX, 0],
+        paddingTopLeft: [0, offsetY]
+      };
     }
 
-    return {
-      paddingBottomRight: [offsetX, 0],
-      paddingTopLeft: [0, offsetY]
-    };
+    return padding;
   },
 });
