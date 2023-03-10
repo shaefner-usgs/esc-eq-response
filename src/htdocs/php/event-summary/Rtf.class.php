@@ -534,7 +534,7 @@ class Rtf {
       }
 
       if (
-        property_exists($pager, 'impact') ||
+        property_exists($pager, 'effects') ||
         property_exists($pager, 'structures')
       ) {
         $section3->writeText(
@@ -543,12 +543,7 @@ class Rtf {
           $this->_format->h4
         );
         $section3->writeText(
-          $pager->impact,
-          $this->_font->body,
-          $this->_format->p // margin below
-        );
-        $section3->writeText(
-          $pager->structures,
+          $pager->structures . ' ' . $pager->effects,
           $this->_font->body,
           $this->_format->body // no margin below (margins don't collapse)
         );
@@ -565,38 +560,53 @@ class Rtf {
           $this->_format->image,
           12
         );
+        $section3->writeText(
+          $pager->fatalBlurb,
+          $this->_font->body,
+          $this->_format->center
+        );
       }
 
-      if (property_exists($pager, 'economic')) {
+      if (property_exists($pager, 'cost')) {
         $section3->writeText(
           'Estimated Economic Losses',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->addImage(
-          $this->_getRemoteImage($pager->economic),
+          $this->_getRemoteImage($pager->cost),
           $this->_format->image,
           12
         );
+        $section3->writeText(
+          $pager->costBlurb,
+          $this->_font->body,
+          $this->_format->center
+        );
+      }
+
+      $section3->writeText(
+        'Population Exposure',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $section3->writeText('<br>');
+
+      if (!empty(get_object_vars($pager->exposures))) {
+        $this->_createTableExposure($section3);
       }
 
       if (property_exists($pager, 'exposure')) {
-        $section3->insertPageBreak();
-        $section3->writeText(
-          'Population Exposure',
-          $this->_font->h4,
-          $this->_format->h4
-        );
-        $section3->writeText('<br>');
         $section3->addImage(
           $this->_getRemoteImage($pager->exposure),
           $this->_format->image,
           10
         );
-      }
-
-      if (!empty(get_object_vars($pager->exposures))) {
-        $this->_createTableExposure($section3);
+        $section3->writeText(
+          'Population per ~1 sq. km. from LandScan',
+          $this->_font->body,
+          $this->_format->center
+        );
       }
 
       $section3->writeText(
@@ -1450,12 +1460,6 @@ class Rtf {
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
     if ($numRows > 1) { // table contains data (and not just a header row)
-      $section->writeText(
-        '<br>',
-        $this->_font->body,
-        $this->_format->table // sets formatting in table that follows
-      );
-
       $table = $section->addTable();
       $table->addRows($numRows);
       $table->addColumnsList(array(2, 5, 3));
@@ -1719,8 +1723,9 @@ class Rtf {
     $this->_format->borderLighter = new PHPRtfLite_Border_Format(1, '#EFEFEF');
 
     $this->_format->center = new PHPRtfLite_ParFormat('center');
-    $this->_format->center->setSpaceAfter(10);
+    $this->_format->center->setSpaceAfter(12);
     $this->_format->center->setSpaceBefore(0);
+    $this->_format->center->setSpaceBetweenLines(1.5);
 
     $this->_format->h1 = new PHPRtfLite_ParFormat('center');
     $this->_format->h1->setSpaceBetweenLines(1.5);
