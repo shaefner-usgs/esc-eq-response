@@ -95,7 +95,7 @@ var ShakeAlert = function (options) {
       Object.assign(props, {
         citydist: AppUtil.round(props.citydist, 1) + ' km',
         warning_time: '~' + AppUtil.round(props.warning_time, 1) +  ' s',
-        mmi: AppUtil.romanize(props.mmi)
+        mmi: AppUtil.romanize(Number(props.mmi))
       });
 
       table +=
@@ -186,17 +186,34 @@ var ShakeAlert = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var props = json.properties,
+    var alerts, final, initial,
+        props = json.properties,
         decimalSecs = props.time.match(/\.0*[^0]+/)[0],
-        final = json.final_alert.properties,
         format = 'LLL d, yyyy TT',
-        initial = json.initial_alert.properties,
         radius = '',
         time = props.time.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
         datetime = Luxon.DateTime.fromISO(time).toUTC(),
         updateTime = Luxon.DateTime.fromSeconds(_product.updateTime/1000).toUTC();
 
-    json.initial_alert.features.forEach(feature => {
+    // Parse alerts, which are stored in disparate formats
+    if (json.alerts) {
+      alerts = {};
+
+      json.alerts.forEach((alert, i) => {
+        var name = alert.id.match(/(.+)AlertCollection/)[1];
+        alerts[name] = json.alerts[i];
+      });
+    } else {
+      alerts = {
+        final: json.final_alert,
+        initial: json.initial_alert,
+      };
+    }
+
+    final = alerts.final.properties;
+    initial = alerts.initial.properties;
+
+    alerts.initial.features.forEach(feature => {
       if (feature.id === 'acircle_0.0') {
         radius = feature.properties.radius;
 
@@ -244,15 +261,14 @@ var ShakeAlert = function (options) {
    * @return {String}
    */
   _getLocation = function (alert) {
-    var azimuth = alert.location_azimuth_error,
-        compassPoints = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
-        index = Math.floor((22.5 + (360 + azimuth) % 360) / 45),
-        direction = compassPoints[index],
+    var bearing = alert.location_azimuth_error,
+        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
         distance = alert.location_distance_error,
         kms = AppUtil.round(distance, 1),
-        miles = AppUtil.round(distance / 1.60934, 1);
+        miles = AppUtil.round(distance / 1.60934, 1),
+        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 
-    return `${kms} km (${miles} mi) ${direction}`;
+    return `${kms} km (${miles} mi) ${directions[octant]}`;
   };
 
   /**
