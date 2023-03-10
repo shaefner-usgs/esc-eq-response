@@ -2,14 +2,9 @@
 
 @use 'variables' as *;
 
-// Convert px to rem
-@function px-to-rem($px-value) {
-	@return ($px-value / $font-size) + rem;
-}
-
 // Convert rem to px
 @function rem-to-px($rem-value) {
-	@return ($rem-value * $font-size) + px;
+	@return ($rem-value * $font-size);
 }
 
 // Replace characters in a string.
