@@ -85,21 +85,16 @@ var Pager = function (options) {
    * @return {String}
    */
   _getContent = function () {
-    var data,
-        exposures = _app.Features.getFeature('pager-exposures'),
+    var exposures = _app.Features.getFeature('pager-exposures'),
         summary = '',
         table = '';
 
-    if (_this.data.impact || _this.data.structures) {
-      summary = '<h4>Summary</h4><p>{impact}</p><p>{structures}</p>';
+    if (_this.data.effects || _this.data.structures) {
+      summary = '<h4>Summary</h4><p>{structures} {effects}</p>';
     }
     if (_app.Features.isFeature(exposures)) {
       table = exposures.summary.replace('<h3>Population Exposure</h3>', '');
     }
-
-    data = Object.assign({}, _this.data, {
-      table: table
-    });
 
     return L.Util.template(
       summary +
@@ -107,19 +102,24 @@ var Pager = function (options) {
         '<div class="loss">' +
           '<h4>Estimated Fatalities</h4>' +
           '<img src="{fatalities}" alt="Estimated fatalities histogram">' +
+          '<p>{fatalBlurb}</p>' +
           '<h4>Estimated Economic Losses</h4>' +
-          '<img src="{economic}" alt="Estimated economic losses histogram">' +
+          '<img src="{cost}" alt="Estimated economic losses histogram">' +
+          '<p>{costBlurb}</p>' +
         '</div>' +
         '<div class="exposure">' +
-          '<h4>Population Exposure</h4>' +
+          '<h4>Estimated Population Exposure</h4>' +
           '<div>' +
-            '{table}' +
-            '<img src="{exposure}" alt="Population exposure map">' +
+            table +
+            '<div>' +
+              '<img src="{exposure}" alt="Population exposure map">' +
+              '<p>Population per ~1 sq. km. from LandScan</p>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>' +
       '<p class="status"><span>{status}</span></p>',
-      data
+      _this.data
     );
   };
 
@@ -131,24 +131,28 @@ var Pager = function (options) {
    * @return {Object}
    */
   _getData = function (json = null) {
-    var impact, structures,
+    var costBlurb, effects, fatalBlurb, structures,
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerExposures = _app.Features.getFeature('pager-exposures'),
         contents = _product.contents;
 
     if (json) {
-      impact = json.impact1;
+      costBlurb = json.impact1;
+      effects = json.secondary_comment;
+      fatalBlurb = json.impact2;
       structures = json.struct_comment;
     }
 
     return {
       alert: _product.properties.alertlevel,
       cities: pagerCities.data,
-      economic: contents['alertecon.png'].url,
+      cost: contents['alertecon.png'].url,
+      costBlurb: costBlurb || '',
+      effects: effects || '',
       exposure: contents['exposure.png'].url,
       exposures: pagerExposures.data,
       fatalities: contents['alertfatal.png'].url,
-      impact: impact || '',
+      fatalBlurb: fatalBlurb || '',
       status: _getStatus(),
       structures: structures || ''
     };
