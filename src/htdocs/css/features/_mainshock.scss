@@ -28,8 +28,7 @@
       margin: 0;
       padding: 0 1rem;
 
-      &:first-child,
-      &.dd.mag {
+      &:first-child {
         padding-left: .25rem;
       }
 
@@ -180,12 +179,16 @@
   }
 
   .pager-exposures {
+    cursor: pointer;
+
     table {
       width: 100%;
     }
   }
 
   .pager-loss {
+    cursor: pointer;
+
     &.bubble {
       padding: 1rem .5rem;
     }
