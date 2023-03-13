@@ -340,9 +340,9 @@ var Mainshock = function (options) {
   _getLossPager = function () {
     var template = '';
 
-    if (_this.data.econImg) {
+    if (_this.data.econImg || _this.data.fatalImg) {
       template =
-        '<div class="pager-loss bubble">' +
+        '<div class="pager-loss feature bubble">' +
           '<h4>Estimated Fatalities</h4>' +
           '<img src="{fatalImg}" alt="Estimated fatalities histogram">' +
           '<h4>Estimated Economic Losses</h4>' +
@@ -481,8 +481,8 @@ var Mainshock = function (options) {
           '<div class="focal-mechanism feature content hide"></div>' +
           '<div class="moment-tensor feature content hide"></div>' +
         '</div>' +
-        '<div class="pager-exposures feature content bubble hide"></div>' +
         _getLossPager() +
+        '<div class="pager-exposures feature content bubble hide"></div>' +
         '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
@@ -687,10 +687,12 @@ var Mainshock = function (options) {
    * Note: Leaflet map popup's listeners are added by the Earthquakes Class.
    */
   _this.addListeners = function () {
-    var selectors = [
+    var selectors = [ // Lightboxes
       '#mainshock .feature', // bubbles on SelectBar
-      '#mapPane .feature', // Beachballs
+      '#mapPane .feature', // map's Beachballs
       '#summaryPane .details .feature',
+      '#summaryPane .pager-exposures',
+      '#summaryPane .pager-loss',
       '#summaryPane .thumbs .feature'
     ];
 
