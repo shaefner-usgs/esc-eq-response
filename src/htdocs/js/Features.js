@@ -850,6 +850,10 @@ var Features = function (options) {
 
     e.preventDefault();
 
+    if (id === 'pager-exposures' || id === 'pager-loss') {
+      id = 'pager'; // show PAGER's Lightbox
+    }
+
     if (_lightboxes[id]) {
       _lightboxes[id].show();
     }
