@@ -32,7 +32,7 @@ var PagerExposures = function (options) {
       _app,
 
       _fetch,
-      _getExposures,
+      _getData,
       _getRows,
       _getSummary,
       _getUrl;
@@ -66,13 +66,13 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get the aggregated population exposure and associated MMI/shaking (ASC).
+   * Get the data used to create the content.
    *
    * @param json {Object}
    *
    * @return {Object}
    */
-  _getExposures = function (json) {
+  _getData = function (json) {
     var exposure = json.population_exposure,
         mmi = exposure.mmi,
         population = exposure.aggregated_exposure.map(pop =>
@@ -205,7 +205,7 @@ var PagerExposures = function (options) {
    * @param json {Object}
    */
   _this.addData = function (json) {
-    _this.data = _getExposures(json);
+    _this.data = _getData(json);
     _this.summary = _getSummary();
   };
 
@@ -218,7 +218,7 @@ var PagerExposures = function (options) {
     _app = null;
 
     _fetch = null;
-    _getExposures = null;
+    _getData = null;
     _getRows = null;
     _getSummary = null;
     _getUrl = null;
