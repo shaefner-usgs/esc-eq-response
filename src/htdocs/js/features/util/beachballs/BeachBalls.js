@@ -195,8 +195,8 @@ var BeachBalls = function (options) {
     azimuth = BeachBallView.zeroToTwoPi(azimuth);
 
     return {
-      azimuth: AppUtil.round(azimuth * _R2D, 0) + '°',
-      plunge: AppUtil.round(plunge * _R2D, 0) + '°',
+      azimuth: Math.round(azimuth * _R2D) + '°',
+      plunge: Math.round(plunge * _R2D) + '°',
       value: value.toFixed(3) + `e+${_tensor.exponent} ${_tensor.units}`
     };
   };
@@ -236,16 +236,16 @@ var BeachBalls = function (options) {
       nAxisAzimuth: axes.N.azimuth,
       nAxisPlunge: axes.N.plunge,
       nAxisValue: axes.N.value,
-      np1Dip: AppUtil.round(_tensor.NP1.dip, 0) + '°',
-      np1Rake: AppUtil.round(_tensor.NP1.rake, 0) + '°',
-      np1Strike: AppUtil.round(_tensor.NP1.strike, 0) + '°',
-      np2Dip: AppUtil.round(_tensor.NP2.dip, 0) + '°',
-      np2Rake: AppUtil.round(_tensor.NP2.rake, 0) + '°',
-      np2Strike: AppUtil.round(_tensor.NP2.strike, 0) + '°',
+      np1Dip: Math.round(_tensor.NP1.dip) + '°',
+      np1Rake: Math.round(_tensor.NP1.rake) + '°',
+      np1Strike: Math.round(_tensor.NP1.strike) + '°',
+      np2Dip: Math.round(_tensor.NP2.dip) + '°',
+      np2Rake: Math.round(_tensor.NP2.rake) + '°',
+      np2Strike: Math.round(_tensor.NP2.strike) + '°',
       pAxisAzimuth: axes.P.azimuth,
       pAxisPlunge: axes.P.plunge,
       pAxisValue: axes.P.value,
-      percentDC: AppUtil.round(_tensor.percentDC * 100, 0) + '%',
+      percentDC: Math.round(_tensor.percentDC * 100) + '%',
       status: _getStatus(),
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
