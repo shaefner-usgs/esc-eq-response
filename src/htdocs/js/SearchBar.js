@@ -331,6 +331,7 @@ var SearchBar = function (options) {
     var zoomControl;
 
     _map = L.map('region-map', {
+      attributionControl: false,
       editable: true,
       layers: [
         L.greyscaleLayer(),
