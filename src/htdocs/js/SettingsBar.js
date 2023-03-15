@@ -573,6 +573,11 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via Features.js.
    */
   _this.reset = function () {
+    var time = _el.querySelector('#aftershocks + time');
+
+    time.textContent = '';
+    time.setAttribute('datetime', '');
+
     _inputs.forEach(input => {
       input.value = '';
 
