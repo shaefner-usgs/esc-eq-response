@@ -102,7 +102,7 @@
 }
 
 body:not(.mainshock) {
-  #aftershocks ~ .details time,
+  #aftershocks + time,
   #settingsBar .required {
     display: none
   }
