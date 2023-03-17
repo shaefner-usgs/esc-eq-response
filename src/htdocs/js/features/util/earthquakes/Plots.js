@@ -389,7 +389,7 @@ var Plots = function (options) {
         userTime: _data.userTime.slice(),
         utcTime: _data.utcTime.slice(),
         x: x.slice(),
-        y: Array.from(new Array(_data.isoTime.length), (val, i) => i + 1) // 1 to length of x
+        y: Array.from(Array(x.length), (val, i) => i + 1) // 1 to length of x
       });
 
       _addMainshock(data, timezone);
