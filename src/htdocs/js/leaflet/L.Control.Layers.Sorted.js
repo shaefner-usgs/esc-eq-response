@@ -4,9 +4,9 @@
 
 /**
  * This class extends L.Control.Layers to sort the list of map layers based on
- * their stacking order on the map. It also adds (and preserves) the loaders and
- * count values next to a Feature's name as well as its CSS classes, which are
- * attached to its <label>.
+ * their stacking order on the map. It also adds the loaders and count values
+ * next to a Feature's name (and its CSS classes, which are attached to its
+ * <label>).
  *
  * Note: stacking order is controlled by setting the z-index value of the
  * Feature's custom [Leaflet map pane](https://leafletjs.com/reference.html#map-pane).
@@ -31,7 +31,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
-   * Add a CSS class name, which is attached to the given Feature's <label>.
+   * Add a CSS class to the given Feature's <label>.
    *
    * @param className {String}
    * @param id {String}
@@ -78,6 +78,23 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
+   * Remove a CSS class from the given Feature's <label>.
+   *
+   * @param className {String}
+   * @param id {String}
+   *     Feature id
+   */
+  removeClass: function (className, id) {
+    var label = document.querySelector('#mapPane .' + id);
+
+    label.classList.remove(className);
+
+    if (Array.isArray(this._classNames)) {
+      this._classNames = this._classNames.filter(name => name !== className);
+    }
+  },
+
+  /**
    * Remove the loader next to the given Feature's name.
    *
    * @param id {String}
@@ -102,7 +119,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   /**
    * Override _addItem from L.Control.Layers.
    *
-   * Include the loader or count value in an overlay's display name.
+   * Include a loader or count value next to the overlay's name.
    *
    * @param obj {Object}
    *
@@ -154,6 +171,9 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   /**
    * Override for _addItem.
    *
+   * Store the display name since Leaflet sets it back to its instantiated value
+   * (no loader or count value) when the list is sorted.
+   *
    * @param obj {Object}
    * @param label {Element}
    *
@@ -183,10 +203,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
 
   /**
    * Set the given Feature's display name, which is typically the Feature's
-   * name, plus either a loader or count value, depending on the status.
-   *
-   * Note: this is necessary to override Leaflet resetting the name to its
-   * instantiated value (its name only) every time the list is sorted.
+   * name, plus a loader or count value, depending on the status.
    *
    * @param id {String}
    *     Feature id
