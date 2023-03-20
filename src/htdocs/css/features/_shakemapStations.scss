@@ -7,6 +7,14 @@
       padding-left: .5rem;
       padding-right: .5rem;
       text-align: center;
+
+      em {
+        font-size: 0.875rem;
+        font-style: normal;
+      }
+    }
+    th span {
+      text-transform: lowercase;
     }
 
     tr {
