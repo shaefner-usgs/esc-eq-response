@@ -58,6 +58,7 @@ var FieldNotes = function (options) {
       _onPopupOpen,
       _pointToLayer,
       _removePopupListeners,
+      _setVisibility,
       _showLightbox,
       _toggleProps,
       _updatePopup;
@@ -300,6 +301,23 @@ var FieldNotes = function (options) {
   };
 
   /**
+   * Only show the overlay in the layer control if it has markers, because only
+   * the 2014 Napa quake includes FieldNotes data.
+   */
+  _setVisibility = function () {
+    var control = _app.MapPane.layerControl,
+        legend = document.querySelector('#legendBar .fieldnotes');
+
+    if (_this.count === 0) {
+      control.addClass('hide', _this.id);
+      legend.classList.add('hide');
+    } else {
+      control.removeClass('hide', _this.id);
+      legend.classList.remove('hide');
+    }
+  };
+
+  /**
    * Event handler that shows a full-size photo in a Lightbox.
    *
    * @param e {Event}
@@ -347,22 +365,16 @@ var FieldNotes = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
-    var legend;
-
+  _this.addData = function (json = {}) {
     _this.count = json.features.length;
 
-    if (_this.count === 0) {
-      // Hide if empty (only the 2014 Napa quake has FieldNotes data)
-      _app.MapPane.layerControl.addClass('hide', _this.id);
-    } else {
+    if (_this.count !== 0) {
       _lightbox = Lightbox({id: _this.id});
-      legend = document.querySelector('#legendBar .fieldnotes');
-
-      legend.classList.remove('hide');
     }
+
+    _setVisibility();
   };
 
   /**
@@ -398,6 +410,7 @@ var FieldNotes = function (options) {
     _onPopupOpen = null;
     _pointToLayer = null;
     _removePopupListeners = null;
+    _setVisibility = null;
     _showLightbox = null;
     _toggleProps = null;
     _updatePopup = null;
