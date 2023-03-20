@@ -36,7 +36,7 @@ _R2D = 180 / Math.PI;
  * @return _this {Object}
  *     {
  *       destroy: {Function}
- *       getContent: {Function}
+ *       getLightbox: {Function}
  *       getMapLayer: {Function}
  *       getSummary: {Function}
  *       getTitle: {Function}
@@ -327,7 +327,7 @@ var BeachBalls = function (options) {
    *
    * @return {String}
    */
-  _this.getContent = function () {
+  _this.getLightbox = function () {
     return L.Util.template(
       '<div class="details">' +
         '<dl class="props alt">' +
