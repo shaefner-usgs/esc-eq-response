@@ -215,6 +215,7 @@ var BeachBalls = function (options) {
         },
         depth = _tensor.depth || _mainshock.data.depth,
         duration = _data['sourcetime-duration'],
+        format = 'LLL d, yyyy TT',
         moment = (_tensor.moment / _tensor.scale).toFixed(3) +
           `e+${_tensor.exponent} ${_tensor.units}`;
 
@@ -228,6 +229,7 @@ var BeachBalls = function (options) {
       dataSource: _data['beachball-source'] || _data.source,
       depth: AppUtil.round(depth, 1) + ' km',
       halfDuration: halfDuration || '–',
+      isoTime: _data.datetime.toISO() || '',
       magType: _data['derived-magnitude-type'] || '',
       magnitude: AppUtil.round(_tensor.magnitude, 2),
       moment: moment,
@@ -250,6 +252,9 @@ var BeachBalls = function (options) {
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
+      userTime: _data.datetime.toLocal().toFormat(format),
+      utcOffset: Number(_data.datetime.toLocal().toFormat('Z')),
+      utcTime: _data.datetime.toFormat(format)
     };
   };
 
@@ -365,7 +370,16 @@ var BeachBalls = function (options) {
           '</tbody>' +
         '</table>' +
         _getAxes() +
-        '<p class="status"><span>{status}</span></p>' +
+        '<dl class="props">' +
+          '<dt>Status</dt>' +
+          '<dd class="status">{status}</dd>' +
+          '<dt>Updated</dt>' +
+          '<dd>' +
+            '<time datetime="{isoTime}" class="user">{userTime} ' +
+              '(UTC{utcOffset})</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+          '</dd>' +
+        '</dl>' +
       '</div>' +
       '<div class="beachball"></div>',
       _getData()

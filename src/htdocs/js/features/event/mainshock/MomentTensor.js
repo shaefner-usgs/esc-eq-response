@@ -1,7 +1,9 @@
 'use strict';
 
 
-var BeachBalls = require('features/util/beachballs/BeachBalls');
+var AppUtil = require('util/AppUtil'),
+    BeachBalls = require('features/util/beachballs/BeachBalls'),
+    Luxon = require('luxon');
 
 
 /**
@@ -55,9 +57,9 @@ var MomentTensor = function (options) {
     _this.zoomToLayer = false;
 
     mainshock = _app.Features.getFeature('mainshock');
-    product = mainshock.data.products[_this.id];
+    product = mainshock.data.products?.[_this.id]?.[0] || {};
 
-    if (product) {
+    if (!AppUtil.isEmpty(product)) {
       _beachballs = BeachBalls({
         data: _getData(product),
         id: _this.id,
@@ -76,15 +78,18 @@ var MomentTensor = function (options) {
   };
 
   /**
-   * Unnest the 'source' data.
+   * Get the data used to create the content.
    *
-   * @param mt {Array} default is []
+   * @param mt {Object}
    *
    * @return {Object}
    */
-  _getData = function (mt = []) {
-    return Object.assign({}, mt[0]?.properties || {}, {
-      source: mt[0]?.source || ''
+  _getData = function (mt) {
+    var seconds = mt.updateTime/1000 || 0;
+
+    return Object.assign({}, mt.properties || {}, {
+      datetime: Luxon.DateTime.fromSeconds(seconds).toUTC(),
+      source: mt.source || '',
     });
   };
 
