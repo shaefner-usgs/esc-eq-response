@@ -13,12 +13,12 @@
     width: 350px;
   }
 
-  dd {
-    max-width: 10rem;
-  }
-
-  dl {
+  dl.alt {
     margin: 0;
+
+    dd {
+      max-width: 10rem;
+    }
   }
 
   td {

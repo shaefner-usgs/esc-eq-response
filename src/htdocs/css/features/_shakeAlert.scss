@@ -32,6 +32,7 @@
 
   ul {
     list-style: none;
+    margin-bottom: 0;
     padding: 0;
 
     strong {
@@ -44,18 +45,24 @@
   }
 
   .logo {
+    max-width: 20rem;
     position: sticky;
     top: 4rem;
 
+    a {
+      display: block;
+      margin: 0 auto;
+      max-width: 15rem;
+      padding: 0;
+    }
+
+    h4 {
+      font-size: 1.375rem;
+    }
+
     img {
       max-width: 100%;
-      width: 250px;
     }
-  }
-
-  .wea {
-    margin-bottom: 0;
-    max-width: 35rem;
   }
 
   .wrapper {
@@ -66,20 +73,11 @@
   }
 }
 
-/* Toggle between user/UTC time
---------------------------------------------- */
-
-body.user #shake-alert time.utc,
-body.utc #shake-alert time.user {
-  display: none;
-}
-
 @media only screen
 and (max-width: $breakpoint-phone-width) {
   #shake-alert {
-    img {
-      display: block;
-      margin: 1rem auto 0;
+    a {
+      margin-top: 1rem;
     }
 
     .wrapper {
@@ -88,7 +86,7 @@ and (max-width: $breakpoint-phone-width) {
 
     .details,
     .logo {
-      width: 100%;
+      max-width: 100%;
     }
   }
 }
