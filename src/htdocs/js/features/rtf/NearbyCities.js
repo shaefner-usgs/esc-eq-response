@@ -80,9 +80,9 @@ var NearbyCities = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object} default is {}
+   * @param json {Object} default is []
    */
-  _this.addData = function (json = {}) {
+  _this.addData = function (json = []) {
     _this.data = json;
   };
 
