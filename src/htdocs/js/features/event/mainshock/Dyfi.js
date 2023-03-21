@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar');
 
 
@@ -70,13 +71,15 @@ var Dyfi = function (options) {
    * Add the intensity bubble to the Lightbox's title.
    */
   _addBubble = function () {
-    var bubble = '' +
-          `<span class="mmi${_mainshock.data.cdi} impact-bubble">` +
-            `<strong class="roman">${_mainshock.data.cdi}</strong>` +
-          '</span>',
+    var bubble = L.Util.template(
+          '<a href="{url}" class="mmi{cdi} impact-bubble" target="new">' +
+            '<strong class="roman">{cdi}</strong>' +
+          '</a>',
+          _this.data
+        ),
         h3 = document.getElementById('dyfi').querySelector('h3');
 
-    h3.innerHTML = h3.textContent + bubble;
+    h3.innerHTML = _this.name + bubble;
   };
 
   /**
@@ -97,16 +100,23 @@ var Dyfi = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var props = _product.properties || {};
+    var format = 'LLL d, yyyy TT',
+        props = _product.properties || {},
+        seconds = _product.updateTime/1000 || 0,
+        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
 
     return {
       cdi: _mainshock.data.cdi,
+      isoTime: datetime.toISO() || '',
       map: _mainshock.data.dyfiImg,
       maxmmi: Number(props.maxmmi),
       plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url || '',
       responses: AppUtil.addCommas(props.numResp),
       status: _getStatus(props),
-      url: _mainshock.data.url + '/dyfi'
+      url: _mainshock.data.url + '/dyfi',
+      userTime: datetime.toLocal().toFormat(format),
+      utcOffset: Number(datetime.toLocal().toFormat('Z')),
+      utcTime: datetime.toFormat(format)
     };
   };
 
@@ -173,14 +183,18 @@ var Dyfi = function (options) {
             '<dt>Responses</dt>' +
             '<dd>{responses}</dd>' +
           '</dl>' +
-          '<p>' +
-            '<a href="{url}" class="external" target="new">Event Page DYFI?' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
         '</div>' +
       '</div>' +
-      '<p class="status"><span>{status}</span></p>',
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        '<dt>Updated</dt>' +
+        '<dd>' +
+          '<time datetime="{isoTime}" class="user">{userTime} ' +
+            '(UTC{utcOffset})</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+        '</dd>' +
+      '</dl>',
       _this.data
     );
   };

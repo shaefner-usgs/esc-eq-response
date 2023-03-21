@@ -2,7 +2,8 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
+var AppUtil = require('util/AppUtil'),
+    Luxon = require('luxon');
 
 
 /**
@@ -88,11 +89,14 @@ var Pager = function (options) {
    */
   _getData = function (json = {}) {
     var contents = _product.contents || {},
+        seconds = _product.updateTime/1000 || 0,
+        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC(),
+        format = 'LLL d, yyyy TT',
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerExposures = _app.Features.getFeature('pager-exposures');
 
     return {
-      alert: _product.properties?.alertlevel || '',
+      alert: _mainshock.data.alert,
       cities: pagerCities.data,
       cost: contents['alertecon.png']?.url || '',
       costBlurb: json.impact1 || '',
@@ -101,8 +105,13 @@ var Pager = function (options) {
       exposures: pagerExposures.data,
       fatal: contents['alertfatal.png']?.url || '',
       fatalBlurb: json.impact2 || '',
+      isoTime: datetime.toISO() || '',
       status: _getStatus(),
-      structures: json.struct_comment || ''
+      structures: json.struct_comment || '',
+      url: _mainshock.data.url + '/pager',
+      userTime: datetime.toLocal().toFormat(format),
+      utcOffset: Number(datetime.toLocal().toFormat('Z')),
+      utcTime: datetime.toFormat(format)
     };
   };
 
@@ -145,7 +154,16 @@ var Pager = function (options) {
           '</div>' +
         '</div>' +
       '</div>' +
-      '<p class="status"><span>{status}</span></p>',
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        '<dt>Updated</dt>' +
+        '<dd>' +
+          '<time datetime="{isoTime}" class="user">{userTime} ' +
+            '(UTC{utcOffset})</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+        '</dd>' +
+      '</dl>',
       _this.data
     );
   };
@@ -224,13 +242,16 @@ var Pager = function (options) {
    * Add the alert bubble.
    */
   _this.render = function () {
-    var bubble =
-          `<span class="pager-alertlevel-${_mainshock.data.alert} impact-bubble">` +
-            `<strong class="roman">${_mainshock.data.alert}</strong>` +
-          '</span>',
+    var bubble = L.Util.template(
+          '<a href="{url}" class="pager-alertlevel-{alert} impact-bubble" ' +
+            'target="new">' +
+            '<strong class="roman">{alert}</strong>' +
+          '</a>',
+          _this.data
+        ),
         h3 = document.getElementById('pager').querySelector('h3');
 
-    h3.innerHTML = h3.textContent + bubble;
+    h3.innerHTML = _this.name + bubble;
   };
 
 

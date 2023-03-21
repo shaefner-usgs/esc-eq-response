@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar');
 
 
@@ -80,13 +81,15 @@ var ShakeMap = function (options) {
    * Add the intensity bubble to the Lightbox's title.
    */
   _addBubble = function () {
-    var bubble = '' +
-          `<span class="mmi${_mainshock.data.mmi} impact-bubble">` +
-            `<strong class="roman">${_mainshock.data.mmi}</strong>` +
-          '</span>',
+    var bubble = L.Util.template(
+          '<a href="{url}" class="mmi{mmiValue} impact-bubble" target="new">' +
+            '<strong class="roman">{mmiValue}</strong>' +
+          '</a>',
+          _this.data
+        ),
         h3 = document.getElementById('shakemap').querySelector('h3');
 
-    h3.innerHTML = h3.textContent + bubble;
+    h3.innerHTML = _this.name + bubble;
   };
 
   /**
@@ -137,16 +140,23 @@ var ShakeMap = function (options) {
    * @return {Object}
    */
   _getData = function (json = {}) {
-    var info = json.input?.event_information || {},
-        motions = _getMotions(json);
+    var format = 'LLL d, yyyy TT',
+        info = json.input?.event_information || {},
+        motions = _getMotions(json),
+        seconds = _product.updateTime/1000 || 0,
+        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
 
     return Object.assign(motions, {
       dyfi: Number(info.intensity_observations) || '–',
       img: _mainshock.data.shakemapImg,
+      isoTime: datetime.toISO() || '',
       mmiValue: _mainshock.data.mmi,
       seismic: Number(info.seismic_stations) || '–',
       status: _getStatus(),
-      url: _mainshock.data.url + '/shakemap'
+      url: _mainshock.data.url + '/shakemap',
+      userTime: datetime.toLocal().toFormat(format),
+      utcOffset: Number(datetime.toLocal().toFormat('Z')),
+      utcTime: datetime.toFormat(format)
     });
   };
 
@@ -226,26 +236,32 @@ var ShakeMap = function (options) {
             '<dd>{pga}</dd>' +
             '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
             '<dd>{pgv}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA <em>(0.3s)</em></abbr></dt>' +
+            '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA ' +
+              '<em>(0.3s)</em></abbr></dt>' +
             '<dd>{sa03}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA <em>(1.0s)</em></abbr></dt>' +
+            '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA ' +
+              '<em>(1.0s)</em></abbr></dt>' +
             '<dd>{sa10}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA <em>(3.0s)</em></abbr></dt>' +
+            '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA ' +
+              '<em>(3.0s)</em></abbr></dt>' +
             '<dd>{sa30}</dd>' +
             '<dt class="stations">Seismic Stations</dt>' +
             '<dd class="stations">{seismic}</dd>' +
             '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
             '<dd>{dyfi}</dd>' +
           '</dl>' +
-          '<p>' +
-            '<a href="{url}" class="external" target="new">' +
-              'Event Page ShakeMap' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
         '</div>' +
       '</div>' +
-      '<p class="status"><span>{status}</span></p>',
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        '<dt>Updated</dt>' +
+        '<dd>' +
+          '<time datetime="{isoTime}" class="user">{userTime} ' +
+            '(UTC{utcOffset})</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+        '</dd>' +
+      '</dl>',
       _this.data
     );
   };
