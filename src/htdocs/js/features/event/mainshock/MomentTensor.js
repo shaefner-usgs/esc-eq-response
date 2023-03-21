@@ -65,7 +65,7 @@ var MomentTensor = function (options) {
         name: _this.name
       });
 
-      _this.lightbox = _beachballs.getContent();
+      _this.lightbox = _beachballs.getLightbox();
       _this.mapLayer = _beachballs.getMapLayer();
       _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
@@ -76,15 +76,15 @@ var MomentTensor = function (options) {
   };
 
   /**
-   * Get the data as a list of un-nested key-value pairs.
+   * Unnest the 'source' data.
    *
-   * @param mt {Array}
+   * @param mt {Array} default is []
    *
    * @return {Object}
    */
-  _getData = function (mt) {
-    return Object.assign({}, mt[0].properties, {
-      source: mt[0].source
+  _getData = function (mt = []) {
+    return Object.assign({}, mt[0]?.properties || {}, {
+      source: mt[0]?.source || ''
     });
   };
 

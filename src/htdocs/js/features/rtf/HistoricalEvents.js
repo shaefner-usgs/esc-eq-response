@@ -61,17 +61,13 @@ var HistoricalEvents = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.losspager || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/historical_earthquakes.json']) {
-        url = contents['json/historical_earthquakes.json'].url;
-      }
+    if (contents['json/historical_earthquakes.json']) {
+      url = contents['json/historical_earthquakes.json']?.url || '';
     }
 
     return url;
@@ -84,9 +80,9 @@ var HistoricalEvents = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = json;
   };
 

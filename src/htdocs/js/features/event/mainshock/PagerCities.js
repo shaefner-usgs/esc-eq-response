@@ -31,6 +31,7 @@ var PagerCities = function (options) {
 
       _compare,
       _fetch,
+      _getData,
       _getUrl;
 
 
@@ -77,22 +78,42 @@ var PagerCities = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Mixed <Object|Array>}
+   *
+   * @return data {Array}
+   */
+  _getData = function (json) {
+    var cities = json.onepager_cities || [],
+        data = [];
+
+    if (Array.isArray(cities)) {
+      data = cities.sort(_compare);
+    } else if (Array.isArray(json)) { // data stored in disparate formats
+      data = json.sort(_compare);
+    }
+
+    data.forEach((city = {}) => {
+      city.pop = AppUtil.roundThousands(city.pop);
+    });
+
+    return data;
+  };
+
+  /**
    * Get the JSON feed's URL.
    *
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.losspager || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/cities.json']) {
-        url = contents['json/cities.json'].url;
-      }
+    if (contents['json/cities.json']) {
+      url = contents['json/cities.json'].url || '';
     }
 
     return url;
@@ -105,18 +126,10 @@ var PagerCities = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
-    if (json.onepager_cities) {
-      _this.data = json.onepager_cities.sort(_compare);
-    } else if (Array.isArray(json)) { // sometimes data stored as top-level Array
-      _this.data = json.sort(_compare);
-    }
-
-    _this.data.forEach(city => {
-      city.pop = AppUtil.roundThousands(city.pop);
-    });
+  _this.addData = function (json = {}) {
+    _this.data = _getData(json);
   };
 
   /**
@@ -129,6 +142,7 @@ var PagerCities = function (options) {
 
     _compare = null;
     _fetch = null;
+    _getData = null;
     _getUrl = null;
 
     _this = null;

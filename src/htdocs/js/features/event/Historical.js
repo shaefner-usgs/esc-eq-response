@@ -78,7 +78,7 @@ var Historical = function (options) {
       _this.id = 'dd-historical';
     }
 
-    _earthquakes = Earthquakes({
+    _earthquakes = Earthquakes({ // fetch feed data
       app: _app,
       feature: _this
     });
@@ -150,9 +150,9 @@ var Historical = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _earthquakes.addData(json);
 
     _summary = Summary(_summaryOpts);

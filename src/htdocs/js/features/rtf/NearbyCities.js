@@ -61,17 +61,13 @@ var NearbyCities = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.['nearby-cities'] || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (products['nearby-cities']) {
-      contents = products['nearby-cities'][0].contents;
-
-      if (contents['nearby-cities.json']) {
-        url = contents['nearby-cities.json'].url;
-      }
+    if (contents['nearby-cities.json']) {
+      url = contents['nearby-cities.json']?.url || '';
     }
 
     return url;
@@ -84,9 +80,9 @@ var NearbyCities = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = json;
   };
 

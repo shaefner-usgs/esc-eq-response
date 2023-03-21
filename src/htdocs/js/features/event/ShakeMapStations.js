@@ -56,6 +56,7 @@ var ShakeMapStations = function (options) {
       _filter,
       _getAmplitudes,
       _getComponent,
+      _getFlag,
       _getPopup,
       _getRow,
       _getTable,
@@ -117,53 +118,65 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get an amplitudes object keyed by 'name'.
+   * Get the amplitudes keyed by 'name'.
    *
-   * @param amps {Array}
+   * @param amplitudes {Array} default is []
    *
-   * @return amplitudes {Object}
+   * @return obj {Object}
    */
-  _getAmplitudes = function (amps) {
-    var amplitudes = {};
+  _getAmplitudes = function (amplitudes = []) {
+    var obj = {};
 
-    amps.forEach(amplitude =>
-      amplitudes[amplitude.name] = amplitude
+    amplitudes.forEach(amplitude =>
+      obj[amplitude.name] = amplitude
     );
 
-    return amplitudes;
+    return obj;
   };
 
   /**
    * Get the HTML content for the given amplitude's channel component.
    *
-   * @param amplitude {Object}
+   * @param amplitude {Object} default is {}
    *
    * @return html {String}
    */
-  _getComponent = function (amplitude) {
-    var flag, html, value;
+  _getComponent = function (amplitude = {}) {
+    var flag, value,
+        html = '';
 
-    if (amplitude) {
-      flag = amplitude.flag;
+    if (!AppUtil.isEmpty(amplitude)) {
       value = AppUtil.round(amplitude.value, 2);
 
-      // Add flag class for all non-zero flags
-      if (flag && flag !== '0') {
-        html = '<span class="station-flag">' + value;
-
-        // display flag with title text
-        if (_FLAGS[flag]) {
-          html += ` <abbr title="${_FLAGS[flag]}">(${flag})</abbr>`;
-        } else {
-          html += ` (${flag})`;
-        }
-
-        html += '</span>';
+      if (amplitude.flag) {
+        flag = _getFlag(amplitude.flag);
+        html += `<span class="station-flag">${value} ${flag}</span>`;
       } else {
-        html = `<span>${value}</span>`;
+        html += `<span>${value}</span>`;
       }
     } else {
-      html = '<span>–</span>';
+      html += '<span>–</span>';
+    }
+
+    return html;
+  };
+
+  /**
+   * Get the HTML for the flag.
+   *
+   * @param flag {String} default is ''
+   *
+   * @return html {String}
+   */
+  _getFlag = function (flag = '') {
+    var html;
+
+    if (flag === '0') return ''; // ignore '0' (String) values
+
+    if (_FLAGS[flag]) { // add flag description to title attr
+      html = `<abbr title="${_FLAGS[flag]}">(${flag})</abbr>`;
+    } else {
+      html = `(${flag})`;
     }
 
     return html;
@@ -177,8 +190,8 @@ var ShakeMapStations = function (options) {
    * @return html {String}
    */
   _getPopup = function (station) {
-    var coords = station.geometry.coordinates,
-        props = station.properties,
+    var coords = station.geometry?.coordinates || [0, 0, 0],
+        props = station.properties || {},
         data = {
           channels: _getTable(props.channels),
           pga: AppUtil.round(props.pga, 2),
@@ -187,7 +200,7 @@ var ShakeMapStations = function (options) {
           intensity: AppUtil.round(props.intensity, 1),
           network: props.network || '–',
           location: AppUtil.formatLatLon(coords),
-          romanIntensity: AppUtil.romanize(props.intensity) || 'I',
+          mmi: AppUtil.romanize(Number(props.intensity)),
           source: props.source || '–',
           title: _getTooltip(station)
         },
@@ -195,8 +208,8 @@ var ShakeMapStations = function (options) {
           '<div class="shakemap-stations">' +
             '<h4>{title}</h4>' +
             '<ul class="station-summary impact-bubbles">' +
-              '<li class="station-summary-intensity mmi{romanIntensity} impact-bubble">' +
-                '<strong class="roman">{romanIntensity}</strong>' +
+              '<li class="station-summary-intensity mmi{mmi} impact-bubble">' +
+                '<strong class="roman">{mmi}</strong>' +
                 '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
               '</li>' +
               '<li class="station-summary-pga">' +
@@ -236,11 +249,11 @@ var ShakeMapStations = function (options) {
   /**
    * Get the HTML <tr> for the given channel.
    *
-   * @param channel {Object}
+   * @param channel {Object} default is {}
    *
    * @return html {String}
    */
-  _getRow = function (channel) {
+  _getRow = function (channel = {}) {
     var amplitudes = _getAmplitudes(channel.amplitudes),
         data = {
           name: channel.name,
@@ -268,11 +281,11 @@ var ShakeMapStations = function (options) {
   /**
    * Get the HTML <table> for the given channels.
    *
-   * @param channels {Array}
+   * @param channels {Array} default is []
    *
    * @return html {String}
    */
-  _getTable = function (channels) {
+  _getTable = function (channels = []) {
     var html =
       '<table class="station-channels-map">' +
         '<thead>' +
@@ -285,13 +298,13 @@ var ShakeMapStations = function (options) {
               '<abbr title="Peak Ground Velocity (cm/s)">PGV</abbr>' +
             '</th>' +
             '<th scope="col" class="station-channels-map-psa03">' +
-              '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA(0.3)</abbr>' +
+              '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA <em>(0.3<span>s</span>)</em></abbr>' +
             '</th>' +
             '<th scope="col" class="station-channels-map-psa10">' +
-              '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA(1.0)</abbr>' +
+              '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA <em>(1.0<span>s</span>)</em></abbr>' +
             '</th>' +
             '<th scope="col" class="station-channels-map-psa30">' +
-              '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA(3.0)</abbr>' +
+              '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA <em>(3.0<span>s</span>)</em></abbr>' +
             '</th>' +
           '</tr>' +
         '</thead>' +
@@ -314,7 +327,7 @@ var ShakeMapStations = function (options) {
    * @return {String}
    */
   _getTooltip = function (station) {
-    var props = station.properties,
+    var props = station.properties || {},
         data = {
           code: props.code || '–',
           name: props.name || '–'
@@ -329,17 +342,13 @@ var ShakeMapStations = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        shakemap = mainshock.data.products.shakemap,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.shakemap || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (shakemap) {
-      contents = shakemap[0].contents;
-
-      if (contents['download/stationlist.json']) {
-        url = contents['download/stationlist.json'].url;
-      }
+    if (contents['download/stationlist.json']) {
+      url = contents['download/stationlist.json']?.url || '';
     }
 
     return url;
@@ -369,10 +378,10 @@ var ShakeMapStations = function (options) {
    * @return {L.Marker}
    */
   _pointToLayer = function (feature, latlng) {
-    var props = feature.properties,
-        romanIntensity = AppUtil.romanize(props.intensity) || 'I',
+    var props = feature.properties || {},
+        mmi = AppUtil.romanize(Number(props.intensity)),
         opts = Object.assign({}, _markerOptions, {
-          className: 'station-layer-icon station-mmi' + romanIntensity
+          className: 'station-layer-icon station-mmi' + mmi
         });
 
     return L.marker(latlng, {
@@ -397,6 +406,7 @@ var ShakeMapStations = function (options) {
     _filter = null;
     _getAmplitudes = null;
     _getComponent = null;
+    _getFlag = null;
     _getPopup = null;
     _getRow = null;
     _getTable = null;

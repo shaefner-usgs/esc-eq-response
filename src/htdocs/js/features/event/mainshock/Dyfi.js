@@ -38,9 +38,10 @@ var Dyfi = function (options) {
 
       _addBubble,
       _destroy,
-      _getContent,
       _getData,
       _getImages,
+      _getLightbox,
+      _getRadioBar,
       _getStatus;
 
 
@@ -49,20 +50,17 @@ var Dyfi = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
+    _product = _mainshock.data.products?.dyfi?.[0] || {};
     _selected = 'block';
-
-    if (_mainshock.data.products.dyfi) {
-      _product = _mainshock.data.products.dyfi[0];
-    }
 
     _this.data = {},
     _this.id = 'dyfi';
     _this.lightbox = '';
     _this.name = 'Did You Feel It?';
 
-    if (_product) {
+    if (!AppUtil.isEmpty(_product)) { // has DYFI, but no feed data
       _this.data = _getData();
-      _this.lightbox = _getContent();
+      _this.lightbox = _getLightbox();
 
       _app.Features.addContent(_this); // no feed data => add manually
     }
@@ -94,79 +92,18 @@ var Dyfi = function (options) {
   };
 
   /**
-   * Get the HTML content for the Lightbox.
-   *
-   * @return {String}
-   */
-  _getContent = function () {
-    var data,
-        div = '',
-        images = _getImages(),
-        imgs = '',
-        radioBar = '';
-
-    images.forEach(image => {
-      imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
-        `class="mmi{cdi} ${image.id} option">`;
-    });
-
-    if (imgs) {
-      div =
-        '<div class="images">' +
-          '{radioBar}' +
-          imgs +
-        '</div>';
-    }
-
-    if (images.length > 1) {
-      _radioBar = RadioBar({
-        id: 'dyfi-images',
-        items: images,
-        selected: _selected
-      });
-
-      radioBar = _radioBar.getHtml();
-    }
-
-    data = Object.assign({}, _this.data, {
-      radioBar: radioBar
-    });
-
-    return L.Util.template(
-      '<div class="wrapper">' +
-        div +
-        '<div class="details">' +
-          '<dl class="props alt">' +
-            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-            '<dd>{maxmmi}</dd>' +
-            '<dt>Responses</dt>' +
-            '<dd>{responses}</dd>' +
-          '</dl>' +
-          '<p>' +
-            '<a href="{url}" class="external" target="new">Event Page DYFI?' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
-        '</div>' +
-      '</div>' +
-      '<p class="status"><span>{status}</span></p>',
-      data
-    );
-  };
-
-  /**
    * Get the data used to create the content.
    *
    * @return {Object}
    */
   _getData = function () {
-    var props = _product.properties;
+    var props = _product.properties || {};
 
     return {
       cdi: _mainshock.data.cdi,
       map: _mainshock.data.dyfiImg,
-      maxmmi: props.maxmmi,
-      plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url,
+      maxmmi: Number(props.maxmmi),
+      plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url || '',
       responses: AppUtil.addCommas(props.numResp),
       status: _getStatus(props),
       url: _mainshock.data.url + '/dyfi'
@@ -187,14 +124,14 @@ var Dyfi = function (options) {
       images.push({
         id: 'block',
         name: 'Intensity map',
-        url: _product.contents[intensity].url
+        url: _product.contents[intensity].url || ''
       });
     }
     if (_product.contents[zip]) {
       images.push({
         id: 'zip',
         name: 'ZIP Code map',
-        url: _product.contents[zip].url
+        url: _product.contents[zip].url || ''
       });
     }
     if (_this.data.plot) {
@@ -206,6 +143,69 @@ var Dyfi = function (options) {
     }
 
     return images;
+  };
+
+  /**
+   * Get the HTML content for the Lightbox.
+   *
+   * @return {String}
+   */
+  _getLightbox = function () {
+    var images = _getImages(),
+        imgs = '',
+        radioBar = _getRadioBar(images);
+
+    images.forEach(image => {
+      imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
+        `class="mmi{cdi} ${image.id} option">`;
+    });
+
+    return L.Util.template(
+      '<div class="wrapper">' +
+        '<div class="images">' +
+          radioBar +
+          imgs +
+        '</div>' +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{maxmmi}</dd>' +
+            '<dt>Responses</dt>' +
+            '<dd>{responses}</dd>' +
+          '</dl>' +
+          '<p>' +
+            '<a href="{url}" class="external" target="new">Event Page DYFI?' +
+              '<i class="icon-link"></i>' +
+            '</a>' +
+          '</p>' +
+        '</div>' +
+      '</div>' +
+      '<p class="status"><span>{status}</span></p>',
+      _this.data
+    );
+  };
+
+  /**
+   * Create and get the HTML for the RadioBar.
+   *
+   * @param images {Array}
+   *
+   * @return html {String}
+   */
+  _getRadioBar = function (images) {
+    var html = '';
+
+    if (images.length > 1) {
+      _radioBar = RadioBar({
+        id: 'dyfi-images',
+        items: images,
+        selected: _selected
+      });
+
+      html = _radioBar.getHtml();
+    }
+
+    return html;
   };
 
   /**
@@ -257,9 +257,10 @@ var Dyfi = function (options) {
 
     _addBubble = null;
     _destroy = null;
-    _getContent = null;
     _getData = null;
     _getImages = null;
+    _getLightbox = null;
+    _getRadioBar = null;
     _getStatus = null;
 
     _this = null;

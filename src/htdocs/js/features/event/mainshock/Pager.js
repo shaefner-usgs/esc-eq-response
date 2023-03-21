@@ -2,6 +2,9 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil');
+
+
 /**
  * Create the PAGER Feature, a sub-Feature of the Mainshock (and super-Feature
  * of PAGER Cities and PAGER Exposures).
@@ -33,8 +36,8 @@ var Pager = function (options) {
       _product,
 
       _fetch,
-      _getContent,
       _getData,
+      _getLightbox,
       _getStatus,
       _getUrl;
 
@@ -44,10 +47,7 @@ var Pager = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-
-    if (_mainshock.data.products.losspager) {
-      _product = _mainshock.data.products.losspager[0];
-    }
+    _product = _mainshock.data.products?.losspager?.[0] || {};
 
     _this.data = {};
     _this.dependencies = [
@@ -61,9 +61,9 @@ var Pager = function (options) {
 
     if (_this.url) {
       _fetch();
-    } else if (_product) { // has PAGER, but there's no feed data
+    } else if (!AppUtil.isEmpty(_product)) { // has PAGER, but no feed data
       _this.data = _getData();
-      _this.lightbox = _getContent();
+      _this.lightbox = _getLightbox();
 
       _app.Features.addContent(_this); // add manually
     }
@@ -80,11 +80,38 @@ var Pager = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Object} default is {}
+   *
+   * @return {Object}
+   */
+  _getData = function (json = {}) {
+    var contents = _product.contents || {},
+        pagerCities = _app.Features.getFeature('pager-cities'),
+        pagerExposures = _app.Features.getFeature('pager-exposures');
+
+    return {
+      alert: _product.properties?.alertlevel || '',
+      cities: pagerCities.data,
+      cost: contents['alertecon.png']?.url || '',
+      costBlurb: json.impact1 || '',
+      effects: json.secondary_comment || '',
+      exposure: contents['exposure.png']?.url || '',
+      exposures: pagerExposures.data,
+      fatal: contents['alertfatal.png']?.url || '',
+      fatalBlurb: json.impact2 || '',
+      status: _getStatus(),
+      structures: json.struct_comment || ''
+    };
+  };
+
+  /**
    * Get the HTML content for the Lightbox.
    *
    * @return {String}
    */
-  _getContent = function () {
+  _getLightbox = function () {
     var exposures = _app.Features.getFeature('pager-exposures'),
         summary = '',
         table = '';
@@ -101,7 +128,7 @@ var Pager = function (options) {
       '<div class="wrapper">' +
         '<div class="loss">' +
           '<h4>Estimated Fatalities</h4>' +
-          '<img src="{fatalities}" alt="Estimated fatalities histogram">' +
+          '<img src="{fatal}" alt="Estimated fatalities histogram">' +
           '<p>{fatalBlurb}</p>' +
           '<h4>Estimated Economic Losses</h4>' +
           '<img src="{cost}" alt="Estimated economic losses histogram">' +
@@ -124,41 +151,6 @@ var Pager = function (options) {
   };
 
   /**
-   * Get the data used to create the content.
-   *
-   * @param json {Object} default is null
-   *
-   * @return {Object}
-   */
-  _getData = function (json = null) {
-    var costBlurb, effects, fatalBlurb, structures,
-        pagerCities = _app.Features.getFeature('pager-cities'),
-        pagerExposures = _app.Features.getFeature('pager-exposures'),
-        contents = _product.contents;
-
-    if (json) {
-      costBlurb = json.impact1;
-      effects = json.secondary_comment;
-      fatalBlurb = json.impact2;
-      structures = json.struct_comment;
-    }
-
-    return {
-      alert: _product.properties.alertlevel,
-      cities: pagerCities.data,
-      cost: contents['alertecon.png'].url,
-      costBlurb: costBlurb || '',
-      effects: effects || '',
-      exposure: contents['exposure.png'].url,
-      exposures: pagerExposures.data,
-      fatalities: contents['alertfatal.png'].url,
-      fatalBlurb: fatalBlurb || '',
-      status: _getStatus(),
-      structures: structures || ''
-    };
-  };
-
-  /**
    * Get the review status.
    *
    * @return status {String}
@@ -166,7 +158,7 @@ var Pager = function (options) {
   _getStatus = function () {
     var status = 'not reviewed'; // default
 
-    status = (_product.properties['review-status'] || status).toLowerCase();
+    status = (_product.properties?.['review-status'] || status).toLowerCase();
 
     if (status === 'reviewed') {
       status += '<i class="icon-check"></i>';
@@ -181,15 +173,11 @@ var Pager = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
+    var contents = _product.contents || {},
         url = '';
 
-    if (_product) {
-      contents = _product.contents;
-
-      if (contents['json/comments.json']) {
-        url = contents['json/comments.json'].url;
-      }
+    if (contents['json/comments.json']) {
+      url = contents['json/comments.json'].url || '';
     }
 
     return url;
@@ -202,11 +190,11 @@ var Pager = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = _getData(json);
-    _this.lightbox = _getContent();
+    _this.lightbox = _getLightbox();
   };
 
   /**
@@ -223,8 +211,8 @@ var Pager = function (options) {
     _mainshock = null;
     _product = null;
 
-    _getContent = null;
     _getData = null;
+    _getLightbox = null;
     _getStatus = null;
     _fetch = null;
     _getUrl = null;

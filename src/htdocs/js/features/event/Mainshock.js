@@ -92,7 +92,7 @@ var Mainshock = function (options) {
     _this.url = _getUrl();
     _this.zoomToLayer = options.zoomToLayer;
 
-    _earthquakes = Earthquakes({
+    _earthquakes = Earthquakes({ // fetch feed data
       app: _app,
       feature: _this
     });
@@ -187,60 +187,43 @@ var Mainshock = function (options) {
    * JSON feed data from Earthquakes.js, plus additional Mainshock-specific
    * convenience properties.
    *
-   * @param json {Object} default is _json
+   * @param json {Object} default is _json or {}
    *
    * @return {Object}
    */
-  _getData = function (json = _json) {
-    var dyfiImg, econImg, fatalImg, notice, shakeAlertStatus, shakemapImg,
-        data = _earthquakes.data[0], // formatted JSON feed data
+  _getData = function (json = _json || {}) {
+    var data = _earthquakes.data[0], // formatted JSON feed data
         datetime = data.datetime,
-        products = json.properties.products,
-        dyfi = products.dyfi,
-        fm = products['focal-mechanism'],
+        products = json.properties?.products || {},
+        dyfi = products.dyfi || [],
+        dyfiImg = _getImage(dyfi[0]),
+        pager = products.losspager || [],
+        econImg = pager[0]?.contents['alertecon.png']?.url,
+        fatalImg = pager[0]?.contents['alertfatal.png']?.url,
+        fm = products['focal-mechanism'] || [],
         format = 'cccc',
-        header = products['general-header'],
+        header = products['general-header'] || [],
         hide = 'hide', // default - hide product thumbs container
-        mmiInt = Math.round(json.properties.mmi),
-        mt = products['moment-tensor'],
-        pager = products.losspager,
+        mmiInt = Math.round(json.properties?.mmi) || 0,
+        mt = products['moment-tensor'] || [],
+        notice = header[0]?.contents['']?.bytes,
         plurality = 's', // default
-        shakeAlert = products['shake-alert'],
-        shakemap = products.shakemap;
+        shakeAlert = products['shake-alert'] || [],
+        shakeAlertStatus = shakeAlert[0]?.status?.toLowerCase(),
+        shakemap = products.shakemap || [],
+        shakemapImg = shakemap[0]?.contents['download/intensity.jpg']?.url;
 
     _json = json; // cache feed data
 
-    if (Array.isArray(dyfi)) {
-      dyfiImg = _getImage(dyfi[0]);
-
-      if (dyfiImg) {
-        hide = ''; // show
-      }
-    }
-    if (Array.isArray(fm) || Array.isArray(mt)) {
+    if (dyfiImg || shakemapImg || fm[0] || mt[0]) {
       hide = ''; // show
     }
-    if (Array.isArray(header)) {
-      notice = header[0].contents[''].bytes;
-    }
-    if (Array.isArray(pager)) {
-      econImg = pager[0].contents['alertecon.png'].url;
-      fatalImg = pager[0].contents['alertfatal.png'].url;
-    }
-    if (Array.isArray(shakeAlert)) {
-      shakeAlertStatus = shakeAlert[0].status.toLowerCase();
-    }
-    if (Array.isArray(shakemap)) {
-      hide = ''; // show
-      shakemapImg = shakemap[0].contents['download/intensity.jpg'].url;
-    }
-
     if (Number(data.felt) === 1) {
       plurality = '';
     }
 
     return Object.assign({}, data, {
-      dyfiImg: dyfiImg || '',
+      dyfiImg: dyfiImg,
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       hide: hide,
@@ -255,7 +238,9 @@ var Mainshock = function (options) {
       tectonic: _getText(products['general-text']),
       userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
       userDayofWeek: datetime.toLocal().toFormat(format),
-      userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      userTime: datetime.toLocal().toLocaleString(
+        Luxon.DateTime.TIME_24_WITH_SECONDS
+      ),
       utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
       utcDayofWeek: datetime.toFormat(format),
       utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
@@ -286,14 +271,14 @@ var Mainshock = function (options) {
   /**
    * Get the URL of the 'primary' DYFI image.
    *
-   * @param dyfi {Object}
+   * @param dyfi {Object} default is {}
    *
    * @return url {String}
    */
-  _getImage = function (dyfi) {
-    var images = [ // note: images listed in order of preference
-          dyfi.contents[dyfi.code + '_ciim.jpg'], // zip
-          dyfi.contents[dyfi.code + '_ciim_geo.jpg'] // intensity (preferred)
+  _getImage = function (dyfi = {}) {
+    var images = [ // NOTE: images listed in order of preference
+          dyfi?.contents?.[dyfi.code + '_ciim.jpg'], // zip
+          dyfi?.contents?.[dyfi.code + '_ciim_geo.jpg'] // intensity (preferred)
         ],
         url = '';
 
@@ -523,25 +508,21 @@ var Mainshock = function (options) {
    * Get the tectonic summary text, replacing any image placeholders with their
    * absolute URLs.
    *
-   * @param product {Object}
+   * @param product {Array} default is []
    *
    * @return text {String}
    */
-  _getText = function (product) {
-    var contents, regex,
-        text = ''; // default
+  _getText = function (product = []) {
+    var contents = product[0]?.contents || {},
+        text = contents['']?.bytes || '';
 
-    if (product) {
-      contents = product[0].contents;
-      regex = /(\.gif|\.jpg|\.png)$/;
-      text = contents[''].bytes || '';
+    Object.keys(contents).forEach(name => {
+      var regex = /(\.gif|\.jpg|\.png)$/;
 
-      Object.keys(contents).forEach(name => {
-        if (regex.test(name)) {
-          text = text.replace(name, contents[name].url);
-        }
-      });
-    }
+      if (regex.test(name)) {
+        text = text.replace(name, contents[name].url);
+      }
+    });
 
     return text;
   };
@@ -554,7 +535,8 @@ var Mainshock = function (options) {
   _getUrl = function () {
     var eqid = AppUtil.getParam('eqid');
 
-    return `https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/${eqid}.geojson`;
+    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' + eqid +
+      '.geojson';
   };
 
   /**
@@ -564,7 +546,7 @@ var Mainshock = function (options) {
   _updateDetails = function () {
     var balloon = document.querySelector('#selectBar .mainshock'),
         mainshock = document.getElementById('mainshock'),
-        newBalloon = _earthquakes.getContent(_this.data),
+        newBalloon = _earthquakes.getPopup(_this.data),
         newStrip = L.Util.template(_getStrip(), _this.data),
         products = document.querySelector('#summaryPane .mainshock .products'),
         strip = document.querySelector('#summaryPane .mainshock .details');
@@ -607,7 +589,7 @@ var Mainshock = function (options) {
         marker = _this.mapLayer.getLayers()[0],
         mt = _app.Features.getFeature('moment-tensor');
 
-    div.innerHTML = _earthquakes.getContent(_this.data);
+    div.innerHTML = _earthquakes.getPopup(_this.data);
 
     marker.setLatLng(_this.data.latLng);
     marker.setPopupContent(div);
@@ -624,7 +606,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Update the Plots using the selected catalog's data.
+   * Update (create new) Plots using the selected catalog's data.
    */
   _updatePlots = function () {
     _this.plots.destroy(); // previous catalog's plots
@@ -646,14 +628,15 @@ var Mainshock = function (options) {
    * Also set the title and defaults (Settings), and update the Significant
    * Earthquakes list.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     var significantEqs = _app.Features.getFeature('significant-eqs');
 
     _earthquakes.addData(json);
-    _this.data = _getData(json); // used by Rtf.js, etc.
-    _this.content = _earthquakes.getContent(_this.data);
+
+    _this.data = _getData(json);
+    _this.content = _earthquakes.getPopup(_this.data);
     _this.plots = Plots({
       app: _app,
       data: [_this.data],
@@ -666,14 +649,14 @@ var Mainshock = function (options) {
     _app.TitleBar.setTitle(_this);
 
     if (_app.Features.isFeature(significantEqs)) {
-      significantEqs.update(json.id); // selects Mainshock if in list
+      significantEqs.update(json.id); // selects Mainshock if it's in the list
     }
   };
 
   /**
    * Add the double-difference data and then update the Mainshock.
    *
-   * @param json {Object}
+   * @param data {Object}
    */
   _this.addDdData = function (data) {
     _ddData = data;

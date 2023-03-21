@@ -43,8 +43,8 @@ _DEFAULTS = {
  *       addListeners: {Function}
  *       data: {Array}
  *       destroy: {Function}
- *       getContent: {Function}
  *       getDescription: {Function}
+ *       getPopup: {Function}
  *       getTooltip: {Function}
  *       mapLayer: {L.FeatureGroup}
  *       params: {Object}
@@ -200,12 +200,12 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Filter out eqs from the GeoJSON feed that aren't in _this.data, which was
-   * already filtered in _getData().
+   * Filter NCEDC (double difference) earthquakes. The NCEDC API doesn't support
+   * radius values for defining a custom search region, so a rectangle is used
+   * as a proxy and extraneous eqs must be subsequently removed.
    *
-   * Note: the NCEDC (double difference) catalog does not support radius values
-   * for defining a custom search region, so a rectangle is used as a proxy and
-   * extraneous points must be subsequently removed.
+   * Note: _this.data gets filtered in _getData(), but the Leaflet map layer was
+   * created before it was filtered.
    *
    * @param feature {Object}
    *     GeoJSON feature
@@ -292,22 +292,24 @@ var Earthquakes = function (options) {
    */
   _getData = function (json) {
     var data = [],
-        features = json.features || [json];
+        features = json.features || [json]; // feature collection or Mainshock
 
-    features.forEach(feature => {
+    features.forEach((feature = {}) => {
       var direction, distance, distanceDisplay, eq, latlon, localTime, statusIcon,
-          coords = feature.geometry.coordinates,
-          props = feature.properties,
-          datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+          props = feature.properties || {},
+          cdi = AppUtil.romanize(Number(props.cdi) || ''),
+          coords = feature.geometry?.coordinates || [0, 0, 0],
+          datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
           format = 'LLL d, yyyy TT',
           magDisplay = AppUtil.round(props.mag, 1), // String
           mag = parseFloat(magDisplay) || 0,
           magType = props.magType || 'M',
+          mmi = AppUtil.romanize(Number(props.mmi) || ''),
           status = (props.status || '').toLowerCase(),
           template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
-          utcOffset = datetime.toLocal().toFormat('Z'),
+          utcOffset = Number(datetime.toLocal().toFormat('Z')),
           userTimeDisplay = datetime.toLocal().toFormat(format) +
             ` <span class="tz">(UTC${utcOffset})</span>`,
           utcTimeDisplay = datetime.toFormat(format) +
@@ -316,25 +318,24 @@ var Earthquakes = function (options) {
       if (props.place) {
         title += '—' + props.place;
       }
-      if (status === 'reviewed') {
-        statusIcon = '<i class="icon-check"></i>';
-      }
-
-      // Add local time (at epicenter) if tz prop is included in feed
-      if (props.tz) {
+      if (props.tz) { // local time (at epicenter)
         localTime = datetime.toUTC(props.tz).toFormat('LLL d, yyyy tt') +
           ' <span class="tz">at the epicenter</span>';
         template += '<time datetime="{isoTime}" class="local">{localTime}</time>';
       }
 
-      if (
-        _feature.id.includes('aftershocks') ||
-        _feature.id.includes('foreshocks') ||
-        _feature.id.includes('historical')
-      ) {
+      if (status === 'reviewed') {
+        statusIcon = '<i class="icon-check"></i>';
+      }
+
+      if (_feature.id === 'mainshock') {
+        distanceDisplay = '0 km';
+      } else if (_feature.id !== 'catalog-search') {
         latlon = LatLon(coords[1], coords[0]);
         direction = _getDirection(latlon);
-        distance = AppUtil.round(_mainshock.data.latlon.distanceTo(latlon) / 1000, 2);
+        distance = Number(AppUtil.round(
+          _mainshock.data.latlon.distanceTo(latlon) / 1000, 2
+        ));
         distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
           `<span>${direction}</span>`;
       }
@@ -342,31 +343,31 @@ var Earthquakes = function (options) {
       eq = {
         alert: props.alert || '', // PAGER
         catalog: _catalog,
-        cdi: AppUtil.romanize(props.cdi), // DYFI
+        cdi: cdi || '', // DYFI
         coords: coords,
         datetime: datetime,
         depth: coords[2],
         depthDisplay: AppUtil.round(coords[2], 1) + '<span> km</span>',
-        distance: distance || '',
+        distance: distance || 0,
         distanceDisplay: distanceDisplay || '',
         featureId: _feature.id,
         felt: AppUtil.addCommas(props.felt), // DYFI felt reports
         fillColor: _COLORS[_getAge(datetime)],
-        id: feature.id, // eqid
+        id: feature.id || '', // eqid
         isoTime: datetime.toISO(),
         localTime: localTime || '',
         location: AppUtil.formatLatLon(coords),
         mag: mag,
         magDisplay: magDisplay,
-        magInt: Math.floor(mag, 1),
+        magInt: Math.floor(mag),
         magType: magType,
-        mmi: AppUtil.romanize(props.mmi), // ShakeMap
+        mmi: mmi || '', // ShakeMap
         radius: AppUtil.getRadius(mag),
         status: status,
         statusIcon: statusIcon || '',
         title: title,
-        tsunami: props.tsunami || 0,
-        url: props.url,
+        tsunami: Boolean(props.tsunami),
+        url: props.url || '',
         userTimeDisplay: userTimeDisplay,
         utcOffset: utcOffset,
         utcTimeDisplay: utcTimeDisplay
@@ -380,7 +381,7 @@ var Earthquakes = function (options) {
       if (
         _feature.id === 'mainshock' ||
         _catalog === 'comcat' ||
-        eq.distance <= Number(_this.params.distance) // DD Aftershocks, Foreshocks, Historical Seismicity
+        eq.distance <= _this.params.distance // DD eq is inside search radius
       ) {
         data.push(eq);
       }
@@ -438,7 +439,7 @@ var Earthquakes = function (options) {
     var div = L.DomUtil.create('div'),
         eq = _this.data.find(item => item.id === feature.id); // eqid
 
-    div.innerHTML = _this.getContent(eq);
+    div.innerHTML = _this.getPopup(eq);
 
     layer.bindPopup(div, {
       maxWidth: 375,
@@ -529,9 +530,9 @@ var Earthquakes = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = _getData(json);
   };
 
@@ -576,46 +577,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the HTML content for the given earthquake's Leaflet Popup.
-   *
-   * @param eq {Object}
-   *
-   * @return {String}
-   */
-  _this.getContent = function (eq) {
-    var data = Object.assign({}, eq);
-
-    if (eq.featureId === 'mainshock') {
-      data.id = ''; // not needed; removing it avoids duplicating it in the DOM
-    }
-
-    return L.Util.template(
-      '<div id="{id}" class="earthquake {featureId}">' +
-        '<h4>{title}</h4>' +
-        '<div class="impact-bubbles">' +
-          _getBubbles(eq) +
-        '</div>' +
-        '<dl class="props">' +
-          '<dt class="time">Time</dt>' +
-          '<dd class="time">{timeDisplay}</dd>' +
-          '<dt>Depth</dt>' +
-          '<dd>{depthDisplay}</dd>' +
-          '<dt>Location</dt>' +
-          '<dd>{location}</dd>' +
-          '<dt class="distance">' +
-            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
-          '</dt>' +
-          '<dd class="distance">{distanceDisplay}</dd>' +
-          '<dt class="status">Status</dt>' +
-          '<dd class="status">{status}{statusIcon}</dd>' +
-        '</dl>' +
-        '<button type="button">Select</button>' +
-      '</div>',
-      data
-    );
-  };
-
-  /**
    * Get the HTML content for the Feature's description.
    *
    * @return {String}
@@ -648,6 +609,46 @@ var Earthquakes = function (options) {
     return L.Util.template(
       '<strong>M {magnitude}+</strong> {catalog} earthquakes within ' +
       '<strong>{distance} km</strong> of the mainshock’s epicenter{append}.',
+      data
+    );
+  };
+
+  /**
+   * Get the HTML content for the given earthquake's Leaflet Popup.
+   *
+   * @param eq {Object}
+   *
+   * @return {String}
+   */
+  _this.getPopup = function (eq) {
+    var data = Object.assign({}, eq);
+
+    if (eq.featureId === 'mainshock') {
+      data.id = ''; // not needed; removing it avoids duplicating it in the DOM
+    }
+
+    return L.Util.template(
+      '<div id="{id}" class="earthquake {featureId}">' +
+        '<h4>{title}</h4>' +
+        '<div class="impact-bubbles">' +
+          _getBubbles(eq) +
+        '</div>' +
+        '<dl class="props">' +
+          '<dt class="time">Time</dt>' +
+          '<dd class="time">{timeDisplay}</dd>' +
+          '<dt>Depth</dt>' +
+          '<dd>{depthDisplay}</dd>' +
+          '<dt>Location</dt>' +
+          '<dd>{location}</dd>' +
+          '<dt class="distance">' +
+            '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
+          '</dt>' +
+          '<dd class="distance">{distanceDisplay}</dd>' +
+          '<dt class="status">Status</dt>' +
+          '<dd class="status">{status}{statusIcon}</dd>' +
+        '</dl>' +
+        '<button type="button">Select</button>' +
+      '</div>',
       data
     );
   };
@@ -701,14 +702,14 @@ var Earthquakes = function (options) {
 /**
  * Static method to get the URL of the earthquakes JSON feed.
  *
- * @param params {Object}
+ * @param params {Object} default is {}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
  * @param type {String <event|search>} default is 'event'
  *     set to 'search' in Catalog Search Feature to always use ComCat
  *
  * @return {String}
  */
-Earthquakes.getUrl = function (params, type = 'event') {
+Earthquakes.getUrl = function (params = {}, type = 'event') {
   var baseUri = 'https://earthquake.usgs.gov/fdsnws/event/1/query', // ComCat
       catalog = AppUtil.getParam('catalog'),
       pairs = [];

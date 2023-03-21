@@ -42,12 +42,15 @@ var ShakeMap = function (options) {
       _compare,
       _destroy,
       _fetch,
-      _getContent,
       _getData,
       _getImages,
-      _getProps,
+      _getLightbox,
+      _getMotions,
+      _getRadioBar,
       _getStatus,
-      _getUrl;
+      _getUrl,
+      _parseFiles,
+      _parseMotions;
 
 
   _this = {};
@@ -55,11 +58,7 @@ var ShakeMap = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _selected = 'intensity';
-
-    if (_mainshock.data.products.shakemap) {
-      _product = _mainshock.data.products.shakemap[0];
-    }
+    _product = _mainshock.data.products?.shakemap?.[0] || {};
 
     _this.data = {};
     _this.id = 'shakemap';
@@ -69,9 +68,9 @@ var ShakeMap = function (options) {
 
     if (_this.url) {
       _fetch();
-    } else if (_product) { // has ShakeMap, but there's no feed data
+    } else if (!AppUtil.isEmpty(_product)) { // has ShakeMap, but no feed data
       _this.data = _getData();
-      _this.lightbox = _getContent();
+      _this.lightbox = _getLightbox();
 
       _app.Features.addContent(_this); // add manually
     }
@@ -131,39 +130,92 @@ var ShakeMap = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Object} default is {}
+   *
+   * @return {Object}
+   */
+  _getData = function (json = {}) {
+    var info = json.input?.event_information || {},
+        motions = _getMotions(json);
+
+    return Object.assign(motions, {
+      dyfi: Number(info.intensity_observations) || '–',
+      img: _mainshock.data.shakemapImg,
+      mmiValue: _mainshock.data.mmi,
+      seismic: Number(info.seismic_stations) || '–',
+      status: _getStatus(),
+      url: _mainshock.data.url + '/shakemap'
+    });
+  };
+
+  /**
+   * Get the list of images.
+   *
+   * @return images {Array}
+   */
+  _getImages = function () {
+    var files = _parseFiles(),
+        images = [];
+
+    if (_mainshock.data.shakemapImg) { // default image
+      _selected = 'intensity';
+
+      images.push({
+        id: 'intensity',
+        name: 'Intensity',
+        url: _mainshock.data.shakemapImg
+      });
+    }
+
+    Object.keys(files).forEach(key => { // additional images
+      var secs,
+          name = key.toUpperCase(); // default
+
+      if (files[key]) {
+        if (key.startsWith('psa')) {
+          secs = key.replace('psa', ''); // will be e.g. '10' or '1p0'
+          secs = secs[0] + '.' + secs[secs.length - 1]; // want e.g. '1.0'
+          name = `PSA <em>(${secs}<span>s</span>)</em>`;
+        } else if (key === 'tvmap') {
+          name = 'TV map';
+        }
+
+        if (!_selected) {
+          _selected = key;
+        }
+
+        images.push({
+          id: key,
+          name: name,
+          url: _product.contents?.[files[key]].url
+        });
+      }
+    });
+
+    return images.sort(_compare);
+  };
+
+  /**
    * Get the HTML content for the Lightbox.
    *
    * @return {String}
    */
-  _getContent = function () {
-    var data,
-        images = _getImages(),
+  _getLightbox = function () {
+    var images = _getImages(),
         imgs = '',
-        radioBar = '';
+        radioBar = _getRadioBar(images);
 
     images.forEach(image => {
       imgs += `<img src="${image.url}" alt="ShakeMap ${image.name}" ` +
         `class="mmi{mmiValue} ${image.id} option">`;
     });
 
-    if (images.length > 1) {
-      _radioBar = RadioBar({
-        id: 'shakemap-images',
-        items: images,
-        selected: _selected
-      });
-
-      radioBar = _radioBar.getHtml();
-    }
-
-    data = Object.assign({}, _this.data, {
-      radioBar: radioBar
-    });
-
     return L.Util.template(
       '<div class="wrapper">' +
         '<div class="images">' +
-          '{radioBar}' +
+          radioBar +
           imgs +
         '</div>' +
         '<div class="details">' +
@@ -194,160 +246,61 @@ var ShakeMap = function (options) {
         '</div>' +
       '</div>' +
       '<p class="status"><span>{status}</span></p>',
-      data
+      _this.data
     );
   };
 
   /**
-   * Get the data used to create the content.
+   * Get the ground motion data formatted for display.
    *
-   * @param json {Object} default is null
+   * @param json {Object}
    *
-   * @return {Object}
+   * @return data {Object}
    */
-  _getData = function (json = null) {
-    var dyfi, info, mmi, pga, pgv, sa03, sa10, sa30, seismic,
-        props = {};
+  _getMotions = function (json) {
+    var data = {},
+        motions = _parseMotions(json);
 
-    if (json) {
-      info = json.input.event_information;
-      props = _getProps(json.output.ground_motions);
-
-      if (info.intensity_observations) {
-        dyfi = info.intensity_observations;
-      }
-      if (info.seismic_stations) {
-        seismic = info.seismic_stations;
-      }
-    }
-
-    if (props.mmi) {
-      mmi = AppUtil.round(props.mmi.max, 1);
-
-      if (props.mmi.bias) {
-        mmi += ` <span>(bias: ${AppUtil.round(props.mmi.bias, 3)})</span>`;
-      }
-    }
-    if (props.pga) {
-      pga = `${AppUtil.round(props.pga.max, 3)} ${props.pga.units}`;
-
-      if (props.pga.bias) {
-        pga += ` <span>(bias: ${AppUtil.round(props.pga.bias, 3)})</span>`;
-      }
-    }
-    if (props.pgv) {
-      pgv = `${AppUtil.round(props.pgv.max, 3)} ${props.pgv.units}`;
-
-      if (props.pgv.bias) {
-        pgv += ` <span>(bias: ${AppUtil.round(props.pgv.bias, 3)})</span>`;
-      }
-    }
-    if (props.sa03) {
-      sa03 = `${AppUtil.round(props.sa03.max, 3)} ${props.sa03.units}`;
-
-      if (props.sa03.bias) {
-        sa03 += ` <span>(bias: ${AppUtil.round(props.sa03.bias, 3)})</span>`;
-      }
-    }
-    if (props.sa10) {
-      sa10 = `${AppUtil.round(props.sa10.max, 3)} ${props.sa10.units}`;
-
-      if (props.sa10.bias) {
-        sa10 += ` <span>(bias: ${AppUtil.round(props.sa10.bias, 3)})</span>`;
-      }
-    }
-    if (props.sa30) {
-      sa30 = `${AppUtil.round(props.sa30.max, 3)} ${props.sa30.units}`;
-
-      if (props.sa30.bias) {
-        sa30 += ` <span>(bias: ${AppUtil.round(props.sa30.bias, 3)})</span>`;
-      }
-    }
-
-    return {
-      dyfi: dyfi || '–',
-      img: _mainshock.data.shakemapImg,
-      mmi: mmi || '–',
-      mmiValue: _mainshock.data.mmi,
-      pga: pga || '–',
-      pgv: pgv || '–',
-      sa03: sa03 || '–',
-      sa10: sa10 || '–',
-      sa30: sa30 || '–',
-      seismic: seismic||  '–',
-      status: _getStatus(),
-      url: _mainshock.data.url + '/shakemap'
-    };
-  };
-
-  /**
-   * Get the list of images (names and perhaps case are inconsistent in feed).
-   *
-   * @return images {Array}
-   */
-  _getImages = function () {
-    var images = [{ // default image
-          id: 'intensity',
-          name: 'Intensity',
-          url: _mainshock.data.shakemapImg
-        }],
-        regexes = [ // used to find images
-          /^pga\.jpg$/i,
-          /^pgv\.jpg$/i,
-          /^psa0p?3\.jpg$/i,
-          /^psa1p?0\.jpg$/i,
-          /^psa3p?0\.jpg$/i,
-          /^tvmap\.jpg$/i
-        ];
-
-    Object.keys(_product.contents).forEach(key => {
-      var filename = key.replace('download/', '');
-
-      regexes.forEach(regex => {
-        var id, name, secs;
-
-        if (regex.test(filename)) {
-          id = filename.replace('.jpg', '').toLowerCase();
-          name = id.toUpperCase(); // default
-
-          if (id.startsWith('psa')) {
-            secs = id.replace('psa', ''); // will be e.g. '10' or '1p0'
-            secs = secs[0] + '.' + secs[secs.length - 1]; // want e.g. '1.0'
-            name = `PSA <em>(${secs}<span>s</span>)</em>`;
-          } else if (id === 'tvmap') {
-            name = 'TV map';
-          }
-
-          images.push({
-            id: id,
-            name: name,
-            url: _product.contents[key].url
-          });
+    Object.keys(motions).forEach(key => {
+      if (motions[key]) {
+        if (key === 'mmi') {
+          data.mmi = AppUtil.round(motions.mmi.max, 1);
+        } else {
+          data[key] = `${AppUtil.round(motions[key].max, 3)} ${motions[key].units}`;
         }
-      });
+
+        if (motions[key].bias) {
+          data[key] += ` <span>(bias: ${AppUtil.round(motions[key].bias, 3)})</span>`;
+        }
+      } else {
+        data[key] = '–';
+      }
     });
 
-    return images.sort(_compare);
+    return data;
   };
 
   /**
-   * Get the relevant properties (names and case are inconsistent in the feed).
+   * Create and get the HTML for the RadioBar.
    *
-   * @param motions {Object}
+   * @param images {Array}
    *
-   * @return {Object}
+   * @return html {String}
    */
-  _getProps = function (motions) {
-    var keys = Object.keys(motions);
+  _getRadioBar = function (images) {
+    var html = '';
 
-    return {
-      mmi: motions[keys.find(key => key.match(/mmi|intensity/i))],
-      pga: motions[keys.find(key => key.match(/pga/i))],
-      pgv: motions[keys.find(key => key.match(/pgv/i))],
-      sa03: motions[keys.find(key => key.match(/sa.*0.*3/i))],
-      sa10: motions[keys.find(key => key.match(/sa.*1.*0/i))],
-      sa30: motions[keys.find(key => key.match(/sa.*3.*0/i))]
-    };
+    if (images.length > 1) {
+      _radioBar = RadioBar({
+        id: 'shakemap-images',
+        items: images,
+        selected: _selected
+      });
+
+      html = _radioBar.getHtml();
+    }
+
+    return html;
   };
 
   /**
@@ -358,7 +311,7 @@ var ShakeMap = function (options) {
   _getStatus = function () {
     var status = 'not reviewed'; // default
 
-    status = (_product.properties['review-status'] || status).toLowerCase();
+    status = (_product.properties?.['review-status'] || status).toLowerCase();
 
     if (status === 'reviewed') {
       status += '<i class="icon-check"></i>';
@@ -373,18 +326,54 @@ var ShakeMap = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
+    var contents = _product.contents || {},
         url = '';
 
-    if (_product) {
-      contents = _product.contents;
-
-      if (contents['download/info.json']) {
-        url = contents['download/info.json'].url;
-      }
+    if (contents['download/info.json']) {
+      url = contents['download/info.json'].url || '';
     }
 
     return url;
+  };
+
+  /**
+   * Parse the list of files (JSON feed uses disparate key values).
+   *
+   * @return {Object}
+   */
+  _parseFiles = function () {
+    var keys = Object.keys(_product.contents || {});
+
+    return {
+      pga: keys.find(key => key.match(/pga\.jpg$/i)),
+      pgv: keys.find(key => key.match(/pgv\.jpg$/i)),
+      psa03: keys.find(key => key.match(/psa0p?3\.jpg$/i)),
+      psa10: keys.find(key => key.match(/psa1p?0\.jpg$/i)),
+      psa30: keys.find(key => key.match(/psa3p?0\.jpg$/i,)),
+      tvmap: keys.find(key => key.match(/tvmap\.jpg$/i))
+    };
+  };
+
+
+  /**
+   * Parse the ground motions (JSON feed uses disparate key values).
+   *
+   * @param json {Object}
+   *
+   * @return {Object}
+   */
+  _parseMotions = function (json) {
+    var motions = json.output?.ground_motions || {},
+        keys = Object.keys(motions);
+
+    return {
+      mmi: motions[keys.find(key => key.match(/mmi|intensity/i))],
+      pga: motions[keys.find(key => key.match(/pga/i))],
+      pgv: motions[keys.find(key => key.match(/pgv/i))],
+      sa03: motions[keys.find(key => key.match(/sa.*0.*3/i))],
+      sa10: motions[keys.find(key => key.match(/sa.*1.*0/i))],
+      sa30: motions[keys.find(key => key.match(/sa.*3.*0/i))]
+    };
   };
 
   // ----------------------------------------------------------
@@ -394,11 +383,11 @@ var ShakeMap = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = _getData(json);
-    _this.lightbox = _getContent();
+    _this.lightbox = _getLightbox();
   };
 
   /**
@@ -429,12 +418,15 @@ var ShakeMap = function (options) {
     _compare = null;
     _destroy = null;
     _fetch = null;
-    _getContent = null;
     _getData = null;
     _getImages = null;
-    _getProps = null;
+    _getLightbox = null;
+    _getMotions = null;
+    _getRadioBar = null;
     _getStatus = null;
     _getUrl = null;
+    _parseFiles = null;
+    _parseMotions = null;
 
     _this = null;
   };

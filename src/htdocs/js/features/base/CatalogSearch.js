@@ -56,7 +56,7 @@ var CatalogSearch = function (options) {
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
-    _earthquakes = Earthquakes({
+    _earthquakes = Earthquakes({ // fetch feed data
       app: _app,
       feature: _this
     });
@@ -117,9 +117,9 @@ var CatalogSearch = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _setTitle();
     _earthquakes.addData(json);
     _app.SearchBar.setButton();

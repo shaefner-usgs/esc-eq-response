@@ -40,6 +40,7 @@ var Forecast = function (options) {
       _toggle,
 
       _fetch,
+      _getData,
       _getItem,
       _getList,
       _getParameters,
@@ -89,6 +90,29 @@ var Forecast = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Object}
+   *
+   * @return {Object}
+   */
+  _getData = function (json) {
+    var millisecs = Number(json.forecast?.[0]?.timeStart) || 0,
+        datetime = Luxon.DateTime.fromMillis(millisecs).toUTC(),
+        format = "ccc, LLL d, yyyy 'at' T"; // eslint-disable-line
+
+    return {
+      advisoryTimeFrame: json.advisoryTimeFrame,
+      isoTime: datetime.toISO(),
+      model: json.model || {},
+      timeFrames: json.forecast || [],
+      userTime: datetime.toLocal().toFormat(format),
+      utcOffset: Number(datetime.toLocal().toFormat('Z')),
+      utcTime: datetime.toFormat(format)
+    };
+  };
+
+  /**
    * Get the HTML <li> for the given probability data.
    *
    * @param data {Object}
@@ -120,14 +144,17 @@ var Forecast = function (options) {
    * @return html {String}
    */
   _getList = function (timeframe) {
-    var eqid = AppUtil.getParam('eqid'),
+    var bins = timeframe.bins || [],
+        eqid = AppUtil.getParam('eqid'),
         data = {
-          url: `https://earthquake.usgs.gov/earthquakes/eventpage/${eqid}/oaf/forecast`
+          url: 'https://earthquake.usgs.gov/earthquakes/eventpage/' + eqid +
+            '/oaf/forecast'
         },
         html = '<ol>';
 
-    timeframe.bins.forEach(bin => {
-      var range = bin.p95minimum;
+    bins.forEach((bin = {}) => {
+      var probability = Number(bin.probability) || 0,
+          range = bin.p95minimum;
 
       if (bin.p95maximum !== 0) {
         range += '–' + bin.p95maximum;
@@ -135,7 +162,7 @@ var Forecast = function (options) {
 
       Object.assign(data, {
         mag: bin.magnitude,
-        probability: _getPercentage(bin.probability),
+        probability: _getPercentage(probability),
         range: range
       });
 
@@ -150,13 +177,11 @@ var Forecast = function (options) {
   /**
    * Get the HTML content for the parameters list.
    *
-   * @param json {Object}
-   *
    * @return html {String}
    */
-  _getParameters = function (json) {
+  _getParameters = function () {
     var html = '<h4>Parameters <a class="toggle button">Show</a></h4>',
-        params = json.model?.parameters;
+        params = _this.data.model.parameters || {};
 
     html += '<dl class="props alt hide">';
 
@@ -184,31 +209,28 @@ var Forecast = function (options) {
     } else if (probability > 0.99) {
       percentage = '> 99%';
     } else {
-      percentage = AppUtil.round(100 * probability, 0) + '%';
+      percentage = Math.round(100 * probability) + '%';
     }
 
     return percentage;
   };
 
   /**
-   * Get the HTML content for the list of probabilities and populate its
-   * RadioBar items.
-   *
-   * @param json {Object}
+   * Get the HTML content for the probabilities and populate its RadioBar items.
    *
    * @return html {String}
    */
-  _getProbabilities = function (json) {
+  _getProbabilities = function () {
     var html = '',
         probabilities = '';
 
-    json.forecast.forEach(timeframe => {
+    _this.data.timeFrames.forEach((timeframe = {}) => {
       var hide = 'hide', // default
-          period = timeframe.label.replace(/1\s+/, ''),
+          period = timeframe.label?.replace(/1\s+/, ''),
           id = 'next' + period;
 
-      if (timeframe.label === json.advisoryTimeFrame) {
-        hide = ''; // show
+      if (timeframe.label === _this.data.advisoryTimeFrame) {
+        hide = ''; // show default timeframe
         _radioBarOpts.selected = id;
       }
 
@@ -232,38 +254,19 @@ var Forecast = function (options) {
   /**
    * Get the HTML content for the SummaryPane.
    *
-   * @param json {Object}
-   *
    * @return html {String}
    */
-  _getSummary = function (json) {
-    var data, datetime, format,
+  _getSummary = function () {
+    var data,
         html = '',
-        probabilities = _getProbabilities(json);
+        probabilities = _getProbabilities();
 
     if (probabilities) {
       _radioBar = RadioBar(_radioBarOpts);
-      datetime = Luxon.DateTime.fromMillis(json.forecast[0].timeStart).toUTC();
-      format = "ccc, LLL d, yyyy 'at' T"; // eslint-disable-line
 
-      data = {
-        isoTime: datetime.toISO(),
-        model: json.model.name,
-        name: _this.name,
-        parameters: _getParameters(json),
-        probabilities: probabilities,
-        radioBar: _radioBar.getHtml(),
-        userTime: datetime.toLocal().toFormat(format),
-        utcOffset: datetime.toLocal().toFormat('Z'),
-        utcTime: datetime.toFormat(format)
-      };
-
-      Object.assign(_this.data, {
-        startTime: {
-          user: data.userTime,
-          utc: data.utcTime
-        },
-        utcOffset: data.utcOffset
+      data = Object.assign({}, _this.data, {
+        modelName: _this.data.model.name, // flatten for template
+        name: _this.name
       });
 
       html = L.Util.template(
@@ -273,11 +276,12 @@ var Forecast = function (options) {
           '<time datetime="{isoTime}" class="user">{userTime} (UTC{utcOffset})</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>. ' +
           'The likely number of aftershocks (95% confidence range) is listed ' +
-          'below the probability.</p>' +
-        '{radioBar}' +
-        '{probabilities}' +
-        '{parameters}' +
-        '<p class="model"><strong>Model</strong>: {model}</p>',
+          'below the probability.' +
+        '</p>' +
+        _radioBar.getHtml() +
+        probabilities +
+        _getParameters() +
+        '<p class="model"><strong>Model</strong>: {modelName}</p>',
         data
       );
     }
@@ -291,17 +295,13 @@ var Forecast = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.oaf || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (products.oaf) {
-      contents = products.oaf[0].contents;
-
-      if (contents['forecast.json']) {
-        url = contents['forecast.json'].url;
-      }
+    if (contents['forecast.json']) {
+      url = contents['forecast.json']?.url || '';
     }
 
     return url;
@@ -329,14 +329,11 @@ var Forecast = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
-    _this.data = {
-      forecasts: json.forecast,
-      model: json.model,
-    };
-    _this.summary = _getSummary(json);
+  _this.addData = function (json = {}) {
+    _this.data = _getData(json);
+    _this.summary = _getSummary();
   };
 
   /**
@@ -370,6 +367,7 @@ var Forecast = function (options) {
     _toggle = null;
 
     _fetch = null;
+    _getData = null;
     _getItem = null;
     _getList = null;
     _getParameters = null;

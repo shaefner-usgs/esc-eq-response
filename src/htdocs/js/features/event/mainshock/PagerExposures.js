@@ -73,11 +73,11 @@ var PagerExposures = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var exposure = json.population_exposure,
-        mmi = exposure.mmi,
-        population = exposure.aggregated_exposure.map(pop =>
+    var exposure = json.population_exposure || {},
+        mmi = exposure.mmi || [],
+        population = exposure.aggregated_exposure?.map(pop =>
           AppUtil.roundThousands(pop)
-        );
+        ) || [];
 
     return {
       mmi: mmi.reverse(),
@@ -92,15 +92,16 @@ var PagerExposures = function (options) {
    * @return html {String}
    */
   _getRows = function () {
-    var cities = _app.Features.getFeature('pager-cities').data,
+    var data,
+        cities = _app.Features.getFeature('pager-cities').data,
         html = '',
         mmis = _this.data.mmi,
         population = _this.data.population,
         shaking = _this.data.shaking;
 
     mmis.forEach((mmi, i) => {
-      if (mmi >= 2 && Number(population[i]) !== 0) { // skip mmi below 2 and when nobody affected
-        var data = {
+      if (mmi >= 2 && parseInt(population[i]) !== 0) { // skip if nobody affected
+        data = {
           intensity: shaking[i].intensity,
           level: shaking[i].level,
           population: population[i]
@@ -119,9 +120,9 @@ var PagerExposures = function (options) {
           data
         );
 
-        cities.forEach(city => {
-          if (mmi === Number(AppUtil.round(city.mmi, 0))) {
-            var data = {
+        cities.forEach((city = {}) => {
+          if (mmi === Math.round(city.mmi)) {
+            data = {
               name: city.name,
               population: city.pop
             };
@@ -179,17 +180,13 @@ var PagerExposures = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
-        mainshock = _app.Features.getFeature('mainshock'),
-        products = mainshock.data.products,
+    var mainshock = _app.Features.getFeature('mainshock'),
+        product = mainshock.data.products?.losspager || [],
+        contents = product[0]?.contents || {},
         url = '';
 
-    if (products.losspager) {
-      contents = products.losspager[0].contents;
-
-      if (contents['json/exposures.json']) {
-        url = contents['json/exposures.json'].url;
-      }
+    if (contents['json/exposures.json']) {
+      url = contents['json/exposures.json'].url || '';
     }
 
     return url;
@@ -202,9 +199,9 @@ var PagerExposures = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = _getData(json);
     _this.summary = _getSummary();
   };

@@ -35,12 +35,14 @@ var ShakeAlert = function (options) {
 
       _fetch,
       _getCities,
-      _getContent,
       _getData,
+      _getLightbox,
       _getLocation,
+      _getRadius,
       _getStatus,
       _getUrl,
-      _getWeaAlert;
+      _getWeaAlert,
+      _parseAlerts;
 
 
   _this = {};
@@ -48,10 +50,7 @@ var ShakeAlert = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-
-    if (_mainshock.data.products['shake-alert']) {
-      _product = _mainshock.data.products['shake-alert'][0];
-    }
+    _product = _mainshock.data.products?.['shake-alert']?.[0] || {};
 
     _this.data = {};
     _this.id = 'shake-alert';
@@ -113,11 +112,58 @@ var ShakeAlert = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Object}
+   *
+   * @return {Object}
+   */
+  _getData = function (json) {
+    var alerts = _parseAlerts(json),
+        props = json.properties || {},
+        decimalSecs = props.time?.match(/\.0*[^0]+/)[0],
+        final = alerts.final.properties || {},
+        format = 'LLL d, yyyy TT',
+        initial = alerts.initial.properties || {},
+        seconds = _product.updateTime/1000 || 0,
+        time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
+        datetime = Luxon.DateTime.fromISO(time).toUTC(),
+        updateTime = Luxon.DateTime.fromSeconds(seconds).toUTC();
+
+    return {
+      cities: json.cities?.features || [],
+      decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
+      isoTime: datetime.toISO() || '',
+      isoUpdateTime: updateTime.toISO() || '',
+      latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
+      latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
+      locationFinal: _getLocation(final),
+      locationInitial: _getLocation(initial),
+      magAnss: 'M ' + AppUtil.round(props.magnitude, 1),
+      magFinal: 'M ' + AppUtil.round(final.magnitude, 1),
+      magInitial: 'M ' + AppUtil.round(initial.magnitude, 1),
+      magSeconds: Math.round(props.elapsed) + ' s',
+      numStations: Number(final.num_stations),
+      numStations10: Number(props.num_stations_10km),
+      numStations100: Number(props.num_stations_100km),
+      radius: _getRadius(alerts),
+      status: _getStatus(),
+      url: _mainshock.data.url + '/shake-alert',
+      userTime: datetime.toLocal().toFormat(format),
+      userUpdateTime: updateTime.toLocal().toFormat(format),
+      utcOffset: Number(datetime.toLocal().toFormat('Z')),
+      utcTime: datetime.toFormat(format),
+      utcUpdateTime: updateTime.toFormat(format),
+      wea: props.wea_report || ''
+    };
+  };
+
+  /**
    * Get the HTML content for the Lightbox.
    *
    * @return {String}
    */
-  _getContent = function () {
+  _getLightbox = function () {
     return L.Util.template(
       '<div class="wrapper">' +
         '<div class="details">' +
@@ -179,41 +225,34 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get the data used to create the content.
+   * Get an alert's location description.
    *
-   * @param json {Object}
+   * @param alert {Object}
    *
-   * @return {Object}
+   * @return {String}
    */
-  _getData = function (json) {
-    var alerts, final, initial,
-        props = json.properties,
-        decimalSecs = props.time.match(/\.0*[^0]+/)[0],
-        format = 'LLL d, yyyy TT',
-        radius = '',
-        time = props.time.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
-        datetime = Luxon.DateTime.fromISO(time).toUTC(),
-        updateTime = Luxon.DateTime.fromSeconds(_product.updateTime/1000).toUTC();
+  _getLocation = function (alert) {
+    var bearing = Number(alert.location_azimuth_error),
+        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
+        distance = Number(alert.location_distance_error),
+        kms = AppUtil.round(distance, 1),
+        miles = AppUtil.round(distance / 1.60934, 1),
+        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 
-    // Parse alerts, which are stored in disparate formats
-    if (json.alerts) {
-      alerts = {};
+    return `${kms} km (${miles} mi) ${directions[octant]}`;
+  };
 
-      json.alerts.forEach((alert, i) => {
-        var name = alert.id.match(/(.+)AlertCollection/)[1];
-        alerts[name] = json.alerts[i];
-      });
-    } else {
-      alerts = {
-        final: json.final_alert,
-        initial: json.initial_alert,
-      };
-    }
+  /**
+   * Get the alert radius.
+   *
+   * @param alerts {Object}
+   *
+   * @return radius {String}
+   */
+  _getRadius = function (alerts) {
+    var radius = '';
 
-    final = alerts.final.properties;
-    initial = alerts.initial.properties;
-
-    alerts.initial.features.forEach(feature => {
+    alerts.initial.features?.forEach(feature => {
       if (feature.id === 'acircle_0.0') {
         radius = feature.properties.radius;
 
@@ -225,50 +264,7 @@ var ShakeAlert = function (options) {
       }
     });
 
-    return {
-      cities: json.cities.features,
-      decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
-      isoTime: datetime.toISO(),
-      isoUpdateTime: updateTime.toISO(),
-      latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
-      latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
-      locationFinal: _getLocation(final),
-      locationInitial: _getLocation(initial),
-      magAnss: 'M ' + AppUtil.round(props.magnitude, 1),
-      magFinal: 'M ' + AppUtil.round(final.magnitude, 1),
-      magInitial: 'M ' + AppUtil.round(initial.magnitude, 1),
-      magSeconds: AppUtil.round(props.elapsed, 0) + ' s',
-      numStations: final.num_stations,
-      numStations10: props.num_stations_10km,
-      numStations100: props.num_stations_100km,
-      radius: radius,
-      status: _getStatus(),
-      url: _mainshock.data.url + '/shake-alert',
-      userTime: datetime.toLocal().toFormat(format),
-      userUpdateTime: updateTime.toLocal().toFormat(format),
-      utcOffset: datetime.toLocal().toFormat('Z'),
-      utcTime: datetime.toFormat(format),
-      utcUpdateTime: updateTime.toFormat(format),
-      wea: props.wea_report || ''
-    };
-  };
-
-  /**
-   * Get an alert's location description.
-   *
-   * @param alert {Object}
-   *
-   * @return {String}
-   */
-  _getLocation = function (alert) {
-    var bearing = alert.location_azimuth_error,
-        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
-        distance = alert.location_distance_error,
-        kms = AppUtil.round(distance, 1),
-        miles = AppUtil.round(distance / 1.60934, 1),
-        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
-
-    return `${kms} km (${miles} mi) ${directions[octant]}`;
+    return radius;
   };
 
   /**
@@ -279,7 +275,7 @@ var ShakeAlert = function (options) {
   _getStatus = function () {
     var status = 'not reviewed'; // default
 
-    status = (_product.properties['review-status'] || status).toLowerCase();
+    status = (_product.properties?.['review-status'] || status).toLowerCase();
 
     if (status === 'reviewed') {
       status += '<i class="icon-check"></i>';
@@ -294,15 +290,11 @@ var ShakeAlert = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var contents,
+    var contents = _product.contents || {},
         url = '';
 
-    if (_product) {
-      contents = _product.contents;
-
-      if (contents['summary.json']) {
-        url = contents['summary.json'].url;
-      }
+    if (contents['summary.json']) {
+      url = contents['summary.json'].url || '';
     }
 
     return url;
@@ -328,6 +320,31 @@ var ShakeAlert = function (options) {
     return alert;
   };
 
+  /**
+   * Parse the alerts, which are stored in disparate formats in the JSON feed.
+   *
+   * @param json {Object}
+   *
+   * @return alerts {Object}
+   */
+  _parseAlerts = function (json) {
+    var alerts = {};
+
+    if (json.alerts) {
+      json.alerts.forEach((alert, i) => {
+        var name = alert.id.match(/(.+)AlertCollection/)[1];
+        alerts[name] = json.alerts[i];
+      });
+    } else {
+      alerts = {
+        final: json.final_alert,
+        initial: json.initial_alert,
+      };
+    }
+
+    return alerts;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -335,11 +352,11 @@ var ShakeAlert = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.data = _getData(json);
-    _this.lightbox = _getContent();
+    _this.lightbox = _getLightbox();
   };
 
   /**
@@ -358,12 +375,14 @@ var ShakeAlert = function (options) {
 
     _fetch = null;
     _getCities = null;
-    _getContent = null;
     _getData = null;
+    _getLightbox = null;
     _getLocation = null;
+    _getRadius = null;
     _getStatus = null;
     _getUrl = null;
     _getWeaAlert = null;
+    _parseAlerts = null;
 
     _this = null;
   };

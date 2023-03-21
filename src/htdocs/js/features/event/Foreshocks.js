@@ -75,7 +75,7 @@ var Foreshocks = function (options) {
       _this.id = 'dd-foreshocks';
     }
 
-    _earthquakes = Earthquakes({
+    _earthquakes = Earthquakes({ // fetch feed data
       app: _app,
       feature: _this
     });
@@ -142,9 +142,9 @@ var Foreshocks = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _earthquakes.addData(json);
 
     _summary = Summary(_summaryOpts);
@@ -189,7 +189,7 @@ var Foreshocks = function (options) {
   _this.removeListeners = function () {
     _earthquakes.removeListeners();
 
-    if (_summary) { // check in case async fetch hasn't finished yet
+    if (_summary) {
       _summary.removeListeners();
     }
   };

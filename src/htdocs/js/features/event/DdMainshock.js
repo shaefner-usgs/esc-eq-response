@@ -72,9 +72,9 @@ var DdMainshock = function (options) {
   _getData = function (json) {
     var data,
         feature = json.features[0],
-        coords = feature.geometry.coordinates,
-        props = feature.properties,
-        datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+        coords = feature.geometry?.coordinates || [0, 0, 0],
+        props = feature.properties || {},
+        datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
         dayFormat = 'cccc',
         format = 'LLL d, yyyy TT',
         mag = AppUtil.round(props.mag, 1),
@@ -122,7 +122,7 @@ var DdMainshock = function (options) {
    * @return {String}
    */
   _getUrl = function () {
-    var eqid = AppUtil.getParam('eqid'),
+    var eqid = AppUtil.getParam('eqid') || '',
         id = eqid.replace(/[A-Za-z]{0,2}(\d+)/, '$1');
 
     return location.origin + location.pathname + 'php/fdsn/search.json.php' +
@@ -136,12 +136,12 @@ var DdMainshock = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     var data;
 
-    if (json.features.length !== 0) {
+    if (json.features?.length >= 1) {
       data = _getData(json);
 
       // Add DD data to existing Mainshock

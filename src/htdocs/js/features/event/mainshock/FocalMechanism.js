@@ -63,7 +63,7 @@ var FocalMechanism = function (options) {
         name: _this.name
       });
 
-      _this.lightbox = _beachballs.getContent();
+      _this.lightbox = _beachballs.getLightbox();
       _this.mapLayer = _beachballs.getMapLayer();
       _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
@@ -73,15 +73,15 @@ var FocalMechanism = function (options) {
   };
 
   /**
-   * Get the data as a list of un-nested key-value pairs.
+   * Unnest the 'source' data.
    *
-   * @param fm {Array}
+   * @param fm {Array} default is []
    *
    * @return {Object}
    */
-  _getData = function (fm) {
-    return Object.assign({}, fm[0].properties, {
-      source: fm[0].source
+  _getData = function (fm = []) {
+    return Object.assign({}, fm[0]?.properties || {}, {
+      source: fm[0]?.source || ''
     });
   };
 

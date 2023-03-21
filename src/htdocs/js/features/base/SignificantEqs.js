@@ -46,7 +46,8 @@ var SignificantEqs = function (options) {
 
     _this.id = 'significant-eqs';
     _this.name = 'Significant Earthquakes';
-    _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
+    _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/' +
+      'significant_month.geojson';
 
     _fetch();
   };
@@ -72,13 +73,13 @@ var SignificantEqs = function (options) {
     var eqid = AppUtil.getParam('eqid'),
         html = '<h4>None</h4>'; // default
 
-    if (json.features) {
+    if (json.features?.length >= 1) {
       html = '<ul>';
 
-      json.features.forEach(feature => {
-        var eq,
-            props = feature.properties,
-            datetime = Luxon.DateTime.fromMillis(props.time).toUTC(),
+      json.features.forEach((feature ={}) => {
+        var data,
+            props = feature.properties || {},
+            datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
             format = 'LLL d, yyyy TT',
             selected = '';
 
@@ -86,18 +87,18 @@ var SignificantEqs = function (options) {
           selected = 'selected';
         }
 
-        eq = {
+        data = {
           id: feature.id,
           isoTime: datetime.toISO(),
           mag: AppUtil.round(props.mag, 1),
-          mmi: AppUtil.romanize(props.mmi),
+          mmi: AppUtil.romanize(Number(props.mmi)),
           place: props.place,
           selected: selected,
           userTime: datetime.toLocal().toFormat(format),
           utcOffset: datetime.toLocal().toFormat('Z'),
           utcTime: datetime.toFormat(format)
         };
-        html += _getItem(eq);
+        html += _getItem(data);
       });
 
       html += '</ul>';
@@ -109,11 +110,11 @@ var SignificantEqs = function (options) {
   /**
    * Get the HTML <li> for the given earthquake.
    *
-   * @param eq {Object}
+   * @param data {Object}
    *
    * @return {String}
    */
-  _getItem = function (eq) {
+  _getItem = function (data) {
     return L.Util.template(
       '<li id="{id}" class="{selected}">' +
         '<div>' +
@@ -128,7 +129,7 @@ var SignificantEqs = function (options) {
           '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
         '</div>' +
       '</li>',
-      eq
+      data
     );
   };
 
@@ -161,9 +162,9 @@ var SignificantEqs = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object}
+   * @param json {Object} default is {}
    */
-  _this.addData = function (json) {
+  _this.addData = function (json = {}) {
     _this.content = _getContent(json);
   };
 
@@ -201,17 +202,17 @@ var SignificantEqs = function (options) {
    * Update the list: select the Mainshock with the given id if it is in the
    * list and unselect all other earthquakes.
    *
-   * Note: if the feed hasn't been fetched yet, the Mainshock will gets selected
+   * Note: if the feed hasn't been fetched yet, the Mainshock will get selected
    * when the list is initially created.
    *
-   * @param selected {String} default is ''
+   * @param id {String} default is ''
    *     Mainshock id
    */
-  _this.update = function (selected = '') {
+  _this.update = function (id = '') {
     if (!_lis) return; // feed hasn't been fetched yet
 
     _lis.forEach(li => {
-      if (li.id === selected) {
+      if (li.id === id) {
         li.classList.add('selected');
       } else {
         li.classList.remove('selected');
