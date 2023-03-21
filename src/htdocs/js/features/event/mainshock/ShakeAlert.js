@@ -168,11 +168,10 @@ var ShakeAlert = function (options) {
       '<div class="wrapper">' +
         '<div class="details">' +
           '<p class="issued">Message issued ' +
-            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} (UTC{utcOffset})</time>' +
-            '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} (UTC)</time>' +
-            '<br>Last updated ' +
-            '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} (UTC{utcOffset})</time>' +
-            '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} (UTC)</time>' +
+            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ' +
+              '(UTC{utcOffset})</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} ' +
+              '(UTC)</time>' +
           '</p>' +
           '<h4>Alert Latency</h4>' +
           '<dl class="props alt">' +
@@ -199,27 +198,33 @@ var ShakeAlert = function (options) {
             '<dt>Final</dt>' +
             '<dd>{locationFinal}</dd>' +
           '</dl>' +
+          '<h4>Nearby Cities</h4>' +
+          _getCities() +
           '<h4>Number of Stations Reporting</h4>' +
           '<ul>' +
             '<li>{numStations10} within 10 km of epicenter</li>' +
             '<li>{numStations100} within 100 km of epicenter</li>' +
             '<li><strong>{numStations} used in final udpate</strong></li>' +
           '</ul>' +
-          '<h4>Nearby Cities</h4>' +
-          _getCities() +
-          _getWeaAlert() +
         '</div>' +
         '<div class="logo">' +
-          '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
-          '<p>' +
-            '<a href="{url}" class="external" target="new">' +
-              'Event Page ShakeAlert' +
-              '<i class="icon-link"></i>' +
-            '</a>' +
-          '</p>' +
+          '<a href="{url}" class="external" target="new">' +
+            '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
+          '</a>' +
+          _getWeaAlert() +
         '</div>' +
       '</div>' +
-      '<p class="status"><span>{status}</span></p>',
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        '<dt>Updated</dt>' +
+        '<dd>' +
+          '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ' +
+            '(UTC{utcOffset})</time>' +
+          '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} ' +
+            '(UTC)</time>' +
+        '</dd>' +
+      '</dl>',
       _this.data
     );
   };
