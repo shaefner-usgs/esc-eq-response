@@ -121,15 +121,15 @@ AppUtil.fetchWithTimeout = async function (resource, options = {}) {
 /**
  * Get a formatted lat/lon coordinate pair.
  *
- * @param coords {Array}
+ * @param coords {Array} default is []
  *
  * @return {String}
  */
-AppUtil.formatLatLon = function (coords) {
-  var lat = Math.abs(coords[1]).toFixed(3),
-      latHemisphere = (coords[1] < 0) ? 'S' : 'N',
-      lon = Math.abs(coords[0]).toFixed(3),
-      lonHemisphere = (coords[0] < 0) ? 'W' : 'E';
+AppUtil.formatLatLon = function (coords = []) {
+  var lat = Math.abs(Number(coords[1])).toFixed(3),
+      latHemisphere = (Number(coords[1]) < 0) ? 'S' : 'N',
+      lon = Math.abs(Number(coords[0])).toFixed(3),
+      lonHemisphere = (Number(coords[0]) < 0) ? 'W' : 'E';
 
   return `${lat}°${latHemisphere}, ${lon}°${lonHemisphere}`;
 };
@@ -157,7 +157,7 @@ AppUtil.getParam = function (name) {
  * @return {Number}
  */
 AppUtil.getRadius = function (mag) {
-  var radius = 2 * Math.pow(10, (0.15 * mag));
+  var radius = 2 * Math.pow(10, (0.15 * Number(mag)));
 
   return Math.round(radius * 10) / 10;
 };
@@ -186,7 +186,7 @@ AppUtil.getShakingValues = function (mmis) {
       values = [];
 
   mmis.forEach(val =>
-    values.push(shaking[val])
+    values.push(shaking[Number(val) || 0])
   );
 
   return values;
@@ -269,10 +269,8 @@ AppUtil.romanize = function (num) {
 };
 
 /**
- * Round a number to the given number of decimal places.
- *
- * Always return the explicit number of decimal places specified by the
- * precision parameter (i.e. return '2.0' for example).
+ * Round a number and return the result with exactly the given precision's
+ * number of digits following the decimal place.
  *
  * @param num {Number}
  * @param precision {Number} default is 0
