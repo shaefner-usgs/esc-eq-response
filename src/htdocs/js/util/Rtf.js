@@ -7,8 +7,8 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create an Event Summary RTF document for an earthquake. A JSON Blob is sent
- * as POST data to a PHP script that generates the document and upon success, a
+ * Create the Event Summary RTF document for an earthquake. A JSON Blob is sent
+ * as POST data to a PHP script that generates the document. Upon success, a
  * download dialog is triggered.
  *
  * @param options {Object}
@@ -20,10 +20,10 @@ var Rtf = function (options) {
   var _initialize,
 
       _app,
-      _field,
       _magThreshold,
-      _order,
       _plots,
+      _sortField,
+      _sortOrder,
 
       _compare,
       _create,
@@ -31,9 +31,9 @@ var Rtf = function (options) {
       _filter,
       _getBeachBalls,
       _getData,
+      _getDescriptions,
       _getParams,
       _getPlotDivs,
-      _getProducts,
       _getPromise,
       _getPromises,
       _upload;
@@ -46,7 +46,7 @@ var Rtf = function (options) {
   };
 
   /**
-   * Comparison function to sort an Array of earthquakes.
+   * Comparison function to sort the Array of earthquakes.
    *
    * @params a, b {Objects}
    *
@@ -56,20 +56,20 @@ var Rtf = function (options) {
     var aVal, bVal,
         comparison = 0; // default
 
-    if (_field) { // not set for unsorted (i.e. single row) tables
-      aVal = a[_field];
-      bVal = b[_field];
+    if (_sortField) { // not set for unsorted (i.e. single row) tables
+      aVal = a[_sortField];
+      bVal = b[_sortField];
 
       // Case insensitive sort for strings
-      if (typeof a[_field] === 'string') {
-        aVal = a[_field].toUpperCase();
+      if (typeof a[_sortField] === 'string') {
+        aVal = a[_sortField].toUpperCase();
       }
-      if (typeof b[_field] === 'string') {
-        bVal = b[_field].toUpperCase();
+      if (typeof b[_sortField] === 'string') {
+        bVal = b[_sortField].toUpperCase();
       }
 
       // Use ISO time to sort date/time fields
-      if (_field === 'userTime' || _field === 'utcTime') {
+      if (_sortField === 'userTime' || _sortField === 'utcTime') {
         aVal = a.isoTime;
         bVal = b.isoTime;
       }
@@ -80,7 +80,7 @@ var Rtf = function (options) {
         comparison = -1;
       }
 
-      if (_order === 'up') {
+      if (_sortOrder === 'up') {
         comparison *= -1;
       }
 
@@ -114,10 +114,10 @@ var Rtf = function (options) {
     _initialize = null;
 
     _app = null;
-    _field = null;
     _magThreshold = null;
-    _order = null;
     _plots = null;
+    _sortField = null;
+    _sortOrder = null;
 
     _compare = null;
     _create = null;
@@ -125,9 +125,9 @@ var Rtf = function (options) {
     _filter = null;
     _getBeachBalls = null;
     _getData = null;
+    _getDescriptions = null;
     _getParams = null;
     _getPlotDivs = null;
-    _getProducts = null;
     _getPromise = null;
     _getPromises = null;
     _upload = null;
@@ -154,18 +154,18 @@ var Rtf = function (options) {
       eqs = eqs.filter(eq => eq.mag >= _magThreshold);
     }
 
-    // Set _field, _order here (not in _compare) so it's set once/Feature
+    // Set sort options here (not in _compare) so it gets set once/Feature
     if (eqs.length > 1 && params) {
-      _field = params.field;
-      _order = params.order;
+      _sortField = params.field;
+      _sortOrder = params.order;
     }
 
     return eqs;
   };
 
   /**
-   * Get the FocalMechanism and MomentTensor beachball images as base64 encoded
-   * dataURLs, along with their status.
+   * Get the Focal Mechanism and Moment Tensor beachball images as base64
+   * encoded dataURLs, along with their status.
    *
    * @param mainshock {Object}
    *
@@ -183,10 +183,10 @@ var Rtf = function (options) {
           beachball = canvasEls[key];
 
       if (beachball) {
-        product = mainshock.data.products[key][0];
+        product = mainshock.data.products?.[key]?.[0] || {};
         beachballs[key] = {
           image: beachball.toDataURL('image/png'),
-          status: product.properties['review-status'].toLowerCase()
+          status: (product.properties?.['review-status'] || '').toLowerCase()
         };
       }
     });
@@ -203,75 +203,73 @@ var Rtf = function (options) {
     var data,
         prefix = (AppUtil.getParam('catalog') === 'dd') ? 'dd-' : '',
         aftershocks = _app.Features.getFeature(`${prefix}aftershocks`),
+        descriptions = _getDescriptions(prefix),
         dyfi = _app.Features.getFeature('dyfi'),
-        el = document.getElementById('summaryPane'),
-        description = {
-          aftershocks: el.querySelector(`.${prefix}aftershocks .description`).innerText,
-          foreshocks: el.querySelector(`.${prefix}foreshocks .description`).innerText,
-          historical: el.querySelector(`.${prefix}historical .description`).innerText
-        },
         forecast = _app.Features.getFeature('forecast'),
         foreshocks = _app.Features.getFeature(`${prefix}foreshocks`),
         historical = _app.Features.getFeature(`${prefix}historical`),
         historicalEvents = _app.Features.getFeature('historical-events'),
         mainshock = _app.Features.getFeature('mainshock'),
         nearbyCities = _app.Features.getFeature('nearby-cities'),
+        products = mainshock.data.products || {},
+        notice = products['general-header'] || [],
         pager = _app.Features.getFeature('pager'),
-        products = _getProducts(mainshock.data.products),
         shakeAlert = _app.Features.getFeature('shake-alert'),
         shakemap = _app.Features.getFeature('shakemap'),
-        zone = AppUtil.getParam('timezone') || 'utc';
+        tectonic = products['general-text'] || [];
 
     data = {
       aftershocks: {
         bins: aftershocks.bins,
         count: aftershocks.count,
-        description: description.aftershocks,
+        description: descriptions.aftershocks,
         earthquakes: _filter(aftershocks).sort(_compare),
-        forecast: forecast.data,
+        forecast: forecast.data || {},
         magThreshold: _magThreshold,
         plots: _plots.aftershocks
       },
       beachballs: _getBeachBalls(mainshock),
-      day: {
-        user: mainshock.data.utcDayofWeek,
-        utc: mainshock.data.utcDayofWeek
-      },
-      depthDisplay: mainshock.data.depthDisplay,
-      dyfi: dyfi.data,
-      eqid: mainshock.data.id,
+      dyfi: dyfi.data || {},
       foreshocks: {
         bins: foreshocks.bins,
         count: foreshocks.count,
-        description: description.foreshocks,
+        description: descriptions.foreshocks,
         earthquakes: _filter(foreshocks).sort(_compare),
         magThreshold: _magThreshold
       },
       historical: {
         bins: historical.bins,
         count: historical.count,
-        description: description.historical,
+        description: descriptions.historical,
         earthquakes: _filter(historical).sort(_compare),
+        events: historicalEvents.data || [],
         magThreshold: _magThreshold,
         plots: _plots.historical
       },
-      historicalEvents: historicalEvents.data,
-      magDisplay: mainshock.data.magDisplay,
-      magType: mainshock.data.magType,
-      nearbyCities: nearbyCities.data,
-      notice: products.notice,
-      pager: pager.data,
-      plotNames: _app.PlotsPane.names,
-      shakeAlert: shakeAlert.data,
-      shakemap: shakemap.data,
-      tectonic: products.tectonic,
-      time: {
-        local: mainshock.data.localTime,
-        user: mainshock.data.userTimeDisplay,
-        utc: mainshock.data.utcTimeDisplay,
-        zone: zone
+      mainshock: {
+        day: {
+          user: mainshock.data.utcDayofWeek,
+          utc: mainshock.data.utcDayofWeek
+        },
+        depthDisplay: mainshock.data.depthDisplay,
+        eqid: mainshock.data.id,
+        magDisplay: mainshock.data.magDisplay,
+        magType: mainshock.data.magType,
+        time: {
+          local: mainshock.data.localTime,
+          user: mainshock.data.userTimeDisplay,
+          utc: mainshock.data.utcTimeDisplay,
+          zone: AppUtil.getParam('timezone') || 'utc'
+        },
+        title: mainshock.data.title,
       },
-      title: mainshock.data.title,
+      nearbyCities: nearbyCities.data || [],
+      notice: notice[0]?.contents?.['']?.bytes || '',
+      pager: pager.data || {},
+      plotNames: _app.PlotsPane.names,
+      shakeAlert: shakeAlert.data || {},
+      shakemap: shakemap.data || {},
+      tectonic: tectonic[0]?.contents?.['']?.bytes || '',
       urls: {
         app: location.href,
         eventPage: mainshock.data.url
@@ -282,7 +280,27 @@ var Rtf = function (options) {
   };
 
   /**
-   * Get the current sort parameters of the given Feature's earthquake list.
+   * Get the Feature descriptions from the SummaryPane text.
+   *
+   * @param prefix {String}
+   *
+   * @return descriptions {Object}
+   */
+  _getDescriptions = function (prefix) {
+    var descriptions = {},
+        el = document.getElementById('summaryPane'),
+        features = ['aftershocks', 'foreshocks', 'historical'];
+
+    features.forEach(id => {
+      var description = el.querySelector(`.${prefix}${id} .description`);
+      descriptions[id] = description.innerText;
+    });
+
+    return descriptions;
+  };
+
+  /**
+   * Get the sort parameters for the given Feature's earthquake list.
    *
    * @param id {String}
    *     Feature id
@@ -291,11 +309,11 @@ var Rtf = function (options) {
    */
   _getParams = function (id) {
     var el, field, order,
-        regex1 = /sort-(up|down)/, // used to find current sorted-by field
-        regex2 = /sort-\w+/, // used to find sorting algorithm's css classes
+        regex1 = /sort-(up|down)/, // current sorted-by field
+        regex2 = /sort-\w+/, // sorting algorithm's CSS classes
         ths = document.querySelectorAll(`.${id} .sortable th`);
 
-    if (ths.length === 0) { // un-sorted table (i.e. only 1 row)
+    if (ths.length === 0) { // un-sorted table (only 1 data row)
       return;
     }
 
@@ -316,8 +334,8 @@ var Rtf = function (options) {
     );
 
     return {
-      field: field,
-      order: order
+      field: field || '',
+      order: order || ''
     };
   };
 
@@ -333,7 +351,7 @@ var Rtf = function (options) {
   _getPlotDivs = function () {
     var plot,
         divs = {},
-        params = _app.PlotsPane.params;
+        params = _app.PlotsPane.params || {};
 
     Object.keys(params).forEach(featureId => {
       divs[featureId] = [];
@@ -351,31 +369,6 @@ var Rtf = function (options) {
     });
 
     return divs;
-  };
-
-  /**
-   * Check if Notice and Tectonic products exist, and if they do, return select
-   * properties for each.
-   *
-   * @param products {Object}
-   *
-   * @return {Object}
-   */
-  _getProducts = function (products) {
-    var notice, tectonic;
-
-    if (products['general-header']) {
-      notice = products['general-header'][0].contents[''].bytes;
-    }
-
-    if (products['general-text']) {
-      tectonic = products['general-text'][0].contents[''].bytes;
-    }
-
-    return {
-      notice: notice || '',
-      tectonic: tectonic || ''
-    };
   };
 
   /**
@@ -431,24 +424,25 @@ var Rtf = function (options) {
    * @param blob {Object}
    */
   _upload = function (blob) {
-    var url = location.origin + location.pathname + 'php/event-summary/create.php';
+    var options = {
+          body: blob,
+          headers: new Headers({
+            'Content-Type': 'application/json'
+          }),
+          method: 'POST'
+        },
+        path = 'php/event-summary/',
+        resource = {
+          id: 'rtf',
+          name: 'Event Summary',
+          url: location.origin + location.pathname + path + 'create.php'
+        };
 
     JsonFeed({
       app: _app
-    }).fetch({
-      id: 'rtf',
-      name: 'Event Summary',
-      url: url
-    }, {
-      body: blob,
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
-      method: 'POST'
-    }).then(json => {
+    }).fetch(resource, options).then(json => {
       if (json.file) {
-        location.assign('php/event-summary/download.php?file=' + json.file);
-
+        location.assign(path + 'download.php?file=' + json.file);
         _app.StatusBar.removeItem('rtf');
       } else if (json.error) {
         console.error(json.error);
@@ -460,8 +454,8 @@ var Rtf = function (options) {
         id: 'rtf',
         message: `<h4>Error Creating Event Summary</h4><ul><li>${error}</li></ul>`
       });
-
       console.error(error);
+
       _destroy();
     });
   };
