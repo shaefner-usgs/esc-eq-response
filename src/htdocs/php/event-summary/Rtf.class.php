@@ -98,9 +98,9 @@ class Rtf {
     }
 
     // Clean up / remove NULL values from historical events list
-    foreach ($this->_data->historicalEvents as $key => $event) {
+    foreach ($this->_data->historical->events as $key => $event) {
       if (!$event) { // NULL
-        unset($this->_data->historicalEvents[$key]);
+        unset($this->_data->historical->events[$key]);
       } else { // clean up slashes/extra quotes on name prop
         $event->Name = trim(stripslashes($event->Name), '"');
       }
@@ -131,8 +131,8 @@ class Rtf {
    * @return $datetime {String}
    */
   private function _getDateTime() {
-    $day = $this->_data->day;
-    $time = $this->_data->time;
+    $day = $this->_data->mainshock->day;
+    $time = $this->_data->mainshock->time;
     $datetime = join(' ', [
       substr($day->utc, 0, 3),
       strip_tags($time->utc),
@@ -164,7 +164,7 @@ class Rtf {
       'distanceDisplay' => 'Distance',
       'id' => 'Event ID'
     ];
-    $time = $this->_data->time;
+    $time = $this->_data->mainshock->time;
 
     // Display user time (replace UTC time)
     if ($time->zone === 'user') {
@@ -208,9 +208,10 @@ class Rtf {
    */
   private function _getPath($extension) {
     static $count = 0;
+
     $count ++;
 
-    return "/tmp/{$this->_data->eqid}-$count.$extension";
+    return "/tmp/{$this->_data->mainshock->eqid}-$count.$extension";
   }
 
   /**
@@ -282,8 +283,9 @@ class Rtf {
    * Save a local (temporary) copy of the RTF file and store its path in $file.
    */
   private function _saveFile() {
-    $timestamp = date('YmdHis'); // e.g. 20191024093156 (ensures unique name)
-    $this->file = "/tmp/{$this->_data->eqid}-$timestamp-event-summary.rtf";
+    $eqid = $this->_data->mainshock->eqid;
+    $timestamp = date('YmdHis'); // ensure unique name
+    $this->file = "/tmp/$eqid-$timestamp-event-summary.rtf";
 
     $this->_rtf->save($this->file);
   }
@@ -296,6 +298,7 @@ class Rtf {
    * Section 1: Basic earthquake details.
    */
   private function _createSection1() {
+    $mainshock = $this->_data->mainshock;
     $nearbyCitiesList = '';
     $section1 = $this->_rtf->addSection();
 
@@ -306,7 +309,7 @@ class Rtf {
     $nearbyCitiesList = substr($nearbyCitiesList, 0, -4); // remove final <br>
 
     $section1->writeText(
-      $this->_data->title,
+      $mainshock->title,
       $this->_font->h1,
       $this->_format->h1
     );
@@ -333,7 +336,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->magType . ' ' . $this->_data->magDisplay,
+      $mainshock->magType . ' ' . $mainshock->magDisplay,
       $this->_font->body,
       $this->_format->body
     );
@@ -344,7 +347,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      strip_tags($this->_data->depthDisplay),
+      strip_tags($mainshock->depthDisplay),
       $this->_font->body,
       $this->_format->body
     );
@@ -368,7 +371,7 @@ class Rtf {
       $this->_format->h4
     );
     $section1->writeText(
-      $this->_data->eqid,
+      $mainshock->eqid,
       $this->_font->body,
       $this->_format->body
     );
@@ -549,14 +552,14 @@ class Rtf {
         );
       }
 
-      if (property_exists($pager, 'fatalities')) {
+      if (property_exists($pager, 'fatal')) {
         $section3->writeText(
           'Estimated Fatalities',
           $this->_font->h4,
           $this->_format->h4
         );
         $section3->addImage(
-          $this->_getRemoteImage($pager->fatalities),
+          $this->_getRemoteImage($pager->fatal),
           $this->_format->image,
           12
         );
@@ -878,7 +881,7 @@ class Rtf {
     if (!empty(get_object_vars($plots))) {
       foreach ($plots as $type => $dataUrl) {
         $section6->writeText(
-          $this->_data->plotNames->{$type},
+          $this->_data->plotNames->$type,
           $this->_font->h4,
           $this->_format->h4
         );
@@ -922,12 +925,13 @@ class Rtf {
         $this->_format->p
       );
 
-      $zone = $this->_data->time->zone; // 'user' or 'utc'
-      $datetime = $forecast->startTime->{$zone};
-      $zoneDisplay = 'UTC';
+      $zone = $this->_data->mainshock->time->zone; // 'user' or 'utc'
+      $timeKey = $zone . 'Time';
+      $datetime = $forecast->$timeKey;
+      $zoneDisplay = 'UTC'; // default
 
       if ($zone === 'user') {
-        $zoneDisplay = 'UTC' . $forecast->utcOffset;
+        $zoneDisplay .= $forecast->utcOffset;
       }
       $section6->writeText(
         "<strong>Forecast starts</strong>: $datetime ($zoneDisplay)",
@@ -1041,7 +1045,7 @@ class Rtf {
     if (!empty(get_object_vars($plots))) {
       foreach ($plots as $type => $dataUrl) {
         $section8->writeText(
-          $this->_data->plotNames->{$type},
+          $this->_data->plotNames->$type,
           $this->_font->h4,
           $this->_format->h4
         );
@@ -1054,7 +1058,7 @@ class Rtf {
       }
     }
 
-    $historicalEvents = $this->_data->historicalEvents;
+    $historicalEvents = $this->_data->historical->events;
     if (!empty($historicalEvents)) {
       // Get sort order based on event date/time
       $dates = array();
@@ -1135,11 +1139,11 @@ class Rtf {
     );
 
     if (!empty(get_object_vars($shakeAlert))) {
-      $zone = $this->_data->time->zone; // 'user' or 'utc'
+      $zone = $this->_data->mainshock->time->zone; // 'user' or 'utc'
       $key1 = $zone . 'Time';
       $key2 = $zone . 'UpdateTime';
-      $datetime = $shakeAlert->{$key1} . $shakeAlert->decimalSecs;
-      $updateTime = $shakeAlert->{$key2};
+      $datetime = $shakeAlert->$key1 . $shakeAlert->decimalSecs;
+      $updateTime = $shakeAlert->$key2;
       $magAnss = "$shakeAlert->magAnss ($shakeAlert->magSeconds after origin)";
       $zoneDisplay = 'UTC';
 
@@ -1282,7 +1286,7 @@ class Rtf {
    * @param $type {String <first|past|prior>}
    */
   private function _createTableBinnedData($section, $id, $type) {
-    $data = $this->_data->{$id}->bins->{$type};
+    $data = $this->_data->$id->bins->$type;
 
     // Convert data rows to an array and sort by key (e.g. m 1, m 2, ..., total)
     $rows = get_object_vars($data);
@@ -1363,7 +1367,7 @@ class Rtf {
    *     Feature id
    */
   private function _createTableEqlist($section, $id) {
-    $eqs = $this->_data->{$id}->earthquakes;
+    $eqs = $this->_data->$id->earthquakes;
     $numRows = count($eqs) + 1; // data rows + 1 header row
 
     $section->writeText(
@@ -1412,7 +1416,7 @@ class Rtf {
           $cell->setPaddingRight(.2);
         }
 
-        $fieldValue = strip_tags($eq->{$key});
+        $fieldValue = strip_tags($eq->$key);
         if ($key === 'userTimeDisplay' || $key === 'utcTimeDisplay') { // strip off timezone
           $fieldValue = preg_replace('/\s+\([\w\-:]+\)/', '', $fieldValue);
         } else if ($key === 'magDisplay') { // add mag type
@@ -1532,9 +1536,9 @@ class Rtf {
    * @param $type {String <number|probability>}
    */
   private function _createTableForecast($section, $type) {
-    $forecasts = $this->_data->aftershocks->forecast->forecasts;
-    $numCols = count($forecasts) + 1; // data cols + 1 header col
-    $numRows = count($forecasts[0]->bins) + 1; // data rows + 1 header row
+    $timeFrames = $this->_data->aftershocks->forecast->timeFrames;
+    $numCols = count($timeFrames) + 1; // data cols + 1 header col
+    $numRows = count($timeFrames[0]->bins) + 1; // data rows + 1 header row
 
     $columns = array(2, 2, 2, 2, 2);
     if ($type === 'number') {
@@ -1563,17 +1567,17 @@ class Rtf {
     $table->setTextAlignmentForCellRange('right', 2, 2, $numRows, $numCols);
 
     $col = 1;
-    foreach ($forecasts as $forecast) {
+    foreach ($timeFrames as $timeFrame) {
       $col ++;
 
       // Header row
       $cell = $table->getCell(1, $col);
       $cell->setCellPaddings(0.1, 0.15, 0.1, 0.15);
-      $cell->writeText($forecast->label);
+      $cell->writeText($timeFrame->label);
 
       // Data rows
       $row = 1;
-      foreach ($forecast->bins as $bin) {
+      foreach ($timeFrame->bins as $bin) {
         $row ++;
 
         if ($col === 2) { // first pass, render magnitude headers
