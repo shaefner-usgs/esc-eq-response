@@ -102,7 +102,11 @@ var ShakeAlert = function (options) {
           `<td>${props.name}</td>` +
           `<td>${props.citydist}</td>` +
           `<td>${props.warning_time}</td>` +
-          `<td>${props.mmi}</td>` +
+          '<td>' +
+            `<span class="mmi${props.mmi} impact-bubble">` +
+              `<strong class="roman">${props.mmi}</strong>` +
+            '</span>' +
+          '</td>' +
         '</tr>';
     });
 

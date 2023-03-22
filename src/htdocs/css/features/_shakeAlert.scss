@@ -25,9 +25,6 @@
       padding-right: 2.75rem;
       text-align: right;
     }
-    &:last-child {
-      text-align: center;
-    }
   }
 
   ul {
@@ -38,6 +35,11 @@
     strong {
       font-weight: 500;
     }
+  }
+
+  .impact-bubble {
+    margin: 0 auto;
+    width: 3.5rem;
   }
 
   .issued {
