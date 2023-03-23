@@ -91,12 +91,17 @@ var FieldNotes = function (options) {
       pane: _this.id // controls stacking order
     };
 
-    _this.mapLayer = L.geoJSON.async(_this.url, {
-      app: _app,
-      feature: _this,
-      onEachFeature: _onEachFeature,
-      pointToLayer: _pointToLayer
-    });
+    // Only the 2014 Napa quake has FieldNotes data; skip for all other events
+    if (AppUtil.getParam('eqid') === 'nc72282711') {
+      _this.mapLayer = L.geoJSON.async(_this.url, {
+        app: _app,
+        feature: _this,
+        onEachFeature: _onEachFeature,
+        pointToLayer: _pointToLayer
+      });
+    } else {
+      _this.status = 'ready';
+    }
   };
 
   /**
@@ -381,10 +386,12 @@ var FieldNotes = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    _this.mapLayer.on({
-      popupopen: _onPopupOpen,
-      popupclose: _onPopupClose
-    });
+    if (_this.mapLayer) {
+      _this.mapLayer.on({
+        popupopen: _onPopupOpen,
+        popupclose: _onPopupClose
+      });
+    }
   };
 
   /**
@@ -422,10 +429,12 @@ var FieldNotes = function (options) {
    * Remove event listeners.
    */
   _this.removeListeners = function () {
-    _this.mapLayer.off({
-      popupopen: _onPopupOpen,
-      popupclose: _onPopupClose
-    });
+    if (_this.mapLayer) {
+      _this.mapLayer.off({
+        popupopen: _onPopupOpen,
+        popupclose: _onPopupClose
+      });
+    }
   };
 
 
