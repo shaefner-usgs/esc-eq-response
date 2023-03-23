@@ -165,13 +165,13 @@ var Rtf = function (options) {
 
   /**
    * Get the Focal Mechanism and Moment Tensor beachball images as base64
-   * encoded dataURLs, along with their status.
+   * encoded dataURLs, along with their status and update times.
    *
    * @param mainshock {Object}
    *
    * @return beachballs {Object}
    */
-  _getBeachBalls = function (mainshock) {
+  _getBeachBalls = function () {
     var beachballs = {},
         canvasEls = {
           'focal-mechanism': document.querySelector('#focal-mechanism canvas'),
@@ -179,14 +179,17 @@ var Rtf = function (options) {
         };
 
     Object.keys(canvasEls).forEach(key => {
-      var product,
+      var data,
           beachball = canvasEls[key];
 
       if (beachball) {
-        product = mainshock.data.products?.[key]?.[0] || {};
+        data = _app.Features.getFeature(key).data || {};
         beachballs[key] = {
           image: beachball.toDataURL('image/png'),
-          status: (product.properties?.['review-status'] || '').toLowerCase()
+          status: data.status,
+          userTime: data.userTime,
+          utcOffset: data.utcOffset,
+          utcTime: data.utcTime
         };
       }
     });
@@ -228,7 +231,7 @@ var Rtf = function (options) {
         magThreshold: _magThreshold,
         plots: _plots.aftershocks
       },
-      beachballs: _getBeachBalls(mainshock),
+      beachballs: _getBeachBalls(),
       dyfi: dyfi.data || {},
       foreshocks: {
         bins: foreshocks.bins,
@@ -248,7 +251,7 @@ var Rtf = function (options) {
       },
       mainshock: {
         day: {
-          user: mainshock.data.utcDayofWeek,
+          user: mainshock.data.userDayofWeek,
           utc: mainshock.data.utcDayofWeek
         },
         depthDisplay: mainshock.data.depthDisplay,
@@ -259,7 +262,6 @@ var Rtf = function (options) {
           local: mainshock.data.localTime,
           user: mainshock.data.userTimeDisplay,
           utc: mainshock.data.utcTimeDisplay,
-          zone: AppUtil.getParam('timezone') || 'utc'
         },
         title: mainshock.data.title,
       },
@@ -273,7 +275,8 @@ var Rtf = function (options) {
       urls: {
         app: location.href,
         eventPage: mainshock.data.url
-      }
+      },
+      zone: AppUtil.getParam('timezone') || 'utc'
     };
 
     return data;
