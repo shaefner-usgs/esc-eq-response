@@ -134,12 +134,12 @@ class Rtf {
     $day = $this->_data->mainshock->day;
     $time = $this->_data->mainshock->time;
     $datetime = join(' ', [
-      substr($day->utc, 0, 3),
+      substr($day->utc, 0, 3) . ',',
       strip_tags($time->utc),
       '<br>'
     ]);
     $datetime .= join(' ', [
-      substr($day->user, 0, 3),
+      substr($day->user, 0, 3) . ',',
       strip_tags($time->user)
     ]);
 
@@ -164,10 +164,9 @@ class Rtf {
       'distanceDisplay' => 'Distance',
       'id' => 'Event ID'
     ];
-    $time = $this->_data->mainshock->time;
 
     // Display user time (replace UTC time)
-    if ($time->zone === 'user') {
+    if ($this->_data->zone === 'user') {
       $fields = array_merge(
         array_slice($fields, 0, 1),
         ['userTimeDisplay' => "Time (User)"],
@@ -253,6 +252,23 @@ class Rtf {
   }
 
   /**
+   * Format the updated time for display.
+   *
+   * @param $feature {Object}
+   *
+   * @return {String}
+   */
+  private function _getUpdated($feature) {
+    if ($this->_data->zone === 'user') {
+      $time = "$feature->userTime (UTC$feature->utcOffset)";
+    } else { // UTC
+      $time = $feature->utcTime . ' (UTC)';
+    }
+
+    return "Updated: $time";
+  }
+
+  /**
    * Get a roman numeral from number.
    *
    * @param $number {Number}
@@ -306,6 +322,7 @@ class Rtf {
       $nearbyCitiesList .= $city->distance . ' km ' . $city->direction .
         ' of ' . $city->name . '<br>';
     }
+
     $nearbyCitiesList = substr($nearbyCitiesList, 0, -4); // remove final <br>
 
     $section1->writeText(
@@ -617,6 +634,11 @@ class Rtf {
         $this->_font->body,
         $this->_format->body
       );
+      $section3->writeText(
+        $this->_getUpdated($pager),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
   }
 
@@ -645,10 +667,15 @@ class Rtf {
       $section4->addImage(
         $this->_getImage($beachball->image),
         $this->_format->image,
-        10
+        9
       );
       $section4->writeText(
         $this->_getStatus($beachball->status),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section4->writeText(
+        $this->_getUpdated($beachball),
         $this->_font->body,
         $this->_format->body
       );
@@ -666,10 +693,15 @@ class Rtf {
       $section4->addImage(
         $this->_getImage($beachball->image),
         $this->_format->image,
-        10
+        9
       );
       $section4->writeText(
         $this->_getStatus($beachball->status),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section4->writeText(
+        $this->_getUpdated($beachball),
         $this->_font->body,
         $this->_format->body
       );
@@ -765,6 +797,11 @@ class Rtf {
         $this->_font->body,
         $this->_format->body
       );
+      $section5->writeText(
+        $this->_getUpdated($shakemap),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
 
     $section5->writeText(
@@ -815,6 +852,11 @@ class Rtf {
         $this->_font->body,
         $this->_format->body
       );
+      $section5->writeText(
+        $this->_getUpdated($dyfi),
+        $this->_font->body,
+        $this->_format->body
+      );
     }
 
     $section5->writeText(
@@ -835,6 +877,8 @@ class Rtf {
   private function _createSection6() {
     $aftershocks = $this->_data->aftershocks;
     $count = $aftershocks->count;
+    $forecast = $aftershocks->forecast;
+    $plots = $aftershocks->plots;
     $section6 = $this->_rtf->addSection();
 
     $section6->writeText(
@@ -876,8 +920,6 @@ class Rtf {
       $this->_createTableEqlist($section6, 'aftershocks');
     }
 
-    $plots = $aftershocks->plots;
-
     if (!empty(get_object_vars($plots))) {
       foreach ($plots as $type => $dataUrl) {
         $section6->writeText(
@@ -894,9 +936,16 @@ class Rtf {
       }
     }
 
-    $forecast = $aftershocks->forecast;
-
     if (!empty(get_object_vars($forecast))) {
+      $zoneDisplay = 'UTC'; // default
+
+      if ($this->_data->zone === 'user') {
+        $time = $forecast->userTime;
+        $zoneDisplay .= $forecast->utcOffset;
+      } else { // UTC
+        $time = $forecast->utcTime;
+      }
+
       $section6->writeText(
         'Aftershock Forecast',
         $this->_font->h4,
@@ -925,16 +974,8 @@ class Rtf {
         $this->_format->p
       );
 
-      $zone = $this->_data->mainshock->time->zone; // 'user' or 'utc'
-      $timeKey = $zone . 'Time';
-      $datetime = $forecast->$timeKey;
-      $zoneDisplay = 'UTC'; // default
-
-      if ($zone === 'user') {
-        $zoneDisplay .= $forecast->utcOffset;
-      }
       $section6->writeText(
-        "<strong>Forecast starts</strong>: $datetime ($zoneDisplay)",
+        "<strong>Forecast starts</strong>: $time ($zoneDisplay)",
         $this->_font->body,
         $this->_format->p
       );
@@ -974,14 +1015,14 @@ class Rtf {
         $this->_format->h3
       );
     } else {
+      $listCount = count($foreshocks->earthquakes);
+      $magThreshold = $foreshocks->magThreshold;
+
       $section7->writeText(
         '<strong>Earthquakes Updated</strong>: ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
-
-      $listCount = count($foreshocks->earthquakes);
-      $magThreshold = $foreshocks->magThreshold;
 
       $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
 
@@ -1000,6 +1041,7 @@ class Rtf {
   private function _createSection8() {
     $historical = $this->_data->historical;
     $count = $historical->count;
+    $plots = $historical->plots;
     $section8 = $this->_rtf->addSection();
 
     $section8->writeText(
@@ -1021,14 +1063,14 @@ class Rtf {
         $this->_format->h3
       );
     } else {
+      $listCount = count($historical->earthquakes);
+      $magThreshold = $historical->magThreshold;
+
       $section8->writeText(
         '<strong>Earthquakes Updated</strong>: ' . $this->_now,
         $this->_font->body,
         $this->_format->body
       );
-
-      $listCount = count($historical->earthquakes);
-      $magThreshold = $historical->magThreshold;
 
       $this->_createTableBinnedData($section8, 'historical', 'prior');
 
@@ -1039,8 +1081,6 @@ class Rtf {
       );
       $this->_createTableEqlist($section8, 'historical');
     }
-
-    $plots = $historical->plots;
 
     if (!empty(get_object_vars($plots))) {
       foreach ($plots as $type => $dataUrl) {
@@ -1058,13 +1098,14 @@ class Rtf {
       }
     }
 
-    $historicalEvents = $this->_data->historical->events;
-    if (!empty($historicalEvents)) {
-      // Get sort order based on event date/time
-      $dates = array();
-      foreach ($historicalEvents as $key => $event) {
+    if (!empty($historical->events)) {
+      $dates = [];
+
+      foreach ($historical->events as $key => $event) {
         $dates[$key] = $event->Time;
       }
+
+      // Sort on event date/time
       arsort($dates);
       $sortKeys = array_keys($dates);
 
@@ -1075,7 +1116,8 @@ class Rtf {
       );
 
       foreach ($sortKeys as $key) {
-        $event = $historicalEvents[$key];
+        $effects = '';
+        $event = $historical->events[$key];
 
         $section8->writeText(
           $event->Name,
@@ -1093,7 +1135,6 @@ class Rtf {
           $this->_format->body
         );
 
-        $effects = '';
         if (!is_null($event->ShakingDeaths)) {
           $fatalities = 'fatalities';
           if ($event->ShakingDeaths === 1) {
@@ -1107,6 +1148,7 @@ class Rtf {
           }
           $effects .= $event->Injured . ' injured';
         }
+
         if ($effects) {
           $section8->writeText(
             $effects,
@@ -1139,25 +1181,18 @@ class Rtf {
     );
 
     if (!empty(get_object_vars($shakeAlert))) {
-      $zone = $this->_data->mainshock->time->zone; // 'user' or 'utc'
-      $key1 = $zone . 'Time';
-      $key2 = $zone . 'UpdateTime';
-      $datetime = $shakeAlert->$key1 . $shakeAlert->decimalSecs;
-      $updateTime = $shakeAlert->$key2;
       $magAnss = "$shakeAlert->magAnss ($shakeAlert->magSeconds after origin)";
       $zoneDisplay = 'UTC';
 
-      if ($zone === 'user') {
-        $zoneDisplay = 'UTC' . $shakeAlert->utcOffset;
+      if ($this->_data->zone === 'user') {
+        $issueTime = $shakeAlert->userIssueTime;
+        $zoneDisplay .= $shakeAlert->utcIssueOffset;
+      } else { //utc
+        $issueTime = $shakeAlert->utcIssueTime;
       }
 
       $section9->writeText(
-        "Message issued $datetime ($zoneDisplay)",
-        $this->_font->body,
-        $this->_format->body
-      );
-      $section9->writeText(
-        "Last updated $updateTime ($zoneDisplay)",
+        "Message issued $issueTime ($zoneDisplay)",
         $this->_font->body,
         $this->_format->body
       );
@@ -1221,6 +1256,13 @@ class Rtf {
       );
 
       $section9->writeText(
+        'Nearby Cities',
+        $this->_font->h4,
+        $this->_format->h4
+      );
+      $this->_createTableShakeAlert($section9);
+
+      $section9->writeText(
         'Number of Stations Reporting',
         $this->_font->h4,
         $this->_format->h4
@@ -1241,13 +1283,6 @@ class Rtf {
         $this->_format->body
       );
 
-      $section9->writeText(
-        'Nearby Cities',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-      $this->_createTableShakeAlert($section9);
-
       if ($shakeAlert->wea) {
         $section9->writeText(
           'Wireless Emergency Alert',
@@ -1264,6 +1299,11 @@ class Rtf {
 
       $section9->writeText(
         $this->_getStatus($shakeAlert->status),
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        $this->_getUpdated($shakeAlert),
         $this->_font->body,
         $this->_format->body
       );
@@ -1417,7 +1457,7 @@ class Rtf {
         }
 
         $fieldValue = strip_tags($eq->$key);
-        if ($key === 'userTimeDisplay' || $key === 'utcTimeDisplay') { // strip off timezone
+        if ($key === 'userTimeDisplay' || $key === 'utcTimeDisplay') { // strip tz
           $fieldValue = preg_replace('/\s+\([\w\-:]+\)/', '', $fieldValue);
         } else if ($key === 'magDisplay') { // add mag type
           $fieldValue = $eq->magType . ' ' . $fieldValue;
