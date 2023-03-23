@@ -540,7 +540,7 @@ class Rtf {
         $this->_format->h3
       );
 
-      if (property_exists($pager, 'alert')) {
+      if ($pager->alert) {
         $section3->writeText(
           'Alert Level',
           $this->_font->h4,
@@ -553,10 +553,7 @@ class Rtf {
         );
       }
 
-      if (
-        property_exists($pager, 'effects') ||
-        property_exists($pager, 'structures')
-      ) {
+      if ($pager->effects || $pager->structures) {
         $section3->writeText(
           'Summary',
           $this->_font->h4,
@@ -569,7 +566,7 @@ class Rtf {
         );
       }
 
-      if (property_exists($pager, 'fatal')) {
+      if ($pager->fatal) {
         $section3->writeText(
           'Estimated Fatalities',
           $this->_font->h4,
@@ -587,7 +584,7 @@ class Rtf {
         );
       }
 
-      if (property_exists($pager, 'cost')) {
+      if ($pager->cost) {
         $section3->writeText(
           'Estimated Economic Losses',
           $this->_font->h4,
@@ -616,7 +613,7 @@ class Rtf {
         $this->_createTableExposure($section3);
       }
 
-      if (property_exists($pager, 'exposure')) {
+      if ($pager->exposure) {
         $section3->addImage(
           $this->_getRemoteImage($pager->exposure),
           $this->_format->image,
@@ -784,7 +781,7 @@ class Rtf {
         $this->_format->p
       );
 
-      if (property_exists($shakemap, 'img')) {
+      if ($shakemap->img) {
         $section5->addImage(
           $this->_getRemoteImage($shakemap->img),
           $this->_format->image,
@@ -832,14 +829,14 @@ class Rtf {
         $this->_format->p
       );
 
-      if (property_exists($dyfi, 'map')) {
+      if ($dyfi->map) {
         $section5->addImage(
           $this->_getRemoteImage($dyfi->map),
           $this->_format->image,
           12
         );
       }
-      if (property_exists($dyfi, 'plot')) {
+      if ($dyfi->plot) {
         $section5->addImage(
           $this->_getRemoteImage($dyfi->plot),
           $this->_format->image,
