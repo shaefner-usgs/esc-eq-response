@@ -124,21 +124,21 @@ var ShakeAlert = function (options) {
    */
   _getData = function (json) {
     var alerts = _parseAlerts(json),
+        seconds = _product.updateTime/1000 || 0,
+        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC(),
         props = json.properties || {},
         decimalSecs = props.time?.match(/\.0*[^0]+/)[0],
         final = alerts.final.properties || {},
         format = 'LLL d, yyyy TT',
         initial = alerts.initial.properties || {},
-        seconds = _product.updateTime/1000 || 0,
         time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
-        datetime = Luxon.DateTime.fromISO(time).toUTC(),
-        updateTime = Luxon.DateTime.fromSeconds(seconds).toUTC();
+        issueTime = Luxon.DateTime.fromISO(time).toUTC();
 
     return {
       cities: json.cities?.features || [],
       decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
+      isoIssueTime: issueTime.toISO() || '',
       isoTime: datetime.toISO() || '',
-      isoUpdateTime: updateTime.toISO() || '',
       latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
       latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
       locationFinal: _getLocation(final),
@@ -153,11 +153,12 @@ var ShakeAlert = function (options) {
       radius: _getRadius(alerts),
       status: _getStatus(),
       url: _mainshock.data.url + '/shake-alert',
+      userIssueTime: issueTime.toLocal().toFormat(format),
       userTime: datetime.toLocal().toFormat(format),
-      userUpdateTime: updateTime.toLocal().toFormat(format),
+      utcIssueTime: issueTime.toFormat(format),
+      utcIssueOffset: Number(issueTime.toLocal().toFormat('Z')),
       utcOffset: Number(datetime.toLocal().toFormat('Z')),
       utcTime: datetime.toFormat(format),
-      utcUpdateTime: updateTime.toFormat(format),
       wea: props.wea_report || ''
     };
   };
@@ -172,10 +173,12 @@ var ShakeAlert = function (options) {
       '<div class="wrapper">' +
         '<div class="details">' +
           '<p class="issued">Message issued ' +
-            '<time datetime="{isoTime}" class="user">{userTime}{decimalSecs} ' +
-              '(UTC{utcOffset})</time>' +
-            '<time datetime="{isoTime}" class="utc">{utcTime}{decimalSecs} ' +
-              '(UTC)</time>' +
+            '<time datetime="{isoIssueTime}" class="user">' +
+              '{userIssueTime}{decimalSecs} (UTC{utcIssueOffset})' +
+            '</time>' +
+            '<time datetime="{isoIssueTime}" class="utc">' +
+              '{utcIssueTime}{decimalSecs} (UTC)' +
+            '</time>' +
           '</p>' +
           '<h4>Alert Latency</h4>' +
           '<dl class="props alt">' +
@@ -223,10 +226,10 @@ var ShakeAlert = function (options) {
         '<dd class="status">{status}</dd>' +
         '<dt>Updated</dt>' +
         '<dd>' +
-          '<time datetime="{isoUpdateTime}" class="user">{userUpdateTime} ' +
-            '(UTC{utcOffset})</time>' +
-          '<time datetime="{isoUpdateTime}" class="utc">{utcUpdateTime} ' +
-            '(UTC)</time>' +
+          '<time datetime="{isoTime}" class="user">' +
+            '{userTime} (UTC{utcOffset})' +
+          '</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
         '</dd>' +
       '</dl>',
       _this.data
