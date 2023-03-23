@@ -57,7 +57,7 @@ var RadioBar = function (options) {
    * @param id {String}
    *     item's id value
    *
-   * @return option {Element|null}
+   * @return option {Mixed <Element|null>}
    */
   _getOption = function (id) {
     var option = null;
