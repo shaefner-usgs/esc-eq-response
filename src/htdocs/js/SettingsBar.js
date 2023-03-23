@@ -211,7 +211,7 @@ var SettingsBar = function (options) {
           'as-refresh': 'aftershocks',
           'cs-refresh': 'catalog-search'
         },
-        id = ids[name];
+        id = ids[name] || '';
 
     if (id === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
       id = 'dd-aftershocks';
@@ -230,7 +230,7 @@ var SettingsBar = function (options) {
    * @return {Integer}
    */
   _getInterval = function (name) {
-    var value = AppUtil.getParam(name);
+    var value = AppUtil.getParam(name) || '';
 
     return parseInt(value.replace(/\D/g, '')) * 60 * 1000; // strip 'm'
   };
@@ -263,7 +263,7 @@ var SettingsBar = function (options) {
    *     hint to user explaining why Feature's settings are disabled
    */
   _getTitle = function (feature) {
-    var title = _title; // default
+    var title = _title || ''; // default
 
     if (document.body.classList.contains('mainshock')) {
       title = `Disabled because ${feature.name} has not finished loading`;
