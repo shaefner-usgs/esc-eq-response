@@ -16,6 +16,7 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
+ *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
  *       lightbox: {String}
@@ -45,6 +46,7 @@ var FocalMechanism = function (options) {
 
     _app = options.app;
 
+    _this.data = {};
     _this.id = 'focal-mechanism';
     _this.lightbox = '';
     _this.mapLayer = null;
@@ -65,6 +67,7 @@ var FocalMechanism = function (options) {
         name: _this.name
       });
 
+      _this.data = _beachballs.data;
       _this.lightbox = _beachballs.getLightbox();
       _this.mapLayer = _beachballs.getMapLayer();
       _this.render = _beachballs.render;

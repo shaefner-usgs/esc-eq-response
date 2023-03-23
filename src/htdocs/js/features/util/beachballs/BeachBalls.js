@@ -35,6 +35,7 @@ _R2D = 180 / Math.PI;
  *
  * @return _this {Object}
  *     {
+ *       data: {Object}
  *       destroy: {Function}
  *       getLightbox: {Function}
  *       getMapLayer: {Function}
@@ -81,6 +82,8 @@ var BeachBalls = function (options) {
         type: _id
       })
     );
+
+    _this.data = _getData();
   };
 
   /**
@@ -382,7 +385,7 @@ var BeachBalls = function (options) {
         '</dl>' +
       '</div>' +
       '<div class="beachball"></div>',
-      _getData()
+      _this.data
     );
   };
 
