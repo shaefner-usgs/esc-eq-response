@@ -28,15 +28,16 @@ var _DEFAULTS = {
  *
  * @return _this {Object}
  *     {
- *       addListeners: {Function}
  *       addData: {Function}
+ *       addListeners: {Function}
  *       count: {Integer}
  *       destroy: {Function}
  *       id: {String}
- *       mapLayer: {L.FeatureGroup}
+ *       mapLayer: {Mixed <L.FeatureGroup|null>}
  *       name: {String}
  *       removeListeners: {Function}
  *       showLayer: {Boolean}
+ *       status: {Mixed <String|null>}
  *       url: {String}
  *       zoomToLayer: {Boolean}
  *     }
@@ -50,6 +51,7 @@ var FieldNotes = function (options) {
       _markerOptions,
 
       _addPopupListeners,
+      _configure,
       _getList,
       _getPopup,
       _getUrl,
@@ -58,7 +60,6 @@ var FieldNotes = function (options) {
       _onPopupOpen,
       _pointToLayer,
       _removePopupListeners,
-      _setVisibility,
       _showLightbox,
       _toggleProps,
       _updatePopup;
@@ -73,26 +74,28 @@ var FieldNotes = function (options) {
 
     _this.count = 0;
     _this.id = 'fieldnotes';
+    _this.mapLayer = null;
     _this.name = 'Fieldnotes';
     _this.showLayer = options.showLayer;
+    _this.status = null;
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
-    _markerOptions = {
-      icon: L.icon({
-        iconAnchor: options.iconAnchor,
-        iconRetinaUrl: options.iconRetinaUrl,
-        iconSize: options.iconSize,
-        iconUrl: options.iconUrl,
-        popupAnchor: options.popupAnchor,
-        tooltipAnchor: options.tooltipAnchor
-      }),
-      opacity: options.opacity,
-      pane: _this.id // controls stacking order
-    };
-
     // Only the 2014 Napa quake has FieldNotes data; skip for all other events
     if (AppUtil.getParam('eqid') === 'nc72282711') {
+      _markerOptions = {
+        icon: L.icon({
+          iconAnchor: options.iconAnchor,
+          iconRetinaUrl: options.iconRetinaUrl,
+          iconSize: options.iconSize,
+          iconUrl: options.iconUrl,
+          popupAnchor: options.popupAnchor,
+          tooltipAnchor: options.tooltipAnchor
+        }),
+        opacity: options.opacity,
+        pane: _this.id // controls stacking order
+      };
+
       _this.mapLayer = L.geoJSON.async(_this.url, {
         app: _app,
         feature: _this,
@@ -100,7 +103,7 @@ var FieldNotes = function (options) {
         pointToLayer: _pointToLayer
       });
     } else {
-      _this.status = 'ready';
+      _this.status = 'ready'; // no data to fetch
     }
   };
 
@@ -118,6 +121,21 @@ var FieldNotes = function (options) {
     }
     if (toggle) {
       toggle.addEventListener('click', _toggleProps);
+    }
+  };
+
+  /**
+   * Add the Feature's Lightbox and show its legend item.
+   *
+   * Note: the legend item is subsequently hidden by LegendBar.reset().
+   */
+  _configure = function () {
+    var legend = document.querySelector('#legendBar .fieldnotes');
+
+    if (_this.count !== 0) {
+      _lightbox = Lightbox({id: _this.id});
+
+      legend.classList.remove('hide');
     }
   };
 
@@ -306,23 +324,6 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Only show the overlay in the layer control if it has markers, because only
-   * the 2014 Napa quake includes FieldNotes data.
-   */
-  _setVisibility = function () {
-    var control = _app.MapPane.layerControl,
-        legend = document.querySelector('#legendBar .fieldnotes');
-
-    if (_this.count === 0) {
-      control.addClass('hide', _this.id);
-      legend.classList.add('hide');
-    } else {
-      control.removeClass('hide', _this.id);
-      legend.classList.remove('hide');
-    }
-  };
-
-  /**
    * Event handler that shows a full-size photo in a Lightbox.
    *
    * @param e {Event}
@@ -375,11 +376,7 @@ var FieldNotes = function (options) {
   _this.addData = function (json = {}) {
     _this.count = json.features.length;
 
-    if (_this.count !== 0) {
-      _lightbox = Lightbox({id: _this.id});
-    }
-
-    _setVisibility();
+    _configure();
   };
 
   /**
@@ -409,6 +406,7 @@ var FieldNotes = function (options) {
     _markerOptions = null;
 
     _addPopupListeners = null;
+    _configure = null;
     _getList = null;
     _getPopup = null;
     _getUrl = null;
@@ -417,7 +415,6 @@ var FieldNotes = function (options) {
     _onPopupOpen = null;
     _pointToLayer = null;
     _removePopupListeners = null;
-    _setVisibility = null;
     _showLightbox = null;
     _toggleProps = null;
     _updatePopup = null;
