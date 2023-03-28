@@ -909,6 +909,51 @@ class Rtf {
       $this->_createTableBinnedData($section6, 'aftershocks', 'first');
       $this->_createTableBinnedData($section6, 'aftershocks', 'past');
 
+      if (!empty(get_object_vars($forecast))) {
+        $zoneDisplay = 'UTC'; // default
+
+        if ($this->_data->zone === 'user') {
+          $time = $forecast->userTime;
+          $zoneDisplay .= $forecast->utcOffset;
+        } else { // UTC
+          $time = $forecast->utcTime;
+        }
+
+        $section6->writeText(
+          'Forecast',
+          $this->_font->h4,
+          $this->_format->h4
+        );
+
+        $section6->writeText(
+          'Probability of one or more aftershocks in the specified time frame ' .
+            "and magnitude range starting on $time ($zoneDisplay):",
+          $this->_font->body,
+          $this->_format->body
+        );
+        $this->_createTableForecast($section6, 'probability');
+
+        $section6->writeText(
+          'Likely number of aftershocks (95% confidence range) in the ' .
+            'specified time frame and magnitude range:',
+          $this->_font->body,
+          $this->_format->body
+        );
+        $this->_createTableForecast($section6, 'number');
+
+        $section6->writeText(
+          '* An earthquake is possible, but the probability is low.',
+          $this->_font->body,
+          $this->_format->p
+        );
+
+        $section6->writeText(
+          '<strong>Model</strong>: ' . $forecast->model->name,
+          $this->_font->body,
+          $this->_format->p
+        );
+      }
+
       $section6->writeText(
         "M $magThreshold+ Earthquakes ($listCount)",
         $this->_font->h4,
@@ -931,57 +976,6 @@ class Rtf {
           18
         );
       }
-    }
-
-    if (!empty(get_object_vars($forecast))) {
-      $zoneDisplay = 'UTC'; // default
-
-      if ($this->_data->zone === 'user') {
-        $time = $forecast->userTime;
-        $zoneDisplay .= $forecast->utcOffset;
-      } else { // UTC
-        $time = $forecast->utcTime;
-      }
-
-      $section6->writeText(
-        'Aftershock Forecast',
-        $this->_font->h4,
-        $this->_format->h4
-      );
-
-      $section6->writeText(
-        'Probability of one or more aftershocks of at least magnitude M ' .
-          'within the given time frame:',
-        $this->_font->body,
-        $this->_format->body
-      );
-      $this->_createTableForecast($section6, 'probability');
-
-      $section6->writeText(
-        'The likely number of aftershocks of at least magnitude M within the ' .
-          'given time frame (95% confidence range):',
-        $this->_font->body,
-        $this->_format->body
-      );
-      $this->_createTableForecast($section6, 'number');
-
-      $section6->writeText(
-        '* = An earthquake is possible, but the probability is low.',
-        $this->_font->body,
-        $this->_format->p
-      );
-
-      $section6->writeText(
-        "<strong>Forecast starts</strong>: $time ($zoneDisplay)",
-        $this->_font->body,
-        $this->_format->p
-      );
-
-      $section6->writeText(
-        '<strong>Model</strong>: ' . $forecast->model->name,
-        $this->_font->body,
-        $this->_format->p
-      );
     }
   }
 
