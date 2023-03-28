@@ -39,7 +39,7 @@ _FLAGS = {
  *       deferFetch: {Boolean}
  *       destroy: {Function}
  *       id: {String}
- *       mapLayer: {L.FeatureGroup}
+ *       mapLayer: {Mixed <L.FeatureGroup|null>}
  *       name: {String}
  *       showLayer: {Boolean}
  *       url: {String}
@@ -85,7 +85,7 @@ var ShakeMapStations = function (options) {
     _this.count = 0;
     _this.deferFetch = options.deferFetch;
     _this.id = 'shakemap-stations';
-    _this.mapLayer = null; // default
+    _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
     _this.showLayer = options.showLayer;
     _this.url = _getUrl();

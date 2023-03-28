@@ -22,7 +22,7 @@ var AppUtil = require('util/AppUtil'),
  *       lightbox: {String}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
- *       render: {Function}
+ *       render: {Mixed <Function|null>}
  *       showLayer: {Boolean}
  *       summary: {String}
  *       update: {Function}

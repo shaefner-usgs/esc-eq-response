@@ -24,7 +24,7 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
- *       removeListeners: {String}
+ *       removeListeners: {Function}
  *       render: {Function}
  *       url: {String}
  *     }
