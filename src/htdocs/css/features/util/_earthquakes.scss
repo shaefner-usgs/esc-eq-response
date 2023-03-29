@@ -1,3 +1,4 @@
+@use '../../util/mixins' as *;
 @use '../../util/variables' as *;
 
 #plotsPane,
@@ -38,6 +39,18 @@
   table.m8 tr.m8,
   table.m9 tr.m9 {
     display: table-row;
+  }
+
+  time.updated {
+    display: block;
+    margin-top: 1.25rem;
+
+    &:before {
+      @include labels;
+
+      content: 'Updated';
+      margin-right: .5rem;
+    }
   }
 
   tr.m0,

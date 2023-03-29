@@ -50,6 +50,7 @@ var Summary = function (options) {
       _featureId,
       _magThreshold,
       _maxNumEqs,
+      _now,
       _params,
       _reverseSort,
       _slider,
@@ -90,6 +91,7 @@ var Summary = function (options) {
     _featureId = options.featureId;
     _magThreshold = options.magThreshold; // default
     _maxNumEqs = options.maxNumEqs;
+    _now = Luxon.DateTime.now();
     _params = options.earthquakes.params;
     _reverseSort = false;
     _sortField = options.sortField;
@@ -769,6 +771,7 @@ var Summary = function (options) {
     _featureId = null;
     _magThreshold = null;
     _maxNumEqs = null;
+    _now = null;
     _params = null;
     _reverseSort = null;
     _slider = null;
@@ -809,7 +812,10 @@ var Summary = function (options) {
   _this.getContent = function () {
     var duration, interval, mostRecentEq,
         count = _eqs.length,
-        html = '';
+        html = '',
+        isoTime = _now.toUTC().toISO(),
+        tz = AppUtil.getTimeZone(),
+        userTime = _now.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
 
     if (_featureId.includes('aftershocks')) {
       if (count > 0) {
@@ -825,7 +831,7 @@ var Summary = function (options) {
         mostRecentEq = _eqs[count - 1];
         interval = Luxon.Interval.fromDateTimes(
           mostRecentEq.datetime,
-          Luxon.DateTime.utc()
+          _now.toUTC()
         ).length('days');
         duration = AppUtil.round(interval, 1) + ' days';
 
@@ -849,6 +855,9 @@ var Summary = function (options) {
       html += _getSlider();
       html += _getListTable();
     }
+
+    html += `<time class="updated" datetime="${isoTime}">${userTime} (${tz})` +
+      '</time>';
 
     return html;
   };
