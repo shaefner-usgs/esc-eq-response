@@ -248,7 +248,7 @@ class Rtf {
    * @return {String}
    */
   private function _getStatus($status) {
-    return 'Status: ' . ucwords(strip_tags($status));
+    return '<b>Status</b>: ' . ucwords(strip_tags($status));
   }
 
   /**
@@ -265,7 +265,7 @@ class Rtf {
       $time = $feature->utcTime . ' (UTC)';
     }
 
-    return "Updated: $time";
+    return "<b>Updated</b>: $time";
   }
 
   /**
@@ -942,7 +942,7 @@ class Rtf {
         );
 
         $section6->writeText(
-          '<strong>Model</strong>: ' . $forecast->model->name,
+          '<b>Model</b>: ' . $forecast->model->name,
           $this->_font->body,
           $this->_format->p
         );
