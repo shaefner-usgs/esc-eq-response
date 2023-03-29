@@ -208,6 +208,7 @@ var Rtf = function (options) {
         aftershocks = _app.Features.getFeature(`${prefix}aftershocks`),
         descriptions = _getDescriptions(prefix),
         dyfi = _app.Features.getFeature('dyfi'),
+        el = document.getElementById('summaryPane'),
         forecast = _app.Features.getFeature('forecast'),
         foreshocks = _app.Features.getFeature(`${prefix}foreshocks`),
         historical = _app.Features.getFeature(`${prefix}historical`),
@@ -229,7 +230,8 @@ var Rtf = function (options) {
         earthquakes: _filter(aftershocks).sort(_compare),
         forecast: forecast.data || {},
         magThreshold: _magThreshold,
-        plots: _plots.aftershocks
+        plots: _plots.aftershocks,
+        updated: el.querySelector('.aftershocks .updated').innerText
       },
       beachballs: _getBeachBalls(),
       dyfi: dyfi.data || {},
@@ -238,7 +240,8 @@ var Rtf = function (options) {
         count: foreshocks.count,
         description: descriptions.foreshocks,
         earthquakes: _filter(foreshocks).sort(_compare),
-        magThreshold: _magThreshold
+        magThreshold: _magThreshold,
+        updated: el.querySelector('.foreshocks .updated').innerText
       },
       historical: {
         bins: historical.bins,
@@ -247,7 +250,8 @@ var Rtf = function (options) {
         earthquakes: _filter(historical).sort(_compare),
         events: historicalEvents.data || [],
         magThreshold: _magThreshold,
-        plots: _plots.historical
+        plots: _plots.historical,
+        updated: el.querySelector('.historical .updated').innerText
       },
       mainshock: {
         day: {

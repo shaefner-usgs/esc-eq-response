@@ -897,12 +897,6 @@ class Rtf {
         $this->_format->h3
       );
     } else {
-      $section6->writeText(
-        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
-        $this->_font->body,
-        $this->_format->body
-      );
-
       $listCount = count($aftershocks->earthquakes);
       $magThreshold = $aftershocks->magThreshold;
 
@@ -960,23 +954,29 @@ class Rtf {
         $this->_format->h4
       );
       $this->_createTableEqlist($section6, 'aftershocks');
-    }
 
-    if (!empty(get_object_vars($plots))) {
-      foreach ($plots as $type => $dataUrl) {
-        $section6->writeText(
-          $this->_data->plotNames->$type,
-          $this->_font->h4,
-          $this->_format->h4
-        );
-        $section6->writeText('<br>');
-        $section6->addImage(
-          $this->_getImage($dataUrl),
-          $this->_format->image,
-          18
-        );
+      if (!empty(get_object_vars($plots))) {
+        foreach ($plots as $type => $dataUrl) {
+          $section6->writeText(
+            $this->_data->plotNames->$type,
+            $this->_font->h4,
+            $this->_format->h4
+          );
+          $section6->writeText('<br>');
+          $section6->addImage(
+            $this->_getImage($dataUrl),
+            $this->_format->image,
+            18
+          );
+        }
       }
     }
+
+    $section6->writeText(
+      '<br><b>Updated</b>: ' . $aftershocks->updated,
+      $this->_font->body,
+      $this->_format->body
+    );
   }
 
   /**
@@ -1009,12 +1009,6 @@ class Rtf {
       $listCount = count($foreshocks->earthquakes);
       $magThreshold = $foreshocks->magThreshold;
 
-      $section7->writeText(
-        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
-        $this->_font->body,
-        $this->_format->body
-      );
-
       $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
 
       $section7->writeText(
@@ -1024,6 +1018,12 @@ class Rtf {
       );
       $this->_createTableEqlist($section7, 'foreshocks');
     }
+
+    $section7->writeText(
+      '<br><b>Updated</b>: ' . $foreshocks->updated,
+      $this->_font->body,
+      $this->_format->body
+    );
   }
 
   /**
@@ -1057,12 +1057,6 @@ class Rtf {
       $listCount = count($historical->earthquakes);
       $magThreshold = $historical->magThreshold;
 
-      $section8->writeText(
-        '<strong>Earthquakes Updated</strong>: ' . $this->_now,
-        $this->_font->body,
-        $this->_format->body
-      );
-
       $this->_createTableBinnedData($section8, 'historical', 'prior');
 
       $section8->writeText(
@@ -1071,23 +1065,29 @@ class Rtf {
         $this->_format->h4
       );
       $this->_createTableEqlist($section8, 'historical');
-    }
 
-    if (!empty(get_object_vars($plots))) {
-      foreach ($plots as $type => $dataUrl) {
-        $section8->writeText(
-          $this->_data->plotNames->$type,
-          $this->_font->h4,
-          $this->_format->h4
-        );
-        $section8->writeText('<br>');
-        $section8->addImage(
-          $this->_getImage($dataUrl),
-          $this->_format->image,
-          18
-        );
+      if (!empty(get_object_vars($plots))) {
+        foreach ($plots as $type => $dataUrl) {
+          $section8->writeText(
+            $this->_data->plotNames->$type,
+            $this->_font->h4,
+            $this->_format->h4
+          );
+          $section8->writeText('<br>');
+          $section8->addImage(
+            $this->_getImage($dataUrl),
+            $this->_format->image,
+            18
+          );
+        }
       }
     }
+
+    $section8->writeText(
+      '<br><b>Updated</b>: ' . $historical->updated,
+      $this->_font->body,
+      $this->_format->body
+    );
 
     if (!empty($historical->events)) {
       $dates = [];
