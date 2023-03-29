@@ -183,7 +183,7 @@ var Forecast = function (options) {
     var html = '<h4>Parameters <a class="toggle button">Show</a></h4>',
         params = _this.data.model.parameters || {};
 
-    html += '<dl class="props alt hide">';
+    html += '<dl class="props alt params hide">';
 
     Object.keys(params).forEach(key => {
       html += `<dt>${key}</dt><dd>${params[key]}</dd>`;
@@ -280,8 +280,11 @@ var Forecast = function (options) {
         '</p>' +
         _radioBar.getHtml() +
         probabilities +
-        _getParameters() +
-        '<p class="model"><strong>Model</strong>: {modelName}</p>',
+        '<dl class="props model">' +
+          '<dt>Model</dt>' +
+          '<dd>{modelName}</dd>' +
+        '</dl>' +
+        _getParameters(),
         data
       );
     }
@@ -314,7 +317,7 @@ var Forecast = function (options) {
    */
   _toggleParams = function (e) {
     var button = e.target,
-        params = _el.querySelector('.props');
+        params = _el.querySelector('.params');
 
     e.preventDefault();
 

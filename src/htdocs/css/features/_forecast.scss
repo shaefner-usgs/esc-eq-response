@@ -8,10 +8,6 @@
       margin-bottom: 1.5rem;
     }
 
-    .model {
-      margin-top: .75rem;
-    }
-
     .probabilities {
       line-height: 1;
       list-style: none;
@@ -119,15 +115,31 @@
       overflow: hidden;
       transition: all $effect-slide-duration ease-in-out;
 
-      &.hide {
-        margin: 0;
-        max-height: 0;
-        opacity: 0;
+      &.model {
+        margin: 1rem 0;
+
+        dd {
+          max-width: none;
+        }
+      }
+
+      &.params {
+        margin-top: .75rem;
+
+        &.hide {
+          margin: 0;
+          max-height: 0;
+          opacity: 0;
+        }
       }
 
       dd {
         max-width: 7rem;
       }
+    }
+
+    h4 {
+      margin: 0;
     }
   }
 }
