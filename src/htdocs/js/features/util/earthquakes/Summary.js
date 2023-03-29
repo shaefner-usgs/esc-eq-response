@@ -633,7 +633,8 @@ var Summary = function (options) {
       if (!isTextSelected) {
         location.href = '#mapPane';
 
-        _app.MapPane.openPopup(eqid, featureId);
+        // setTimeout insures location.href setting is applied first
+        setTimeout(() => _app.MapPane.openPopup(eqid, featureId));
       }
     }
   };

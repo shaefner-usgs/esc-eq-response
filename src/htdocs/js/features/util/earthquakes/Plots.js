@@ -456,7 +456,9 @@ var Plots = function (options) {
     }
 
     location.href = '#mapPane';
-    _app.MapPane.openPopup(eqids[index], featureId);
+
+    // setTimeout insures location.href setting is applied first
+    setTimeout(() => _app.MapPane.openPopup(eqids[index], featureId));
   };
 
   /**
