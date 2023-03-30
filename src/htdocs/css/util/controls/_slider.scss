@@ -1,5 +1,9 @@
 @use '../variables' as *;
 
+/* ---------------------------------------------
+   Range Sliders, adapted from:
+   https://css-tricks.com/sliding-nightmare-understanding-range-input/ */
+
 $thumb-d: 1.25rem;
 $track-bg: $control-color;
 $track-c: $accent-color;
@@ -24,7 +28,6 @@ $dist: $track-w - $thumb-d;
   height: $track-h;
   width: $track-w;
 }
-
 
 input[type='range'] {
   background: transparent;
@@ -125,7 +128,3 @@ input[type='range'] {
 .slider-container {
   display: flex;
 }
-
-/* ---------------------------------------------
-   Range Sliders, adapted from:
-   https://css-tricks.com/sliding-nightmare-understanding-range-input/ */
