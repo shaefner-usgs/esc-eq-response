@@ -547,7 +547,7 @@ class Rtf {
           $this->_format->h4
         );
         $section3->writeText(
-          ucfirst($pager->alert),
+          ' ' . ucfirst($pager->alert) . ' ',
           $this->_font->pagerAlert[$pager->alert],
           $this->_format->body
         );
@@ -1326,7 +1326,7 @@ class Rtf {
     $numRows = count($rows) + 1; // data rows + 1 header row
 
     $section->writeText(
-      '<br>',
+      '',
       $this->_font->body,
       $this->_format->table // sets paragraph formatting in table that follows
     );
@@ -1495,7 +1495,7 @@ class Rtf {
     $numRows = count($cities) + count($population)  + 1; // data rows + 1 header row
 
     if ($numRows > 1) { // table contains data (and not just a header row)
-      $table = $section->addTable();
+      $table = $section->addTable('center');
       $table->addRows($numRows);
       $table->addColumnsList(array(2, 5, 3));
       $table->setBackgroundForCellRange('#666666', 1, 1, 1, 3);
@@ -1721,10 +1721,10 @@ class Rtf {
     $this->_font->h1 = new PHPRtfLite_Font(20, 'Calibri', '#000000', '#FFFFFF');
     $this->_font->h1->setBold();
 
-    $this->_font->h2 = new PHPRtfLite_Font(18, 'Calibri', '#313131', '#FFFFFF');
+    $this->_font->h2 = new PHPRtfLite_Font(18, 'Calibri', '#111111', '#FFFFFF');
     $this->_font->h2->setBold();
 
-    $this->_font->h3 = new PHPRtfLite_Font(16, 'Calibri', '#474747', '#FFFFFF');
+    $this->_font->h3 = new PHPRtfLite_Font(16, 'Calibri', '#333333', '#FFFFFF');
     $this->_font->h3->setBold();
 
     $this->_font->h4 = new PHPRtfLite_Font(14, 'Calibri', '#5281c9', '#FFFFFF');
@@ -1757,6 +1757,7 @@ class Rtf {
     $this->_format->borderDarker = new PHPRtfLite_Border_Format(1, '#000000');
     $this->_format->borderLighter = new PHPRtfLite_Border_Format(1, '#EFEFEF');
 
+    // Same format as p, but with centered text
     $this->_format->center = new PHPRtfLite_ParFormat('center');
     $this->_format->center->setSpaceAfter(12);
     $this->_format->center->setSpaceBefore(0);
@@ -1779,7 +1780,8 @@ class Rtf {
 
     $this->_format->image = new PHPRtfLite_ParFormat('center');
 
-    $this->_format->p = new PHPRtfLite_ParFormat('left'); // same as body but w/ bottom margin
+    // Same format as body, but with bottom margin
+    $this->_format->p = new PHPRtfLite_ParFormat('left');
     $this->_format->p->setSpaceAfter(12);
     $this->_format->p->setSpaceBefore(0);
     $this->_format->p->setSpaceBetweenLines(1.5);
