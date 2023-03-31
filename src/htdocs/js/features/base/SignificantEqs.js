@@ -79,7 +79,8 @@ var SignificantEqs = function (options) {
       json.features.forEach((feature ={}) => {
         var data,
             props = feature.properties || {},
-            datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
+            millis = Number(props.time) || 0,
+            datetime = Luxon.DateTime.fromMillis(millis),
             selected = '';
 
         if (feature.id === eqid) {
@@ -88,14 +89,14 @@ var SignificantEqs = function (options) {
 
         data = {
           id: feature.id,
-          isoTime: datetime.toISO(),
+          isoTime: datetime.toUTC().toISO(),
           mag: AppUtil.round(props.mag, 1),
           mmi: AppUtil.romanize(Number(props.mmi)),
           place: props.place,
           selected: selected,
-          userTime: datetime.toLocal().toFormat(_app.dateFormat),
-          utcOffset: datetime.toLocal().toFormat('Z'),
-          utcTime: datetime.toFormat(_app.dateFormat)
+          userTime: datetime.toFormat(_app.dateFormat),
+          utcOffset: Number(datetime.toFormat('Z')),
+          utcTime: datetime.toUTC().toFormat(_app.dateFormat)
         };
         html += _getItem(data);
       });

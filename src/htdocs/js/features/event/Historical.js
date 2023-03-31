@@ -129,9 +129,9 @@ var Historical = function (options) {
     var mainshock = _app.Features.getFeature('mainshock'),
         coords = mainshock.data.coords,
         endtime = mainshock.data.datetime.minus({ seconds: 1 })
-          .toISO().slice(0, -5),
+          .toUTC().toISO().slice(0, -5),
         starttime = mainshock.data.datetime.minus({ years: _this.params.years })
-          .toISO().slice(0, -5);
+          .toUTC().toISO().slice(0, -5);
 
     return Earthquakes.getUrl({
       endtime: endtime,

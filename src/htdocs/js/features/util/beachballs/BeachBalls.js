@@ -234,7 +234,7 @@ var BeachBalls = function (options) {
       dataSource: _data['beachball-source'] || _data.source,
       depth: AppUtil.round(depth, 1) + ' km',
       halfDuration: halfDuration || '–',
-      isoTime: _data.datetime.toISO() || '',
+      isoTime: _data.datetime.toUTC().toISO() || '',
       magType: _data['derived-magnitude-type'] || '',
       magnitude: AppUtil.round(_tensor.magnitude, 2),
       moment: moment,
@@ -257,9 +257,9 @@ var BeachBalls = function (options) {
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
-      userTime: _data.datetime.toLocal().toFormat(_app.dateFormat),
-      utcOffset: Number(_data.datetime.toLocal().toFormat('Z')),
-      utcTime: _data.datetime.toFormat(_app.dateFormat)
+      userTime: _data.datetime.toFormat(_app.dateFormat),
+      utcOffset: Number(_data.datetime.toFormat('Z')),
+      utcTime: _data.datetime.toUTC().toFormat(_app.dateFormat)
     };
   };
 

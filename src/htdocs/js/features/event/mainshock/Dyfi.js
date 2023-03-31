@@ -101,21 +101,21 @@ var Dyfi = function (options) {
    */
   _getData = function () {
     var props = _product.properties || {},
-        seconds = _product.updateTime/1000 || 0,
-        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
+        millis = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millis);
 
     return {
       cdi: _mainshock.data.cdi,
-      isoTime: datetime.toISO() || '',
+      isoTime: datetime.toUTC().toISO() || '',
       map: _mainshock.data.dyfiImg,
       maxmmi: Number(props.maxmmi),
       plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url || '',
       responses: AppUtil.addCommas(props.numResp),
       status: _getStatus(props),
       url: _mainshock.data.url + '/dyfi',
-      userTime: datetime.toLocal().toFormat(_app.dateFormat),
-      utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(_app.dateFormat)
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat)
     };
   };
 

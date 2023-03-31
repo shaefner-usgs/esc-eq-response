@@ -74,17 +74,17 @@ var DdMainshock = function (options) {
         feature = json.features[0],
         coords = feature.geometry?.coordinates || [0, 0, 0],
         props = feature.properties || {},
-        datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
+        datetime = Luxon.DateTime.fromMillis(Number(props.time)),
         dayFormat = 'cccc',
         mag = AppUtil.round(props.mag, 1),
         magType = props.magType || 'M',
         template =
           '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
-        utcOffset = datetime.toLocal().toFormat('Z'),
-        userTimeDisplay = datetime.toLocal().toFormat(_app.dateFormat) +
+        utcOffset = datetime.toFormat('Z'),
+        userTimeDisplay = datetime.toFormat(_app.dateFormat) +
           ` <span class="tz">(UTC${utcOffset})</span>`,
-        utcTimeDisplay = datetime.toFormat(_app.dateFormat) +
+        utcTimeDisplay = datetime.toUTC().toFormat(_app.dateFormat) +
           ' <span class="tz">(UTC)</span>';
 
     data = {
@@ -92,20 +92,20 @@ var DdMainshock = function (options) {
       coords: coords,
       datetime: datetime,
       depthDisplay: AppUtil.round(coords[2], 1) + '<span> km</span>',
-      isoTime: datetime.toISO(),
+      isoTime: datetime.toUTC().toISO(),
       latLng: L.latLng(coords[1], coords[0]), // for map marker
       latlon: LatLon(coords[1], coords[0]), // for distance, direction
       location: AppUtil.formatLatLon(coords),
       magDisplay: mag,
       magType: magType,
       title: _mainshock.data.title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
-      userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
-      userDayofweek: datetime.toLocal().toFormat(dayFormat),
-      userTime: datetime.toLocal().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
+      userDayofweek: datetime.toFormat(dayFormat),
+      userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       userTimeDisplay: userTimeDisplay,
-      utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      utcDayofweek: datetime.toFormat(dayFormat),
-      utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
+      utcDayofweek: datetime.toUTC().toFormat(dayFormat),
+      utcTime: datetime.toUTC().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       utcTimeDisplay: utcTimeDisplay
     };
 

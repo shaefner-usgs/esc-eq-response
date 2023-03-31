@@ -86,7 +86,7 @@ var Earthquakes = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _this.params = {
-      now: Luxon.DateTime.utc()
+      now: Luxon.DateTime.now()
     };
 
     _app = options.app;
@@ -299,7 +299,7 @@ var Earthquakes = function (options) {
           props = feature.properties || {},
           cdi = AppUtil.romanize(Number(props.cdi) || ''),
           coords = feature.geometry?.coordinates || [0, 0, 0],
-          datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
+          datetime = Luxon.DateTime.fromMillis(Number(props.time)),
           magDisplay = AppUtil.round(props.mag, 1), // String
           mag = parseFloat(magDisplay) || 0,
           magType = props.magType || 'M',
@@ -308,10 +308,10 @@ var Earthquakes = function (options) {
           template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
-          utcOffset = Number(datetime.toLocal().toFormat('Z')),
-          userTimeDisplay = datetime.toLocal().toFormat(_app.dateFormat) +
+          utcOffset = Number(datetime.toFormat('Z')),
+          userTimeDisplay = datetime.toFormat(_app.dateFormat) +
             ` <span class="tz">(UTC${utcOffset})</span>`,
-          utcTimeDisplay = datetime.toFormat(_app.dateFormat) +
+          utcTimeDisplay = datetime.toUTC().toFormat(_app.dateFormat) +
             ' <span class="tz">(UTC)</span>';
 
       if (props.place) {
@@ -353,7 +353,7 @@ var Earthquakes = function (options) {
         felt: AppUtil.addCommas(props.felt), // DYFI felt reports
         fillColor: _COLORS[_getAge(datetime)],
         id: feature.id || '', // eqid
-        isoTime: datetime.toISO(),
+        isoTime: datetime.toUTC().toISO(),
         localTime: localTime || '',
         location: AppUtil.formatLatLon(coords),
         mag: mag,

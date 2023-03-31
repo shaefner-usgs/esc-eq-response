@@ -124,20 +124,20 @@ var ShakeAlert = function (options) {
    */
   _getData = function (json) {
     var alerts = _parseAlerts(json),
-        seconds = _product.updateTime/1000 || 0,
-        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC(),
+        millis = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millis),
         props = json.properties || {},
         decimalSecs = props.time?.match(/\.0*[^0]+/)[0],
         final = alerts.final.properties || {},
         initial = alerts.initial.properties || {},
         time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
-        issueTime = Luxon.DateTime.fromISO(time).toUTC();
+        issueTime = Luxon.DateTime.fromISO(time);
 
     return {
       cities: json.cities?.features || [],
       decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
-      isoIssueTime: issueTime.toISO() || '',
-      isoTime: datetime.toISO() || '',
+      isoIssueTime: issueTime.toUTC().toISO() || '',
+      isoTime: datetime.toUTC().toISO() || '',
       latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
       latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
       locationFinal: _getLocation(final),
@@ -152,12 +152,12 @@ var ShakeAlert = function (options) {
       radius: _getRadius(alerts),
       status: _getStatus(),
       url: _mainshock.data.url + '/shake-alert',
-      userIssueTime: issueTime.toLocal().toFormat(_app.dateFormat),
-      userTime: datetime.toLocal().toFormat(_app.dateFormat),
-      utcIssueTime: issueTime.toFormat(_app.dateFormat),
-      utcIssueOffset: Number(issueTime.toLocal().toFormat('Z')),
-      utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(_app.dateFormat),
+      userIssueTime: issueTime.toFormat(_app.dateFormat),
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcIssueTime: issueTime.toUTC().toFormat(_app.dateFormat),
+      utcIssueOffset: Number(issueTime.toFormat('Z')),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat),
       wea: props.wea_report || ''
     };
   };

@@ -86,10 +86,10 @@ var FocalMechanism = function (options) {
    * @return {Object}
    */
   _getData = function (fm) {
-    var seconds = fm.updateTime/1000 || 0;
+    var millis = Number(fm.updateTime) || 0;
 
     return Object.assign({}, fm.properties || {}, {
-      datetime: Luxon.DateTime.fromSeconds(seconds).toUTC(),
+      datetime: Luxon.DateTime.fromMillis(millis),
       source: fm.source || '',
     });
   };

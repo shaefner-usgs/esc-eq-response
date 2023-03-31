@@ -236,14 +236,12 @@ var Mainshock = function (options) {
       shakeAlertStatus: shakeAlertStatus || '',
       shakemapImg: shakemapImg || '',
       tectonic: _getText(products['general-text']),
-      userDate: datetime.toLocal().toLocaleString(Luxon.DateTime.DATE_MED),
-      userDayofWeek: datetime.toLocal().toFormat(format),
-      userTime: datetime.toLocal().toLocaleString(
-        Luxon.DateTime.TIME_24_WITH_SECONDS
-      ),
-      utcDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      utcDayofWeek: datetime.toFormat(format),
-      utcTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
+      userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
+      userDayofWeek: datetime.toFormat(format),
+      userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
+      utcDayofWeek: datetime.toUTC().toFormat(format),
+      utcTime: datetime.toUTC().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
     });
   };
 

@@ -126,7 +126,7 @@ var Aftershocks = function (options) {
     var mainshock = _app.Features.getFeature('mainshock'),
         coords = mainshock.data.coords,
         starttime = mainshock.data.datetime.plus({ seconds: 1 })
-          .toISO().slice(0, -5);
+          .toUTC().toISO().slice(0, -5);
 
     return Earthquakes.getUrl({
       latitude: coords[1],

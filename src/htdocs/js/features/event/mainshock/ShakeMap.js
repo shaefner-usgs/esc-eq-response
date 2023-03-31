@@ -142,20 +142,20 @@ var ShakeMap = function (options) {
   _getData = function (json = {}) {
     var info = json.input?.event_information || {},
         motions = _getMotions(json),
-        seconds = _product.updateTime/1000 || 0,
-        datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
+        millis = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millis);
 
     return Object.assign(motions, {
       dyfi: Number(info.intensity_observations) || '–',
       img: _mainshock.data.shakemapImg,
-      isoTime: datetime.toISO() || '',
+      isoTime: datetime.toUTC().toISO() || '',
       mmiValue: _mainshock.data.mmi,
       seismic: Number(info.seismic_stations) || '–',
       status: _getStatus(),
       url: _mainshock.data.url + '/shakemap',
-      userTime: datetime.toLocal().toFormat(_app.dateFormat),
-      utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(_app.dateFormat)
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat)
     });
   };
 
