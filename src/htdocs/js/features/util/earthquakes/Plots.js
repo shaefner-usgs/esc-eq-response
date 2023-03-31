@@ -255,7 +255,8 @@ var Plots = function (options) {
           },
           showlegend: false
         },
-        spikecolor = '#4440CC', // SCSS $accent-color
+        sel = document.querySelector('nav a.selected'),
+        spikecolor = getComputedStyle(sel).getPropertyValue('background-color'),
         timezone = AppUtil.getParam('timezone') || 'utc',
         zoneDisplay = 'UTC';
 
