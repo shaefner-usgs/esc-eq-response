@@ -61,6 +61,7 @@ var FocalMechanism = function (options) {
 
     if (!AppUtil.isEmpty(product)) {
       _beachballs = BeachBalls({
+        app: _app,
         data: _getData(product),
         id: _this.id,
         mainshock: mainshock,
