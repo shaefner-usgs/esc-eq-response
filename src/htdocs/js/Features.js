@@ -259,6 +259,12 @@ var Features = function (options) {
       options = Object.assign({}, _SETTINGS, options, {
         app: _app
       });
+
+      // Avoid "infinite" nesting of previous Features
+      if (options.prevFeature?.prevFeature) {
+        delete options.prevFeature.prevFeature;
+      }
+
       feature = module(options);
 
       if (!feature.url) {
