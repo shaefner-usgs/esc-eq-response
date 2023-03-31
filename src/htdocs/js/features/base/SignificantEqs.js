@@ -80,7 +80,6 @@ var SignificantEqs = function (options) {
         var data,
             props = feature.properties || {},
             datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
-            format = 'LLL d, yyyy TT',
             selected = '';
 
         if (feature.id === eqid) {
@@ -94,9 +93,9 @@ var SignificantEqs = function (options) {
           mmi: AppUtil.romanize(Number(props.mmi)),
           place: props.place,
           selected: selected,
-          userTime: datetime.toLocal().toFormat(format),
+          userTime: datetime.toLocal().toFormat(_app.dateFormat),
           utcOffset: datetime.toLocal().toFormat('Z'),
-          utcTime: datetime.toFormat(format)
+          utcTime: datetime.toFormat(_app.dateFormat)
         };
         html += _getItem(data);
       });

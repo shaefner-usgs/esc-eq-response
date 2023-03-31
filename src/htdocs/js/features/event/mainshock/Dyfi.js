@@ -100,8 +100,7 @@ var Dyfi = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var format = 'LLL d, yyyy TT',
-        props = _product.properties || {},
+    var props = _product.properties || {},
         seconds = _product.updateTime/1000 || 0,
         datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
 
@@ -114,9 +113,9 @@ var Dyfi = function (options) {
       responses: AppUtil.addCommas(props.numResp),
       status: _getStatus(props),
       url: _mainshock.data.url + '/dyfi',
-      userTime: datetime.toLocal().toFormat(format),
+      userTime: datetime.toLocal().toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(format)
+      utcTime: datetime.toFormat(_app.dateFormat)
     };
   };
 

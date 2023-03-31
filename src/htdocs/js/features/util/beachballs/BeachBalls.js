@@ -27,6 +27,7 @@ _R2D = 180 / Math.PI;
  *
  * @param options {Object}
  *     {
+ *       app: {Object}
  *       data: {Object}
  *       id: {String} optional
  *       mainshock: {Object}
@@ -48,6 +49,7 @@ var BeachBalls = function (options) {
   var _this,
       _initialize,
 
+      _app,
       _beachballs,
       _data,
       _id,
@@ -68,6 +70,7 @@ var BeachBalls = function (options) {
   _initialize = function (options = {}) {
     options = Object.assign({}, _DEFAULTS, options);
 
+    _app = options.app;
     _data = options.data;
     _id = options.id;
     _mainshock = options.mainshock;
@@ -218,7 +221,6 @@ var BeachBalls = function (options) {
         },
         depth = _tensor.depth || _mainshock.data.depth,
         duration = _data['sourcetime-duration'],
-        format = 'LLL d, yyyy TT',
         moment = (_tensor.moment / _tensor.scale).toFixed(3) +
           `e+${_tensor.exponent} ${_tensor.units}`;
 
@@ -255,9 +257,9 @@ var BeachBalls = function (options) {
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
-      userTime: _data.datetime.toLocal().toFormat(format),
+      userTime: _data.datetime.toLocal().toFormat(_app.dateFormat),
       utcOffset: Number(_data.datetime.toLocal().toFormat('Z')),
-      utcTime: _data.datetime.toFormat(format)
+      utcTime: _data.datetime.toFormat(_app.dateFormat)
     };
   };
 

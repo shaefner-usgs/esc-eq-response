@@ -300,7 +300,6 @@ var Earthquakes = function (options) {
           cdi = AppUtil.romanize(Number(props.cdi) || ''),
           coords = feature.geometry?.coordinates || [0, 0, 0],
           datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
-          format = 'LLL d, yyyy TT',
           magDisplay = AppUtil.round(props.mag, 1), // String
           mag = parseFloat(magDisplay) || 0,
           magType = props.magType || 'M',
@@ -310,16 +309,16 @@ var Earthquakes = function (options) {
             '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
           utcOffset = Number(datetime.toLocal().toFormat('Z')),
-          userTimeDisplay = datetime.toLocal().toFormat(format) +
+          userTimeDisplay = datetime.toLocal().toFormat(_app.dateFormat) +
             ` <span class="tz">(UTC${utcOffset})</span>`,
-          utcTimeDisplay = datetime.toFormat(format) +
+          utcTimeDisplay = datetime.toFormat(_app.dateFormat) +
             ' <span class="tz">(UTC)</span>';
 
       if (props.place) {
         title += '—' + props.place;
       }
       if (props.tz) { // local time (at epicenter)
-        localTime = datetime.toUTC(props.tz).toFormat('LLL d, yyyy tt') +
+        localTime = datetime.toUTC(props.tz).toFormat(_app.dateFormat) +
           ' <span class="tz">at the epicenter</span>';
         template += '<time datetime="{isoTime}" class="local">{localTime}</time>';
       }

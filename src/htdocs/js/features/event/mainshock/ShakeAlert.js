@@ -129,7 +129,6 @@ var ShakeAlert = function (options) {
         props = json.properties || {},
         decimalSecs = props.time?.match(/\.0*[^0]+/)[0],
         final = alerts.final.properties || {},
-        format = 'LLL d, yyyy TT',
         initial = alerts.initial.properties || {},
         time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
         issueTime = Luxon.DateTime.fromISO(time).toUTC();
@@ -153,12 +152,12 @@ var ShakeAlert = function (options) {
       radius: _getRadius(alerts),
       status: _getStatus(),
       url: _mainshock.data.url + '/shake-alert',
-      userIssueTime: issueTime.toLocal().toFormat(format),
-      userTime: datetime.toLocal().toFormat(format),
-      utcIssueTime: issueTime.toFormat(format),
+      userIssueTime: issueTime.toLocal().toFormat(_app.dateFormat),
+      userTime: datetime.toLocal().toFormat(_app.dateFormat),
+      utcIssueTime: issueTime.toFormat(_app.dateFormat),
       utcIssueOffset: Number(issueTime.toLocal().toFormat('Z')),
       utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(format),
+      utcTime: datetime.toFormat(_app.dateFormat),
       wea: props.wea_report || ''
     };
   };

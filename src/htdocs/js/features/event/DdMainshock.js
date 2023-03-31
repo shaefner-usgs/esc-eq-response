@@ -76,16 +76,15 @@ var DdMainshock = function (options) {
         props = feature.properties || {},
         datetime = Luxon.DateTime.fromMillis(Number(props.time)).toUTC(),
         dayFormat = 'cccc',
-        format = 'LLL d, yyyy TT',
         mag = AppUtil.round(props.mag, 1),
         magType = props.magType || 'M',
         template =
           '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
         utcOffset = datetime.toLocal().toFormat('Z'),
-        userTimeDisplay = datetime.toLocal().toFormat(format) +
+        userTimeDisplay = datetime.toLocal().toFormat(_app.dateFormat) +
           ` <span class="tz">(UTC${utcOffset})</span>`,
-        utcTimeDisplay = datetime.toFormat(format) +
+        utcTimeDisplay = datetime.toFormat(_app.dateFormat) +
           ' <span class="tz">(UTC)</span>';
 
     data = {

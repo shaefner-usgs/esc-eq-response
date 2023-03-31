@@ -140,8 +140,7 @@ var ShakeMap = function (options) {
    * @return {Object}
    */
   _getData = function (json = {}) {
-    var format = 'LLL d, yyyy TT',
-        info = json.input?.event_information || {},
+    var info = json.input?.event_information || {},
         motions = _getMotions(json),
         seconds = _product.updateTime/1000 || 0,
         datetime = Luxon.DateTime.fromSeconds(seconds).toUTC();
@@ -154,9 +153,9 @@ var ShakeMap = function (options) {
       seismic: Number(info.seismic_stations) || '–',
       status: _getStatus(),
       url: _mainshock.data.url + '/shakemap',
-      userTime: datetime.toLocal().toFormat(format),
+      userTime: datetime.toLocal().toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(format)
+      utcTime: datetime.toFormat(_app.dateFormat)
     });
   };
 

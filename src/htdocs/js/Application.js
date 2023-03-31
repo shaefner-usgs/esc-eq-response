@@ -80,6 +80,7 @@ var Application = function (options) {
     _els = options;
     _rendered = false;
 
+    _this.dateFormat = 'LLL d, yyyy TT';
     _this.headerHeight = document.querySelector('header').offsetHeight;
     _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
 

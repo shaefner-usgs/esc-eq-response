@@ -91,7 +91,6 @@ var Pager = function (options) {
     var contents = _product.contents || {},
         seconds = _product.updateTime/1000 || 0,
         datetime = Luxon.DateTime.fromSeconds(seconds).toUTC(),
-        format = 'LLL d, yyyy TT',
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerExposures = _app.Features.getFeature('pager-exposures');
 
@@ -109,9 +108,9 @@ var Pager = function (options) {
       status: _getStatus(),
       structures: json.struct_comment || '',
       url: _mainshock.data.url + '/pager',
-      userTime: datetime.toLocal().toFormat(format),
+      userTime: datetime.toLocal().toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toLocal().toFormat('Z')),
-      utcTime: datetime.toFormat(format)
+      utcTime: datetime.toFormat(_app.dateFormat)
     };
   };
 
