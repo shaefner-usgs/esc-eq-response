@@ -2,10 +2,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil'),
-    Luxon = require('luxon');
-
-
 /**
  * Add and remove a Feature's summary content and update the timestamp. Also
  * handle swapping the Tablesort plugin's direction indicators between user/UTC
@@ -36,8 +32,7 @@ var SummaryPane = function (options) {
 
       _cacheFeatures,
       _embedFeatures,
-      _getSummary,
-      _updateTimestamp;
+      _getSummary;
 
 
   _this = {};
@@ -114,21 +109,6 @@ var SummaryPane = function (options) {
     return summary;
   };
 
-  /**
-   * Update the timestamp.
-   *
-   * @param timestamp {Integer}
-   */
-  _updateTimestamp = function (timestamp) {
-    var datetime = Luxon.DateTime.fromMillis(timestamp),
-        el = document.getElementById('updated'),
-        tz = AppUtil.getTimeZone(),
-        userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
-
-    el.innerHTML = `${userTime} (${tz})`;
-    el.setAttribute('datetime', datetime.toISO());
-  };
-
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -163,9 +143,6 @@ var SummaryPane = function (options) {
 
     _embedFeatures(feature);
 
-    if (feature.id === 'mainshock') {
-      _updateTimestamp(feature.updated);
-    }
     if (status === 'ready') {
       _app.Features.getFeature('mainshock').enableDownload();
     }
