@@ -267,6 +267,8 @@
 body.user {
   td.utcTime,
   th.utcTime,
+  #settingsBar time.utc,
+  #summaryPane time.utc,
   .earthquake:not(.mainshock) time.utc,
   .leaflet-tooltip time.utc,
   .plotly .line > tspan:nth-of-type(2) {
@@ -284,6 +286,8 @@ body.user {
 body.utc {
   td.userTime,
   th.userTime,
+  #settingsBar time.user,
+  #summaryPane time.user,
   .earthquake:not(.mainshock) time.user,
   .leaflet-tooltip time.user,
   .plotly .line > tspan:nth-of-type(1) {
