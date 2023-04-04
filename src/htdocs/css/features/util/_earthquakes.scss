@@ -15,6 +15,21 @@
       margin-left: 1rem;
     }
   }
+
+  .timestamp {
+    margin-top: 1.25rem;
+
+    time:before {
+      @include labels;
+
+      content: 'Updated';
+      margin-right: .5rem;
+    }
+  }
+
+  .filter:not(.hide) + .timestamp {
+    margin-top: 0;
+  }
 }
 #plotsPane .filter {
   justify-content: center;
@@ -39,18 +54,6 @@
   table.m8 tr.m8,
   table.m9 tr.m9 {
     display: table-row;
-  }
-
-  time.updated {
-    display: block;
-    margin-top: 1.25rem;
-
-    &:before {
-      @include labels;
-
-      content: 'Updated';
-      margin-right: .5rem;
-    }
   }
 
   tr.m0,
@@ -267,6 +270,7 @@
 body.user {
   td.utcTime,
   th.utcTime,
+  #plotsPane time.utc,
   #settingsBar time.utc,
   #summaryPane time.utc,
   .earthquake:not(.mainshock) time.utc,
@@ -286,6 +290,7 @@ body.user {
 body.utc {
   td.userTime,
   th.userTime,
+  #plotsPane time.user,
   #settingsBar time.user,
   #summaryPane time.user,
   .earthquake:not(.mainshock) time.user,

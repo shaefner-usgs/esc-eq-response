@@ -38,6 +38,7 @@ var PlotsPane = function (options) {
       _el,
       _ids,
 
+      _addPlots,
       _configPlots,
       _getParams,
       _isActive,
@@ -46,7 +47,8 @@ var PlotsPane = function (options) {
       _toggleFilter,
       _togglePlot,
       _updateFilter,
-      _updateParams;
+      _updateParams,
+      _updateTimeStamp;
 
 
   _this = {};
@@ -73,6 +75,28 @@ var PlotsPane = function (options) {
     window.onresize = function () {
       _this.resize();
     };
+  };
+
+  /**
+   * Add the given Feature's plots.
+   *
+   * @param feature {Object}
+   */
+  _addPlots = function (feature) {
+    var bubble = _el.querySelector(`.${feature.id} .bubble`),
+        html = `<div class="timestamp">${feature.timestamp}</div>`,
+        params = {};
+
+    _ids.forEach(id => {
+      params[id] = feature.plots.getParams(id); // add headers, containers
+
+      _togglePlot(id, feature);
+    });
+
+    _this.params[feature.id] = params; // add plot data
+    _configured[feature.id] = false;
+
+    bubble.insertAdjacentHTML('beforeend', html); // add timestamp
   };
 
   /**
@@ -136,7 +160,7 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Refresh the given Feature's plots with the newly fetched data.
+   * Refresh the given Feature's plots.
    *
    * @param feature {Object}
    */
@@ -160,6 +184,8 @@ var PlotsPane = function (options) {
 
     _updateFilter(feature);
     _updateParams(feature);
+    _updateTimeStamp(feature);
+
     feature.plots.addListeners(_this.params[feature.id]);
   };
 
@@ -256,6 +282,17 @@ var PlotsPane = function (options) {
     }
   };
 
+  /**
+   * Update the given Feature's timestamp.
+   *
+   * @param feature {Object}
+   */
+  _updateTimeStamp = function (feature) {
+    var timestamp = _el.querySelector(`.${feature.id} .timestamp`);
+
+    timestamp.innerHTML = feature.timestamp;
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -267,21 +304,11 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var params = {};
-
-    // Skip the Mainshock (it's included in other Features' plots)
-    if (feature.plots && feature.id !== 'mainshock') {
+    if (feature.plots && feature.id !== 'mainshock') { // no stand-alone MS plot
       if (feature.isRefreshing) {
         _refresh(feature);
       } else {
-        _ids.forEach(id => {
-          params[id] = feature.plots.getParams(id); // adds headers, containers
-
-          _togglePlot(id, feature);
-        });
-
-        _this.params[feature.id] = params; // add plot data
-        _configured[feature.id] = false;
+        _addPlots(feature);
       }
 
       _toggleFilter(feature);
