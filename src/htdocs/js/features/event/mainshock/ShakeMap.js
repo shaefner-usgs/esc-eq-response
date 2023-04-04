@@ -59,7 +59,7 @@ var ShakeMap = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _product = _mainshock.data.products?.shakemap?.[0] || {};
+    _product = _mainshock.data.eq.products?.shakemap?.[0] || {};
 
     _this.data = {};
     _this.id = 'shakemap';
@@ -140,19 +140,20 @@ var ShakeMap = function (options) {
    * @return {Object}
    */
   _getData = function (json = {}) {
-    var info = json.input?.event_information || {},
-        motions = _getMotions(json),
-        millis = Number(_product.updateTime) || 0,
-        datetime = Luxon.DateTime.fromMillis(millis);
+    var millis = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millis),
+        eq = _mainshock.data.eq,
+        info = json.input?.event_information || {},
+        motions = _getMotions(json);
 
     return Object.assign(motions, {
       dyfi: Number(info.intensity_observations) || '–',
-      img: _mainshock.data.shakemapImg,
+      img: eq.shakemapImg,
       isoTime: datetime.toUTC().toISO() || '',
-      mmiValue: _mainshock.data.mmi,
+      mmiValue: eq.mmi,
       seismic: Number(info.seismic_stations) || '–',
       status: _getStatus(),
-      url: _mainshock.data.url + '/shakemap',
+      url: eq.url + '/shakemap',
       userTime: datetime.toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toFormat('Z')),
       utcTime: datetime.toUTC().toFormat(_app.dateFormat)
@@ -168,13 +169,13 @@ var ShakeMap = function (options) {
     var files = _parseFiles(),
         images = [];
 
-    if (_mainshock.data.shakemapImg) { // default image
+    if (_mainshock.data.eq.shakemapImg) { // default image
       _selected = 'intensity';
 
       images.push({
         id: 'intensity',
         name: 'Intensity',
-        url: _mainshock.data.shakemapImg
+        url: _mainshock.data.eq.shakemapImg
       });
     }
 

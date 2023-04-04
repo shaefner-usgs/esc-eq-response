@@ -124,7 +124,7 @@ var CatalogSearch = function (options) {
     _earthquakes.addData(json);
     _app.SearchBar.setButton();
 
-    _this.count = _earthquakes.data.length;
+    _this.count = _earthquakes.data.eqs.length;
   };
 
   /**

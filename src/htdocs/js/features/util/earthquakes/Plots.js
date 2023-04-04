@@ -99,25 +99,25 @@ var Plots = function (options) {
    * @param timezone {String}
    */
   _addMainshock = function (data, timezone) {
-    var eqid = AppUtil.getParam('eqid'),
-        x = _mainshock.data.isoTime;
+    var eq = _mainshock.data.eq,
+        x = eq.isoTime;
 
     if (timezone === 'user') {
-      x = _mainshock.data.datetime.toLocal().toISO();
+      x = eq.datetime.toLocal().toISO();
     }
 
     if (_featureId.includes('aftershocks')) {
-      data.eqid.unshift(eqid);
-      data.title.unshift(_mainshock.data.title);
-      data.userTime.unshift(_mainshock.data.userTimeDisplay);
-      data.utcTime.unshift(_mainshock.data.utcTimeDisplay);
+      data.eqid.unshift(eq.id);
+      data.title.unshift(eq.title);
+      data.userTime.unshift(eq.userTimeDisplay);
+      data.utcTime.unshift(eq.utcTimeDisplay);
       data.x.unshift(x);
       data.y.unshift(0);
     } else if (_featureId.includes('historical')) {
-      data.eqid.push(eqid);
-      data.title.push(_mainshock.data.title);
-      data.userTime.push(_mainshock.data.userTimeDisplay);
-      data.utcTime.push(_mainshock.data.utcTimeDisplay);
+      data.eqid.push(eq.id);
+      data.title.push(eq.title);
+      data.userTime.push(eq.userTimeDisplay);
+      data.utcTime.push(eq.utcTimeDisplay);
       data.x.push(x);
       data.y.push(data.y.length + 1);
     }

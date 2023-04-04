@@ -50,7 +50,7 @@ var ShakeAlert = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _product = _mainshock.data.products?.['shake-alert']?.[0] || {};
+    _product = _mainshock.data.eq.products?.['shake-alert']?.[0] || {};
 
     _this.data = {};
     _this.id = 'shake-alert';
@@ -151,7 +151,7 @@ var ShakeAlert = function (options) {
       numStations100: Number(props.num_stations_100km),
       radius: _getRadius(alerts),
       status: _getStatus(),
-      url: _mainshock.data.url + '/shake-alert',
+      url: _mainshock.data.eq.url + '/shake-alert',
       userIssueTime: issueTime.toFormat(_app.dateFormat),
       userTime: datetime.toFormat(_app.dateFormat),
       utcIssueTime: issueTime.toUTC().toFormat(_app.dateFormat),

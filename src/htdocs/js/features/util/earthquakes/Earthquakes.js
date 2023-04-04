@@ -67,9 +67,9 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
-      _getData,
       _getDirection,
       _getDuration,
+      _getEqs,
       _onEachFeature,
       _onPopupClose,
       _onPopupOpen,
@@ -202,10 +202,10 @@ var Earthquakes = function (options) {
   /**
    * Filter NCEDC (double difference) earthquakes. The NCEDC API doesn't support
    * radius values for defining a custom search region, so a rectangle is used
-   * as a proxy and extraneous eqs must be subsequently removed.
+   * as a proxy and extraneous eqs need to be removed.
    *
-   * Note: _this.data gets filtered in _getData(), but the Leaflet map layer was
-   * created before it was filtered.
+   * Note: _this.data.eqs was filtered by _getEqs(), but the map layer was
+   * created before filtering.
    *
    * @param feature {Object}
    *     GeoJSON feature
@@ -213,7 +213,7 @@ var Earthquakes = function (options) {
    * @return {Boolean}
    */
   _filter = function (feature) {
-    if (_this.data.find(item => item.id === feature.id)) { // eqid
+    if (_this.data.eqs.find(item => item.id === feature.id)) { // eqid
       return true;
     }
 
@@ -283,15 +283,53 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the formatted data (a list of earthquakes with convenience props set)
-   * that is used to create the Feature.
+   * Get the direction from the Mainshock.
+   *
+   * @param latlon {Object}
+   *
+   * @return {String}
+   */
+  _getDirection = function (latlon) {
+    var bearing = _mainshock.data.eq.latlon.bearing(latlon),
+        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
+        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
+
+    return directions[octant];
+  };
+
+  /**
+   * Get the duration of an earthquake sequence.
+   *
+   * @return duration {Object}
+   */
+  _getDuration = function () {
+    var interval,
+        duration = {};
+
+    if (_feature.id.includes('aftershocks')) {
+      interval = Luxon.Interval
+        .fromDateTimes(_mainshock.data.eq.datetime, _this.params.now)
+        .length('days');
+      duration.days = Number(AppUtil.round(interval, 1));
+    } else if (_feature.id.includes('foreshocks')) {
+      duration.days = _feature.params.days;
+    } else { // historical
+      duration.years = _feature.params.years;
+    }
+
+    return duration;
+  };
+
+  /**
+   * Get the list of earthquakes (with convenience props set) that is used to
+   * create the Feature.
    *
    * @param json {Object}
    *
-   * @return data {Array}
+   * @return eqs {Array}
    */
-  _getData = function (json) {
-    var data = [],
+  _getEqs = function (json) {
+    var eqs = [],
         features = json.features || [json]; // feature collection or Mainshock
 
     features.forEach((feature = {}) => {
@@ -333,7 +371,7 @@ var Earthquakes = function (options) {
         latlon = LatLon(coords[1], coords[0]);
         direction = _getDirection(latlon);
         distance = Number(AppUtil.round(
-          _mainshock.data.latlon.distanceTo(latlon) / 1000, 2
+          _mainshock.data.eq.latlon.distanceTo(latlon) / 1000, 2
         ));
         distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
           `<span>${direction}</span>`;
@@ -382,49 +420,11 @@ var Earthquakes = function (options) {
         _catalog === 'comcat' ||
         eq.distance <= _this.params.distance // DD eq is inside search radius
       ) {
-        data.push(eq);
+        eqs.push(eq);
       }
     });
 
-    return data;
-  };
-
-  /**
-   * Get the direction from the Mainshock.
-   *
-   * @param latlon {Object}
-   *
-   * @return {String}
-   */
-  _getDirection = function (latlon) {
-    var bearing = _mainshock.data.latlon.bearing(latlon),
-        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
-        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
-
-    return directions[octant];
-  };
-
-  /**
-   * Get the duration of an earthquake sequence.
-   *
-   * @return duration {Object}
-   */
-  _getDuration = function () {
-    var interval,
-        duration = {};
-
-    if (_feature.id.includes('aftershocks')) {
-      interval = Luxon.Interval
-        .fromDateTimes(_mainshock.data.datetime, _this.params.now)
-        .length('days');
-      duration.days = Number(AppUtil.round(interval, 1));
-    } else if (_feature.id.includes('foreshocks')) {
-      duration.days = _feature.params.days;
-    } else { // historical
-      duration.years = _feature.params.years;
-    }
-
-    return duration;
+    return eqs;
   };
 
   /**
@@ -436,7 +436,7 @@ var Earthquakes = function (options) {
    */
   _onEachFeature = function (feature, layer) {
     var div = L.DomUtil.create('div'),
-        eq = _this.data.find(item => item.id === feature.id); // eqid
+        eq = _this.data.eqs.find(item => item.id === feature.id); // eqid
 
     div.innerHTML = _this.getPopup(eq);
 
@@ -477,7 +477,7 @@ var Earthquakes = function (options) {
    * @return {L.CircleMarker}
    */
   _pointToLayer = function (feature, latlng) {
-    var eq = _this.data.find(item => item.id === feature.id), // eqid
+    var eq = _this.data.eqs.find(item => item.id === feature.id), // eqid
         opts = Object.assign({}, _markerOptions, {
           fillColor: eq.fillColor,
           pane: _feature.id, // controls stacking order
@@ -532,7 +532,16 @@ var Earthquakes = function (options) {
    * @param json {Object} default is {}
    */
   _this.addData = function (json = {}) {
-    _this.data = _getData(json);
+    var feature = _app.Features.getFeature(_this.mapLayer.id),
+        datetime = Luxon.DateTime.fromMillis(feature.updated);
+
+    _this.data = {
+      eqs: _getEqs(json),
+      isoTime: datetime.toUTC().toISO(),
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat)
+    };
   };
 
   /**
@@ -562,9 +571,9 @@ var Earthquakes = function (options) {
     _filter = null;
     _getAge = null;
     _getBubbles = null;
-    _getData = null;
     _getDirection = null;
     _getDuration = null;
+    _getEqs = null;
     _onEachFeature = null;
     _onPopupClose = null;
     _onPopupOpen = null;

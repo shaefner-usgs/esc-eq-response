@@ -343,7 +343,7 @@ var ShakeMapStations = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.products?.shakemap || [],
+        product = mainshock.data.eq.products?.shakemap || [],
         contents = product[0]?.contents || {},
         url = '';
 

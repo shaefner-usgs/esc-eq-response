@@ -215,9 +215,10 @@ var FieldNotes = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        after = mainshock.data.datetime.plus({ seconds: 1 }).toSeconds(),
-        before = mainshock.data.datetime.plus({ days: 30 }).toSeconds(),
-        coords = mainshock.data.coords,
+        datetime = mainshock.data.eq.datetime,
+        after = datetime.plus({ seconds: 1 }).toSeconds(),
+        before = datetime.plus({ days: 30 }).toSeconds(),
+        coords = mainshock.data.eq.coords,
         pairs = [],
         params = {
           between: after + ',' + before,

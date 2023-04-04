@@ -48,7 +48,7 @@ var Pager = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _product = _mainshock.data.products?.losspager?.[0] || {};
+    _product = _mainshock.data.eq.products?.losspager?.[0] || {};
 
     _this.data = {};
     _this.dependencies = [
@@ -91,11 +91,12 @@ var Pager = function (options) {
     var contents = _product.contents || {},
         millis = Number(_product.updateTime) || 0,
         datetime = Luxon.DateTime.fromMillis(millis),
+        eq = _mainshock.data.eq,
         pagerCities = _app.Features.getFeature('pager-cities'),
         pagerExposures = _app.Features.getFeature('pager-exposures');
 
     return {
-      alert: _mainshock.data.alert,
+      alert: eq.alert,
       cities: pagerCities.data,
       cost: contents['alertecon.png']?.url || '',
       costBlurb: json.impact1 || '',
@@ -107,7 +108,7 @@ var Pager = function (options) {
       isoTime: datetime.toUTC().toISO() || '',
       status: _getStatus(),
       structures: json.struct_comment || '',
-      url: _mainshock.data.url + '/pager',
+      url: eq.url + '/pager',
       userTime: datetime.toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toFormat('Z')),
       utcTime: datetime.toUTC().toFormat(_app.dateFormat)

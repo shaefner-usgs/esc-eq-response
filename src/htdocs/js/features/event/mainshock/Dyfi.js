@@ -51,7 +51,7 @@ var Dyfi = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _mainshock = _app.Features.getFeature('mainshock');
-    _product = _mainshock.data.products?.dyfi?.[0] || {};
+    _product = _mainshock.data.eq.products?.dyfi?.[0] || {};
     _selected = 'block';
 
     _this.data = {},
@@ -100,19 +100,20 @@ var Dyfi = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var props = _product.properties || {},
-        millis = Number(_product.updateTime) || 0,
-        datetime = Luxon.DateTime.fromMillis(millis);
+    var millis = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millis),
+        eq = _mainshock.data.eq,
+        props = _product.properties || {};
 
     return {
-      cdi: _mainshock.data.cdi,
+      cdi: eq.cdi,
       isoTime: datetime.toUTC().toISO() || '',
-      map: _mainshock.data.dyfiImg,
+      map: eq.dyfiImg,
       maxmmi: Number(props.maxmmi),
-      plot: _product.contents[_mainshock.data.id + '_plot_atten.jpg']?.url || '',
+      plot: _product.contents[eq.id + '_plot_atten.jpg']?.url || '',
       responses: AppUtil.addCommas(props.numResp),
       status: _getStatus(props),
-      url: _mainshock.data.url + '/dyfi',
+      url: eq.url + '/dyfi',
       userTime: datetime.toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toFormat('Z')),
       utcTime: datetime.toUTC().toFormat(_app.dateFormat)

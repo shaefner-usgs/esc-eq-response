@@ -87,7 +87,7 @@ var Summary = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
-    _eqs = options.earthquakes.data;
+    _eqs = options.earthquakes.data.eqs;
     _featureId = options.featureId;
     _magThreshold = options.magThreshold; // default
     _maxNumEqs = options.maxNumEqs;
@@ -191,7 +191,7 @@ var Summary = function (options) {
       if (_featureId.includes('aftershocks')) {
         var days = Math.ceil(
           Luxon.Interval
-            .fromDateTimes(mainshock.data.datetime, eq.datetime)
+            .fromDateTimes(mainshock.data.eq.datetime, eq.datetime)
             .length('days')
         );
 
@@ -210,7 +210,7 @@ var Summary = function (options) {
       ) {
         days = Math.ceil(
           Luxon.Interval
-            .fromDateTimes(eq.datetime, mainshock.data.datetime)
+            .fromDateTimes(eq.datetime, mainshock.data.eq.datetime)
             .length('days')
         );
 

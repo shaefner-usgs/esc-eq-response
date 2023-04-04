@@ -62,7 +62,7 @@ var NearbyCities = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.products?.['nearby-cities'] || [],
+        product = mainshock.data.eq.products?.['nearby-cities'] || [],
         contents = product[0]?.contents || {},
         url = '';
 

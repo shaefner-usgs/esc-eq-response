@@ -81,6 +81,7 @@ var DdMainshock = function (options) {
         template =
           '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
           '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+        title = _mainshock.data.eq.title,
         utcOffset = datetime.toFormat('Z'),
         userTimeDisplay = datetime.toFormat(_app.dateFormat) +
           ` <span class="tz">(UTC${utcOffset})</span>`,
@@ -98,7 +99,7 @@ var DdMainshock = function (options) {
       location: AppUtil.formatLatLon(coords),
       magDisplay: mag,
       magType: magType,
-      title: _mainshock.data.title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
+      title: title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
       userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
       userDayofweek: datetime.toFormat(dayFormat),
       userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),

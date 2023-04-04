@@ -142,7 +142,7 @@ var Rtf = function (options) {
    * @return eqs {Array}
    */
   _filter = function (feature) {
-    var eqs = feature.data,
+    var eqs = feature.data.eqs,
         params = _getParams(feature.id),
         slider = document.querySelector(`#summaryPane .${feature.id} output`);
 
@@ -209,13 +209,14 @@ var Rtf = function (options) {
         descriptions = _getDescriptions(prefix),
         dyfi = _app.Features.getFeature('dyfi'),
         el = document.getElementById('summaryPane'),
+        mainshock = _app.Features.getFeature('mainshock'),
+        eq = mainshock.data.eq,
         forecast = _app.Features.getFeature('forecast'),
         foreshocks = _app.Features.getFeature(`${prefix}foreshocks`),
         historical = _app.Features.getFeature(`${prefix}historical`),
         historicalEvents = _app.Features.getFeature('historical-events'),
-        mainshock = _app.Features.getFeature('mainshock'),
         nearbyCities = _app.Features.getFeature('nearby-cities'),
-        products = mainshock.data.products || {},
+        products = eq.products || {},
         notice = products['general-header'] || [],
         pager = _app.Features.getFeature('pager'),
         shakeAlert = _app.Features.getFeature('shake-alert'),
@@ -255,19 +256,19 @@ var Rtf = function (options) {
       },
       mainshock: {
         day: {
-          user: mainshock.data.userDayofWeek,
-          utc: mainshock.data.utcDayofWeek
+          user: eq.userDayofWeek,
+          utc: eq.utcDayofWeek
         },
-        depthDisplay: mainshock.data.depthDisplay,
-        eqid: mainshock.data.id,
-        magDisplay: mainshock.data.magDisplay,
-        magType: mainshock.data.magType,
+        depthDisplay: eq.depthDisplay,
+        eqid: eq.id,
+        magDisplay: eq.magDisplay,
+        magType: eq.magType,
         time: {
-          local: mainshock.data.localTime,
-          user: mainshock.data.userTimeDisplay,
-          utc: mainshock.data.utcTimeDisplay,
+          local: eq.localTime,
+          user: eq.userTimeDisplay,
+          utc: eq.utcTimeDisplay,
         },
-        title: mainshock.data.title,
+        title: eq.title,
       },
       nearbyCities: nearbyCities.data || [],
       notice: notice[0]?.contents?.['']?.bytes || '',
@@ -278,7 +279,7 @@ var Rtf = function (options) {
       tectonic: tectonic[0]?.contents?.['']?.bytes || '',
       urls: {
         app: location.href,
-        eventPage: mainshock.data.url
+        eventPage: eq.url
       },
       zone: AppUtil.getParam('timezone') || 'utc'
     };

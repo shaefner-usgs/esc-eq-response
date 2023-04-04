@@ -108,7 +108,7 @@ var PagerCities = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.products?.losspager || [],
+        product = mainshock.data.eq.products?.losspager || [],
         contents = product[0]?.contents || {},
         url = '';
 

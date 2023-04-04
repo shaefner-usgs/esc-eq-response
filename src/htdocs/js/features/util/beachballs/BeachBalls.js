@@ -219,7 +219,7 @@ var BeachBalls = function (options) {
           P: _getAxis('P'),
           T: _getAxis('T')
         },
-        depth = _tensor.depth || _mainshock.data.depth,
+        depth = _tensor.depth || _mainshock.data.eq.depth,
         duration = _data['sourcetime-duration'],
         moment = (_tensor.moment / _tensor.scale).toFixed(3) +
           `e+${_tensor.exponent} ${_tensor.units}`;
@@ -397,7 +397,7 @@ var BeachBalls = function (options) {
    * @return {L.Marker}
    */
   _this.getMapLayer = function () {
-    return L.marker.canvas(_mainshock.data.latLng, {
+    return L.marker.canvas(_mainshock.data.eq.latLng, {
       icon: L.divIcon({
         className: _id,
         iconSize: L.point(40, 40)

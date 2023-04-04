@@ -359,7 +359,7 @@ var MapPane = function (options) {
 
     if (mode === 'event') {
       mainshock = _app.Features.getFeature('mainshock');
-      _bounds = mainshock.data.latLng.toBounds(5000); // init val: 2.5km radius
+      _bounds = mainshock.data.eq.latLng.toBounds(5000); // init val: 2.5km radius
     } else if (AppUtil.getParam('region')) {
       _bounds = L.latLngBounds( // custom Catalog Search region
         [

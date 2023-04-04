@@ -59,7 +59,7 @@ var MomentTensor = function (options) {
     _this.zoomToLayer = false;
 
     mainshock = _app.Features.getFeature('mainshock');
-    product = mainshock.data.products?.[_this.id]?.[0] || {};
+    product = mainshock.data.eq.products?.[_this.id]?.[0] || {};
 
     if (!AppUtil.isEmpty(product)) {
       _beachballs = BeachBalls({

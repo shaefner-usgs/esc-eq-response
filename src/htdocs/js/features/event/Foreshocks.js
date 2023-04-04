@@ -119,10 +119,10 @@ var Foreshocks = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        coords = mainshock.data.coords,
-        endtime = mainshock.data.datetime.minus({ seconds: 1 })
-          .toUTC().toISO().slice(0, -5),
-        starttime = mainshock.data.datetime.minus({ days: _this.params.days })
+        coords = mainshock.data.eq.coords,
+        datetime = mainshock.data.eq.datetime,
+        endtime = datetime.minus({ seconds: 1 }).toUTC().toISO().slice(0, -5),
+        starttime = datetime.minus({ days: _this.params.days })
           .toUTC().toISO().slice(0, -5);
 
     return Earthquakes.getUrl({
@@ -150,7 +150,7 @@ var Foreshocks = function (options) {
     _summary = Summary(_summaryOpts);
 
     _this.bins = _summary.bins;
-    _this.count = _earthquakes.data.length;
+    _this.count = _earthquakes.data.eqs.length;
     _this.data = _earthquakes.data; // used by Rtf.js
     _this.summary = _summary.getContent();
   };

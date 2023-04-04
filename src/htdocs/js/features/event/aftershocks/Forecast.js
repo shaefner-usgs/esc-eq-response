@@ -299,7 +299,7 @@ var Forecast = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.products?.oaf || [],
+        product = mainshock.data.eq.products?.oaf || [],
         contents = product[0]?.contents || {},
         url = '';
 

@@ -61,6 +61,7 @@ var Mainshock = function (options) {
       _getBubbles,
       _getData,
       _getDyfi,
+      _getEq,
       _getImage,
       _getLinks,
       _getLossPager,
@@ -138,9 +139,10 @@ var Mainshock = function (options) {
    * @return template {String}
    */
   _getBubbles = function () {
-    var template = '';
+    var eq = _this.data.eq,
+        template = '';
 
-    if (_this.data.cdi) { // DYFI
+    if (eq.cdi) { // DYFI
       template +=
         '<li class="dyfi feature">' +
           '<strong>' +
@@ -151,7 +153,7 @@ var Mainshock = function (options) {
         '</li>';
     }
 
-    if (_this.data.mmi) { // ShakeMap
+    if (eq.mmi) { // ShakeMap
       template +=
         '<li class="shakemap feature">' +
           '<strong>ShakeMap</strong>' +
@@ -160,7 +162,7 @@ var Mainshock = function (options) {
         '</li>';
     }
 
-    if (_this.data.alert) { // PAGER
+    if (eq.alert) { // PAGER
       template +=
         '<li class="pager feature">' +
           '<strong>' +
@@ -171,7 +173,7 @@ var Mainshock = function (options) {
         '</li>';
     }
 
-    if (_this.data.tsunami) {
+    if (eq.tsunami) {
       template +=
         '<li>' +
           '<strong>Tsunami</strong>' +
@@ -183,18 +185,57 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the formatted data used to create the summary HTML. This is the
-   * JSON feed data from Earthquakes.js, plus additional Mainshock-specific
-   * convenience properties.
+   * Get the data used to create the content.
    *
-   * @param json {Object} default is _json or {}
+   * @param json {Object}
    *
    * @return {Object}
    */
-  _getData = function (json = _json || {}) {
-    var data = _earthquakes.data[0], // formatted JSON feed data
-        datetime = data.datetime,
-        products = json.properties?.products || {},
+  _getData = function (json) {
+    var data = _earthquakes.data;
+
+    _json = json; // cache feed data
+
+    return {
+      eq: _getEq(),
+      isoTime: data.isoTime,
+      userTime: data.userTime,
+      utcOffset: data.utcOffset,
+      utcTime: data.utcTime
+    };
+  };
+
+  /**
+   * Get the HTML template for 'Did You Feel It?'.
+   *
+   * @return template {String}
+   */
+  _getDyfi = function () {
+    var img,
+        template = '';
+
+    if (_this.data.eq.dyfiImg) {
+      img = '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">';
+      template =
+        '<div class="dyfi feature">' +
+          '<h4>Did You Feel It?</h4>' +
+          '<a href="{url}/dyfi">' + img + '</a>' +
+        '</div>';
+    }
+
+    return template;
+  };
+
+  /**
+   * Get the earthquake details. This is the formatted JSON feed data from
+   * Earthquakes.js, plus additional Mainshock-specific convenience properties.
+   *
+   * @return {Object}
+   */
+  _getEq = function () {
+    var eq = _earthquakes.data.eqs[0], // formatted JSON feed data
+        datetime = eq.datetime,
+        products = _json.properties?.products || {},
         dyfi = products.dyfi || [],
         dyfiImg = _getImage(dyfi[0]),
         pager = products.losspager || [],
@@ -204,7 +245,7 @@ var Mainshock = function (options) {
         format = 'cccc',
         header = products['general-header'] || [],
         hide = 'hide', // default - hide product thumbs container
-        mmiInt = Math.round(json.properties?.mmi) || 0,
+        mmiInt = Math.round(_json.properties?.mmi) || 0,
         mt = products['moment-tensor'] || [],
         notice = header[0]?.contents['']?.bytes,
         plurality = 's', // default
@@ -213,22 +254,20 @@ var Mainshock = function (options) {
         shakemap = products.shakemap || [],
         shakemapImg = shakemap[0]?.contents['download/intensity.jpg']?.url;
 
-    _json = json; // cache feed data
-
     if (dyfiImg || shakemapImg || fm[0] || mt[0]) {
       hide = ''; // show
     }
-    if (Number(data.felt) === 1) {
+    if (Number(eq.felt) === 1) {
       plurality = '';
     }
 
-    return Object.assign({}, data, {
+    return Object.assign({}, eq, {
       dyfiImg: dyfiImg,
       econImg: econImg || '',
       fatalImg: fatalImg || '',
       hide: hide,
-      latLng: L.latLng(data.coords[1], data.coords[0]), // for map marker
-      latlon: LatLon(data.coords[1], data.coords[0]), // for distance, direction
+      latLng: L.latLng(eq.coords[1], eq.coords[0]), // for map marker
+      latlon: LatLon(eq.coords[1], eq.coords[0]), // for distance, direction
       level: AppUtil.getShakingValues([mmiInt])[0].level || '', // ShakeMap
       notice: notice || '',
       plurality: plurality,
@@ -243,27 +282,6 @@ var Mainshock = function (options) {
       utcDayofWeek: datetime.toUTC().toFormat(format),
       utcTime: datetime.toUTC().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
     });
-  };
-
-  /**
-   * Get the HTML template for 'Did You Feel It?'.
-   *
-   * @return template {String}
-   */
-  _getDyfi = function () {
-    var img,
-        template = '';
-
-    if (_this.data.dyfiImg) {
-      img = '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">';
-      template =
-        '<div class="dyfi feature">' +
-          '<h4>Did You Feel It?</h4>' +
-          '<a href="{url}/dyfi">' + img + '</a>' +
-        '</div>';
-    }
-
-    return template;
   };
 
   /**
@@ -321,9 +339,10 @@ var Mainshock = function (options) {
    * @return template {String}
    */
   _getLossPager = function () {
-    var template = '';
+    var eq = _this.data.eq,
+        template = '';
 
-    if (_this.data.econImg || _this.data.fatalImg) {
+    if (eq.econImg || eq.fatalImg) {
       template =
         '<div class="pager-loss feature bubble">' +
           '<h4>Estimated Fatalities</h4>' +
@@ -344,7 +363,7 @@ var Mainshock = function (options) {
   _getNotice = function () {
     var template = '';
 
-    if (_this.data.notice) {
+    if (_this.data.eq.notice) {
       template = '<p class="notice">{notice}</p>';
     }
 
@@ -359,7 +378,7 @@ var Mainshock = function (options) {
   _getShakeAlert = function () {
     var template = '';
 
-    if (_this.data.shakeAlertStatus) {
+    if (_this.data.eq.shakeAlertStatus) {
       template =
         '<li class="shake-alert feature">' +
           '<strong>ShakeAlert<sup>®</sup></strong>' +
@@ -382,7 +401,7 @@ var Mainshock = function (options) {
     var img,
         template = '';
 
-    if (_this.data.shakemapImg) {
+    if (_this.data.eq.shakemapImg) {
       img = '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity">';
       template =
         '<div class="shakemap feature">' +
@@ -479,7 +498,7 @@ var Mainshock = function (options) {
         _getTectonic() +
         _getLinks() +
       '</div>',
-      _this.data
+      _this.data.eq
     );
   };
 
@@ -491,7 +510,7 @@ var Mainshock = function (options) {
   _getTectonic = function () {
     var template = '';
 
-    if (_this.data.tectonic) {
+    if (_this.data.eq.tectonic) {
       template =
         '<div class="tectonic bubble">' +
           '<h3>Tectonic Summary</h3>' +
@@ -544,8 +563,8 @@ var Mainshock = function (options) {
   _updateDetails = function () {
     var balloon = document.querySelector('#selectBar .mainshock'),
         mainshock = document.getElementById('mainshock'),
-        newBalloon = _earthquakes.getPopup(_this.data),
-        newStrip = L.Util.template(_getStrip(), _this.data),
+        newBalloon = _earthquakes.getPopup(_this.data.eq),
+        newStrip = L.Util.template(_getStrip(), _this.data.eq),
         products = document.querySelector('#summaryPane .mainshock .products'),
         strip = document.querySelector('#summaryPane .mainshock .details');
 
@@ -571,7 +590,7 @@ var Mainshock = function (options) {
       span = header.querySelector('span');
     }
 
-    if (_this.data.catalog === 'comcat') {
+    if (_this.data.eq.catalog === 'comcat') {
       span.classList.add('hide');
     } else {
       span.classList.remove('hide');
@@ -583,23 +602,24 @@ var Mainshock = function (options) {
    */
   _updateMarkers = function () {
     var div = document.createElement('div'),
+        eq = _this.data.eq,
         fm = _app.Features.getFeature('focal-mechanism'),
         marker = _this.mapLayer.getLayers()[0],
         mt = _app.Features.getFeature('moment-tensor');
 
-    div.innerHTML = _earthquakes.getPopup(_this.data);
+    div.innerHTML = _earthquakes.getPopup(eq);
 
-    marker.setLatLng(_this.data.latLng);
+    marker.setLatLng(eq.latLng);
     marker.setPopupContent(div);
-    marker.setTooltipContent(_earthquakes.getTooltip(_this.data));
+    marker.setTooltipContent(_earthquakes.getTooltip(eq));
 
     _earthquakes.updateListeners();
 
     if (fm.mapLayer) {
-      fm.update(_this.data.latLng);
+      fm.update(eq.latLng);
     }
     if (mt.mapLayer) {
-      mt.update(_this.data.latLng);
+      mt.update(eq.latLng);
     }
   };
 
@@ -611,7 +631,7 @@ var Mainshock = function (options) {
 
     _this.plots = Plots({
       app: _app,
-      data: [_this.data],
+      data: [_this.data.eq],
       featureId: _this.id
     });
   };
@@ -634,14 +654,14 @@ var Mainshock = function (options) {
     _earthquakes.addData(json);
 
     _this.data = _getData(json);
-    _this.content = _earthquakes.getPopup(_this.data);
+    _this.content = _earthquakes.getPopup(_this.data.eq);
     _this.plots = Plots({
       app: _app,
-      data: [_this.data],
+      data: [_this.data.eq],
       featureId: _this.id
     });
     _this.summary = _getSummary();
-    _this.title = _this.data.title;
+    _this.title = _this.data.eq.title;
 
     _app.SettingsBar.setValues();
     _app.TitleBar.setTitle(_this);
@@ -713,6 +733,7 @@ var Mainshock = function (options) {
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
+    _getEq = null;
     _getImage = null;
     _getLinks = null;
     _getLossPager = null;
@@ -779,13 +800,13 @@ var Mainshock = function (options) {
    * @param catalog {String <comcat|dd>}
    */
   _this.update = function (catalog) {
-    _this.data = _getData(); // default (ComCat data)
+    _this.data.eq = _getEq(); // default (ComCat data)
 
     if (catalog === 'dd') {
-      Object.assign(_this.data, _ddData); // replace with DD data
+      Object.assign(_this.data.eq, _ddData); // replace with DD data
     }
 
-    _this.title = _this.data.title;
+    _this.title = _this.data.eq.title;
     _app.TitleBar.setTitle(_this);
 
     _updateDetails();

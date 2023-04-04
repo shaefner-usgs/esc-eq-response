@@ -127,10 +127,10 @@ var Historical = function (options) {
    */
   _getUrl = function () {
     var mainshock = _app.Features.getFeature('mainshock'),
-        coords = mainshock.data.coords,
-        endtime = mainshock.data.datetime.minus({ seconds: 1 })
-          .toUTC().toISO().slice(0, -5),
-        starttime = mainshock.data.datetime.minus({ years: _this.params.years })
+        coords = mainshock.data.eq.coords,
+        datetime = mainshock.data.eq.datetime,
+        endtime = datetime.minus({ seconds: 1 }).toUTC().toISO().slice(0, -5),
+        starttime = datetime.minus({ years: _this.params.years })
           .toUTC().toISO().slice(0, -5);
 
     return Earthquakes.getUrl({
@@ -158,11 +158,11 @@ var Historical = function (options) {
     _summary = Summary(_summaryOpts);
 
     _this.bins = _summary.bins;
-    _this.count = _earthquakes.data.length;
+    _this.count = _earthquakes.data.eqs.length;
     _this.data = _earthquakes.data; // used by Rtf.js
     _this.plots = Plots({
       app: _app,
-      data: _earthquakes.data,
+      data: _earthquakes.data.eqs,
       featureId: _this.id
     });
     _this.summary = _summary.getContent();
