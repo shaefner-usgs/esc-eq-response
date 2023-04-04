@@ -69,12 +69,14 @@ class Ncedc {
    *     NCEDC catalog search URL
    */
   private function _createJson($eqs, $url) {
+    $milliseconds = floor(microtime(true) * 1000);
+
     // Initialize the array template for the feed
     $template = [
       'type' => 'FeatureCollection',
       'metadata' => [
         'count' => count($eqs),
-        'generated' => date(DATE_RFC2822),
+        'generated' => $milliseconds,
         'sourceUrl' => $url,
         'url' => $this->_url
       ],
