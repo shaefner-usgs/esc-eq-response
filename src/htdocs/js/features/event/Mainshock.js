@@ -429,25 +429,25 @@ var Mainshock = function (options) {
           '</li>' +
           _getBubbles() +
           _getShakeAlert() +
-          '<li class="utc date">' +
-            '<strong>Date</strong>' +
-            '<span>{utcDate}</span>' +
-            '<small>{utcDayofWeek}</small>' +
-          '</li>' +
-          '<li class="utc time">' +
-            '<strong>Time</strong>' +
-            '<span>{utcTime}</span>' +
-            '<small>UTC</small>' +
-          '</li>' +
           '<li class="user date">' +
             '<strong>Date</strong>' +
             '<span>{userDate}</span>' +
             '<small>{userDayofWeek}</small>' +
           '</li>' +
+          '<li class="utc date">' +
+            '<strong>Date</strong>' +
+            '<span>{utcDate}</span>' +
+            '<small>{utcDayofWeek}</small>' +
+          '</li>' +
           '<li class="user time">' +
             '<strong>Time</strong>' +
             '<span>{userTime}</span>' +
             '<small>UTC{utcOffset}</small>' +
+          '</li>' +
+          '<li class="utc time">' +
+            '<strong>Time</strong>' +
+            '<span>{utcTime}</span>' +
+            '<small>UTC</small>' +
           '</li>' +
           '<li class="depth">' +
             '<strong>Depth</strong>' +
@@ -462,6 +462,16 @@ var Mainshock = function (options) {
             '<strong>Status</strong>' +
             '<span>{statusIcon}</span>' +
             '<small>{status}</small>' +
+          '</li>' +
+          '<li class="user updated">' +
+            '<strong>Updated</strong>' +
+            `<span>${_this.data.userTime}</span>` +
+            `<small>UTC${_this.data.utcOffset}</small>` +
+          '</li>' +
+          '<li class="utc updated">' +
+            '<strong>Updated</strong>' +
+            `<span>${_this.data.utcTime}</span>` +
+            '<small>UTC</small>' +
           '</li>' +
         '</ul>' +
       '</div>';
