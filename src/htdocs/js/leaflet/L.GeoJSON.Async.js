@@ -229,7 +229,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     try {
       response = await AppUtil.fetchWithTimeout(this._url.href);
       this._json = await response.clone().json();
-      feature.updated = Date.now();
+      feature.updated = this._getUpdated();
 
       this._app.StatusBar.removeItem(feature.id);
       this._addContent();
@@ -251,6 +251,21 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
 
       console.error(error);
     }
+  },
+
+  /**
+   * Get the updated time from the feed metadata or use the current time.
+   *
+   * @return milliseconds {Integer}
+   */
+  _getUpdated: function () {
+    var milliseconds = Date.now(); // default
+
+    if (this._json.metadata?.generated) {
+      milliseconds = this._json.metadata.generated;
+    }
+
+    return milliseconds;
   }
 });
 
