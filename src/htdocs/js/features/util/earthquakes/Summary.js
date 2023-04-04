@@ -50,13 +50,13 @@ var Summary = function (options) {
       _featureId,
       _magThreshold,
       _maxNumEqs,
-      _now,
       _params,
       _reverseSort,
       _slider,
       _sortField,
       _sortOrder,
       _tables,
+      _timestamp,
 
       _addEqToBins,
       _addTitles,
@@ -91,11 +91,11 @@ var Summary = function (options) {
     _featureId = options.featureId;
     _magThreshold = options.magThreshold; // default
     _maxNumEqs = options.maxNumEqs;
-    _now = Luxon.DateTime.now();
     _params = options.earthquakes.params;
     _reverseSort = false;
     _sortField = options.sortField;
     _sortOrder = options.sortOrder;
+    _timestamp = options.earthquakes.timestamp;
 
     _createBins(); // creates, populates _this.bins
   };
@@ -772,13 +772,13 @@ var Summary = function (options) {
     _featureId = null;
     _magThreshold = null;
     _maxNumEqs = null;
-    _now = null;
     _params = null;
     _reverseSort = null;
     _slider = null;
     _sortField = null;
     _sortOrder = null;
     _tables = null;
+    _timestamp = null;
 
     _addEqToBins = null;
     _addTitles = null;
@@ -813,10 +813,7 @@ var Summary = function (options) {
   _this.getContent = function () {
     var duration, interval, mostRecentEq,
         count = _eqs.length,
-        html = '',
-        isoTime = _now.toUTC().toISO(),
-        tz = AppUtil.getTimeZone(),
-        userTime = _now.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+        html = '';
 
     if (_featureId.includes('aftershocks')) {
       if (count > 0) {
@@ -831,8 +828,7 @@ var Summary = function (options) {
       if (count > 1) {
         mostRecentEq = _eqs[count - 1];
         interval = Luxon.Interval.fromDateTimes(
-          mostRecentEq.datetime,
-          _now.toUTC()
+          mostRecentEq.datetime, Luxon.DateTime.now()
         ).length('days');
         duration = AppUtil.round(interval, 1) + ' days';
 
@@ -857,8 +853,7 @@ var Summary = function (options) {
       html += _getListTable();
     }
 
-    html += `<time class="updated" datetime="${isoTime}">${userTime} (${tz})` +
-      '</time>';
+    html += `<div class="timestamp">${_timestamp}</div>`;
 
     return html;
   };

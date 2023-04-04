@@ -2,7 +2,6 @@
 
 
 var AppUtil = require('util/AppUtil'),
-    Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar'),
     Switch = require('util/controls/Switch');
 
@@ -573,10 +572,9 @@ var SettingsBar = function (options) {
    * Note: Feature counts are removed separately via Features.js.
    */
   _this.reset = function () {
-    var time = _el.querySelector('#aftershocks + time');
+    var timestamp = _el.querySelector('#aftershocks + .timestamp');
 
-    time.textContent = '';
-    time.setAttribute('datetime', '');
+    timestamp.innerHTML = '';
 
     _inputs.forEach(input => {
       input.value = '';
@@ -670,22 +668,18 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Update the given Feature's refresh timestamp.
+   * Update the given Feature's timestamp.
    *
    * @param feature {Object}
    */
   _this.updateTimeStamp = function (feature) {
-    var datetime, el, id, tz, userTime;
+    var el, id;
 
     if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
-      datetime = Luxon.DateTime.fromMillis(feature.updated),
-      id = feature.id.replace(/^dd-/, ''), // remove double-difference prefix
-      el = document.getElementById(id).parentNode.querySelector('time'),
-      tz = AppUtil.getTimeZone(),
-      userTime = datetime.toFormat("ccc, LLL d, yyyy 'at' tt"); // eslint-disable-line
+      id = feature.id.replace(/^dd-/, ''); // remove double-difference prefix
+      el = _el.querySelector(`#${id} + .timestamp`);
 
-      el.innerHTML = `${userTime} (${tz})`;
-      el.setAttribute('datetime', datetime.toISO());
+      el.innerHTML = feature.timestamp;
     }
   };
 
