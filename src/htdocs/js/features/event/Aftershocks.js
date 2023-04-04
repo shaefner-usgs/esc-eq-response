@@ -38,6 +38,7 @@ var AppUtil = require('util/AppUtil'),
  *       removeListeners: {Function}
  *       showLayer: {Boolean}
  *       summary: {String}
+ *       timestamp: {String}
  *       url: {String}
  *       zoomToLayer: {Boolean}
  *     }
@@ -160,6 +161,7 @@ var Aftershocks = function (options) {
       featureId: _this.id
     });
     _this.summary = _summary.getContent();
+    _this.timestamp = _earthquakes.timestamp;
   };
 
   /**

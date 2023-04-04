@@ -26,6 +26,7 @@ var AppUtil = require('util/AppUtil'),
  *       params: {Object}
  *       removeListeners: {Function}
  *       showLayer: {Boolean}
+ *       timestamp: {String}
  *       title: {String}
  *       url: {String}
  *       zoomToLayer: {Boolean}
@@ -125,6 +126,7 @@ var CatalogSearch = function (options) {
     _app.SearchBar.setButton();
 
     _this.count = _earthquakes.data.eqs.length;
+    _this.timestamp = _earthquakes.timestamp;
   };
 
   /**

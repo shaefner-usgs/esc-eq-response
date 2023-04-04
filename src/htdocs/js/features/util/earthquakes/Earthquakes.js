@@ -49,6 +49,7 @@ _DEFAULTS = {
  *       mapLayer: {L.FeatureGroup}
  *       params: {Object}
  *       removeListeners: {Function}
+ *       timestamp: {String}
  *       updateListeners: {Function}
  *     }
  */
@@ -70,6 +71,7 @@ var Earthquakes = function (options) {
       _getDirection,
       _getDuration,
       _getEqs,
+      _getTimeStamp,
       _onEachFeature,
       _onPopupClose,
       _onPopupOpen,
@@ -428,6 +430,21 @@ var Earthquakes = function (options) {
   };
 
   /**
+   * Get the updated timestamp HTML (user and UTC time).
+   *
+   * @return {String}
+   */
+  _getTimeStamp = function () {
+    return L.Util.template(
+      '<time datetime="{isoTime}" class="user">' +
+        '{userTime} (UTC{utcOffset})' +
+      '</time>' +
+      '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>',
+      _this.data
+    );
+  };
+
+  /**
    * Add Leaflet Popups and Tooltips.
    *
    * @param feature {Object}
@@ -532,8 +549,7 @@ var Earthquakes = function (options) {
    * @param json {Object} default is {}
    */
   _this.addData = function (json = {}) {
-    var feature = _app.Features.getFeature(_this.mapLayer.id),
-        datetime = Luxon.DateTime.fromMillis(feature.updated);
+    var datetime = Luxon.DateTime.fromMillis(_feature.updated);
 
     _this.data = {
       eqs: _getEqs(json),
@@ -542,6 +558,7 @@ var Earthquakes = function (options) {
       utcOffset: Number(datetime.toFormat('Z')),
       utcTime: datetime.toUTC().toFormat(_app.dateFormat)
     };
+    _this.timestamp = _getTimeStamp();
   };
 
   /**
@@ -574,6 +591,7 @@ var Earthquakes = function (options) {
     _getDirection = null;
     _getDuration = null;
     _getEqs = null;
+    _getTimeStamp = null;
     _onEachFeature = null;
     _onPopupClose = null;
     _onPopupOpen = null;
