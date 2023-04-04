@@ -92,9 +92,9 @@ var TitleBar = function (options) {
         title = feature.title;
 
     if (feature.id === 'mainshock') {
-      subTitle = feature.data.timeDisplay;
+      subTitle = feature.data.eq.timeDisplay;
       title = // link to Event Page
-        `<a href="${feature.data.url}" class="external" target="new" title="USGS Event Page">` +
+        `<a href="${feature.data.eq.url}" class="external" target="new" title="USGS Event Page">` +
           `${title}<i class="icon-link"></i>` +
         '</a>';
     }
