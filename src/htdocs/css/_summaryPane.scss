@@ -8,18 +8,6 @@
     max-width: 55rem;
   }
 
-  #updated {
-    display: none;
-    padding: 1rem var(--padding-gutter) 1rem;
-
-    &:before {
-      @include labels;
-
-      content: 'Updated';
-      margin-right: .5rem;
-    }
-  }
-
   .bubble {
     display: inline-block;
   }
@@ -56,11 +44,5 @@
   .historical,
   .dd-historical {
     order: 3;
-  }
-}
-
-body.mainshock {
-  #updated {
-    display: block !important;
   }
 }
