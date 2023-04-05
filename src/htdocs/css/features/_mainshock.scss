@@ -149,6 +149,27 @@
         border-radius: $button-border-radius;
       }
     }
+
+    .updated {
+      position: relative;
+
+      em {
+        color: $text-color;
+        display: block;
+        font-size: 1rem;
+        font-style: normal;
+        margin-top: .125rem;
+      }
+
+      span {
+        color: $text-color-lightest;
+        font-size: .625rem;
+        line-height: 1;
+        position: absolute;
+        text-align: center;
+        top: 1.375rem;
+      }
+    }
   }
 
   .download {
