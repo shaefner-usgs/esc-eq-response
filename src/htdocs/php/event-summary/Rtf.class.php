@@ -973,7 +973,7 @@ class Rtf {
     }
 
     $section6->writeText(
-      '<br><b>Updated</b>: ' . $aftershocks->updated,
+      '<br>' . $this->_getUpdated($aftershocks),
       $this->_font->body,
       $this->_format->body
     );
@@ -1020,7 +1020,7 @@ class Rtf {
     }
 
     $section7->writeText(
-      '<br><b>Updated</b>: ' . $foreshocks->updated,
+      '<br>' . $this->_getUpdated($foreshocks),
       $this->_font->body,
       $this->_format->body
     );
@@ -1084,7 +1084,7 @@ class Rtf {
     }
 
     $section8->writeText(
-      '<br><b>Updated</b>: ' . $historical->updated,
+      '<br>' . $this->_getUpdated($historical),
       $this->_font->body,
       $this->_format->body
     );
