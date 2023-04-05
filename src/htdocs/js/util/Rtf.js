@@ -208,7 +208,6 @@ var Rtf = function (options) {
         aftershocks = _app.Features.getFeature(`${prefix}aftershocks`),
         descriptions = _getDescriptions(prefix),
         dyfi = _app.Features.getFeature('dyfi'),
-        el = document.getElementById('summaryPane'),
         mainshock = _app.Features.getFeature('mainshock'),
         eq = mainshock.data.eq,
         forecast = _app.Features.getFeature('forecast'),
@@ -232,7 +231,9 @@ var Rtf = function (options) {
         forecast: forecast.data || {},
         magThreshold: _magThreshold,
         plots: _plots.aftershocks,
-        updated: el.querySelector('.aftershocks .updated').innerText
+        userTime: aftershocks.data.userTime,
+        utcOffset: aftershocks.data.utcOffset,
+        utcTime: aftershocks.data.utcTime
       },
       beachballs: _getBeachBalls(),
       dyfi: dyfi.data || {},
@@ -242,7 +243,9 @@ var Rtf = function (options) {
         description: descriptions.foreshocks,
         earthquakes: _filter(foreshocks).sort(_compare),
         magThreshold: _magThreshold,
-        updated: el.querySelector('.foreshocks .updated').innerText
+        userTime: foreshocks.data.userTime,
+        utcOffset: foreshocks.data.utcOffset,
+        utcTime: foreshocks.data.utcTime
       },
       historical: {
         bins: historical.bins,
@@ -252,7 +255,9 @@ var Rtf = function (options) {
         events: historicalEvents.data || [],
         magThreshold: _magThreshold,
         plots: _plots.historical,
-        updated: el.querySelector('.historical .updated').innerText
+        userTime: historical.data.userTime,
+        utcOffset: historical.data.utcOffset,
+        utcTime: historical.data.utcTime
       },
       mainshock: {
         day: {
@@ -264,11 +269,11 @@ var Rtf = function (options) {
         magDisplay: eq.magDisplay,
         magType: eq.magType,
         time: {
-          local: eq.localTime,
+          local: eq.localTimeDisplay,
           user: eq.userTimeDisplay,
           utc: eq.utcTimeDisplay,
         },
-        title: eq.title,
+        title: eq.title
       },
       nearbyCities: nearbyCities.data || [],
       notice: notice[0]?.contents?.['']?.bytes || '',
