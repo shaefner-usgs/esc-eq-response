@@ -335,7 +335,8 @@ var Earthquakes = function (options) {
         features = json.features || [json]; // feature collection or Mainshock
 
     features.forEach((feature = {}) => {
-      var direction, distance, distanceDisplay, eq, latlon, localTime, statusIcon,
+      var direction, distance, distanceDisplay, eq, latlon, localTimeDisplay,
+          statusIcon,
           props = feature.properties || {},
           cdi = AppUtil.romanize(Number(props.cdi) || ''),
           coords = feature.geometry?.coordinates || [0, 0, 0],
@@ -358,9 +359,9 @@ var Earthquakes = function (options) {
         title += '—' + props.place;
       }
       if (props.tz) { // local time (at epicenter)
-        localTime = datetime.toUTC(props.tz).toFormat(_app.dateFormat) +
+        localTimeDisplay = datetime.toUTC(props.tz).toFormat(_app.dateFormat) +
           ' <span class="tz">at the epicenter</span>';
-        template += '<time datetime="{isoTime}" class="local">{localTime}</time>';
+        template += '<time datetime="{isoTime}" class="local">{localTimeDisplay}</time>';
       }
 
       if (status === 'reviewed') {
@@ -394,7 +395,7 @@ var Earthquakes = function (options) {
         fillColor: _COLORS[_getAge(datetime)],
         id: feature.id || '', // eqid
         isoTime: datetime.toUTC().toISO(),
-        localTime: localTime || '',
+        localTimeDisplay: localTimeDisplay || '',
         location: AppUtil.formatLatLon(coords),
         mag: mag,
         magDisplay: magDisplay,
@@ -430,7 +431,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the updated timestamp HTML (user and UTC time).
+   * Get the HTML content for the updated timestamp (user and UTC time).
    *
    * @return {String}
    */
