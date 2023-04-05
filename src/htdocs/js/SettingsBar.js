@@ -231,7 +231,7 @@ var SettingsBar = function (options) {
   _getInterval = function (name) {
     var value = AppUtil.getParam(name) || '';
 
-    return parseInt(value.replace(/\D/g, '')) * 60 * 1000; // strip 'm'
+    return parseInt(value.replace(/\D/g, ''), 10) * 60 * 1000; // strip 'm'
   };
 
   /**

@@ -100,7 +100,7 @@ var PagerExposures = function (options) {
         shaking = _this.data.shaking;
 
     mmis.forEach((mmi, i) => {
-      if (mmi >= 2 && parseInt(population[i]) !== 0) { // skip if nobody affected
+      if (mmi >= 2 && parseInt(population[i], 10) > 0) {
         data = {
           intensity: shaking[i].intensity,
           level: shaking[i].level,
