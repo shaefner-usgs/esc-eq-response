@@ -154,7 +154,7 @@ var Aftershocks = function (options) {
 
     _this.bins = _summary.bins;
     _this.count = _earthquakes.data.eqs.length;
-    _this.data = _earthquakes.data; // used by Rtf.js
+    _this.data = _earthquakes.data;
     _this.plots = Plots({
       app: _app,
       data: _earthquakes.data.eqs,
