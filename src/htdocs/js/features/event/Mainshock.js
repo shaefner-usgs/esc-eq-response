@@ -72,6 +72,7 @@ var Mainshock = function (options) {
       _getSummary,
       _getTectonic,
       _getText,
+      _getUpdated,
       _getUrl,
       _updateDetails,
       _updateHeader,
@@ -192,16 +193,17 @@ var Mainshock = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var data = _earthquakes.data;
+    var datetime = Luxon.DateTime.fromMillis(_this.updated);
 
     _json = json; // cache feed data
 
     return {
       eq: _getEq(),
-      isoTime: data.isoTime,
-      userTime: data.userTime,
-      utcOffset: data.utcOffset,
-      utcTime: data.utcTime
+      userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
+      userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
+      utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS)
     };
   };
 
@@ -463,16 +465,7 @@ var Mainshock = function (options) {
             '<span>{statusIcon}</span>' +
             '<small>{status}</small>' +
           '</li>' +
-          '<li class="user updated">' +
-            '<strong>Updated</strong>' +
-            `<span>${_this.data.userTime}</span>` +
-            `<small>UTC${_this.data.utcOffset}</small>` +
-          '</li>' +
-          '<li class="utc updated">' +
-            '<strong>Updated</strong>' +
-            `<span>${_this.data.utcTime}</span>` +
-            '<small>UTC</small>' +
-          '</li>' +
+          _getUpdated() +
         '</ul>' +
       '</div>';
   };
@@ -552,6 +545,33 @@ var Mainshock = function (options) {
     });
 
     return text;
+  };
+
+  /**
+   * Get the HTML content for the updated time.
+   *
+   * @return {String}
+   */
+  _getUpdated = function () {
+    return L.Util.template(
+      '<li class="user updated">' +
+        '<strong>Updated</strong>' +
+        '<span>' +
+          '{userDate}' +
+          '<em>{userTime}</em>' +
+        '</span>' +
+        '<small>UTC{utcOffset}</small>' +
+      '</li>' +
+      '<li class="utc updated">' +
+        '<strong>Updated</strong>' +
+        '<span>' +
+          '{utcDate}' +
+          '<em>{utcTime}</em>' +
+        '</span>' +
+        '<small>UTC</small>' +
+      '</li>',
+      _this.data
+    );
   };
 
   /**
@@ -754,6 +774,7 @@ var Mainshock = function (options) {
     _getSummary = null;
     _getTectonic = null;
     _getText = null;
+    _getUpdated = null;
     _getUrl = null;
     _updateDetails = null;
     _updateHeader = null;
