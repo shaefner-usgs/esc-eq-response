@@ -262,7 +262,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     var milliseconds = Date.now(); // default
 
     if (this._json.metadata?.generated) {
-      milliseconds = this._json.metadata.generated;
+      milliseconds = parseInt(this._json.metadata.generated, 10);
     }
 
     return milliseconds;
