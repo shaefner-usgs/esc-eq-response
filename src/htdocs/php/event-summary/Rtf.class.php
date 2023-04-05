@@ -819,7 +819,7 @@ class Rtf {
         $this->_format->h4
       );
       $section5->writeText(
-        $dyfi->responses . ' responses as of ' . $this->_now,
+        $dyfi->responses . ' responses',
         $this->_font->body,
         $this->_format->body
       );
