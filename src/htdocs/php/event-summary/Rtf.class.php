@@ -488,6 +488,17 @@ class Rtf {
     );
 
     $section2->writeText(
+      'ShakeAlert®',
+      $this->_font->h4,
+      $this->_format->h4
+    );
+    $section2->writeText(
+      '[PLACEHOLDER]',
+      $this->_font->body,
+      $this->_format->body
+    );
+
+    $section2->writeText(
       'Long-term Probabilities',
       $this->_font->h4,
       $this->_format->h4
