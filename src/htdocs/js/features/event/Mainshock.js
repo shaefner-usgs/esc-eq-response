@@ -491,12 +491,13 @@ var Mainshock = function (options) {
         '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
-            'containing earthquake details, images, plots and ' +
-            'placeholders for talking points and analysis. Microsoft ' +
-            'Word is recommended for viewing the document.</p>' +
+            'containing earthquake details, images, plots and placeholders ' +
+            'for talking points and analysis. Any settings you tweak will be ' +
+            'reflected in the document.</p>' +
           '<button id="download" disabled="disabled" type="button" ' +
             'title="Disabled because some features have not finished ' +
             'loading">Download</button>' +
+          '<p>Microsoft Word is recommended for viewing the summary.</p>' +
         '</div>' +
         _getTectonic() +
         _getLinks() +

@@ -4,16 +4,6 @@
 @use '../util/variables' as *;
 
 #summaryPane {
-  #download {
-    margin-top: .5rem;
-    padding-bottom: .1875rem;
-    padding-top: .1875rem;
-
-    &:after {
-      content: 'Event Summary';
-    }
-  }
-
   .details {
     max-width: 100%;
     overflow: scroll;
@@ -174,7 +164,18 @@
 
   .download {
     button {
-      margin-bottom: .5rem;
+      margin: 0;
+      padding-bottom: .1875rem;
+      padding-top: .1875rem;
+
+      &:after {
+        content: 'Event Summary';
+      }
+    }
+
+    button + p {
+      font-size: $font-size-smaller;
+      margin: 1rem 0 0;
     }
   }
 
