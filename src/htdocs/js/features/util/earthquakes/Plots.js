@@ -450,8 +450,8 @@ var Plots = function (options) {
 
     // The first/last point on cumulative aftershocks/historical curve is Mainshock
     if (id === 'cumulative' &&
-      (featureId === 'aftershocks' && index === 0) ||
-      (featureId === 'historical' && index === count)
+      (featureId.includes('aftershocks') && index === 0) ||
+      (featureId.includes('historical') === count)
     ) {
       featureId = 'mainshock';
     }
