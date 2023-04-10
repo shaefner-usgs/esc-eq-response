@@ -575,6 +575,10 @@ var Features = function (options) {
 
     if (mode === 'rtf') {
       _features.rtf = {}; // reset so _this.getStatus() is accurate
+
+      if (_MODULES[mode].length === 0) {
+        _createRtf(); // creates RTF doc when no RTF Features are defined
+      }
     }
 
     _MODULES[mode].forEach(module => {
@@ -698,6 +702,7 @@ var Features = function (options) {
     if (mode === 'rtf') {
       numFeatures = Object.keys(_features.rtf).length;
       numModules = _MODULES.rtf.length;
+      status = 'ready';
 
       if (numFeatures !== numModules) {
         status = 'loading';
