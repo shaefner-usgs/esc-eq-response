@@ -11,11 +11,11 @@ var Aftershocks = require('features/event/Aftershocks'),
     Forecast = require('features/event/aftershocks/Forecast'),
     Foreshocks = require('features/event/Foreshocks'),
     Historical = require('features/event/Historical'),
-    HistoricalEvents = require('features/rtf/HistoricalEvents'),
+    HistoricalEvents = require('features/event/historical/HistoricalEvents'),
     Lightbox = require('util/Lightbox'),
     Mainshock = require('features/event//Mainshock'),
     MomentTensor = require('features/event/mainshock/MomentTensor'),
-    NearbyCities = require('features/rtf/NearbyCities'),
+    NearbyCities = require('features/event/mainshock/NearbyCities'),
     Pager = require('features/event/mainshock/Pager'),
     PagerCities = require('features/event/mainshock/PagerCities'),
     PagerExposures = require('features/event/mainshock/PagerExposures'),
@@ -54,7 +54,9 @@ _MODULES = {
     FieldNotes,
     FocalMechanism,
     Forecast,
+    HistoricalEvents,
     MomentTensor,
+    NearbyCities,
     Pager,
     PagerCities,
     PagerExposures,
@@ -62,10 +64,7 @@ _MODULES = {
     ShakeMap,
     ShakeMapStations
   ],
-  rtf: [ // Features added when the Event Summary RTF is created
-    HistoricalEvents,
-    NearbyCities
-  ]
+  rtf: [] // Features added when the Event Summary RTF is created
 };
 
 /**
