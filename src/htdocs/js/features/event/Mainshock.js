@@ -488,6 +488,7 @@ var Mainshock = function (options) {
         '</div>' +
         _getLossPager() +
         '<div class="pager-exposures feature content bubble hide"></div>' +
+        '<div class="nearby-cities feature content bubble hide"></div>' +
         '<div class="download bubble">' +
           '<h3>Event Summary</h3>' +
           '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
