@@ -72,7 +72,8 @@ var Dyfi = function (options) {
    */
   _addBubble = function () {
     var bubble = L.Util.template(
-          '<a href="{url}" class="mmi{cdi} impact-bubble" target="new">' +
+          '<a href="{url}" class="mmi{cdi} impact-bubble" target="new" ' +
+            'title="Maximum reported intensity">' +
             '<strong class="roman">{cdi}</strong>' +
           '</a>',
           _this.data

@@ -82,7 +82,8 @@ var ShakeMap = function (options) {
    */
   _addBubble = function () {
     var bubble = L.Util.template(
-          '<a href="{url}" class="mmi{mmiValue} impact-bubble" target="new">' +
+          '<a href="{url}" class="mmi{mmiValue} impact-bubble" target="new" ' +
+            'title="Maximum estimated intensity">' +
             '<strong class="roman">{mmiValue}</strong>' +
           '</a>',
           _this.data
