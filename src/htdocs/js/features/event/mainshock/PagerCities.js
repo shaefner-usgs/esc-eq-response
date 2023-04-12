@@ -88,10 +88,10 @@ var PagerCities = function (options) {
     var cities = json.onepager_cities || [],
         data = [];
 
-    if (Array.isArray(cities)) {
-      data = cities.sort(_compare);
-    } else if (Array.isArray(json)) { // data stored in disparate formats
+    if (Array.isArray(json)) { // data stored in disparate formats
       data = json.sort(_compare);
+    } else {
+      data = cities.sort(_compare);
     }
 
     data.forEach((city = {}) => {
