@@ -2,6 +2,10 @@
 'use strict';
 
 
+var AppUtil = require('util/AppUtil'),
+    Luxon = require('luxon');
+
+
 /**
  * Create the Historical Events Feature.
  *
@@ -14,9 +18,11 @@
  *     {
  *       addData: {Function}
  *       data: {Array}
+ *       dependencies: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String}
+ *       summary: {String}
  *       url: {String}
  *     }
  */
@@ -26,21 +32,49 @@ var HistoricalEvents = function (options) {
 
       _app,
 
+      _compare,
       _fetch,
+      _getData,
+      _getSummary,
       _getUrl;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
+    var dependency = 'historical';
+
+    if (AppUtil.getParam('catalog') === 'dd') {
+      dependency = 'dd-historical';
+    }
+
     _app = options.app;
 
     _this.data = [];
+    _this.dependencies = [dependency];
     _this.id = 'historical-events';
     _this.name = 'Historical Events';
+    _this.summary = '';
     _this.url = _getUrl();
 
     _fetch();
+  };
+
+  /**
+   * Comparison function to sort events by time (DESC).
+   *
+   * @params a, b {Objects}
+   *
+   * @return {Integer}
+   */
+  _compare = function (a, b) {
+    if (a.Time > b.Time) {
+      return -1;
+    } else if (b.Time > a.Time) {
+      return 1;
+    }
+
+    return 0;
   };
 
   /**
@@ -53,6 +87,95 @@ var HistoricalEvents = function (options) {
         feature: _this
       });
     }
+  };
+
+  /**
+   * Get the data used to create the content.
+   *
+   * @param json {Array}
+   *
+   * @return data {Array}
+   */
+  _getData = function (json) {
+    var data = [];
+
+    if (Array.isArray(json)) {
+      json = json.sort(_compare);
+
+      json.forEach((eq = {}) => {
+        var isoDate = (eq.Time || '').replace(' ', 'T') + 'Z',
+            datetime = Luxon.DateTime.fromISO(isoDate),
+            name = (eq.Name || '').replace(/"/g, ''),
+            title = 'M ' + AppUtil.round(eq.Magnitude, 1);
+
+        if (name !== 'UK') {
+          title += '—' + name;
+        }
+
+        data.push({
+          deaths: parseInt(eq.TotalDeaths, 10) || 0,
+          distance: AppUtil.round(Number(eq.Distance), 0),
+          injured: parseInt(eq.Injured, 10) || 0,
+          isoTime: datetime.toUTC().toISO() || '',
+          mmi: AppUtil.romanize(parseInt(eq.MaxMMI, 10)),
+          population: AppUtil.roundThousands(eq.NumMaxMMI),
+          title: title,
+          userTime: datetime.toFormat(_app.dateFormat),
+          utcOffset: Number(datetime.toFormat('Z')),
+          utcTime: datetime.toUTC().toFormat(_app.dateFormat)
+        });
+      });
+    }
+
+    return data;
+  };
+
+  /**
+   * Get the HTML content for the SummaryPane.
+   *
+   * @return html {String}
+   */
+  _getSummary = function () {
+    var html = '';
+
+    _this.data.forEach(eq => {
+      html += L.Util.template(
+        '<div>' +
+          '<h4>{title}</h4>' +
+          '<dl class="props">' +
+            '<dt>Time</dt>' +
+            '<dd>' +
+              '<time datetime="{isoTime}" class="user">' +
+                '{userTime} (UTC{utcOffset})' +
+              '</time>' +
+              '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+            '</dd>' +
+            '<dt>' +
+              '<abbr title="Distance from mainshock">Distance</abbr>' +
+            '</dt>' +
+            '<dd>{distance} km</dd>' +
+            '<dt>Fatalities</dt>' +
+            '<dd>{deaths} ({injured} injured)</dd>' +
+            '<dt>Max MMI</dt>' +
+            '<dd class="mmi">' +
+              '<span class="impact-bubble mmi{mmi}" ' +
+                'title="ShakeMap maximum estimated intensity">' +
+                '<strong class="roman">{mmi}</strong>' +
+              '</span> ' +
+              '{population} exposed' +
+            '</dd>' +
+          '</dl>' +
+        '</div>',
+        eq
+      );
+    });
+
+    if (html) {
+      html = '<h3>Previous Significant Earthquakes</h3>' +
+        '<div>' + html + '</div>';
+    }
+
+    return html;
   };
 
   /**
@@ -83,7 +206,8 @@ var HistoricalEvents = function (options) {
    * @param json {Object} default is []
    */
   _this.addData = function (json = []) {
-    _this.data = json;
+    _this.data = _getData(json);
+    _this.summary = _getSummary();
   };
 
   /**
@@ -94,7 +218,10 @@ var HistoricalEvents = function (options) {
 
     _app = null;
 
+    _compare = null;
     _fetch = null;
+    _getData = null;
+    _getSummary = null;
     _getUrl = null;
 
     _this = null;
