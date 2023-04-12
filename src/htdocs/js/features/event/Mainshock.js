@@ -500,8 +500,8 @@ var Mainshock = function (options) {
             'loading">Download</button>' +
           '<p>Microsoft Word is recommended for viewing the summary.</p>' +
         '</div>' +
-        _getTectonic() +
         _getLinks() +
+        _getTectonic() +
       '</div>',
       _this.data.eq
     );
