@@ -853,6 +853,10 @@ var Summary = function (options) {
       html += _getListTable();
     }
 
+    if (_featureId.includes('historical')) { // add placeholder
+      html += '<div class="historical-events feature content hide"></div>';
+    }
+
     html += `<div class="timestamp">${_timestamp}</div>`;
 
     return html;
