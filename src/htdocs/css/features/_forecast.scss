@@ -4,8 +4,34 @@
 
 #summaryPane {
   .forecast {
+    h4 {
+      margin: 0;
+    }
+
     #timeframe {
       margin-bottom: 1.5rem;
+    }
+
+    .model {
+      margin: 1rem 0;
+    }
+
+    .params {
+      margin-top: .75rem;
+      max-height: 35rem;
+      opacity: 1;
+      overflow: hidden;
+      transition: all $effect-slide-duration ease-in-out;
+
+      &.hide {
+        margin: 0;
+        max-height: 0;
+        opacity: 0;
+      }
+
+      dd {
+        max-width: 7rem;
+      }
     }
 
     .probabilities {
@@ -106,40 +132,6 @@
 
     .probability {
       font: 1.25rem $font-family-mmi;
-    }
-
-    .props {
-      margin: .25rem 0 1.5rem;
-      max-height: 35rem;
-      opacity: 1;
-      overflow: hidden;
-      transition: all $effect-slide-duration ease-in-out;
-
-      &.model {
-        margin: 1rem 0;
-
-        dd {
-          max-width: none;
-        }
-      }
-
-      &.params {
-        margin-top: .75rem;
-
-        &.hide {
-          margin: 0;
-          max-height: 0;
-          opacity: 0;
-        }
-      }
-
-      dd {
-        max-width: 7rem;
-      }
-    }
-
-    h4 {
-      margin: 0;
     }
   }
 }
