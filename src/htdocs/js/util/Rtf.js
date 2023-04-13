@@ -228,7 +228,7 @@ var Rtf = function (options) {
         count: aftershocks.count,
         description: descriptions.aftershocks,
         earthquakes: _filter(aftershocks).sort(_compare),
-        forecast: forecast.data || {},
+        forecast: forecast.data,
         magThreshold: _magThreshold,
         plots: _plots.aftershocks,
         userTime: aftershocks.data.userTime,
@@ -236,7 +236,7 @@ var Rtf = function (options) {
         utcTime: aftershocks.data.utcTime
       },
       beachballs: _getBeachBalls(),
-      dyfi: dyfi.data || {},
+      dyfi: dyfi.data,
       foreshocks: {
         bins: foreshocks.bins,
         count: foreshocks.count,
@@ -252,7 +252,7 @@ var Rtf = function (options) {
         count: historical.count,
         description: descriptions.historical,
         earthquakes: _filter(historical).sort(_compare),
-        events: historicalEvents.data || [],
+        events: historicalEvents.data,
         magThreshold: _magThreshold,
         plots: _plots.historical,
         userTime: historical.data.userTime,
@@ -275,12 +275,12 @@ var Rtf = function (options) {
         },
         title: eq.title
       },
-      nearbyCities: nearbyCities.data || [],
+      nearbyCities: nearbyCities.data,
       notice: notice[0]?.contents?.['']?.bytes || '',
-      pager: pager.data || {},
+      pager: pager.data,
       plotNames: _app.PlotsPane.names,
-      shakeAlert: shakeAlert.data || {},
-      shakemap: shakemap.data || {},
+      shakeAlert: shakeAlert.data,
+      shakemap: shakemap.data,
       tectonic: tectonic[0]?.contents?.['']?.bytes || '',
       urls: {
         app: location.href,
