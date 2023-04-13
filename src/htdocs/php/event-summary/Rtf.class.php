@@ -44,31 +44,6 @@ class Rtf {
   }
 
   /**
-  * Add commas to large numbers.
-  *
-  * @param $num {Number}
-  *
-  * @return {String}
-   */
-  private function _addCommas($num) {
-    $dec = '';
-    $num .= ''; // convert to string
-    $parts = explode('.', $num);
-    $int = $parts[0];
-    $regex = '/(\d+)(\d{3})/';
-
-    if (count($parts) > 1) {
-      $dec = '.' . $parts[1];
-    }
-
-    while (preg_match($regex, $int)) {
-      $int = preg_replace($regex, "$1,$2", $int);
-    }
-
-    return $int . $dec;
-  }
-
-  /**
    * Sanitize data from external JSON feeds for known issues.
    */
   private function _cleanData() {
@@ -95,15 +70,6 @@ class Rtf {
       $pager->structures = preg_replace(
         '/\s+/', ' ', $pager->structures
       );
-    }
-
-    // Clean up / remove NULL values from historical events list
-    foreach ($this->_data->historical->events as $key => $event) {
-      if (!$event) { // NULL
-        unset($this->_data->historical->events[$key]);
-      } else { // clean up slashes/extra quotes on name prop
-        $event->Name = trim(stripslashes($event->Name), '"');
-      }
     }
   }
 
@@ -1101,67 +1067,48 @@ class Rtf {
     );
 
     if (!empty($historical->events)) {
-      $dates = [];
-
-      foreach ($historical->events as $key => $event) {
-        $dates[$key] = $event->Time;
-      }
-
-      // Sort on event date/time
-      arsort($dates);
-      $sortKeys = array_keys($dates);
-
+      $section8->writeText('<br>');
       $section8->writeText(
         'Previous Significant Earthquakes',
         $this->_font->h3,
         $this->_format->h3
       );
 
-      foreach ($sortKeys as $key) {
-        $effects = '';
-        $event = $historical->events[$key];
+      foreach ($historical->events as $event) {
+        if ($this->_data->zone === 'user') {
+          $time = "$event->userTime (UTC$event->utcOffset)";
+        } else { // UTC
+          $time = $event->utcTime . ' (UTC)';
+        }
 
         $section8->writeText(
-          $event->Name,
+          $event->title,
           $this->_font->h4,
           $this->_format->h4
         );
         $section8->writeText(
-          'M ' . $event->Magnitude . ', ' . $event->Time . ' (UTC)',
+          '<b>Time</b>: ' . $time,
           $this->_font->body,
           $this->_format->body
         );
         $section8->writeText(
-          round($event->Distance) . ' km away',
+          '<b>Distance</b>: ' . $event->distance . ' km from mainshock',
           $this->_font->body,
           $this->_format->body
         );
-
-        if (!is_null($event->ShakingDeaths)) {
-          $fatalities = 'fatalities';
-          if ($event->ShakingDeaths === 1) {
-            $fatalities = 'fatality';
-          }
-          $effects = $event->ShakingDeaths . " shaking $fatalities";
-        }
-        if (!is_null($event->Injured)) {
-          if ($effects) {
-            $effects .= '; ';
-          }
-          $effects .= $event->Injured . ' injured';
-        }
-
-        if ($effects) {
-          $section8->writeText(
-            $effects,
-            $this->_font->body,
-            $this->_format->body
-          );
-        }
-
         $section8->writeText(
-          'Max MMI: ' . $this->_numberToRoman($event->MaxMMI) . ' (pop ' .
-            $this->_addCommas($event->NumMaxMMI) . ')',
+          '<b>Fatalities</b>: ' . sprintf('%d (%d injured)',
+            $event->deaths,
+            $event->injured
+          ),
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section8->writeText(
+          '<b>Max MMI</b>: ' . sprintf('%s (%s exposed)',
+            $event->mmi,
+            $event->population
+          ),
           $this->_font->body,
           $this->_format->body
         );
