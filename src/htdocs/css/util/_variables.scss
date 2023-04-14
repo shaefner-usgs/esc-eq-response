@@ -4,8 +4,6 @@ $breakpoint-phone-width: 735px;
 $breakpoint-tablet-width: 1023px;
 
 $button-border-radius: 4px;
-$button-text-shadow: 1px 1px 3px #444;
-
 $content-border-radius: 12px;
 
 $effect-duration: .25s;
@@ -30,12 +28,14 @@ $accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 91%);
 $accent-color-lightest: color.scale($accent-color, $alpha: -4%, $lightness: 96%, $saturation: 25%);
 
 $bg-color: #fff;
-$bg-color-alpha: color.scale($bg-color, $alpha: -3.5%);
+$bg-color-alpha: color.scale($bg-color, $alpha: -4%);
 $bg-color-darker: #f7f7f7;
 
 $border-color: #ddd;
 $border-color-lighter: #efefef;
 $border-color-lightest: #f6f6f6;
+
+$button-text-shadow: 1px 1px 2px color.scale($accent-color, $blackness: 50%);
 
 $control-color: #ddd;
 
