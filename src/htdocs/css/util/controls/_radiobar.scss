@@ -39,6 +39,7 @@ ul.options {
       border-radius: 0;
       color: $bg-color;
       cursor: auto;
+      text-shadow: $button-text-shadow;
       transition: all $effect-on-duration ease-out;
     }
   }
