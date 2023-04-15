@@ -157,6 +157,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-popup-content {
     color: $text-color;
     font-size: 1rem;
+    line-height: $line-height;
     margin: .75rem 1rem;
 
     a {

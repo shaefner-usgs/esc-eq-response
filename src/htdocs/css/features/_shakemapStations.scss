@@ -100,12 +100,12 @@
         align-items: center;
         display: flex;
         flex-direction: column;
-        line-height: 1rem;
+        line-height: 1.125;
         padding: .25rem 0;
 
         abbr {
           color: $text-color-lightest;
-          font-size: .6875rem;
+          font-size: .75rem;
           margin-top: .15rem;
         }
       }

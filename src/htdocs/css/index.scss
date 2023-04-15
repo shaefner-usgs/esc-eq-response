@@ -126,7 +126,7 @@ html {
 }
 
 p {
-  line-height: 1.625;
+  line-height: $line-height;
   margin: 1.25rem 0;
 
   > strong {
@@ -150,11 +150,10 @@ th {
     padding-right: .375rem;
   }
 }
-
 th {
   @include labels;
 
-  padding-bottom: .3rem;
+  padding: .125rem .75rem;
   text-align: center;
 }
 
@@ -178,7 +177,7 @@ ul {
 }
 
 .container {
-  line-height: 1.625;
+  line-height: $line-height;
   padding: 1rem var(--padding-gutter);
 
   > .feature {
@@ -278,7 +277,7 @@ ul {
 
   dd,
   dt {
-    line-height: 1.7;
+    line-height: 1.75;
   }
   dd {
     color: $text-color;
@@ -290,7 +289,6 @@ ul {
     @include labels;
 
     grid-column-start: 1;
-    line-height: 27px; // accommodate smaller font-size of labels
     text-align: right;
   }
 }

@@ -27,7 +27,8 @@
 
 @mixin labels() {
   color: $text-color-lighter;
-  font: 700 .9375rem $font-family-headers;
+  font-family: $font-family-headers;
+  font-weight: 700;
   text-transform: uppercase;
 }
 

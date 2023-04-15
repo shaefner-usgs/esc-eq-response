@@ -49,6 +49,7 @@
       > strong {
         @include labels;
 
+        line-height: 1.5;
         padding-bottom: .25rem;
       }
     }
@@ -146,7 +147,7 @@
       em {
         color: $text-color;
         display: block;
-        font-size: 1rem;
+        font-size: 1.125rem;
         font-style: normal;
         margin-top: .125rem;
       }
@@ -157,7 +158,7 @@
         line-height: 1;
         position: absolute;
         text-align: center;
-        top: 1.375rem;
+        top: 1.5rem;
       }
     }
   }
