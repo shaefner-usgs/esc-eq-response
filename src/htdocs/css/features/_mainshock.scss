@@ -1,5 +1,6 @@
 @use 'sass:color';
 
+@use '../util/functions' as *;
 @use '../util/mixins' as *;
 @use '../util/variables' as *;
 
@@ -250,26 +251,10 @@
 
     div {
       max-width: 100%;
-      width: 400px;
+      width: $panel-width;
 
       &.tectonic {
-        max-width: 100%;
-        width: 816px;
-
-        h1,
-        h2 {
-          display: none;
-        }
-
-        img {
-          display: block;
-          margin: 0 auto;
-          max-width: 100%;
-        }
-
-        p:last-child {
-          margin-bottom: .25rem;
-        }
+        width: calc(2 * $panel-width + rem-to-px(1));
       }
     }
 
@@ -280,6 +265,23 @@
     h4 {
       margin-top: .125rem;
       text-align: center;
+    }
+  }
+
+  .tectonic {
+    h1,
+    h2 {
+      display: none;
+    }
+
+    img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+
+    p:last-child {
+      margin-bottom: .25rem;
     }
   }
 
