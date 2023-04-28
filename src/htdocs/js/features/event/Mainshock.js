@@ -498,7 +498,8 @@ var Mainshock = function (options) {
           '<button id="download" disabled="disabled" type="button" ' +
             'title="Disabled because some features have not finished ' +
             'loading">Download</button>' +
-          '<p>Microsoft Word is recommended for viewing the summary.</p>' +
+          '<p><strong>Microsoft Word</strong> is recommended for viewing the ' +
+            'summary</p>' +
         '</div>' +
         _getLinks() +
         _getTectonic() +
