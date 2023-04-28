@@ -97,17 +97,21 @@ var Forecast = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var millisecs = Number(json.forecast?.[0]?.timeStart) || 0,
-        datetime = Luxon.DateTime.fromMillis(millisecs),
-        format = "ccc, LLL d, yyyy 'at' T"; // eslint-disable-line
+    var format = "ccc, LLL d, yyyy 'at' T", // eslint-disable-line
+        millisecs = Number(json.forecast?.[0]?.timeStart) || 0,
+        startTime = Luxon.DateTime.fromMillis(millisecs),
+        updated = Number(json.creationTime),
+        datetime = Luxon.DateTime.fromMillis(updated);
 
     return {
       advisoryTimeFrame: json.advisoryTimeFrame,
       isoTime: datetime.toUTC().toISO(),
       model: json.model || {},
       timeFrames: json.forecast || [],
+      userStartTime: startTime.toFormat(format),
       userTime: datetime.toFormat(format),
       utcOffset: Number(datetime.toFormat('Z')),
+      utcStartTime: startTime.toUTC().toFormat(format),
       utcTime: datetime.toUTC().toFormat(format)
     };
   };
@@ -273,18 +277,25 @@ var Forecast = function (options) {
         '<h3>{name}</h3>' +
         '<p>Probability of one or more aftershocks in the specified time ' +
           'frame and magnitude range starting on ' +
-          '<time datetime="{isoTime}" class="user">{userTime} (UTC{utcOffset})</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>. ' +
+          '<time datetime="{isoTime}" class="user">{userStartTime} (UTC{utcOffset})</time>' +
+          '<time datetime="{isoTime}" class="utc">{utcStartTime} (UTC)</time>. ' +
           'The likely number of aftershocks (95% confidence range) is listed ' +
           'below the probability.' +
         '</p>' +
         _radioBar.getHtml() +
         probabilities +
-        '<dl class="props model">' +
+        _getParameters() +
+        '<dl class="props">' +
           '<dt>Model</dt>' +
           '<dd>{modelName}</dd>' +
-        '</dl>' +
-        _getParameters(),
+          '<dt>Updated</dt>' +
+          '<dd>' +
+            '<time datetime="{isoTime}" class="user">' +
+              '{userTime} (UTC{utcOffset})' +
+            '</time>' +
+            '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+          '</dd>' +
+        '</dl>',
         data
       );
     }
