@@ -96,6 +96,15 @@
       margin-left: .25rem;
     }
   }
+
+  @media only screen
+    and (max-width: $breakpoint-phone-width) {
+      padding: 0;
+
+      .container {
+        border-radius: 0;
+      }
+    }
 }
 
 
@@ -105,15 +114,4 @@
 body.user .lightbox time.utc,
 body.utc .lightbox time.user {
   display: none;
-}
-
-@media only screen
-and (max-width: $breakpoint-phone-width) {
-  .lightbox {
-    padding: 0;
-
-    .container {
-      border-radius: 0;
-    }
-  }
 }

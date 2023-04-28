@@ -48,30 +48,27 @@
       padding-right: 1.25rem;
     }
   }
-}
 
-@media only screen
-and (max-width: $breakpoint-phone-width) {
-  #focal-mechanism,
-  #moment-tensor {
-    canvas {
-      display: block;
-      margin: 1.5rem auto 0;
-    }
+  @media only screen
+    and (max-width: $breakpoint-phone-width) {
+      canvas {
+        display: block;
+        margin: 1.5rem auto 0;
+      }
 
-    .beachball,
-    .details {
-      width: 100%;
-    }
-    .beachball {
-      order: 0;
-    }
-    .details {
-      order: 1;
-    }
+      .beachball,
+      .details {
+        width: 100%;
+      }
+      .beachball {
+        order: 0;
+      }
+      .details {
+        order: 1;
+      }
 
-    .content {
-      flex-flow: row wrap;
+      .content {
+        flex-flow: row wrap;
+      }
     }
-  }
 }

@@ -61,14 +61,11 @@
     gap: 2rem 1.5rem;
     position: relative;
   }
-}
 
-@media only screen
-and (max-width: 950px) {
-  #dyfi,
-  #shakemap {
-    .wrapper {
-      flex-flow: row wrap;
+  @media only screen
+    and (max-width: 950px) {
+      .wrapper {
+        flex-flow: row wrap;
+      }
     }
-  }
 }

@@ -73,22 +73,20 @@
     gap: 2rem;
     position: relative;
   }
-}
 
-@media only screen
-and (max-width: $breakpoint-phone-width) {
-  #shake-alert {
-    a {
-      margin-top: 1rem;
-    }
+  @media only screen
+    and (max-width: $breakpoint-phone-width) {
+      a {
+        margin-top: 1rem;
+      }
 
-    .wrapper {
-      flex-flow: row wrap;
-    }
+      .wrapper {
+        flex-flow: row wrap;
+      }
 
-    .details,
-    .logo {
-      max-width: 100%;
+      .details,
+      .logo {
+        max-width: 100%;
+      }
     }
-  }
 }
