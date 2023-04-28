@@ -68,7 +68,6 @@ var Earthquakes = function (options) {
       _filter,
       _getAge,
       _getBubbles,
-      _getDirection,
       _getDuration,
       _getEqs,
       _getTimeStamp,
@@ -285,21 +284,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the direction from the Mainshock.
-   *
-   * @param latlon {Object}
-   *
-   * @return {String}
-   */
-  _getDirection = function (latlon) {
-    var bearing = _mainshock.data.eq.latlon.bearing(latlon),
-        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
-        octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
-
-    return directions[octant];
-  };
-
-  /**
    * Get the duration of an earthquake sequence.
    *
    * @return duration {Object}
@@ -335,8 +319,8 @@ var Earthquakes = function (options) {
         features = json.features || [json]; // feature collection or Mainshock
 
     features.forEach((feature = {}) => {
-      var direction, distance, distanceDisplay, eq, latlon, localTimeDisplay,
-          statusIcon,
+      var direction, distance, distanceDisplay, eq, from, localTimeDisplay,
+          statusIcon, to,
           props = feature.properties || {},
           cdi = AppUtil.romanize(Number(props.cdi) || ''),
           coords = feature.geometry?.coordinates || [0, 0, 0],
@@ -371,10 +355,11 @@ var Earthquakes = function (options) {
       if (_feature.id === 'mainshock') {
         distanceDisplay = '0 km';
       } else if (_feature.id !== 'catalog-search') {
-        latlon = LatLon(coords[1], coords[0]);
-        direction = _getDirection(latlon);
+        from = _mainshock.data.eq.latlon;
+        to = LatLon(coords[1], coords[0]);
+        direction = AppUtil.getDirection(from, to);
         distance = Number(AppUtil.round(
-          _mainshock.data.eq.latlon.distanceTo(latlon) / 1000, 2
+          from.distanceTo(to) / 1000, 2
         ));
         distanceDisplay = AppUtil.round(distance, 1) + ' km ' +
           `<span>${direction}</span>`;
@@ -589,7 +574,6 @@ var Earthquakes = function (options) {
     _filter = null;
     _getAge = null;
     _getBubbles = null;
-    _getDirection = null;
     _getDuration = null;
     _getEqs = null;
     _getTimeStamp = null;
