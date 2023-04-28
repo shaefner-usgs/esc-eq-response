@@ -249,7 +249,7 @@
       width: $panel-width;
 
       &.tectonic {
-        width: calc(2 * $panel-width + rem-to-px(1));
+        width: calc(2 * $panel-width + 1rem);
       }
     }
 

@@ -2,11 +2,6 @@
 
 @use 'variables' as *;
 
-// Convert rem to px
-@function rem-to-px($rem-value) {
-	@return ($rem-value * $font-size);
-}
-
 // Replace characters in a string.
 @function str-replace($string, $search, $replace: '') {
   $index: str-index($string, $search);
