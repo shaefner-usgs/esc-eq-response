@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    LatLon = require('util/LatLon'),
     Luxon = require('luxon');
 
 
@@ -105,8 +106,10 @@ var HistoricalEvents = function (options) {
       json.forEach((eq = {}) => {
         var isoDate = (eq.Time || '').replace(' ', 'T') + 'Z',
             datetime = Luxon.DateTime.fromISO(isoDate),
+            from = _app.Features.getFeature('mainshock').data.eq.latlon,
             name = (eq.Name || '').replace(/"/g, ''),
-            title = 'M ' + AppUtil.round(eq.Magnitude, 1);
+            title = 'M ' + AppUtil.round(eq.Magnitude, 1),
+            to = LatLon(eq.Lat || 0, eq.Lon || 0);
 
         if (name !== 'UK') {
           title += '—' + name;
@@ -114,6 +117,7 @@ var HistoricalEvents = function (options) {
 
         data.push({
           deaths: parseInt(eq.TotalDeaths, 10) || 0,
+          direction: AppUtil.getDirection(from, to),
           distance: AppUtil.round(Number(eq.Distance), 0),
           injured: parseInt(eq.Injured, 10) || 0,
           isoTime: datetime.toUTC().toISO() || '',
@@ -151,9 +155,9 @@ var HistoricalEvents = function (options) {
               '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
             '</dd>' +
             '<dt>' +
-              '<abbr title="Distance from mainshock">Distance</abbr>' +
+              '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</dt>' +
-            '<dd>{distance} km</dd>' +
+            '<dd>{distance} km {direction}</dd>' +
             '<dt>Fatalities</dt>' +
             '<dd>{deaths} ({injured} injured)</dd>' +
             '<dt>Max MMI</dt>' +
