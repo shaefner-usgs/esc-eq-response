@@ -135,6 +135,22 @@ AppUtil.formatLatLon = function (coords = []) {
 };
 
 /**
+ * Get the compass direction between two points.
+ *
+ * @params from, to {Object}
+ *     LatLon instance
+ *
+ * @return {String}
+ */
+AppUtil.getDirection = function (from, to) {
+  var bearing = from.bearing(to),
+      directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
+      octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
+
+  return directions[octant];
+};
+
+/**
  * Get the value of the given URL parameter.
  *
  * @param name {String}
