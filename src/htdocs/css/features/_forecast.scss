@@ -4,6 +4,9 @@
 
 #summaryPane {
   .forecast {
+    h3 {
+      margin-top: 0;
+    }
     h4 {
       margin: 0;
     }
@@ -12,12 +15,8 @@
       margin-bottom: 1.5rem;
     }
 
-    .model {
-      margin: 1rem 0;
-    }
-
     .params {
-      margin-top: .75rem;
+      margin: .5rem 0 1.5rem;
       max-height: 35rem;
       opacity: 1;
       overflow: hidden;
@@ -27,8 +26,18 @@
         margin: 0;
         max-height: 0;
         opacity: 0;
+
+        dd,
+        dt {
+          line-height: 0; // removes 'phantom margin' in Safari (below bubble)
+        }
       }
 
+      dd,
+      dt {
+        line-height: 1.75;
+        transition: all $effect-slide-duration ease-in-out;
+      }
       dd {
         max-width: 7rem;
       }

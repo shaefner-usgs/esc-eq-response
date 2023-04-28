@@ -823,8 +823,6 @@ var Summary = function (options) {
         html += '</div>';
       }
 
-      html += '<div class="forecast feature content hide"></div>'; // placeholder
-
       if (count > 1) {
         mostRecentEq = _eqs[count - 1];
         interval = Luxon.Interval.fromDateTimes(
@@ -851,10 +849,6 @@ var Summary = function (options) {
       html += _getSubHeader();
       html += _getSlider();
       html += _getListTable();
-    }
-
-    if (_featureId.includes('historical')) { // add placeholder
-      html += '<div class="historical-events feature content hide"></div>';
     }
 
     html += `<div class="timestamp">${_timestamp}</div>`;

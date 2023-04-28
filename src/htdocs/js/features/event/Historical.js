@@ -118,7 +118,8 @@ var Historical = function (options) {
     return '' +
       '<div class="bubble content">' +
         `<p class="description">${_this.description}</p>` +
-      '</div>';
+      '</div>' +
+      '<div class="historical-events feature content bubble hide"></div>';
   };
 
   /**

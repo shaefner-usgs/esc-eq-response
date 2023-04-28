@@ -115,7 +115,8 @@ var Aftershocks = function (options) {
     return '' +
       '<div class="bubble content">' +
         `<p class="description">${_this.description}</p>` +
-      '</div>';
+      '</div>' +
+      '<div class="forecast feature content bubble hide"></div>';
   };
 
   /**

@@ -72,9 +72,6 @@ body {
   color: $text-color;
   position: relative;
 }
-main {
-  position: relative;
-}
 
 dl {
   margin: 1rem 0;
@@ -115,14 +112,14 @@ h4 {
   font-size: 1.25rem;
   margin: 0 0 .5rem;
 }
-h5 {
-  font-size: 1rem;
-  margin: 1rem 0 .5rem;
-}
 
 html {
   box-sizing: border-box;
   font: $font-size $font-family;
+}
+
+main {
+  position: relative;
 }
 
 p {
@@ -174,6 +171,10 @@ ul {
   border-radius: $content-border-radius;
   box-shadow: 0 3px 14px 0 rgba(102 ,102, 102, 0.1);
   padding: 1rem;
+
+  + .bubble {
+    margin-top: 1rem;
+  }
 }
 
 .container {
