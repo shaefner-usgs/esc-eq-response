@@ -1096,7 +1096,10 @@ class Rtf {
           $this->_format->body
         );
         $section8->writeText(
-          '<b>Distance</b>: ' . $event->distance . ' km from mainshock',
+          '<b>Distance</b>: ' . sprintf('%s km %s of mainshock',
+            $event->distance,
+            $event->direction
+          ),
           $this->_font->body,
           $this->_format->body
         );
@@ -1134,18 +1137,17 @@ class Rtf {
     );
 
     if (!empty(get_object_vars($shakeAlert))) {
+      $dec = $shakeAlert->decimalSecs;
       $magAnss = "$shakeAlert->magAnss ($shakeAlert->magSeconds after origin)";
-      $zoneDisplay = 'UTC';
 
       if ($this->_data->zone === 'user') {
-        $issueTime = $shakeAlert->userIssueTime;
-        $zoneDisplay .= $shakeAlert->utcIssueOffset;
-      } else { //utc
-        $issueTime = $shakeAlert->utcIssueTime;
+        $issueTime = "$shakeAlert->userIssueTime$dec (UTC$shakeAlert->utcOffset)";
+      } else { // UTC
+        $issueTime = "$shakeAlert->utcIssueTime$dec (UTC)";
       }
 
       $section9->writeText(
-        "Message issued $issueTime ($zoneDisplay)",
+        "Message issued $issueTime",
         $this->_font->body,
         $this->_format->body
       );
@@ -1218,7 +1220,7 @@ class Rtf {
       $section9->writeText(
         'Number of Stations Reporting',
         $this->_font->h4,
-        $this->_format->h4
+        $this->_format->body
       );
       $section9->writeText(
         $shakeAlert->numStations10 . ' within 10 km of epicenter',
