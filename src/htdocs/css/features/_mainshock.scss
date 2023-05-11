@@ -37,7 +37,7 @@
         white-space: nowrap;
       }
       > small {
-        color: $text-color;
+        color: $text-color-darker;
         font-size: .8125rem;
         font-weight: 300;
         letter-spacing: 0.015rem;
@@ -154,7 +154,7 @@
       }
 
       span {
-        color: $text-color-lightest;
+        color: $text-color-lighter;
         font-size: .625rem;
         line-height: 1;
         position: absolute;
