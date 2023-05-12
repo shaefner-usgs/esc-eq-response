@@ -1,7 +1,8 @@
 @use '../util/variables' as *;
 
 #summaryPane {
-  .historical {
+  .historical,
+  .dd-historical {
     container-type: inline-size;
   }
 
