@@ -676,7 +676,7 @@ var SettingsBar = function (options) {
     var el, id;
 
     if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
-      id = feature.id.replace(/^dd-/, ''); // remove double-difference prefix
+      id = feature.id.replace(/^dd-/, ''); // catalog agnostic
       el = _el.querySelector(`#${id} + .timestamp`);
 
       el.innerHTML = feature.timestamp;
