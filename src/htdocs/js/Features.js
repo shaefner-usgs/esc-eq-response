@@ -172,9 +172,12 @@ var Features = function (options) {
    */
   _addFeature = function (feature) {
     try {
-      _app.PlotsPane.addFeature(feature);
-      _app.SummaryPane.addFeature(feature);
-      _app.MapPane.addFeature(feature); // must be last (so loaders can be added)
+      if (!feature.isRefreshing) {
+        _app.PlotsPane.addFeature(feature);
+        _app.SummaryPane.addFeature(feature);
+      }
+
+      _app.MapPane.addFeature(feature); // must be last (so loaders are ready)
     } catch (error) {
       _app.StatusBar.addError({
         id: feature.id,
@@ -855,7 +858,7 @@ var Features = function (options) {
   _this.showLightbox = function (e) {
     var el = e.target.closest('.feature'),
         id = Array.from(el.classList).find(className =>
-          className !== 'content' && className !== 'feature'
+          !className.match('content|feature')
         );
 
     e.preventDefault();

@@ -28,11 +28,9 @@ var SummaryPane = function (options) {
 
       _app,
       _el,
-      _subFeatures,
 
       _cacheFeatures,
-      _embedFeatures,
-      _getSummary;
+      _embedFeatures;
 
 
   _this = {};
@@ -40,7 +38,6 @@ var SummaryPane = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
-    _subFeatures = {};
   };
 
   /**
@@ -49,64 +46,31 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _cacheFeatures = function (feature) {
-    var container, featureId,
-        subFeatures = _el.querySelectorAll(`.${feature.id} .content .content`);
+    var container = _el.querySelector('.container'),
+        els = _el.querySelectorAll(`.${feature.id} .feature`);
 
-    if (subFeatures) {
-      container = _el.querySelector('.container');
-      featureId = feature.id.replace(/^dd-/, ''); // combine ComCat, DD sub-Features
-      _subFeatures[featureId] = [];
-
-      subFeatures.forEach(subFeature => {
-        var id = Array.from(subFeature.classList).find(className =>
-          className !== 'content'
-        );
-
-        _subFeatures[featureId].push(id); // store cached sub-Features by id
-        container.appendChild(subFeature);
-      });
-    }
+    els.forEach(el => container.appendChild(el));
   };
 
   /**
-   * Embed the given Feature's cached sub-Features (during a Feature refresh or
-   * when swapping catalogs).
+   * Re-embed the given Feature's cached sub-Features (during a Feature refresh
+   * or when swapping catalogs).
    *
    * @param feature {Object}
    */
   _embedFeatures = function (feature) {
-    var featureId = feature.id.replace(/^dd-/, ''), // combined ComCat, DD sub-Features
-        ids = _subFeatures[featureId];
+    var els = _el.querySelectorAll('.container > .bubble');
 
-    if (ids) {
-      ids.forEach(id => {
-        var content = _el.querySelector(`.container > .${id}`),
-            placeholder = _el.querySelector(`.${feature.id} .${id}`);
+    els.forEach(el => {
+      var id = Array.from(el.classList).find(className =>
+            !className.match('bubble|content|feature|hide')
+          ),
+          placeholder = _el.querySelector(`.${feature.id} .${id}`);
 
-        placeholder.replaceWith(content);
-      });
-    }
-  };
-
-  /**
-   * Get the given Feature's summary content (if applicable) for a refresh.
-   *
-   * @param feature {Object}
-   *
-   * @return summary {String}
-   */
-  _getSummary = function (feature) {
-    var summary = '';
-
-    if (Object.prototype.hasOwnProperty.call(feature, 'summary')) {
-      summary = L.Util.template(
-        '<p class="description">{description}</p>' +
-        '{summary}',
-        feature
-      );
-    }
-
-    return summary;
+      if (placeholder) {
+        placeholder.replaceWith(el);
+      }
+    });
   };
 
   // ----------------------------------------------------------
@@ -120,23 +84,21 @@ var SummaryPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var summary,
+    var el,
         selectors = `
           div.${feature.id}.content,
           div.${feature.id} .content
         `,
-        el = _el.querySelector(selectors),
         status = _app.Features.getStatus();
 
     if (feature.isRefreshing) {
-      summary = _getSummary(feature);
+      _this.removeFeature(feature);
+      _this.addFeature(feature);
+    }
 
-      if (summary) {
-        _cacheFeatures(feature);
+    if (feature.summary) {
+      el = _el.querySelector(selectors);
 
-        el.innerHTML = summary;
-      }
-    } else if (feature.summary) {
       el.insertAdjacentHTML('beforeend', feature.summary);
       el.classList.remove('hide'); // un-hide placeholder if hidden
     }
@@ -158,7 +120,7 @@ var SummaryPane = function (options) {
     var el, html;
 
     if (
-      feature.placeholder && !feature.isRefreshing &&
+      feature.placeholder &&
       Object.prototype.hasOwnProperty.call(feature, 'summary')
     ) {
       el = _el.querySelector('.container');
@@ -202,8 +164,6 @@ var SummaryPane = function (options) {
    */
   _this.reset = function () {
     _el.querySelector('.container').innerHTML = '';
-
-    _subFeatures = {};
   };
 
   /**

@@ -328,20 +328,18 @@ var PlotsPane = function (options) {
   _this.addFeature = function (feature) {
     var el, html;
 
-    if (!feature.isRefreshing) {
-      // Skip the Mainshock (it's included in other Features' plots)
-      if (feature.plots && feature.id !== 'mainshock') {
-        el = _el.querySelector('.container');
-        html = L.Util.template(
-          '<div class="{id} feature">' +
-            '<h2>{name}</h2>' +
-            '{placeholder}' +
-          '</div>',
-          feature
-        );
+    // Skip the Mainshock (it's included in other Features' plots)
+    if (feature.plots && feature.id !== 'mainshock') {
+      el = _el.querySelector('.container');
+      html = L.Util.template(
+        '<div class="{id} feature">' +
+          '<h2>{name}</h2>' +
+          '{placeholder}' +
+        '</div>',
+        feature
+      );
 
-        el.insertAdjacentHTML('beforeend', html);
-      }
+      el.insertAdjacentHTML('beforeend', html);
     }
   };
 
