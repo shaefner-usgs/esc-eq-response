@@ -249,7 +249,7 @@ var Pager = function (options) {
           '</a>',
           _this.data
         ),
-        h3 = document.getElementById('pager').querySelector('h3');
+        h3 = document.getElementById(_this.id).querySelector('h3');
 
     h3.innerHTML = _this.name + bubble;
   };
