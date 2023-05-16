@@ -59,7 +59,7 @@ var Dyfi = function (options) {
     _this.lightbox = '';
     _this.name = 'Did You Feel It?';
 
-    if (!AppUtil.isEmpty(_product)) { // has DYFI, but no feed data
+    if (!AppUtil.isEmpty(_product)) {
       _this.data = _getData();
       _this.lightbox = _getLightbox();
 
