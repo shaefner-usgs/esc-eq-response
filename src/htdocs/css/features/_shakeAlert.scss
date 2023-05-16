@@ -5,15 +5,13 @@
     max-width: 21rem;
   }
 
-  h3 {
-    align-items: flex-start;
-    gap: 0 .25rem;
-  }
-
   h4 span,
   sup {
     color: $text-color-lighter;
     font-size: .75em;
+  }
+  sup {
+    margin: -.375rem 0 0 -.25rem;
   }
 
   td {
@@ -51,19 +49,15 @@
     position: sticky;
     top: 4rem;
 
-    a {
-      display: block;
-      margin: 0 auto;
-      max-width: 15rem;
-      padding: 0;
-    }
-
     h4 {
       font-size: 1.375rem;
     }
 
     img {
-      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+      max-width: 15rem;
+      padding: 0;
     }
   }
 

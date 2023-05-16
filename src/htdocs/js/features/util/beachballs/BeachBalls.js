@@ -257,6 +257,7 @@ var BeachBalls = function (options) {
       tAxisAzimuth: axes.T.azimuth,
       tAxisPlunge: axes.T.plunge,
       tAxisValue: axes.T.value,
+      url: _mainshock.data.eq.url + '/' + _id,
       userTime: _data.datetime.toFormat(_app.dateFormat),
       utcOffset: Number(_data.datetime.toFormat('Z')),
       utcTime: _data.datetime.toUTC().toFormat(_app.dateFormat)

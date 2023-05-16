@@ -22,6 +22,10 @@
     opacity: 0;
     visibility: hidden;
 
+    .button {
+      transition: none;
+    }
+
     .close,
     .options {
       display: none;
@@ -46,6 +50,21 @@
     position: sticky;
     top: 0;
     z-index: 10001;
+
+    .button {
+      border: 1px solid $accent-color;
+      display: flex;
+      font-weight: bold;
+      justify-content: center;
+      padding: .25rem 0;
+      width: 3rem;
+
+      &:active {
+        background: $accent-color;
+        color: $bg-color;
+        text-shadow: $button-text-shadow;
+      }
+    }
   }
 
   h4 {

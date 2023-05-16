@@ -22,6 +22,7 @@ var AppUtil = require('util/AppUtil'),
  *       id: {String}
  *       lightbox: {String}
  *       name: {String}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -214,9 +215,7 @@ var ShakeAlert = function (options) {
           '</ul>' +
         '</div>' +
         '<div class="logo">' +
-          '<a href="{url}" class="external" target="new">' +
-            '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
-          '</a>' +
+          '<img src="img/shake-alert.png" alt="ShakeAlert logo">' +
           _getWeaAlert() +
         '</div>' +
       '</div>' +
@@ -397,6 +396,20 @@ var ShakeAlert = function (options) {
 
     _this = null;
   };
+
+  /**
+   * Add the external link button.
+   */
+  _this.render = function () {
+    var button =
+          `<a href="${_this.data.url}" target="new" class="button">` +
+            '<i class="icon-link"></i>' +
+          '</a>',
+        h3 = document.getElementById(_this.id).querySelector('h3');
+
+    h3.innerHTML = _this.name + button;
+  };
+
 
   _initialize(options);
   options = null;

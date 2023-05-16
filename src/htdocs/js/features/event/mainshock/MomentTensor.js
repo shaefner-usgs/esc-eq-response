@@ -22,7 +22,7 @@ var AppUtil = require('util/AppUtil'),
  *       lightbox: {String}
  *       mapLayer: {Mixed <L.Marker|null>}
  *       name: {String}
- *       render: {Mixed <Function|null>}
+ *       render: {Function}
  *       showLayer: {Boolean}
  *       summary: {String}
  *       title: {String}
@@ -37,6 +37,7 @@ var MomentTensor = function (options) {
       _app,
       _beachballs,
 
+      _addButton,
       _getData;
 
 
@@ -52,7 +53,6 @@ var MomentTensor = function (options) {
     _this.lightbox = '';
     _this.mapLayer = null;
     _this.name = 'Moment Tensor';
-    _this.render = null;
     _this.showLayer = false;
     _this.summary = '';
     _this.title = '';
@@ -73,12 +73,24 @@ var MomentTensor = function (options) {
       _this.data = _beachballs.data;
       _this.lightbox = _beachballs.getLightbox();
       _this.mapLayer = _beachballs.getMapLayer();
-      _this.render = _beachballs.render;
       _this.summary = _beachballs.getSummary();
       _this.title = _beachballs.getTitle();
 
       _app.Features.addContent(_this); // no feed data => add manually
     }
+  };
+
+  /**
+   * Add the external link button.
+   */
+  _addButton = function () {
+    var button =
+          `<a href="${_this.data.url}" target="new" class="button">` +
+            '<i class="icon-link"></i>' +
+          '</a>',
+        h3 = document.getElementById(_this.id).querySelector('h3');
+
+    h3.innerHTML = _this.title + button;
   };
 
   /**
@@ -115,9 +127,21 @@ var MomentTensor = function (options) {
     _app = null;
     _beachballs = null;
 
+    _addButton = null;
     _getData = null;
 
     _this = null;
+  };
+
+  /**
+   * Add the button and render the Beachballs.
+   */
+  _this.render = function () {
+    _addButton();
+
+    if (_beachballs) {
+      _beachballs.render();
+    }
   };
 
   /**
