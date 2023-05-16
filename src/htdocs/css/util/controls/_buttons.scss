@@ -22,6 +22,7 @@ a.button {
     background: $accent-color;
     color: $bg-color;
     transition: all $effect-on-duration ease-out;
+    text-shadow: $button-text-shadow;
   }
 }
 
