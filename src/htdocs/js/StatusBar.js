@@ -61,18 +61,23 @@ var StatusBar = function (options) {
       });
     }
 
-    // Reload a Feature
+    // Reload Feature (or the app)
     if (reload) {
       reload.addEventListener('click', e => {
         var feature = _app.Features.getFeature(id);
 
         e.preventDefault();
-        _this.removeItem(id, false);
 
-        if (feature.isRefreshing) {
-          _app.Features.refreshFeature(id);
+        if (reload.classList.contains('app')) {
+          location.reload(); // reload app
         } else {
-          _app.Features.reloadFeature(id, mode);
+          _this.removeItem(id, false);
+
+          if (feature.isRefreshing) {
+            _app.Features.refreshFeature(id);
+          } else {
+            _app.Features.reloadFeature(id, mode);
+          }
         }
       });
     }
@@ -158,14 +163,16 @@ var StatusBar = function (options) {
     var content = error.message,
         div = document.createElement('div');
 
-    if (
-      error.id !== 'rtf' &&
-      error.status !== 200 &&
-      error.status !== 400 &&
-      error.status !== 404 &&
-      error.status !== 'invalid'
-    ) {
-      content += '<a href="#" class="reload"></a>';
+    if (error.id !== 'rtf') {
+      if (error.status === 200) {
+        content += '<a href="#" class="reload app"></a>';
+      } else if (
+        error.status !== 400 &&
+        error.status !== 404 &&
+        error.status !== 'invalid'
+      ) {
+        content += '<a href="#" class="reload"></a>';
+      }
     }
 
     content += '<a href="#" class="close"></a>';
