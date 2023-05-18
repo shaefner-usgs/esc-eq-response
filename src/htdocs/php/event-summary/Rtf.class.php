@@ -1096,6 +1096,11 @@ class Rtf {
           $this->_format->body
         );
         $section8->writeText(
+          '<b>Depth</b>: ' . $event->depth . ' km',
+          $this->_font->body,
+          $this->_format->body
+        );
+        $section8->writeText(
           '<b>Distance</b>: ' . sprintf('%s km %s of mainshock',
             $event->distance,
             $event->direction

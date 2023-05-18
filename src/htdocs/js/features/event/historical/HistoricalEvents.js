@@ -119,6 +119,7 @@ var HistoricalEvents = function (options) {
 
         data.push({
           deaths: parseInt(eq.TotalDeaths, 10) || 0,
+          depth: AppUtil.round(eq.Depth, 1),
           direction: AppUtil.getDirection(from, to),
           distance: AppUtil.round(Number(eq.Distance), 0),
           injured: parseInt(eq.Injured, 10) || 0,
@@ -156,6 +157,8 @@ var HistoricalEvents = function (options) {
               '</time>' +
               '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
             '</dd>' +
+            '<dt>Depth</dt>' +
+            '<dd>{depth} km</dd>' +
             '<dt>' +
               '<abbr title="Distance and direction from mainshock">Distance</abbr>' +
             '</dt>' +
