@@ -37,7 +37,8 @@ var HistoricalEvents = function (options) {
       _fetch,
       _getData,
       _getSummary,
-      _getUrl;
+      _getUrl,
+      _removeNullVals;
 
 
   _this = {};
@@ -101,7 +102,8 @@ var HistoricalEvents = function (options) {
     var data = [];
 
     if (Array.isArray(json)) {
-      json = json.sort(_compare);
+      _removeNullVals(json);
+      json.sort(_compare);
 
       json.forEach((eq = {}) => {
         var isoDate = (eq.Time || '').replace(' ', 'T') + 'Z',
@@ -200,6 +202,17 @@ var HistoricalEvents = function (options) {
     return url;
   };
 
+  /**
+   * Remove null entries in feed.
+   *
+   * @param json {Array}
+   */
+  _removeNullVals = function (json) {
+    json.forEach((eq, i) => {
+      if (eq === null) delete json[i];
+    });
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
@@ -227,6 +240,7 @@ var HistoricalEvents = function (options) {
     _getData = null;
     _getSummary = null;
     _getUrl = null;
+    _removeNullVals = null;
 
     _this = null;
   };
