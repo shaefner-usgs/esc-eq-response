@@ -383,13 +383,13 @@ var Plots = function (options) {
     }
 
     if (id === 'cumulative') {
-      // Copy data Arrays using slice to add Mainshock to trace w/o altering _data
+      // Copy data Arrays and add the Mainshock, leaving _data unaltered
       Object.assign(data, {
-        eqid: _data.eqid.slice(),
-        title: _data.title.slice(),
-        userTime: _data.userTime.slice(),
-        utcTime: _data.utcTime.slice(),
-        x: x.slice(),
+        eqid: [..._data.eqid],
+        title: [..._data.title],
+        userTime: [..._data.userTime],
+        utcTime: [..._data.utcTime],
+        x: [...x],
         y: Array.from(Array(x.length), (val, i) => i + 1) // 1 to length of x
       });
 
