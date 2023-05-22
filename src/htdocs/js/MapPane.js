@@ -55,12 +55,14 @@ var MapPane = function (options) {
       _bounds,
       _el,
       _initialExtent,
+      _layers,
       _rendered,
 
       _addControls,
       _addListeners,
       _createPane,
       _getBounds,
+      _getClassName,
       _getLayers,
       _initMap,
       _removeLayer,
@@ -76,6 +78,7 @@ var MapPane = function (options) {
     _app = options.app;
     _el = options.el;
     _initialExtent = true;
+    _layers = _getLayers();
     _rendered = false;
 
     _initMap();
@@ -85,16 +88,14 @@ var MapPane = function (options) {
   /**
    * Add the map controls: layers, mouse position and scale. Zoom and
    * attribution controls are added by default.
-   *
-   * @param layers {Object}
    */
-  _addControls = function (layers) {
+  _addControls = function () {
     L.control.mousePosition().addTo(_this.map);
     L.control.scale().addTo(_this.map);
 
     _this.layerControl = L.control.layers.sorted(
-      layers.baseLayers,
-      layers.overlays
+      _layers.baseLayers,
+      _layers.overlays
     ).addTo(_this.map);
   };
 
@@ -105,6 +106,16 @@ var MapPane = function (options) {
    * including programmatically.
    */
   _addListeners = function () {
+    // Track the selected base layer
+    _this.map.on('baselayerchange', e => {
+      var baseLayers = Object.keys(_layers.baseLayers),
+          names = baseLayers.map(name => _getClassName(name)),
+          selected = _getClassName(e.name);
+
+      document.body.classList.remove(...names);
+      document.body.classList.add(selected);
+    });
+
     // Track a Feature's showLayer property when the layer is toggled on/off
     _this.map.on('overlayadd overlayremove', e => {
       var feature = _app.Features.getFeature(e.layer.id),
@@ -156,6 +167,17 @@ var MapPane = function (options) {
   };
 
   /**
+   * Get the CSS class name from the given layer name.
+   *
+   * @param name {String}
+   *
+   * @return {String}
+   */
+  _getClassName = function (name) {
+    return name.replaceAll(' ', '-').toLowerCase();
+  };
+
+  /**
    * Get the initial (static) map layers.
    *
    * @return layers {Object}
@@ -193,17 +215,16 @@ var MapPane = function (options) {
    * Create the Leaflet map instance.
    */
   _initMap = function () {
-    var zoomControl,
-        layers = _getLayers();
+    var zoomControl;
 
     _this.map = L.map('map', {
-      layers: layers.defaults,
+      layers: _layers.defaults,
       minZoom: 1
     });
 
     _this.map.setView([0, 0], 3); // set arbitrary view so map fully initializes
     _this.initBounds();
-    _addControls(layers);
+    _addControls();
 
     // Hide the zoom control on mobile (in favor of pinch-to-zoom)
     if (L.Browser.mobile) {

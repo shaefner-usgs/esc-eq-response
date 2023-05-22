@@ -15,6 +15,7 @@ L.FaultsLayer = function () {
       faults = L.mouseOverLayer({
         dataUrl: urlPrefix + 'faults/{z}/{x}/{y}.grid.json?callback={cb}',
         tileOpts: {
+          className: 'faults',
           maxZoom: 17,
           minZoom: 6,
         },
@@ -22,6 +23,7 @@ L.FaultsLayer = function () {
         tiptext: '{NAME}'
       }),
       plates = L.tileLayer(urlPrefix + 'plates/{z}/{x}/{y}.png', {
+        className: 'plates',
         maxZoom: 5,
         minZoom: 0,
       }),
