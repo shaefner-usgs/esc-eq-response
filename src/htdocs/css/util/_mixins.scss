@@ -1,9 +1,9 @@
 @use 'variables' as *;
 
 @mixin close() {
-  background: $bg-color;
+  background: var(--bg-color);
   border-radius: 50%;
-  color: $accent-color;
+  color: var(--accent-color);
   cursor: pointer;
   font: bold 16px Tahoma, Verdana, sans-serif;
   height: 23px;
@@ -15,18 +15,18 @@
   width: 23px;
 
   &:hover {
-    background: $accent-color-lightest;
+    background: var(--accent-color-lightest);
     transition: background $effect-on-duration ease-out;
   }
   &:active {
-    background: $accent-color;
-    color: $bg-color;
+    background: var(--accent-color);
+    color: var(--bg-color);
     transition: all $effect-on-duration ease-out;
   }
 }
 
 @mixin labels() {
-  color: $text-color-lighter;
+  color: var(--text-color-lighter);
   font-family: $font-family-headers;
   font-weight: 700;
   text-transform: uppercase;

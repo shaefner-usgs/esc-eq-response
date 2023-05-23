@@ -2,7 +2,7 @@
 @use 'util/variables' as *;
 
 #sideBar {
-  background: $bg-color-alpha;
+  background: var(--bg-color-alpha);
   bottom: 0;
   margin-right: $sidebar-width * -1;
   overflow: scroll;
@@ -63,13 +63,13 @@
   }
 
   .hide-link {
-    color: $text-color;
+    color: var(--text-color);
     cursor: text;
     text-decoration: none;
   }
 
   .note {
-    border-top: 1px solid $border-color-lighter;
+    border-top: 1px solid var(--border-color-lighter);
     margin: 2.75rem 0 0;
     padding-top: 1rem;
   }
@@ -86,7 +86,7 @@ body.sidebar {
   }
 
   #sideBar {
-    border-left: 1px solid $border-color-lighter;
+    border-left: 1px solid var(--border-color-lighter);
     margin-right: 0;
 
     a.icon-close {

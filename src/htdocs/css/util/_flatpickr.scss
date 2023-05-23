@@ -8,14 +8,14 @@
 .flatpickr-wrapper {
   &.invalid {
     .flatpickr-calendar {
-      border-color: $invalid-color;
-      box-shadow: 0 0 3px $invalid-color;
+      border-color: var(--invalid-color);
+      box-shadow: 0 0 3px var(--invalid-color);
 
       &.arrowBottom:before {
-        border-top-color: $invalid-color;
+        border-top-color: var(--invalid-color);
       }
       &.arrowTop:before {
-        border-bottom-color: $invalid-color;
+        border-bottom-color: var(--invalid-color);
       }
     }
   }
@@ -26,17 +26,17 @@
 
   // Use the same border styles as form controls
   .flatpickr-calendar {
-    border: 1px solid $accent-color;
+    border: 1px solid var(--accent-color);
     border-radius: $button-border-radius;
-    box-shadow: 0 0 3px $accent-color;
+    box-shadow: 0 0 3px var(--accent-color);
     transition: all $effect-duration ease-in-out;
     z-index: 1001 !important; // stack above map
 
     &.arrowBottom:before {
-      border-top-color: $accent-color;
+      border-top-color: var(--accent-color);
     }
     &.arrowTop:before {
-      border-bottom-color: $accent-color;
+      border-bottom-color: var(--accent-color);
     }
   }
 
@@ -51,14 +51,14 @@
       font-weight: 500;
 
       &:hover {
-        background: $bg-color;
+        background: var(--bg-color);
       }
     }
   }
 
   .flatpickr-day {
     align-items: center;
-    color: $text-color;
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     transition: all $effect-off-duration ease-in;
@@ -66,9 +66,9 @@
     &:hover,
     &.nextMonthDay:not(.flatpickr-disabled):hover,
     &.prevMonthDay:not(.flatpickr-disabled):hover {
-      background: $accent-color-lightest;
-      border-color: $accent-color-lighter;
-      color: color.adjust($text-color, $alpha: 0); // alpha: 0 overrides level set below
+      background: var(--accent-color-lightest);
+      border-color: var(--accent-color-lighter);
+      color: var(--text-color); // overrides level set below
       transition: all $effect-on-duration ease-out;
     }
     &.nextMonthDay,
@@ -78,30 +78,30 @@
 
     &.flatpickr-disabled,
     &.flatpickr-disabled:hover {
-      background: $bg-color;
-      border-color: $bg-color;
+      background: var(--bg-color);
+      border-color: var(--bg-color);
       color: color.adjust($text-color-lightest, $alpha: -0.75);
     }
 
     &.selected,
     &.selected:hover {
       animation: opacify $effect-on-duration ease-out;
-      background: $accent-color !important;
-      border-color: $accent-color !important;
-      color: $bg-color !important;
+      background: var(--accent-color) !important;
+      border-color: var(--accent-color) !important;
+      color: var(--bg-color) !important;
       cursor: auto;
     }
 
     &.today {
-      border-color: $accent-color;
+      border-color: var(--accent-color);
       transition-property: background, color;
 
       &:hover {
-        border-color: $accent-color !important;
+        border-color: var(--accent-color) !important;
 
         &:not(.flatpickr-disabled) {
-          background: $accent-color-lightest;
-          color: $text-color;
+          background: var(--accent-color-lightest);
+          color: var(--text-color);
         }
       }
     }
@@ -111,12 +111,12 @@
     margin-bottom: .5rem;
 
     .flatpickr-month {
-      color: $text-color;
+      color: var(--text-color);
     }
 
     .flatpickr-prev-month,
     .flatpickr-next-month {
-      color: $accent-color;
+      color: var(--accent-color);
       line-height: 1;
       top: 0;
 
@@ -148,7 +148,7 @@
   }
 
   .flatpickr-time {
-    border-color: $accent-color-lighter !important;
+    border-color: var(--accent-color-lighter) !important;
 
     &:last-child {
       border-radius: 0 0 $button-border-radius 0;
@@ -160,18 +160,18 @@
     }
 
     .flatpickr-am-pm {
-      color: $text-color;
+      color: var(--text-color);
 
       &:focus {
-        background: $bg-color;
+        background: var(--bg-color);
       }
       &:hover {
-        background: $accent-color-lightest;
+        background: var(--accent-color-lightest);
       }
       &:active {
-        background: $accent-color;
+        background: var(--accent-color);
         border-radius: 0;
-        color: $bg-color;
+        color: var(--bg-color);
       }
     }
 
@@ -191,7 +191,7 @@
   }
 
   .flatpickr-weekday {
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
   }
 
   .numInputWrapper {
@@ -200,17 +200,17 @@
     }
 
     &:hover {
-      background: $accent-color-lightest;
+      background: var(--accent-color-lightest);
     }
 
     input {
       border: none;
       box-shadow: none;
-      color: $text-color;
+      color: var(--text-color);
 
       &:focus,
       &:hover {
-        background: $accent-color-lightest;
+        background: var(--accent-color-lightest);
         border: none;
         box-shadow: none;
       }
@@ -221,7 +221,7 @@
 
           &:hover,
           &:active {
-            background: $accent-color-lightest;
+            background: var(--accent-color-lightest);
           }
         }
 
@@ -237,7 +237,7 @@
     }
 
     span { // up, down arrows
-      border-color: $accent-color-lighter;
+      border-color: var(--accent-color-lighter);
       transition: all $effect-off-duration ease-in;
 
       &.arrowDown:after,
@@ -245,17 +245,17 @@
         transition: all $effect-off-duration ease-in;
       }
       &.arrowDown:after {
-        border-top-color: $accent-color;
+        border-top-color: var(--accent-color);
       }
       &.arrowUp:after {
-        border-bottom-color: $accent-color;
+        border-bottom-color: var(--accent-color);
       }
 
       &:hover {
-        background: $accent-color-lighter;
+        background: var(--accent-color-lighter);
       }
       &:active {
-        background: $accent-color;
+        background: var(--accent-color);
         transition: all $effect-on-duration ease-out;
 
         &.arrowDown:after,
@@ -263,10 +263,10 @@
           transition: all $effect-on-duration ease-out;
         }
         &.arrowDown:after {
-          border-top-color: $bg-color;
+          border-top-color: var(--bg-color);
         }
         &.arrowUp:after {
-          border-bottom-color: $bg-color;
+          border-bottom-color: var(--bg-color);
         }
       }
 

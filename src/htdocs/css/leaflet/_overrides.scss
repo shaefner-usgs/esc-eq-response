@@ -11,8 +11,8 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-bar a.leaflet-disabled,
   .leaflet-bar a.leaflet-disabled:active,
   .leaflet-bar a.leaflet-disabled:hover {
-    background: $bg-color-alpha;
-    color: $accent-color-disabled;
+    background: var(--bg-color-alpha);
+    color: var(--accent-color-disabled);
   }
 
   .leaflet-center,
@@ -32,7 +32,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     font-size: .75rem;
   }
   .leaflet-control-attribution {
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
     max-width: 200px;
     overflow: hidden; // quell long attributions
     padding: 2px 4px;
@@ -40,11 +40,11 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     white-space: nowrap;
 
     a {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
       transition: color $effect-off-duration ease-in;
 
       &:hover {
-        color: $text-color;
+        color: var(--text-color);
         text-decoration: none;
         transition: color $effect-on-duration ease-out;
       }
@@ -54,13 +54,13 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-control-layers,
   .leaflet-control-region,
   .leaflet-control-zoom {
-    border: 1px solid $accent-color;
+    border: 1px solid var(--accent-color);
     border-radius: $button-border-radius;
   }
   .leaflet-control-layers,
   .leaflet-control-region a,
   .leaflet-control-zoom a {
-    background: $bg-color-alpha;
+    background: var(--bg-color-alpha);
   }
   .leaflet-control-layers {
     label {
@@ -79,16 +79,16 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   .leaflet-control-region a,
   .leaflet-control-zoom a {
     border-radius: 0;
-    color: $accent-color;
+    color: var(--accent-color);
     transition: all $effect-off-duration-shorter ease-in;
 
     &:hover {
-      background: $accent-color-lightest;
+      background: var(--accent-color-lightest);
       transition: all $effect-on-duration ease-out;
     }
     &:active, &.selected {
-      background: $accent-color;
-      color: $bg-color;
+      background: var(--accent-color);
+      color: var(--bg-color);
       transition: all $effect-on-duration ease-out;
     }
 
@@ -104,7 +104,7 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-control-layers-expanded {
-    background: $bg-color;
+    background: var(--bg-color);
     border-radius: $button-border-radius;
     padding: 3px 10px;
   }
@@ -155,13 +155,13 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-popup-content {
-    color: $text-color;
+    color: var(--text-color);
     font-size: 1rem;
     line-height: $line-height;
     margin: .75rem 1rem;
 
     a {
-      color: $link-color;
+      color: var(--accent-color);
     }
 
     [datetime] {

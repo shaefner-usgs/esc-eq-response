@@ -30,7 +30,7 @@
         background: rgba(19, 173, 16, 0.8);
         border: 2px solid #42e43f;
         border-radius: 50%;
-        color: $bg-color;
+        color: var(--bg-color);
         content: counter(item);
         font: bold 1rem "Open Sans";
         height: 1.75rem;

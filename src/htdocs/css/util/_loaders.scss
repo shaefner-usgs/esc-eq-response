@@ -6,7 +6,7 @@
 
   span {
     animation: scale 1s infinite ease-in-out;
-    background: $text-color;
+    background: var(--text-color);
     border-radius: 50%;
     height: .8em;
     left: .375em;
@@ -37,7 +37,7 @@
 
 .spinner {
   animation: rotate 0.75s infinite linear;
-  border: 5px solid $text-color-lighter;
+  border: 5px solid var(--text-color-lighter);
   border-radius: 50%;
   border-right-color: transparent;
   display: block;

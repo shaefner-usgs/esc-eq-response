@@ -12,26 +12,26 @@ a.button {
   transition: all $effect-off-duration-shorter ease-in;
 
   &:hover {
-    background: $accent-color-lightest;
-    border-color: $accent-color;
+    background: var(--accent-color-lightest);
+    border-color: var(--accent-color);
     cursor: pointer;
     transition: all $effect-on-duration ease-out;
   }
 
   &.selected {
-    background: $accent-color;
-    color: $bg-color;
+    background: var(--accent-color);
+    color: var(--bg-color);
     transition: all $effect-on-duration ease-out;
-    text-shadow: $button-text-shadow;
+    text-shadow: var(--button-text-shadow);
   }
 }
 
 button {
   appearance: none;
-  background: $bg-color;
-  border: 1px solid $accent-color;
+  background: var(--bg-color);
+  border: 1px solid var(--accent-color);
   border-radius: $button-border-radius;
-  color: $accent-color;
+  color: var(--accent-color);
   cursor: pointer;
   font: 700 1.125rem $font-family-headers;
   margin: 1rem 0 0;
@@ -45,15 +45,15 @@ button {
   &:active,
   &:focus,
   &:hover {
-    background: $accent-color-lightest;
+    background: var(--accent-color-lightest);
     transition: all $effect-on-duration ease-out;
   }
   &:active {
-    background: $accent-color;
+    background: var(--accent-color);
     box-shadow: inset 0 3px 8px rgba(0, 0, 0, .35);
     color: #fff;
     outline: 0;
-    text-shadow: $button-text-shadow;
+    text-shadow: var(--button-text-shadow);
   }
   &:focus {
     outline: 0;
@@ -67,25 +67,25 @@ button {
   }
 
   &[disabled] {
-    background: $bg-color;
-    border-color: $accent-color-disabled;
+    background: var(--bg-color);
+    border-color: var(--accent-color-disabled);
     box-shadow: none;
-    color: $accent-color-disabled;
+    color: var(--accent-color-disabled);
     cursor: not-allowed;
     text-shadow: none;
   }
 
   &#reset {
-    background: $reset-button-color;
+    background: var(--reset-button-color);
     border-color: color.scale($reset-button-color, $blackness: 15%);
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
 
     &:active,
     &:focus,
     &:hover {
       background: color.scale($reset-button-color, $lightness: 40%);
       border-color: color.scale($reset-button-color, $blackness: 25%);
-      color: $text-color;
+      color: var(--text-color);
       text-shadow: none;
     }
     &:active {

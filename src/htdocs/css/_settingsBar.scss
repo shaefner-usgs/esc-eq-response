@@ -22,7 +22,7 @@
 
   .dd,
   .details {
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
     font-size: $font-size-smaller;
     opacity: 1;
     overflow: hidden;
@@ -75,7 +75,7 @@
     h3,
     input,
     label, label:active {
-      color: $text-color-disabled;
+      color: var(--text-color-disabled);
       cursor: auto;
     }
     input {
@@ -96,7 +96,7 @@
   }
 
   .required {
-    color: $invalid-color;
+    color: var(--invalid-color);
     margin-bottom: 0;
   }
 

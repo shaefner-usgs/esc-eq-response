@@ -11,7 +11,7 @@
     margin-top: -.5rem;
 
     label {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
       margin-left: 1rem;
     }
   }
@@ -74,7 +74,7 @@
 
     td {
       &.total {
-        background: $bg-color-darker;
+        background: var(--bg-color-darker);
         color: #222;
       }
 
@@ -85,7 +85,7 @@
 
     th {
       &.type {
-        border-bottom: 1px solid $border-color-lighter;
+        border-bottom: 1px solid var(--border-color-lighter);
         font-weight: 400;
         padding-right: 2px;
         text-align: right;
@@ -93,15 +93,15 @@
       }
 
       &.rowlabel {
-        border-bottom: 1px solid $border-color-lighter;
-        border-right: 1px solid $border-color;
+        border-bottom: 1px solid var(--border-color-lighter);
+        border-right: 1px solid var(--border-color);
         padding-right: .75rem;
         text-align: center;
       }
     }
 
     tr:first-child {
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--border-color);
     }
   }
 
@@ -148,23 +148,23 @@
     }
 
     th {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
 
       &.sort-header span:after,
       &.sort-header span:before {
-        border-color: $text-color-lighter transparent;
+        border-color: var(--text-color-lighter) transparent;
       }
 
       &.sort-header:hover {
-        color: $text-color;
+        color: var(--text-color);
 
         span:after,
         span:before {
-          border-color: $text-color transparent;
+          border-color: var(--text-color) transparent;
         }
       }
       &.sort-header:active {
-        color: $text-color-darker;
+        color: var(--text-color-darker);
       }
 
       em {
@@ -179,14 +179,14 @@
 
       &.selected,
       &:hover:not(.no-sort) {
-        background: $accent-color-lightest;
-        color: $text-color-darker;
+        background: var(--accent-color-lightest);
+        color: var(--text-color-darker);
         cursor: pointer;
         transition: all $effect-on-duration ease-out;
       }
 
       &:active td {
-        background: $accent-color;
+        background: var(--accent-color);
         color: #fff !important;
 
         &.mag span {
@@ -335,7 +335,7 @@ and (max-width: $breakpoint-phone-width) {
 
       // Reflow table content
       tbody {
-        border-top: 1px solid $border-color-lighter;
+        border-top: 1px solid var(--border-color-lighter);
 
         td,
         tr {
@@ -348,7 +348,7 @@ and (max-width: $breakpoint-phone-width) {
 
         .depth,
         .distance {
-          color: $text-color-lighter;
+          color: var(--text-color-lighter);
           font-size: .95rem;
         }
         .depth {
@@ -383,7 +383,7 @@ and (max-width: $breakpoint-phone-width) {
           text-align: center;
 
           span {
-            color: $text-color-lighter;
+            color: var(--text-color-lighter);
             display: block;
             font-size: .75rem;
             font-weight: 300;
@@ -414,11 +414,11 @@ and (max-width: $breakpoint-phone-width) {
 
         &.sort-down,
         &.sort-up { // show current sorted-by field
-          border-bottom: 1px solid $accent-color;
+          border-bottom: 1px solid var(--accent-color);
           display: inline-block;
 
           &:before {
-            color: $text-color-lighter;
+            color: var(--text-color-lighter);
             content: 'Sort by: ';
             font-size: .95rem;
             text-transform: none;
@@ -462,8 +462,8 @@ and (max-width: $breakpoint-phone-width) {
             }
 
             &:hover {
-              background: $accent-color-lightest;
-              color: $text-color-darker;
+              background: var(--accent-color-lightest);
+              color: var(--text-color-darker);
               transition: $effect-on-duration ease-out;
               transition-property: background, color;
 
@@ -473,7 +473,7 @@ and (max-width: $breakpoint-phone-width) {
             }
 
             &:active {
-              background: $accent-color;
+              background: var(--accent-color);
               color: #fff;
               transition: all $effect-on-duration ease-out;
 
@@ -495,7 +495,7 @@ and (max-width: $breakpoint-phone-width) {
 
           tr {
             background: rgba(255, 255, 255, .96);
-            border: 1px solid $accent-color;
+            border: 1px solid var(--accent-color);
             border-radius: $button-border-radius;
             box-shadow: 0 0 6px 0 rgba(0, 0, 0, .25);
             cursor: pointer;
@@ -505,19 +505,19 @@ and (max-width: $breakpoint-phone-width) {
             top: -25px;
 
             &.hover:after {
-              background: $accent-color-lightest;
+              background: var(--accent-color-lightest);
               transition: all $effect-on-duration ease-out;
             }
 
             &.active:after {
-              background: $accent-color;
+              background: var(--accent-color);
               color: #fff;
               transition: all $effect-on-duration ease-out;
             }
 
             &:after {
               border-radius: 50%;
-              color: $accent-color;
+              color: var(--accent-color);
               content: '×';
               font: bold 1rem Tahoma, Verdana, sans-serif;
               height: 23px;
@@ -532,7 +532,7 @@ and (max-width: $breakpoint-phone-width) {
             }
 
             &:before {
-              color: $text-color-lighter;
+              color: var(--text-color-lighter);
               content: 'Sort by:';
               display: block;
               font: .95rem $font-family-headers;

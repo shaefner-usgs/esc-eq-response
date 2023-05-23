@@ -8,7 +8,7 @@
 
   h1 {
     a {
-      color: $text-color;
+      color: var(--text-color);
       text-decoration-color: transparent;
       text-decoration-skip-ink: none;
       text-decoration-thickness: 2px;
@@ -16,14 +16,14 @@
       transition: all $effect-off-duration ease-in;
 
       &:hover {
-        color: $text-color-darker;
-        text-decoration-color: $text-color-lighter;
+        color: var(--text-color-darker);
+        text-decoration-color: var(--text-color-lighter);
         transition: all $effect-on-duration ease-out;
       }
     }
 
     i {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
       font-size: 1.25rem;
       right: -1.125rem;
       top: .75rem;
@@ -31,7 +31,7 @@
   }
 
   p {
-    color: $text-color;
+    color: var(--text-color);
     font: 1.25rem $font-family;
     margin: .5rem 0;
   }

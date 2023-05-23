@@ -26,7 +26,7 @@
       border: 1px solid transparent;
       border-bottom: none;
       border-radius: 6px 6px 0 0;
-      color: $link-color;
+      color: var(--accent-color);
       display: block;
       padding: .6rem .85rem;
       text-decoration: none;
@@ -34,15 +34,15 @@
       transition: all $effect-off-duration-shorter ease-in;
 
       &:hover {
-        border-color: $accent-color;
+        border-color: var(--accent-color);
         transition: border $effect-on-duration ease-out;
       }
 
       &.selected {
-        background: $accent-color;
-        border-color: $accent-color;
+        background: var(--accent-color);
+        border-color: var(--accent-color);
         color: #fff;
-        text-shadow: $button-text-shadow;
+        text-shadow: var(--button-text-shadow);
         transition: all $effect-on-duration ease-out;
       }
     }
@@ -54,7 +54,7 @@
 
   #navSub {
     i {
-      color: $accent-color;
+      color: var(--accent-color);
       font-size: 21px;
       padding: 0 7px 9px;
 
@@ -71,7 +71,7 @@
         transition: border $effect-on-duration ease-out;
       }
       &.selected:after {
-        border-bottom-color: $accent-color;
+        border-bottom-color: var(--accent-color);
         transition: border $effect-on-duration ease-out;
       }
 

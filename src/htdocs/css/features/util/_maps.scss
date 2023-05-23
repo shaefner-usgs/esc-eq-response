@@ -46,7 +46,7 @@
 
   .props {
     span {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
       padding-left: .25rem;
     }
   }

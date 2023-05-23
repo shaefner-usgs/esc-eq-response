@@ -7,7 +7,7 @@
 
   h4 span,
   sup {
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
     font-size: .75em;
   }
   sup {

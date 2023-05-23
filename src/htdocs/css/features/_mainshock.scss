@@ -11,7 +11,7 @@
 
     li {
       align-items: center;
-      border-right: 1px solid $border-color-lighter;
+      border-right: 1px solid var(--border-color-lighter);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -37,7 +37,7 @@
         white-space: nowrap;
       }
       > small {
-        color: $text-color-darker;
+        color: var(--text-color-darker);
         font-size: .8125rem;
         font-weight: 300;
         letter-spacing: 0.015rem;
@@ -146,7 +146,7 @@
       position: relative;
 
       em {
-        color: $text-color;
+        color: var(--text-color);
         display: block;
         font-size: 1.125rem;
         font-style: normal;
@@ -154,7 +154,7 @@
       }
 
       span {
-        color: $text-color-lighter;
+        color: var(--text-color-lighter);
         font-size: .625rem;
         line-height: 1;
         position: absolute;
@@ -330,7 +330,7 @@
       border-color: $mmi-NAcolor;
     }
     &.mmiI {
-      border-color: $border-color-lighter;
+      border-color: var(--border-color-lighter);
     }
     &.mmiII {
       border-color: $mmiII-color;

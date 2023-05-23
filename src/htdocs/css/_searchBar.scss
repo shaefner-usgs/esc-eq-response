@@ -39,7 +39,7 @@
 
   .instructions,
   .utc {
-    color: $text-color-lighter;
+    color: var(--text-color-lighter);
     font-size: $font-size-smaller;
     margin: 0;
     opacity: 1;
@@ -54,8 +54,8 @@
 
   // Custom region Rectangle overlay
   .leaflet-path-draggable {
-    fill: $accent-color;
-    stroke: $accent-color;
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
   }
 
   .option {
@@ -87,7 +87,7 @@
       // Flash invalid fields when custom period is toggled on
       .invalid > input[type="text"] {
         background: color.scale($invalid-color, $alpha: -90%);
-        box-shadow: 0 0 8px 2px $invalid-color;
+        box-shadow: 0 0 8px 2px var(--invalid-color);
       }
     }
   }

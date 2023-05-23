@@ -21,7 +21,7 @@
     }
 
     time {
-      color: $text-color-lighter;
+      color: var(--text-color-lighter);
       font-size: .9rem;
       margin-top: 4px;
     }
@@ -36,7 +36,7 @@
     }
 
     .operator {
-      border-top: 1px solid $border-color-lighter;
+      border-top: 1px solid var(--border-color-lighter);
       margin-bottom: 0;
       margin-top: 1.5rem;
 
@@ -76,7 +76,7 @@
 
       &:before {
         border-bottom: 4px solid transparent;
-        border-left: 6px solid $accent-color;
+        border-left: 6px solid var(--accent-color);
         border-top: 4px solid transparent;
         content: '';
         height: 0;
@@ -97,7 +97,7 @@
         position: relative;
 
         &:active {
-          color: $accent-color;
+          color: var(--accent-color);
         }
       }
     }

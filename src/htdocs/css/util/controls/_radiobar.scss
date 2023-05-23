@@ -2,7 +2,7 @@
 
 ul.options {
   align-items: center;
-  border: 1px solid $accent-color;
+  border: 1px solid var(--accent-color);
   border-radius: $button-border-radius;
   display: inline-flex;
   list-style: none;
@@ -10,9 +10,9 @@ ul.options {
   padding: 0;
 
   li {
-    background: $bg-color;
-    border-left: 1px solid $accent-color;
-    color: $accent-color;
+    background: var(--bg-color);
+    border-left: 1px solid var(--accent-color);
+    color: var(--accent-color);
     cursor: pointer;
     font: bold .8125rem $font-family-headers;
     margin: 0;
@@ -22,7 +22,7 @@ ul.options {
     transition: all $effect-off-duration-shorter ease-in;
 
     &:hover {
-      background: $accent-color-lightest;
+      background: var(--accent-color-lightest);
       transition: background $effect-on-duration ease-out;
     }
 
@@ -35,11 +35,11 @@ ul.options {
     }
 
     &.selected {
-      background: $accent-color;
+      background: var(--accent-color);
       border-radius: 0;
-      color: $bg-color;
+      color: var(--bg-color);
       cursor: auto;
-      text-shadow: $button-text-shadow;
+      text-shadow: var(--button-text-shadow);
       transition: all $effect-on-duration ease-out;
     }
   }

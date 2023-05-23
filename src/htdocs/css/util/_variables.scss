@@ -23,41 +23,7 @@ $line-height: 1.625;
 $panel-width: 25rem;
 $sidebar-width: 25rem;
 
-/* Colors */
-
-$accent-color: #4440CC;
-$accent-color-disabled: color.scale($accent-color, $lightness: 75%);
-$accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 91%);
-$accent-color-lightest: color.scale($accent-color, $alpha: -4%, $lightness: 96%, $saturation: 25%);
-
-$bg-color: #fff;
-$bg-color-alpha: color.scale($bg-color, $alpha: -4%);
-$bg-color-darker: #f7f7f7;
-
-$border-color: #ddd;
-$border-color-lighter: #efefef;
-$border-color-lightest: #f6f6f6;
-
-$button-text-shadow: 1px 1px 2px color.scale($accent-color, $blackness: 50%);
-
-$control-color: #ddd;
-
-$invalid-color: #c00;
-
-$link-color: $accent-color;
-$link-color-active: $accent-color;
-$link-color-hover: $accent-color;
-$link-color-visited: $accent-color;
-
-$reset-button-color: #efefef;
-
-$text-color: #333;
-$text-color-darker: #000;
-$text-color-disabled: #ccc;
-$text-color-lighter: #555;
-$text-color-lightest: #999;
-
-/* MMI / PAGER (impact bubbles) */
+/* MMI, PAGER impact bubbles */
 
 $mmi-NAcolor: #eee;
 $mmiI-color: #fff;
@@ -77,11 +43,56 @@ $pager-yellow-color: #ff0;
 $pager-orange-color: #f90;
 $pager-red-color: #f00;
 
-/* CSS variables (used for dynamic values via media queries) */
+/* Colors (CSS vars preferred, but SCSS vars are necessary for calculations) */
+
+$accent-color: #4440CC;
+$accent-color-disabled: color.scale($accent-color, $lightness: 75%);
+$accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 91%);
+$accent-color-lightest: color.scale($accent-color, $alpha: -4%, $lightness: 96%, $saturation: 25%);
+
+$bg-color: #fff;
+$bg-color-alpha: color.scale($bg-color, $alpha: -4%);
+
+$button-text-shadow: 1px 1px 2px color.scale($accent-color, $blackness: 50%);
+
+$invalid-color: #c00;
+
+$reset-button-color: #efefef;
+
+$text-color-lightest: #999;
+
+/* CSS variables (dynamic) */
 
 :root {
+  --accent-color: #{$accent-color};
+  --accent-color-disabled: #{$accent-color-disabled};
+  --accent-color-lighter: #{$accent-color-lighter};
+  --accent-color-lightest: #{$accent-color-lightest};
+
+  --bg-color: #{$bg-color};
+  --bg-color-alpha: #{$bg-color-alpha};
+  --bg-color-darker: #f7f7f7;
+
+  --border-color: #ddd;
+  --border-color-lighter: #efefef;
+  --border-color-lightest: #f6f6f6;
+
+  --button-text-shadow: #{$button-text-shadow};
+
+  --control-color: #ddd;
+
+  --invalid-color: #{$invalid-color};
+
   --padding-header: 7rem;
   --padding-gutter: 1rem; // left and right page gutters
+
+  --reset-button-color: #{$reset-button-color};
+
+  --text-color: #333;
+  --text-color-darker: #000;
+  --text-color-disabled: #ccc;
+  --text-color-lighter: #555;
+  --text-color-lightest: #{$text-color-lightest};
 }
 
 @media only screen

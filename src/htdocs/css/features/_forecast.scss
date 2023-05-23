@@ -60,9 +60,9 @@
       }
 
       a {
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: $button-border-radius;
-        color: $text-color;
+        color: var(--text-color);
         display: block;
         text-align: center;
         text-decoration: none;
@@ -70,26 +70,26 @@
         width: 6rem;
 
         &:hover {
-          border-color: $accent-color;
-          color: $text-color-darker;
+          border-color: var(--accent-color);
+          color: var(--text-color-darker);
           transition: all $effect-on-duration ease-out;
 
           abbr {
             border-color: color.scale($text-color-lightest, $lightness: -5%);
-            color: $text-color-darker;
+            color: var(--text-color-darker);
             transition: all $effect-on-duration ease-out;
           }
 
           h5 {
-            background: $accent-color-lightest;
-            color: $text-color-darker;
+            background: var(--accent-color-lightest);
+            color: var(--text-color-darker);
             transition: all $effect-on-duration ease-out;
           }
         }
 
         &:active {
           h5 {
-            background: $accent-color;
+            background: var(--accent-color);
             color: #fff;
           }
         }
@@ -104,9 +104,9 @@
       }
 
       h5 {
-        background: $bg-color-darker;
+        background: var(--bg-color-darker);
         border-radius: $button-border-radius $button-border-radius 0 0;
-        color: $text-color;
+        color: var(--text-color);
         font-size: 1.25rem;
         margin: 0;
         padding: 4px 0;

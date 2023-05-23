@@ -5,14 +5,14 @@
    https://css-tricks.com/sliding-nightmare-understanding-range-input/ */
 
 $thumb-d: 1.25rem;
-$track-bg: $control-color;
-$track-c: $accent-color;
+$track-bg: var(--control-color);
+$track-c: var(--accent-color);
 $track-h: .25rem;
 $track-w: 18rem;
 $dist: $track-w - $thumb-d;
 
 @mixin thumb() {
-  background: $bg-color;
+  background: var(--bg-color);
   border: 1px solid #aaa;
   border-radius: 50%;
   box-shadow: 0px 1px 2px #bbb;
@@ -76,7 +76,7 @@ input[type='range'] {
 
   ~ output {
     background: none;
-    color: $text-color;
+    color: var(--text-color);
     display: block;
     left: .5 * $thumb-d;
     line-height: 1;
@@ -105,7 +105,7 @@ input[type='range'] {
 
 .max,
 .min {
-  color: $text-color-lighter;
+  color: var(--text-color-lighter);
   font-size: .9rem;
   font-weight: 300;
   margin-top: 1.5rem;

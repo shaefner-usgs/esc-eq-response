@@ -12,7 +12,7 @@ a.impact-bubble:hover {
   align-items: center;
   background: #fff;
   border-radius: $button-border-radius;
-  color: $text-color-darker !important;
+  color: var(--text-color-darker) !important;
   display: flex;
   flex-direction: column;
   letter-spacing: .03rem;
@@ -30,7 +30,7 @@ a.impact-bubble:hover {
   }
   &.mmiI {
     background: $mmiI-color;
-    border: 1px solid $border-color-lighter;  // add border so button shows up
+    border: 1px solid var(--border-color-lighter);  // add border so button shows up
   }
   &.mmiII {
     background: $mmiII-color;
