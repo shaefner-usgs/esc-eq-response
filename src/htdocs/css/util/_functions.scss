@@ -1,7 +1,5 @@
 @use 'sass:math';
 
-@use 'variables' as *;
-
 // Replace characters in a string.
 @function str-replace($string, $search, $replace: '') {
   $index: str-index($string, $search);

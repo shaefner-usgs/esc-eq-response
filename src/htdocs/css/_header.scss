@@ -1,5 +1,3 @@
-@use 'util/variables' as *;
-
 header {
   background: linear-gradient(var(--bg-color), var(--accent-color-lighter));
   border-bottom: 2px solid var(--accent-color);

@@ -1,7 +1,6 @@
 @use 'sass:color';
 
 @use '../util/mixins' as *;
-@use '../util/functions' as *;
 @use '../util/variables' as *;
 
 $separator-color: color.scale($accent-color, $lightness: 80%);
