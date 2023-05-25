@@ -26,6 +26,7 @@
 
   // Use the same border styles as form controls
   .flatpickr-calendar {
+    background: var(--bg-color);
     border: 1px solid var(--accent-color);
     border-radius: $button-border-radius;
     box-shadow: 0 0 3px var(--accent-color);

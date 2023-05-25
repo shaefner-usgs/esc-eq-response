@@ -50,6 +50,7 @@ input[type="radio"]:checked + span:before {
 
 input[type="text"],
 input[type="number"] {
+  background: var(--bg-color);
   border: 1px solid var(--border-color-lighter);
   border-radius: $button-border-radius;
   box-shadow: inset 0 1px 4px 0 hsla(0, 0%, 0%, .08);
