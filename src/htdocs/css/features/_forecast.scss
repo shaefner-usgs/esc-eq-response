@@ -75,7 +75,7 @@
           transition: all $effect-on-duration ease-out;
 
           abbr {
-            border-color: color.scale($text-color-lightest, $lightness: -5%);
+            border-color: var(--text-color-lightest);
             color: var(--text-color-darker);
             transition: all $effect-on-duration ease-out;
           }

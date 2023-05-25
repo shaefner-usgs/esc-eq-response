@@ -73,14 +73,14 @@
     }
     &.nextMonthDay,
     &.prevMonthDay {
-      color: color.adjust($text-color-lightest, $alpha: -0.3);
+      color: rgba(153, 153, 153, .7);
     }
 
     &.flatpickr-disabled,
     &.flatpickr-disabled:hover {
       background: var(--bg-color);
       border-color: var(--bg-color);
-      color: color.adjust($text-color-lightest, $alpha: -0.75);
+      color: rgba(153, 153, 153, .25);
     }
 
     &.selected,

@@ -59,8 +59,6 @@ $invalid-color: #c00;
 
 $reset-button-color: #efefef;
 
-$text-color-lightest: #999;
-
 /* CSS variables (dynamic) */
 
 :root {
@@ -92,7 +90,7 @@ $text-color-lightest: #999;
   --text-color-darker: #000;
   --text-color-disabled: #ccc;
   --text-color-lighter: #555;
-  --text-color-lightest: #{$text-color-lightest};
+  --text-color-lightest: #999;
 }
 
 @media only screen
