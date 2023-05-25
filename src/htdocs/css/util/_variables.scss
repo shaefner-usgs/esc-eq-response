@@ -54,8 +54,6 @@ $button-text-shadow: 1px 1px 2px color.scale($accent-color, $blackness: 50%);
 
 $invalid-color: #c00;
 
-$reset-button-color: #efefef;
-
 /* CSS variables (dynamic) */
 
 :root {
@@ -80,8 +78,6 @@ $reset-button-color: #efefef;
 
   --padding-header: 7rem;
   --padding-gutter: 1rem; // left and right page gutters
-
-  --reset-button-color: #{$reset-button-color};
 
   --text-color: #333;
   --text-color-darker: #000;

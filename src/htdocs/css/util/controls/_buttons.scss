@@ -76,16 +76,18 @@ button {
   }
 
   &#reset {
-    background: var(--reset-button-color);
+    $reset-button-color: #efefef;
+
+    background: $reset-button-color;
     border-color: color.scale($reset-button-color, $blackness: 15%);
-    color: var(--text-color-lighter);
+    color: #555;
 
     &:active,
     &:focus,
     &:hover {
       background: color.scale($reset-button-color, $lightness: 40%);
       border-color: color.scale($reset-button-color, $blackness: 25%);
-      color: var(--text-color);
+      color: #333;
       text-shadow: none;
     }
     &:active {
