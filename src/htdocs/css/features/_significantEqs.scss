@@ -48,7 +48,7 @@
       &:active,
       &.selected {
         background: var(--accent-color);
-        color: #fff;
+        color: var(--bg-color);
         transition: all $effect-on-duration ease-out;
 
         &:hover {
@@ -56,7 +56,7 @@
         }
 
         time {
-          color: #fff;
+          color: var(--bg-color);
           transition: color $effect-on-duration ease-out;
         }
       }

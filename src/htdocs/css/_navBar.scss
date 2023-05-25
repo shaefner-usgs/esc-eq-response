@@ -41,7 +41,7 @@
       &.selected {
         background: var(--accent-color);
         border-color: var(--accent-color);
-        color: #fff;
+        color: var(--bg-color);
         text-shadow: var(--button-text-shadow);
         transition: all $effect-on-duration ease-out;
       }

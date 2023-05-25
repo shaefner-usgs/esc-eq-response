@@ -75,7 +75,7 @@
     td {
       &.total {
         background: var(--bg-color-darker);
-        color: #222;
+        color: var(--text-color);
       }
 
       &:not(:first-child) {
@@ -187,10 +187,10 @@
 
       &:active td {
         background: var(--accent-color);
-        color: #fff !important;
+        color: var(--bg-color) !important;
 
         &.mag span {
-          color: #fff !important;
+          color: var(--bg-color) !important;
         }
       }
     }
