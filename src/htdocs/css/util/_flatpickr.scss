@@ -20,6 +20,10 @@
     }
   }
 
+  input {
+    color: var(--text-color);
+  }
+
   .dayContainer {
     padding-right: 2px;
   }
@@ -35,6 +39,9 @@
 
     &.arrowBottom:before {
       border-top-color: var(--accent-color);
+    }
+    &.arrowTop:after {
+      border-bottom-color: var(--bg-color);
     }
     &.arrowTop:before {
       border-bottom-color: var(--accent-color);
@@ -74,14 +81,14 @@
     }
     &.nextMonthDay,
     &.prevMonthDay {
-      color: rgba(153, 153, 153, .7);
+      color: rgba(153, 153, 153, .75);
     }
 
     &.flatpickr-disabled,
     &.flatpickr-disabled:hover {
       background: var(--bg-color);
       border-color: var(--bg-color);
-      color: rgba(153, 153, 153, .25);
+      color: rgba(153, 153, 153, .3);
     }
 
     &.selected,
