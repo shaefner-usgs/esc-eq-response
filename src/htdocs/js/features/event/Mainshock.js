@@ -54,6 +54,7 @@ var Mainshock = function (options) {
       _earthquakes,
       _els,
       _json,
+      _tsunami,
 
       _addPlaceholders,
       _createFeatures,
@@ -74,6 +75,7 @@ var Mainshock = function (options) {
       _getText,
       _getUpdated,
       _getUrl,
+      _openTsunami,
       _updateDetails,
       _updateHeader,
       _updateMarkers,
@@ -176,7 +178,7 @@ var Mainshock = function (options) {
 
     if (eq.tsunami) {
       template +=
-        '<li>' +
+        '<li class="tsunami">' +
           '<strong>Tsunami</strong>' +
           '{tsunamiBubble}' +
         '</li>';
@@ -590,6 +592,13 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Open the tsunami web site.
+   */
+  _openTsunami = function () {
+    open('https://www.tsunami.gov/', 'new');
+  };
+
+  /**
    * Update the earthquake details 'strip' (on the SummaryPane) and 'balloon'
    * (on the SelectBar) using the selected catalog's data.
    */
@@ -732,14 +741,19 @@ var Mainshock = function (options) {
 
     _button = document.getElementById('download');
     _els = document.querySelectorAll(selectors.join());
+    _tsunami = document.querySelector('#summaryPane li.tsunami');
 
-    // Create RTF Features (RTF document is created when all Features are ready)
+    // Create RTF Features (RTF document is created once all Features are ready)
     _button.addEventListener('click', _createFeatures);
 
     // Open a Lightbox
     _els.forEach(el =>
       el.addEventListener('click', _app.Features.showLightbox)
     );
+
+    if (_tsunami) {
+      _tsunami.addEventListener('click', _openTsunami);
+    }
 
     _earthquakes.addListeners();
   };
@@ -759,6 +773,7 @@ var Mainshock = function (options) {
     _earthquakes = null;
     _els = null;
     _json = null;
+    _tsunami = null;
 
     _addPlaceholders = null;
     _createFeatures = null;
@@ -779,6 +794,7 @@ var Mainshock = function (options) {
     _getText = null;
     _getUpdated = null;
     _getUrl = null;
+    _openTsunami = null;
     _updateDetails = null;
     _updateHeader = null;
     _updateMarkers = null;
@@ -822,6 +838,10 @@ var Mainshock = function (options) {
       _els.forEach(el =>
         el.removeEventListener('click', _app.Features.showLightbox)
       );
+    }
+
+    if (_tsunami) {
+      _tsunami.removeEventListener('click', _openTsunami);
     }
 
     _earthquakes.removeListeners();
