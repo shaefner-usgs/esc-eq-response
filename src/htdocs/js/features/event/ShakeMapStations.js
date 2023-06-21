@@ -287,24 +287,24 @@ var ShakeMapStations = function (options) {
    */
   _getTable = function (channels = []) {
     var html =
-      '<table class="station-channels-map">' +
+      '<table class="channels">' +
         '<thead>' +
           '<tr>' +
-            '<th scope="col" class="station-channels-map-name freeze">Name</th>' +
-            '<th scope="col" class="station-channels-map-pga">' +
+            '<th scope="col" class="name freeze">Name</th>' +
+            '<th scope="col" class="pga">' +
               '<abbr title="Peak Ground Acceleration (%g)">PGA</abbr>' +
             '</th>' +
-            '<th scope="col" class="station-channels-map-pgv">' +
+            '<th scope="col" class="pgv">' +
               '<abbr title="Peak Ground Velocity (cm/s)">PGV</abbr>' +
             '</th>' +
-            '<th scope="col" class="station-channels-map-psa03">' +
-              '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA <em>(0.3<span>s</span>)</em></abbr>' +
+            '<th scope="col" class="psa03">' +
+              '<abbr title="Spectral Acceleration at 0.3 s period, 5% damping (%g)">PSA <em>(0.3s)</em></abbr>' +
             '</th>' +
-            '<th scope="col" class="station-channels-map-psa10">' +
-              '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA <em>(1.0<span>s</span>)</em></abbr>' +
+            '<th scope="col" class="psa10">' +
+              '<abbr title="Spectral Acceleration at 1.0 s period, 5% damping (%g)">PSA <em>(1.0s)</em></abbr>' +
             '</th>' +
-            '<th scope="col" class="station-channels-map-psa30">' +
-              '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA <em>(3.0<span>s</span>)</em></abbr>' +
+            '<th scope="col" class="psa30">' +
+              '<abbr title="Spectral Acceleration at 3.0 s period, 5% damping (%g)">PSA <em>(3.0s)</em></abbr>' +
             '</th>' +
           '</tr>' +
         '</thead>' +
@@ -381,7 +381,7 @@ var ShakeMapStations = function (options) {
     var props = feature.properties || {},
         mmi = AppUtil.romanize(Number(props.intensity)),
         opts = Object.assign({}, _markerOptions, {
-          className: 'station-layer-icon station-mmi' + mmi
+          className: 'station-icon station-mmi' + mmi
         });
 
     return L.marker(latlng, {
