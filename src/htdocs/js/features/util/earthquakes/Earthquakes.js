@@ -330,8 +330,8 @@ var Earthquakes = function (options) {
           magType = props.magType || 'M',
           mmi = AppUtil.romanize(Number(props.mmi) || ''),
           status = (props.status || '').toLowerCase(),
-          template = '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
-            '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+          template = '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>' +
+            '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
           utcOffset = Number(datetime.toFormat('Z')),
           userTimeDisplay = datetime.toFormat(_app.dateFormat) +
