@@ -96,7 +96,7 @@ var Svg = function () {
    */
   _this.createLine = function (opts = {}) {
     var svg = _createElement(),
-        template = '<path fill="#fff" stroke="{color}" ' +
+        template = '<path fill="{fillColor}" fill-opacity="0" stroke="{color}" ' +
           'stroke-opacity="{opacity}" stroke-width="2" stroke-linecap="round" ' +
           'd="M1.5,1.5c2.6,0.4,5.9,1.3,8,4c1.4,1.8,1.5,3.4,2,5c0.9,3,3.1,6.9,9,11" />';
 
