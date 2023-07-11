@@ -59,7 +59,7 @@ var Summary = function (options) {
       _timestamp,
 
       _addEqToBins,
-      _addTitles,
+      _configSort,
       _configTable,
       _createBins,
       _filter,
@@ -145,37 +145,42 @@ var Summary = function (options) {
   };
 
   /**
-   * Add title attrs. to the given table's headers to reveal sort capability.
+   * Configure the given table's sort capability.
    *
    * @param table {Element}
    */
-  _addTitles = function (table) {
-    var ths = table.querySelectorAll('th');
+  _configSort = function (table) {
+    var sortField = table.querySelector('th.' + _sortField),
+        ths = table.querySelectorAll('th');
 
     ths.forEach(th =>
       th.setAttribute('title', 'Sort by ' + th.textContent)
     );
+
+    _app.SummaryPane.swapSortIndicator([table]);
+
+    if (_reverseSort) {
+      sortField.click(); // swap sort order
+    }
   };
 
   /**
-   * Additional steps (besides adding Event Listeners) necessary to configure an
-   * earthquake list table's interactive components (filtering and sorting).
+   * Set up the given table's filtering and sorting capability.
    *
    * @param table {Element}
    */
   _configTable = function (table) {
-    _addTitles(table);
     _initSort(table);
-    _app.SummaryPane.swapSortIndicator([table]);
+    _configSort(table);
 
-    if (_slider) { // eq list filter
+    if (_slider) { // list filter
       _slider.els = {
         count: _el.querySelector('h3 .count'),
         mag: _el.querySelector('h3 .mag'),
         table: _el.querySelector('.filter + .wrapper table')
       };
 
-      _slider.setValue(); // set the range Slider to its initial value
+      _slider.setValue(); // set initial value
     }
   };
 
@@ -565,13 +570,12 @@ var Summary = function (options) {
   };
 
   /**
-   * Configure and instantiate the Tablesort plugin for the given table.
+   * Instantiate the Tablesort plugin for the given table.
    *
    * @param table {Element}
    */
   _initSort = function (table) {
-    var th,
-        cleanNumber = function (i) {
+    var cleanNumber = function (i) {
           return i.replace(/[^\-?0-9.]/g, '');
         },
         compareNumber = function (a, b) {
@@ -595,11 +599,6 @@ var Summary = function (options) {
     });
 
     Tablesort(table);
-
-    if (_reverseSort) { // set initial sort direction to opposite of default
-      th = table.querySelector('th.' + _sortField);
-      th.click();
-    }
   };
 
   /**
@@ -781,7 +780,7 @@ var Summary = function (options) {
     _timestamp = null;
 
     _addEqToBins = null;
-    _addTitles = null;
+    _configSort = null;
     _configTable = null;
     _createBins = null;
     _filter = null;
