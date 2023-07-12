@@ -75,7 +75,7 @@ var DdMainshock = function (options) {
         coords = feature.geometry?.coordinates || [0, 0, 0],
         props = feature.properties || {},
         datetime = Luxon.DateTime.fromMillis(Number(props.time)),
-        dayFormat = 'cccc',
+        format = 'cccc',
         mag = AppUtil.round(props.mag, 1),
         magType = props.magType || 'M',
         template =
@@ -101,11 +101,11 @@ var DdMainshock = function (options) {
       magType: magType,
       title: title.replace(/^[\w ]+\s+\d\.\d/, magType + ' ' + mag),
       userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
-      userDayofweek: datetime.toFormat(dayFormat),
+      userDayofweek: datetime.toFormat(format),
       userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       userTimeDisplay: userTimeDisplay,
       utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
-      utcDayofweek: datetime.toUTC().toFormat(dayFormat),
+      utcDayofweek: datetime.toUTC().toFormat(format),
       utcTime: datetime.toUTC().toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       utcTimeDisplay: utcTimeDisplay
     };
