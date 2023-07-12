@@ -97,7 +97,7 @@ var Forecast = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var format = "ccc, LLL d, yyyy 'at' T", // eslint-disable-line
+    var format = "cccc, LLLL d, yyyy 'at' T", // eslint-disable-line
         millisecs = Number(json.forecast?.[0]?.timeStart) || 0,
         startTime = Luxon.DateTime.fromMillis(millisecs),
         updated = Number(json.creationTime),
@@ -109,10 +109,10 @@ var Forecast = function (options) {
       model: json.model || {},
       timeFrames: json.forecast || [],
       userStartTime: startTime.toFormat(format),
-      userTime: datetime.toFormat(format),
+      userTime: datetime.toFormat(_app.dateFormat),
       utcOffset: Number(datetime.toFormat('Z')),
       utcStartTime: startTime.toUTC().toFormat(format),
-      utcTime: datetime.toUTC().toFormat(format)
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat)
     };
   };
 
