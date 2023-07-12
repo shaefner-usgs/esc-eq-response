@@ -79,8 +79,8 @@ var DdMainshock = function (options) {
         mag = AppUtil.round(props.mag, 1),
         magType = props.magType || 'M',
         template =
-          '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+          '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>' +
+          '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>',
         title = _mainshock.data.eq.title,
         utcOffset = datetime.toFormat('Z'),
         userTimeDisplay = datetime.toFormat(_app.dateFormat) +
