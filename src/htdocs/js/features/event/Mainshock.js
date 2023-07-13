@@ -181,6 +181,7 @@ var Mainshock = function (options) {
         '<li class="tsunami">' +
           '<strong>Tsunami</strong>' +
           '{tsunamiBubble}' +
+          '<small>tsunami.gov</small>' +
         '</li>';
     }
 
