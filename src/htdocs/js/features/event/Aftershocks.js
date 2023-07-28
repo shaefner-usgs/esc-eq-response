@@ -90,6 +90,8 @@ var Aftershocks = function (options) {
     _this.description = _earthquakes.getDescription();
     _this.mapLayer = _earthquakes.mapLayer;
     _this.placeholder = _getPlaceholder();
+
+    _app.SettingsBar.setStatus(_this, 'disabled');
   };
 
   /**
