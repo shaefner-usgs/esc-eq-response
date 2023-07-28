@@ -170,9 +170,14 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
 
   /**
    * Clean up after a failed fetch request.
+   *
+   * @param text {String} default is ''
    */
-  _cleanup: function () {
-    var feature = this._feature;
+  _cleanup: function (text = '') {
+    var feature = this._feature,
+        paramError = text.match('limit of 20000|parameter combination');
+
+    this._app.SettingsBar.setStatus(feature, 'enabled');
 
     if (feature.id === 'mainshock') {
       this._app.Features.clearQueue();
@@ -185,7 +190,11 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         feature.destroy();
       }
     } else {
-      this._app.Features.removeFeature(feature);
+      if (paramError) {
+        this._removeLoader();
+      } else {
+        this._app.Features.removeFeature(feature);
+      }
     }
   },
 
@@ -248,7 +257,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       }
 
       this._addError(error, response, text, type);
-      this._cleanup();
+      this._cleanup(text);
 
       console.error(error);
     }
@@ -267,6 +276,18 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     }
 
     return milliseconds;
+  },
+
+  /**
+   * Remove the loader next to the Feature's name.
+   */
+  _removeLoader: function () {
+    var feature = this._feature,
+        els = this._app.Features.getHeaders(feature.id);
+
+    els.forEach(el => el.innerHTML = feature.name);
+
+    this._app.MapPane.layerControl.removeLoader(feature.id);
   }
 });
 
