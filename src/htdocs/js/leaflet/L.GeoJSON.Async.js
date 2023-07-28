@@ -129,10 +129,10 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     } else if (type === 'notfound') {
       message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else {
-      if (text.match('limit of 20000')) {
+      if (text.includes('limit of 20000')) {
         message += '<li>Modify the parameters to match fewer earthquakes ' +
           '(max 20,000)</li>';
-      } else if (text.match('parameter combination')){
+      } else if (text.includes('parameter combination')){
         message += '<li>Missing parameters (all fields are required)</li>';
       } else if (response.status !== 200) {
         message += `<li>Error code: ${response.status} (${response.statusText})</li>`;
@@ -196,7 +196,6 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     delete this._app;
     delete this._feature;
     delete this._host;
-    delete this._url;
   },
 
   /**
@@ -209,9 +208,15 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   _fetch: async function () {
     var text, type,
         feature = this._feature,
-        response = {};
+        options = {},
+        response = {},
+        url = this._url.href;
 
     if (this._json) return; // only fetch data once
+
+    if (url.includes('php/fdsn/search.json.php')) {
+      options.timeout = 120000; // increase timeout for DD catalog
+    }
 
     this._json = {};
     feature.status = 'loading';
@@ -223,7 +228,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
     this._addLoader();
 
     try {
-      response = await AppUtil.fetchWithTimeout(this._url.href);
+      response = await AppUtil.fetchWithTimeout(url, options);
       this._json = await response.clone().json();
       feature.updated = this._getUpdated();
 
