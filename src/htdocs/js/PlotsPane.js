@@ -93,7 +93,10 @@ var PlotsPane = function (options) {
       _togglePlot(id, feature);
     });
 
-    _this.params[feature.id] = params; // add plot data
+    _updateParams(feature); // necessary when eq limit reached on initial request
+
+    _this.params[feature.id] = params; // add Plotly data
+    _this.rendered = false;
     _configured[feature.id] = false;
 
     bubble.insertAdjacentHTML('beforeend', html); // add timestamp
@@ -106,11 +109,9 @@ var PlotsPane = function (options) {
    * @param featureId {String}
    */
   _configPlots = function (featureId) {
-    var feature;
+    var feature = _app.Features.getFeature(featureId);
 
-    if (!_configured[featureId]) {
-      feature = _app.Features.getFeature(featureId);
-
+    if (feature.plots && !_configured[featureId]) {
       feature.plots.addListeners();
       _swapButton(featureId);
 
@@ -304,8 +305,10 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
+    var prevPlots = Object.prototype.hasOwnProperty.call(_this.params, feature.id);
+
     if (feature.plots && feature.id !== 'mainshock') { // no stand-alone MS plot
-      if (feature.isRefreshing) {
+      if (feature.isRefreshing && prevPlots) {
         _refresh(feature);
       } else {
         _addPlots(feature);
