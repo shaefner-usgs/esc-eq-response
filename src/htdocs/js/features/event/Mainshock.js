@@ -76,6 +76,7 @@ var Mainshock = function (options) {
       _getUpdated,
       _getUrl,
       _openTsunami,
+      _setMainshock,
       _updateDetails,
       _updateHeader,
       _updateMarkers,
@@ -600,6 +601,25 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Set the Mainshock with the given id by updating the UI components that are
+   * dependent upon it.
+   *
+   * @param id {String}
+   */
+  _setMainshock = function (id) {
+    var significantEqs = _app.Features.getFeature('significant-eqs');
+
+    document.body.classList.replace('loading', 'mainshock');
+
+    if (_app.Features.isFeature(significantEqs)) {
+      significantEqs.update(id);
+    }
+
+    _app.SettingsBar.setValues();
+    _app.TitleBar.setTitle(_this);
+  };
+
+  /**
    * Update the earthquake details 'strip' (on the SummaryPane) and 'balloon'
    * (on the SelectBar) using the selected catalog's data.
    */
@@ -692,8 +712,6 @@ var Mainshock = function (options) {
    * @param json {Object} default is {}
    */
   _this.addData = function (json = {}) {
-    var significantEqs = _app.Features.getFeature('significant-eqs');
-
     _earthquakes.addData(json);
 
     _this.data = _getData(json);
@@ -706,12 +724,7 @@ var Mainshock = function (options) {
     _this.summary = _getSummary();
     _this.title = _this.data.eq.title;
 
-    _app.SettingsBar.setValues();
-    _app.TitleBar.setTitle(_this);
-
-    if (_app.Features.isFeature(significantEqs)) {
-      significantEqs.update(json.id); // selects Mainshock if it's in the list
-    }
+    _setMainshock(json.id);
   };
 
   /**

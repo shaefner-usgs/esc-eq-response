@@ -105,10 +105,6 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         this._addContent();
       }, 250);
     }
-
-    if (feature.id === 'mainshock') {
-      document.body.classList.replace('loading', 'mainshock');
-    }
   },
 
   /**
