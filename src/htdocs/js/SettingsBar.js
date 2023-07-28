@@ -265,7 +265,7 @@ var SettingsBar = function (options) {
     var title = _title || ''; // default
 
     if (document.body.classList.contains('mainshock')) {
-      title = `Disabled because ${feature.name} has not finished loading`;
+      title = `Disabled because ${feature.name} is loading`;
     }
 
     return title;
