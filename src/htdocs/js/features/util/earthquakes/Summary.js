@@ -850,7 +850,7 @@ var Summary = function (options) {
       html += _getListTable();
     }
 
-    html += `<div class="timestamp">${_timestamp}</div>`;
+    html += `<dl class="props timestamp">${_timestamp}</dl>`;
 
     return html;
   };

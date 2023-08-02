@@ -330,7 +330,7 @@ var Earthquakes = function (options) {
           magType = props.magType || 'M',
           mmi = AppUtil.romanize(Number(props.mmi) || ''),
           status = (props.status || '').toLowerCase(),
-          template = '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>' +
+          time = '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>' +
             '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>',
           title = magType + ' ' + magDisplay,
           utcOffset = Number(datetime.toFormat('Z')),
@@ -345,7 +345,7 @@ var Earthquakes = function (options) {
       if (props.tz) { // local time (at epicenter)
         localTimeDisplay = datetime.toUTC(props.tz).toFormat(_app.dateFormat) +
           ' <span class="tz">at the epicenter</span>';
-        template += '<time datetime="{isoTime}" class="local">{localTimeDisplay}</time>';
+        time += '<time datetime="{isoTime}" class="local">{localTimeDisplay}</time>';
       }
 
       if (status === 'reviewed') {
@@ -400,7 +400,7 @@ var Earthquakes = function (options) {
 
       // Add additional props that depend on other props being set first
       _addBubbles(eq);
-      eq.timeDisplay = L.Util.template(template, eq);
+      eq.timeDisplay = L.Util.template(time, eq);
 
       // Filter out eqs from NCEDC (DD) catalog that are outside search radius
       if (
@@ -416,16 +416,19 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the HTML content for the updated timestamp (user and UTC time).
+   * Get the HTML content for the updated timestamps (user and UTC time).
    *
    * @return {String}
    */
   _getTimeStamp = function () {
     return L.Util.template(
-      '<time datetime="{isoTime}" class="user">' +
-        '{userTime} (UTC{utcOffset})' +
-      '</time>' +
-      '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>',
+      '<dt>Updated</dt>' +
+      '<dd>' +
+        '<time datetime="{isoTime}" class="user">' +
+          '{userTime} (UTC{utcOffset})' +
+        '</time>' +
+        '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+      '</dd>',
       _this.data
     );
   };
@@ -444,8 +447,7 @@ var Earthquakes = function (options) {
     div.innerHTML = _this.getPopup(eq);
 
     layer.bindPopup(div, {
-      maxWidth: 375,
-      minWidth: 250
+      minWidth: 365
     }).bindTooltip(_this.getTooltip(eq));
   };
 

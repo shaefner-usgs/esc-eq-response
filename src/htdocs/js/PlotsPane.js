@@ -84,8 +84,8 @@ var PlotsPane = function (options) {
    */
   _addPlots = function (feature) {
     var bubble = _el.querySelector(`.${feature.id} .bubble`),
-        html = `<div class="timestamp">${feature.timestamp}</div>`,
-        params = {};
+        params = {},
+        timestamp = `<dl class="props timestamp">${feature.timestamp}</dl>`;
 
     _ids.forEach(id => {
       params[id] = feature.plots.getParams(id); // add headers, containers
@@ -99,7 +99,7 @@ var PlotsPane = function (options) {
     _this.rendered = false;
     _configured[feature.id] = false;
 
-    bubble.insertAdjacentHTML('beforeend', html); // add timestamp
+    bubble.insertAdjacentHTML('beforeend', timestamp);
   };
 
   /**
