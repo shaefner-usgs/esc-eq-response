@@ -1,0 +1,19 @@
+@layer overrides {
+  body.dark {
+    :is(.faults, .plates) img {
+      filter: brightness(135%) contrast(125%);
+    }
+  }
+
+  body.satellite {
+    :is(.faults, .plates) img {
+      filter: brightness(125%) contrast(175%) saturate(125%);
+    }
+  }
+
+  body.terrain {
+    :is(.faults, .plates) img {
+      filter: contrast(125%);
+    }
+  }
+}
