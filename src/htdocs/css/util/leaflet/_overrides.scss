@@ -1,5 +1,5 @@
-@use '../util/opt/mixins' as *;
-@use '../util/opt/variables' as *;
+@use '../opt/mixins' as *;
+@use '../opt/variables' as *;
 
 @layer overrides {
   .leaflet-center,
