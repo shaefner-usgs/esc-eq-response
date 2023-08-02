@@ -1,49 +1,50 @@
-@use 'sass:color';
+@use 'opt/variables' as *;
 
-@use 'variables' as *;
+// !important declarations override lib's inline styles
 
-/* Plotly overrides */
+@layer overrides {
+  .plotly {
+    [data-title] {
+      &:after {
+        background: var(--accent-color-lightest) !important;
+        border-radius: $button-border-radius !important;
+        color: var(--accent-color) !important;
+        font: 500 $font-size $font-family !important;
+      }
 
-#plotsPane {
-  .hovertext {
-    path {
-      fill: #fff !important;
-      fill-opacity: 0.9;
-      stroke: #ccc !important;
+      &:before {
+        border-color: transparent transparent var(--accent-color-lightest) !important;
+      }
     }
 
-    text {
-      fill: var(--text-color) !important;
-      font: $font-size $font-family !important;
-    }
-  }
+    .hovertext {
+      path {
+        fill: var(--bg-color) !important;
+        fill-opacity: .9;
+        stroke: var(--border-color) !important;
+      }
 
-  .modebar-btn {
-    path {
-      fill: color.scale($accent-color, $alpha: -4%, $lightness: 75%) !important;
-      transition: fill $effect-off-duration ease-in;
+      text {
+        fill: var(--text-color) !important;
+        font: $font-size $font-family !important;
+      }
     }
 
-    &:hover path,
-    &.active path {
-      fill: var(--accent-color) !important;
-      transition: fill $effect-on-duration ease-out;
-    }
-  }
+    .modebar-btn {
+      &:is(:hover, .active) path {
+        fill: var(--accent-color) !important;
+        transition-duration: $effect-on-duration;
+      }
 
-  .plotly [data-title] {
-    &:after {
-      background: var(--accent-color-lightest);
-      color: var(--accent-color);
-      font: $font-size $font-family;
+      path {
+        fill: var(--accent-color-hover) !important;
+        transition: fill $effect-duration ease-in-out;
+      }
     }
-    &:before {
-      border-color: transparent transparent var(--accent-color-lightest);
-    }
-  }
 
-  .xtitle,
-  .ytitle {
-    font-weight: 500 !important;
+    .xtitle,
+    .ytitle {
+      font-weight: 500 !important;
+    }
   }
 }

@@ -1,55 +1,47 @@
-@use '../util/variables' as *;
+@use '../util/opt/variables' as *;
 
-#significant-eqs {
-  border-bottom: 1px solid var(--border-color-lighter);
-  border-top: 1px solid var(--border-color);
-  min-height: 4rem;
-  position: relative;
+@layer default {
+  #significant-eqs {
+    border-bottom: 1px solid var(--border-color-lighter);
+    border-top: 1px solid var(--border-color);
+    min-height: 3.5rem;
+    position: relative; // for loading spinner
 
-  > h4 { // no Significant Eqs msg
-    margin: 0;
-    padding: 1rem 0;
-  }
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    h4 {
-      font-size: 1.125rem;
-      margin-bottom: .125rem;
+    > h4 { // no Significant Eqs msg
+      margin: 1rem 0;
     }
 
     li {
       align-items: center;
       border-bottom: 1px solid var(--border-color-lighter);
+      column-gap: .75rem;
       display: flex;
       margin: 0;
       padding: .5rem .25rem;
-      transition: all $effect-off-duration ease-in;
+      transition: $effect-duration ease-in-out {
+        property: background, color;
+      };
+
+      &:last-child {
+        border: none;
+      }
 
       &:hover {
         background: var(--accent-color-lightest);
         color: var(--text-color-darker);
         cursor: pointer;
-        transition: all $effect-on-duration ease-out;
+        transition-duration: $effect-on-duration;
 
         time {
           color: var(--text-color);
-          transition: color $effect-on-duration ease-out;
+          transition-duration: $effect-on-duration;
         }
-      }
-
-      &:last-child {
-        border: none;
       }
 
       &:active,
       &.selected {
         background: var(--accent-color);
         color: var(--bg-color);
-        transition: all $effect-on-duration ease-out;
 
         &:hover {
           cursor: auto;
@@ -57,44 +49,42 @@
 
         time {
           color: var(--bg-color);
-          transition: color $effect-on-duration ease-out;
+          transition-duration: $effect-on-duration;
         }
       }
 
-      > div:first-of-type {
+      div:first-of-type {
         align-items: center;
         display: flex;
         flex-direction: column;
-        margin-right: .75rem;
+        row-gap: .25rem;
       }
 
-      span.mmi {
-        visibility: hidden; /* hide empty (no MMI assigned) bubbles */
-      }
-
-      .mag {
-        font-size: 1.25rem;
-        line-height: 1;
-        padding-bottom: .25rem;
+      h4 {
+        font-size: 1.125rem;
+        margin: -.125rem 0 .375rem;
       }
     }
 
     time {
       color: var(--text-color-lighter);
-      margin: 0;
-      transition: color $effect-off-duration ease-in;
+      transition: color $effect-duration ease-in-out;
+    }
+
+    .mag {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    // hide bubbles w/ no assigned MMI value
+    .mmiN\/A {
+      height: 0;
+      padding: 0;
+      visibility: hidden;
+    }
+
+    .spinner {
+      top: 30%;
     }
   }
-
-  .spinner {
-    top: 33%;
-  }
-}
-
-/* Toggle between user/UTC time
---------------------------------------------- */
-
-body.user #significant-eqs time.utc,
-body.utc #significant-eqs time.user {
-  display: none;
 }

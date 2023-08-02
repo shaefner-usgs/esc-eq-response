@@ -1,101 +1,81 @@
-@use 'sass:color';
+@use '../opt/variables' as *;
 
-@use '../variables' as *;
+@layer default {
+  a.button {
+    border: 1px solid transparent;
+    border-radius: $button-border-radius;
+    font: bold .8125rem $font-family-headers;
+    padding: .125rem .375rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: $effect-duration ease-in-out {
+      property: background, border-color, color, text-shadow;
+    };
 
-a.button {
-  border: 1px solid transparent;
-  border-radius: $button-border-radius;
-  font: bold .8125rem $font-family-headers;
-  padding: .125rem .375rem;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: all $effect-off-duration-shorter ease-in;
+    &:hover {
+      background: var(--accent-color-lightest);
+      border-color: var(--accent-color);
+      cursor: pointer;
+      transition-duration: $effect-on-duration;
+    }
 
-  &:hover {
-    background: var(--accent-color-lightest);
-    border-color: var(--accent-color);
-    cursor: pointer;
-    transition: all $effect-on-duration ease-out;
+    &.selected {
+      background: var(--accent-color);
+      color: var(--bg-color);
+      text-shadow: var(--button-text-shadow);
+      transition-duration: $effect-on-duration;
+    }
   }
 
-  &.selected {
-    background: var(--accent-color);
-    color: var(--bg-color);
-    transition: all $effect-on-duration ease-out;
-    text-shadow: var(--button-text-shadow);
-  }
-}
-
-button {
-  appearance: none;
-  background: var(--bg-color);
-  border: 1px solid var(--accent-color);
-  border-radius: $button-border-radius;
-  color: var(--accent-color);
-  cursor: pointer;
-  font: 700 1.125rem $font-family-headers;
-  margin: 1rem 0 0;
-  padding: .3125rem .75rem;
-  text-align: center;
-  text-transform: uppercase;
-  transition: all $effect-off-duration-shorter ease-in;
-  user-select: none;
-  white-space: nowrap;
-
-  &:active,
-  &:focus,
-  &:hover {
-    background: var(--accent-color-lightest);
-    transition: all $effect-on-duration ease-out;
-  }
-  &:active {
-    background: var(--accent-color);
-    box-shadow: inset 0 3px 8px rgba(0, 0, 0, .35);
-    color: var(--bg-color);
-    outline: 0;
-    text-shadow: var(--button-text-shadow);
-  }
-  &:focus {
-    outline: 0;
-  }
-
-  &:after {
-    display: block;
-    font-size: .75rem;
-    font-weight: 400;
-    margin-top: -.125rem;
-  }
-
-  &[disabled] {
+  button {
     background: var(--bg-color);
-    border-color: var(--accent-color-disabled);
-    box-shadow: none;
-    color: var(--accent-color-disabled);
-    cursor: not-allowed;
-    text-shadow: none;
-  }
-
-  &#reset {
-    $reset-button-color: #efefef;
-
-    background: $reset-button-color;
-    border-color: color.scale($reset-button-color, $blackness: 15%);
-    color: #555;
+    border: 1px solid var(--accent-color);
+    border-radius: $button-border-radius;
+    color: var(--accent-color);
+    cursor: pointer;
+    font: bold 1.125rem $font-family-headers;
+    line-height: 1;
+    margin: 0;
+    padding: .375rem .75rem;
+    text-transform: uppercase;
+    transition: $effect-duration ease-in-out {
+      property: background, border-color, box-shadow, color, text-shadow;
+    };
+    user-select: none;
 
     &:active,
     &:focus,
     &:hover {
-      background: color.scale($reset-button-color, $lightness: 40%);
-      border-color: color.scale($reset-button-color, $blackness: 25%);
-      color: #333;
-      text-shadow: none;
-    }
-    &:active {
-      box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
+      background: var(--accent-color-lightest);
+      transition-duration: $effect-on-duration;
     }
 
-    &.dim {
-      opacity: .5;
+    &:active {
+      background: var(--accent-color);
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, .35);
+      color: var(--bg-color);
+      outline: none;
+      text-shadow: var(--button-text-shadow);
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:after {
+      display: block;
+      font-size: $font-size-smallest;
+      font-weight: normal;
+      margin-top: .25rem;
+    }
+
+    &[disabled] {
+      background: var(--bg-color);
+      border-color: var(--accent-color-disabled);
+      box-shadow: none;
+      color: var(--accent-color-disabled);
+      cursor: not-allowed;
+      text-shadow: none;
     }
   }
 }

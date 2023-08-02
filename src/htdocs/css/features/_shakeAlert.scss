@@ -1,86 +1,96 @@
-@use '../util/variables' as *;
+@use '../util/opt/variables' as *;
 
-#shake-alert {
-  dl {
-    max-width: 21rem;
-  }
-
-  h4 span,
-  sup {
-    color: var(--text-color-lighter);
-    font-size: .75em;
-  }
-  sup {
-    margin: -.375rem 0 0 -.25rem;
-  }
-
-  td {
-    &:nth-child(2) {
-      padding-right: 1.125rem;
-      text-align: right;
-    }
-    &:nth-child(3) {
-      padding-right: 2.75rem;
-      text-align: right;
-    }
-  }
-
-  ul {
-    list-style: none;
-    margin-bottom: 0;
-    padding: 0;
-
-    strong {
-      font-weight: 500;
-    }
-  }
-
-  .impact-bubble {
-    margin: 0 auto;
-    width: 3.5rem;
-  }
-
-  .issued {
-    margin-top: 0;
-  }
-
-  .logo {
-    max-width: 20rem;
-    position: sticky;
-    top: 4rem;
-
-    h4 {
-      font-size: 1.375rem;
+@layer default {
+  #shake-alert {
+    dl {
+      max-width: 20rem;
     }
 
-    img {
-      display: block;
+    h4:first-of-type {
+      margin-top: 1.25rem;
+    }
+
+    h4 span,
+    sup {
+      color: var(--text-color-lighter);
+      font-size: .75em;
+    }
+
+    sup {
+      margin: -.375rem 0 0 -.25rem;
+    }
+
+    li {
+      margin-top: .25rem
+    }
+
+    td {
+      padding: {
+        bottom: .25rem;
+        top: .25rem;
+      }
+
+      &:nth-child(2) {
+        padding-right: 1.125rem;
+        text-align: right;
+      }
+
+      &:nth-child(3) {
+        padding-right: 2.75rem;
+        text-align: right;
+      }
+    }
+
+    ul {
+      line-height: $line-height-alt;
+      margin-top: 1rem;
+
+      strong {
+        font-weight: 500;
+      }
+    }
+
+    .impact-bubble {
       margin: 0 auto;
-      max-width: 15rem;
-      padding: 0;
+      width: 3.5rem;
     }
-  }
 
-  .wrapper {
-    align-items: flex-start;
-    display: flex;
-    gap: 2rem;
-    position: relative;
-  }
+    .issued {
+      margin-top: 0;
+    }
 
-  @media only screen
-    and (max-width: $breakpoint-phone-width) {
-      a {
-        margin-top: 1rem;
+    .logo {
+      max-width: 20rem;
+      position: sticky;
+      top: 4rem;
+
+      h4 {
+        text-align: center;
       }
 
-      .wrapper {
-        flex-flow: row wrap;
+      img {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        width: 15rem;
       }
+    }
 
+    .wrapper {
+      align-items: flex-start;
+      display: flex;
+      gap: 2rem;
+    }
+
+    @media only screen and (max-width: $breakpoint-phone-width) {
       .details,
       .logo {
         max-width: 100%;
       }
+
+      .wrapper {
+        flex-wrap: wrap;
+      }
     }
+  }
 }

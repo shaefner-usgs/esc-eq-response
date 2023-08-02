@@ -1,41 +1,41 @@
-@use 'sass:color';
+@use 'util/opt/variables' as *;
 
-@use 'util/variables' as *;
-
-#navBar {
-  align-items: flex-end;
-  display: flex;
-  justify-content: space-between;
-
-  ul {
+@layer default {
+  #navBar {
+    align-items: flex-end;
     display: flex;
-    margin: 0;
-    padding: 0;
-  }
+    justify-content: space-between;
 
-  li {
-    list-style: none;
-    margin: 0;
+    li {
+      margin: 0;
+      padding: 0;
+    }
+
+    ul {
+      display: flex;
+    }
   }
 
   #navMain {
-    font: 700 1rem/1 $font-family-headers;
-    margin-left: -6px;
+    margin-left: -.375rem;
 
     a {
       border: 1px solid transparent;
       border-bottom: none;
-      border-radius: 6px 6px 0 0;
+      border-radius: 8px 8px 0 0;
       color: var(--accent-color);
       display: block;
-      padding: .6rem .85rem;
+      font: bold 1rem/1 $font-family-headers;
+      padding: .625rem .875rem;
       text-decoration: none;
       text-transform: uppercase;
-      transition: all $effect-off-duration-shorter ease-in;
+      transition: $effect-duration-shorter ease-in-out {
+        property: background, border, color, text-shadow;
+      };
 
       &:hover {
         border-color: var(--accent-color);
-        transition: border $effect-on-duration ease-out;
+        transition-duration: $effect-on-duration;
       }
 
       &.selected {
@@ -43,20 +43,16 @@
         border-color: var(--accent-color);
         color: var(--bg-color);
         text-shadow: var(--button-text-shadow);
-        transition: all $effect-on-duration ease-out;
+        transition-duration: $effect-on-duration;
       }
-    }
-
-    li {
-      padding: 0;
     }
   }
 
   #navSub {
     i {
       color: var(--accent-color);
-      font-size: 21px;
-      padding: 0 7px 9px;
+      font-size: 22px;
+      padding: 0 7px 10px;
 
       &:after {
         border: 8px solid transparent;
@@ -64,26 +60,23 @@
         content: '';
         left: 10px;
         position: absolute;
-        transition: border $effect-off-duration-shorter ease-in;
-      }
-      &:hover:after {
-        border-bottom-color: color.scale($accent-color, $lightness: 85%);
-        transition: border $effect-on-duration ease-out;
-      }
-      &.selected:after {
-        border-bottom-color: var(--accent-color);
-        transition: border $effect-on-duration ease-out;
+        transition: border-color $effect-duration-shorter ease-in-out;
       }
 
-      &:before {
-        margin: 0;
+      &:hover:after {
+        border-bottom-color: var(--accent-color-hover);
+        transition-duration: $effect-on-duration;
+      }
+
+      &.selected:after {
+        border-bottom-color: var(--accent-color);
+        transition-duration: $effect-on-duration;
       }
     }
 
     li {
       cursor: pointer;
       display: flex;
-      padding: 0;
       position: relative;
 
       &:first-child i:after { // select icon

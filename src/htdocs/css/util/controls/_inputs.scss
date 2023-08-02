@@ -1,88 +1,105 @@
-@use '../variables' as *;
+@use '../opt/variables' as *;
 
-/* Check boxes, radio inputs
-   (customized to Leaflet's html rendering)
---------------------------------------------- */
+@layer default {
+  input[type="checkbox"],
+  input[type="radio"] {
+    display: none;
 
-input[type="checkbox"],
-input[type="radio"] {
-  display: none;
+    &:checked + span:before {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: var(--bg-color);
+    }
 
-  + span:before {
-    align-items: center;
+    + span:before {
+      align-items: center;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color-darker);
+      content: '\00a0';
+      display: flex;
+      font: 1rem/1 'Arial Unicode MS';
+      height: 1rem;
+      justify-content: center;
+      margin-right: .5rem;
+      text-shadow: var(--button-text-shadow);
+      width: 1rem;
+    }
+  }
+
+  input[type="checkbox"] {
+    &:checked + span:before {
+      content: '\2713';
+    }
+
+    + span:before {
+      border-radius: 3px;
+    }
+  }
+
+  input[type="radio"] {
+    &:checked + span:before {
+      content: '\25CF';
+    }
+
+    + span:before {
+      border-radius: 50%;
+      font-size: .625rem;
+    }
+  }
+
+  input[type="number"],
+  input[type="text"] {
     background: var(--bg-color);
-    border: 1px solid #888;
-    content: '\00a0';
-    display: flex;
-    font: 1rem/1 'Arial Unicode MS';
-    height: 1rem;
-    justify-content: center;
-    margin-right: .5rem;
-    position: relative;
-    text-shadow: var(--button-text-shadow);
-    top: 0px;
-    width: 1rem;
-  }
-}
-input[type="checkbox"] + span:before {
-  border-radius: 3px;
-}
-input[type="radio"] + span:before {
-  border-radius: 50%;
-  font-size: 10px;
-}
+    border: 1px solid var(--border-color-lighter);
+    border-radius: $button-border-radius;
+    box-shadow: $box-shadow-inset;
+    color: var(--text-color);
+    font: 1rem/1 $font-family;
+    margin: 0 0 .125rem 0;
+    outline: none;
+    padding: .375rem 0 .375rem .375rem;
+    transition: $effect-duration ease-in-out {
+      property: border-color, box-shadow, color;
+    };
+    width: 100%;
 
-input[type="checkbox"]:checked + span:before,
-input[type="radio"]:checked + span:before {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  color: #fff;
-}
-input[type="checkbox"]:checked + span:before {
-  content: '\2713';
-}
-input[type="radio"]:checked + span:before {
-  content: '\25CF';
-}
+    &:autofill {
+      background: var(--bg-color) !important; // override user-agent style
+    }
 
-/* Text / number inputs
---------------------------------------------- */
+    &:not(:disabled) {
+      transition-duration: $effect-duration;
+    }
 
-input[type="text"],
-input[type="number"] {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color-lighter);
-  border-radius: $button-border-radius;
-  box-shadow: inset 0 1px 4px 0 hsla(0, 0%, 0%, .08);
-  font-size: .9rem;
-  margin: 0 1px 3px 0;
-  outline: none;
-  padding: 6px 0 6px 6px;
-  transition: all $effect-duration ease-in-out;
-  width: 100%;
+    &:active,
+    &:focus,
+    &.active { // .active is for Flatpickr
+      border-color: var(--accent-color);
+      box-shadow: $box-shadow-inset, $box-shadow-length var(--accent-color);
+      transition-duration: $effect-on-duration;
+    }
 
-  &:autofill {
-    background: none !important;
+    &:disabled {
+      border-color: var(--border-color-lightest);
+      box-shadow: none;
+      color: var(--text-color-disabled);
+      cursor: not-allowed;
+      transition-duration: $effect-duration;
+    }
   }
 
-  &:focus,
-  &.active { // .active is for Flatpickr inputs
-    border: 1px solid var(--accent-color);
-    box-shadow: 0 0 3px var(--accent-color);
-  }
-}
-
-// Invalid Flatpickr inputs
-.invalid > input[type="text"] {
-  border: 1px solid var(--invalid-color);
-  box-shadow: 0 0 3px var(--invalid-color);
-}
-
-// Flag invalid inputs when a Mainshock is selected
-.mainshock {
-  input[type="text"]:invalid,
-  input[type="number"]:invalid {
+  // Invalid Flatpickr inputs
+  .invalid > input[type="text"] {
     border: 1px solid var(--invalid-color);
-    box-shadow: 0 0 3px var(--invalid-color);
+    box-shadow: $box-shadow-inset, $box-shadow-length var(--invalid-color);
+  }
+
+  // Flag (non-Flatpickr) invalid inputs only when a Mainshock is selected
+  .mainshock {
+    input[type="number"]:invalid,
+    input[type="text"]:invalid {
+      border: 1px solid var(--invalid-color);
+      box-shadow: $box-shadow-inset, $box-shadow-length var(--invalid-color);
+    }
   }
 }

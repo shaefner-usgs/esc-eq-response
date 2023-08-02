@@ -1,146 +1,154 @@
-@use 'util/variables' as *;
+@use 'sass:color';
 
-#statusBar {
-  bottom: 0;
-  box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, .06);
-  height: 2.75rem;
-  left: 0;
-  position: fixed;
-  width: 100%;
-  z-index: 10000;
+@use 'util/opt/variables' as *;
 
-  &.hide {
-    height: 0;
-    transition: height $effect-duration ease-in .25s;
-  }
+$bg-color: rgba(255, 255, 120, .95);
+$bg-color-error: rgba(223, 62, 62, .92);
+$height: 3rem;
 
-  div {
-    background: rgba(255, 255, 120, .95);
-    border-top: 2px solid rgb(255, 255, 0);
-    display: none;
-    min-height: 2.75rem;
-    padding: .625rem 0;
-    position: absolute;
-    text-align: center;
-    text-shadow: 1px 1px 3px #fffec6;
+@layer default {
+  #statusBar {
+    bottom: 0;
+    box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, .1);
+    height: $height;
+    left: 0;
+    position: fixed;
     width: 100%;
+    z-index: 10000;
 
-    &:first-child {
-      display: block; // only display one item (first) at a time
+    &.hide {
+      height: 0;
+      transition: height $effect-duration ease-in .25s;
     }
 
-    &.error {
-      background: rgba(223, 62, 62, .92);
-      border-color: rgb(195, 0, 0);
-      padding: 0;
-      text-shadow: 1px 1px 3px #922c2c;
+    div {
+      align-items: center;
+      background: $bg-color;
+      border: solid rgb(255, 255, 0) {
+        width: 2px 0;
+      };
+      border-bottom-color: $bg-color;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      min-height: $height;
+      text-shadow: 1px 1px 3px color.scale($bg-color, $lightness: 60%);
 
-      h4 {
-        color: #fff;
-        margin: 0;
+      &:first-child {
+        display: flex; // only display first item
+      }
+
+      &.error {
+        background: $bg-color-error;
+        border-bottom-color: $bg-color-error;
+        border-top-color: rgb(195, 0, 0);
+        text-shadow: 1px 1px 3px color.scale($bg-color-error, $lightness: -40%);
+
+        h4 {
+          color: #fff;
+        }
       }
     }
-  }
 
-  h4 {
-    color: #333;
-    line-height: 1;
-    text-align: center;
-  }
-
-  li { // error details
-    color: #fff;
-    display: inline;
-    font-size: $font-size-smaller;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    &:after {
-      content: ', ';
+    h4 {
+      color: #333;
+      line-height: 1;
+      margin: 0;
     }
 
-    &:last-child:after {
-      content: '';
+    li { // error details
+      color: #fff;
+      display: inline;
+      font-size: $font-size-smaller;
+
+      &:after {
+        content: ', ';
+      }
+
+      &:last-child:after {
+        content: '';
+      }
     }
-  }
 
-  sup {
-    font-size: .75em;
-    vertical-align: top; // ShakeAlert trademark
-  }
-
-  ul {
-    margin: 1px 0 0;
-    padding: 0;
-    text-align: center;
-  }
-
-  .close,
-  .reload {
-    background: rgb(195, 0, 0);
-    border-radius: 50%;
-    height: 32px;
-    opacity: 0.75;
-    position: absolute;
-    top: 5px;
-    transition: opacity $effect-off-duration-shorter ease-in;
-    width: 32px;
-
-    &:hover {
-      opacity: 1;
-      transition: opacity $effect-on-duration ease-out;
+    sup { // ShakeAlert trademark
+      font-size: .75em;
+      padding-left: .125rem;
     }
-  }
 
-  .close {
-    right: 15px;
-
-    &:after,
-    &:before { // 'X'
-      background: #fff;
-      content: '';
-      height: 20px;
-      left: 15px;
-      position: absolute;
-      top: 6px;
-      width: 2px;
-    }
-    &:after {
-      transform: rotate(-45deg);
-    }
-    &:before {
-      transform: rotate(45deg);
-    }
-  }
-
-  .reload {
-    padding: 7px;
-    right: 52px;
-
-    &:after,
-    &:before { // partial circle w/ arrow
-      content: '';
-      display: block;
-    }
-    &:after {
-      border-color: transparent transparent transparent #fff;
-      border-style: solid;
-      border-width: 4px 0 4px 6px;
-      height: 0;
-      position: absolute;
-      top: 4px;
-      left: 50%;
-      width: 0;
-    }
-    &:before {
-      border-color: transparent #fff #fff #fff;
+    .close,
+    .reload {
+      background: rgb(195, 0, 0);
       border-radius: 50%;
-      border-style: solid;
-      border-width: 2px;
-      height: 18px;
-      width: 18px;
-      transform: rotate(45deg);
+      height: 32px;
+      opacity: .75;
+      position: absolute;
+      transition: opacity $effect-duration ease-in-out;
+      width: 32px;
+
+      &:active {
+        box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.15);
+        transition-duration: $effect-on-duration;
+      }
+
+      &:hover {
+        opacity: 1;
+        transition-duration: $effect-on-duration;
+      }
+    }
+
+    .close {
+      right: 6px;
+
+      &:after,
+      &:before { // 'x'
+        background: #fff;
+        content: '';
+        height: 20px;
+        left: 15px;
+        position: absolute;
+        top: 6px;
+        width: 2px;
+      }
+
+      &:after {
+        transform: rotate(-45deg);
+      }
+      &:before {
+        transform: rotate(45deg);
+      }
+    }
+
+    .reload {
+      padding: 7px;
+      right: 44px;
+
+      &:after,
+      &:before { // partial circle w/ arrow
+        content: '';
+        display: block;
+      }
+
+      &:after {
+        border: solid {
+          color: transparent transparent transparent #fff;
+          width: 4px 0 4px 6px;
+        }
+        height: 0;
+        position: absolute;
+        top: 4px;
+        left: 50%;
+        width: 0;
+      }
+
+      &:before {
+        border: 2px solid {
+          color: transparent #fff #fff #fff;
+        }
+        border-radius: 50%;
+        height: 18px;
+        width: 18px;
+        transform: rotate(45deg);
+      }
     }
   }
 }

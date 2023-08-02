@@ -1,53 +1,62 @@
-// Icon font created at https://fontello.com on 2023-02-09
+/**
+ * Icon font, created at
+ * https://fontello.com on 2023-02-09
+ */
+@layer default {
+  @font-face {
+    font-family: 'icons';
+    src: url('../font/icons.eot?59672064');
+    src: url('../font/icons.eot?59672064#iefix') format('embedded-opentype'),
+         url('../font/icons.woff2?59672064') format('woff2'),
+         url('../font/icons.woff?59672064') format('woff'),
+         url('../font/icons.ttf?59672064') format('truetype'),
+         url('../font/icons.svg?59672064#fontello') format('svg');
+    font-weight: normal;
+    font-style: normal;
+  }
 
-@font-face {
-  font-family: 'icons';
-  src: url('../font/icons.eot?59672064');
-  src: url('../font/icons.eot?59672064#iefix') format('embedded-opentype'),
-       url('../font/icons.woff2?59672064') format('woff2'),
-       url('../font/icons.woff?59672064') format('woff'),
-       url('../font/icons.ttf?59672064') format('truetype'),
-       url('../font/icons.svg?59672064#fontello') format('svg');
-  font-weight: normal;
-  font-style: normal;
+  [class^="icon-"]:before,
+  [class*=" icon-"]:before {
+    font-family: "icons";
+    font-style: normal;
+    font-weight: normal;
+    speak: never;
+
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    // margin-right: .2em;
+    text-align: center;
+    // opacity: .8;
+
+    // For safety - reset parent styles that can break glyph codes
+    font-variant: normal;
+    text-transform: none;
+
+    // Fix buttons height, for twitter bootstrap
+    line-height: 1em;
+
+    // Font smoothing
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    // 3D effect
+    // text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
+  }
+
+  .icon-check:before { content: '\e804'; }
+  .icon-info:before { content: '\f129'; }
+  .icon-legend:before { content: '\e802'; }
+  .icon-link:before { content: '\f08e'; }
+  .icon-menu:before { content: '\f0c9'; }
+  .icon-next:before { content: '\e806'; }
+  .icon-prev:before { content: '\e805'; }
+  .icon-search:before { content: '\e801'; }
+  .icon-select:before { content: '\e800'; }
+  .icon-settings:before { content: '\e803'; }
+  .icon-warning:before { content: '\e807'; }
+
+  .icon-check {
+    color: green;
+  }
 }
-
-[class^="icon-"]:before, [class*=" icon-"]:before {
-  font-family: "icons";
-  font-style: normal;
-  font-weight: normal;
-  speak: never;
-
-  display: inline-block;
-  text-decoration: inherit;
-  width: 1em;
-  // margin-right: .2em;
-  text-align: center;
-  // opacity: .8;
-
-  // For safety - reset parent styles that can break glyph codes
-  font-variant: normal;
-  text-transform: none;
-
-  // Fix buttons height, for twitter bootstrap
-  line-height: 1em;
-
-  // Font smoothing
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  // 3D effect
-  // text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
-}
-
-.icon-check:before { content: '\e804'; }
-.icon-info:before { content: '\f129'; }
-.icon-legend:before { content: '\e802'; }
-.icon-link:before { content: '\f08e'; }
-.icon-menu:before { content: '\f0c9'; }
-.icon-next:before { content: '\e806'; }
-.icon-prev:before { content: '\e805'; }
-.icon-search:before { content: '\e801'; }
-.icon-select:before { content: '\e800'; }
-.icon-settings:before { content: '\e803'; }
-.icon-warning:before { content: '\e807'; }

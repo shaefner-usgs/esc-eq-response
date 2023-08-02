@@ -1,49 +1,78 @@
-@use 'util/variables' as *;
+@use 'sass:color';
 
-#selectBar {
-  button {
-    margin-bottom: 1.5rem; // ensure StatusBar doesn't obscure button
-    padding-bottom: .1875rem;
-    padding-top: .1875rem;
+@use 'util/opt/variables' as *;
 
-    &:after {
-      content: 'Mainshock';
-    }
-  }
+$reset-button-color: #efefef;
 
-  h3 + label {
-    margin-top: 1rem;
-  }
-
-  p + h3 {
-    margin-bottom: .25rem;
-
-    span {
-      color: var(--text-color-lighter);
-      font-size: 1rem;
-      margin-left: .3rem;
-
-      &:after {
-        content: ')';
-      }
-      &:before {
-        content: '(';
-      }
-    }
-  }
-
+@layer default {
   #mainshock {
     margin-top: 1rem;
     max-height: 350px;
     opacity: 1;
     overflow: hidden;
-    transition: all $effect-slide-duration ease-in-out;
+    transition: $effect-slide-duration ease-in-out {
+      property: margin, max-height, opacity;
+    };
 
     &.hide {
       margin: 0;
       max-height: 0;
       opacity: 0;
-      transition: none;
+    }
+  }
+
+  #reset {
+    background: $reset-button-color;
+    border-color: color.scale($reset-button-color, $blackness: 15%);
+    color: #555;
+
+    &:active,
+    &:focus,
+    &:hover:not(.dim) {
+      background: color.scale($reset-button-color, $lightness: 40%);
+      border-color: color.scale($reset-button-color, $blackness: 25%);
+      color: #333;
+      text-shadow: none;
+    }
+
+    &:active {
+      box-shadow: inset 0 1px 5px rgba(0, 0, 0, .1);
+    }
+
+    &.dim {
+      cursor: auto;
+      opacity: .5;
+    }
+  }
+
+  #selectBar {
+    button {
+      margin-bottom: 1.5rem; // ensure StatusBar doesn't obscure button
+
+      &:after {
+        content: 'Mainshock';
+      }
+    }
+
+    h3:first-of-type {
+      margin-bottom: .25rem;
+
+      span {
+        color: var(--text-color-lighter);
+        font-size: 1rem;
+        margin-left: .3rem;
+
+        &:after {
+          content: ')';
+        }
+        &:before {
+          content: '(';
+        }
+      }
+    }
+
+    label {
+      margin-top: 1rem;
     }
   }
 }

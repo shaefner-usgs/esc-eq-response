@@ -3,27 +3,31 @@
 $breakpoint-phone-width: 735px;
 $breakpoint-tablet-width: 1023px;
 
+$box-shadow-length:  0 0 3px; // inputs, Flatpickr
+$box-shadow-inset: inset 0 1px 4px hsla(0, 0%, 0%, .08); // inputs
+
 $button-border-radius: 4px;
 $content-border-radius: 12px;
 
 $effect-duration: .25s;
-$effect-off-duration: $effect-duration;
-$effect-off-duration-shorter: .15s;
+$effect-duration-shorter: .15s;
 $effect-on-duration: .05s;
 $effect-slide-duration: .175s;
 
 $font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-family-buttons: Tahoma, Verdana, sans-serif;
 $font-family-headers: 'Open Sans', sans-serif;
-$font-family-mmi: Tahoma, Verdana, Segoe, sans-serif;
 $font-size: 16px;
 $font-size-smaller: .875rem;
+$font-size-smallest: .75rem;
 
 $line-height: 1.625;
+$line-height-alt: 1.35; // tables, lists
 
 $panel-width: 25rem;
 $sidebar-width: 25rem;
 
-/* MMI, PAGER impact bubbles */
+// MMI, PAGER impact bubble colors
 
 $mmi-NAcolor: #eee;
 $mmiI-color: #fff;
@@ -43,10 +47,11 @@ $pager-yellow-color: #ff0;
 $pager-orange-color: #f90;
 $pager-red-color: #f00;
 
-/* Colors (CSS vars preferred, but SCSS vars are necessary for calculations) */
+// UI colors (CSS vars preferred, but SCSS vars are necessary for calculations)
 
 $accent-color: #4440CC;
 $accent-color-disabled: color.scale($accent-color, $lightness: 75%);
+$accent-color-hover: color.scale($accent-color, $alpha: -4%, $lightness: 75%);
 $accent-color-lighter: color.scale($accent-color, $alpha: -4%, $lightness: 91%);
 $accent-color-lightest: color.scale($accent-color, $alpha: -4%, $lightness: 96%, $saturation: 25%);
 
@@ -54,19 +59,21 @@ $button-text-shadow: 1px 1px 2px color.scale($accent-color, $blackness: 50%);
 
 $invalid-color: #c00;
 
-/* CSS variables (dynamic) */
+// CSS run-time (dynamic) variables
 
 :root {
   --accent-color: #{$accent-color};
   --accent-color-disabled: #{$accent-color-disabled};
+  --accent-color-hover: #{$accent-color-hover};
   --accent-color-lighter: #{$accent-color-lighter};
   --accent-color-lightest: #{$accent-color-lightest};
 
   --bg-color: #fff;
-  --bg-color-alpha: rgba(255, 255, 255, .96);
+  --bg-color-alpha: rgba(255, 255, 255, .95);
   --bg-color-darker: #f7f7f7;
 
   --border-color: #ddd;
+  --border-color-darker: #bbb;
   --border-color-lighter: #efefef;
   --border-color-lightest: #f6f6f6;
 
@@ -79,16 +86,18 @@ $invalid-color: #c00;
   --padding-header: 7rem;
   --padding-gutter: 1rem; // left and right page gutters
 
+  --shadow-color: rgba(0, 0, 0, .07);
+  --shadow-color-map: rgba(0, 0, 0, .3);
+
   --text-color: #333;
   --text-color-darker: #000;
-  --text-color-disabled: #ccc;
+  --text-color-disabled: #ddd;
   --text-color-lighter: #555;
   --text-color-lightest: #999;
 }
 
-@media only screen
-  and (max-width: $breakpoint-phone-width) {
-    :root {
-      --padding-gutter: .5rem;
-    }
+@media only screen and (max-width: $breakpoint-phone-width) {
+  :root {
+    --padding-gutter: .5rem;
+  }
 }

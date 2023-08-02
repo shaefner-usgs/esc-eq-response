@@ -1,46 +1,48 @@
-@use '../variables' as *;
+@use '../opt/variables' as *;
 
-ul.options {
-  align-items: center;
-  border: 1px solid var(--accent-color);
-  border-radius: $button-border-radius;
-  display: inline-flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+@layer default {
+  ul.options {
+    align-items: center;
+    border: 1px solid var(--accent-color);
+    border-radius: $button-border-radius;
+    display: inline-flex;
 
-  li {
-    background: var(--bg-color);
-    border-left: 1px solid var(--accent-color);
-    color: var(--accent-color);
-    cursor: pointer;
-    font: bold .8125rem $font-family-headers;
-    margin: 0;
-    padding: .25rem .5rem;
-    text-align: center;
-    text-transform: uppercase;
-    transition: all $effect-off-duration-shorter ease-in;
+    li {
+      background: var(--bg-color);
+      border-left: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      cursor: pointer;
+      font: bold .8125rem $font-family-headers;
+      margin: 0;
+      padding: .25rem .5rem;
+      text-align: center;
+      text-transform: uppercase;
+      transition: $effect-duration-shorter ease-in-out {
+        property: background, color, text-shadow;
+      };
 
-    &:hover {
-      background: var(--accent-color-lightest);
-      transition: background $effect-on-duration ease-out;
-    }
+      &:first-child {
+        border: none;
+        border-radius: $button-border-radius 0 0 $button-border-radius;
+      }
 
-    &:first-child {
-      border: none;
-      border-radius: $button-border-radius 0 0 $button-border-radius;
-    }
-    &:last-child {
-      border-radius: 0 $button-border-radius $button-border-radius 0;
-    }
+      &:last-child {
+        border-radius: 0 $button-border-radius $button-border-radius 0;
+      }
 
-    &.selected {
-      background: var(--accent-color);
-      border-radius: 0;
-      color: var(--bg-color);
-      cursor: auto;
-      text-shadow: var(--button-text-shadow);
-      transition: all $effect-on-duration ease-out;
+      &:hover {
+        background: var(--accent-color-lightest);
+        transition-duration: $effect-on-duration;
+      }
+
+      &.selected {
+        background: var(--accent-color);
+        border-radius: 0;
+        color: var(--bg-color);
+        cursor: auto;
+        text-shadow: var(--button-text-shadow);
+        transition-duration: $effect-on-duration;
+      }
     }
   }
 }

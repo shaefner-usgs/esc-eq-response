@@ -1,145 +1,186 @@
-@use '../../util/mixins' as *;
-@use '../../util/variables' as *;
+@use '../../util/opt/mixins' as *;
+@use '../../util/opt/variables' as *;
 
-#plotsPane,
-#summaryPane {
-  .filter {
-    align-items: center;
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    margin-top: -.5rem;
-
+@layer default {
+  #plotsPane,
+  #summaryPane {
     label {
       color: var(--text-color-lighter);
       margin-left: 1rem;
     }
-  }
 
-  .timestamp {
-    margin-top: 1.25rem;
+    .description {
+      font-size: 1.125rem;
+      line-height: 1.5;
+      margin: 0;
+    }
 
-    time:before {
-      @include labels;
-
-      content: 'Updated';
-      margin-right: .5rem;
+    .filter {
+      align-items: center;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      margin-top: -.5rem;
     }
   }
 
-  .filter:not(.hide) + .timestamp {
-    margin-top: 0;
-  }
-}
-#plotsPane .filter {
-  justify-content: center;
-  margin-top: -1.5rem;
-}
+  #plotsPane {
+    output:after {
+      content: ' km';
+    }
 
-#summaryPane {
-  h3 {
-    .mag {
+    .filter {
+      justify-content: center;
+      margin-top: -1rem;
+
+      &.hide {
+        display: none;
+      }
+    }
+
+    .timestamp {
+      margin-top: 0;
+    }
+  }
+
+  #summaryPane {
+    h3.mag {
       margin-left: .25em; // account for collapse of whitespace by display:flex
     }
-  }
 
-  table.m0 tr.m0,
-  table.m1 tr.m1,
-  table.m2 tr.m2,
-  table.m3 tr.m3,
-  table.m4 tr.m4,
-  table.m5 tr.m5,
-  table.m6 tr.m6,
-  table.m7 tr.m7,
-  table.m8 tr.m8,
-  table.m9 tr.m9 {
-    display: table-row;
-  }
+    table.m0 tr.m0,
+    table.m1 tr.m1,
+    table.m2 tr.m2,
+    table.m3 tr.m3,
+    table.m4 tr.m4,
+    table.m5 tr.m5,
+    table.m6 tr.m6,
+    table.m7 tr.m7,
+    table.m8 tr.m8,
+    table.m9 tr.m9 {
+      display: table-row;
+    }
 
-  tr.m0,
-  tr.m1,
-  tr.m2,
-  tr.m3,
-  tr.m4,
-  tr.m5,
-  tr.m6,
-  tr.m7,
-  tr.m8,
-  tr.m9 {
-    display: none;
-  }
+    tr.m0,
+    tr.m1,
+    tr.m2,
+    tr.m3,
+    tr.m4,
+    tr.m5,
+    tr.m6,
+    tr.m7,
+    tr.m8,
+    tr.m9 {
+      display: none;
+    }
 
-  .bin {
-    margin: 1.25rem 0 1rem;
+    .bin {
+      margin: 1.25rem 0 1rem;
 
-    td {
-      &.total {
-        background: var(--bg-color-darker);
-        color: var(--text-color);
+      td {
+        &:not(:first-child) {
+          text-align: right;
+        }
+
+        &.total {
+          background: var(--bg-color-darker);
+        }
       }
 
-      &:not(:first-child) {
-        text-align: right;
+      th {
+        &.rowlabel {
+          border-right: 1px solid var(--border-color);
+        }
+
+        &.type {
+          border-bottom: 1px solid var(--border-color-lighter);
+          font-weight: normal;
+          padding-right: .125rem;
+          text-align: right;
+          text-transform: capitalize;
+        }
+      }
+
+      tr:first-child {
+        border-bottom: 1px solid var(--border-color);
       }
     }
 
-    th {
-      &.type {
-        border-bottom: 1px solid var(--border-color-lighter);
-        font-weight: 400;
-        padding-right: 2px;
-        text-align: right;
-        text-transform: capitalize;
-      }
+    .bins {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: -1rem;
 
-      &.rowlabel {
-        border-bottom: 1px solid var(--border-color-lighter);
-        border-right: 1px solid var(--border-color);
-        padding-right: .75rem;
-        text-align: center;
+      table {
+        margin-right: 2rem;
+
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
 
-    tr:first-child {
-      border-bottom: 1px solid var(--border-color);
+    .hide-month .month,
+    .hide-year .year {
+      display: none; // elapsed time is less than previous bin column's duration
     }
-  }
 
-  .bins {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: -1.25rem;
-
-    table {
-      margin-right: 2rem;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-  .hide-month .month,
-  .hide-year .year {
-    display: none; // hide column when duration is shorter than next smaller category
-  }
-
-  .list {
-    td {
-      &.depth,
-      &.distance,
-      &.mag {
-        text-align: right;
+    .list {
+      &.sortable th {
+        @include hover-effect;
       }
 
-      &.distance span {
-        display: inline-block;
-        text-align: left;
-        width: 1.5rem;
+      tbody tr {
+        transition: $effect-duration ease-in-out {
+          property: background, color;
+        };
+
+        &:hover,
+        &.selected {
+          background: var(--accent-color-lightest);
+          color: var(--text-color-darker);
+          cursor: pointer;
+          transition-duration: $effect-on-duration;
+        }
+
+        &:active {
+          background: var(--accent-color);
+          color: var(--bg-color);
+          transition-duration: $effect-on-duration;
+        }
       }
 
-      &.latlng {
-        text-align: center;
+      td {
+        &.depth,
+        &.distance,
+        &.mag {
+          text-align: right;
+        }
+
+        &.distance span { // direction
+          display: inline-block;
+          text-align: left;
+          width: 1.5rem;
+        }
+      }
+
+      th {
+        &.sort-header:hover {
+          span:after,
+          span:before {
+            border-color: var(--text-color) transparent; // sort arrows
+          }
+        }
+
+        &.sort-header span:after,
+        &.sort-header span:before {
+          border-color: var(--text-color-lighter) transparent; // sort arrows
+        }
+
+        em {
+          font-style: normal;
+          font-weight: normal;
+        }
       }
 
       .tz {
@@ -147,396 +188,196 @@
       }
     }
 
-    th {
-      color: var(--text-color-lighter);
+    .sort-header {
+      color: var(--text-color-lighter); // override tablesort's default
+    }
 
-      &.sort-header span:after,
-      &.sort-header span:before {
-        border-color: var(--text-color-lighter) transparent;
-      }
+    .timestamp {
+      margin-top: 1.25rem;
+    }
 
-      &.sort-header:hover {
-        color: var(--text-color);
+    @media only screen and (max-width: $breakpoint-phone-width) {
+      .list {
+        position: relative;
+        width: 100%;
 
-        span:after,
-        span:before {
-          border-color: var(--text-color) transparent;
+        tbody {
+          border-top: 1px solid var(--border-color-lighter);
         }
-      }
-      &.sort-header:active {
-        color: var(--text-color-darker);
-      }
 
-      em {
-        font-family: $font-family-headers;
-        font-style: normal;
-        font-weight: normal;
-      }
-    }
-
-    tr {
-      transition: all $effect-off-duration ease-in;
-
-      &.selected,
-      &:hover:not(.no-sort) {
-        background: var(--accent-color-lightest);
-        color: var(--text-color-darker);
-        cursor: pointer;
-        transition: all $effect-on-duration ease-out;
-      }
-
-      &:active td {
-        background: var(--accent-color);
-        color: var(--bg-color) !important;
-
-        &.mag span {
-          color: var(--bg-color) !important;
-        }
-      }
-    }
-  }
-}
-
-/* Earthquake details in map popups and on the SelectBar
---------------------------------------------- */
-
-.earthquake {
-  &:not(.mainshock) {
-    .status {
-      display: none;
-    }
-  }
-
-  &.mainshock,
-  &.catalog-search {
-    .distance {
-      display: none;
-    }
-  }
-  &.mainshock {
-    button {
-      display: none;
-    }
-  }
-
-  position: relative;
-
-  button {
-    &:after {
-      content: 'Earthquake';
-    }
-
-    bottom: 0;
-    margin: 0;
-    padding-bottom: 2px;
-    padding-top: 2px;
-    position: absolute;
-    right: -.25rem;
-  }
-
-  dd {
-    &.status {
-      text-transform: capitalize;
-
-      i {
-        margin-left: .25rem;
-      }
-    }
-
-    &.time {
-      display: flex;
-      flex-direction: column;
-    }
-  }
-
-  time {
-    display: block;
-
-    &.utc {
-      order: 1;
-    }
-    &.user {
-      order: 2;
-    }
-    &.local {
-      order: 3;
-    }
-  }
-}
-
-/* Toggle between user/UTC time
---------------------------------------------- */
-
-body.user {
-  td.utcTime,
-  th.utcTime,
-  #plotsPane time.utc,
-  #settingsBar time.utc,
-  #summaryPane time.utc,
-  .earthquake:not(.mainshock) time.utc,
-  .leaflet-tooltip time.utc,
-  .plotly .line > tspan:nth-of-type(2) {
-    display: none !important; // need !important for responsive tables
-  }
-
-  time.user {
-    order: 1;
-  }
-  time.utc {
-    order: 2;
-  }
-}
-
-body.utc {
-  td.userTime,
-  th.userTime,
-  #plotsPane time.user,
-  #settingsBar time.user,
-  #summaryPane time.user,
-  .earthquake:not(.mainshock) time.user,
-  .leaflet-tooltip time.user,
-  .plotly .line > tspan:nth-of-type(1) {
-    display: none !important; // need !important for responsive tables
-  }
-}
-
-@media only screen
-and (max-width: $breakpoint-phone-width) {
-  #summaryPane {
-    .list {
-      position: relative;
-      width: 100%;
-
-      &.m0 tr.m0,
-      &.m1 tr.m1,
-      &.m2 tr.m2,
-      &.m3 tr.m3,
-      &.m4 tr.m4,
-      &.m5 tr.m5,
-      &.m6 tr.m6,
-      &.m7 tr.m7,
-      &.m8 tr.m8,
-      &.m9 tr.m9 {
-        display: block;
-      }
-
-      tr.m0,
-      tr.m1,
-      tr.m2,
-      tr.m3,
-      tr.m4,
-      tr.m5,
-      tr.m6,
-      tr.m7,
-      tr.m8,
-      tr.m9 {
-        display: none;
-      }
-
-      // Reflow table content
-      tbody {
-        border-top: 1px solid var(--border-color-lighter);
-
-        td,
-        tr {
-          display: block;
-        }
+        // Reflow table content
         td {
-          line-height: 1;
-          padding: 0 .5rem;
-        }
+          display: block;
+          padding: 0 1rem;
 
-        .depth,
-        .distance {
-          color: var(--text-color-lighter);
-          font-size: .95rem;
-        }
-        .depth {
-          float: right;
-        }
-        .distance {
-          margin-top: -.5rem;
-          text-align: left;
+          &.depth {
+            float: right;
+            margin-top: -.75rem;
+            padding-right: .25rem;
+          }
 
-          span {
-            width: auto;
+          &.distance {
+            font-size: $font-size-smaller;
+            padding-bottom: .25rem;
+            text-align: left;
+
+            &:after {
+              content: ' of Mainshock';
+            }
+
+            span {
+              width: auto;
+            }
+          }
+
+          &.eqid,
+          &.location {
+            display: none;
+          }
+
+          &.mag {
+            float: left;
+            font-size: 1.25rem;
+            margin-top: .375rem;
+            padding-left: .25rem;
+            text-align: center;
+
+            span {
+              display: block;
+              font-size: $font-size-smaller;
+              font-weight: 300;
+              line-height: 1;
+            }
+          }
+
+          &.userTime,
+          &.utcTime {
+            padding-top: .25rem;
           }
         }
-        .distance:after {
-          content: ' of Mainshock';
-        }
 
-        .distance,
-        .utcTime {
-          padding: .5rem 0 .5rem 3.5rem;
-        }
-
-        .eqid,
-        .location {
+        // Unexpanded sort options select menu
+        th {
           display: none;
-        }
+          font-weight: normal;
 
-        .mag {
-          float: left;
-          font-size: 1.15rem;
-          margin-top: .8rem;
-          text-align: center;
+          &.sort-down,
+          &.sort-up {
+            border-bottom: 1px solid var(--accent-color);
+            display: inline-block; // show current sorted-by field only
+            padding: 0;
 
-          span {
-            color: var(--text-color-lighter);
-            display: block;
-            font-size: .75rem;
-            font-weight: 300;
+            &:before {
+              color: var(--text-color-lighter);
+              content: 'Sort by: ';
+              text-transform: none;
+            }
           }
-        }
-      }
 
-      // Sort options menu
-      th {
-        font-size: 1rem;
-        font-weight: 400;
+          abbr {
+            border-bottom: none;
+          }
 
-        abbr {
-          border-bottom: none;
-        }
-      }
-
-      thead tr {
-        border: none;
-        transition: none;
-      }
-
-      // Unexpanded sort options select menu
-      th {
-        display: none;
-        margin-top: -.25rem;
-        padding: 0;
-
-        &.sort-down,
-        &.sort-up { // show current sorted-by field
-          border-bottom: 1px solid var(--accent-color);
-          display: inline-block;
-
-          &:before {
-            color: var(--text-color-lighter);
-            content: 'Sort by: ';
-            font-size: .95rem;
-            text-transform: none;
+          span:before {
+            display: none; // hide sort order arrow's hover state
           }
         }
 
-        span:before {
-          display: none; // hide sort order arrow's hover state
+        thead tr {
+          border: none;
         }
-      }
 
-      // Expanded sort options select menu
-      &.show-menu {
-        thead {
+        // Expanded sort options select menu (must follow unexpanded rules)
+        &.show-menu {
           th {
             border-bottom: none;
             display: block;
-            margin: 0;
             padding: .5rem 1.5rem;
             position: relative;
             text-align: left;
-            transition: $effect-off-duration ease-in;
-            transition-property: background, color;
-
-            &.distance {
-              border-radius: 0 0 $button-border-radius $button-border-radius;
-            }
-
-            &.sort-down,
-            &.sort-up {
-              &:after {
-                content: '✔';
-                left: .35rem;
-                position: absolute;
-                top: .5rem;
-              }
-            }
+            transition: $effect-duration ease-in-out {
+              property: background, color;
+            };
 
             &:before {
-              content: '';
+              content: ''; // remove 'Sort by:' text
             }
 
-            &:hover {
+            &:hover,
+            &:focus {
               background: var(--accent-color-lightest);
               color: var(--text-color-darker);
-              transition: $effect-on-duration ease-out;
-              transition-property: background, color;
+              transition-duration: $effect-on-duration;
 
               span:before {
-                display: inline;
+                display: inline; // sort arrows
               }
             }
 
             &:active {
               background: var(--accent-color);
-              color: #fff;
-              transition: all $effect-on-duration ease-out;
+              color: var(--bg-color);
+              transition-duration: $effect-on-duration;
 
-              span{
+              // Sort arrows
+              span {
                 &:after {
-                  border-bottom-color: #ccc;
-                  border-top-color: #ccc;
+                  border-bottom-color: var(--accent-color-lightest);
+                  border-top-color: var(--accent-color-lightest);
                   opacity: .4;
                 }
 
                 &:before {
-                  border-bottom-color: #fff;
-                  border-top-color: #fff;
+                  border-bottom-color: var(--bg-color);
+                  border-top-color: var(--bg-color);
                   opacity: 1;
                 }
               }
             }
+
+            &:is(.sort-down, .sort-up):after {
+              content: '✔';
+              left: .35rem;
+              position: absolute;
+              top: .5rem;
+            }
+
+            &.distance {
+              border-radius: 0 0 $button-border-radius $button-border-radius;
+            }
           }
 
-          tr {
-            background: rgba(255, 255, 255, .96);
+          thead tr {
+            background: var(--bg-color-alpha);
             border: 1px solid var(--accent-color);
             border-radius: $button-border-radius;
-            box-shadow: 0 0 6px 0 rgba(0, 0, 0, .25);
+            box-shadow: 4px 4px 4px 0 var(--shadow-color);
             cursor: pointer;
             left: 0;
-            padding: 0;
             position: absolute;
-            top: -25px;
-
-            &.hover:after {
-              background: var(--accent-color-lightest);
-              transition: all $effect-on-duration ease-out;
-            }
-
-            &.active:after {
-              background: var(--accent-color);
-              color: #fff;
-              transition: all $effect-on-duration ease-out;
-            }
+            top: -1.625rem;
 
             &:after {
-              border-radius: 50%;
-              color: var(--accent-color);
+              @include close-button;
+
               content: '×';
-              font: bold 1rem Tahoma, Verdana, sans-serif;
-              height: 23px;
-              line-height: 1.35;
-              padding: 0;
-              position: absolute;
-              right: 2px;
-              text-align: center;
-              top: 2px;
-              transition: all $effect-off-duration ease-in;
-              width: 23px;
             }
 
             &:before {
               color: var(--text-color-lighter);
               content: 'Sort by:';
               display: block;
-              font: .95rem $font-family-headers;
-              padding: .25rem 0 .25rem .4rem;
+              font-family: $font-family-headers;
+              padding: .25rem 0 .25rem .375rem;
+            }
+
+            &.hover:after { // close button
+              background: var(--accent-color-lightest);
+            }
+
+            &.active:after { // close button
+              background: var(--accent-color);
+              color: var(--bg-color);
             }
           }
 
@@ -546,6 +387,46 @@ and (max-width: $breakpoint-phone-width) {
           }
         }
       }
+    }
+  }
+
+  // Earthquake details in map Popups and SelectBar
+  .earthquake {
+    position: relative;
+
+    &:is(.catalog-search, .mainshock) .distance {
+      display: none;
+    }
+
+    &:not(.mainshock) .status {
+      display: none;
+    }
+
+    &.mainshock button {
+      display: none;
+    }
+
+    button {
+      bottom: 0;
+      position: absolute;
+      right: -.25rem;
+
+      &:after {
+        content: 'Earthquake';
+      }
+    }
+
+    dd.status {
+      text-transform: capitalize;
+
+      i {
+        margin-left: .25rem;
+      }
+    }
+
+    .time {
+      display: flex;
+      flex-direction: column;
     }
   }
 }

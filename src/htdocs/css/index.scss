@@ -1,15 +1,11 @@
-@use 'sass:color';
+@use 'sass:meta';
 
-@use 'tablesort'; // located in node_modules/tablesort
+@use 'base'; // must be first, to establish layer order
 
 @use 'features';
 @use 'leaflet';
 @use 'util';
 
-@use 'util/mixins' as *;
-@use 'util/variables' as *;
-
-@use 'header';
 @use 'infoBar';
 @use 'legendBar';
 @use 'mapPane';
@@ -24,278 +20,18 @@
 @use 'summaryPane';
 @use 'titleBar';
 
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
+/**
+ * External Sass libs, loaded into layers (located in node_modules)
+ *
+ * see: https://github.com/sass/sass/issues/3240
+ */
+@layer leaflet {
+  @include meta.load-css('L.Control.MousePosition');
 }
 
-a {
-  color: var(--accent-color);
-  text-decoration-color: color.scale($accent-color, $lightness: 75%);
-  text-decoration-skip-ink: none;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 2px;
-  transition: text-decoration-color $effect-off-duration ease-in;
-
-  &:active {
-    color: var(--accent-color);
-  }
-  &:hover {
-    text-decoration-color: color.scale($accent-color, $lightness: 25%);
-    transition: text-decoration-color $effect-on-duration ease-out;
-  }
-  &:visited {
-    color: var(--accent-color);
-  }
+@layer tablesort {
+  @include meta.load-css('tablesort');
 }
 
-abbr {
-  border-bottom: 1px dotted #bbb;
-  cursor: help;
-  font-variant: none; // avoid browser-default small caps
-
-  &[title] {
-    text-decoration: none; // clean up default styling in Chrome
-  }
-}
-
-body,
-html,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-body {
-  background: var(--bg-color-darker);
-  color: var(--text-color);
-  position: relative;
-}
-
-dl {
-  margin: 1rem 0;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5 {
-  font-family: $font-family-headers;
-  font-weight: 400;
-}
-h2,
-h3,
-h4 {
-  line-height: 1.25;
-}
-h2,
-h3 {
-  align-items: baseline;
-  display: flex;
-}
-h1 {
-  font-size: 1.75rem;
-  line-height: 1;
-  margin: 0;
-}
-h2 {
-  font-size: 2rem;
-  margin: 2.25rem 0 .625rem;
-}
-h3 {
-  font-size: 1.5rem;
-  margin: 2.25rem 0 1rem;
-}
-h4 {
-  font-size: 1.25rem;
-  margin: 0 0 .5rem;
-}
-h5 {
-  font-size: 1rem;
-  margin: 1rem 0 .5rem
-}
-
-html {
-  box-sizing: border-box;
-  font: $font-size $font-family;
-}
-
-main {
-  position: relative;
-}
-
-p {
-  line-height: $line-height;
-  margin: 1.25rem 0;
-
-  > strong {
-    font-weight: 500;
-  }
-}
-
-table {
-  border-collapse: collapse;
-  margin: 0 0 .75rem;
-}
-
-td,
-th {
-  padding: .375rem .75rem;
-
-  &:first-child {
-    padding-left: .375rem;
-  }
-  &:last-child {
-    padding-right: .375rem;
-  }
-}
-th {
-  @include labels;
-
-  padding: .125rem .75rem;
-  text-align: center;
-}
-
-thead tr {
-  border-color: var(--border-color);
-}
-
-tr {
-  border-bottom: 1px solid var(--border-color-lighter);
-}
-
-ul {
-  padding: 0 0 0 1.75rem;
-}
-
-.bubble {
-  background: var(--bg-color);
-  border-radius: $content-border-radius;
-  box-shadow: 0 3px 14px 0 rgba(102 ,102, 102, 0.1);
-  padding: 1rem;
-
-  + .bubble {
-    margin-top: 1rem;
-  }
-}
-
-.container {
-  line-height: $line-height;
-  padding: 1rem var(--padding-gutter);
-
-  > .feature {
-    width: 100%;
-  }
-}
-
-.count {
-  font-size: .8em;
-  margin-left: .3em;
-
-  &:after {
-    content: ")";
-  }
-  &:before {
-    content: "(";
-  }
-
-  &:not(.played) {
-    animation: opacify $effect-duration ease-out;
-  }
-}
-
-.description {
-  font-size: 1.125rem;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.external {
-  padding-right: .5rem;
-  position: relative;
-
-  &:hover {
-    i {
-      opacity: 1;
-      transition: all $effect-on-duration ease-out;
-    }
-  }
-
-  i {
-    color: color.scale($accent-color, $lightness: 25%);
-    font-size: $font-size-smaller;
-    opacity: 0;
-    position: absolute;
-    right: -.625rem;
-    top: 0;
-    transition: all $effect-off-duration ease-in;
-  }
-}
-
-.icon-check {
-  color: green;
-}
-
-.pane {
-  display: block;
-  padding: var(--padding-header) 0 0;
-
-  &.hide {
-    display: none;
-    max-height: 1vh;
-    overflow: hidden;
-  }
-}
-
-.props {
-  display: grid;
-  grid-template-columns: max-content auto;
-  margin-bottom: 0;
-
-  &.alt {
-    dd,
-    dt {
-      border-bottom: 1px solid var(--border-color-lightest);
-      padding-bottom: .25rem;
-      padding-top: .25rem;
-
-      &:first-child,
-      &:nth-child(2) {
-        padding-top: 0
-      }
-
-      &:nth-last-child(2),
-      &:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
-      }
-    }
-    dd {
-      padding-left: .75rem;
-    }
-    dt {
-      text-transform: none;
-    }
-  }
-
-  dd,
-  dt {
-    line-height: 1.75;
-  }
-  dd {
-    color: var(--text-color);
-    grid-column-start: 2;
-    margin: 0;
-    padding-left: .5rem;
-  }
-  dt {
-    @include labels;
-
-    grid-column-start: 1;
-    text-align: right;
-  }
-}
-
-@include opacify;
+@import url('../lib/flatpickr/flatpickr.css') layer(flatpickr);
+@import url('../lib/leaflet/leaflet.css') layer(leaflet);

@@ -1,57 +1,57 @@
-.leaflet-control-region {
-  a {
-    align-items: center;
-    display: flex;
-    justify-content: center;
+@use '../util/opt/variables' as *;
 
-    &:active,
-    &.selected {
-      .box {
-        border-color: var(--bg-color);
-      }
+@layer default {
+  .leaflet-control-region {
+    :is(.leaflet-disabled, .leaflet-disabled:active) .box {
+      border-color: var(--accent-color-disabled);
+    }
 
-      .icon-close {
-        background: var(--bg-color);
-        color: var(--accent-color);
+    :is(.leaflet-disabled, .leaflet-disabled:active) .close {
+      background: var(--accent-color-disabled);
+      color: var(--bg-color);
+    }
+
+    a {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+
+      &:active,
+      &.selected {
+        .box {
+          border-color: var(--bg-color);
+        }
+
+        .close {
+          background: var(--bg-color);
+          color: var(--accent-color);
+        }
       }
     }
-    &:hover {
-      display: flex; // override Leaflet's display:block
+
+    .box {
+      border: 2px solid var(--accent-color);
+      height: 15px;
+      position: relative;
+      width: 15px;
+    }
+
+    .close {
+      background: var(--accent-color);
+      border-radius: 50%;
+      color: var(--bg-color);
+      font: 10px/1.1 $font-family-buttons;
+      height: 12px;
+      position: absolute;
+      right: -7px;
+      text-align: center;
+      top: -7px;
+      width: 12px;
     }
   }
 
-  .box {
-    align-items: center;
-    border: 2px solid var(--accent-color);
-    display: flex;
-    height: 15px;
-    justify-content: center;
-    position: relative;
-    width: 15px;
-  }
-
-  .icon-close {
-    background: var(--accent-color);
-    border-radius: 50%;
-    color: var(--bg-color);
-    font: normal 10px Tahoma, Verdana, sans-serif;
-    height: 12px;
-    line-height: 1.1;
-    position: absolute;
-    right: -5px;
-    text-align: center;
-    top: -6px;
-    width: 12px;
-  }
-
-  // Disabled controls
-  .leaflet-disabled .box,
-  .leaflet-disabled:active .box {
-    border-color: var(--accent-color-disabled);
-  }
-  .leaflet-disabled .icon-close,
-  .leaflet-disabled:active .icon-close {
-    background: var(--accent-color-disabled);
-    color: var(--bg-color);
+  .leaflet-path-draggable {
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
   }
 }

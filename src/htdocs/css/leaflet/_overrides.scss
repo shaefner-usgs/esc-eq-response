@@ -1,53 +1,49 @@
-@use 'sass:color';
+@use '../util/opt/mixins' as *;
+@use '../util/opt/variables' as *;
 
-@use '../util/mixins' as *;
-@use '../util/variables' as *;
-
-$separator-color: color.scale($accent-color, $lightness: 80%);
-
-#mapPane,
-#searchBar {
-  .leaflet-bar a.leaflet-disabled,
-  .leaflet-bar a.leaflet-disabled:active,
-  .leaflet-bar a.leaflet-disabled:hover {
-    background: var(--bg-color-alpha);
-    color: var(--accent-color-disabled);
-  }
-
+@layer overrides {
   .leaflet-center,
   .leaflet-right {
-    transition: padding $effect-duration ease;
+    transition: padding $effect-duration ease; // SideBar open/close
   }
 
   .leaflet-container {
-    font: $font-size $font-family;
+    font: 1rem $font-family;
     outline: none;
   }
 
   .leaflet-control-attribution,
   .leaflet-control-mouseposition,
   .leaflet-control-scale-line {
-    background: rgba(255, 255, 255, .75);
-    font-size: .75rem;
+    background: rgba(255, 255, 255, .8);
+    font-size: $font-size-smallest;
   }
+
   .leaflet-control-attribution {
     color: var(--text-color-lighter);
     max-width: 200px;
     overflow: hidden; // quell long attributions
-    padding: 2px 4px;
+    padding: 1px 4px;
     text-overflow: ellipsis;
     white-space: nowrap;
 
     a {
       color: var(--text-color-lighter);
-      transition: color $effect-off-duration ease-in;
+      transition: color $effect-duration ease-in-out;
 
-      &:hover {
+      &:hover,
+      &:active {
         color: var(--text-color);
         text-decoration: none;
-        transition: color $effect-on-duration ease-out;
+        transition-duration: $effect-on-duration;
       }
     }
+  }
+
+  .leaflet-control-mouseposition,
+  .leaflet-control-scale-line {
+    color: var(--text-color);
+    text-shadow: 1px 1px var(--bg-color);
   }
 
   .leaflet-control-layers,
@@ -56,49 +52,60 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     border: 1px solid var(--accent-color);
     border-radius: $button-border-radius;
   }
+
   .leaflet-control-layers,
   .leaflet-control-region a,
   .leaflet-control-zoom a {
     background: var(--bg-color-alpha);
   }
-  .leaflet-control-layers {
-    label {
-      cursor: pointer;
-      font: 1.0625rem $font-family-headers;
-      line-height: 1.3;
-      margin: 6px 0;
 
-      > span,
-      > span span {
-        align-items: center;
-        display: flex;
-      }
-    }
-  }
   .leaflet-control-region a,
   .leaflet-control-zoom a {
-    border-radius: 0;
+    border-radius: $button-border-radius - 1px;
     color: var(--accent-color);
-    transition: all $effect-off-duration-shorter ease-in;
+    transition: $effect-duration ease-in-out {
+      property: background, color;
+    };
 
     &:hover {
       background: var(--accent-color-lightest);
-      transition: all $effect-on-duration ease-out;
+      transition-duration: $effect-on-duration;
     }
-    &:active, &.selected {
+
+    &:active,
+    &.selected {
       background: var(--accent-color);
       color: var(--bg-color);
-      transition: all $effect-on-duration ease-out;
+      transition-duration: $effect-on-duration;
     }
 
     &:first-child {
-      border-bottom-color: $separator-color;
-      border-top-left-radius: $button-border-radius - 1;
-      border-top-right-radius: $button-border-radius - 1;
+      border-bottom-color: var(--accent-color-lighter);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
+
     &:last-child {
-      border-bottom-left-radius: $button-border-radius - 1;
-      border-bottom-right-radius: $button-border-radius - 1;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &.leaflet-disabled,
+    &.leaflet-disabled:active,
+    &.leaflet-disabled:hover {
+      background: var(--bg-color-alpha);
+      color: var(--accent-color-disabled);
+    }
+  }
+
+  .leaflet-control-layers label {
+    cursor: pointer;
+    font: 1.0625rem $font-family-headers;
+    padding: .125rem 0;
+
+    > span > span {
+      align-items: center;
+      display: flex;
     }
   }
 
@@ -106,41 +113,42 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
     background: var(--bg-color);
     border-radius: $button-border-radius;
     color: var(--text-color);
-    padding: 3px 10px;
+    padding: .25rem .625rem;
   }
 
-  .leaflet-control-layers-overlays {
-    label span > span { // contains Feature count
-      align-items: baseline;
-    }
+  .leaflet-control-layers-overlays label > span > span {
+    align-items: baseline; // for Feature count
   }
 
   .leaflet-control-layers-separator {
-    border-top-color: $separator-color;
-    margin: 5px -10px;
+    border-top-color: var(--accent-color-lighter);
+    margin: .25rem -.625rem;
   }
 
   .leaflet-control-layers-toggle {
-    @include layers($accent-color);
+    @include layer-icon($accent-color);
   }
 
   .leaflet-popup-close-button {
-    @include close;
+    @include close-button;
   }
 
   .leaflet-popup-content {
     color: var(--text-color);
     font-size: 1rem;
-    line-height: $line-height;
+    line-height: normal;
     margin: .75rem 1rem;
+  }
 
-    a {
-      color: var(--accent-color);
-    }
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip,
+  .leaflet-tooltip {
+    background: var(--bg-color);
+  }
 
-    [datetime] {
-      min-width: 20rem; // prevent datetime from wrapping
-    }
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    box-shadow: 0 3px 14px var(--shadow-color-map);
   }
 
   .leaflet-popup-content-wrapper {
@@ -148,10 +156,23 @@ $separator-color: color.scale($accent-color, $lightness: 80%);
   }
 
   .leaflet-tooltip {
-    z-index: 10;
+    border: none;
+    border-radius: $button-border-radius;
+    box-shadow: 0 1px 3px var(--shadow-color-map);
+    color: var(--text-color);
+    padding: .5rem;
+    z-index: 10; // markers
 
     &.mouseoverlayer {
-      z-index: 1;
+      z-index: 1; // faults
     }
+  }
+
+  .leaflet-tooltip-left:before {
+    border-left-color: var(--bg-color);
+  }
+
+  .leaflet-tooltip-right:before {
+    border-right-color: var(--bg-color);
   }
 }

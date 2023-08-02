@@ -1,50 +1,40 @@
-@use 'util/variables' as *;
-
-#titleBar {
-  h1,
-  p {
-    white-space: nowrap;
-  }
-
-  h1 {
+@layer default {
+  #titleBar {
     a {
       color: var(--text-color);
       text-decoration-color: transparent;
-      text-decoration-skip-ink: none;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 2px;
-      transition: all $effect-off-duration ease-in;
 
       &:hover {
         color: var(--text-color-darker);
         text-decoration-color: var(--text-color-lighter);
-        transition: all $effect-on-duration ease-out;
       }
+    }
+
+    h1,
+    p {
+      white-space: nowrap;
+      overflow-x: scroll;
+      overflow-y: hidden;
+    }
+
+    h1 {
+      margin-top: .25rem;
     }
 
     i {
       color: var(--text-color-lighter);
       font-size: 1.25rem;
       right: -1.125rem;
-      top: .75rem;
+      top: .625rem;
+    }
+
+    p {
+      font-size: 1.25rem;
+      margin: 0 0 .25rem;
+    }
+
+    time.local {
+      display: none;
     }
   }
-
-  p {
-    color: var(--text-color);
-    font: 1.25rem $font-family;
-    margin: .5rem 0;
-  }
-
-  time.local {
-    display: none;
-  }
-}
-
-/* Toggle between user/UTC time
---------------------------------------------- */
-
-body.user #titleBar time.utc,
-body.utc #titleBar time.user {
-  display: none;
 }

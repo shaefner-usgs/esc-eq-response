@@ -1,112 +1,115 @@
-@use '../util/variables' as *;
+@use '../util/opt/variables' as *;
 
-#mapPane {
-  .station-channels-map {
-    td,
-    th {
-      padding-left: .5rem;
-      padding-right: .5rem;
-      text-align: center;
+@layer default {
+  // Map markers
+  .leaflet-shakemap-stations-pane {
+    .station-icon {
+      opacity: .85;
+      position: absolute;
 
-      em {
-        font-size: 0.875rem;
-        font-style: normal;
+      &:after,
+      &:before {
+        border: solid transparent;
+        content: '';
+        position: absolute;
+      }
+
+      &:after { // outline
+        border-bottom-color: rgba(0, 0, 0, .6);
+        border-width: 12px 8px;
+        left: -1px;
+        top: -13px;
+        z-index: 1;
+      }
+
+      &:before { // symbol
+        border-width: 10px 6px;
+        left: 1px;
+        top: -10px;
+        z-index: 2;
       }
     }
-    th span {
-      text-transform: lowercase;
-    }
 
-    tr {
-      white-space: nowrap;
+    .station-mmiI:before {
+      border-bottom-color: $mmiI-color;
     }
-  }
-
-  .station-layer-icon {
-    opacity: 0.85;
-    position: absolute;
-
-    &:after {
-      border: 12px solid transparent;
-      border-bottom-color: rgba(0, 0, 0, .6);
-      border-left-width: 8px;
-      border-right-width: 8px;
-      content: ' ';
-      display: block;
-      left: -1px;
-      position: absolute;
-      top: -13px;
-      z-index: 1;
+    .station-mmiII:before {
+      border-bottom-color: $mmiII-color;
     }
-    &:before {
-      border: 10px solid transparent;
-      border-left-width: 6px;
-      border-right-width: 6px;
-      content: ' ';
-      display: block;
-      left: 1px;
-      position: absolute;
-      top: -10px;
-      z-index: 2;
+    .station-mmiIII:before {
+      border-bottom-color: $mmiIII-color;
+    }
+    .station-mmiIV:before {
+      border-bottom-color: $mmiIV-color;
+    }
+    .station-mmiV:before {
+      border-bottom-color: $mmiV-color;
+    }
+    .station-mmiVI:before {
+      border-bottom-color: $mmiVI-color;
+    }
+    .station-mmiVII:before {
+      border-bottom-color: $mmiVII-color;
+    }
+    .station-mmiVIII:before {
+      border-bottom-color: $mmiVIII-color;
+    }
+    .station-mmiIX:before {
+      border-bottom-color: $mmiIX-color;
+    }
+    .station-mmiX:before,
+    .station-mmiX\+:before,
+    .station-mmiXI:before,
+    .station-mmiXII:before {
+      border-bottom-color: $mmiX-color;
     }
   }
 
-  /* Leaflet marker colors */
+  // Map popups
+  .shakemap-stations {
+    .channels {
+      em {
+        font-size: $font-size-smaller;
+        font-style: normal;
+        text-transform: lowercase;
+      }
 
-  .station-mmiI:before {
-    border-bottom-color: $mmiI-color;
-  }
-  .station-mmiII:before {
-    border-bottom-color: $mmiII-color;
-  }
-  .station-mmiIII:before {
-    border-bottom-color: $mmiIII-color;
-  }
-  .station-mmiIV:before {
-    border-bottom-color: $mmiIV-color;
-  }
-  .station-mmiV:before {
-    border-bottom-color: $mmiV-color;
-  }
-  .station-mmiVI:before {
-    border-bottom-color: $mmiVI-color;
-  }
-  .station-mmiVII:before {
-    border-bottom-color: $mmiVII-color;
-  }
-  .station-mmiVIII:before {
-    border-bottom-color: $mmiVIII-color;
-  }
-  .station-mmiIX:before {
-    border-bottom-color: $mmiIX-color;
-  }
-  .station-mmiX:before,
-  .station-mmiX\+:before,
-  .station-mmiXI:before,
-  .station-mmiXII:before {
-    border-bottom-color: $mmiX-color;
-  }
+      td,
+      th {
+        padding-left: .5rem;
+        padding-right: .5rem;
+        text-align: center;
 
-  .station-summary {
-    display: flex;
-    list-style: none;
-    margin: 1rem 0;
-    padding: 0;
+        &:first-child {
+          padding-left: .25rem;
+        }
+        &:last-child {
+          padding-right: .25rem;
+        }
+      }
 
-    li {
+      tr {
+        white-space: nowrap;
+      }
+    }
+
+    .station-channel-name {
+      padding-bottom: .5rem;
+    }
+
+    .station-summary li {
       width: 25%;
 
       &:not(.impact-bubble) {
         align-items: center;
         display: flex;
         flex-direction: column;
-        line-height: 1.125;
-        padding: .25rem 0;
+        justify-content: center;
 
         abbr {
-          color: var(--text-color-lightest);
-          font-size: .75rem;
-          margin-top: .15rem;
+          color: var(--text-color-lighter);
+          font-size: $font-size-smallest;
+          margin-top: .125rem;
         }
       }
     }

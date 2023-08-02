@@ -1,64 +1,136 @@
-@use 'sass:color';
+@use 'opt/variables' as *;
 
-@use 'mixins' as *;
-@use 'variables' as *;
+// Flatpickr overrides, 'Now' button
 
-/* Flatpickr overrides and 'Now' button additions */
+@layer overrides {
+  .invalid .flatpickr-calendar {
+    border-color: var(--invalid-color);
+    box-shadow: $box-shadow-length var(--invalid-color);
 
-.flatpickr-wrapper {
-  &.invalid {
-    .flatpickr-calendar {
-      border-color: var(--invalid-color);
-      box-shadow: 0 0 3px var(--invalid-color);
+    &.arrowBottom:before {
+      border-top-color: var(--invalid-color);
+    }
 
-      &.arrowBottom:before {
-        border-top-color: var(--invalid-color);
-      }
-      &.arrowTop:before {
-        border-bottom-color: var(--invalid-color);
-      }
+    &.arrowTop:before {
+      border-bottom-color: var(--invalid-color);
     }
   }
 
-  input {
-    color: var(--text-color);
-  }
-
   .dayContainer {
-    padding-right: 2px;
+    padding: 0 2px 2px 0;
   }
 
-  // Use the same border styles as form controls
+  .flatpickr-am-pm {
+    color: var(--text-color);
+
+    &:focus {
+      background: var(--bg-color);
+    }
+
+    &:hover {
+      background: var(--accent-color-lightest);
+    }
+
+    &:active {
+      background: var(--accent-color);
+      color: var(--bg-color);
+    }
+  }
+
   .flatpickr-calendar {
     background: var(--bg-color);
     border: 1px solid var(--accent-color);
     border-radius: $button-border-radius;
-    box-shadow: 0 0 3px var(--accent-color);
-    transition: all $effect-duration ease-in-out;
-    z-index: 1001 !important; // stack above map
+    box-shadow: $box-shadow-length var(--accent-color);
+    transition: $effect-on-duration ease-in-out {
+      property: border-color, box-shadow;
+    };
 
+    &.arrowBottom:after {
+      border-top-color: var(--bg-color);
+    }
     &.arrowBottom:before {
       border-top-color: var(--accent-color);
     }
+
     &.arrowTop:after {
       border-bottom-color: var(--bg-color);
     }
     &.arrowTop:before {
       border-bottom-color: var(--accent-color);
     }
+
+    &.open {
+      z-index: 1001; // stack above map
+    }
+
+    input {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      font-size: inherit;
+      margin: 0;
+      padding: 0;
+      transition: background $effect-duration ease-in-out;
+
+      &:focus,
+      &:hover {
+        background: var(--accent-color-lightest);
+        transition-duration: $effect-on-duration;
+      }
+
+      &[disabled] {
+        background: var(--bg-color);
+        cursor: not-allowed;
+        pointer-events: all;
+
+        ~ :is(.arrowDown, .arrowDown:active):after {
+          border-top-color: var(--text-color-disabled);
+        }
+
+        ~ :is(.arrowUp, .arrowUp:active):after {
+          border-bottom-color: var(--text-color-disabled);
+        }
+
+        ~ span { // up, down arrows
+          border-color: var(--border-color-lighter);
+          cursor: not-allowed;
+
+          &:hover,
+          &:active {
+            background: var(--bg-color);
+          }
+        }
+      }
+    }
+
+    .flatpickr-hour {
+      border-bottom-left-radius: $button-border-radius + 2px;
+      font-weight: normal;
+    }
+
+    .flatpickr-minute {
+      border-bottom-right-radius: $button-border-radius + 2px;
+    }
   }
 
   .flatpickr-current-month {
     margin-left: .5rem;
 
-    input.cur-year {
-      font-weight: 300;
-    }
-
-    span.cur-month {
+    .cur-month {
       font-weight: 500;
+      margin: 0 .125rem 0 0;
 
       &:hover {
+        background: var(--bg-color);
+      }
+    }
+
+    .cur-year {
+      font-weight: 300;
+      padding-left: .25rem;
+
+      &:focus {
         background: var(--bg-color);
       }
     }
@@ -69,85 +141,71 @@
     color: var(--text-color);
     display: flex;
     justify-content: center;
-    transition: all $effect-off-duration ease-in;
+    transition: $effect-duration ease-in-out {
+      property: background, border-color;
+    };
 
-    &:hover,
-    &.nextMonthDay:not(.flatpickr-disabled):hover,
-    &.prevMonthDay:not(.flatpickr-disabled):hover {
+    &:focus,
+    &:hover {
       background: var(--accent-color-lightest);
       border-color: var(--accent-color-lighter);
-      color: var(--text-color); // overrides level set below
-      transition: all $effect-on-duration ease-out;
+      transition-duration: $effect-on-duration;
     }
+
     &.nextMonthDay,
     &.prevMonthDay {
-      color: rgba(153, 153, 153, .75);
+      color: var(--text-color-lightest);
     }
 
-    &.flatpickr-disabled,
-    &.flatpickr-disabled:hover {
+    &.flatpickr-disabled {
       background: var(--bg-color);
       border-color: var(--bg-color);
-      color: rgba(153, 153, 153, .3);
+      color: var(--text-color-disabled); // must follow .next/prevMonthDay color
     }
 
-    &.selected,
-    &.selected:hover {
-      animation: opacify $effect-on-duration ease-out;
-      background: var(--accent-color) !important;
-      border-color: var(--accent-color) !important;
-      color: var(--bg-color) !important;
+    &.selected {
+      animation: $effect-on-duration ease-in-out selected;
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: var(--bg-color);
       cursor: auto;
     }
 
     &.today {
       border-color: var(--accent-color);
-      transition-property: background, color;
 
-      &:hover {
-        border-color: var(--accent-color) !important;
-
-        &:not(.flatpickr-disabled) {
-          background: var(--accent-color-lightest);
-          color: var(--text-color);
-        }
+      &:hover:not(.flatpickr-disabled, .selected) {
+        background: var(--accent-color-lightest);
       }
     }
+  }
+
+  .flatpickr-disabled + .flatpickr-now {
+    display: inline; // show 'Now' button
+  }
+
+  .flatpickr-month {
+    color: var(--text-color);
   }
 
   .flatpickr-months {
-    margin-bottom: .5rem;
-
-    .flatpickr-month {
-      color: var(--text-color);
-    }
-
-    .flatpickr-prev-month,
-    .flatpickr-next-month {
-      color: var(--accent-color);
-      line-height: 1;
-      top: 0;
-
-      i {
-        font-size: 1rem;
-      }
-    }
-    .flatpickr-prev-month {
-      left: 2px;
-    }
-    .flatpickr-next-month {
-      right: 2px;
-    }
+    margin-bottom: .375rem;
   }
 
-  .flatpickr-next-month.flatpickr-disabled + .flatpickr-now {
-    display: inline; // show 'Now' button
+  .flatpickr-next-month,
+  .flatpickr-prev-month {
+    color: var(--accent-color);
+    line-height: 1;
+
+    i {
+      font-size: 1rem;
+    }
   }
 
   .flatpickr-now {
     display: none;
     position: absolute;
-    right: 5px;
+    right: 6px;
     top: 6px;
 
     &.selected:hover {
@@ -156,44 +214,18 @@
   }
 
   .flatpickr-time {
-    border-color: var(--accent-color-lighter) !important;
+    border-color: var(--accent-color-lighter);
 
-    &:last-child {
-      border-radius: 0 0 $button-border-radius 0;
-
-      .arrowUp,
-      .arrowDown {
-        border-right: 0;
-      }
+    .arrowDown,
+    .arrowUp {
+      border-right: none;
     }
 
-    .flatpickr-am-pm {
-      color: var(--text-color);
+    .arrowUp {
+      border-top: none;
 
-      &:focus {
-        background: var(--bg-color);
-      }
-      &:hover {
-        background: var(--accent-color-lightest);
-      }
-      &:active {
-        background: var(--accent-color);
-        border-radius: 0;
-        color: var(--bg-color);
-      }
-    }
-
-    .flatpickr-hour {
-      border-radius: 0 0 0 $button-border-radius + 2px;
-      font-weight: normal;
-    }
-
-    .flatpickr-minute {
-      border-radius: 0;
-
-      &:invalid {
-        border: none;
-        box-shadow: none;
+      &:after {
+        top: 40%;
       }
     }
   }
@@ -202,91 +234,59 @@
     color: var(--text-color-lighter);
   }
 
-  .numInputWrapper {
-    &:first-child {
-      border-radius: 0 0 0 $button-border-radius + 2px;
+  .numInputWrapper span { // up, down arrows
+    border-color: var(--accent-color-lighter);
+    transition: $effect-duration ease-in-out {
+      property: background, opacity;
+    };
+
+    &:after {
+      transition: border-color $effect-duration ease-in-out;
     }
 
-    &:hover {
-      background: var(--accent-color-lightest);
+    &.arrowDown:after {
+      border-top-color: var(--accent-color);
     }
 
-    input {
-      border: none;
-      box-shadow: none;
-      color: var(--text-color);
-
-      &:focus,
-      &:hover {
-        background: var(--accent-color-lightest);
-        border: none;
-        box-shadow: none;
-      }
-
-      &[disabled] {
-        ~ span {
-          cursor: auto;
-
-          &:hover,
-          &:active {
-            background: var(--accent-color-lightest);
-          }
-        }
-
-        ~ .arrowDown:after,
-        ~ .arrowDown:active:after {
-          border-top-color: #bbb;
-        }
-        ~ .arrowUp:after,
-        ~ .arrowUp:active:after {
-          border-bottom-color: #bbb;
-        }
-      }
+    &.arrowUp:after {
+      border-bottom-color: var(--accent-color);
     }
 
-    span { // up, down arrows
-      border-color: var(--accent-color-lighter);
-      transition: all $effect-off-duration ease-in;
+		&:active,
+		&:active:after,
+		&:hover {
+			transition-duration: $effect-on-duration;
+		}
 
-      &.arrowDown:after,
-      &.arrowUp:after {
-        transition: all $effect-off-duration ease-in;
-      }
+		&:hover {
+			background: var(--accent-color-lighter);
+		}
+
+    &:active {
+      background: var(--accent-color);
+
       &.arrowDown:after {
-        border-top-color: var(--accent-color);
+        border-top-color: var(--bg-color);
       }
+
       &.arrowUp:after {
-        border-bottom-color: var(--accent-color);
-      }
-
-      &:hover {
-        background: var(--accent-color-lighter);
-      }
-      &:active {
-        background: var(--accent-color);
-        transition: all $effect-on-duration ease-out;
-
-        &.arrowDown:after,
-        &.arrowUp:after {
-          transition: all $effect-on-duration ease-out;
-        }
-        &.arrowDown:after {
-          border-top-color: var(--bg-color);
-        }
-        &.arrowUp:after {
-          border-bottom-color: var(--bg-color);
-        }
-      }
-
-      &.arrowUp {
-        border-top: none;
-
-        &:after {
-          top: 35%;
-        }
+        border-bottom-color: var(--bg-color);
       }
     }
   }
-}
 
-@include opacify;
+  .numInputWrapper ~ .numInputWrapper .arrowDown {
+    border-bottom-right-radius: $button-border-radius;
+  }
+
+  @keyframes selected {
+    0% {
+      color: var(--text-color);
+      opacity: 0;
+    }
+    100% {
+      color: var(--bg-color);
+      opacity: 1;
+    }
+  }
+}

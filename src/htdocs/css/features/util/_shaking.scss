@@ -1,71 +1,68 @@
-@use '../../util/variables' as *;
+@use '../../util/opt/mixins' as *;
+@use '../../util/opt/variables' as *;
 
-/* DYFI, ShakeMap Lightboxes
---------------------------------------------- */
+// DYFI, ShakeMap Lightboxes
 
-#dyfi,
-#shakemap {
-  dl.alt {
-    margin: 0;
-  }
+@layer default {
+  #dyfi,
+  #shakemap {
+    @include impact-borders;
 
-  em {
-    font-size: .75rem;
-    font-style: normal;
-
-    span {
-      text-transform: lowercase;
+    dl.alt {
+      margin: 0;
     }
-  }
 
-  img {
-    border: 3px solid;
-    border-radius: $content-border-radius;
-    display: block;
-    margin-right: 1px; // 1px: fix border rendering issue when scrolled (webkit)
-    max-height: 650px;
-    max-width: 100%;
+    em {
+      font-size: .9em;
+      font-style: normal;
 
-    &.hide {
-      display: none;
-    }
-  }
-
-  .details {
-    position: sticky;
-    top: 6.75rem;
-
-    p {
-      margin: 1.5rem 0 0;
-    }
-  }
-
-  .options {
-    margin-bottom: 1.25rem;
-  }
-
-  .props {
-    span {
-      color: var(--text-color-lighter);
-      padding-left: .25rem;
-    }
-  }
-
-  .stations {
-    margin-top: .5rem;
-  }
-
-  .wrapper {
-    align-items: flex-start;
-    display: flex;
-    gap: 2rem 1.5rem;
-    position: relative;
-  }
-
-  @media only screen
-    and (max-width: 950px) {
-      .wrapper {
-        flex-flow: row wrap;
+      span {
+        text-transform: lowercase;
       }
     }
+
+    img {
+      border-width: 3px;
+      display: block;
+      margin-right: 1px; // 1px: fix border rendering issue when scrolled (webkit)
+      max-height: 650px;
+      max-width: 100%;
+
+      &.hide {
+        display: none;
+      }
+    }
+
+    .details {
+      position: sticky;
+      top: 6.75rem;
+    }
+
+    .options {
+      margin-bottom: 1.25rem;
+    }
+
+    .props {
+      span {
+        color: var(--text-color-lighter);
+        padding-left: .125rem;
+      }
+    }
+
+    .stations {
+      margin-top: .5rem;
+    }
+
+    .wrapper {
+      align-items: flex-start;
+      display: flex;
+      gap: 2rem 1.5rem;
+    }
+
+    @media only screen and (max-width: $breakpoint-phone-width) {
+      .wrapper {
+        flex-wrap: wrap;
+      }
+    }
+  }
 }

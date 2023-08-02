@@ -1,33 +1,30 @@
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#selectPane {
-  align-items: center;
-  display: none;
-  flex-direction: column;
-  height: 100%;
-  justify-content: center;
-  left: 0;
-  padding: var(--padding-header) 0 0;
-  position: absolute;
-  top: 0;
-  transition: padding $effect-duration ease;
-  width: 100%;
+@layer default {
+  #selectPane {
+    align-items: center;
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    padding: var(--padding-header) 0 0;
+    position: absolute;
+    top: 0;
+    transition: padding $effect-duration ease; // SideBar open/close
+    width: 100%;
 
-  h2 {
-    font-size: 1.75rem;
-    margin: 0 0 1rem;
-    text-align: center;
+    h2 {
+      margin-top: 0;
+    }
+
+    p {
+      margin: 0;
+    }
   }
 
-  p {
-    margin: 0;
-  }
-}
-
-body:not(.loading, .mainshock) {
-  #plotsPane,
-  #summaryPane {
-    &:not(.hide) ~ #selectPane {
+  body:not(.loading, .mainshock) {
+    :is(#plotsPane, #summaryPane):not(.hide) ~ #selectPane {
       display: flex;
     }
   }

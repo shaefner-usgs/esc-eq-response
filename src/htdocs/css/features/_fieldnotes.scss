@@ -1,7 +1,13 @@
-@use '../util/variables' as *;
+@use '../util/opt/variables' as *;
 
-#mapPane {
-  .fieldnotes { // map popups
+@layer default {
+  // Lightbox
+  #fieldnotes img {
+    max-width: 100%;
+  }
+
+  // Map popups
+  .fieldnotes {
     dl,
     h4,
     p,
@@ -9,8 +15,9 @@
       margin-left: 1rem;
       margin-right: 1rem;
     }
+
     dl {
-      margin-top: .5rem;
+      margin-top: .75rem;
     }
 
     img {
@@ -18,16 +25,12 @@
       margin: 0 auto;
       max-height: 300px;
       max-width: 100%;
+      position: relative;
+      z-index: 1001;
     }
 
     time {
       color: var(--text-color-lighter);
-      font-size: .9rem;
-      margin-top: 4px;
-    }
-
-    .leaflet-popup-content {
-      margin: 0.75rem 0 !important; // allow "full-bleed" photos
     }
 
     .leaflet-popup-content-wrapper {
@@ -42,7 +45,7 @@
 
       a {
         display: inline-block;
-        padding-top: 3px;
+        padding-top: .25rem;
       }
     }
 
@@ -50,18 +53,15 @@
       display: block;
       min-height: 200px;
       position: relative;
-
-      img {
-        position: relative;
-        z-index: 1001;
-      }
     }
 
     .props {
-      max-height: 400px;
+      max-height: 25rem;
       opacity: 1;
       overflow: hidden;
-      transition: all $effect-slide-duration ease-in-out;
+      transition: $effect-slide-duration ease-in-out {
+        property: max-height, opacity;
+      };
 
       &.hide {
         max-height: 0;
@@ -75,9 +75,10 @@
       position: relative;
 
       &:before {
-        border-bottom: 4px solid transparent;
-        border-left: 6px solid var(--accent-color);
-        border-top: 4px solid transparent;
+        border: .25rem solid transparent {
+          left: .375rem solid var(--accent-color);
+          right: none;
+        };
         content: '';
         height: 0;
         left: 0;
@@ -93,22 +94,14 @@
       }
 
       a {
-        padding-left: 10px;
-        position: relative;
-
-        &:active {
-          color: var(--accent-color);
-        }
+        margin-left: .625rem;
       }
     }
   }
 }
 
-/* Lightbox
---------------------------------------------- */
-
-#fieldnotes {
-  img {
-    max-width: 100%;
+@layer overrides {
+  .fieldnotes .leaflet-popup-content {
+    margin: .75rem 0; // "full-bleed" photos
   }
 }

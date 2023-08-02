@@ -1,136 +1,143 @@
-@use 'variables' as *;
+@use 'opt/variables' as *;
 
 @mixin hover {
   background-image: linear-gradient(0deg, rgba(0, 0, 0, .1) 0, transparent);
 }
 
-a.impact-bubble:hover {
-  @include hover;
-}
-
-.impact-bubble {
-  align-items: center;
-  background: #fff;
-  border-radius: $button-border-radius;
-  color: #000 !important;
-  display: flex;
-  flex-direction: column;
-  letter-spacing: .03rem;
-  line-height: 1.25;
-  max-width: 6rem;
-  min-width: 3.5rem;
-  overflow: hidden;
-  padding: 6px 0;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .2);
-
-  &.mmiN\/A {
-    background: $mmi-NAcolor;
-  }
-  &.mmiI {
-    background: $mmiI-color;
-    border: 1px solid var(--border-color-lighter);  // add border so button shows up
-  }
-  &.mmiII {
-    background: $mmiII-color;
-  }
-  &.mmiIII  {
-    background: $mmiIII-color;
-  }
-  &.mmiIV {
-    background: $mmiIV-color;
-  }
-  &.mmiV {
-    background: $mmiV-color;
-  }
-  &.mmiVI {
-    background: $mmiVI-color;
-  }
-  &.mmiVII {
-    background: $mmiVII-color;
-  }
-  &.mmiVIII {
-    background: $mmiVIII-color;
-  }
-  &.mmiIX {
-    background: $mmiIX-color;
-  }
-  &.mmiX,
-  &.mmiX\+,
-  &.mmiXI,
-  &.mmiXII {
-    background: $mmiX-color;
+@layer default {
+  a.impact-bubble:hover {
+    @include hover; // linked bubbles only
   }
 
-  &.pager-alertlevel-green {
-    background: $pager-green-color;
-  }
-  &.pager-alertlevel-orange {
-    background: $pager-orange-color;
-  }
-  &.pager-alertlevel-pending {
-    background: $pager-pending-color;
-  }
-  &.pager-alertlevel-red {
-    background: $pager-red-color;
-  }
-  &.pager-alertlevel-yellow {
-    background: $pager-yellow-color;
-  }
+  .impact-bubble {
+    align-items: center;
+    background: #fff;
+    border-radius: $button-border-radius;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: .03rem;
+    max-width: 6rem;
+    min-width: 3.5rem;
+    overflow: hidden;
+    padding: .375rem 0;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px 0 hsla(0, 0%, 100%, .2);
 
-  &.tsunami {
-    padding: 0;
-    position: relative;
-
-    > img,
-    > span {
-      height: 100%;
-      left: 0;
-      position: absolute;
-      top: 0;
-      width: 100%;
+    &:active,
+    &:visited {
+      color: #000;
     }
-    > img {
-      z-index: 1;
-    }
-    > span {
-      z-index: 10;
 
-      &:hover {
-        @include hover;
+    &.mmiN\/A {
+      background: $mmi-NAcolor;
+    }
+    &.mmiI {
+      background: $mmiI-color;
+      border: 1px solid var(--border-color-lighter);  // add border so button shows up
+    }
+    &.mmiII {
+      background: $mmiII-color;
+    }
+    &.mmiIII  {
+      background: $mmiIII-color;
+    }
+    &.mmiIV {
+      background: $mmiIV-color;
+    }
+    &.mmiV {
+      background: $mmiV-color;
+    }
+    &.mmiVI {
+      background: $mmiVI-color;
+    }
+    &.mmiVII {
+      background: $mmiVII-color;
+    }
+    &.mmiVIII {
+      background: $mmiVIII-color;
+    }
+    &.mmiIX {
+      background: $mmiIX-color;
+    }
+    &.mmiX,
+    &.mmiX\+,
+    &.mmiXI,
+    &.mmiXII {
+      background: $mmiX-color;
+    }
+
+    &.pager-alertlevel-green {
+      background: $pager-green-color;
+    }
+    &.pager-alertlevel-orange {
+      background: $pager-orange-color;
+    }
+    &.pager-alertlevel-pending {
+      background: $pager-pending-color;
+    }
+    &.pager-alertlevel-red {
+      background: $pager-red-color;
+    }
+    &.pager-alertlevel-yellow {
+      background: $pager-yellow-color;
+    }
+
+    &.tsunami {
+      border: 1px solid #2e318c;
+      padding: 0;
+      position: relative;
+
+      > img,
+      > span {
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+
+      > img {
+        z-index: 1;
+      }
+
+      > span {
+        z-index: 10;
+
+        &:hover {
+          @include hover;
+        }
       }
     }
+
+    > abbr {
+      border-color: #666;
+      font-size: $font-size-smallest;
+    }
+
+    > strong {
+      font-size: .8125rem;
+      white-space: nowrap;
+    }
+
+    .roman {
+      font-family: $font-family-buttons;
+      text-transform: uppercase;
+    }
   }
 
-  > abbr {
-    border-bottom: 1px dotted #666;
-    font-size: .75rem;
-  }
+  .impact-bubbles {
+    display: flex;
+    margin: 1rem 0;
 
-  > strong {
-    font-size: .8125rem;
-    white-space: nowrap;
-  }
+    :is(a, span) + :is(a, span) {
+      margin-left: 5px;
+    }
 
-  .roman {
-    font-family: $font-family-mmi;
-    text-transform: uppercase;
-  }
-}
-
-.impact-bubbles {
-  display: flex;
-  margin: 1rem 0;
-
-  > a,
-  > span {
-    width: 25%;
-  }
-
-  a + a,
-  span + a,
-  span + span {
-    margin-left: 5px;
+    > a,
+    > span {
+      width: 25%;
+    }
   }
 }

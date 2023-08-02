@@ -1,44 +1,47 @@
-#infoBar {
-  dl {
-    margin: 0 0 .75rem;
-  }
+@use 'util/opt/variables' as *;
 
-  img {
-    margin-top: 1.5rem;
-    width: 120px;
-  }
+@layer default {
+  #infoBar {
+    dl {
+      margin: 0 0 .75rem;
+    }
 
-  ol,
-  ul {
-    list-style: none;
-    margin: 1rem 0;
-    padding: 0;
-  }
+    img {
+      margin-top: 1.5rem;
+      width: 7.5rem;
+    }
 
-  .iconlist {
-    counter-reset: item;
-
-    > li {
-      counter-increment: item;
+    ol,
+    ul {
+      line-height: $line-height;
       margin: 1rem 0;
-      padding-left: 2.2rem;
-      position: relative;
+    }
 
-      &:before {
-        background: rgba(19, 173, 16, 0.8);
-        border: 2px solid #42e43f;
-        border-radius: 50%;
-        color: var(--bg-color);
-        content: counter(item);
-        font: bold 1rem "Open Sans";
-        height: 1.75rem;
-        left: 0;
-        line-height: 1;
-        padding-top: .25rem;
-        position: absolute;
-        text-align: center;
-        top: 0;
-        width: 1.75rem;
+    .iconlist {
+      counter-reset: item;
+
+      > li {
+        counter-increment: item;
+        margin: 1rem 0;
+        padding-left: 2.25rem;
+        position: relative;
+
+        &:before {
+          align-items: center;
+          background: rgba(19, 173, 16, .8);
+          border: 2px solid #42e43f;
+          border-radius: 50%;
+          color: var(--bg-color);
+          content: counter(item);
+          display: flex;
+          font: bold 1rem $font-family-headers;
+          height: 1.75rem;
+          justify-content: center;
+          left: 0;
+          position: absolute;
+          top: 0;
+          width: 1.75rem;
+        }
       }
     }
   }

@@ -1,13 +1,16 @@
 @use 'sass:math';
+@use 'sass:string';
 
-// Replace characters in a string.
+/**
+ * Replace characters in a string.
+ */
 @function str-replace($string, $search, $replace: '') {
-  $index: str-index($string, $search);
+  $index: string.index($string, $search);
 
   @return if($index,
-    str-slice($string, 1, $index - 1) + $replace +
-    str-replace(str-slice($string, $index +
-    str-length($search)), $search, $replace),
+    string.slice($string, 1, $index - 1) + $replace +
+    str-replace(string.slice($string, $index +
+    string.length($search)), $search, $replace),
     $string
   );
 }
@@ -17,7 +20,7 @@
  *
  * Taken from: https://codepen.io/jakob-e/pen/doMoML (v 1.0.6)
  *
- * Usage examples:
+ * Usage example:
  *
  * .class {
  *   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg">...</svg>');
@@ -25,18 +28,18 @@
  */
 @function svg-url($svg) {
   // Add missing namespace
-  @if not str-index($svg,xmlns) {
+  @if not string.index($svg,xmlns) {
     $svg: str-replace($svg, '<svg','<svg xmlns="http://www.w3.org/2000/svg"');
   }
 
   $encoded: '';
   $index: 0;
   $slice: 2000;
-  $loops: ceil(math.div(str-length($svg), $slice));
+  $loops: ceil(math.div(string.length($svg), $slice));
 
   // Chunk up string in order to avoid  "stack level too deep" error
   @for $i from 1 through $loops {
-    $chunk: str-slice($svg, $index, $index + $slice - 1);
+    $chunk: string.slice($svg, $index, $index + $slice - 1);
 
     // Encode
     $chunk: str-replace($chunk, '"', '\'');

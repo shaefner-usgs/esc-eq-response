@@ -3,39 +3,103 @@
 @use 'functions' as *;
 @use 'variables' as *;
 
-@mixin close() {
+@mixin close-button() {
   background: var(--bg-color);
   border-radius: 50%;
   color: var(--accent-color);
   cursor: pointer;
-  font: bold 16px Tahoma, Verdana, sans-serif;
+  font: bold 1rem $font-family-buttons;
   height: 23px;
   line-height: 1.35;
+  position: absolute;
   right: 2px;
-  top: 2px;
   text-align: center;
-  transition: all $effect-off-duration-shorter ease-in;
+  top: 2px;
+  transition: $effect-duration ease-in-out {
+    property: background, color;
+  };
   width: 23px;
 
   &:hover {
     background: var(--accent-color-lightest);
-    transition: background $effect-on-duration ease-out;
+    transition-duration: $effect-on-duration;
   }
+
   &:active {
     background: var(--accent-color);
     color: var(--bg-color);
-    transition: all $effect-on-duration ease-out;
+    transition-duration: $effect-on-duration;
+  }
+}
+
+@mixin hover-effect() {
+  transition: color $effect-duration ease-in-out;
+
+  &:hover {
+    color: var(--text-color);
+    transition-duration: $effect-on-duration;
+  }
+
+  &:active {
+    color: var(--text-color-darker);
+    transition-duration: $effect-on-duration;
+  }
+}
+
+@mixin impact-borders() {
+  img {
+    background: #fff;
+    border: 2px solid;
+    border-radius: $content-border-radius;
+    padding: 2px;
+
+    &.mmiN\/A {
+      border-color: $mmi-NAcolor;
+    }
+    &.mmiI {
+      border-color: var(--border-color-lighter);
+    }
+    &.mmiII {
+      border-color: $mmiII-color;
+    }
+    &.mmiIII {
+      border-color: $mmiIII-color;
+    }
+    &.mmiIV {
+      border-color: $mmiIV-color;
+    }
+    &.mmiV {
+      border-color: $mmiV-color;
+    }
+    &.mmiVI {
+      border-color: $mmiVI-color;
+    }
+    &.mmiVII {
+      border-color: $mmiVII-color;
+    }
+    &.mmiVIII {
+      border-color: $mmiVIII-color;
+    }
+    &.mmiIX {
+      border-color: $mmiIX-color;
+    }
+    &.mmiX,
+    &.mmiX\+,
+    &.mmiXI,
+    &.mmiXII {
+      border-color: $mmiX-color;
+    }
   }
 }
 
 @mixin labels() {
   color: var(--text-color-lighter);
   font-family: $font-family-headers;
-  font-weight: 700;
+  font-weight: bold;
   text-transform: uppercase;
 }
 
-@mixin layers($color) {
+@mixin layer-icon($color) {
   background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" ' +
     'height="26" width="26" viewBox="0 0 26 26">' +
       '<style type="text/css">' +
@@ -51,7 +115,7 @@
         '.layer3 {' +
           'fill: ' + color.scale($color, $alpha: -45%, $lightness: 91%) + ';' +
           'stroke: #{$color};' +
-          'stroke-width: 0.2;' +
+          'stroke-width: .2;' +
         '}' +
       '</style>' +
       '<path class="layer1" d="M0,16.7l13-8l13,8l-13,8L0,16.7"/>' +
@@ -62,15 +126,4 @@
       '<path class="border" d="M0,8.8V10l13,8l13-8V8.8l-13,8L0,8.8z"/>' +
     '</svg>'
   );
-}
-
-@mixin opacify() {
-  @keyframes opacify {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
 }

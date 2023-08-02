@@ -1,38 +1,40 @@
-table.exposures {
-  margin: 0;
+@layer default {
+  .exposures {
+    margin: -.125rem 0 -.375rem;
 
-  tbody tr {
-    border-bottom: none; // override general table border styles
-    border-top: 1px solid var(--border-color-lighter);
+    tbody tr {
+      border-bottom: none; // remove default table borders
+      border-top: 1px solid var(--border-color-lighter);
 
-    &.city,
-    &:first-child {
-      border: none;
+      &:first-child,
+      &.city {
+        border: none;
+      }
     }
-  }
 
-  td,
-  th {
-    padding: 0.25rem .375rem;
+    td,
+    th {
+      padding: .25rem .375rem;
 
-    &:nth-child(1) {
-      width: 3.5rem;
-      padding-left: .25rem;
+      &:first-child {
+        padding-left: .25rem;
+        width: 3.5rem;
+      }
+
+      &:last-child {
+        padding-right: .25rem;
+        text-align: right;
+      }
     }
-    &:nth-child(3) {
-      padding-right: .25rem;
-      text-align: right;
-    }
-  }
-  td {
-    font-weight: 500;
-  }
 
-  .city td {
-    color: var(--text-color-lighter);
-    font-weight: 400;
-    line-height: 1.4;
-    padding-bottom: .375rem;
-    padding-top: .125rem;
+    td {
+      font-weight: 500;
+    }
+
+    .city td {
+      font-weight: normal;
+      padding-bottom: .5rem;
+      padding-top: 0;
+    }
   }
 }

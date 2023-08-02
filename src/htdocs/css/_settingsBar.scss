@@ -1,113 +1,72 @@
-@use 'util/mixins' as *;
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#settingsBar {
-  button {
-    margin-top: .25rem;
-  }
-
-  label span {
-    font-weight: normal;
-    text-transform: none;
-  }
-
-  .aftershocks,
-  .foreshocks,
-  .historical {
-    margin-bottom: 1.75rem;
-  }
-  .aftershocks {
-    margin-top: 1.75rem;
-  }
-
-  .dd,
-  .details {
-    color: var(--text-color-lighter);
-    font-size: $font-size-smaller;
-    opacity: 1;
-    overflow: hidden;
-    transition: all $effect-slide-duration ease-in-out;
-
-    &.hide {
-      margin: 0;
-      max-height: 0;
-      opacity: 0;
-    }
-  }
-  .dd {
-    line-height: 1.2;
-    margin: .125rem 0 0;
-    max-height: 1.5rem;
-  }
-  .details {
-    margin: 0 0 1.25rem;
-    max-height: 6rem;
-
-    p {
-      margin: .125rem 0 .25rem;
-    }
-
-    time {
+@layer default {
+  #settingsBar {
+    dd {
       color: var(--text-color);
-      display: block;
-      line-height: 1;
-      margin-top: .25rem;
+    }
 
-      &:before {
-        @include labels;
+    div:is(.aftershocks, .foreshocks, .historical) h3 {
+      margin-top: 1.625rem;
+    }
 
-        content: 'Updated';
-        font-size: $font-size-smaller;
-        margin-right: .375rem;
+    label.input {
+      margin-top: 1.25rem;
+
+      span {
+        font-weight: normal;
+        text-transform: none;
       }
     }
-  }
 
-  .disabled,
-  .enabled {
-    h3,
-    input,
-    label {
-      transition: color $effect-duration ease-in-out;
-    }
-  }
-  .disabled {
-    h3,
-    input,
-    label, label:active {
-      color: var(--text-color-disabled);
-      cursor: auto;
-    }
-    input {
-      cursor: not-allowed;
+    .dd,
+    .details {
+      opacity: 1;
+      overflow: hidden;
+      transition: $effect-slide-duration ease-in-out {
+        property: margin, max-height, opacity;
+      };
+
+      &.hide {
+        margin: 0;
+        max-height: 0;
+        opacity: 0;
+      }
     }
 
-    .breather span {
-      background: #ccc;
+    .dd {
+      line-height: normal;
+      margin-top: .25rem;
+      max-height: 1.5rem;
+    }
+
+    .details {
+      margin: 0 0 1rem;
+      max-height: 6rem;
+
+      p {
+        margin: .125rem 0;
+      }
+    }
+
+    .disabled {
+      label.input,
+      label.input:hover {
+        color: var(--text-color-disabled);
+        cursor: auto;
+      }
+    }
+
+    .refresh {
+      margin: .75rem 0;
+    }
+
+    .timestamp {
+      margin-top: .125rem;
     }
   }
 
-  .explanation {
-    margin: 2rem 0 0;
-  }
-
-  .refresh {
-    margin: .75rem 0;
-  }
-
-  .required {
-    color: var(--invalid-color);
-    margin-bottom: 0;
-  }
-
-  .timezone {
-    margin-bottom: .5rem;
-  }
-}
-
-body:not(.mainshock) {
-  #aftershocks + time,
-  #settingsBar .required {
+  body:not(.mainshock) #aftershocks + time {
     display: none
   }
 }

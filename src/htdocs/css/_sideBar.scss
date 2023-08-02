@@ -1,103 +1,115 @@
-@use 'util/mixins' as *;
-@use 'util/variables' as *;
+@use 'util/opt/mixins' as *;
+@use 'util/opt/variables' as *;
 
-#sideBar {
-  background: var(--bg-color-alpha);
-  bottom: 0;
-  margin-right: $sidebar-width * -1;
-  overflow: scroll;
-  padding: 0;
-  position: fixed;
-  right: 0;
-  top: var(--padding-header);
-  transition: margin $effect-duration ease;
-  width: $sidebar-width;
-  z-index: 1000;
-
-  // Hide scrollbars
-  -ms-overflow-style: none; // IE, Edge
-  scrollbar-width: none; // Firefox
-
-  &::-webkit-scrollbar {
-    display: none; // Chrome, Safari, and Opera
-  }
-
-  a.icon-close {
-    @include close;
-
-    opacity: 0;
-    position: fixed;
-    right: $sidebar-width * -1;
-    top: 7.625rem;
-    z-index: 10000;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-    margin: .25rem 0 1rem;
-  }
-
-  h3 {
-    margin: 1.5rem 0 .75rem;
-  }
-
-  label {
-    @include labels;
-
-    cursor: pointer;
-    display: block;
-    margin: 1.25rem 0 0;
-    padding-bottom: .125rem;
-
-    &:active {
-      color: #444;
-    }
-  }
-
-  section.hide {
-    display: none;
-  }
-
-  ul.options {
-    margin-bottom: .25rem;
-  }
-
-  .hide-link {
-    color: var(--text-color);
-    cursor: text;
-    text-decoration: none;
-  }
-
-  .note {
-    border-top: 1px solid var(--border-color-lighter);
-    margin: 2.75rem 0 0;
-    padding-top: 1rem;
-  }
-}
-
-body.sidebar {
-  #plotsPane,
-  #summaryPane {
-    margin-right: $sidebar-width;
-  }
-
-  #selectPane {
-    padding-right: $sidebar-width;
-  }
-
+@layer default {
   #sideBar {
-    border-left: 1px solid var(--border-color-lighter);
-    margin-right: 0;
+    background: var(--bg-color-alpha);
+    bottom: 0;
+    margin: 0 $sidebar-width * -1 0 0;
+    overflow: scroll;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    top: var(--padding-header);
+    transition: margin $effect-duration ease; // SideBar open/close
+    width: $sidebar-width;
+    z-index: 1000;
 
-    a.icon-close {
-      opacity: 1;
-      right: .5rem;
-      transition: background .5s ease-out, opacity .5s ease-out;
+    // Hide scrollbars
+    -ms-overflow-style: none; // IE, Edge
+    scrollbar-width: none; // Firefox
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari and Opera
+    }
+
+    button {
+      margin-top: 1rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      margin: .25rem 0 1rem;
+    }
+
+    h3 {
+      margin-bottom: .75rem;
+
+      &:first-of-type {
+        margin-top: 1.25rem;
+      }
+    }
+
+    label.input {
+      @include hover-effect;
+      @include labels;
+
+      cursor: pointer;
+      display: block;
+      padding-bottom: .125rem;
+    }
+
+    section.hide {
+      display: none;
+    }
+
+    .hide-link { // used to hide 'map' link when map is visible
+      color: var(--text-color);
+      cursor: text;
+      text-decoration: none;
+    }
+
+    .icon-close {
+      @include close-button;
+
+      opacity: 0;
+      position: fixed;
+      right: $sidebar-width * -1;
+      top: 7.625rem;
+      z-index: 10000;
+    }
+
+    .info {
+      color: var(--text-color-lighter);
+      font-size: $font-size-smaller;
+    }
+
+    .note {
+      border-top: 1px solid var(--border-color-lighter);
+      margin: 2.75rem 0 0;
+      padding-top: 1rem;
     }
   }
 
-  .leaflet-center,
-  .leaflet-right {
-    padding-right: $sidebar-width;
+  // SideBar on
+  body.sidebar {
+    #plotsPane,
+    #summaryPane {
+      margin-right: $sidebar-width;
+    }
+
+    #selectPane,
+    .leaflet-center,
+    .leaflet-right {
+      padding-right: $sidebar-width;
+    }
+
+    #sideBar {
+      border-left: 1px solid var(--border-color-lighter);
+      margin-right: 0;
+
+      .icon-close {
+        opacity: 1;
+        right: .5rem;
+        transition: $effect-duration ease-in-out {
+          property: background, color, opacity
+        };
+
+        &:active,
+        &:hover {
+          transition-duration: $effect-on-duration;
+        }
+      }
+    }
   }
 }

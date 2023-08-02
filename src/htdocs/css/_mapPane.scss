@@ -1,122 +1,102 @@
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#map,
-#mapPane {
-  height: 100%;
-}
-#mapPane {
-  padding: 0;
-
-  canvas {
-    width: 40px;
+@layer default {
+  #map,
+  #mapPane {
+    height: 100%;
   }
 
-  .breather { // loader
-    width: 1.5em;
+  #mapPane {
+    padding: 0;
 
-    span {
-      height: .9em;
-      top: -.75em;
-      width: .9em;
+    canvas {
+      width: 40px;
     }
-  }
 
-  .container { // contains beachballs that are turned off in layer controller
-    display: none;
-  }
+    .breather { // loader
+      width: 1.5rem;
 
-  .count {
-    animation: none; /* plays every time layer control is displayed */
-  }
-
-  .faults img,
-  .plates img {
-    transition: all 0.2s linear;
-  }
-
-  /**
-   * Rendering order of Features on the map and layer controller. All overlays
-   * are rendered in leaflet-overlay-pane which has a z-index of 400.
-   */
-  .leaflet-focal-mechanism-pane {
-    z-index: 425;
-  }
-  .leaflet-moment-tensor-pane {
-    z-index: 424;
-  }
-  .leaflet-mainshock-pane {
-    z-index: 423;
-  }
-  .leaflet-aftershocks-pane,
-  .leaflet-dd-aftershocks-pane {
-    z-index: 422;
-  }
-  .leaflet-foreshocks-pane,
-  .leaflet-dd-foreshocks-pane {
-    z-index: 421;
-  }
-  .leaflet-historical-pane,
-  .leaflet-dd-historical-pane {
-    z-index: 420;
-  }
-  .leaflet-shakemap-stations-pane {
-    z-index: 419;
-  }
-  .leaflet-fieldnotes-pane {
-    z-index: 418;
-  }
-  .leaflet-catalog-search-pane {
-    z-index: 417;
-  }
-
-  .leaflet-control-layers .hide {
-    display: none; // hide empty FieldNotes layer
-  }
-
-  // Push top controls down to accommodate header
-  .leaflet-top .leaflet-control {
-    margin-top: 7.75rem;
-  }
-
-  // Scroll wide tables in Leaflet popups elegantly
-  .scroll-wrapper {
-    overflow: auto;
-
-    th.freeze {
-      background: white;
-      left: 0;
-      position: sticky;
+      span {
+        height: 1rem;
+        top: -.8125rem;
+        width: 1rem;
+      }
     }
-  }
 
-  // Hide attribution text on (small screen) mobile devices
-  @media only screen
-    and (max-width: $breakpoint-tablet-width) {
+    .container { // contains Beachballs that are turned off in layer controller
+      display: none;
+    }
+
+    .count {
+      animation: none; // prevents playing every time layer control is displayed
+    }
+
+    .faults img,
+    .plates img {
+      transition: filter .2s linear; // color associated w/ base layer change
+    }
+
+     // Rendering order of Features (map and layer controller)
+
+    .leaflet-focal-mechanism-pane {
+      z-index: 425;
+    }
+
+    .leaflet-moment-tensor-pane {
+      z-index: 424;
+    }
+
+    .leaflet-mainshock-pane {
+      z-index: 423;
+    }
+
+    .leaflet-aftershocks-pane,
+    .leaflet-dd-aftershocks-pane {
+      z-index: 422;
+    }
+
+    .leaflet-foreshocks-pane,
+    .leaflet-dd-foreshocks-pane {
+      z-index: 421;
+    }
+
+    .leaflet-historical-pane,
+    .leaflet-dd-historical-pane {
+      z-index: 420;
+    }
+
+    .leaflet-shakemap-stations-pane {
+      z-index: 419;
+    }
+
+    .leaflet-fieldnotes-pane {
+      z-index: 418;
+    }
+
+    .leaflet-catalog-search-pane {
+      z-index: 417;
+    }
+
+    .leaflet-top .leaflet-control {
+      margin-top: 7.75rem;
+    }
+
+    // Scroll wide tables in Leaflet popups elegantly
+    .scroll-wrapper {
+      overflow: auto;
+
+      th.freeze {
+        background: white;
+        left: 0;
+        position: sticky;
+      }
+    }
+
+    // Hide attribution text on (small screen) mobile devices
+    @media only screen and (max-width: $breakpoint-tablet-width) {
       .leaflet-control-attribution {
         display: none;
       }
-  }
-}
-
-body {
-  &.dark {
-    .faults img,
-    .plates img {
-      filter: brightness(135%) contrast(125%);
-    }
-  }
-
-  &.satellite {
-    .faults img,
-    .plates img {
-      filter: brightness(125%) contrast(175%) saturate(125%);
-    }
-  }
-
-  &.terrain {
-    .faults img,
-    .plates img {
-      filter: contrast(125%);
     }
   }
 }

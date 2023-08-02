@@ -1,82 +1,80 @@
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#legendBar {
-  font-family: $font-family-headers;
+@layer default {
+  #legendBar {
+    h2 + ul > li {
+      border-top: 1px solid var(--border-color-lighter);
+      font-family: $font-family-headers;
+      padding: .625rem 0;
 
-  h2 + ul > li {
-    border-top: 1px solid var(--border-color-lighter);
-    padding: 0.5rem 0;
-
-    &:first-child {
-      border: none;
-      padding-top: 0;
-    }
-  }
-
-  img {
-    margin: 0.3rem .2rem;
-    max-width: 100%;
-  }
-
-  li {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  ul {
-    list-style: none;
-    margin: 1.25rem 0 0;
-    padding: 0;
-  }
-
-  .aftershocks,
-  .magnitude,
-  .intensity {
-    display: block;
-  }
-  .aftershocks {
-    ul {
-      color: var(--text-color);
-      font-family: $font-family;
-      font-weight: 300;
-      letter-spacing: 0.015rem;
-      margin-top: .25rem;
-    }
-  }
-
-  .fieldnotes {
-    position: relative;
-
-    &.hide {
-      display: none;
+      &:first-child {
+        border: none;
+        padding-top: 0;
+      }
     }
 
     img {
-      clip: rect(0, 25px, 30px, 0);
-      position: absolute;
-      right: -2px;
-      top: 1px;
-      width: 20px;
+      margin: .5rem 0;
+      max-width: 100%;
     }
-  }
 
-  .mags {
-    align-items: center;
-    color: var(--text-color-lighter);
-    display: flex;
-    font-size: .9rem;
-    justify-content: space-around;
-    margin: .25rem 0;
-    padding: 0;
-
-    &:after {
-      content: '7';
-      margin-left: .5rem;
+    li {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
     }
-    &:before {
-      content: '0';
-      margin-right: .5rem;
+
+    ul {
+      margin-top: 1.25rem;
+    }
+
+    .aftershocks,
+    .magnitude,
+    .intensity {
+      display: block;
+    }
+
+    .aftershocks ul {
+      font-family: $font-family;
+      font-weight: 300;
+      letter-spacing: .015rem;
+      line-height: $line-height;
+      margin-top: .25rem;
+    }
+
+    .fieldnotes {
+      position: relative;
+
+      &.hide {
+        display: none;
+      }
+
+      img {
+        clip: rect(0, 20px, 30px, 0);
+        position: absolute;
+        right: 0;
+        top: .25rem;
+        width: 20px;
+      }
+    }
+
+    .mags {
+      align-items: center;
+      color: var(--text-color-lighter);
+      display: flex;
+      font-size: $font-size-smaller;
+      justify-content: space-around;
+      margin: .25rem 0;
+
+      &:after {
+        content: '7';
+        margin-left: .5rem;
+      }
+
+      &:before {
+        content: '0';
+        margin-right: .5rem;
+      }
     }
   }
 }

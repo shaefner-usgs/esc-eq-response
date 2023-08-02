@@ -1,52 +1,58 @@
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#summaryPane {
-  transition: margin $effect-duration ease;
+@layer default {
+  #summaryPane {
+    margin-top: -2.25rem;
+    transition: margin $effect-duration ease; // SideBar open/close
 
-  p {
-    max-width: 55rem;
-  }
+    h3 {
+      margin-top: 2rem;
 
-  .bubble {
-    display: inline-block;
-  }
-
-  .bubble.hide,
-  .feature.hide { // missing product(s)
-    display: none;
-  }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-
-    > .content {
-      display: none; // hide preserved sub-Features when their parent is removed
+      &:first-child {
+        margin-top: 0;
+      }
     }
-  }
 
-  /* Rendering order of Features */
-
-  .mainshock {
-    order: 0;
-
-    h2 {
-      margin-top: 0;
+    p {
+      max-width: 55rem;
     }
-  }
 
-  .aftershocks,
-  .dd-aftershocks {
-    order: 1;
-  }
+    .bubble {
+      display: inline-block;
+    }
 
-  .foreshocks,
-  .dd-foreshocks {
-    order: 2
-  }
+    .container {
+      display: flex;
+      flex-direction: column;
 
-  .historical,
-  .dd-historical {
-    order: 3;
+      > .content {
+        display: none; // hide preserved sub-Features when their parent is removed
+      }
+    }
+
+    .feature.hide {
+      display: none; // missing Features
+    }
+
+    // Rendering order of Features
+
+    .mainshock {
+      order: 1;
+    }
+
+    .aftershocks,
+    .dd-aftershocks {
+      order: 2;
+    }
+
+    .foreshocks,
+    .dd-foreshocks {
+      order: 3;
+    }
+
+    .historical,
+    .dd-historical {
+      order: 4;
+    }
   }
 }

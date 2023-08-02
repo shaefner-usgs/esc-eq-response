@@ -1,55 +1,54 @@
-@use '../../util/variables' as *;
+@use '../../util/opt/variables' as *;
 
-/* Lightboxes
---------------------------------------------- */
+// FM, MT Lightboxes
 
-#focal-mechanism,
-#moment-tensor {
-  canvas {
-    max-width: 100%;
-    position: sticky;
-    top: 4rem;
-    width: 350px;
-  }
-
-  dl.alt {
-    margin: 0;
-
-    dd {
-      max-width: 10rem;
+@layer default {
+  #focal-mechanism,
+  #moment-tensor {
+    canvas {
+      max-width: 100%;
+      position: sticky;
+      top: 4rem;
+      width: 20rem;
     }
-  }
 
-  td {
-    text-align: right;
-  }
+    dl.alt {
+      margin: 0;
 
-  .axes {
-    td:nth-child(3),
-    td:nth-child(4) {
-      padding-right: 1.5rem;
+      dd {
+        max-width: 10rem;
+      }
     }
-  }
 
-  .catalog,
-  .contributor,
-  .source {
-    text-transform: uppercase;
-  }
-
-  .content {
-    display: flex;
-    gap: 2rem 3rem;
-  }
-
-  .planes {
-    td:nth-child(2) {
-      padding-right: 1.25rem;
+    td {
+      text-align: right;
     }
-  }
 
-  @media only screen
-    and (max-width: $breakpoint-phone-width) {
+    .axes {
+      td:nth-child(3),
+      td:last-child {
+        padding-right: 1.75rem;
+      }
+    }
+
+    .catalog,
+    .contributor,
+    .source {
+      text-transform: uppercase;
+    }
+
+    .content {
+      display: flex;
+      gap: 2rem 3rem;
+    }
+
+    .planes {
+      td:nth-child(2) {
+        padding-right: 1.25rem;
+      }
+    }
+
+    @media only screen and (max-width: $breakpoint-phone-width) {
       canvas {
         display: block;
         margin: 1.5rem auto 0;
@@ -59,15 +58,18 @@
       .details {
         width: 100%;
       }
+
       .beachball {
-        order: 0;
-      }
-      .details {
         order: 1;
       }
 
+      .details {
+        order: 2;
+      }
+
       .content {
-        flex-flow: row wrap;
+        flex-wrap: wrap;
       }
     }
+  }
 }

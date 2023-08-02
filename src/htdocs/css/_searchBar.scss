@@ -1,98 +1,92 @@
 @use 'sass:color';
 
-@use 'util/variables' as *;
+@use 'util/opt/variables' as *;
 
-#searchBar {
-  button {
-    margin: 1rem 0 1.5rem;
-  }
-
-  p.note {
-    margin-top: 1.5rem;
-  }
-
+@layer default {
   #endtime ~ .flatpickr-calendar {
-    right: 0; // align end date calendar to right edge
+    right: 0;
   }
 
   #region-map {
     height: 300px;
-    margin: 1.25rem 0 0;
+    margin-top: 1.25rem;
   }
 
-  .dates {
-    align-items: center;
-    display: flex;
-    margin-top: .5rem;
-
-    label {
-      margin-top: .25rem;
+  #searchBar {
+    button {
+      padding: {
+        bottom: .5rem;
+        top: .5rem;
+      }
     }
 
-    > span {
-      display: block;
-      padding-top: 1.75rem;
-      text-align: center;
-      width: 2rem;
-    }
-  }
+    .dates {
+      align-items: center;
+      display: flex;
+      margin-top: 1rem;
 
-  .instructions,
-  .utc {
-    color: var(--text-color-lighter);
-    font-size: $font-size-smaller;
-    margin: 0;
-    opacity: 1;
-    transition: opacity $effect-on-duration ease-out;
-
-    &.hide {
-      opacity: 0;
-      transition: all $effect-off-duration-shorter ease-in;
-      visibility: hidden;
-    }
-  }
-
-  // Custom region Rectangle overlay
-  .leaflet-path-draggable {
-    fill: var(--accent-color);
-    stroke: var(--accent-color);
-  }
-
-  .option {
-    opacity: 1;
-    transition: $effect-slide-duration ease-in-out;
-    transition-property: margin, max-height, opacity;
-
-    &.customPeriod {
-      max-height: 6rem;
-    }
-    &.customRegion {
-      max-height: 20rem;
-      overflow: hidden; // Note: breaks Flatpickr if applied to .customPeriod
+      > span {
+        margin-top: 1.25rem;
+        text-align: center;
+        width: 2rem;
+      }
     }
 
-    &.hide {
-      max-height: 0;
-      opacity: 0;
+    .info {
+      margin: 0;
+      opacity: 1;
+      transition: $effect-on-duration ease-in-out {
+        property: opacity, visibility;
+      };
+
+      &.hide {
+        opacity: 0;
+        transition-duration: $effect-duration-shorter;
+        visibility: hidden;
+      }
+    }
+
+    .invalid > input[type="text"] {
+      transition-property: background, box-shadow;
+    }
+
+    .option {
+      opacity: 1;
+      transition: $effect-slide-duration ease-in-out {
+        property: margin, max-height, opacity;
+      };
 
       &.customPeriod {
-        margin-top: -.5rem; // compensate for not setting overflow: hidden
-        visibility: hidden; // helps mitigate not setting overflow: hidden
+        max-height: 6rem;
       }
 
-      input {
-        transition: none; // fix jankiness due to not setting overflow: hidden
+      &.customRegion {
+        max-height: 24rem;
+        overflow: hidden; // note: breaks Flatpickr if applied to .customPeriod
+
+        &.hide {
+          margin-bottom: 1.5rem;
+        }
       }
 
-      // Flash invalid fields when custom period is toggled on
-      .invalid > input[type="text"] {
-        background: color.scale($invalid-color, $alpha: -90%);
-        box-shadow: 0 0 8px 2px var(--invalid-color);
+      &.hide {
+        max-height: 0;
+        opacity: 0;
+
+        &.customPeriod { // mitigate not setting overflow on .customPeriod
+          margin-top: -.75rem;
+          visibility: hidden;
+        }
+
+        .invalid > input[type="text"] { // flash invalid fields
+          background: color.scale($invalid-color, $alpha: -90%);
+          box-shadow: $box-shadow-inset, 0 0 8px 2px var(--invalid-color);
+        }
       }
     }
-  }
 
-  .slider-container {
-    margin: -.5rem 0 -1rem;
+    .slider-container {
+      margin: -.5rem 0 -1rem;
+    }
   }
 }
