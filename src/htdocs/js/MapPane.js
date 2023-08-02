@@ -4,19 +4,19 @@
 
 // Leaflet plugins and layer factories
 require('leaflet-mouse-position');
-require('leaflet/L.Control.Layers.Sorted');
-require('leaflet/L.Control.Zoom');
-require('leaflet/L.DarkLayer');
-require('leaflet/L.FaultsLayer');
-require('leaflet/L.GreyscaleLayer');
-require('leaflet/L.GeoJSON.Async');
-require('leaflet/L.Map');
-require('leaflet/L.Map.BoxZoom');
-require('leaflet/L.Marker.Canvas');
-require('leaflet/L.Popup');
-require('leaflet/L.SatelliteLayer');
-require('leaflet/L.TerrainLayer');
-require('leaflet/L.Tooltip');
+require('util/leaflet/L.Control.Layers.Sorted');
+require('util/leaflet/L.Control.Zoom');
+require('util/leaflet/L.DarkLayer');
+require('util/leaflet/L.FaultsLayer');
+require('util/leaflet/L.GeoJSON.Async');
+require('util/leaflet/L.GreyscaleLayer');
+require('util/leaflet/L.Map');
+require('util/leaflet/L.Map.BoxZoom');
+require('util/leaflet/L.Marker.Canvas');
+require('util/leaflet/L.Popup');
+require('util/leaflet/L.SatelliteLayer');
+require('util/leaflet/L.TerrainLayer');
+require('util/leaflet/L.Tooltip');
 
 var AppUtil = require('util/AppUtil');
 

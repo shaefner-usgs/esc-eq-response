@@ -4,7 +4,7 @@
 
 require('leaflet-editable');
 require('leaflet.path.drag'); // add path dragging to Leaflet.Editable
-require('leaflet/L.Control.Rectangle'); // map control to draw a rectangle
+require('util/leaflet/L.Control.Rectangle'); // map control to draw a rectangle
 
 var AppUtil = require('util/AppUtil'),
     Luxon = require('luxon'),
