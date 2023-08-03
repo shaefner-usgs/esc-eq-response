@@ -119,7 +119,7 @@ var SelectBar = function (options) {
       map.addLayer(search);
     }
 
-    _setStatus('disabled');
+    _setStatus();
     _app.reset();
     _app.NavBar.reset();
     _app.SettingsBar.resetCatalog();
@@ -144,17 +144,16 @@ var SelectBar = function (options) {
   /**
    * Set the status of the Reset button.
    *
-   * @param status {String <enabled|disabled>}
+   * @param status {String} default is ''
    */
-  _setStatus = function (status) {
-    var reset = document.getElementById('reset'),
-        title = 'Disabled because no mainshock is selected';
+  _setStatus = function (status = '') {
+    var reset = document.getElementById('reset');
 
     if (status === 'enabled') {
       reset.removeAttribute('title');
       reset.classList.remove('dim');
     } else {
-      reset.setAttribute('title', title);
+      reset.setAttribute('title', 'Disabled because no mainshock is selected');
       reset.classList.add('dim');
     }
   };
@@ -201,6 +200,8 @@ var SelectBar = function (options) {
       _app.StatusBar.removeItems();
       _createFeatures();
       _setStatus('enabled');
+    } else {
+      _setStatus();
     }
   };
 

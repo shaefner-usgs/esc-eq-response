@@ -627,9 +627,9 @@ var SettingsBar = function (options) {
    * Set the status of the given Feature's settings.
    *
    * @param feature {Object}
-   * @param status {String <disabled|enabled>} default is 'disabled'
+   * @param status {String} default is ''
    */
-  _this.setStatus = function (feature, status = 'disabled') {
+  _this.setStatus = function (feature, status = '') {
     var inputs,
         settings = _el.querySelector('.' + feature.id);
 
@@ -640,12 +640,12 @@ var SettingsBar = function (options) {
       settings.classList.add(status);
 
       inputs.forEach(input => {
-        if (status === 'disabled') {
-          input.setAttribute('disabled', 'disabled');
-          input.setAttribute('title', _getTitle(feature));
-        } else {
+        if (status === 'enabled') {
           input.removeAttribute('disabled');
           input.removeAttribute('title');
+        } else {
+          input.setAttribute('disabled', 'disabled');
+          input.setAttribute('title', _getTitle(feature));
         }
       });
     }
