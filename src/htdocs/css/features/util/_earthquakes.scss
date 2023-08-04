@@ -12,7 +12,7 @@
     .description {
       font-size: 1.125rem;
       line-height: 1.5;
-      margin: 0;
+      margin-top: 0;
     }
 
     .filter {
@@ -118,6 +118,10 @@
           margin-right: 0;
         }
       }
+    }
+
+    .description {
+      margin-bottom: 0;
     }
 
     .hide-month .month,
