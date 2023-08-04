@@ -318,7 +318,7 @@ var Features = function (options) {
    * @param headers {NodeList}
    */
   _flagCount = function (id, headers) {
-    var subheaders = document.querySelectorAll(`#summaryPane .${id} h3`),
+    var subheaders = document.querySelectorAll(`#summary-pane .${id} h3`),
         els = Array.from(headers).concat(Array.from(subheaders));
 
     setTimeout(() => {
@@ -355,7 +355,7 @@ var Features = function (options) {
   };
 
   /**
-   * Get the given Feature's refresh options.
+   * Get the given Feature's currently visible earthquakes list options.
    *
    * @param feature {Object}
    *
@@ -369,7 +369,7 @@ var Features = function (options) {
           prevFeature: feature,
           showLayer: feature.showLayer
         },
-        table = document.querySelector(`#summaryPane .${feature.id} .sortable`);
+        table = document.querySelector(`#summary-pane .${feature.id} .sortable`);
 
     if (magThreshold) {
       options.magThreshold = Number(magThreshold);
@@ -443,7 +443,7 @@ var Features = function (options) {
    */
   _removeCount = function (feature) {
     var count, loader,
-        el = document.getElementById('settingsBar'),
+        el = document.getElementById('settings-bar'),
         header = el.querySelector(`div.${feature.id} h3`);
 
     if (header) { // Feature has user-configurable settings
@@ -640,9 +640,9 @@ var Features = function (options) {
   _this.getHeaders = function (id) {
     var els = [],
         selectors = [
-          `#plotsPane div.${id} h2`,
-          `#settingsBar div.${id} h3`,
-          `#summaryPane div.${id} h2`
+          `#plots-pane div.${id} h2`,
+          `#settings-bar div.${id} h3`,
+          `#summary-pane div.${id} h2`
         ];
 
     selectors.forEach(selector => {

@@ -82,7 +82,7 @@ var Application = function (options) {
 
     _this.dateFormat = 'LLL d, yyyy TT';
     _this.headerHeight = document.querySelector('header').offsetHeight;
-    _this.sideBarWidth = document.getElementById('sideBar').offsetWidth;
+    _this.sideBarWidth = document.getElementById('sidebar').offsetWidth;
 
     _initClasses();
   };
@@ -132,8 +132,8 @@ var Application = function (options) {
   _resetQueryString = function () {
     var queryString,
         selectors = [
-          '#selectBar input',
-          '#settingsBar input[type=number]'
+          '#select-bar input',
+          '#settings-bar input[type=number]'
         ],
         inputs = document.querySelectorAll(selectors.join()),
         msParams = [],

@@ -354,7 +354,7 @@ var Forecast = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    _el = document.querySelector('#summaryPane .forecast');
+    _el = document.querySelector('#summary-pane .forecast');
     _toggle = _el.querySelector('.toggle');
 
     // Display the selected timeframe's forecast

@@ -1,7 +1,7 @@
 @use 'util/opt/variables' as *;
 
 @layer default {
-  #selectPane {
+  #select-pane {
     align-items: center;
     display: none;
     flex-direction: column;
@@ -24,7 +24,7 @@
   }
 
   body:not(.loading, .mainshock) {
-    :is(#plotsPane, #summaryPane):not(.hide) ~ #selectPane {
+    :is(#plots-pane, #summary-pane):not(.hide) ~ #select-pane {
       display: flex;
     }
   }

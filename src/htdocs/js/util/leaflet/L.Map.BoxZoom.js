@@ -53,7 +53,7 @@ L.Map.BoxZoom.include({
       offsetY = document.querySelector('header').offsetHeight;
 
       if (AppUtil.getParam('sidebar')) {
-        offsetX = document.getElementById('sideBar').offsetWidth;
+        offsetX = document.getElementById('sidebar').offsetWidth;
       }
 
       padding = {

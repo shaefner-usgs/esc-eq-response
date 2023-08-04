@@ -174,7 +174,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
    *     Feature id
    */
   _setName: function (id) {
-    var el = document.querySelector(`#mapPane label.${id} input + span`);
+    var el = document.querySelector(`#map-pane label.${id} input + span`);
 
     if (el) {
       el.innerHTML = ' ' + this._displayNames[id];
@@ -194,7 +194,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
           var style,
               id = layer.id || '',
               order = 1, // default (baselayer)
-              pane = document.querySelector(`#mapPane .leaflet-${id}-pane`);
+              pane = document.querySelector(`#map-pane .leaflet-${id}-pane`);
 
           if (pane) { // custom map pane (overlay)
             style = window.getComputedStyle(pane);

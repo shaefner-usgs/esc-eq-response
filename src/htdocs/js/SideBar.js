@@ -112,8 +112,8 @@ var SideBar = function (options) {
    * @param state {String <on|off>}
    */
   _this.toggle = function (state) {
-    var selected = document.querySelector('#navSub .selected'),
-        id = selected.className.match(/icon-(\w+)/)[1] + 'Bar',
+    var selected = document.querySelector('#nav-sub .selected'),
+        id = selected.className.match(/icon-(\w+)/)[1] + '-bar',
         el = document.getElementById(id),
         toggled = true; // default; whether or not SideBar visibility changed
 
@@ -127,9 +127,9 @@ var SideBar = function (options) {
         document.body.classList.add('sidebar');
       }
 
-      if (id === 'searchBar') {
+      if (id === 'search-bar') {
         _app.SearchBar.renderMap();
-      } else if (id === 'settingsBar') {
+      } else if (id === 'settings-bar') {
         _app.SettingsBar.setFocusedField();
       }
     } else { // close SideBar
@@ -143,7 +143,7 @@ var SideBar = function (options) {
     if (toggled) {
       _app.MapPane.shiftMap();
 
-      if (_app.Pane.getSelPane() === 'plotsPane') {
+      if (_app.Pane.getSelPane() === 'plots-pane') {
         _app.PlotsPane.resize();
       }
     }
@@ -156,10 +156,10 @@ var SideBar = function (options) {
    *     Pane id
    */
   _this.toggleLinks = function (id) {
-    var links = _el.querySelectorAll('a[href="#mapPane"]');
+    var links = _el.querySelectorAll('a[href="#map-pane"]');
 
     links.forEach(link => {
-      if (id === 'mapPane') {
+      if (id === 'map-pane') {
         link.classList.add('hide-link');
       } else {
         link.classList.remove('hide-link');

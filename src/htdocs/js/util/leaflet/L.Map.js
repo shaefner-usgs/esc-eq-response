@@ -18,7 +18,7 @@ L.Map.include({
   getVisibleCenter: function () {
     var center = this.getCenter(), // default - ancillary map (SideBar)
         main = this._container.closest('main'),
-        offsetX = document.getElementById('sideBar').offsetWidth / 2,
+        offsetX = document.getElementById('sidebar').offsetWidth / 2,
         offsetY = document.querySelector('header').offsetHeight / 2,
         point = this.getSize().divideBy(2).add([0, offsetY]);
 

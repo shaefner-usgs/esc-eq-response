@@ -2,7 +2,7 @@
 @use '../util/opt/variables' as *;
 
 @layer default {
-  #summaryPane {
+  #summary-pane {
     .details {
       line-height: 1;
       max-width: 100%;
@@ -284,7 +284,7 @@
    * Double-difference label in header
    * (scoped to body.mainshock so loader is not affected)
    */
-  body.mainshock #summaryPane .mainshock {
+  body.mainshock #summary-pane .mainshock {
     h2 {
       flex-direction: column;
 

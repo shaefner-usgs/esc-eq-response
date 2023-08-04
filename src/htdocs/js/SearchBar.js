@@ -196,7 +196,7 @@ var SearchBar = function (options) {
 
     // Search the catalog
     _searchButton.addEventListener('click', () => {
-      location.href = '#mapPane';
+      location.href = '#map-pane';
 
       _searchCatalog();
     });
@@ -305,7 +305,7 @@ var SearchBar = function (options) {
     }).setValue();
 
     // Set custom dates
-    if (period.id === 'customPeriod') {
+    if (period.id === 'custom-period') {
       if (settings.endtime === 'now') {
         _setNow();
       } else {
@@ -316,7 +316,7 @@ var SearchBar = function (options) {
     }
 
     // Set custom region polygon
-    if (region.id === 'customRegion') {
+    if (region.id === 'custom-region') {
       _regionLayer = L.rectangle([
         [settings.maxlatitude, settings.maxlongitude],
         [settings.minlatitude, settings.minlongitude]
@@ -362,7 +362,7 @@ var SearchBar = function (options) {
     var isValid = true, // default
         period = _el.querySelector('#period .selected').id;
 
-    if (period === 'customPeriod') {
+    if (period === 'custom-period') {
       isValid = _setValidity(_starttime) && _setValidity(_endtime);
 
       if (!isValid) {
@@ -537,7 +537,7 @@ var SearchBar = function (options) {
    * Event handler that sets the options for the selected region.
    */
   _setOption = function () {
-    if (this.id === 'customRegion') {
+    if (this.id === 'custom-region') {
       _this.renderMap();
     } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
       _setRegion();
@@ -563,7 +563,7 @@ var SearchBar = function (options) {
       }
     });
 
-    if (params.period !== 'customPeriod') {
+    if (params.period !== 'custom-period') {
       AppUtil.deleteParam('endtime');
       AppUtil.deleteParam('starttime');
     }
@@ -644,12 +644,12 @@ var SearchBar = function (options) {
    * region's (or default) bounds.
    */
   _setView = function () {
-    var map = _el.querySelector('.customRegion'),
+    var map = _el.querySelector('.custom-region'),
         sidebar = AppUtil.getParam('sidebar');
 
     if (map.classList.contains('hide')) return; // map not visible
 
-    if (sidebar === 'searchBar' && !_mapRendered) {
+    if (sidebar === 'search-bar' && !_mapRendered) {
       _map.fitBounds(_regionLayer.getBounds(), {
         animate: false,
         padding: [32, 0]
@@ -686,7 +686,7 @@ var SearchBar = function (options) {
         endtime: now.toUTC().toISO().slice(0, -5),
         starttime: now.minus(minus).toUTC().toISO().slice(0, -5)
       });
-    } else if (params.period === 'customPeriod') {
+    } else if (params.period === 'custom-period') {
       Object.assign(params, {
         endtime: _endtime.value,
         starttime: _starttime.value
@@ -696,7 +696,7 @@ var SearchBar = function (options) {
     // Bounds
     if (params.region === 'ca-nv') {
       Object.assign(params, _CANV);
-    } else if (params.region === 'customRegion') {
+    } else if (params.region === 'custom-region') {
       _setRegion(); // ensure custom region control is not active
 
       _map.eachLayer(layer => {
@@ -737,7 +737,7 @@ var SearchBar = function (options) {
    * are invalid.
    */
   _this.setButton = function () {
-    var customPeriod = document.getElementById('customPeriod')
+    var customPeriod = document.getElementById('custom-period')
           .classList.contains('selected'),
         inputs = [_endtime, _starttime],
         search = _app.Features.getFeature('catalog-search'),

@@ -1,7 +1,7 @@
 @use 'util/opt/variables' as *;
 
 @layer default {
-  #navBar {
+  #navbar {
     align-items: flex-end;
     display: flex;
     justify-content: space-between;
@@ -16,7 +16,7 @@
     }
   }
 
-  #navMain {
+  #nav-main {
     margin-left: -.375rem;
 
     a {
@@ -48,7 +48,7 @@
     }
   }
 
-  #navSub {
+  #nav-sub {
     i {
       color: var(--accent-color);
       font-size: 22px;

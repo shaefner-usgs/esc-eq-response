@@ -11,17 +11,17 @@
   </head>
   <body>
     <header>
-      <section id="titleBar">
+      <section id="title-bar">
         <h1>Earthquake Response App</h1>
         <p>Select an earthquake to get started.</p>
       </section>
-      <nav id="navBar">
-        <ul id="navMain">
-          <li><a href="#mapPane">Map</a></li>
-          <li><a href="#plotsPane">Plots</a></li>
-          <li><a href="#summaryPane">Summary</a></li>
+      <nav id="navbar">
+        <ul id="nav-main">
+          <li><a href="#map-pane">Map</a></li>
+          <li><a href="#plots-pane">Plots</a></li>
+          <li><a href="#summary-pane">Summary</a></li>
         </ul>
-        <ul id="navSub">
+        <ul id="nav-sub">
           <li title="Select an Earthquake"><i class="icon-select"></i></li>
           <li title="Find an Earthquake"><i class="icon-search"></i></li>
           <li title="Settings"><i class="icon-settings"></i></li>
@@ -31,27 +31,27 @@
       </nav>
     </header>
     <main id="pane">
-      <section id="mapPane" class="pane hide">
+      <section id="map-pane" class="pane hide">
         <div class="container"></div>
         <div id="map"></div>
       </section>
-      <section id="plotsPane" class="pane hide">
+      <section id="plots-pane" class="pane hide">
         <div class="container"></div>
       </section>
-      <section id="summaryPane" class="pane hide">
+      <section id="summary-pane" class="pane hide">
         <div class="container"></div>
       </section>
-      <section id="selectPane">
+      <section id="select-pane">
         <h2>No Mainshock</h2>
-        <p><a href="#mapPane" class="select">Select an earthquake</a></p>
+        <p><a href="#map-pane" class="select">Select an earthquake</a></p>
       </section>
     </main>
-    <aside id="sideBar">
+    <aside id="sidebar">
       <form>
-        <section id="selectBar" class="bar hide">
+        <section id="select-bar" class="bar hide">
           <div class="container">
             <h2>Select an Earthquake</h2>
-            <p>Select an earthquake from the list or <a href="#mapPane">map</a>,
+            <p>Select an earthquake from the list or <a href="#map-pane">map</a>,
               or <a href="#" class="search">search</a> the catalog for an
               earthquake. You can also manually enter an Event ID below.</p>
             <h3>Significant Earthquakes <span>Past Month</span></h3>
@@ -66,11 +66,11 @@
             <button type="reset" id="reset">Reset</button>
           </div>
         </section>
-        <section id="searchBar" class="bar hide">
+        <section id="search-bar" class="bar hide">
           <div class="container">
             <h2>Find an Earthquake</h2>
             <p>Search the ComCat earthquake catalog and display the results on the
-              <a href="#mapPane">map</a>.</p>
+              <a href="#map-pane">map</a>.</p>
             <h3>Magnitude</h3>
             <div class="slider-container">
               <div class="min">0</div>
@@ -86,9 +86,9 @@
               <li id="month">Past Month</li>
               <li id="week">Past Week</li>
               <li id="day">Past Day</li>
-              <li id="customPeriod">Custom</li>
+              <li id="custom-period">Custom</li>
             </ul>
-            <div class="customPeriod option hide">
+            <div class="custom-period option hide">
               <div class="dates">
                 <div>
                   <label for="starttime" class="input">Begin</label>
@@ -106,9 +106,9 @@
             <ul id="region" class="options">
               <li id="worldwide">Worldwide</li>
               <li id="ca-nv">California-Nevada</li>
-              <li id="customRegion">Custom</li>
+              <li id="custom-region">Custom</li>
             </ul>
-            <div class="customRegion option hide">
+            <div class="custom-region option hide">
               <div id="region-map"></div>
               <p class="instructions info hide">Click and drag to draw a new custom
                 region.</p>
@@ -120,7 +120,7 @@
               settings.</p>
           </div>
         </section>
-        <section id="settingsBar" class="bar hide">
+        <section id="settings-bar" class="bar hide">
           <div class="container">
             <h2>Settings</h2>
             <p>Initial values for Aftershocks, Foreshocks,
@@ -213,7 +213,7 @@
               settings.</p>
           </div>
         </section>
-        <section id="legendBar" class="bar hide">
+        <section id="legend-bar" class="bar hide">
           <div class="container">
             <h2>Legend + Key</h2>
             <ul>
@@ -240,7 +240,7 @@
             </ul>
           </div>
         </section>
-        <section id="infoBar" class="bar hide">
+        <section id="info-bar" class="bar hide">
           <div class="container">
             <h2>Earthquake Response App</h2>
             <p>This web application creates an interactive Map, Plots, and Summary
@@ -288,7 +288,7 @@
       <a class="icon-close">×</a>
     </aside>
     <footer>
-      <div id="statusBar"></div>
+      <div id="status-bar"></div>
     </footer>
     <script src="lib/flatpickr/flatpickr.js"></script>
     <script src="lib/plotly/plotly-gl3d.js"></script>

@@ -2,8 +2,8 @@
 @use '../../util/opt/variables' as *;
 
 @layer default {
-  #plotsPane,
-  #summaryPane {
+  #plots-pane,
+  #summary-pane {
     label {
       color: var(--text-color-lighter);
       margin-left: 1rem;
@@ -24,7 +24,7 @@
     }
   }
 
-  #plotsPane {
+  #plots-pane {
     output:after {
       content: ' km';
     }
@@ -43,7 +43,7 @@
     }
   }
 
-  #summaryPane {
+  #summary-pane {
     h3.mag {
       margin-left: .25em; // account for collapse of whitespace by display:flex
     }

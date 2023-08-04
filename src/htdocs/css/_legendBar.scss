@@ -1,7 +1,7 @@
 @use 'util/opt/variables' as *;
 
 @layer default {
-  #legendBar {
+  #legend-bar {
     h2 + ul > li {
       border-top: 1px solid var(--border-color-lighter);
       font-family: $font-family-headers;

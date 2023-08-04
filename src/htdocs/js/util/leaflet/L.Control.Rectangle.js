@@ -21,7 +21,7 @@ L.Control.Rectangle = L.Control.extend({
     L.setOptions(this, options);
 
     this._addButtonTitle = 'Create a new custom region'; // default
-    this._instructions = document.querySelector('#searchBar .instructions');
+    this._instructions = document.querySelector('#search-bar .instructions');
     this._region = options.region;
     this._removeButtonTitle = 'Remove the custom region'; // default
   },

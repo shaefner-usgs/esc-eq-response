@@ -2,7 +2,7 @@
 @use 'util/opt/variables' as *;
 
 @layer default {
-  #sideBar {
+  #sidebar {
     background: var(--bg-color-alpha);
     bottom: 0;
     margin: 0 $sidebar-width * -1 0 0;
@@ -83,18 +83,18 @@
 
   // SideBar on
   body.sidebar {
-    #plotsPane,
-    #summaryPane {
+    #plots-pane,
+    #summary-pane {
       margin-right: $sidebar-width;
     }
 
-    #selectPane,
+    #select-pane,
     .leaflet-center,
     .leaflet-right {
       padding-right: $sidebar-width;
     }
 
-    #sideBar {
+    #sidebar {
       border-left: 1px solid var(--border-color-lighter);
       margin-right: 0;
 

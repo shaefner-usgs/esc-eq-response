@@ -12,7 +12,7 @@
     margin-top: 1.25rem;
   }
 
-  #searchBar {
+  #search-bar {
     button {
       padding: {
         bottom: .5rem;
@@ -56,13 +56,13 @@
         property: margin, max-height, opacity;
       };
 
-      &.customPeriod {
+      &.custom-period {
         max-height: 6rem;
       }
 
-      &.customRegion {
+      &.custom-region {
         max-height: 24rem;
-        overflow: hidden; // note: breaks Flatpickr if applied to .customPeriod
+        overflow: hidden; // note: breaks Flatpickr if applied to .custom-period
 
         &.hide {
           margin-bottom: 1.5rem;
@@ -73,7 +73,7 @@
         max-height: 0;
         opacity: 0;
 
-        &.customPeriod { // mitigate not setting overflow on .customPeriod
+        &.custom-period { // mitigate not setting overflow on .custom-period
           margin-top: -.75rem;
           visibility: hidden;
         }

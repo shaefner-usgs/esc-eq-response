@@ -485,7 +485,7 @@ var MapPane = function (options) {
     if (status === 'ready') {
       animate = true;
 
-      if (_app.Pane.getSelPane() === 'mapPane') {
+      if (_app.Pane.getSelPane() === 'map-pane') {
         _rendered = true;
       }
     }

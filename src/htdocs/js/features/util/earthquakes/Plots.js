@@ -71,7 +71,7 @@ var Plots = function (options) {
    */
   _addContainer = function (id) {
     var h3,
-        el = document.getElementById('plotsPane'),
+        el = document.getElementById('plots-pane'),
         parent = el.querySelector(`.${_featureId} .bubble`),
         container = parent.querySelector('div.' + id);
 
@@ -456,7 +456,7 @@ var Plots = function (options) {
       featureId = 'mainshock';
     }
 
-    location.href = '#mapPane';
+    location.href = '#map-pane';
 
     // setTimeout insures location.href setting is applied first
     setTimeout(() => _app.MapPane.openPopup(eqids[index], featureId));
@@ -489,7 +489,7 @@ var Plots = function (options) {
    * Add event listeners.
    */
   _this.addListeners = function () {
-    var div = document.querySelector('#plotsPane .' + _featureId),
+    var div = document.querySelector('#plots-pane .' + _featureId),
         input = document.getElementById(_featureId + '-depth');
 
     _plots = div.querySelectorAll('.js-plotly-plot');

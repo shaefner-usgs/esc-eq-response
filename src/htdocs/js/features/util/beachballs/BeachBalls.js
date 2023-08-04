@@ -106,8 +106,8 @@ var BeachBalls = function (options) {
         },
         selectors = { // BeachBall containers
           lightbox: `#${_id} .beachball`,
-          marker: `#mapPane div.feature.${_id}`,
-          thumb: `#summaryPane div.${_id} a`
+          marker: `#map-pane div.feature.${_id}`,
+          thumb: `#summary-pane div.${_id} a`
         };
 
     _beachballs = {

@@ -144,7 +144,7 @@ var Rtf = function (options) {
   _filter = function (feature) {
     var eqs = feature.data.eqs,
         params = _getParams(feature.id),
-        slider = document.querySelector(`#summaryPane .${feature.id} output`);
+        slider = document.querySelector(`#summary-pane .${feature.id} output`);
 
     _magThreshold = feature.params.magnitude; // default
 
@@ -301,7 +301,7 @@ var Rtf = function (options) {
    */
   _getDescriptions = function (prefix) {
     var descriptions = {},
-        el = document.getElementById('summaryPane'),
+        el = document.getElementById('summary-pane'),
         features = ['aftershocks', 'foreshocks', 'historical'];
 
     features.forEach(id => {
@@ -370,7 +370,7 @@ var Rtf = function (options) {
       divs[featureId] = [];
 
       Object.keys(params[featureId]).forEach(id => {
-        plot = document.querySelector(`#plotsPane .${featureId} div.${id}`);
+        plot = document.querySelector(`#plots-pane .${featureId} div.${id}`);
 
         if (
           !plot.classList.contains('hide') &&

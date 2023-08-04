@@ -1,7 +1,7 @@
 @use '../util/opt/variables' as *;
 
 @layer default {
-  #summaryPane {
+  #summary-pane {
     .historical,
     .dd-historical {
       container-type: inline-size; // parent container

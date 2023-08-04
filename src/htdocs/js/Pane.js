@@ -46,10 +46,10 @@ var Pane = function (options) {
   _addListeners = function () {
     var select = _el.querySelector('a.select');
 
-    // Show the SelectBar
+    // Show the Select Bar
     select.addEventListener('click', () => {
-      sessionStorage.setItem('selectBar', 0);
-      _app.NavBar.switchSideBar('selectBar');
+      sessionStorage.setItem('select-bar', 0);
+      _app.NavBar.switchSideBar('select-bar');
     });
 
     // Save the scroll position
@@ -108,7 +108,7 @@ var Pane = function (options) {
    */
   _this.getSelPane = function () {
     var hash = location.hash,
-        id = 'mapPane', // default
+        id = 'map-pane', // default
         paneExists = _el.querySelector('section' + hash);
 
     if (hash && paneExists) {
@@ -128,9 +128,9 @@ var Pane = function (options) {
     _this.setScrollPosition(id);
     _app.SideBar.toggleLinks(id);
 
-    if (id === 'mapPane') {
+    if (id === 'map-pane') {
       _app.MapPane.render();
-    } else if (id === 'plotsPane') {
+    } else if (id === 'plots-pane') {
       _renderPlots();
     }
   };

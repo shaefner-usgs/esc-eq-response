@@ -47,7 +47,7 @@ var NavBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var lis = _el.querySelectorAll('#navSub li');
+    var lis = _el.querySelectorAll('#nav-sub li');
 
     // Switch Panes
     window.addEventListener('hashchange', _switchPane);
@@ -56,7 +56,7 @@ var NavBar = function (options) {
     lis.forEach(li => {
       li.addEventListener('click', () => {
         var button = li.querySelector('i'),
-            id = button.className.match(/icon-(\w+)/)[1] + 'Bar';
+            id = button.className.match(/icon-(\w+)/)[1] + '-bar';
 
         _this.switchSideBar(id);
       });
@@ -86,11 +86,11 @@ var NavBar = function (options) {
    *     SideBar id
    */
   _showSideBar = function (id) {
-    var button = _el.querySelector('.icon-' + id.replace('Bar', '')),
-        sideBar = document.getElementById(id);
+    var button = _el.querySelector('.icon-' + id.replace('-bar', '')),
+        sidebar = document.getElementById(id);
 
     button.classList.add('selected');
-    sideBar.classList.remove('hide');
+    sidebar.classList.remove('hide');
 
     _app.SideBar.toggle('on');
   };
@@ -128,7 +128,7 @@ var NavBar = function (options) {
       if (el.classList.contains('pane')) {
         button = _el.querySelector('[href="#' + id + '"]');
       } else { // sidebars
-        button = _el.querySelector('.icon-' + id.replace('Bar', ''));
+        button = _el.querySelector('.icon-' + id.replace('-bar', ''));
       }
 
       button.classList.remove('selected');
@@ -143,7 +143,7 @@ var NavBar = function (options) {
     var id = AppUtil.getParam('sidebar');
 
     if (id === null) {
-      id = 'selectBar'; // default'
+      id = 'select-bar'; // default'
     }
     if (id) {
       _showSideBar(id);
@@ -156,7 +156,7 @@ var NavBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    location.hash = '#mapPane';
+    location.hash = '#map-pane';
 
     _switchPane();
   };

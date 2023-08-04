@@ -60,10 +60,10 @@ var SelectBar = function (options) {
     // Reset the app
     reset.addEventListener('click', _hardReset);
 
-    // Show the SearchBar
+    // Show the Search Bar
     search.addEventListener('click', e => {
       e.preventDefault();
-      _app.NavBar.switchSideBar('searchBar');
+      _app.NavBar.switchSideBar('search-bar');
     });
 
     // Create a new Mainshock and fetch its Features
@@ -108,7 +108,7 @@ var SelectBar = function (options) {
     var input = _el.querySelector('input'),
         map = _app.MapPane.map,
         search = _app.Features.getFeature('catalog-search').mapLayer,
-        sidebar = document.getElementById('sideBar');
+        sidebar = document.getElementById('sidebar');
 
     input.value = '';
     sidebar.scrollTop = 0;

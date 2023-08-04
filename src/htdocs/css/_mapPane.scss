@@ -2,11 +2,11 @@
 
 @layer default {
   #map,
-  #mapPane {
+  #map-pane {
     height: 100%;
   }
 
-  #mapPane {
+  #map-pane {
     padding: 0;
 
     canvas {

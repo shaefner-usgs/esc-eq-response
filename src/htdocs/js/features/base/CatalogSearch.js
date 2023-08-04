@@ -76,7 +76,7 @@ var CatalogSearch = function (options) {
 
     if (
       _this.params.region === 'worldwide' &&
-      _this.params.period !== 'customPeriod'
+      _this.params.period !== 'custom-period'
     ) {
       title += `, Past ${period}`;
     } else {

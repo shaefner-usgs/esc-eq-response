@@ -130,7 +130,7 @@ var FieldNotes = function (options) {
    * Note: the legend item is subsequently hidden by LegendBar.reset().
    */
   _configure = function () {
-    var legend = document.querySelector('#legendBar .fieldnotes');
+    var legend = document.querySelector('#legend-bar .fieldnotes');
 
     if (_this.count !== 0) {
       _lightbox = Lightbox({id: _this.id});

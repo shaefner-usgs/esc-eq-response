@@ -1,7 +1,7 @@
 @use 'util/opt/variables' as *;
 
 @layer default {
-  #settingsBar {
+  #settings-bar {
     dd {
       color: var(--text-color);
     }

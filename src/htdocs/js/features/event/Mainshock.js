@@ -112,7 +112,7 @@ var Mainshock = function (options) {
    * Add the Beachball placeholders to the MapPane.
    */
   _addPlaceholders = function () {
-    var container = document.querySelector('#mapPane .container');
+    var container = document.querySelector('#map-pane .container');
 
     container.innerHTML =
       '<div class="focal-mechanism feature"></div>' +
@@ -624,12 +624,12 @@ var Mainshock = function (options) {
    * (on the SelectBar) using the selected catalog's data.
    */
   _updateDetails = function () {
-    var balloon = document.querySelector('#selectBar .mainshock'),
+    var balloon = document.querySelector('#select-bar .mainshock'),
         mainshock = document.getElementById('mainshock'),
         newBalloon = _earthquakes.getPopup(_this.data.eq),
         newStrip = L.Util.template(_getStrip(), _this.data.eq),
-        products = document.querySelector('#summaryPane .mainshock .products'),
-        strip = document.querySelector('#summaryPane .mainshock .details');
+        products = document.querySelector('#summary-pane .mainshock .products'),
+        strip = document.querySelector('#summary-pane .mainshock .details');
 
     _this.removeListeners();
     balloon.remove();
@@ -645,7 +645,7 @@ var Mainshock = function (options) {
    * the SummaryPane) on/off depending on which catalog is selected.
    */
   _updateHeader = function () {
-    var header = document.querySelector('#summaryPane .mainshock h2'),
+    var header = document.querySelector('#summary-pane .mainshock h2'),
         span = header.querySelector('span');
 
     if (!span) {
@@ -746,16 +746,16 @@ var Mainshock = function (options) {
   _this.addListeners = function () {
     var selectors = [ // Lightboxes
       '#mainshock .feature', // bubbles on SelectBar
-      '#mapPane .feature', // map's Beachballs
-      '#summaryPane .details .feature',
-      '#summaryPane .pager-exposures',
-      '#summaryPane .pager-loss',
-      '#summaryPane .thumbs .feature'
+      '#map-pane .feature', // map's Beachballs
+      '#summary-pane .details .feature',
+      '#summary-pane .pager-exposures',
+      '#summary-pane .pager-loss',
+      '#summary-pane .thumbs .feature'
     ];
 
     _button = document.getElementById('download');
     _els = document.querySelectorAll(selectors.join());
-    _tsunami = document.querySelector('#summaryPane li.tsunami');
+    _tsunami = document.querySelector('#summary-pane li.tsunami');
 
     // Create RTF Features (RTF document is created once all Features are ready)
     _button.addEventListener('click', _createFeatures);

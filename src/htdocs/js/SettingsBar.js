@@ -375,10 +375,10 @@ var SettingsBar = function (options) {
         _app.Features.createFeatures(catalog);
       }
 
-      if (pane !== 'mapPane') {
+      if (pane !== 'map-pane') {
         _app.Pane.setScrollPosition(pane);
       }
-      if (pane !== 'plotsPane') {
+      if (pane !== 'plots-pane') {
         _app.PlotsPane.rendered = false; // flag to (re-)render plots
       }
     }
@@ -496,7 +496,7 @@ var SettingsBar = function (options) {
     _setParam('timezone', timezone);
 
     if (document.body.classList.contains('mainshock')) {
-      tables = document.querySelectorAll('#summaryPane table.list.sortable');
+      tables = document.querySelectorAll('#summary-pane table.list.sortable');
 
       _app.PlotsPane.update();
       _app.SummaryPane.swapSortIndicator(tables);
