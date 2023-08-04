@@ -31,24 +31,6 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
-   * Add a CSS class to the given Feature's <label>.
-   *
-   * @param className {String}
-   * @param id {String}
-   *     Feature id
-   */
-  addClass: function (className, id) {
-    var label = document.querySelector('#mapPane .' + id);
-
-    if (!this._classNames[id]) {
-      this._classNames[id] = [];
-    }
-
-    label.classList.add(className);
-    this._classNames[id].push(className); // store class to re-add when sorting
-  },
-
-  /**
    * Add the count value next to the given Feature's name (which replaces the
    * loader).
    *
@@ -74,23 +56,6 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
     if (this._names[id]) {
       this._displayNames[id] = this._names[id] + loader;
       this._setName(id);
-    }
-  },
-
-  /**
-   * Remove a CSS class from the given Feature's <label>.
-   *
-   * @param className {String}
-   * @param id {String}
-   *     Feature id
-   */
-  removeClass: function (className, id) {
-    var label = document.querySelector('#mapPane .' + id);
-
-    label.classList.remove(className);
-
-    if (Array.isArray(this._classNames)) {
-      this._classNames = this._classNames.filter(name => name !== className);
     }
   },
 
