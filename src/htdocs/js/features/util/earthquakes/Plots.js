@@ -7,8 +7,10 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Supply the Plotly parameters that are used to create the plots for the
- * Mainshock, Aftershocks, and Historical Seismicity Features.
+ * Supply the Plotly parameters/traces used to create the plots for the
+ * Mainshock, Aftershocks, and Historical Seismicity Features and handle its
+ * interactive components like filtering and clicking on an earthquake (2d plots
+ * only).
  *
  * @param options {Object}
  *     {
@@ -456,7 +458,7 @@ var Plots = function (options) {
       featureId = 'mainshock';
     }
 
-    location.href = '#map-pane';
+    location.href = '#map';
 
     // setTimeout insures location.href setting is applied first
     setTimeout(() => _app.MapPane.openPopup(eqids[index], featureId));

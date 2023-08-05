@@ -60,10 +60,10 @@ var SelectBar = function (options) {
     // Reset the app
     reset.addEventListener('click', _hardReset);
 
-    // Show the Search Bar
+    // Show the SearchBar
     search.addEventListener('click', e => {
       e.preventDefault();
-      _app.NavBar.switchSideBar('search-bar');
+      _app.NavBar.switchSideBar('search');
     });
 
     // Create a new Mainshock and fetch its Features

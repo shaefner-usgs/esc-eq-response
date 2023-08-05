@@ -630,7 +630,7 @@ var Summary = function (options) {
 
       // Suppress click event if user is selecting text
       if (!isTextSelected) {
-        location.href = '#map-pane';
+        location.href = '#map';
 
         // setTimeout insures location.href setting is applied first
         setTimeout(() => _app.MapPane.openPopup(eqid, featureId));

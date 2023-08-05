@@ -64,24 +64,24 @@ var SideBar = function (options) {
    * Save the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
-    var id = AppUtil.getParam('sidebar'),
+    var name = AppUtil.getParam('sidebar'),
         position = _el.scrollTop;
 
     clearTimeout(_throttler);
 
     // Throttle scroll event
     _throttler = setTimeout(() =>
-      sessionStorage.setItem(id, position), 250
+      sessionStorage.setItem(name, position), 250
     );
   };
 
   /**
    * Set the scroll position to its previously saved value.
    *
-   * @param id {String}
+   * @param name {String}
    */
-  _setScrollPosition = function (id) {
-    var position = Number(sessionStorage.getItem(id));
+  _setScrollPosition = function (name) {
+    var position = Number(sessionStorage.getItem(name));
 
     if (position !== null) {
       _el.scrollTop = position;
@@ -99,9 +99,9 @@ var SideBar = function (options) {
     var sidebars = _el.querySelectorAll('section.bar');
 
     sidebars.forEach(sidebar => {
-      var id = sidebar.getAttribute('id');
+      var name = sidebar.getAttribute('id').replace('-bar', '');
 
-      sessionStorage.setItem(id, 0);
+      sessionStorage.setItem(name, 0);
     });
   };
 
@@ -113,13 +113,13 @@ var SideBar = function (options) {
    */
   _this.toggle = function (state) {
     var selected = document.querySelector('#nav-sub .selected'),
-        id = selected.className.match(/icon-(\w+)/)[1] + '-bar',
-        el = document.getElementById(id),
+        name = selected.className.match(/icon-(\w+)/)[1],
+        el = document.getElementById(name + '-bar'),
         toggled = true; // default; whether or not SideBar visibility changed
 
     if (state === 'on') { // open SideBar (if it's closed)
-      AppUtil.setParam('sidebar', id);
-      _setScrollPosition(id);
+      AppUtil.setParam('sidebar', name);
+      _setScrollPosition(name);
 
       if (document.body.classList.contains('sidebar')) {
         toggled = false; // already open
@@ -127,9 +127,9 @@ var SideBar = function (options) {
         document.body.classList.add('sidebar');
       }
 
-      if (id === 'search-bar') {
+      if (name === 'search') {
         _app.SearchBar.renderMap();
-      } else if (id === 'settings-bar') {
+      } else if (name === 'settings') {
         _app.SettingsBar.setFocusedField();
       }
     } else { // close SideBar
@@ -143,7 +143,7 @@ var SideBar = function (options) {
     if (toggled) {
       _app.MapPane.shiftMap();
 
-      if (_app.Pane.getSelPane() === 'plots-pane') {
+      if (_app.Pane.getSelPane() === 'plots') {
         _app.PlotsPane.resize();
       }
     }
@@ -152,14 +152,14 @@ var SideBar = function (options) {
   /**
    * Toggle the 'map' links depending on whether or not the MapPane is visible.
    *
-   * @param id {String}
-   *     Pane id
+   * @param name {String}
+   *     Pane name
    */
-  _this.toggleLinks = function (id) {
-    var links = _el.querySelectorAll('a[href="#map-pane"]');
+  _this.toggleLinks = function (name) {
+    var links = _el.querySelectorAll('a[href="#map"]');
 
     links.forEach(link => {
-      if (id === 'map-pane') {
+      if (name === 'map') {
         link.classList.add('hide-link');
       } else {
         link.classList.remove('hide-link');

@@ -46,10 +46,10 @@ var Pane = function (options) {
   _addListeners = function () {
     var select = _el.querySelector('a.select');
 
-    // Show the Select Bar
+    // Show the SelectBar
     select.addEventListener('click', () => {
-      sessionStorage.setItem('select-bar', 0);
-      _app.NavBar.switchSideBar('select-bar');
+      sessionStorage.setItem('select', 0);
+      _app.NavBar.switchSideBar('select');
     });
 
     // Save the scroll position
@@ -85,14 +85,14 @@ var Pane = function (options) {
    * Event handler that saves the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
-    var id = _this.getSelPane(),
+    var name = _this.getSelPane(),
         position = window.pageYOffset;
 
     clearTimeout(_throttler);
 
     // Throttle scroll event
     _throttler = setTimeout(() =>
-      sessionStorage.setItem(id, position), 250
+      sessionStorage.setItem(name, position), 250
     );
   };
 
@@ -103,34 +103,34 @@ var Pane = function (options) {
   /**
    * Get the selected Pane from the URL.
    *
-   * @return id {String}
-   *     Pane id
+   * @return name {String}
+   *     Pane name
    */
   _this.getSelPane = function () {
     var hash = location.hash,
-        id = 'map-pane', // default
-        paneExists = _el.querySelector('section' + hash);
+        name = 'map', // default
+        paneExists = _el.querySelector(hash + '-pane');
 
     if (hash && paneExists) {
-      id = hash.substring(1);
+      name = hash.substring(1);
     }
 
-    return id;
+    return name;
   };
 
   /**
    * Render the given Pane so it displays correctly when it's unhidden.
    *
-   * @param id {String}
-   *     Pane id
+   * @param name {String}
+   *     Pane name
    */
-  _this.render = function (id) {
-    _this.setScrollPosition(id);
-    _app.SideBar.toggleLinks(id);
+  _this.render = function (name) {
+    _this.setScrollPosition(name);
+    _app.SideBar.toggleLinks(name);
 
-    if (id === 'map-pane') {
+    if (name === 'map') {
       _app.MapPane.render();
-    } else if (id === 'plots-pane') {
+    } else if (name === 'plots') {
       _renderPlots();
     }
   };
@@ -142,20 +142,20 @@ var Pane = function (options) {
     var panes = _el.querySelectorAll('section.pane');
 
     panes.forEach(pane => {
-      var id = pane.getAttribute('id');
+      var name = pane.getAttribute('id').replace('-pane', '');
 
-      sessionStorage.setItem(id, 0);
+      sessionStorage.setItem(name, 0);
     });
   };
 
   /**
    * Set the scroll position to its previously saved value.
    *
-   * @param id {String}
-   *     Pane id
+   * @param name {String}
+   *     Pane name
    */
-  _this.setScrollPosition = function (id) {
-    var position = Number(sessionStorage.getItem(id));
+  _this.setScrollPosition = function (name) {
+    var position = Number(sessionStorage.getItem(name));
 
     if (position !== null) {
       window.scroll(0, position);

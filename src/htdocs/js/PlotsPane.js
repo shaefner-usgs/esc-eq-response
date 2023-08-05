@@ -153,7 +153,7 @@ var PlotsPane = function (options) {
    * @return {Boolean}
    */
   _isActive = function () {
-    if (location.hash === '#plots-pane') {
+    if (location.hash === '#plots') {
       return true;
     }
 

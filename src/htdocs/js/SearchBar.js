@@ -196,7 +196,7 @@ var SearchBar = function (options) {
 
     // Search the catalog
     _searchButton.addEventListener('click', () => {
-      location.href = '#map-pane';
+      location.href = '#map';
 
       _searchCatalog();
     });
@@ -649,7 +649,7 @@ var SearchBar = function (options) {
 
     if (map.classList.contains('hide')) return; // map not visible
 
-    if (sidebar === 'search-bar' && !_mapRendered) {
+    if (sidebar === 'search' && !_mapRendered) {
       _map.fitBounds(_regionLayer.getBounds(), {
         animate: false,
         padding: [32, 0]

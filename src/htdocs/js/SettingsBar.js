@@ -375,10 +375,10 @@ var SettingsBar = function (options) {
         _app.Features.createFeatures(catalog);
       }
 
-      if (pane !== 'map-pane') {
+      if (pane !== 'map') {
         _app.Pane.setScrollPosition(pane);
       }
-      if (pane !== 'plots-pane') {
+      if (pane !== 'plots') {
         _app.PlotsPane.rendered = false; // flag to (re-)render plots
       }
     }

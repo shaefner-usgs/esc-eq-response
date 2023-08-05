@@ -47,18 +47,27 @@ var NavBar = function (options) {
    * Add event listeners.
    */
   _addListeners = function () {
-    var lis = _el.querySelectorAll('#nav-sub li');
+    var icons = _el.querySelectorAll('#nav-sub i'),
+        tabs = _el.querySelectorAll('#nav-main a');
 
     // Switch Panes
     window.addEventListener('hashchange', _switchPane);
 
     // Switch SideBars
-    lis.forEach(li => {
-      li.addEventListener('click', () => {
-        var button = li.querySelector('i'),
-            id = button.className.match(/icon-(\w+)/)[1] + '-bar';
+    icons.forEach(icon => {
+      icon.addEventListener('click', () => {
+        var name = icon.className.match(/icon-(\w+)/)[1];
 
-        _this.switchSideBar(id);
+        _this.switchSideBar(name);
+      });
+    });
+
+    // Set scroll position
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.hash.substr(1) === _app.Pane.getSelPane()) {
+          window.scrollTo(0, 0); // scroll to top if already selected
+        }
       });
     });
   };
@@ -66,28 +75,28 @@ var NavBar = function (options) {
   /**
    * Show the given Pane and select its nav button.
    *
-   * @param id {String}
-   *     Pane id
+   * @param name {String}
+   *     Pane name
    */
-  _showPane = function (id) {
-    var button = _el.querySelector('[href="#' + id + '"]'),
-        pane = document.getElementById(id);
+  _showPane = function (name) {
+    var button = _el.querySelector('[href="#' + name + '"]'),
+        pane = document.getElementById(name + '-pane');
 
     button.classList.add('selected');
     pane.classList.remove('hide');
 
-    _app.Pane.render(id);
+    _app.Pane.render(name);
   };
 
   /**
    * Show the given SideBar and select its nav button.
    *
-   * @param id {String}
-   *     SideBar id
+   * @param name {String}
+   *     SideBar name
    */
-  _showSideBar = function (id) {
-    var button = _el.querySelector('.icon-' + id.replace('-bar', '')),
-        sidebar = document.getElementById(id);
+  _showSideBar = function (name) {
+    var button = _el.querySelector('.icon-' + name),
+        sidebar = document.getElementById(name + '-bar');
 
     button.classList.add('selected');
     sidebar.classList.remove('hide');
@@ -99,10 +108,10 @@ var NavBar = function (options) {
    * Event handler that switches to the Pane matching the URL hash.
    */
   _switchPane = function () {
-    var id = _app.Pane.getSelPane();
+    var name = _app.Pane.getSelPane();
 
     _this.hideAll('panes');
-    _showPane(id);
+    _showPane(name);
   };
 
   // ----------------------------------------------------------
@@ -122,13 +131,15 @@ var NavBar = function (options) {
     }
 
     els.forEach(el => {
-      var button,
+      var button, name,
           id = el.getAttribute('id');
 
       if (el.classList.contains('pane')) {
-        button = _el.querySelector('[href="#' + id + '"]');
+        name = id.replace('-pane', '');
+        button = _el.querySelector(`[href="#${name}"]`);
       } else { // sidebars
-        button = _el.querySelector('.icon-' + id.replace('-bar', ''));
+        name = id.replace('-bar', '');
+        button = _el.querySelector('.icon-' + name);
       }
 
       button.classList.remove('selected');
@@ -140,15 +151,9 @@ var NavBar = function (options) {
    * Initialization that depends on the app's other Classes being ready first.
    */
   _this.postInit = function () {
-    var id = AppUtil.getParam('sidebar');
+    var name = AppUtil.getParam('sidebar') || 'select';
 
-    if (id === null) {
-      id = 'select-bar'; // default'
-    }
-    if (id) {
-      _showSideBar(id);
-    }
-
+    _showSideBar(name);
     _showPane(_app.Pane.getSelPane());
   };
 
@@ -156,7 +161,7 @@ var NavBar = function (options) {
    * Reset to default state.
    */
   _this.reset = function () {
-    location.hash = '#map-pane';
+    location.hash = '#map';
 
     _switchPane();
   };
@@ -164,16 +169,16 @@ var NavBar = function (options) {
   /**
    * Event handler that switches to the given SideBar.
    *
-   * @param id {String}
-   *     SideBar id
+   * @param name {String}
+   *     SideBar name
    */
-  _this.switchSideBar = function (id) {
-    if (id === AppUtil.getParam('sidebar')) {
-      sessionStorage.setItem(id, 0); // reset scroll position to top
+  _this.switchSideBar = function (name) {
+    if (name === AppUtil.getParam('sidebar')) {
+      sessionStorage.setItem(name, 0); // scroll to top if already selected
     }
 
     _this.hideAll('sidebars');
-    _showSideBar(id);
+    _showSideBar(name);
   };
 
 
