@@ -83,23 +83,27 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
         dependencies = this._app.Features.checkDependencies(feature);
 
     if (dependencies === 'ready') {
-      if (feature.addData) {
-        feature.addData(this._json);
-      }
-      if (feature.mapLayer) {
-        this.addData(this._json); // L.GeoJSON: add to MapPane
-
-        if (feature.showLayer) {
-          this._render(); // L.GeoJSON.DateLine: render on both sides of IDL
+      try {
+        if (feature.addData) {
+          feature.addData(this._json);
         }
+        if (feature.mapLayer) {
+          this.addData(this._json); // L.GeoJSON: add to MapPane
+
+          if (feature.showLayer) {
+            this._render(); // L.GeoJSON.DateLine: render on both sides of IDL
+          }
+        }
+
+        feature.status = 'ready';
+
+        this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
+        this._deleteProps();
+
+        feature.isRefreshing = false; // reset flag if Feature was refreshing
+      } catch {
+        console.error('Feature destroyed; cannot add content.');
       }
-
-      feature.status = 'ready';
-
-      this._app.Features.addContent(feature); // add to Plots/SummaryPanes, etc
-      this._deleteProps();
-
-      feature.isRefreshing = false; // reset flag if Feature was refreshing
     } else { // dependencies not ready
       setTimeout(() => {
         this._addContent();
