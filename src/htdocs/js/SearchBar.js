@@ -645,7 +645,7 @@ var SearchBar = function (options) {
    */
   _setView = function () {
     var map = _el.querySelector('.custom-region'),
-        sidebar = AppUtil.getParam('sidebar');
+        sidebar = _app.SideBar.getSelected();
 
     if (map.classList.contains('hide')) return; // map not visible
 

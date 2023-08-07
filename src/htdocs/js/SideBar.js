@@ -17,6 +17,7 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *     {
+ *       getSelected: {Function}
  *       reset: {Function}
  *       toggle: {Function}
  *       toggleLinks: {Function}
@@ -64,7 +65,7 @@ var SideBar = function (options) {
    * Save the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
-    var name = AppUtil.getParam('sidebar'),
+    var name = _this.getSelected(),
         position = _el.scrollTop;
 
     clearTimeout(_throttler);
@@ -91,6 +92,26 @@ var SideBar = function (options) {
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
+
+  /**
+   * Get the selected SideBar from the URL.
+   *
+   * @return name {String}
+   *     SideBar name
+   */
+  _this.getSelected = function () {
+    var name = 'select', // default
+        param = AppUtil.getParam('sidebar'),
+        sidebarExists = document.getElementById(param + '-bar');
+
+    if (param && sidebarExists) {
+      name = param;
+    } else if (param === '') {
+      name = '';
+    }
+
+    return name;
+  };
 
   /**
    * Reset to default state.

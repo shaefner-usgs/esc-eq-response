@@ -1,9 +1,6 @@
 'use strict';
 
 
-var AppUtil = require('util/AppUtil');
-
-
 /**
  * Switch between Panes (i.e. 'pages') and toggle/switch between SideBars.
  *
@@ -151,10 +148,13 @@ var NavBar = function (options) {
    * Initialization that depends on the app's other Classes being ready first.
    */
   _this.postInit = function () {
-    var name = AppUtil.getParam('sidebar') || 'select';
+    var sidebar = _app.SideBar.getSelected();
 
-    _showSideBar(name);
-    _showPane(_app.Pane.getSelPane());
+    if (sidebar) {
+      _showSideBar(sidebar);
+    }
+
+    _showPane(_app.Pane.getSelected());
   };
 
   /**
@@ -173,7 +173,7 @@ var NavBar = function (options) {
    *     SideBar name
    */
   _this.switchSideBar = function (name) {
-    if (name === AppUtil.getParam('sidebar')) {
+    if (name === _app.SideBar.getSelected()) {
       sessionStorage.setItem(name, 0); // scroll to top if already selected
     }
 
