@@ -12,7 +12,7 @@
  *
  * @return _this {Object}
  *     {
- *       getSelPane: {Function}
+ *       getSelected: {Function}
  *       render: {Function}
  *       reset: {Function}
  *       setScrollPosition: {Function}
@@ -85,7 +85,7 @@ var Pane = function (options) {
    * Event handler that saves the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
-    var name = _this.getSelPane(),
+    var name = _this.getSelected(),
         position = window.pageYOffset;
 
     clearTimeout(_throttler);
@@ -106,7 +106,7 @@ var Pane = function (options) {
    * @return name {String}
    *     Pane name
    */
-  _this.getSelPane = function () {
+  _this.getSelected = function () {
     var hash = location.hash,
         name = 'map', // default
         paneExists = _el.querySelector(hash + '-pane');

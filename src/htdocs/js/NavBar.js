@@ -65,7 +65,7 @@ var NavBar = function (options) {
     // Set scroll position
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        if (tab.hash.substr(1) === _app.Pane.getSelPane()) {
+        if (tab.hash.substr(1) === _app.Pane.getSelected()) {
           window.scrollTo(0, 0); // scroll to top if already selected
         }
       });
@@ -108,7 +108,7 @@ var NavBar = function (options) {
    * Event handler that switches to the Pane matching the URL hash.
    */
   _switchPane = function () {
-    var name = _app.Pane.getSelPane();
+    var name = _app.Pane.getSelected();
 
     _this.hideAll('panes');
     _showPane(name);
