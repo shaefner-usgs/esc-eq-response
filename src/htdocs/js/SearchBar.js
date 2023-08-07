@@ -80,7 +80,6 @@ var SearchBar = function (options) {
       _initCalendars,
       _initControls,
       _initMap,
-      _isValid,
       _onDateChange,
       _onDateClose,
       _onEndOpen,
@@ -195,11 +194,7 @@ var SearchBar = function (options) {
     });
 
     // Search the catalog
-    _searchButton.addEventListener('click', () => {
-      location.href = '#map';
-
-      _searchCatalog();
-    });
+    _searchButton.addEventListener('click', _searchCatalog);
   };
 
   /**
@@ -354,26 +349,6 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Check if both the starttime and endtime values are valid or not.
-   *
-   * @return isValid {Boolean}
-   */
-  _isValid = function () {
-    var isValid = true, // default
-        period = _el.querySelector('#period .selected').id;
-
-    if (period === 'custom-period') {
-      isValid = _setValidity(_starttime) && _setValidity(_endtime);
-
-      if (!isValid) {
-        _setValidity(_endtime); // be certain to flag invalid endtime as well
-      }
-    }
-
-    return isValid;
-  };
-
-  /**
    * Event handler for changing a calendar's date or time.
    *
    * @param selDates {Array}
@@ -501,19 +476,20 @@ var SearchBar = function (options) {
   _searchCatalog = function () {
     var search = _app.Features.getFeature('catalog-search');
 
-    if (_isValid()) { // checks custom dates
-      if (_app.Features.isFeature(search)) {
-        _app.Features.refreshFeature('catalog-search');
-      } else {
-        _app.Features.reloadFeature('catalog-search', 'base');
-      }
+    location.href = '#map';
 
-      _setParams();
+    if (_app.Features.isFeature(search)) {
+      _app.Features.refreshFeature('catalog-search');
+    } else {
+      _app.Features.reloadFeature('catalog-search', 'base');
+    }
 
-      if (!document.body.classList.contains('mainshock')) {
-        _app.MapPane.initBounds();
-        _app.MapPane.setView();
-      }
+    _searchButton.setAttribute('disabled', 'disabled');
+    _setParams();
+
+    if (!document.body.classList.contains('mainshock')) {
+      _app.MapPane.initBounds();
+      _app.MapPane.setView();
     }
   };
 
