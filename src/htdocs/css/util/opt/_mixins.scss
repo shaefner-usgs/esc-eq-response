@@ -95,7 +95,7 @@
 @mixin labels() {
   color: var(--text-color-lighter);
   font-family: $font-family-headers;
-  font-weight: bold;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
