@@ -18,6 +18,11 @@
 
       &:active,
       &.selected {
+        .box,
+        .close {
+          transition-duration: $effect-on-duration;
+        }
+
         .box {
           border-color: var(--bg-color);
         }
@@ -33,6 +38,7 @@
       border: 2px solid var(--accent-color);
       height: 15px;
       position: relative;
+      transition: border-color $effect-duration ease-in-out;
       width: 15px;
     }
 
@@ -46,6 +52,9 @@
       right: -7px;
       text-align: center;
       top: -7px;
+      transition: $effect-duration ease-in-out {
+        property: background, color;
+      };
       width: 12px;
     }
   }
