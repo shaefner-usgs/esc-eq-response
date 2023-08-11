@@ -4,7 +4,7 @@
   #legend-bar {
     h2 + ul > li {
       border-top: 1px solid var(--border-color-lighter);
-      font-family: $font-family-headers;
+      font: 1.125rem $font-family-headers;
       padding: .625rem 0;
 
       &:first-child {
@@ -35,10 +35,8 @@
     }
 
     .aftershocks ul {
-      font-family: $font-family;
-      font-weight: 300;
+      font: 300 $font-size/#{$line-height} $font-family;
       letter-spacing: .015rem;
-      line-height: $line-height;
       margin-top: .25rem;
     }
 
@@ -62,7 +60,7 @@
       align-items: center;
       color: var(--text-color-lighter);
       display: flex;
-      font-size: $font-size-smaller;
+      font: 300 $font-size-smaller $font-family;
       justify-content: space-around;
       margin: .25rem 0;
 

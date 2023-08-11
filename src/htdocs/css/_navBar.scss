@@ -25,7 +25,7 @@
       border-radius: 8px 8px 0 0;
       color: var(--accent-color);
       display: block;
-      font: 600 1rem/1 $font-family-headers;
+      font: 600 #{$font-size}/1 $font-family-labels;
       padding: .625rem .875rem;
       text-decoration: none;
       text-transform: uppercase;

@@ -67,6 +67,10 @@
 
   // Map popups
   .shakemap-stations {
+    h5 strong {
+      font-weight: 500;
+    }
+
     .channels {
       em {
         font-size: $font-size-smaller;

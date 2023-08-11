@@ -34,7 +34,7 @@
           color: var(--bg-color);
           content: counter(item);
           display: flex;
-          font: bold 1rem $font-family-headers;
+          font: 600 $font-size $font-family-labels;
           height: 1.75rem;
           justify-content: center;
           left: 0;

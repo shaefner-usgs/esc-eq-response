@@ -4,7 +4,7 @@
   a.button {
     border: 1px solid transparent;
     border-radius: $button-border-radius;
-    font: 600 .8125rem $font-family-headers;
+    font: 600 .8125rem $font-family-labels;
     padding: .125rem .375rem;
     text-decoration: none;
     text-transform: uppercase;
@@ -33,8 +33,7 @@
     border-radius: $button-border-radius;
     color: var(--accent-color);
     cursor: pointer;
-    font: 600 1.125rem $font-family-headers;
-    line-height: 1;
+    font: 600 1.125rem/1 $font-family-labels;
     margin: 0;
     padding: .375rem .75rem;
     text-transform: uppercase;
