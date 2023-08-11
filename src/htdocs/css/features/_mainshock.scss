@@ -57,7 +57,7 @@
       }
 
       span {
-        font-size: 1.125rem;
+        font-size: $font-size-larger;
 
         span {
           display: none; // depth unit
@@ -81,7 +81,7 @@
         position: relative;
 
         span {
-          font-size: 1rem;
+          font-size: $font-size;
           line-height: 1.25;
           position: absolute;
           text-align: center;

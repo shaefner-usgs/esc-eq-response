@@ -39,7 +39,7 @@
       }
 
       span { // text
-        font: 1.125rem/1 $font-family-headers;
+        font: #{$font-size-larger}/1 $font-family-headers;
         left: 2.25rem;
         padding-left: .5rem;
         position: absolute;

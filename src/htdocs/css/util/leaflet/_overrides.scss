@@ -100,7 +100,7 @@
 
   .leaflet-control-layers label {
     cursor: pointer;
-    font: 1.125rem $font-family-headers;
+    font: $font-size-larger $font-family-headers;
     padding: .125rem 0;
 
     > span > span {
