@@ -17,7 +17,7 @@
       border: 1px solid var(--border-color-darker);
       content: '\00a0';
       display: flex;
-      font: 1rem/1 'Arial Unicode MS';
+      font: #{$font-size}/1 'Arial Unicode MS';
       height: 1rem;
       justify-content: center;
       margin-right: .5rem;
@@ -54,7 +54,7 @@
     border-radius: $button-border-radius;
     box-shadow: $box-shadow-inset;
     color: var(--text-color);
-    font: 1rem/1 $font-family;
+    font: #{$font-size}/1 $font-family;
     margin: 0 0 .125rem 0;
     outline: none;
     padding: .375rem 0 .375rem .375rem;
