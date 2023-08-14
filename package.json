@@ -23,16 +23,16 @@
     "node": ">=10"
   },
   "dependencies": {
-    "flatpickr": "^4.6.11",
-    "leaflet": "^1.8.0",
-    "leaflet-editable": "^1.2.0",
+    "flatpickr": "^4.6",
+    "leaflet": "^1.9",
+    "leaflet-editable": "^1.2",
     "leaflet-geojson-dateline": "github:shaefner-usgs/Leaflet.geoJSON.dateLine",
     "leaflet-mouse-position": "github:shaefner-usgs/Leaflet.MousePosition",
     "leaflet-mouseover-layer": "github:shaefner-usgs/Leaflet.mouseOverLayer",
     "leaflet.path.drag": "^0.0.6",
     "leaflet.utfgrid": "github:danzel/Leaflet.utfgrid",
-    "luxon": "^2.5.2",
-    "plotly.js": "^2.14.0",
+    "luxon": "^3.4",
+    "plotly.js": "^2.25",
     "tablesort": "github:shaefner-usgs/tablesort"
   },
   "devDependencies": {
