@@ -601,8 +601,8 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Set the Mainshock with the given id by updating the UI components that are
-   * dependent upon it.
+   * Set the given Mainshock's title and default Settings, and update the
+   * Significant Earthquakes list.
    *
    * @param id {String}
    */
@@ -706,8 +706,7 @@ var Mainshock = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * Also set the title and defaults (Settings), and update the Significant
-   * Earthquakes list.
+   * Also set the selected Mainshock's parameters in the UI.
    *
    * @param json {Object} default is {}
    */
