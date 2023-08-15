@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "flatpickr": "^4.6",
+    "imagesloaded": "^5.0.0",
     "leaflet": "^1.9",
     "leaflet-editable": "^1.2",
     "leaflet-geojson-dateline": "github:shaefner-usgs/Leaflet.geoJSON.dateLine",
@@ -32,6 +33,7 @@
     "leaflet.path.drag": "^0.0.6",
     "leaflet.utfgrid": "github:danzel/Leaflet.utfgrid",
     "luxon": "^3.4",
+    "masonry-layout": "^4.2.2",
     "plotly.js": "^2.25",
     "tablesort": "github:shaefner-usgs/tablesort"
   },
