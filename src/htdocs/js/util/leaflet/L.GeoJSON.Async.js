@@ -122,22 +122,21 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
   _addError: function (error, response, text, type) {
     var feature = this._feature,
         host = this._host || this._url.hostname,
-        message = `<h4>Error Loading ${feature.name}</h4>`;
+        message = `<h4>Error Loading ${feature.name}</h4>`,
+        number = text.match(/(\d+) matching events/)[1];
 
     message += '<ul>';
 
     if (type === 'timeout') {
       message += `<li>Request timed out (can’t connect to ${host})</li>`;
-    } else if (type === 'network') {
-      message += `<li>${error.message}</li>`;
     } else if (type === 'notfound') {
       message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else {
       if (text.includes('limit of 20000')) {
-        message += '<li>Modify the parameters to match fewer earthquakes ' +
-          '(max 20,000)</li>';
+        message += '<li>The current <a href="#">settings</a> matched ' +
+          AppUtil.addCommas(number) + ' earthquakes (max 20,000).</li>';
       } else if (text.includes('parameter combination')){
-        message += '<li>Missing parameters (all fields are required)</li>';
+        message += '<li>Required <a href="#">settings</a> are missing.</li>';
       } else if (response.status !== 200) {
         message += `<li>Error code: ${response.status} (${response.statusText})</li>`;
       } else { // generic error message

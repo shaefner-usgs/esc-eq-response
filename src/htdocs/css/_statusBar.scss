@@ -21,6 +21,15 @@ $height: 3rem;
       transition: height $effect-duration ease-in .25s;
     }
 
+    a {
+      color: #fff;
+      text-decoration-color: color.scale(#fff, $alpha: -40%);
+
+      &:hover {
+        text-decoration-color: color.scale(#fff, $alpha: -10%);
+      }
+    }
+
     div {
       align-items: center;
       background: $bg-color;

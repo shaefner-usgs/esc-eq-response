@@ -51,7 +51,8 @@ var StatusBar = function (options) {
    */
   _addListeners = function (div, id, mode = '') {
     var close = div.querySelector('.close'),
-        reload = div.querySelector('.reload');
+        reload = div.querySelector('.reload'),
+        settings = div.querySelector('ul a');
 
     // Remove StatusBar item
     if (close) {
@@ -79,6 +80,19 @@ var StatusBar = function (options) {
             _app.Features.reloadFeature(id, mode);
           }
         }
+      });
+    }
+
+    // Open Settings
+    if (settings) {
+      settings.addEventListener('click', e => {
+        var aftershocks = document.querySelector('#settings-bar .aftershocks');
+
+        e.preventDefault();
+        _app.NavBar.switchSideBar('settings');
+        aftershocks.scrollIntoView({
+          behavior: 'smooth'
+        });
       });
     }
   };
