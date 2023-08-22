@@ -36,6 +36,10 @@
       text-decoration-color: color.scale($accent-color, $lightness: 25%);
       transition-duration: $effect-on-duration;
     }
+
+    &:active {
+      text-decoration-color: var(--accent-color);
+    }
   }
 
   abbr {

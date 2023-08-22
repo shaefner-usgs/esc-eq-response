@@ -28,6 +28,10 @@ $height: 3rem;
       &:hover {
         text-decoration-color: color.scale(#fff, $alpha: -10%);
       }
+
+      &:active {
+        text-decoration-color: #fff;
+      }
     }
 
     div {

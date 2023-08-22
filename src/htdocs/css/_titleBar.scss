@@ -8,6 +8,10 @@
         color: var(--text-color-darker);
         text-decoration-color: var(--text-color-lighter);
       }
+
+      &:active {
+        text-decoration-color: var(--text-color);
+      }
     }
 
     h1,
