@@ -4,8 +4,10 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
+    ImagesLoaded = require('imagesloaded'),
     LatLon = require('util/LatLon'),
     Luxon = require('luxon'),
+    Masonry = require('masonry-layout'),
     Plots = require('features/util/earthquakes/Plots');
 
 
@@ -28,13 +30,13 @@ var AppUtil = require('util/AppUtil'),
  *       data: {Object}
  *       destroy: {Function}
  *       disableDownload: {Function}
- *       enableDownload: {Function}
  *       id: {String}
  *       mapLayer: {L.FeatureGroup}
  *       name: {String}
  *       placeholder: {String}
  *       plots: {Object}
  *       removeListeners: {Function}
+ *       render: {Function}
  *       showLayer: {Boolean}
  *       summary: {String}
  *       title: {String}
@@ -54,11 +56,13 @@ var Mainshock = function (options) {
       _earthquakes,
       _els,
       _json,
+      _masonry,
       _tsunami,
 
       _addPlaceholders,
       _createFeatures,
       _destroy,
+      _enableDownload,
       _getBubbles,
       _getData,
       _getDyfi,
@@ -75,6 +79,7 @@ var Mainshock = function (options) {
       _getText,
       _getUpdated,
       _getUrl,
+      _initMasonry,
       _openTsunami,
       _setMainshock,
       _updateDetails,
@@ -132,9 +137,23 @@ var Mainshock = function (options) {
   _destroy = function () {
     _earthquakes.destroy();
 
+    if (_masonry) {
+      _masonry.destroy();
+    }
+
     if (!AppUtil.isEmpty(_this.plots)) {
       _this.plots.destroy();
     }
+  };
+
+  /**
+   * Enable the download RTF button.
+   */
+  _enableDownload = function () {
+    _buttonTitle = _button.getAttribute('title');
+
+    _button.removeAttribute('disabled');
+    _button.setAttribute('title', 'Download RTF Document');
   };
 
   /**
@@ -594,6 +613,29 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Initialize the Masonry layout plugin.
+   *
+   * @param el {Element}
+   * @param phase {String <interim|final>} default is 'interim'
+   */
+  _initMasonry = function (el, phase = 'interim') {
+    var duration = 0;
+
+    if (phase === 'final') {
+      duration = '.25s';
+    }
+
+    _masonry = new Masonry(el, {
+      columnWidth: 400,
+      gutter: 16,
+      itemSelector: '.bubble',
+      transitionDuration: duration
+    });
+
+    _masonry.phase = phase;
+  };
+
+  /**
    * Open the tsunami web site.
    */
   _openTsunami = function () {
@@ -786,11 +828,13 @@ var Mainshock = function (options) {
     _earthquakes = null;
     _els = null;
     _json = null;
+    _masonry = null;
     _tsunami = null;
 
     _addPlaceholders = null;
     _createFeatures = null;
     _destroy = null;
+    _enableDownload = null;
     _getBubbles = null;
     _getData = null;
     _getDyfi = null;
@@ -807,7 +851,9 @@ var Mainshock = function (options) {
     _getText = null;
     _getUpdated = null;
     _getUrl = null;
+    _initMasonry = null;
     _openTsunami = null;
+    _setMainshock = null;
     _updateDetails = null;
     _updateHeader = null;
     _updateMarkers = null;
@@ -830,16 +876,6 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Enable the download RTF button.
-   */
-  _this.enableDownload = function () {
-    _buttonTitle = _button.getAttribute('title');
-
-    _button.removeAttribute('disabled');
-    _button.setAttribute('title', 'Download RTF Document');
-  };
-
-  /**
    * Remove event listeners.
    */
   _this.removeListeners = function () {
@@ -858,6 +894,38 @@ var Mainshock = function (options) {
     }
 
     _earthquakes.removeListeners();
+  };
+
+  /**
+   * Configure/update Masonry layout; enable the download button.
+   *
+   * @param status {String} default is ''
+   */
+  _this.render = function (status = '') {
+    var images,
+        el = document.querySelector('.mainshock .products');
+
+    if (!_masonry) {
+      images = ImagesLoaded(el);
+
+      _initMasonry(el);
+
+      images.on('progress', () => {
+        _masonry.layout(); // update layout as images load
+      });
+    }
+
+    if (status === 'ready') {
+      _enableDownload();
+
+      if (_masonry.phase === 'interim') {
+        // Masonry API doesn't allow changing settings; create a new instance
+        _masonry.destroy();
+        _initMasonry(el, 'final');
+      }
+    } else {
+      _masonry.layout(); // update layout
+    }
   };
 
   /**

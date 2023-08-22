@@ -125,6 +125,8 @@ var Pane = function (options) {
    *     Pane name
    */
   _this.render = function (name) {
+    var mainshock = _app.Features.getFeature('mainshock');
+
     _this.setScrollPosition(name);
     _app.SideBar.toggleLinks(name);
 
@@ -132,6 +134,8 @@ var Pane = function (options) {
       _app.MapPane.render();
     } else if (name === 'plots') {
       _renderPlots();
+    } else if (name ==='summary' && mainshock.render) {
+      mainshock.render();
     }
   };
 

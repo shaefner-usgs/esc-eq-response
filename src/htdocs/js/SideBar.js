@@ -128,12 +128,15 @@ var SideBar = function (options) {
 
   /**
    * Toggle the SideBar on/off and set the 'sidebar' URL parameter. Also shift
-   * the map's center point and resize the plots if they are visible.
+   * the map's center point, resize the plots, and update the layout of the
+   * Mainshock's products.
    *
    * @param state {String <on|off>}
    */
   _this.toggle = function (state) {
-    var selected = document.querySelector('#nav-sub .selected'),
+    var mainshock = _app.Features.getFeature('mainshock'),
+        pane = _app.Pane.getSelected(),
+        selected = document.querySelector('#nav-sub .selected'),
         name = selected.className.match(/icon-(\w+)/)[1],
         el = document.getElementById(name + '-bar'),
         toggled = true; // default; whether or not SideBar visibility changed
@@ -154,18 +157,20 @@ var SideBar = function (options) {
         _app.SettingsBar.setFocusedField();
       }
     } else { // close SideBar
-      AppUtil.setParam('sidebar', ''); // retain param to repress default SideBar
+      AppUtil.setParam('sidebar', ''); // suppresses default SideBar on load
       document.body.classList.remove('sidebar');
-
       _app.NavBar.hideAll('sidebars');
+
       el.classList.remove('hide'); // keep visible for animation
     }
 
     if (toggled) {
       _app.MapPane.shiftMap();
 
-      if (_app.Pane.getSelected() === 'plots') {
+      if (pane === 'plots') {
         _app.PlotsPane.resize();
+      } else if (pane === 'summary' && mainshock.render) {
+        mainshock.render();
       }
     }
   };

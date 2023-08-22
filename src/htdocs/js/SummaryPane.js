@@ -85,6 +85,7 @@ var SummaryPane = function (options) {
    */
   _this.addContent = function (feature) {
     var el,
+        mainshock = _app.Features.getFeature('mainshock'),
         selectors = `
           div.${feature.id}.content,
           div.${feature.id} .content
@@ -101,12 +102,13 @@ var SummaryPane = function (options) {
 
       el.insertAdjacentHTML('beforeend', feature.summary);
       el.classList.remove('hide'); // un-hide placeholder if hidden
+      mainshock.render(); // update Masonry layout
     }
 
     _embedFeatures(feature);
 
     if (status === 'ready') {
-      _app.Features.getFeature('mainshock').enableDownload();
+      mainshock.render(status);
     }
   };
 
