@@ -218,9 +218,10 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _toggleFilter = function (feature) {
-    var el = _el.querySelector(`.${feature.id} .filter`);
+    var count = parseInt(feature.count.replaceAll(',', ''), 10),
+        el = _el.querySelector(`.${feature.id} .filter`);
 
-    if (feature.count < 2) {
+    if (count < 2) {
       el.classList.add('hide');
     } else {
       el.classList.remove('hide');
@@ -234,9 +235,10 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _togglePlot = function (id, feature) {
-    var els = _el.querySelectorAll(`.${feature.id} .${id}`); // plot + header
+    var count = parseInt(feature.count.replaceAll(',', ''), 10),
+        els = _el.querySelectorAll(`.${feature.id} .${id}`); // plot + header
 
-    if (feature.count === 0 || (id === 'cumulative' && feature.count === 1)) {
+    if (count === 0 || (id === 'cumulative' && count === 1)) {
       els.forEach(el => el.classList.add('hide'));
     } else {
       els.forEach(el => el.classList.remove('hide'));
