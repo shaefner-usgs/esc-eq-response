@@ -116,14 +116,14 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
    *
    * @param error {Object}
    * @param response {Object}
-   * @param text {String}
+   * @param text {String} default is ''
    * @param type {String <timeout|network|notfound>}
    */
-  _addError: function (error, response, text, type) {
-    var feature = this._feature,
+  _addError: function (error, response, text = '', type) {
+    var number,
+        feature = this._feature,
         host = this._host || this._url.hostname,
-        message = `<h4>Error Loading ${feature.name}</h4>`,
-        number = text.match(/(\d+) matching events/)[1];
+        message = `<h4>Error Loading ${feature.name}</h4>`;
 
     message += '<ul>';
 
@@ -133,6 +133,7 @@ L.GeoJSON.Async = L.GeoJSON.DateLine.extend({
       message += `<li>Can’t find Event ID (${AppUtil.getParam('eqid')}) in catalog</li>`;
     } else {
       if (text.includes('limit of 20000')) {
+        number = text.match(/(\d+) matching events/)[1];
         message += '<li>The current <a href="#">settings</a> matched ' +
           AppUtil.addCommas(number) + ' earthquakes (max 20,000).</li>';
       } else if (text.includes('parameter combination')){
