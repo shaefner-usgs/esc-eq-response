@@ -200,7 +200,6 @@
   }
 
   .external {
-    padding-right: .5rem;
     position: relative;
 
     &:hover i {
@@ -208,13 +207,19 @@
       transition-duration: $effect-on-duration;
     }
 
+    &:active i {
+      color: var(--accent-color);
+    }
+
     i {
+      background: var(--bg-color-alpha);
       color: color.scale($accent-color, $lightness: 25%);
       font-size: $font-size-smaller;
       opacity: 0;
+      padding: 0 .1875rem;
       position: absolute;
-      right: -.625rem;
-      top: .125rem;
+      right: -1.25rem;
+      top: -.0625rem;
       transition: opacity $effect-duration ease-in-out;
     }
   }

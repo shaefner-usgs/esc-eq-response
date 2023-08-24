@@ -11,6 +11,10 @@
 
       &:active {
         text-decoration-color: var(--text-color);
+
+        i {
+          color: var(--text-color);
+        }
       }
     }
 
@@ -26,10 +30,12 @@
     }
 
     i {
+      background: none;
       color: var(--text-color-lighter);
       font-size: 1.25rem;
-      right: -1.125rem;
-      top: .625rem;
+      padding: 0 .25rem;
+      right: -1.75rem;
+      top: .4375rem;
     }
 
     p {
