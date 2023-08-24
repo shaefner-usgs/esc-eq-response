@@ -88,18 +88,11 @@
     }
   }
 
-  // Invalid Flatpickr inputs
-  .invalid > input[type="text"] {
+  // Flag invalid inputs (Note: only flags Settings if a Mainshock is selected)
+  #eqid:invalid,
+  .invalid > input[type="text"], // Flatpickr inputs
+  .mainshock #settings-bar input:invalid {
     border: 1px solid var(--invalid-color);
     box-shadow: $box-shadow-inset, $box-shadow-length var(--invalid-color);
-  }
-
-  // Flag (non-Flatpickr) invalid inputs only when a Mainshock is selected
-  .mainshock {
-    input[type="number"]:invalid,
-    input[type="text"]:invalid {
-      border: 1px solid var(--invalid-color);
-      box-shadow: $box-shadow-inset, $box-shadow-length var(--invalid-color);
-    }
   }
 }
