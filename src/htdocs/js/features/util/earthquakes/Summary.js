@@ -234,7 +234,7 @@ var Summary = function (options) {
         feature = _app.Features.getFeature(_featureId),
         value = Number(this.value);
 
-    els.count.innerHTML = feature.bins.mag[value];
+    els.count.innerHTML = AppUtil.addCommas(feature.bins.mag[value]);
     els.mag.innerHTML = value;
 
     for (i = value; i <= this.getAttribute('max'); i ++) {

@@ -152,7 +152,7 @@ var Foreshocks = function (options) {
     _summary = Summary(_summaryOpts);
 
     _this.bins = _summary.bins;
-    _this.count = _earthquakes.data.eqs.length;
+    _this.count = AppUtil.addCommas(_earthquakes.data.eqs.length);
     _this.data = _earthquakes.data;
     _this.summary = _summary.getContent();
   };
