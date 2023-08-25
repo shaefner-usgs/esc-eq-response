@@ -218,7 +218,7 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _toggleFilter = function (feature) {
-    var count = parseInt(feature.count.replaceAll(',', ''), 10),
+    var count = AppUtil.getInteger(feature.count),
         el = _el.querySelector(`.${feature.id} .filter`);
 
     if (count < 2) {
@@ -235,7 +235,7 @@ var PlotsPane = function (options) {
    * @param feature {Object}
    */
   _togglePlot = function (id, feature) {
-    var count = parseInt(feature.count.replaceAll(',', ''), 10),
+    var count = AppUtil.getInteger(feature.count),
         els = _el.querySelectorAll(`.${feature.id} .${id}`); // plot + header
 
     if (count === 0 || (id === 'cumulative' && count === 1)) {

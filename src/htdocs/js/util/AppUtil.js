@@ -151,6 +151,17 @@ AppUtil.getDirection = function (from, to) {
 };
 
 /**
+ * Get the integer value from a number with commas (i.e. remove commas).
+ *
+ * @param str {String}
+ *
+ * @return {Number}
+ */
+AppUtil.getInteger = function (str) {
+  return parseInt(str.replaceAll(',', ''), 10);
+};
+
+/**
  * Get the value of the given URL parameter.
  *
  * @param name {String}
