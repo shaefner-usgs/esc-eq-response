@@ -255,6 +255,8 @@ var Plots = function (options) {
             r: 50,
             t: 0
           },
+          paper_bgcolor: '#fff',
+          plot_bgcolor: '#fff',
           showlegend: false
         },
         sel = document.querySelector('nav a.selected'),
@@ -649,7 +651,7 @@ var Plots = function (options) {
       trace.marker = {
         color: data.color, // fill
         line: { // stroke
-          color: 'rgb(65, 65, 65)',
+          color: 'rgba(0, 0, 0. .6)',
           width: 1
         },
         opacity: 0.85,
