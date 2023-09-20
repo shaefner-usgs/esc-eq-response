@@ -12,7 +12,7 @@
     .description {
       font-size: $font-size-larger;
       line-height: 1.5;
-      margin-top: 0;
+      margin: 0;
     }
 
     .filter {
@@ -21,6 +21,10 @@
       flex-direction: row-reverse;
       justify-content: flex-end;
       margin-top: -.5rem;
+    }
+
+    .timestamp {
+      margin-top: 1.25rem;
     }
   }
 
@@ -38,7 +42,7 @@
       }
     }
 
-    .timestamp {
+    .hypocenters:not(.hide) + .filter + .timestamp {
       margin-top: 0;
     }
   }
@@ -120,10 +124,6 @@
       }
     }
 
-    .description {
-      margin-bottom: 0;
-    }
-
     .hide-month .month,
     .hide-year .year {
       display: none; // elapsed time is less than previous bin column's duration
@@ -194,10 +194,6 @@
 
     .sort-header {
       color: var(--text-color-lighter); // override tablesort's default
-    }
-
-    .timestamp {
-      margin-top: 1.25rem;
     }
 
     @media only screen and (max-width: $breakpoint-phone-width) {
