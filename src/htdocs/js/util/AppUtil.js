@@ -96,12 +96,14 @@ AppUtil.extent = function (values) {
 /**
  * Add timeout support to a fetch() request.
  *
- * Taken from: https://dmitripavlutin.com/timeout-fetch-request/
+ * Adapted from: https://dmitripavlutin.com/timeout-fetch-request/
  *
  * @param resource {String}
  *     URI
  * @param options {Object} default is {}
  *     fetch() settings, with an additional prop for timeout in milliseconds
+ *
+ * @return response {Object}
  */
 AppUtil.fetchWithTimeout = async function (resource, options = {}) {
   const { timeout = 30000 } = options;
@@ -148,17 +150,6 @@ AppUtil.getDirection = function (from, to) {
       octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 
   return directions[octant];
-};
-
-/**
- * Get the integer value from a number with commas (i.e. remove commas).
- *
- * @param str {String}
- *
- * @return {Number}
- */
-AppUtil.getInteger = function (str) {
-  return parseInt(str.replaceAll(',', ''), 10);
 };
 
 /**
