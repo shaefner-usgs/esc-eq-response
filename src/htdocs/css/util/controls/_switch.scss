@@ -24,12 +24,14 @@
       display: block;
       padding: 0;
       position: relative;
-      transition: $effect-duration-shorter ease-in-out {
-        property: background, border-color, padding, width;
-      };
+      transition:
+        background .35s ease-out,
+        border-color .35s ease-out,
+        padding $effect-slide-duration ease-in-out,
+        width $effect-slide-duration ease-in-out;
       width: 2.25rem;
 
-      &:before {
+      &:before { // handle
         background: var(--bg-color);
         border-radius: 50%;
         content: '';
