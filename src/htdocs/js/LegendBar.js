@@ -14,9 +14,6 @@ var AppUtil = require('util/AppUtil'),
  *     }
  *
  * @return _this {Object)
- *     {
- *       reset: {Function}
- *     }
  */
 var LegendBar = function (options) {
   var _this,
@@ -104,19 +101,6 @@ var LegendBar = function (options) {
       older: '#ffffe6',
       week: '#ff0'
     };
-  };
-
-  // ----------------------------------------------------------
-  // Public methods
-  // ----------------------------------------------------------
-
-  /**
-   * Reset to default state.
-   */
-  _this.reset = function () {
-    var fieldnotes = _el.querySelector('.fieldnotes');
-
-    fieldnotes.classList.add('hide');
   };
 
 

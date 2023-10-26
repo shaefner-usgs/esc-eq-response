@@ -166,7 +166,6 @@ var Application = function (options) {
     document.body.classList.remove('loading', 'mainshock');
 
     _this.Features.reset(); // Features must be first
-    _this.LegendBar.reset();
     _this.MapPane.reset();
     _this.Pane.reset();
     _this.PlotsPane.reset();
