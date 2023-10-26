@@ -20,7 +20,7 @@
  *     {
  *       addListeners: {Function}
  *       destroy: {Function}
- *       getHtml: {Function}
+ *       getContent: {Function}
  *       getIds: {Function}
  *       removeListeners: {Function}
  *       setOption: {Function}
@@ -104,11 +104,11 @@ var RadioBar = function (options) {
   };
 
   /**
-   * Get the RadioBar's HTML.
+   * Get the HTML content for the RadioBar.
    *
    * @return html {String}
    */
-  _this.getHtml = function () {
+  _this.getContent = function () {
     var html = `<ul id="${_id}" class="options">`;
 
     _items.forEach(item => {

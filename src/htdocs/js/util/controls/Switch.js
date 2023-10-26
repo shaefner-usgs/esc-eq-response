@@ -18,7 +18,7 @@
  *     {
  *       addListeners: {Function}
  *       destroy: {Function}
- *       getHtml: {Function}
+ *       getContent: {Function}
  *       removeListeners: {Function}
  *       setValue: {Function}
  *     }
@@ -92,11 +92,11 @@ var Switch = function (options) {
   };
 
   /**
-   * Get the Switch's HTML.
+   * Get the HTML content for the Switch.
    *
    * @return {String}
    */
-  _this.getHtml = function () {
+  _this.getContent = function () {
     return '' +
       `<input type="checkbox" id="${_id}" value="" class="switch">` +
       `<label for="${_id}"><span>${_name}</span></label>`;

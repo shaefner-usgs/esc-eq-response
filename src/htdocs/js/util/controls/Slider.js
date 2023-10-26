@@ -24,7 +24,7 @@
  *     {
  *       addListeners: {Function}
  *       destroy: {Function}
- *       getHtml: {Function}
+ *       getContent: {Function}
  *       removeListeners: {Function}
  *       setValue: {Function}
  *     }
@@ -146,11 +146,11 @@ var Slider = function (options) {
   };
 
   /**
-   * Get the Slider's HTML.
+   * Get the HTML content for the Slider.
    *
    * @return {String}
    */
-  _this.getHtml = function () {
+  _this.getContent = function () {
     var template =
       '<div class="slider-container">' +
         '<div class="min">{min}</div>' +
