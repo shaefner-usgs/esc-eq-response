@@ -4,11 +4,14 @@
 @layer default {
   .props {
     display: grid;
+    gap: .375rem .5rem;
     grid-template-columns: max-content auto;
     line-height: $line-height-alt;
     margin: 1rem 0 0;
 
     &.alt {
+      gap: 0;
+
       dd,
       dt {
         border-bottom: 1px solid var(--border-color-lightest);
@@ -36,21 +39,13 @@
       }
     }
 
-    dd,
-    dt {
-      margin: 0;
-      padding: .1875rem 0;
-    }
-
     dd {
-      grid-column-start: 2;
-      padding-left: .5rem;
+      margin: 0;
     }
 
     dt {
       @include labels;
 
-      grid-column-start: 1;
       text-align: right;
     }
   }
