@@ -980,13 +980,7 @@ class Rtf {
       $this->_format->p
     );
 
-    if ($count === 0) {
-      $section7->writeText(
-        'None',
-        $this->_font->h3,
-        $this->_format->h3
-      );
-    } else {
+    if ($count > 0) {
       $listCount = count($foreshocks->earthquakes);
       $magThreshold = $foreshocks->magThreshold;
 
@@ -1028,13 +1022,7 @@ class Rtf {
       $this->_format->p
     );
 
-    if ($count === 0) {
-      $section8->writeText(
-        'None',
-        $this->_font->h3,
-        $this->_format->h3
-      );
-    } else {
+    if ($count > 0) {
       $listCount = count($historical->earthquakes);
       $magThreshold = $historical->magThreshold;
 
@@ -1168,6 +1156,11 @@ class Rtf {
         $this->_format->body
       );
       $section9->writeText(
+        'Peak: ' . $shakeAlert->latencyMax . ' after origin',
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
         'Final: ' . $shakeAlert->latencyFinal . ' after origin',
         $this->_font->body,
         $this->_format->body
@@ -1189,6 +1182,11 @@ class Rtf {
         $this->_format->body
       );
       $section9->writeText(
+        'Peak: ' . $shakeAlert->magMax,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
         'Final: ' . $shakeAlert->magFinal,
         $this->_font->body,
         $this->_format->body
@@ -1206,6 +1204,11 @@ class Rtf {
       );
       $section9->writeText(
         'Initial: ' . $shakeAlert->locationInitial,
+        $this->_font->body,
+        $this->_format->body
+      );
+      $section9->writeText(
+        'Peak: ' . $shakeAlert->locationMax,
         $this->_font->body,
         $this->_format->body
       );
