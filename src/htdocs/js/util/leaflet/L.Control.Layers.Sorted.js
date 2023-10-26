@@ -60,6 +60,20 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
+   * Override addOverlay from L.Control.Layers.
+   *
+   * @param feature {Object}
+   */
+  addOverlay: function (feature) {
+    var layer = feature.mapLayer,
+        name = feature.name;
+
+    layer.id = feature.id; // need access to id for sorting
+
+    L.Control.Layers.prototype.addOverlay.call(this, layer, name);
+  },
+
+  /**
    * Remove the loader next to the given Feature's name.
    *
    * @param id {String}
