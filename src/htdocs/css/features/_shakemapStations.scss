@@ -102,19 +102,15 @@
     }
 
     .station-summary li {
-      width: 25%;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
-      &:not(.impact-bubble) {
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        abbr {
-          color: var(--text-color-lighter);
-          font-size: $font-size-smallest;
-          margin-top: .125rem;
-        }
+      &:not(.impact-bubble) abbr {
+        color: var(--text-color-lighter);
+        font-size: $font-size-smallest;
+        margin-top: .125rem;
       }
     }
   }
