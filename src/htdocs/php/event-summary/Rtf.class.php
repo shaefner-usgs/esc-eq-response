@@ -1619,7 +1619,7 @@ class Rtf {
    * @param $section {Object}
    *     RTF Document section
    */
-  function _createTableShakeAlert($section) {
+  private function _createTableShakeAlert($section) {
     $cities = $this->_data->shakeAlert->cities;
     $numRows = count($cities) + 1; // data rows + 1 header row
 
