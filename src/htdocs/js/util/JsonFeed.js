@@ -40,6 +40,7 @@ var JsonFeed = function (options) {
    *
    * @param opts {Object}
    *     {
+   *       host: {String} optional; for DD eqs which fetch via a local php script
    *       id: {String}
    *       name: {String}
    *       url: {String}
@@ -53,6 +54,7 @@ var JsonFeed = function (options) {
     var json,
         message = `<h4>Error Loading ${opts.name}</h4>`,
         url = new URL(opts.url),
+        host = opts.host || url.hostname,
         response = {};
 
     // Alert user that the feed is loading
@@ -69,7 +71,7 @@ var JsonFeed = function (options) {
       message += '<ul>';
 
       if (error.name === 'AbortError') { // timeout
-        message += `<li>Request timed out (can’t connect to ${url.hostname})</li>`;
+        message += `<li>Request timed out (can’t connect to ${host})</li>`;
       } else {
         message += `<li>Error code: ${response.status} (${response.statusText})</li>`;
       }
