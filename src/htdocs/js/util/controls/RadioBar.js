@@ -82,8 +82,12 @@ var RadioBar = function (options) {
   _this.addListeners = function (el) {
     _buttons = el.querySelectorAll('li');
 
-    _buttons.forEach(button => button.addEventListener('click', () => {
-      _this.setOption(button);
+    _buttons.forEach(button => button.addEventListener('click', (e) => {
+      if (button.classList.contains('selected')) {
+        e.stopImmediatePropagation();
+      } else {
+        _this.setOption(button);
+      }
     }));
   };
 
