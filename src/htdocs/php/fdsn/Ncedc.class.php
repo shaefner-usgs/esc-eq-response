@@ -1,13 +1,10 @@
 <?php
 
 /**
- * Search the NCEDC double difference catalog and convert the results from CSV
- * to GeoJSON conforming to ComCat's syntax.
+ * Search the NCEDC double-difference catalog and convert the results from CSV
+ * to GeoJSON, conforming to ComCat's syntax.
  *
  * See: https://service.ncedc.org/fdsnws/event/1/
- *
- * ¹ the minmag param appears to ignore hundredths values, leading to unexpected
- *   results. For ex, a minmag value of 0.95 still selects M 0.9 eqs.
  *
  * @param $params {Array}
  *     ComCat API query parameters (https://earthquake.usgs.gov/fdsnws/event/1/)
@@ -17,7 +14,11 @@
  * @return {Object}
  *     {
  *       json: {String} GeoJSON Feed
+ *       search: {Function}
  *     }
+ *
+ * ¹ the minmag param appears to ignore hundredths values, leading to unexpected
+ *   results. For ex, a minmag value of 0.95 still selects M 0.9 eqs.
  */
 class Ncedc {
   private $_params,
@@ -35,10 +36,10 @@ class Ncedc {
   /**
    * Add the query parameters for a bounding box that includes the circle
    * defined by the 'maxradiuskm' ComCat param.
-
-   * NCEDC does not support radius values specified in km for limiting search
-   * results. Extraneous results outside the circle can be filtered out later if
-   * desired.
+   *
+   * Note: NCEDC does not support radius values specified in km for limiting
+   * search results. Extraneous results outside the circle must be filtered out
+   * later if desired.
    *
    * @param $params {Array}
    *     Note: passed by reference
@@ -61,66 +62,55 @@ class Ncedc {
   }
 
   /**
-   * Create the GeoJSON feed and store it in the public 'json' property.
+   * Create the GeoJSON feed and store it.
    *
    * @param $eqs {Array}
    *     Earthquake list
-   * @param $url {String}
-   *     NCEDC catalog search URL
    */
-  private function _createJson($eqs, $url) {
-    $milliseconds = floor(microtime(true) * 1000);
+  private function _createJson($eqs) {
+    $template = $this->_getTemplate(count($eqs));
 
-    // Initialize the array template for the feed
-    $template = [
-      'type' => 'FeatureCollection',
-      'metadata' => [
-        'count' => count($eqs),
-        'generated' => $milliseconds,
-        'sourceUrl' => $url,
-        'url' => $this->_url
-      ],
-      'features' => []
-    ];
-
-    // Add earthquake data
     foreach ($eqs as $eq) {
       $data = $this->_getData($eq);
-      $coords = [
-        $data['lon'],
-        $data['lat'],
-        $data['depth']
-      ];
-      $title = sprintf('M %.1f - %s',
-        round($data['mag'], 1),
-        $data['place']
-      );
-
       $feature = [
         'type' => 'Feature',
         'geometry' => [
-          'coordinates' => $coords,
+          'coordinates' => [
+            $data['lon'],
+            $data['lat'],
+            $data['depth']
+          ],
           'type' => 'Point'
         ],
         'id' => $data['id'],
         'properties' => [
           'mag' => $data['mag'],
           'magType' => $data['magType'],
-          'place' => $data['place'],
           'time' => $data['time'],
-          'title' => $title,
           'type' => $data['type']
         ]
       ];
 
-      array_push($template['features'], $feature);
+      if (isset($this->_params['eventid'])) { // Mainshock
+        $template = array_merge($template, $feature);
+      } else { // Aftershocks, Foreshocks or Historical
+        $title = sprintf('M %.1f - %s',
+          round($data['mag'], 1),
+          $data['place']
+        );
+
+        $feature['properties']['place'] = $data['place'];
+        $feature['properties']['title'] = $title;
+
+        array_push($template['features'], $feature);
+      }
     }
 
     $this->json = json_encode($template, JSON_UNESCAPED_SLASHES);
   }
 
   /**
-   * Get the formatted data (as an associative array) for a given earthquake.
+   * Get the formatted data for a given earthquake.
    *
    * @param $eq {Array}
    *
@@ -144,8 +134,8 @@ class Ncedc {
   }
 
   /**
-   * Get the query parameters for a catalog search. Converts them from ComCat to
-   * NCEDC syntax
+   * Get the query parameters for a catalog search, converting from ComCat to
+   * NCEDC syntax.
    *
    * @return $params {Array}
    */
@@ -176,7 +166,7 @@ class Ncedc {
       $params[$name] = $value;
     }
 
-    // Add additional params
+    // Add additional req'd params
     $params['catalog'] = 'DD';
     $this->_addBoundingBox($params);
 
@@ -184,7 +174,37 @@ class Ncedc {
   }
 
   /**
-   * Get the URL for a catalog search.
+   * Get the feed's template, which varies depending on type (i.e. just the
+   * Mainshock or a collection of eqs).
+   *
+   * @param $count {Integer}
+   *
+   * @return $template {Array}
+   */
+  private function _getTemplate($count) {
+    $millisecs = floor(microtime(true) * 1000);
+    $metadata = [
+      'count' => $count,
+      'generated' => $millisecs,
+      'sourceUrl' => $this->_getUrl(),
+      'url' => $this->_url
+    ];
+    $template = [ // Mainshock
+      'metadata' => $metadata
+    ];
+
+    if (!isset($this->_params['eventid'])) { // everything besides Mainshock
+      $template = array_merge($template, [
+        'type' => 'FeatureCollection',
+        'features' => []
+      ]);
+    }
+
+    return $template;
+  }
+
+  /**
+   * Get the 'source' URL for the double-difference catalog search.
    *
    * @return {String}
    */
@@ -217,7 +237,7 @@ class Ncedc {
         array_push($eqs, $eq);
       }
 
-      $this->_createJson($eqs, $url);
+      $this->_createJson($eqs);
     }
   }
 }
