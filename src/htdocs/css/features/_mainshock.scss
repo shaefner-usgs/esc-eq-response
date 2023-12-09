@@ -141,9 +141,13 @@
       }
     }
 
-    .notice {
-      margin-top: .5rem;
-      max-width: none;
+    .notice,
+    .tectonic {
+      line-height: $line-height; // <p> tags missing sometimes
+
+      p:last-child {
+        margin-bottom: 0;
+      }
     }
 
     .pager-exposures {
@@ -174,6 +178,7 @@
         max-width: 100%;
         width: $panel-width;
 
+        &.notice,
         &.tectonic {
           width: calc(2 * $panel-width + 1rem);
         }
@@ -209,8 +214,6 @@
     }
 
     .tectonic {
-      line-height: $line-height; // <p> tags missing sometimes
-
       h1,
       h2 {
         display: none;
@@ -220,10 +223,6 @@
         display: block;
         margin: 0 auto;
         max-width: 100%;
-      }
-
-      p:last-child {
-        margin-bottom: .25rem;
       }
     }
 
