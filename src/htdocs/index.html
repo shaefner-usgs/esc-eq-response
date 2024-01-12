@@ -168,25 +168,25 @@
                 <dl class="props timestamp"></dl>
               </div>
             </div>
-            <div class="aftershocks dd-aftershocks disabled">
+            <div class="aftershocks disabled">
               <h3>Aftershocks</h3>
-              <label for="as-mag" class="input">Min magnitude</label>
-              <input type="number" id="as-mag" value="" min="0" max="9"
+              <label for="as-magnitude" class="input">Min magnitude</label>
+              <input type="number" id="as-magnitude" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="4"
                 disabled="disabled" title="Disabled because no mainshock is selected">
-              <label for="as-dist" class="input">Max distance <span>from Mainshock (km)</span></label>
-              <input type="number" id="as-dist" value="" min="1" step="1"
+              <label for="as-distance" class="input">Max distance <span>from Mainshock (km)</span></label>
+              <input type="number" id="as-distance" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="5"
                 disabled="disabled" title="Disabled because no mainshock is selected">
             </div>
-            <div class="foreshocks dd-foreshocks disabled">
+            <div class="foreshocks disabled">
               <h3>Foreshocks</h3>
-              <label for="fs-mag" class="input">Min magnitude</label>
-              <input type="number" id="fs-mag" value="" min="0" max="9"
+              <label for="fs-magnitude" class="input">Min magnitude</label>
+              <input type="number" id="fs-magnitude" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="6"
                 disabled="disabled" title="Disabled because no mainshock is selected">
-              <label for="fs-dist" class="input">Max distance <span>from Mainshock (km)</span></label>
-              <input type="number" id="fs-dist" value="" min="1" step="1"
+              <label for="fs-distance" class="input">Max distance <span>from Mainshock (km)</span></label>
+              <input type="number" id="fs-distance" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="7"
                 disabled="disabled" title="Disabled because no mainshock is selected">
               <label for="fs-days" class="input">Max days <span>before Mainshock</span></label>
@@ -194,14 +194,14 @@
                 autocomplete="off" required="required" tabindex="8"
                 disabled="disabled" title="Disabled because no mainshock is selected">
             </div>
-            <div class="historical dd-historical disabled">
+            <div class="historical disabled">
               <h3>Historical Seismicity</h3>
-              <label for="hs-mag" class="input">Min magnitude</label>
-              <input type="number" id="hs-mag" value="" min="0" max="9"
+              <label for="hs-magnitude" class="input">Min magnitude</label>
+              <input type="number" id="hs-magnitude" value="" min="0" max="9"
                 step="0.1" autocomplete="off" required="required" tabindex="9"
                 disabled="disabled" title="Disabled because no mainshock is selected">
-              <label for="hs-dist" class="input">Max distance <span>from Mainshock (km)</span></label>
-              <input type="number" id="hs-dist" value="" min="1" step="1"
+              <label for="hs-distance" class="input">Max distance <span>from Mainshock (km)</span></label>
+              <input type="number" id="hs-distance" value="" min="1" step="1"
                 autocomplete="off" required="required" tabindex="10"
                 disabled="disabled" title="Disabled because no mainshock is selected">
               <label for="hs-years" class="input">Max years <span>before Mainshock</span></label>
@@ -222,9 +222,9 @@
               <li class="mainshock">Mainshock</li>
               <li class="aftershocks">Aftershocks, Catalog Search
                 <ul>
-                  <li class="hour">Past hour</li>
-                  <li class="day">Past day</li>
-                  <li class="week">Past week</li>
+                  <li class="pasthour">Past hour</li>
+                  <li class="pastday">Past day</li>
+                  <li class="pastweek">Past week</li>
                   <li class="older">Older</li>
                 </ul>
               </li>
