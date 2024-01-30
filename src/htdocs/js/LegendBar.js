@@ -5,8 +5,19 @@ var AppUtil = require('util/AppUtil'),
     Svg = require('util/Svg');
 
 
+var _COLORS = {
+  foreshocks: '#99a',
+  historical: '#dde',
+  mainshock: '#00f',
+  pasthour: '#f00',
+  pastday: '#f90',
+  pastweek: '#ff0',
+  older: '#ffffe6'
+};
+
+
 /**
- * Add SVG elements to the LegendBar.
+ * Add the SVG elements to the LegendBar.
  *
  * @param options {Object}
  *     {
@@ -21,9 +32,8 @@ var LegendBar = function (options) {
 
       _el,
 
-      _addSvgElements,
       _createMagRange,
-      _getColors;
+      _render;
 
 
   _this = {};
@@ -31,33 +41,7 @@ var LegendBar = function (options) {
   _initialize = function (options = {}) {
     _el = options.el;
 
-    _addSvgElements();
-  };
-
-  /**
-   * Add the SVG elements to the legend.
-   */
-  _addSvgElements = function () {
-    var colors = _getColors(),
-        svg = Svg(),
-        line = svg.createLine({
-          color: '#c00',
-          opacity: '0.5'
-        }),
-        range = _createMagRange(svg),
-        triangle = svg.createTriangle();
-
-    Object.keys(colors).forEach(key => {
-      var circle = svg.createCircle({
-        fillColor: colors[key]
-      });
-
-      _el.querySelector('.' + key).appendChild(circle);
-    });
-
-    _el.querySelector('.faults').appendChild(line);
-    _el.querySelector('.magnitude').appendChild(range);
-    _el.querySelector('.shakemap').appendChild(triangle);
+    _render();
   };
 
   /**
@@ -87,20 +71,28 @@ var LegendBar = function (options) {
   };
 
   /**
-   * Get the colors of the earthquake circles keyed by type.
-   *
-   * @return {Object}
+   * Render the SVG elements.
    */
-  _getColors = function () {
-    return {
-      day: '#f90',
-      foreshocks: '#99a',
-      historical: '#dde',
-      hour: '#f00',
-      mainshock: '#00f',
-      older: '#ffffe6',
-      week: '#ff0'
-    };
+  _render = function () {
+    var svg = Svg(),
+        line = svg.createLine({
+          color: '#c00',
+          opacity: '0.5'
+        }),
+        range = _createMagRange(svg),
+        triangle = svg.createTriangle();
+
+    Object.keys(_COLORS).forEach(key => {
+      var circle = svg.createCircle({
+        fillColor: _COLORS[key]
+      });
+
+      _el.querySelector('.' + key).appendChild(circle);
+    });
+
+    _el.querySelector('.faults').appendChild(line);
+    _el.querySelector('.magnitude').appendChild(range);
+    _el.querySelector('.shakemap').appendChild(triangle);
   };
 
 
