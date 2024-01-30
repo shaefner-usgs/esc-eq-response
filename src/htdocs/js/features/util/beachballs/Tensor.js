@@ -94,7 +94,7 @@ __fromProduct = function (product) {
     type = product['derived-magnitude-type'];
     if (!type) {
       type = product['beachball-type'];
-      if (type && Object.prototype.hasOwnProperty.call(_BEACHBALL_METHODS, type)) {
+      if (type && Object.hasOwn(_BEACHBALL_METHODS, type)) {
         type = _BEACHBALL_METHODS[type];
       }
     }

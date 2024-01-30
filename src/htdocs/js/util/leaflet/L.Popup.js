@@ -103,7 +103,7 @@ L.Popup.include({
         },
         padding = null;
 
-    if (Object.prototype.hasOwnProperty.call(this.options, 'autoPanPadding')) {
+    if (Object.hasOwn(this.options, 'autoPanPadding')) {
       padding = L.point(this.options.autoPanPadding);
     }
 
