@@ -1,17 +1,25 @@
+/* global L */
 'use strict';
 
 
+var _DEFAULTS = {
+  el: null, // existing Switch's <input>
+  id: '',   // new Switch's id value
+  name: ''  // new Switch's display name
+};
+
+
 /**
- * Create a new Switch (or configure an existing one), which is a custom on/off
- * toggle that replaces a checkbox.
+ * Create a new Switch (or configure an existing one), which is a checkbox
+ * rendered as a sliding toggle.
  *
  * Either supply a pre-existing Switch Element or an id and display name.
  *
  * @param options {Object}
  *     {
- *       el: {Element} optional; existing Switch's <input>
- *       id: {String} optional; new Switch's id value
- *       name: {String} optional; new Switch's display name
+ *       el: {Element} optional
+ *       id: {String} optional
+ *       name: {String} optional
  *     {
  *
  * @return _this {Object}
@@ -27,10 +35,9 @@ var Switch = function (options) {
   var _this,
       _initialize,
 
+      _data,
       _el,
-      _id,
       _label,
-      _name,
 
       _toggle;
 
@@ -38,9 +45,13 @@ var Switch = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
+    options = Object.assign({}, _DEFAULTS, options);
+
+    _data = {
+      id: options.id,
+      name: options.name
+    };
     _el = options.el;
-    _id = options.id;
-    _name = options.name;
 
     if (_el) {
       _this.addListeners();
@@ -48,7 +59,7 @@ var Switch = function (options) {
   };
 
   /**
-   * Event handler that toggles the Switch (and optional details).
+   * Event handler that toggles the Switch.
    *
    * @param e {Event}
    */
@@ -76,15 +87,14 @@ var Switch = function (options) {
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
 
+    _data = null;
     _el = null;
-    _id = null;
     _label = null;
-    _name = null;
 
     _toggle = null;
 
@@ -97,9 +107,11 @@ var Switch = function (options) {
    * @return {String}
    */
   _this.getContent = function () {
-    return '' +
-      `<input type="checkbox" id="${_id}" value="" class="switch">` +
-      `<label for="${_id}"><span>${_name}</span></label>`;
+    return L.Util.template(
+      '<input type="checkbox" id="{id}" value="" class="switch">' +
+      '<label for="{id}"><span>{name}</span></label>',
+      _data
+    );
   };
 
   /**
@@ -110,7 +122,7 @@ var Switch = function (options) {
   };
 
   /**
-   * Set the Switch on or off.
+   * Set the Switch on or off (and show/hide its optional details).
    *
    * @param checked {Boolean} default is true
    *
@@ -128,8 +140,6 @@ var Switch = function (options) {
     }
 
     _el.checked = checked;
-
-    return _this; // enable chaining
   };
 
 

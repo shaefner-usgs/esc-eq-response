@@ -2,6 +2,17 @@
 'use strict';
 
 
+var _DEFAULTS = {
+  el: null,     // existing Slider's <input>
+  filter: null, // filter content based on Slider's value
+  id: '',       // new Slider's id value
+  label: '',    // new Slider's <label>
+  max: 9,       // new Slider's maximum value
+  min: 0,       // new Slider's minimum value
+  val: 5        // new Slider's initial value
+};
+
+
 /**
  * Create a new range Slider (or configure an existing one), which is a custom
  * UI component for setting an <input> value.
@@ -11,13 +22,13 @@
  *
  * @param options {Object}
  *     {
- *       el: {Element} optional; existing Slider's <input>
- *       filter: {Function} optional; filters content based on Slider's value
- *       id: {String} optional; new Slider's id value
- *       label: {String} optional; new Slider's filter <label>
- *       max: {Number} optional; new Slider's maximum value
- *       min: {Number} optional; new Slider's minimum value
- *       val: {Number} optional; new Slider's initial value
+ *       el: {Element} optional
+ *       filter: {Function} optional
+ *       id: {String} optional
+ *       label: {String} optional
+ *       max: {Number} optional
+ *       min: {Number} optional
+ *       val: {Number} optional
  *     {
  *
  * @return _this {Object}
@@ -47,6 +58,8 @@ var Slider = function (options) {
   _this = {};
 
   _initialize = function (options = {}) {
+    options = Object.assign({}, _DEFAULTS, options);
+
     _data = {
       id: options.id,
       label: options.label,
@@ -76,24 +89,21 @@ var Slider = function (options) {
   };
 
   /**
-   * Get the CSS value for the colored section of the Slider track.
+   * Get the CSS percentage value for the colored section of the Slider's track.
    *
    * @return {String}
    */
   _getValue = function () {
-    var max = Number(_el.max),
+    var max = Number(_el.max) || 9,
         min = Number(_el.min) || 0,
-        value = Number(_el.value);
+        value = Number(_el.value),
+        percentage = Math.floor(100 * (value - min) / (max - min));
 
-    if (max && value) {
-      value = Math.floor(100 * (value - min) / (max - min));
-    }
-
-    return value + '% 100%';
+    return percentage + '% 100%';
   };
 
   /**
-   * Event handler that updates the Slider track and optionally filters the
+   * Event handler that updates the Slider's track and optionally filters the
    * displayed content.
    */
   _update = function () {
@@ -120,6 +130,8 @@ var Slider = function (options) {
     var container = el.closest('.slider-container');
 
     _el = el; // in case it wasn't set in _initialize()
+
+    // Set Element refs now that it's safe to assume Slider has been rendered
     _output = container.querySelector('output');
     _slider = container.querySelector('.slider');
 
@@ -127,7 +139,7 @@ var Slider = function (options) {
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -182,27 +194,31 @@ var Slider = function (options) {
   };
 
   /**
-   * Set the displayed value and inline styles for the colored section of the
-   * Slider.
+   * Set the displayed value and inline styles that highlight the 'active'
+   * section of the Slider (based on the <input>'s current value).
    */
   _this.setValue = function () {
-    var newStyles = '',
+    var value,
+        newStyles = '',
         oldStyles = new RegExp(`#${_el.id}[^#]+`, 'g'),
-        value = _getValue(),
         vendorAttrs = ['webkit-slider-runnable', 'moz-range'];
 
-    vendorAttrs.forEach(attr =>
-      newStyles += `#${_el.id}::-${attr}-track {background-size:${value} !important}`
-    );
+    if (_el) {
+      value = _getValue();
 
-    _output.value = _el.value;
+      vendorAttrs.forEach(attr =>
+        newStyles += `#${_el.id}::-${attr}-track {background-size:${value} !important}`
+      );
 
-    // Set the inline CSS styles in <style#sliders>
-    _style.textContent = _style.textContent.replace(oldStyles, '');
-    _style.appendChild(document.createTextNode(newStyles));
+      _output.value = _el.value;
 
-    // Set the style attribute on the control
-    _slider.style.setProperty('--val', _el.value);
+      // Set the inline CSS styles in <style#sliders>
+      _style.textContent = _style.textContent.replace(oldStyles, '');
+      _style.appendChild(document.createTextNode(newStyles));
+
+      // Set the style attribute on the control
+      _slider.style.setProperty('--val', _el.value);
+    }
   };
 
 

@@ -1,6 +1,14 @@
 'use strict';
 
 
+var _DEFAULTS = {
+  el: null,    // existing RadioBar's <ul>
+  id: '',      // new RadioBar's id value
+  items: [],   // new RadioBar's items
+  selected: '' // new RadioBar's initially selected item
+};
+
+
 /**
  * Create a new RadioBar (or configure an existing one), which is a list of
  * mutually exclusive items rendered as a navbar.
@@ -10,10 +18,10 @@
  *
  * @param options {Object}
  *     {
- *       el: {Element} optional; existing RadioBar's <ul>
- *       id: {String} optional; new RadioBar's id value
- *       items: {Array} optional; new RadioBar's items
- *       selected: {String} optional; new RadioBar's initially selected item id
+ *       el: {Element} optional
+ *       id: {String} optional
+ *       items: {Array} optional
+ *       selected: {String} optional
  *     {
  *
  * @return _this {Object}
@@ -31,42 +39,50 @@ var RadioBar = function (options) {
       _initialize,
 
       _buttons,
-      _id,
-      _items,
-      _selected,
+      _data,
+      _el,
 
-      _getOption;
+      _unsetOptions;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
-    _buttons = []; // default
-    _id = options.id;
-    _items = options.items;
-    _selected = options.selected || '';
+    options = Object.assign({}, _DEFAULTS, options);
 
-    if (options.el) {
-      _this.addListeners(options.el);
+    _buttons = []; // default
+    _data = {
+      id: options.id,
+      items: options.items,
+      selected: options.selected
+    };
+    _el = options.el;
+
+    if (_el) {
+      _this.addListeners();
     }
   };
 
   /**
-   * Get the given item's optional content node, if it exists.
+   * Unhighlight all options (+ hide their content).
    *
-   * @param id {String}
-   *     item's id value
-   *
-   * @return option {Mixed <Element|null>}
+   * @param el {Element}
    */
-  _getOption = function (id) {
-    var option = null;
+  _unsetOptions = function (el) {
+    var option,
+        sibling = el.parentNode.firstElementChild;
 
-    if (id) {
-      option = document.querySelector('.option.' + id);
+    while (sibling) {
+      sibling.classList.remove('selected'); // button
+
+      if (sibling.id) {
+        option = document.querySelector(`.option.${sibling.id}`);
+
+        option?.classList.add('hide'); // content
+      }
+
+      sibling = sibling.nextElementSibling;
     }
-
-    return option;
   };
 
   // ----------------------------------------------------------
@@ -76,15 +92,16 @@ var RadioBar = function (options) {
   /**
    * Add event listeners.
    *
-   * @param el {Element}
+   * @param el {Element} optional; default is _el
    *     RadioBar's <ul> container
    */
-  _this.addListeners = function (el) {
+  _this.addListeners = function (el = _el) {
     _buttons = el.querySelectorAll('li');
+    _el = el; // in case it wasn't set in _initialize()
 
-    _buttons.forEach(button => button.addEventListener('click', (e) => {
+    _buttons.forEach(button => button.addEventListener('click', e => {
       if (button.classList.contains('selected')) {
-        e.stopImmediatePropagation();
+        e.stopImmediatePropagation(); // ignore subsequent clicks
       } else {
         _this.setOption(button);
       }
@@ -92,17 +109,16 @@ var RadioBar = function (options) {
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _buttons = null;
-    _id = null;
-    _items = null;
-    _selected = null;
+    _data = null;
+    _el = null;
 
-    _getOption = null;
+    _unsetOptions = null;
 
     _this = null;
   };
@@ -113,16 +129,21 @@ var RadioBar = function (options) {
    * @return html {String}
    */
   _this.getContent = function () {
-    var html = `<ul id="${_id}" class="options">`;
+    var html = `<ul id="${_data.id}" class="options">`;
 
-    _items.forEach(item => {
-      var selAttr = '';
+    _data.items.forEach(item => {
+      var classNames,
+          classList = [];
 
-      if (item.id === _selected) {
-        selAttr = 'class="selected"';
+      if (item.class) {
+        classList.push(item.class);
+      }
+      if (item.id === _data.selected) {
+        classList.push('selected');
       }
 
-      html += `<li id="${item.id}" ${selAttr}>${item.name}</li>`;
+      classNames = classList.join(' ');
+      html += `<li class="${classNames}" id="${item.id}">${item.name}</li>`;
     });
 
     html += '</ul>';
@@ -153,37 +174,28 @@ var RadioBar = function (options) {
   };
 
   /**
-   * Highlight the selected option's button (+ show its content, if applicable).
-   * Unselect (and hide) all other options.
+   * Highlight the selected option (+ show its content, if applicable).
    *
    * @param el {Element}
+   *     selected <li>
    *
    * @return _this {Object}
    */
   _this.setOption = function (el) {
-    var option = _getOption(el.id),
-        sibling = el.parentNode.firstElementChild;
+    var option, value;
 
-    // Selected option
-    el.classList.add('selected'); // button
+    if (el) {
+      value = el.id || el.className || '';
 
-    if (option) {
-      option.classList.remove('hide'); // content
-    }
+      _unsetOptions(el);
+      el.classList.add('selected'); // button
+      sessionStorage.setItem(_el.id, value);
 
-    // Unselected options
-    while (sibling) {
-      if (sibling !== el) {
-        option = _getOption(sibling.id);
+      if (el.id) {
+        option = document.querySelector(`.option.${el.id}`);
 
-        sibling.classList.remove('selected');
-
-        if (option) {
-          option.classList.add('hide');
-        }
+        option?.classList.remove('hide'); // content
       }
-
-      sibling = sibling.nextElementSibling;
     }
 
     return _this; // enable chaining
