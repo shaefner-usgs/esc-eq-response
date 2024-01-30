@@ -4,9 +4,8 @@
 
 /**
  * This class extends L.Control.Layers to sort the list of map layers based on
- * their stacking order on the map. It also adds the loaders and count values
- * next to a Feature's name (and its CSS classes, which are attached to its
- * <label>).
+ * their stacking order on the map. It also adds the loader, count value, and
+ * CSS class to the layer's name.
  *
  * Note: stacking order is controlled by setting the z-index value of the
  * Feature's custom [Leaflet map pane](https://leafletjs.com/reference.html#map-pane).
@@ -23,7 +22,6 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
       sortLayers: true
     });
 
-    this._classNames = {};
     this._displayNames = {}; // 'display' name includes the loader/count value
     this._names = {}; // 'original' layer name
 
@@ -148,6 +146,25 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
   },
 
   /**
+   * Override _onInputClick from L.Control.Layers.
+   *
+   * Store the Feature's layer status (i.e. on/off) in sessionStorage.
+   *
+   * @param e {Event}
+   */
+  _onInputClick: function (e) {
+    var id = e.target.closest('label').className || '', // Feature id
+        name = id.replace('dd-', '') + '-layer',
+        value = e.target.checked;
+
+    if (id) {
+      sessionStorage.setItem(name, value);
+    }
+
+    L.Control.Layers.prototype._onInputClick.call(this);
+  },
+
+  /**
    * Override for _addItem.
    *
    * Store the display name since Leaflet sets it back to its instantiated value
@@ -169,11 +186,6 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
         this._names[id] = obj.name; // store the 'original' name of the overlay
       }
 
-      // Add CSS classes
-      if (this._classNames[id]) {
-        label.classList.add(this._classNames[id].join(','));
-      }
-
       label.classList.add(id);
     }
 
@@ -182,7 +194,7 @@ L.Control.Layers.Sorted = L.Control.Layers.extend({
 
   /**
    * Set the given Feature's display name, which is typically the Feature's
-   * name, plus a loader or count value, depending on the status.
+   * name, plus a loader or count value, depending on the state.
    *
    * @param id {String}
    *     Feature id
