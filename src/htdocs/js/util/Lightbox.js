@@ -147,11 +147,11 @@ var Lightbox = function (options) {
    * Remove event listeners.
    */
   _removeListeners = function () {
-    _button.removeEventListener('click', _this.hide);
-    _container.removeEventListener('click', _disableClick);
+    _button?.removeEventListener('click', _this.hide);
+    _container?.removeEventListener('click', _disableClick);
     _el.removeEventListener('click', _this.hide);
 
-    _targets.forEach(target => {
+    _targets?.forEach(target => {
       target.removeEventListener('click', _this.hide);
     });
 
@@ -163,7 +163,7 @@ var Lightbox = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _remove();
