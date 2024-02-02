@@ -127,7 +127,8 @@
       }
     }
 
-    .mainshock {
+    .mainshock,
+    .dd-mainshock {
       .bubble {
         margin-top: 1rem;
 
@@ -281,21 +282,17 @@
   }
 
   /**
-   * Double-difference label in header
-   * (scoped to body.mainshock so loader is not affected)
+   * Header's double-difference label
    */
-  body.mainshock #summary-pane .mainshock {
-    h2 {
-      flex-direction: column;
+  #summary-pane .dd-mainshock h2.dd {
+    margin-top: 3.625rem;
+    position: relative;
 
-      span {
-        font-size: 1.2rem;
-        margin-bottom: -.25rem;
-
-        &.hide {
-          display: none;
-        }
-      }
+    &:before {
+      content: 'Double-difference';
+      font-size: 1.1875rem;
+      position: absolute;
+      top: -1.25rem;
     }
   }
 }
