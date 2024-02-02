@@ -182,18 +182,16 @@ class Ncedc {
    * @return $template {Array}
    */
   private function _getTemplate($count) {
-    $millisecs = floor(microtime(true) * 1000);
-    $metadata = [
-      'count' => $count,
-      'generated' => $millisecs,
-      'sourceUrl' => $this->_getUrl(),
-      'url' => $this->_url
-    ];
-    $template = [ // Mainshock
-      'metadata' => $metadata
+    $template = [
+      'metadata' => [
+        'count' => $count,
+        'generated' => floor(microtime(true) * 1000),
+        'sourceUrl' => $this->_getUrl(),
+        'url' => $this->_url
+      ]
     ];
 
-    if (!isset($this->_params['eventid'])) { // everything besides Mainshock
+    if (!isset($this->_params['eventid'])) { // everything but Mainshock
       $template = array_merge($template, [
         'type' => 'FeatureCollection',
         'features' => []
