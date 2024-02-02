@@ -15,14 +15,17 @@
       display: none;
     }
 
-    .earthquake.mainshock .user {
-      order: 1;
-    }
+    .earthquake.dd-mainshock,
+    .earthquake.mainshock {
+      .user {
+        order: 1;
+      }
 
-    .earthquake.mainshock .utc {
-      display: block;
-      order: 2;
-      padding-top: .25rem;
+      .utc {
+        display: block;
+        order: 2;
+        padding-top: .25rem;
+      }
     }
   }
 
@@ -34,14 +37,17 @@
       display: none;
     }
 
-    .earthquake.mainshock .user {
-      display: block;
-      order: 2;
-      padding-top: .25rem;
-    }
+    .earthquake.dd-mainshock,
+    .earthquake.mainshock {
+      .user {
+        display: block;
+        order: 2;
+        padding-top: .25rem;
+      }
 
-    .earthquake.mainshock .utc {
-      order: 1;
+      .utc {
+        order: 1;
+      }
     }
   }
 }
