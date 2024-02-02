@@ -36,10 +36,6 @@
     .filter {
       justify-content: center;
       margin-top: -1rem;
-
-      &.hide {
-        display: none;
-      }
     }
 
     .hypocenters:not(.hide) + .filter + .timestamp {
@@ -394,15 +390,9 @@
   .earthquake {
     position: relative;
 
-    &:is(.catalog-search, .mainshock) .distance {
-      display: none;
-    }
-
-    &:not(.mainshock) .status {
-      display: none;
-    }
-
-    &.mainshock button {
+    &:is(.catalog-search, .dd-mainshock, .mainshock) .distance,
+    &:is(.dd-mainshock, .mainshock) button,
+    &:not(.dd-mainshock, .mainshock) .status {
       display: none;
     }
 
