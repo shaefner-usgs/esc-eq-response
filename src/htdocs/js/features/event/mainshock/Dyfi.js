@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Lightbox = require('util/Lightbox'),
     Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar');
 
@@ -17,13 +18,11 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
- *       addListeners: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {String}
+ *       lightbox: {Mixed <Object|null>}
  *       name: {String}
- *       removeListeners: {Function}
  *       render: {Function}
  *     }
  */
@@ -35,13 +34,13 @@ var Dyfi = function (options) {
       _mainshock,
       _product,
       _radioBar,
-      _selected,
+      _rendered,
 
-      _addBubble,
       _destroy,
+      _getBubble,
+      _getContent,
       _getData,
       _getImages,
-      _getLightbox,
       _getRadioBar,
       _getStatus;
 
@@ -50,49 +49,81 @@ var Dyfi = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _mainshock = _app.Features.getFeature('mainshock');
+    _mainshock = _app.Features.getMainshock();
     _product = _mainshock.data.eq.products?.dyfi?.[0] || {};
-    _selected = 'block';
+    _rendered = false;
 
-    _this.data = {},
+    _this.data = {};
     _this.id = 'dyfi';
-    _this.lightbox = '';
+    _this.lightbox = null;
     _this.name = 'Did You Feel It?';
 
     if (!AppUtil.isEmpty(_product)) {
       _this.data = _getData();
-      _this.lightbox = _getLightbox();
 
-      _app.Features.addContent(_this); // no feed data => add manually
+      _this.render(); // no feed data => render immediately
     }
-  };
-
-  /**
-   * Add the intensity bubble to the Lightbox's title.
-   */
-  _addBubble = function () {
-    var bubble = L.Util.template(
-          '<a href="{url}" class="mmi{cdi} impact-bubble" target="new" ' +
-            'title="Maximum reported intensity">' +
-            '<strong class="roman">{cdi}</strong>' +
-          '</a>',
-          _this.data
-        ),
-        h3 = document.getElementById(_this.id).querySelector('h3');
-
-    h3.innerHTML = _this.name + bubble;
   };
 
   /**
    * Destroy this Feature's sub-Classes.
    */
   _destroy = function () {
-    if (_this.lightbox) {
-      _app.Features.getLightbox(_this.id).destroy();
-    }
-    if (_radioBar) {
-      _radioBar.destroy();
-    }
+    _this.lightbox?.destroy();
+    _radioBar?.destroy();
+  };
+
+  /**
+   * Get the HTML content for the external link bubble.
+   *
+   * @return {String}
+   */
+  _getBubble = function () {
+    return L.Util.template(
+      '<a href="{url}" class="mmi{cdi} impact-bubble" target="new" ' +
+        'title="Maximum reported intensity">' +
+        '<strong class="roman">{cdi}</strong>' +
+      '</a>',
+      _this.data
+    );
+  };
+
+  /**
+   * Get the HTML content for the Lightbox.
+   *
+   * @return {String}
+   */
+  _getContent = function () {
+    var images = _getImages(),
+        imgs = '';
+
+    images.forEach(image => {
+      imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
+        `class="mmi{cdi} ${image.id} option">`;
+    });
+
+    return L.Util.template(
+      '<div class="wrapper">' +
+        '<div class="images">' +
+          _getRadioBar(images) +
+          imgs +
+        '</div>' +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{maxmmi}</dd>' +
+            '<dt>Responses</dt>' +
+            '<dd>{responses}</dd>' +
+          '</dl>' +
+        '</div>' +
+      '</div>' +
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        _app.Features.getTimeStamp(_this.data) +
+      '</dl>',
+      _this.data
+    );
   };
 
   /**
@@ -101,14 +132,14 @@ var Dyfi = function (options) {
    * @return {Object}
    */
   _getData = function () {
-    var millis = Number(_product.updateTime) || 0,
-        datetime = Luxon.DateTime.fromMillis(millis),
+    var millisecs = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millisecs),
         eq = _mainshock.data.eq,
         props = _product.properties || {};
 
     return {
       cdi: eq.cdi,
-      isoTime: datetime.toUTC().toISO() || '',
+      isoTime: datetime.toUTC().toISO(),
       map: eq.dyfiImg,
       maxmmi: Number(props.maxmmi),
       plot: _product.contents[eq.id + '_plot_atten.jpg']?.url || '',
@@ -157,51 +188,7 @@ var Dyfi = function (options) {
   };
 
   /**
-   * Get the HTML content for the Lightbox.
-   *
-   * @return {String}
-   */
-  _getLightbox = function () {
-    var images = _getImages(),
-        imgs = '',
-        radioBar = _getRadioBar(images);
-
-    images.forEach(image => {
-      imgs += `<img src="${image.url}" alt="DYFI ${image.name}" ` +
-        `class="mmi{cdi} ${image.id} option">`;
-    });
-
-    return L.Util.template(
-      '<div class="wrapper">' +
-        '<div class="images">' +
-          radioBar +
-          imgs +
-        '</div>' +
-        '<div class="details">' +
-          '<dl class="props alt">' +
-            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-            '<dd>{maxmmi}</dd>' +
-            '<dt>Responses</dt>' +
-            '<dd>{responses}</dd>' +
-          '</dl>' +
-        '</div>' +
-      '</div>' +
-      '<dl class="props">' +
-        '<dt>Status</dt>' +
-        '<dd class="status">{status}</dd>' +
-        '<dt>Updated</dt>' +
-        '<dd>' +
-          '<time datetime="{isoTime}" class="user">{userTime} ' +
-            '(UTC{utcOffset})</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
-        '</dd>' +
-      '</dl>',
-      _this.data
-    );
-  };
-
-  /**
-   * Create and get the HTML for the RadioBar.
+   * Get the HTML content for the RadioBar.
    *
    * @param images {Array}
    *
@@ -213,11 +200,10 @@ var Dyfi = function (options) {
     if (images.length > 1) {
       _radioBar = RadioBar({
         id: 'dyfi-images',
-        items: images,
-        selected: _selected
+        items: images
       });
 
-      html = _radioBar.getHtml();
+      html = _radioBar.getContent();
     }
 
     return html;
@@ -247,19 +233,10 @@ var Dyfi = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    // Display the selected image
-    if (_radioBar) {
-      _radioBar.addListeners(document.getElementById('dyfi-images'));
-    }
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
+    _radioBar?.removeListeners();
     _destroy();
 
     _initialize = null;
@@ -268,13 +245,13 @@ var Dyfi = function (options) {
     _mainshock = null;
     _product = null;
     _radioBar = null;
-    _selected = null;
+    _rendered = null;
 
-    _addBubble = null;
     _destroy = null;
+    _getBubble = null;
+    _getContent = null;
     _getData = null;
     _getImages = null;
-    _getLightbox = null;
     _getRadioBar = null;
     _getStatus = null;
 
@@ -282,23 +259,25 @@ var Dyfi = function (options) {
   };
 
   /**
-   * Remove event listeners.
-   */
-  _this.removeListeners = function () {
-    if (_radioBar) {
-      _radioBar.removeListeners();
-    }
-  };
-
-  /**
-   * Add the bubble and set the selected RadioBar option.
+   * Render the Feature.
    */
   _this.render = function () {
-    _addBubble();
-
-    if (_radioBar) {
-      _radioBar.setOption(document.getElementById(_selected));
+    if (_rendered) { // re-rendering
+      _radioBar?.removeListeners();
+      _this.lightbox?.destroy();
     }
+
+    _this.lightbox = Lightbox({
+      content: _getContent(),
+      id: _this.id,
+      targets: document.querySelectorAll('.dyfi.feature'),
+      title: _this.name + _getBubble()
+    }).render();
+
+    _radioBar?.addListeners(document.getElementById('dyfi-images'));
+    _radioBar?.setOption(document.getElementById('block'));
+
+    _rendered = true;
   };
 
 

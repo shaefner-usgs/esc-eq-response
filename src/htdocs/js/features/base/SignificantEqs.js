@@ -16,13 +16,11 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
- *       addListeners: {Function}
- *       content: {String}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String)
- *       update: {Function}
+ *       remove: {Function}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -31,12 +29,17 @@ var SignificantEqs = function (options) {
       _initialize,
 
       _app,
+      _el,
       _lis,
 
+      _addListeners,
       _fetch,
       _getContent,
+      _getData,
       _getItem,
-      _setMainshock;
+      _removeListeners,
+      _setMainshock,
+      _update;
 
 
   _this = {};
@@ -49,13 +52,28 @@ var SignificantEqs = function (options) {
     _this.url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/' +
       'significant_month.geojson';
 
+    _el = document.getElementById(_this.id);
+
     _fetch();
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    _lis = _el.querySelectorAll('li');
+
+    _lis.forEach(li =>
+      li.addEventListener('click', _setMainshock)
+    );
   };
 
   /**
    * Fetch the feed data.
    */
   _fetch = function () {
+    _el.innerHTML = '<div class="spinner"></div>';
+
     L.geoJSON.async(_this.url, {
       app: _app,
       feature: _this
@@ -70,35 +88,13 @@ var SignificantEqs = function (options) {
    * @return html {String}
    */
   _getContent = function (json) {
-    var eqid = AppUtil.getParam('eqid'),
-        html = '<h4>None</h4>'; // default
+    var html = '<h4>None</h4>'; // default
 
     if (json.features?.length >= 1) {
       html = '<ul>';
 
-      json.features.forEach((feature ={}) => {
-        var data,
-            props = feature.properties || {},
-            millis = Number(props.time) || 0,
-            datetime = Luxon.DateTime.fromMillis(millis),
-            selected = '';
-
-        if (feature.id === eqid) {
-          selected = 'selected';
-        }
-
-        data = {
-          id: feature.id,
-          isoTime: datetime.toUTC().toISO(),
-          mag: AppUtil.round(props.mag, 1),
-          mmi: AppUtil.romanize(Number(props.mmi)),
-          place: props.place,
-          selected: selected,
-          userTime: datetime.toFormat(_app.dateFormat),
-          utcOffset: Number(datetime.toFormat('Z')),
-          utcTime: datetime.toUTC().toFormat(_app.dateFormat)
-        };
-        html += _getItem(data);
+      json.features.forEach((feature = {}) => {
+        html += _getItem(feature);
       });
 
       html += '</ul>';
@@ -108,13 +104,44 @@ var SignificantEqs = function (options) {
   };
 
   /**
-   * Get the HTML <li> for the given earthquake.
+   * Get the data for the given earthquake.
    *
-   * @param data {Object}
+   * @param eq {Object}
+   *
+   * @return {Object}
+   */
+  _getData = function (eq) {
+    var eqid = AppUtil.getParam('eqid'),
+        props = eq.properties || {},
+        millisecs = Number(props.time) || 0,
+        datetime = Luxon.DateTime.fromMillis(millisecs),
+        selected = '';
+
+    if (eq.id === eqid) {
+      selected = 'selected';
+    }
+
+    return {
+      id: eq.id,
+      isoTime: datetime.toUTC().toISO(),
+      mag: AppUtil.round(props.mag, 1),
+      mmi: AppUtil.romanize(Number(props.mmi)),
+      place: props.place,
+      selected: selected,
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat)
+    };
+  };
+
+  /**
+   * Get the HTML content for the given earthquake.
+   *
+   * @param eq {Object}
    *
    * @return {String}
    */
-  _getItem = function (data) {
+  _getItem = function (eq) {
     return L.Util.template(
       '<li id="{id}" class="{selected}">' +
         '<div>' +
@@ -129,25 +156,45 @@ var SignificantEqs = function (options) {
           '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
         '</div>' +
       '</li>',
-      data
+      _getData(eq)
     );
   };
 
   /**
-   * Event handler that sets the Mainshock.
+   * Remove event listeners.
+   */
+  _removeListeners = function () {
+    _lis?.forEach(li =>
+      li.removeEventListener('click', _setMainshock)
+    );
+  };
+
+  /**
+   * Event handler that sets the selected Mainshock.
    */
   _setMainshock = function () {
     var input = document.getElementById('eqid');
 
+    if (input.value !== this.id) { // eq not already selected
+      input.value = this.id;
+
+      // Input event not triggered when changed programmatically
+      _app.SelectBar.setMainshock();
+    }
+
+    _this.render();
+  };
+
+  /**
+   * Select the Mainshock (if applicable) and unselect all other earthquakes.
+   */
+  _update = function () {
+    var eqid = document.getElementById('eqid').value;
+
+    if (!_lis) return; // feed data not fetched yet
+
     _lis.forEach(li => {
-      if (li.id === this.id) {
-        if (input.value !== li.id) { // eq not already selected
-          input.value = li.id;
-
-          // Input event not triggered when changed programmatically
-          _app.SelectBar.setMainshock();
-        }
-
+      if (li.id === eqid) {
         li.classList.add('selected');
       } else {
         li.classList.remove('selected');
@@ -160,64 +207,49 @@ var SignificantEqs = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
-   */
-  _this.addData = function (json = {}) {
-    _this.content = _getContent(json);
-  };
-
-  /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    var el = document.getElementById(_this.id);
-
-    _lis = el.querySelectorAll('li');
-
-    _lis.forEach(li =>
-      li.addEventListener('click', _setMainshock)
-    );
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _app = null;
+    _el = null;
     _lis = null;
 
+    _addListeners = null;
     _fetch = null;
     _getContent = null;
+    _getData = null;
     _getItem = null;
+    _removeListeners = null;
     _setMainshock = null;
+    _update = null;
 
     _this = null;
   };
 
   /**
-   * Update the list: select the Mainshock with the given id if it is in the
-   * list and unselect all other earthquakes.
-   *
-   * Note: if the feed hasn't been fetched yet, the Mainshock will get selected
-   * when the list is initially created.
-   *
-   * @param id {String} default is ''
-   *     Mainshock id
+   * Remove the Feature.
    */
-  _this.update = function (id = '') {
-    if (!_lis) return; // feed hasn't been fetched yet
+  _this.remove = function () {
+    _removeListeners();
 
-    _lis.forEach(li => {
-      if (li.id === id) {
-        li.classList.add('selected');
-      } else {
-        li.classList.remove('selected');
-      }
-    });
+    _el.innerHTML = '';
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} default is {}
+   */
+  _this.render = function (json = {}) {
+    if (!AppUtil.isEmpty(json)) { // initial render
+      _el.innerHTML = _getContent(json);
+
+      _addListeners();
+    }
+
+    _update();
   };
 
 

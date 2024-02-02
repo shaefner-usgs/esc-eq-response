@@ -8,7 +8,7 @@ var AppUtil = require('util/AppUtil'),
 
 
 /**
- * Create the Historical Events Feature.
+ * Create the Historical Events Feature, a sub-Feature of Historical Seismicity.
  *
  * @param options {Object}
  *     {
@@ -17,13 +17,13 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
+ *       content: {String}
  *       data: {Array}
  *       dependencies: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String}
- *       summary: {String}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -32,11 +32,12 @@ var HistoricalEvents = function (options) {
       _initialize,
 
       _app,
+      _mainshock,
 
       _compare,
       _fetch,
+      _getContent,
       _getData,
-      _getSummary,
       _getUrl,
       _removeNullVals;
 
@@ -51,12 +52,13 @@ var HistoricalEvents = function (options) {
     }
 
     _app = options.app;
+    _mainshock = _app.Features.getMainshock();
 
+    _this.content = '';
     _this.data = [];
     _this.dependencies = [dependency];
     _this.id = 'historical-events';
     _this.name = 'Historical Events';
-    _this.summary = '';
     _this.url = _getUrl();
 
     _fetch();
@@ -92,57 +94,11 @@ var HistoricalEvents = function (options) {
   };
 
   /**
-   * Get the data used to create the content.
-   *
-   * @param json {Array}
-   *
-   * @return data {Array}
-   */
-  _getData = function (json) {
-    var data = [];
-
-    if (Array.isArray(json)) {
-      _removeNullVals(json);
-      json.sort(_compare);
-
-      json.forEach((eq = {}) => {
-        var isoDate = (eq.Time || '').replace(' ', 'T') + 'Z',
-            datetime = Luxon.DateTime.fromISO(isoDate),
-            from = _app.Features.getFeature('mainshock').data.eq.latlon,
-            name = (eq.Name || '').replace(/"/g, ''),
-            title = 'M ' + AppUtil.round(eq.Magnitude, 1),
-            to = LatLon(eq.Lat || 0, eq.Lon || 0);
-
-        if (name !== 'UK') {
-          title += '—' + name;
-        }
-
-        data.push({
-          deaths: parseInt(eq.TotalDeaths, 10) || 0,
-          depth: AppUtil.round(eq.Depth, 1),
-          direction: AppUtil.getDirection(from, to),
-          distance: AppUtil.round(Number(eq.Distance), 0),
-          injured: parseInt(eq.Injured, 10) || 0,
-          isoTime: datetime.toUTC().toISO() || '',
-          mmi: AppUtil.romanize(parseInt(eq.MaxMMI, 10)),
-          population: AppUtil.roundThousands(eq.NumMaxMMI),
-          title: title,
-          userTime: datetime.toFormat(_app.dateFormat),
-          utcOffset: Number(datetime.toFormat('Z')),
-          utcTime: datetime.toUTC().toFormat(_app.dateFormat)
-        });
-      });
-    }
-
-    return data;
-  };
-
-  /**
    * Get the HTML content for the SummaryPane.
    *
    * @return html {String}
    */
-  _getSummary = function () {
+  _getContent = function () {
     var html = '';
 
     _this.data.forEach(eq => {
@@ -188,13 +144,58 @@ var HistoricalEvents = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Array}
+   *
+   * @return data {Array}
+   */
+  _getData = function (json) {
+    var data = [];
+
+    if (Array.isArray(json)) {
+      _removeNullVals(json);
+      json.sort(_compare);
+
+      json.forEach((eq = {}) => {
+        var isoDate = (eq.Time || '').replace(' ', 'T') + 'Z',
+            datetime = Luxon.DateTime.fromISO(isoDate),
+            from = _mainshock.data.eq.latlon,
+            name = (eq.Name || '').replace(/"/g, ''),
+            title = 'M ' + AppUtil.round(eq.Magnitude || 0, 1),
+            to = LatLon(eq.Lat || 0, eq.Lon || 0);
+
+        if (name !== 'UK') {
+          title += '—' + name;
+        }
+
+        data.push({
+          deaths: parseInt(eq.TotalDeaths || 0, 10) || 0,
+          depth: AppUtil.round(eq.Depth || 0, 1),
+          direction: AppUtil.getDirection(from, to),
+          distance: AppUtil.round(Number(eq.Distance), 0),
+          injured: parseInt(eq.Injured || 0, 10) || 0,
+          isoTime: datetime.toUTC().toISO(),
+          mmi: AppUtil.romanize(parseInt(eq.MaxMMI, 10) || 0),
+          population: AppUtil.roundThousands(eq.NumMaxMMI || 0),
+          title: title,
+          userTime: datetime.toFormat(_app.dateFormat),
+          utcOffset: Number(datetime.toFormat('Z')),
+          utcTime: datetime.toUTC().toFormat(_app.dateFormat)
+        });
+      });
+    }
+
+    return data;
+  };
+
+  /**
    * Get the JSON feed's URL.
    *
    * @return url {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
-        product = mainshock.data.eq.products?.losspager || [],
+    var product = _mainshock.data.eq.products?.losspager || [],
         contents = product[0]?.contents || {},
         url = '';
 
@@ -206,7 +207,7 @@ var HistoricalEvents = function (options) {
   };
 
   /**
-   * Remove null entries in feed.
+   * Remove null entries from the feed data.
    *
    * @param json {Array}
    */
@@ -221,31 +222,36 @@ var HistoricalEvents = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is []
-   */
-  _this.addData = function (json = []) {
-    _this.data = _getData(json);
-    _this.summary = _getSummary();
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
 
     _app = null;
+    _mainshock = null;
 
     _compare = null;
     _fetch = null;
+    _getContent = null;
     _getData = null;
-    _getSummary = null;
     _getUrl = null;
     _removeNullVals = null;
 
     _this = null;
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Array} optional; default is []
+   */
+  _this.render = function (json = []) {
+    if (_this.data.length === 0) { // initial render
+      _this.data = _getData(json);
+      _this.content = _getContent();
+    }
+
+    _app.SummaryPane.addContent(_this);
   };
 
 

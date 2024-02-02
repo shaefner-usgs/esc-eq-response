@@ -11,8 +11,8 @@ var _COLORS,
     _DEFAULTS;
 
 _COLORS = {
-  historical: '#dde',
   foreshocks: '#99a',
+  historical: '#dde',
   mainshock: '#00f',
   pasthour: '#f00',
   pastday: '#f90',
@@ -23,13 +23,14 @@ _DEFAULTS = {
   color: '#000', // stroke
   fillOpacity: 0.85,
   opacity: 0.6, // stroke
-  weight: 1 // stroke width
+  weight: 1 // stroke
 };
 
 
 /**
- * Fetch/parse an earthquake GeoJSON feed and create the Leaflet map layer for a
- * Feature. Also supply the data used to create the Feature's Summary and Plots.
+ * Fetch/parse an earthquake GeoJSON feed and create the Leaflet map layer for
+ * the Catalog Search, Mainshock, Aftershocks, Foreshocks, and Historical
+ * Seismicity Features.
  *
  * @param options {Object}
  *     {
@@ -41,16 +42,11 @@ _DEFAULTS = {
  *     {
  *       addData: {Function}
  *       addListeners: {Function}
- *       data: {Array}
+ *       data: {Object}
  *       destroy: {Function}
- *       getDescription: {Function}
  *       getPopup: {Function}
- *       getTooltip: {Function}
- *       mapLayer: {L.FeatureGroup}
- *       params: {Object}
+ *       mapLayer: {L.GeoJSON}
  *       removeListeners: {Function}
- *       timestamp: {String}
- *       updateListeners: {Function}
  *     }
  */
 var Earthquakes = function (options) {
@@ -64,18 +60,17 @@ var Earthquakes = function (options) {
       _markerOptions,
 
       _addBubbles,
-      _addPopupListeners,
+      _addListeners,
       _filter,
       _getAge,
       _getBubbles,
-      _getDuration,
       _getEqs,
-      _getTimeStamp,
+      _getTooltip,
       _onEachFeature,
       _onPopupClose,
       _onPopupOpen,
       _pointToLayer,
-      _removePopupListeners,
+      _removeListeners,
       _setMainshock;
 
 
@@ -85,10 +80,6 @@ var Earthquakes = function (options) {
     var host = '';
 
     options = Object.assign({}, _DEFAULTS, options);
-
-    _this.params = {
-      now: Luxon.DateTime.now()
-    };
 
     _app = options.app;
     _catalog = AppUtil.getParam('catalog') || 'comcat';
@@ -100,20 +91,14 @@ var Earthquakes = function (options) {
       weight: options.weight
     };
 
-    if (_feature.id === 'mainshock' || _feature.id === 'catalog-search') {
+    if (_feature.type === 'mainshock' || _feature.id === 'catalog-search') {
       _catalog = 'comcat'; // always ComCat, despite catalog param
     } else { // Aftershocks, Foreshocks, or Historical Seismicity
-      _mainshock = _app.Features.getFeature('mainshock');
+      _mainshock = _app.Features.getMainshock();
 
-      Object.assign(_this.params, {
-        distance: _feature.params.distance,
-        duration: _getDuration(),
-        magnitude: _feature.params.magnitude
-      });
-    }
-
-    if (_catalog === 'dd') {
-      host = 'ncedc.org'; // PHP script on localhost fetches data from ncedc.org
+      if (_catalog === 'dd') {
+        host = 'ncedc.org'; // PHP script on localhost fetches data from ncedc.org
+      }
     }
 
     _this.mapLayer = L.geoJSON.async(_feature.url, {
@@ -127,7 +112,8 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Add the HTML for the given earthquake's 'impact bubbles', keyed by type.
+   * Add the the given earthquake's relevant 'impact bubbles' HTML, keyed by
+   * type.
    *
    * @param eq {Object}
    */
@@ -187,26 +173,34 @@ var Earthquakes = function (options) {
    *
    * @param popup {Element}
    */
-  _addPopupListeners = function (popup) {
+  _addListeners = function (popup) {
     var bubbles = popup.querySelectorAll('.impact-bubbles .feature'),
         button = popup.querySelector('button');
 
     button.addEventListener('click', _setMainshock);
 
-    if (_feature.id === 'mainshock') {
+    if (_feature.type === 'mainshock') {
       bubbles.forEach(bubble =>
-        bubble.addEventListener('click', _app.Features.showLightbox)
+        bubble.addEventListener('click', e => {
+          var id = Array.from(bubble.classList).find(item => item !== 'feature'),
+              feature = _app.Features.getFeature(id);
+
+          if (feature.lightbox) {
+            e.preventDefault();
+            feature.lightbox.show();
+          }
+        })
       );
     }
   };
 
   /**
-   * Filter NCEDC (double difference) earthquakes. The NCEDC API doesn't support
-   * radius values for defining a custom search region, so a rectangle is used
-   * as a proxy and extraneous eqs need to be removed.
+   * Filter out non-matching NCEDC (double-difference) earthquakes. The NCEDC
+   * API doesn't support radius values for a custom search region, so a
+   * rectangle is used as a proxy.
    *
-   * Note: _this.data.eqs was filtered by _getEqs(), but the map layer was
-   * created before filtering.
+   * Note: _this.data.eqs gets filtered by _getEqs(), but the map layer is
+   * created before filtering happens.
    *
    * @param feature {Object}
    *     GeoJSON feature
@@ -231,12 +225,15 @@ var Earthquakes = function (options) {
    * @return age {String}
    */
   _getAge = function (datetime) {
-    var age = _feature.id.replace('dd-', ''), // default
-        pastday = _this.params.now.minus({ days: 1 }),
-        pasthour = _this.params.now.minus({ hours: 1 }),
-        pastweek = _this.params.now.minus({ weeks: 1 });
+    var now, pastday, pasthour, pastweek,
+        age = _feature.type; // default
 
-    if (_feature.id.includes('aftershocks') || _feature.id === 'catalog-search') {
+    if (_feature.type === 'aftershocks' || _feature.id === 'catalog-search') {
+      now = _feature.params.now;
+      pastday = now.minus({ days: 1 }),
+      pasthour = now.minus({ hours: 1 }),
+      pastweek = now.minus({ weeks: 1 });
+
       if (datetime >= pasthour) {
         age = 'pasthour';
       } else if (datetime >= pastday) {
@@ -252,9 +249,9 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the bubbles template.
+   * Get the 'impact bubbles' template.
    *
-   * Wraps the Mainshock's DYFI, ShakeMap and PAGER bubbles in a <span>
+   * Note: wraps the Mainshock's DYFI, ShakeMap and PAGER bubbles in a <span>
    * containing CSS classes needed for their Lightbox links.
    *
    * @param eq {Object}
@@ -264,7 +261,7 @@ var Earthquakes = function (options) {
   _getBubbles = function (eq) {
     var bubbles = '{cdiBubble}{mmiBubble}{alertBubble}{tsunamiBubble}'; // default
 
-    if (eq.featureId === 'mainshock') {
+    if (eq.featureId.includes('mainshock')) {
       bubbles = '';
 
       if (eq.cdiBubble) {
@@ -281,29 +278,6 @@ var Earthquakes = function (options) {
     }
 
     return bubbles;
-  };
-
-  /**
-   * Get the duration of an earthquake sequence.
-   *
-   * @return duration {Object}
-   */
-  _getDuration = function () {
-    var interval,
-        duration = {};
-
-    if (_feature.id.includes('aftershocks')) {
-      interval = Luxon.Interval
-        .fromDateTimes(_mainshock.data.eq.datetime, _this.params.now)
-        .length('days');
-      duration.days = Number(AppUtil.round(interval, 1));
-    } else if (_feature.id.includes('foreshocks')) {
-      duration.days = _feature.params.days;
-    } else { // historical
-      duration.years = _feature.params.years;
-    }
-
-    return duration;
   };
 
   /**
@@ -352,7 +326,7 @@ var Earthquakes = function (options) {
         statusIcon = '<i class="icon-check"></i>';
       }
 
-      if (_feature.id === 'mainshock') {
+      if (_feature.type === 'mainshock') {
         distanceDisplay = '0 km';
       } else if (_feature.id !== 'catalog-search') {
         from = _mainshock.data.eq.latlon;
@@ -404,9 +378,9 @@ var Earthquakes = function (options) {
 
       // Filter out eqs from NCEDC (DD) catalog that are outside search radius
       if (
-        _feature.id === 'mainshock' ||
+        _feature.type === 'mainshock' ||
         _catalog === 'comcat' ||
-        eq.distance <= _this.params.distance // DD eq is inside search radius
+        eq.distance <= _feature.params.distance // DD eq is inside search radius
       ) {
         eqs.push(eq);
       }
@@ -416,28 +390,25 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the HTML content for the updated timestamps (user and UTC time).
+   * Get the HTML content for the given earthquake's Leaflet Tooltip.
+   *
+   * @param eq {Object}
    *
    * @return {String}
    */
-  _getTimeStamp = function () {
+  _getTooltip = function(eq) {
     return L.Util.template(
-      '<dt>Updated</dt>' +
-      '<dd>' +
-        '<time datetime="{isoTime}" class="user">' +
-          '{userTime} (UTC{utcOffset})' +
-        '</time>' +
-        '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
-      '</dd>',
-      _this.data
+      '{magType} {magDisplay}—' +
+      '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
+      '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
+      eq
     );
   };
 
   /**
-   * Add Leaflet Popups and Tooltips.
+   * Add the Leaflet Popups and Tooltips.
    *
    * @param feature {Object}
-   *     geoJSON feature
    * @param layer {L.Layer}
    */
   _onEachFeature = function (feature, layer) {
@@ -448,7 +419,7 @@ var Earthquakes = function (options) {
 
     layer.bindPopup(div, {
       minWidth: 365
-    }).bindTooltip(_this.getTooltip(eq));
+    }).bindTooltip(_getTooltip(eq));
   };
 
   /**
@@ -457,7 +428,10 @@ var Earthquakes = function (options) {
    * @param e {Event}
    */
   _onPopupClose = function (e) {
-    _removePopupListeners(e.popup.getElement());
+    var name = e.target.id.replace('dd-', '') + '-popup';
+
+    sessionStorage.removeItem(name);
+    _removeListeners(e.popup.getElement());
   };
 
   /**
@@ -466,17 +440,19 @@ var Earthquakes = function (options) {
    * @param e {Event}
    */
   _onPopupOpen = function (e) {
-    var marker = e.layer;
+    var marker = e.layer,
+        name = e.target.id.replace('dd-', '') + '-popup',
+        value = e.layer.feature.id; // eqid
 
     marker.openPopup(marker.getLatLng()); // position at marker center
-    _addPopupListeners(e.popup.getElement());
+    sessionStorage.setItem(name, value);
+    _addListeners(e.popup.getElement());
   };
 
   /**
-   * Create Leaflet markers.
+   * Create Leaflet Markers.
    *
    * @param feature {Object}
-   *     geoJSON feature
    * @param latlng {L.LatLng}
    *
    * @return {L.CircleMarker}
@@ -497,13 +473,13 @@ var Earthquakes = function (options) {
    *
    * @param popup {Element}
    */
-  _removePopupListeners = function (popup) {
+  _removeListeners = function (popup) {
     var bubbles = popup.querySelectorAll('.impact-bubbles .feature'),
         button = popup.querySelector('button');
 
     button.removeEventListener('click', _setMainshock);
 
-    if (_feature.id === 'mainshock') {
+    if (_feature.type === 'mainshock') {
       bubbles.forEach(bubble =>
         bubble.removeEventListener('click', _app.Features.showLightbox)
       );
@@ -511,7 +487,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Event handler that sets the selected earthquake as the Mainshock.
+   * Event handler that sets an earthquake as the Mainshock.
    *
    * @param e {Event}
    */
@@ -534,7 +510,7 @@ var Earthquakes = function (options) {
   /**
    * Add the JSON feed data.
    *
-   * @param json {Object} default is {}
+   * @param json {Object} optional; default is {}
    */
   _this.addData = function (json = {}) {
     var datetime = Luxon.DateTime.fromMillis(_feature.updated);
@@ -546,7 +522,8 @@ var Earthquakes = function (options) {
       utcOffset: Number(datetime.toFormat('Z')),
       utcTime: datetime.toUTC().toFormat(_app.dateFormat)
     };
-    _this.timestamp = _getTimeStamp();
+
+    _this.mapLayer.addData(json);
   };
 
   /**
@@ -560,7 +537,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -572,58 +549,20 @@ var Earthquakes = function (options) {
     _markerOptions = null;
 
     _addBubbles = null;
-    _addPopupListeners = null;
+    _addListeners = null;
     _filter = null;
     _getAge = null;
     _getBubbles = null;
-    _getDuration = null;
     _getEqs = null;
-    _getTimeStamp = null;
+    _getTooltip = null;
     _onEachFeature = null;
     _onPopupClose = null;
     _onPopupOpen = null;
     _pointToLayer = null;
-    _removePopupListeners = null;
+    _removeListeners = null;
     _setMainshock = null;
 
     _this = null;
-  };
-
-  /**
-   * Get the HTML content for the Feature's description.
-   *
-   * @return {String}
-   */
-  _this.getDescription = function () {
-    var append, data,
-        catalog = '', // default (ComCat, don't notate)
-        period = Object.keys(_this.params.duration)[0],
-        length = _this.params.duration[period];
-
-    if (_feature.id.includes('aftershocks')) {
-      append = '. The duration of the aftershock sequence is <strong>' +
-        `${length} ${period}</strong>`;
-    } else {
-      append = ` in the prior <strong>${length} ${period}</strong>` +
-        ' before the mainshock';
-    }
-
-    if (_catalog === 'dd') {
-      catalog = 'double-difference';
-    }
-
-    data = {
-      append: append,
-      catalog: catalog,
-      distance: _this.params.distance,
-      magnitude: _this.params.magnitude
-    };
-
-    return L.Util.template(
-      '<strong>M {magnitude}+</strong> {catalog} earthquakes within ' +
-      '<strong>{distance} km</strong> of the mainshock’s epicenter{append}.',
-      data
-    );
   };
 
   /**
@@ -636,7 +575,7 @@ var Earthquakes = function (options) {
   _this.getPopup = function (eq) {
     var data = Object.assign({}, eq);
 
-    if (eq.featureId === 'mainshock') {
+    if (eq.featureId.includes('mainshock')) {
       data.id = ''; // not needed; removing it avoids duplicating it in the DOM
     }
 
@@ -667,22 +606,6 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Get the HTML content for the given earthquake's Leaflet Tooltip.
-   *
-   * @param eq {Object}
-   *
-   * @return {String}
-   */
-  _this.getTooltip = function(eq) {
-    return L.Util.template(
-      '{magType} {magDisplay}—' +
-      '<time datetime="{isoTime}" class="user">{userTimeDisplay}</time>' +
-      '<time datetime="{isoTime}" class="utc">{utcTimeDisplay}</time>',
-      eq
-    );
-  };
-
-  /**
    * Remove event listeners.
    */
   _this.removeListeners = function () {
@@ -692,20 +615,6 @@ var Earthquakes = function (options) {
     });
   };
 
-  /**
-   * Update the Mainshock's event listeners if its Popup is open.
-   *
-   * Note: necessary when swapping between catalogs.
-   */
-  _this.updateListeners = function () {
-    var popup = document.querySelector('.leaflet-popup-pane .mainshock');
-
-    if (popup) {
-      _removePopupListeners(popup);
-      _addPopupListeners(popup);
-    }
-  };
-
 
   _initialize(options);
   options = null;
@@ -713,11 +622,11 @@ var Earthquakes = function (options) {
 };
 
 /**
- * Static method to get the URL of the earthquakes JSON feed.
+ * Static method to get the URL of the GeoJSON feed.
  *
- * @param params {Object} default is {}
+ * @param params {Object} optional; default is {}
  *     see API Documentation at https://earthquake.usgs.gov/fdsnws/event/1/
- * @param type {String <event|search>} default is 'event'
+ * @param type {String <event|search>} optional; default is 'event'
  *     set to 'search' in Catalog Search Feature to always use ComCat
  *
  * @return {String}

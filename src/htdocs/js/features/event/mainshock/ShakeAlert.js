@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Lightbox = require('util/Lightbox'),
     Luxon = require('luxon');
 
 
@@ -16,11 +17,10 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {String}
+ *       lightbox: {Mixed <Object|null>}
  *       name: {String}
  *       render: {Function}
  *       url: {String}
@@ -35,9 +35,10 @@ var ShakeAlert = function (options) {
       _product,
 
       _fetch,
+      _getButton,
       _getCities,
+      _getContent,
       _getData,
-      _getLightbox,
       _getLocation,
       _getRadius,
       _getStatus,
@@ -50,12 +51,12 @@ var ShakeAlert = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _mainshock = _app.Features.getFeature('mainshock');
+    _mainshock = _app.Features.getMainshock();
     _product = _mainshock.data.eq.products?.['shake-alert']?.[0] || {};
 
     _this.data = {};
     _this.id = 'shake-alert';
-    _this.lightbox = '';
+    _this.lightbox = null;
     _this.name = 'ShakeAlert<sup>®</sup>';
     _this.url = _getUrl();
 
@@ -75,12 +76,24 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get the HTML for the cities table.
+   * Get the HTML content for the external link button.
    *
-   * @return table {String}
+   * @return {String}
+   */
+  _getButton = function () {
+    return '' +
+      `<a href="${_this.data.url}" target="new" class="button">` +
+        '<i class="icon-link"></i>' +
+      '</a>';
+  };
+
+  /**
+   * Get the HTML content for the cities table.
+   *
+   * @return html {String}
    */
   _getCities = function () {
-    var table =
+    var html =
       '<table>' +
         '<tr>' +
           '<th>City</th>' +
@@ -89,8 +102,8 @@ var ShakeAlert = function (options) {
           '<th>Predicted MMI</th>' +
         '</tr>';
 
-    _this.data.cities.forEach(city => {
-      var props = city.properties;
+    _this.data.cities.forEach((city = {}) => {
+      var props = city.properties || {};
 
       Object.assign(props, {
         citydist: AppUtil.round(props.citydist, 1) + ' km',
@@ -98,7 +111,7 @@ var ShakeAlert = function (options) {
         mmi: AppUtil.romanize(Number(props.mmi))
       });
 
-      table +=
+      html +=
         '<tr>' +
           `<td>${props.name}</td>` +
           `<td>${props.citydist}</td>` +
@@ -111,56 +124,9 @@ var ShakeAlert = function (options) {
         '</tr>';
     });
 
-    table += '</table>';
+    html += '</table>';
 
-    return table;
-  };
-
-  /**
-   * Get the data used to create the content.
-   *
-   * @param json {Object}
-   *
-   * @return {Object}
-   */
-  _getData = function (json) {
-    var alerts = _parseAlerts(json),
-        millis = Number(_product.updateTime) || 0,
-        datetime = Luxon.DateTime.fromMillis(millis),
-        props = json.properties || {},
-        decimalSecs = props.time?.match(/\.0*[^0]+/)[0],
-        final = alerts.final.properties || {},
-        initial = alerts.initial.properties || {},
-        time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
-        issueTime = Luxon.DateTime.fromISO(time);
-
-    return {
-      cities: json.cities?.features || [],
-      decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
-      isoIssueTime: issueTime.toUTC().toISO() || '',
-      isoTime: datetime.toUTC().toISO() || '',
-      latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
-      latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
-      locationFinal: _getLocation(final),
-      locationInitial: _getLocation(initial),
-      magAnss: 'M ' + AppUtil.round(props.magnitude, 1),
-      magFinal: 'M ' + AppUtil.round(final.magnitude, 1),
-      magInitial: 'M ' + AppUtil.round(initial.magnitude, 1),
-      magSeconds: Math.round(props.elapsed) + ' s',
-      numStations: Number(final.num_stations),
-      numStations10: Number(props.num_stations_10km),
-      numStations100: Number(props.num_stations_100km),
-      radius: _getRadius(alerts),
-      status: _getStatus(),
-      url: _mainshock.data.eq.url + '/shake-alert',
-      userIssueTime: issueTime.toFormat(_app.dateFormat),
-      userTime: datetime.toFormat(_app.dateFormat),
-      utcIssueTime: issueTime.toUTC().toFormat(_app.dateFormat),
-      utcIssueOffset: Number(issueTime.toFormat('Z')),
-      utcOffset: Number(datetime.toFormat('Z')),
-      utcTime: datetime.toUTC().toFormat(_app.dateFormat),
-      wea: props.wea_report || ''
-    };
+    return html;
   };
 
   /**
@@ -168,7 +134,7 @@ var ShakeAlert = function (options) {
    *
    * @return {String}
    */
-  _getLightbox = function () {
+  _getContent = function () {
     return L.Util.template(
       '<div class="wrapper">' +
         '<div class="details">' +
@@ -184,15 +150,19 @@ var ShakeAlert = function (options) {
           '<dl class="props alt">' +
             '<dt>Initial</dt>' +
             '<dd>{latencyInitial} after origin</dd>' +
+            '<dt>Peak</dt>' +
+            '<dd>{latencyMax} after origin</dd>' +
             '<dt>Final</dt>' +
             '<dd>{latencyFinal} after origin</dd>' +
             '<dt>Late-alert Radius</dt>' +
             '<dd>{radius}</dd>' +
           '</dl>' +
-          '<h4>Magnitude Accuracy</h4>' +
+          '<h4>Magnitude Estimates</h4>' +
           '<dl class="props alt">' +
             '<dt>Initial</dt>' +
             '<dd>{magInitial}</dd>' +
+            '<dt>Peak</dt>' +
+            '<dd>{magMax}</dd>' +
             '<dt>Final</dt>' +
             '<dd>{magFinal}</dd>' +
             '<dt>ANSS Report</dt>' +
@@ -202,6 +172,8 @@ var ShakeAlert = function (options) {
           '<dl class="props alt">' +
             '<dt>Initial</dt>' +
             '<dd>{locationInitial}</dd>' +
+            '<dt>Peak</dt>' +
+            '<dd>{locationMax}</dd>' +
             '<dt>Final</dt>' +
             '<dd>{locationFinal}</dd>' +
           '</dl>' +
@@ -222,34 +194,84 @@ var ShakeAlert = function (options) {
       '<dl class="props">' +
         '<dt>Status</dt>' +
         '<dd class="status">{status}</dd>' +
-        '<dt>Updated</dt>' +
-        '<dd>' +
-          '<time datetime="{isoTime}" class="user">' +
-            '{userTime} (UTC{utcOffset})' +
-          '</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
-        '</dd>' +
+        _app.Features.getTimeStamp(_this.data) +
       '</dl>',
       _this.data
     );
   };
 
   /**
-   * Get an alert's location description.
+   * Get the data used to create the content.
+   *
+   * @param json {Object}
+   *
+   * @return {Object}
+   */
+  _getData = function (json) {
+    var alerts = _parseAlerts(json),
+        millisecs = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millisecs),
+        props = json.properties || {},
+        decimalSecs = props.time?.match(/\.0*[^0]+/)[0] || 0,
+        final = alerts.final?.properties || {},
+        initial = alerts.initial?.properties || {},
+        max = alerts.max?.properties || {},
+        time = props.time?.substring(0, 19).replace(' ', 'T') + decimalSecs + 'Z',
+        issueTime = Luxon.DateTime.fromISO(time);
+
+    return {
+      cities: json.cities?.features || [],
+      decimalSecs: AppUtil.round(decimalSecs, 1).substring(1),
+      isoIssueTime: issueTime.toUTC().toISO(),
+      isoTime: datetime.toUTC().toISO(),
+      latencyFinal: AppUtil.round(final.elapsed, 1) + ' s',
+      latencyInitial: AppUtil.round(initial.elapsed, 1) + ' s',
+      latencyMax: AppUtil.round(max.elapsed, 1) + ' s',
+      locationFinal: _getLocation(final),
+      locationInitial: _getLocation(initial),
+      locationMax: _getLocation(max),
+      magAnss: 'M ' + AppUtil.round(props.magnitude, 1),
+      magFinal: 'M ' + AppUtil.round(final.magnitude, 1),
+      magInitial: 'M ' + AppUtil.round(initial.magnitude, 1),
+      magMax: 'M ' + AppUtil.round(max.magnitude, 1),
+      magSeconds: Math.round(Number(props.elapsed)) || '–' + ' s',
+      numStations: Number(final.num_stations) || 0,
+      numStations10: Number(props.num_stations_10km) || 0,
+      numStations100: Number(props.num_stations_100km) || 0,
+      radius: _getRadius(alerts),
+      status: _getStatus(),
+      url: _mainshock.data.eq.url + '/shake-alert',
+      userIssueTime: issueTime.toFormat(_app.dateFormat),
+      userTime: datetime.toFormat(_app.dateFormat),
+      utcIssueTime: issueTime.toUTC().toFormat(_app.dateFormat),
+      utcIssueOffset: Number(issueTime.toFormat('Z')),
+      utcOffset: Number(datetime.toFormat('Z')),
+      utcTime: datetime.toUTC().toFormat(_app.dateFormat),
+      wea: props.wea_report || ''
+    };
+  };
+
+  /**
+   * Get the given alert's location description.
    *
    * @param alert {Object}
    *
-   * @return {String}
+   * @return location {String}
    */
   _getLocation = function (alert) {
     var bearing = Number(alert.location_azimuth_error),
         directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'],
         distance = Number(alert.location_distance_error),
         kms = AppUtil.round(distance, 1),
+        location = '–',
         miles = AppUtil.round(distance / 1.60934, 1),
         octant = Math.floor((22.5 + (360 + bearing) % 360) / 45);
 
-    return `${kms} km (${miles} mi) ${directions[octant]}`;
+    if (!AppUtil.isEmpty(alert)) {
+      location = `${kms} km (${miles} mi) ${directions[octant]}`;
+    }
+
+    return location;
   };
 
   /**
@@ -262,11 +284,11 @@ var ShakeAlert = function (options) {
   _getRadius = function (alerts) {
     var radius = '';
 
-    alerts.initial.features?.forEach(feature => {
+    alerts.initial?.features?.forEach((feature = {}) => {
       if (feature.id === 'acircle_0.0') {
-        radius = feature.properties.radius;
+        radius = Number(feature.properties?.radius);
 
-        if (feature.properties.radiusunits === 'm') {
+        if (feature.properties?.radiusunits === 'm') {
           radius = radius / 1000;
         }
 
@@ -311,15 +333,15 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Get the WEA alert.
+   * Get the HTML content for the WEA alert.
    *
-   * @return alert {String}
+   * @return html {String}
    */
   _getWeaAlert = function () {
-    var alert = '';
+    var html = '';
 
     if (_this.data.wea) {
-      alert =
+      html =
         '<h4>Wireless Emergency Alert</h4>' +
         '<p class="wea">' +
           _this.data.wea + ' ' +
@@ -327,11 +349,11 @@ var ShakeAlert = function (options) {
         '</p>';
     }
 
-    return alert;
+    return html;
   };
 
   /**
-   * Parse the alerts, which are stored in disparate formats in the JSON feed.
+   * Parse the alerts (JSON feed uses disparate formats).
    *
    * @param json {Object}
    *
@@ -342,13 +364,15 @@ var ShakeAlert = function (options) {
 
     if (json.alerts) {
       json.alerts.forEach((alert, i) => {
-        var name = alert.id.match(/(.+)AlertCollection/)[1];
-        alerts[name] = json.alerts[i];
+        var name = alert.id?.match(/(.+[^M])M?AlertCollection/)[1] || 'alert' + i;
+
+        alerts[name] = json.alerts[i] || {};
       });
     } else {
       alerts = {
-        final: json.final_alert,
-        initial: json.initial_alert,
+        final: json.final_alert || {},
+        initial: json.initial_alert || {},
+        max: json.maxM_alert || {}
       };
     }
 
@@ -360,22 +384,10 @@ var ShakeAlert = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
-   */
-  _this.addData = function (json = {}) {
-    _this.data = _getData(json);
-    _this.lightbox = _getLightbox();
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
-    if (_this.lightbox) {
-      _app.Features.getLightbox(_this.id).destroy();
-    }
+    _this.lightbox?.destroy();
 
     _initialize = null;
 
@@ -384,9 +396,10 @@ var ShakeAlert = function (options) {
     _product = null;
 
     _fetch = null;
+    _getButton = null;
     _getCities = null;
+    _getContent = null;
     _getData = null;
-    _getLightbox = null;
     _getLocation = null;
     _getRadius = null;
     _getStatus = null;
@@ -398,16 +411,23 @@ var ShakeAlert = function (options) {
   };
 
   /**
-   * Add the external link button.
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is {}
    */
-  _this.render = function () {
-    var button =
-          `<a href="${_this.data.url}" target="new" class="button">` +
-            '<i class="icon-link"></i>' +
-          '</a>',
-        h3 = document.getElementById(_this.id).querySelector('h3');
+  _this.render = function (json = {}) {
+    if (AppUtil.isEmpty(_this.data)) { // initial render
+      _this.data = _getData(json);
+    } else {
+      _this.lightbox?.destroy();
+    }
 
-    h3.innerHTML = _this.name + button;
+    _this.lightbox = Lightbox({
+      content: _getContent(),
+      id: _this.id,
+      targets: document.querySelectorAll('.shake-alert.feature'),
+      title: _this.name + _getButton()
+    }).render();
   };
 
 

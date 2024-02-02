@@ -12,7 +12,7 @@ _DEFAULTS = {
   deferFetch: true,
   iconAnchor: [7, 5],
   iconSize: [14, 10],
-  popupAnchor: [0, -5],
+  popupAnchor: [0, -5]
 };
 _FLAGS = {
   G: 'Glitch (clipped or below noise)',
@@ -29,18 +29,20 @@ _FLAGS = {
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       deferFetch: {Boolean} set to false on reload after failed request
- *       showLayer: {Boolean}
+ *       deferFetch: {Boolean} optional
  *     }
  *
  * @return _this {Object}
  *     {
+ *       add: {Function}
  *       count: {Integer}
  *       deferFetch: {Boolean}
  *       destroy: {Function}
  *       id: {String}
- *       mapLayer: {Mixed <L.FeatureGroup|null>}
+ *       mapLayer: {Mixed <L.GeoJSON|null>}
  *       name: {String}
+ *       remove: {Function}
+ *       render: {Function}
  *       showLayer: {Boolean}
  *       url: {String}
  *       zoomToLayer: {Boolean}
@@ -78,16 +80,12 @@ var ShakeMapStations = function (options) {
       popupAnchor: options.popupAnchor
     };
 
-    if (options.deferFetch) {
-      options.showLayer = false;
-    }
-
     _this.count = 0;
     _this.deferFetch = options.deferFetch;
     _this.id = 'shakemap-stations';
     _this.mapLayer = null;
     _this.name = 'ShakeMap Stations';
-    _this.showLayer = options.showLayer;
+    _this.showLayer = false;
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
@@ -105,12 +103,12 @@ var ShakeMapStations = function (options) {
   /**
    * Filter out DYFI stations.
    *
-   * @param station {Object}
+   * @param station {Object} default is {}
    *
    * @return {Number}
    */
-  _filter = function (station) {
-    var props = station.properties;
+  _filter = function (station = {}) {
+    var props = station.properties || {};
 
     if (props.network !== 'DYFI' && props.network !== 'INTENSITY') {
       return ++ _this.count;
@@ -162,7 +160,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML for the flag.
+   * Get the HTML for the given flag.
    *
    * @param flag {String} default is ''
    *
@@ -183,13 +181,13 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML content for the given station's Leaflet popup.
+   * Get the HTML content for the given station's Leaflet Popup.
    *
-   * @param station {Object}
+   * @param station {Object} default is {}
    *
    * @return html {String}
    */
-  _getPopup = function (station) {
+  _getPopup = function (station = {}) {
     var coords = station.geometry?.coordinates || [0, 0, 0],
         props = station.properties || {},
         data = {
@@ -247,7 +245,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML <tr> for the given channel.
+   * Get the HTML content for the given channel row.
    *
    * @param channel {Object} default is {}
    *
@@ -279,7 +277,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML <table> for the given channels.
+   * Get the HTML content for the given channels' table.
    *
    * @param channels {Array} default is []
    *
@@ -320,13 +318,13 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Get the HTML content for the given station's Leaflet tooltip.
+   * Get the HTML content for the given station's Leaflet Tooltip.
    *
-   * @param station {Object}
+   * @param station {Object} default is {}
    *
    * @return {String}
    */
-  _getTooltip = function (station) {
+  _getTooltip = function (station = {}) {
     var props = station.properties || {},
         data = {
           code: props.code || '–',
@@ -342,7 +340,7 @@ var ShakeMapStations = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         product = mainshock.data.eq.products?.shakemap || [],
         contents = product[0]?.contents || {},
         url = '';
@@ -355,7 +353,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Add Leaflet popups and tooltips.
+   * Add Leaflet Popups and Tooltips.
    *
    * @param feature {Object}
    * @param layer (L.Layer)
@@ -370,7 +368,7 @@ var ShakeMapStations = function (options) {
   };
 
   /**
-   * Create Leaflet markers.
+   * Create Leaflet Markers.
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -395,7 +393,14 @@ var ShakeMapStations = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Add the Feature.
+   */
+  _this.add = function () {
+    _app.MapPane.addFeature(_this);
+  };
+
+  /**
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -416,6 +421,23 @@ var ShakeMapStations = function (options) {
     _pointToLayer = null;
 
     _this = null;
+  };
+
+  /**
+   * Remove the Feature.
+   */
+  _this.remove = function () {
+    _app.MapPane.removeFeature(_this);
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} default is {}
+   */
+  _this.render = function (json = {}) {
+    _this.mapLayer.addData(json);
+    _app.MapPane.addContent(_this);
   };
 
 

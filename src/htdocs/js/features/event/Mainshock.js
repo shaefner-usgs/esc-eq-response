@@ -4,43 +4,41 @@
 
 var AppUtil = require('util/AppUtil'),
     Earthquakes = require('features/util/earthquakes/Earthquakes'),
-    ImagesLoaded = require('imagesloaded'),
+    JsonFeed = require('util/JsonFeed'),
     LatLon = require('util/LatLon'),
     Luxon = require('luxon'),
-    Masonry = require('masonry-layout'),
-    Plots = require('features/util/earthquakes/Plots');
+    Plots = require('features/util/earthquakes/Plots'),
+    Rtf = require('util/Rtf');
 
 
 /**
- * Create the (ComCat) Mainshock Feature.
+ * Create the Mainshock Feature.
  *
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       showLayer: {Boolean}
- *       zoomToLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
- *       addDdData: {Function}
- *       addListeners: {Function}
+ *       add: {Function}
  *       content: {String}
+ *       createRtf: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       disableDownload: {Function}
+ *       enableDownload: {Function}
  *       id: {String}
- *       mapLayer: {L.FeatureGroup}
+ *       json: {Object}
+ *       mapLayer: {L.GeoJSON}
  *       name: {String}
  *       placeholder: {String}
  *       plots: {Object}
- *       removeListeners: {Function}
+ *       remove: {Function}
  *       render: {Function}
  *       showLayer: {Boolean}
- *       summary: {String}
  *       title: {String}
- *       update: {Function}
+ *       type: {String}
  *       url: {String}
  *       zoomToLayer: {Boolean}
  *     }
@@ -50,20 +48,20 @@ var Mainshock = function (options) {
       _initialize,
 
       _app,
-      _button,
-      _buttonTitle,
-      _ddData,
+      _download,
       _earthquakes,
-      _els,
+      _el,
       _json,
-      _masonry,
+      _note,
       _tsunami,
 
-      _addPlaceholders,
-      _createFeatures,
+      _addData,
+      _addListeners,
+      _addSubFeatures,
       _destroy,
-      _enableDownload,
+      _fetch,
       _getBubbles,
+      _getContent,
       _getData,
       _getDyfi,
       _getEq,
@@ -74,72 +72,105 @@ var Mainshock = function (options) {
       _getShakeAlert,
       _getShakeMap,
       _getStrip,
-      _getSummary,
       _getTectonic,
       _getText,
       _getUpdated,
       _getUrl,
-      _initMasonry,
+      _initDownload,
+      _mergeJson,
       _openTsunami,
-      _setMainshock,
-      _updateDetails,
-      _updateHeader,
-      _updateMarkers,
-      _updatePlots;
+      _removeListeners,
+      _setJson;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
-    _app = options.app;
+    var catalog = AppUtil.getParam('catalog');
 
+    _app = options.app;
+    _el = document.getElementById('mainshock');
+
+    _this.content = '';
+    _this.data = {};
     _this.id = 'mainshock';
+    _this.json = {};
+    _this.mapLayer = L.geoJSON();
     _this.name = 'Mainshock';
     _this.placeholder = '<div class="content"></div>';
     _this.plots = {};
-    _this.showLayer = options.showLayer;
-    _this.summary = '';
+    _this.showLayer = true;
+    _this.title = '';
+    _this.type = _this.id;
     _this.url = _getUrl();
-    _this.zoomToLayer = options.zoomToLayer;
+    _this.zoomToLayer = true;
 
-    _earthquakes = Earthquakes({ // fetch feed data
+    if (catalog === 'dd') {
+      _this.id = 'dd-mainshock';
+    }
+  };
+
+  /**
+   * Add the JSON data and set properties that depend on it.
+   */
+  _addData = function () {
+    _earthquakes.addData(_json);
+
+    _this.data = _getData(_json);
+    _this.content = _getContent();
+    _this.mapLayer = _earthquakes.mapLayer;
+    _this.plots = Plots({
       app: _app,
       feature: _this
     });
-    _ddData = {}; // double-difference data
-
-    _this.mapLayer = _earthquakes.mapLayer;
-
-    _addPlaceholders();
+    _this.title = _this.data.eq.title;
   };
 
   /**
-   * Add the Beachball placeholders to the MapPane.
+   * Add event listeners.
+   *
+   * Note: listeners for sub-Features are added by their respective Classes.
    */
-  _addPlaceholders = function () {
-    var container = document.querySelector('#map-pane .container');
+  _addListeners = function () {
+    _download = document.getElementById('download');
+    _tsunami = document.querySelector('#summary-pane li.tsunami');
 
-    container.innerHTML =
-      '<div class="focal-mechanism feature"></div>' +
-      '<div class="moment-tensor feature"></div>';
+    _download.addEventListener('click', _initDownload);
+
+    if (_tsunami) {
+      _tsunami.addEventListener('click', _openTsunami);
+    }
+
+    _earthquakes.addListeners();
   };
 
   /**
-   * Event handler that creates the RTF Features.
+   * Add the sub-Features if they exist (i.e. preserve them when re-rendering).
    */
-  _createFeatures = function () {
-    _app.Features.createFeatures('rtf');
+  _addSubFeatures = function () {
+    var features = [
+      _app.Features.getFeature('dyfi'),
+      _app.Features.getFeature('focal-mechanism'),
+      _app.Features.getFeature('moment-tensor'),
+      _app.Features.getFeature('nearby-cities'),
+      _app.Features.getFeature('pager'),
+      _app.Features.getFeature('pager-exposures'),
+      _app.Features.getFeature('shakemap'),
+      _app.Features.getFeature('shake-alert')
+    ];
+
+    features.forEach(feature => {
+      if (feature.content || feature.lightbox) {
+        feature.render();
+      }
+    });
   };
 
   /**
    * Destroy this Feature's sub-Classes.
    */
   _destroy = function () {
-    _earthquakes.destroy();
-
-    if (_masonry) {
-      _masonry.destroy();
-    }
+    _earthquakes?.destroy();
 
     if (!AppUtil.isEmpty(_this.plots)) {
       _this.plots.destroy();
@@ -147,17 +178,34 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Enable the download RTF button.
+   * Fetch the feed data.
    */
-  _enableDownload = function () {
-    _buttonTitle = _button.getAttribute('title');
+  _fetch = function () {
+    document.body.classList.add('loading');
 
-    _button.removeAttribute('disabled');
-    _button.setAttribute('title', 'Download RTF Document');
+    // Fetch ComCat data
+    _earthquakes = Earthquakes({
+      app: _app,
+      feature: _this
+    });
+
+    // Fetch DD data
+    if (_this.id === 'dd-mainshock') {
+      JsonFeed({
+        app: _app
+      }).fetch({
+        host: 'ncedc.org', // PHP script on localhost fetches from ncedc.org
+        id: _this.id,
+        name: _this.name,
+        url: _getUrl()
+      }).then(json => {
+        _this.render(json);
+      });
+    }
   };
 
   /**
-   * Get the HTML template for the USGS 'impact bubbles'.
+   * Get the HTML template for the USGS 'impact bubbles' list.
    *
    * @return template {String}
    */
@@ -209,6 +257,44 @@ var Mainshock = function (options) {
   };
 
   /**
+   * Get the HTML content for the SummaryPane.
+   *
+   * @return {String}
+   */
+  _getContent = function () {
+    return L.Util.template(
+      _getStrip() +
+      '<div class="products">' +
+        '<div class="thumbs bubble {hide}">' +
+          _getDyfi() +
+          _getShakeMap() +
+          '<div class="focal-mechanism feature content hide"></div>' +
+          '<div class="moment-tensor feature content hide"></div>' +
+        '</div>' +
+        _getLossPager() +
+        '<div class="pager-exposures feature content bubble hide"></div>' +
+        '<div class="nearby-cities feature content bubble hide"></div>' +
+        '<div class="download bubble">' +
+          '<h3>Event Summary</h3>' +
+          '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
+            'containing earthquake details, images, plots and placeholders ' +
+            'for talking points and analysis. Any settings you tweak will be ' +
+            'reflected in the document.</p>' +
+          '<button id="download" disabled="disabled" type="button" ' +
+            'title="Disabled because some features have not finished ' +
+            'loading">Download</button>' +
+          '<p><strong>Microsoft Word</strong> is recommended for viewing the ' +
+            'summary</p>' +
+        '</div>' +
+        _getNotice() +
+        _getLinks() +
+        _getTectonic() +
+      '</div>',
+      _this.data.eq
+    );
+  };
+
+  /**
    * Get the data used to create the content.
    *
    * @param json {Object}
@@ -218,10 +304,8 @@ var Mainshock = function (options) {
   _getData = function (json) {
     var datetime = Luxon.DateTime.fromMillis(_this.updated);
 
-    _json = json; // cache feed data
-
     return {
-      eq: _getEq(),
+      eq: _getEq(json),
       userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
       userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
@@ -231,20 +315,20 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'Did You Feel It?'.
+   * Get the HTML template for the 'Did You Feel It?' thumbnail.
    *
    * @return template {String}
    */
   _getDyfi = function () {
-    var img,
-        template = '';
+    var template = '';
 
     if (_this.data.eq.dyfiImg) {
-      img = '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">';
       template =
         '<div class="dyfi feature">' +
           '<h4>Did You Feel It?</h4>' +
-          '<a href="{url}/dyfi">' + img + '</a>' +
+          '<a href="{url}/dyfi" target="new">' +
+            '<img src="{dyfiImg}" class="mmi{cdi}" alt="DYFI intensity">' +
+          '</a>' +
         '</div>';
     }
 
@@ -255,12 +339,14 @@ var Mainshock = function (options) {
    * Get the earthquake details. This is the formatted JSON feed data from
    * Earthquakes.js, plus additional Mainshock-specific convenience properties.
    *
+   * @param json {Object}
+   *
    * @return {Object}
    */
-  _getEq = function () {
-    var eq = _earthquakes.data.eqs[0], // formatted JSON feed data
+  _getEq = function (json) {
+    var eq = _earthquakes.data.eqs[0] || {}, // formatted JSON feed data
         datetime = eq.datetime,
-        products = _json.properties?.products || {},
+        products = json.properties?.products || {},
         dyfi = products.dyfi || [],
         dyfiImg = _getImage(dyfi[0]),
         pager = products.losspager || [],
@@ -270,7 +356,7 @@ var Mainshock = function (options) {
         format = 'cccc',
         header = products['general-header'] || [],
         hide = 'hide', // default - hide product thumbs container
-        mmiInt = Math.round(_json.properties?.mmi) || 0,
+        mmiInt = Math.round(json.properties?.mmi) || 0,
         mt = products['moment-tensor'] || [],
         notice = header[0]?.contents['']?.bytes,
         plurality = 's', // default
@@ -280,7 +366,7 @@ var Mainshock = function (options) {
         shakemapImg = shakemap[0]?.contents['download/intensity.jpg']?.url;
 
     if (dyfiImg || shakemapImg || fm[0] || mt[0]) {
-      hide = ''; // show
+      hide = ''; // show thumbs bubble
     }
     if (Number(eq.felt) === 1) {
       plurality = '';
@@ -317,7 +403,7 @@ var Mainshock = function (options) {
    * @return url {String}
    */
   _getImage = function (dyfi = {}) {
-    var images = [ // NOTE: images listed in order of preference
+    var images = [ // listed in order of preference
           dyfi?.contents?.[dyfi.code + '_ciim.jpg'], // zip
           dyfi?.contents?.[dyfi.code + '_ciim_geo.jpg'] // intensity (preferred)
         ],
@@ -333,7 +419,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for external links.
+   * Get the HTML template for the external 'Links' bubble.
    *
    * @return {String}
    */
@@ -359,7 +445,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'loss PAGER'.
+   * Get the HTML template for the 'loss PAGER' bubble.
    *
    * @return template {String}
    */
@@ -389,14 +475,18 @@ var Mainshock = function (options) {
     var template = '';
 
     if (_this.data.eq.notice) {
-      template = '<p class="notice">{notice}</p>';
+      template =
+        '<div class="notice bubble">' +
+          '<h3>Notice</h3>' +
+          '{notice}' +
+        '</div>';
     }
 
     return template;
   };
 
   /**
-   * Get the HTML template for 'ShakeAlert'.
+   * Get the HTML template for the 'ShakeAlert' button.
    *
    * @return template {String}
    */
@@ -418,20 +508,20 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for 'ShakeMap'.
+   * Get the HTML template for the 'ShakeMap' thumbnail.
    *
    * @return template {String}
    */
   _getShakeMap = function () {
-    var img,
-        template = '';
+    var template = '';
 
     if (_this.data.eq.shakemapImg) {
-      img = '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity">';
       template =
         '<div class="shakemap feature">' +
           '<h4>ShakeMap</h4>' +
-          '<a href="{url}/shakemap">' + img + '</a>' +
+          '<a href="{url}/shakemap" target="new">' +
+            '<img src="{shakemapImg}" class="mmi{mmi}" alt="ShakeMap intensity">' +
+          '</a>' +
         '</div>';
     }
 
@@ -494,45 +584,7 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML content for the SummaryPane.
-   *
-   * @return {String}
-   */
-  _getSummary = function () {
-    return L.Util.template(
-      _getNotice() +
-      _getStrip() +
-      '<div class="products">' +
-        '<div class="thumbs bubble {hide}">' +
-          _getDyfi() +
-          _getShakeMap() +
-          '<div class="focal-mechanism feature content hide"></div>' +
-          '<div class="moment-tensor feature content hide"></div>' +
-        '</div>' +
-        _getLossPager() +
-        '<div class="pager-exposures feature content bubble hide"></div>' +
-        '<div class="nearby-cities feature content bubble hide"></div>' +
-        '<div class="download bubble">' +
-          '<h3>Event Summary</h3>' +
-          '<p><abbr title="Rich Text Format">RTF</abbr> document ' +
-            'containing earthquake details, images, plots and placeholders ' +
-            'for talking points and analysis. Any settings you tweak will be ' +
-            'reflected in the document.</p>' +
-          '<button id="download" disabled="disabled" type="button" ' +
-            'title="Disabled because some features have not finished ' +
-            'loading">Download</button>' +
-          '<p><strong>Microsoft Word</strong> is recommended for viewing the ' +
-            'summary</p>' +
-        '</div>' +
-        _getLinks() +
-        _getTectonic() +
-      '</div>',
-      _this.data.eq
-    );
-  };
-
-  /**
-   * Get the HTML template for the 'Tectonic Summary'.
+   * Get the HTML template for the 'Tectonic Summary' bubble.
    *
    * @return template {String}
    */
@@ -574,12 +626,12 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML content for the updated time.
+   * Get the HTML template for the updated time.
    *
    * @return {String}
    */
   _getUpdated = function () {
-    return L.Util.template(
+    return '' +
       '<li class="user updated">' +
         '<strong>Updated</strong>' +
         '<span>' +
@@ -595,150 +647,122 @@ var Mainshock = function (options) {
           '<em>{utcTime}</em>' +
         '</span>' +
         '<small>UTC</small>' +
-      '</li>',
-      _this.data
-    );
+      '</li>';
   };
 
   /**
    * Get the JSON feed's URL.
    *
-   * @return {String}
+   * @return url {String}
    */
   _getUrl = function () {
-    var eqid = AppUtil.getParam('eqid');
+    var eventid, url,
+        eqid = AppUtil.getParam('eqid');
 
-    return 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' + eqid +
-      '.geojson';
-  };
-
-  /**
-   * Initialize the Masonry layout plugin.
-   *
-   * @param el {Element}
-   * @param phase {String <interim|final>} default is 'interim'
-   */
-  _initMasonry = function (el, phase = 'interim') {
-    var duration = 0;
-
-    if (phase === 'final') {
-      duration = '.25s';
+    if (_this.id === 'mainshock') {
+      url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/' + eqid +
+        '.geojson';
+    } else { // double-difference MS
+      eventid = eqid.replace(/[A-Za-z]{0,2}(\d+)/, '$1');
+      url = location.origin + location.pathname + 'php/fdsn/search.json.php' +
+        `?eventid=${eventid}&format=text`;
     }
 
-    _masonry = new Masonry(el, {
-      columnWidth: 400,
-      gutter: 16,
-      itemSelector: '.bubble',
-      transitionDuration: duration
-    });
-
-    _masonry.phase = phase;
+    return url;
   };
 
   /**
-   * Open the tsunami web site.
+   * Event handler that creates the RTF document (which triggers a download).
+   *
+   * Note: the document gets created immediately or via Features.storeFeature()
+   * once all Features are ready.
    */
-  _openTsunami = function () {
+  _initDownload = function () {
+    var status = _app.Features.getStatus('rtf');
+
+    if (status === 'ready') {
+      _this.createRtf();
+    } else {
+      _app.Features.createFeatures('rtf');
+    }
+  };
+
+  /**
+   * Merge Comcat (_this.json) and Double-difference (_json) data.
+   *
+   * @return json {Object}
+   */
+  _mergeJson = function () {
+    var json = structuredClone(_this.json);
+
+    json.metadata = {
+      merged: true // flag as merged
+    };
+
+    Object.assign(json.geometry, _json.geometry);
+    Object.assign(json.properties, _json.properties);
+
+    return json;
+  };
+
+  /**
+   * Event handler that opens the tsunami web site.
+   *
+   * @param e {Event}
+   */
+  _openTsunami = function (e) {
+    e.preventDefault();
+
     open('https://www.tsunami.gov/', 'new');
   };
 
   /**
-   * Set the given Mainshock's title and default Settings, and update the
-   * Significant Earthquakes list.
+   * Remove event listeners.
+   */
+  _removeListeners = function () {
+    _download?.removeEventListener('click', _initDownload);
+    _earthquakes?.removeListeners();
+    _tsunami?.removeEventListener('click', _openTsunami);
+  };
+
+  /**
+   * Set _json so that it contains either ComCat data or merged ComCat/Double-
+   * difference data (i.e. when the DD catalog is selected).
    *
-   * @param id {String}
+   * Also store ComCat data in _this.json.
+   *
+   * @param json {Object}
+   *     ComCat or DD data
+   *
+   * @return isReady {Boolean}
    */
-  _setMainshock = function (id) {
-    var significantEqs = _app.Features.getFeature('significant-eqs');
+  _setJson = function (json) {
+    var catalog = 'comcat', // default
+        isReady = true; // default
 
-    document.body.classList.replace('loading', 'mainshock');
-
-    if (_app.Features.isFeature(significantEqs)) {
-      significantEqs.update(id);
+    if (json.metadata?.sourceUrl?.includes('ncedc')) {
+      catalog = 'dd';
     }
 
-    _app.SettingsBar.setValues();
-    _app.TitleBar.setTitle(_this);
-  };
-
-  /**
-   * Update the earthquake details 'strip' (on the SummaryPane) and 'balloon'
-   * (on the SelectBar) using the selected catalog's data.
-   */
-  _updateDetails = function () {
-    var balloon = document.querySelector('#select-bar .mainshock'),
-        mainshock = document.getElementById('mainshock'),
-        newBalloon = _earthquakes.getPopup(_this.data.eq),
-        newStrip = L.Util.template(_getStrip(), _this.data.eq),
-        products = document.querySelector('#summary-pane .mainshock .products'),
-        strip = document.querySelector('#summary-pane .mainshock .details');
-
-    _this.removeListeners();
-    balloon.remove();
-    strip.remove();
-
-    mainshock.insertAdjacentHTML('afterbegin', newBalloon);
-    products.insertAdjacentHTML('beforebegin', newStrip);
-    _this.addListeners();
-  };
-
-  /**
-   * Update the header: add and toggle the 'Double-difference' descriptor (on
-   * the SummaryPane) on/off depending on which catalog is selected.
-   */
-  _updateHeader = function () {
-    var header = document.querySelector('#summary-pane .mainshock h2'),
-        span = header.querySelector('span');
-
-    if (!span) {
-      header.innerHTML = '<span>Double-difference</span>' + header.innerText;
-      span = header.querySelector('span');
-    }
-
-    if (_this.data.eq.catalog === 'comcat') {
-      span.classList.add('hide');
+    if (catalog === 'comcat') {
+      _this.json = json;
     } else {
-      span.classList.remove('hide');
+      _json = json; // cache DD data for now
     }
-  };
 
-  /**
-   * Update the Markers using the selected catalog's data.
-   */
-  _updateMarkers = function () {
-    var div = document.createElement('div'),
-        eq = _this.data.eq,
-        fm = _app.Features.getFeature('focal-mechanism'),
-        marker = _this.mapLayer.getLayers()[0],
-        mt = _app.Features.getFeature('moment-tensor');
-
-    div.innerHTML = _earthquakes.getPopup(eq);
-
-    marker.setLatLng(eq.latLng);
-    marker.setPopupContent(div);
-    marker.setTooltipContent(_earthquakes.getTooltip(eq));
-
-    _earthquakes.updateListeners();
-
-    if (fm.mapLayer) {
-      fm.update(eq.latLng);
+    if (_this.id === 'mainshock') { // nothing to merge
+      _json = json;
+    } else if (!AppUtil.isEmpty(_this.json) && _json) { // both catalogs fetched
+      if (_json.metadata?.count === 0) { // DD data unavailable
+        _json = _this.json;
+      } else {
+        _json = _mergeJson();
+      }
+    } else { // still fetching data
+      isReady = false;
     }
-    if (mt.mapLayer) {
-      mt.update(eq.latLng);
-    }
-  };
 
-  /**
-   * Update (create new) Plots using the selected catalog's data.
-   */
-  _updatePlots = function () {
-    _this.plots.destroy(); // previous catalog's plots
-
-    _this.plots = Plots({
-      app: _app,
-      data: [_this.data.eq],
-      featureId: _this.id
-    });
+    return isReady;
   };
 
   // ----------------------------------------------------------
@@ -746,75 +770,32 @@ var Mainshock = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * Also set the selected Mainshock's parameters in the UI.
-   *
-   * @param json {Object} default is {}
+   * Add the Feature.
    */
-  _this.addData = function (json = {}) {
-    _earthquakes.addData(json);
+  _this.add = function () {
+    _app.MapPane.addFeature(_this);
+    _app.SummaryPane.addFeature(_this);
 
-    _this.data = _getData(json);
-    _this.content = _earthquakes.getPopup(_this.data.eq);
-    _this.plots = Plots({
-      app: _app,
-      data: [_this.data.eq],
-      featureId: _this.id
-    });
-    _this.summary = _getSummary();
-    _this.title = _this.data.eq.title;
-
-    _setMainshock(json.id);
-  };
-
-  /**
-   * Add the double-difference data and then update the Mainshock.
-   *
-   * @param data {Object}
-   */
-  _this.addDdData = function (data) {
-    _ddData = data;
-
-    _this.update('dd');
-  };
-
-  /**
-   * Add event listeners.
-   *
-   * Note: Leaflet map popup's listeners are added by the Earthquakes Class.
-   */
-  _this.addListeners = function () {
-    var selectors = [ // Lightboxes
-      '#mainshock .feature', // bubbles on SelectBar
-      '#map-pane .feature', // map's Beachballs
-      '#summary-pane .details .feature',
-      '#summary-pane .pager-exposures',
-      '#summary-pane .pager-loss',
-      '#summary-pane .thumbs .feature'
-    ];
-
-    _button = document.getElementById('download');
-    _els = document.querySelectorAll(selectors.join());
-    _tsunami = document.querySelector('#summary-pane li.tsunami');
-
-    // Create RTF Features (RTF document is created once all Features are ready)
-    _button.addEventListener('click', _createFeatures);
-
-    // Open a Lightbox
-    _els.forEach(el =>
-      el.addEventListener('click', _app.Features.showLightbox)
-    );
-
-    if (_tsunami) {
-      _tsunami.addEventListener('click', _openTsunami);
+    if (!_earthquakes) { // only fetch once
+      _fetch();
     }
-
-    _earthquakes.addListeners();
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Create the RTF Event Summary document if all RTF Features are ready.
+   */
+  _this.createRtf = function () {
+    var status = _app.Features.getStatus('rtf');
+
+    if (status === 'ready') {
+      Rtf({
+        app: _app
+      });
+    }
+  };
+
+  /**
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _destroy();
@@ -822,20 +803,20 @@ var Mainshock = function (options) {
     _initialize = null;
 
     _app = null;
-    _button = null;
-    _buttonTitle = null;
-    _ddData = null;
+    _download = null;
     _earthquakes = null;
-    _els = null;
+    _el = null;
     _json = null;
-    _masonry = null;
+    _note = null;
     _tsunami = null;
 
-    _addPlaceholders = null;
-    _createFeatures = null;
+    _addData = null;
+    _addListeners = null;
+    _addSubFeatures = null;
     _destroy = null;
-    _enableDownload = null;
+    _fetch = null;
     _getBubbles = null;
+    _getContent = null;
     _getData = null;
     _getDyfi = null;
     _getEq = null;
@@ -846,108 +827,96 @@ var Mainshock = function (options) {
     _getShakeAlert = null;
     _getShakeMap = null;
     _getStrip = null;
-    _getSummary = null;
     _getTectonic = null;
     _getText = null;
     _getUpdated = null;
     _getUrl = null;
-    _initMasonry = null;
+    _initDownload = null;
+    _mergeJson = null;
     _openTsunami = null;
-    _setMainshock = null;
-    _updateDetails = null;
-    _updateHeader = null;
-    _updateMarkers = null;
-    _updatePlots = null;
+    _removeListeners = null;
+    _setJson = null;
 
     _this = null;
   };
 
   /**
-   * Disable the download RTF button.
+   * Disable the RTF download button.
    */
   _this.disableDownload = function () {
-    if (_button) {
-      _button.setAttribute('disabled', 'disabled');
+    if (_download) {
+      _download.setAttribute('disabled', 'disabled');
 
-      if (_buttonTitle) {
-        _button.setAttribute('title', _buttonTitle);
+      if (_note) {
+        _download.setAttribute('title', _note);
       }
     }
   };
 
   /**
-   * Remove event listeners.
+   * Enable the RTF download button.
    */
-  _this.removeListeners = function () {
-    if (_button) {
-      _button.removeEventListener('click', _createFeatures);
-    }
+  _this.enableDownload = function () {
+    if (_download) {
+      _note = _download.getAttribute('title'); // cache initial value
 
-    if (_els) {
-      _els.forEach(el =>
-        el.removeEventListener('click', _app.Features.showLightbox)
-      );
+      _download.removeAttribute('disabled');
+      _download.setAttribute('title', 'Download RTF Document');
     }
-
-    if (_tsunami) {
-      _tsunami.removeEventListener('click', _openTsunami);
-    }
-
-    _earthquakes.removeListeners();
   };
 
   /**
-   * Configure/update Masonry layout; enable the download button.
-   *
-   * @param status {String} default is ''
+   * Remove the Feature.
    */
-  _this.render = function (status = '') {
-    var images,
-        el = document.querySelector('.mainshock .products');
+  _this.remove = function () {
+    _removeListeners();
+    _app.MapPane.removeFeature(_this);
+    _app.SummaryPane.removeFeature(_this);
+    _el.classList.add('hide');
 
-    if (!_masonry) {
-      images = ImagesLoaded(el);
+    _el.innerHTML = '';
+  };
 
-      _initMasonry(el);
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is {}
+   */
+  _this.render = function (json = {}) {
+    var header,
+        catalog = AppUtil.getParam('catalog'),
+        isReady = true; // default
 
-      images.on('progress', () => {
-        _masonry.layout(); // update layout as images load
-      });
-    }
+    if (!AppUtil.isEmpty(json)) { // initial render
+      isReady = _setJson(json);
 
-    if (status === 'ready') {
-      _enableDownload();
+      if (isReady) {
+        _this.status = 'ready';
 
-      if (_masonry.phase === 'interim') {
-        // Masonry API doesn't allow changing settings; create a new instance
-        _masonry.destroy();
-        _initMasonry(el, 'final');
+        _addData();
+        _app.SettingsBar.setValues();
+        document.body.classList.replace('loading', 'mainshock');
+      } else {
+        _this.status = 'loading'; // still loading either ComCat or DD data
       }
-    } else {
-      _masonry.layout(); // update layout
-    }
-  };
-
-  /**
-   * Update the content to display the given catalog's data (i.e. depth,
-   * location, magnitude, and time).
-   *
-   * @param catalog {String <comcat|dd>}
-   */
-  _this.update = function (catalog) {
-    _this.data.eq = _getEq(); // default (ComCat data)
-
-    if (catalog === 'dd') {
-      Object.assign(_this.data.eq, _ddData); // replace with DD data
     }
 
-    _this.title = _this.data.eq.title;
-    _app.TitleBar.setTitle(_this);
+    if (isReady) {
+      _el.innerHTML = _earthquakes.getPopup(_this.data.eq);
 
-    _updateDetails();
-    _updateHeader();
-    _updateMarkers();
-    _updatePlots();
+      _el.classList.remove('hide');
+      _app.MapPane.addContent(_this);
+      _app.SummaryPane.addContent(_this);
+      _app.TitleBar.setTitle(_this);
+      _addListeners();
+      _addSubFeatures();
+
+      if (catalog === 'dd' && _json.metadata?.merged) {
+        header = document.querySelector('#summary-pane .dd-mainshock h2');
+
+        header.classList.add('dd');
+      }
+    }
   };
 
 

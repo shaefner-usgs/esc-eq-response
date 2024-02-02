@@ -6,7 +6,8 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the PAGER Exposures Feature, a sub-Feature of the Mainshock.
+ * Create the PAGER Exposures Feature, a sub-Feature of the Mainshock (and
+ * co-Feature of PAGER Cities).
  *
  * @param options {Object}
  *     {
@@ -15,13 +16,13 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
+ *       content: {String}
  *       data: {Object}
  *       dependencies: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String)
- *       summary: {String}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -32,9 +33,9 @@ var PagerExposures = function (options) {
       _app,
 
       _fetch,
+      _getContent,
       _getData,
       _getRows,
-      _getSummary,
       _getUrl;
 
 
@@ -43,11 +44,11 @@ var PagerExposures = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
+    _this.content = '';
     _this.data = {};
     _this.dependencies = ['pager-cities'];
     _this.id = 'pager-exposures';
     _this.name = 'PAGER Exposures';
-    _this.summary = '';
     _this.url = _getUrl();
 
     _fetch();
@@ -63,6 +64,37 @@ var PagerExposures = function (options) {
         feature: _this
       });
     }
+  };
+
+  /**
+   * Get the HTML content for the SummaryPane.
+   *
+   * @return html {String}
+   */
+  _getContent = function () {
+    var rows = _getRows(),
+        html = '';
+
+    if (rows) {
+      html =
+        '<h3>Population Exposure</h3>' +
+        '<table class="exposures">' +
+          '<thead>' +
+            '<tr>' +
+              '<th>' +
+                '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
+              '</th>' +
+              '<th>Selected Cities</th>' +
+              '<th>Population</th>' +
+            '<tr>' +
+          '</thead>' +
+          '<tbody>' +
+            rows +
+          '</tbody>' +
+        '</table>';
+    }
+
+    return html;
   };
 
   /**
@@ -144,43 +176,12 @@ var PagerExposures = function (options) {
   };
 
   /**
-   * Get the HTML content for the SummaryPane.
-   *
-   * @return html {String}
-   */
-  _getSummary = function () {
-    var rows = _getRows(),
-        html = '';
-
-    if (rows) {
-      html =
-        '<h3>Population Exposure</h3>' +
-        '<table class="exposures">' +
-          '<thead>' +
-            '<tr>' +
-              '<th>' +
-                '<abbr title="Modified Mercalli Intensity">MMI</abbr>' +
-              '</th>' +
-              '<th>Selected Cities</th>' +
-              '<th>Population</th>' +
-            '<tr>' +
-          '</thead>' +
-          '<tbody>' +
-            rows +
-          '</tbody>' +
-        '</table>';
-    }
-
-    return html;
-  };
-
-  /**
    * Get the JSON feed's URL.
    *
    * @return url {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         product = mainshock.data.eq.products?.losspager || [],
         contents = product[0]?.contents || {},
         url = '';
@@ -197,17 +198,7 @@ var PagerExposures = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
-   */
-  _this.addData = function (json = {}) {
-    _this.data = _getData(json);
-    _this.summary = _getSummary();
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -215,12 +206,26 @@ var PagerExposures = function (options) {
     _app = null;
 
     _fetch = null;
+    _getContent = null;
     _getData = null;
     _getRows = null;
-    _getSummary = null;
     _getUrl = null;
 
     _this = null;
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is {}
+   */
+  _this.render = function (json = {}) {
+    if (AppUtil.isEmpty(_this.data)) { // initial render
+      _this.data = _getData(json);
+      _this.content = _getContent();
+    }
+
+    _app.SummaryPane.addContent(_this);
   };
 
 

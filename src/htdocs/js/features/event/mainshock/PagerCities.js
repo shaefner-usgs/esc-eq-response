@@ -6,7 +6,8 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the PAGER Cities Feature, a co-Feature of PAGER Exposures.
+ * Create the PAGER Cities Feature, a sub-Feature of the Mainshock (and
+ * co-Feature of PAGER Exposures).
  *
  * @param options {Object}
  *     {
@@ -15,11 +16,11 @@ var AppUtil = require('util/AppUtil');
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
  *       data: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String)
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -107,7 +108,7 @@ var PagerCities = function (options) {
    * @return url {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         product = mainshock.data.eq.products?.losspager || [],
         contents = product[0]?.contents || {},
         url = '';
@@ -124,16 +125,7 @@ var PagerCities = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
-   */
-  _this.addData = function (json = {}) {
-    _this.data = _getData(json);
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -146,6 +138,17 @@ var PagerCities = function (options) {
     _getUrl = null;
 
     _this = null;
+  };
+
+  /**
+   * Add the JSON feed data (nothing to render).
+   *
+   * @param json {Object} default is {}
+   */
+  _this.render = function (json = {}) {
+    if (_this.data.length === 0) { // initial 'render'
+      _this.data = _getData(json);
+    }
   };
 
 

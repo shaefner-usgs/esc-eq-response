@@ -234,7 +234,7 @@ var BeachBalls = function (options) {
       dataSource: _data['beachball-source'] || _data.source,
       depth: AppUtil.round(depth, 1) + ' km',
       halfDuration: halfDuration || '–',
-      isoTime: _data.datetime.toUTC().toISO() || '',
+      isoTime: _data.datetime.toUTC().toISO(),
       magType: _data['derived-magnitude-type'] || '',
       magnitude: AppUtil.round(_tensor.magnitude, 2),
       moment: moment,
@@ -311,7 +311,7 @@ var BeachBalls = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -379,12 +379,7 @@ var BeachBalls = function (options) {
         '<dl class="props">' +
           '<dt>Status</dt>' +
           '<dd class="status">{status}</dd>' +
-          '<dt>Updated</dt>' +
-          '<dd>' +
-            '<time datetime="{isoTime}" class="user">{userTime} ' +
-              '(UTC{utcOffset})</time>' +
-            '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
-          '</dd>' +
+          _app.Features.getTimeStamp(_this.data) +
         '</dl>' +
       '</div>' +
       '<div class="beachball"></div>',

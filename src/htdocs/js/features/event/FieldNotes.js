@@ -23,21 +23,20 @@ var _DEFAULTS = {
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       showLayer: {Boolean}
  *     }
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
- *       addListeners: {Function}
+ *       add: {Function}
  *       count: {Integer}
  *       destroy: {Function}
  *       id: {String}
- *       mapLayer: {Mixed <L.FeatureGroup|null>}
+ *       lightbox: {Mixed <Object|null>}
+ *       mapLayer: {Mixed <L.GeoJSON|null>}
  *       name: {String}
- *       removeListeners: {Function}
+ *       remove: {Function}
+ *       render: {Function}
  *       showLayer: {Boolean}
- *       status: {Mixed <String|null>}
  *       url: {String}
  *       zoomToLayer: {Boolean}
  *     }
@@ -47,11 +46,12 @@ var FieldNotes = function (options) {
       _initialize,
 
       _app,
-      _lightbox,
+      _legendItem,
       _markerOptions,
 
+      _addListeners,
       _addPopupListeners,
-      _configure,
+      _fetch,
       _getList,
       _getPopup,
       _getUrl,
@@ -59,6 +59,7 @@ var FieldNotes = function (options) {
       _onPopupClose,
       _onPopupOpen,
       _pointToLayer,
+      _removeListeners,
       _removePopupListeners,
       _showLightbox,
       _toggleProps,
@@ -71,17 +72,18 @@ var FieldNotes = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _app = options.app;
+    _legendItem = document.querySelector('#legend-bar .fieldnotes');
 
     _this.count = 0;
     _this.id = 'fieldnotes';
+    _this.lightbox = null;
     _this.mapLayer = null;
     _this.name = 'Fieldnotes';
-    _this.showLayer = options.showLayer;
-    _this.status = null;
-    _this.url = _getUrl();
+    _this.showLayer = true;
+    _this.url = '';
     _this.zoomToLayer = false;
 
-    // Only the 2014 Napa quake has FieldNotes data; skip for all other events
+    // Only the 2014 Napa quake has FieldNotes data
     if (AppUtil.getParam('eqid') === 'nc72282711') {
       _markerOptions = {
         icon: L.icon({
@@ -96,14 +98,20 @@ var FieldNotes = function (options) {
         pane: _this.id // controls stacking order
       };
 
-      _this.mapLayer = L.geoJSON.async(_this.url, {
-        app: _app,
-        feature: _this,
-        onEachFeature: _onEachFeature,
-        pointToLayer: _pointToLayer
+      _this.mapLayer = L.geoJSON();
+      _this.url = _getUrl();
+    }
+  };
+
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    if (_this.mapLayer) {
+      _this.mapLayer.on({
+        popupopen: _onPopupOpen,
+        popupclose: _onPopupClose
       });
-    } else {
-      _this.status = 'ready'; // no data to fetch
     }
   };
 
@@ -119,29 +127,27 @@ var FieldNotes = function (options) {
     if (photo) {
       photo.addEventListener('click', _showLightbox);
     }
+
     if (toggle) {
       toggle.addEventListener('click', _toggleProps);
     }
   };
 
   /**
-   * Add the Feature's Lightbox and show its legend item.
-   *
-   * Note: the legend item is subsequently hidden by LegendBar.reset().
+   * Fetch the feed data.
    */
-  _configure = function () {
-    var legend = document.querySelector('#legend-bar .fieldnotes');
-
-    if (_this.count !== 0) {
-      _lightbox = Lightbox({id: _this.id});
-
-      legend.classList.remove('hide');
-    }
+  _fetch = function () {
+    _this.mapLayer = L.geoJSON.async(_this.url, {
+      app: _app,
+      feature: _this,
+      onEachFeature: _onEachFeature,
+      pointToLayer: _pointToLayer
+    });
   };
 
   /**
-   * Get the HTML content for the 'Additional properties' list. These are the
-   * props that vary based on the observation type.
+   * Get the HTML content for the "Additional properties" list, which varies
+   * based on the observation type.
    *
    * @param props {Object}
    *
@@ -174,7 +180,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Get the Leaflet Popup content for a Marker.
+   * Get the HTML content for a marker's Popup.
    *
    * @param data {Object}
    *
@@ -214,7 +220,7 @@ var FieldNotes = function (options) {
    * @return {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         datetime = mainshock.data.eq.datetime,
         after = datetime.plus({ seconds: 1 }).toSeconds(),
         before = datetime.plus({ days: 30 }).toSeconds(),
@@ -224,7 +230,7 @@ var FieldNotes = function (options) {
           between: after + ',' + before,
           lat: coords[1],
           lon: coords[0],
-          radius: document.getElementById('as-dist').value // Aftershocks
+          radius: document.getElementById('as-distance').value // Aftershocks
         };
 
     Object.keys(params).forEach(key =>
@@ -244,7 +250,7 @@ var FieldNotes = function (options) {
   _onEachFeature = function (feature, layer) {
     var props = feature.properties;
 
-    // Strip slashes from JSON encoded values
+    // Strip slashes from JSON-encoded values
     Object.keys(props).forEach(key =>
       props[key] = AppUtil.stripslashes(props[key])
     );
@@ -288,15 +294,17 @@ var FieldNotes = function (options) {
       content = `<img src="${imgSrc}" alt="enlarged photo">`;
       image = new Image();
 
-      _lightbox.setContent(content).setTitle(props.title);
+      _this.lightbox.setContent(content).setTitle(props.title);
 
       image.src = imgSrc;
+      // TODO: handle load errors gracefully
+      image.onerror = () => console.error('error loading image');
       image.onload = () => _updatePopup(e.popup);
     }
   };
 
   /**
-   * Create Leaflet markers.
+   * Create Leaflet Markers.
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -305,6 +313,18 @@ var FieldNotes = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     return L.marker(latlng, _markerOptions);
+  };
+
+  /**
+   * Remove event listeners.
+   */
+  _removeListeners = function () {
+    if (_this.mapLayer) {
+      _this.mapLayer.off({
+        popupopen: _onPopupOpen,
+        popupclose: _onPopupClose
+      });
+    }
   };
 
   /**
@@ -332,11 +352,11 @@ var FieldNotes = function (options) {
   _showLightbox = function (e) {
     e.preventDefault();
 
-    _lightbox.show();
+    _this.lightbox.show();
   };
 
   /**
-   * Event handler that shows/hides additional properties.
+   * Event handler that toggles the additional properties.
    *
    * @param e {Event}
    */
@@ -351,7 +371,7 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Pan map to contain Popup after the image loads.
+   * Pan map to contain a Popup after its image loads.
    *
    * Note: listeners must be removed and re-added.
    *
@@ -370,44 +390,31 @@ var FieldNotes = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
+   * Add the Feature.
    */
-  _this.addData = function (json = {}) {
-    _this.count = json.features.length;
+  _this.add = function () {
+    _app.MapPane.addFeature(_this);
 
-    _configure();
-  };
-
-  /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    if (_this.mapLayer) {
-      _this.mapLayer.on({
-        popupopen: _onPopupOpen,
-        popupclose: _onPopupClose
-      });
+    if (_this.url) {
+      _fetch();
     }
   };
 
   /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
-    if (_lightbox) {
-      _lightbox.destroy();
-    }
+    _this.lightbox?.destroy();
 
     _initialize = null;
 
     _app = null;
-    _lightbox = null;
+    _legendItem = null;
     _markerOptions = null;
 
+    _addListeners = null;
     _addPopupListeners = null;
-    _configure = null;
+    _fetch = null;
     _getList = null;
     _getPopup = null;
     _getUrl = null;
@@ -415,6 +422,7 @@ var FieldNotes = function (options) {
     _onPopupClose = null;
     _onPopupOpen = null;
     _pointToLayer = null;
+    _removeListeners = null;
     _removePopupListeners = null;
     _showLightbox = null;
     _toggleProps = null;
@@ -424,15 +432,31 @@ var FieldNotes = function (options) {
   };
 
   /**
-   * Remove event listeners.
+   * Remove the Feature.
    */
-  _this.removeListeners = function () {
-    if (_this.mapLayer) {
-      _this.mapLayer.off({
-        popupopen: _onPopupOpen,
-        popupclose: _onPopupClose
-      });
-    }
+  _this.remove = function () {
+    _app.MapPane.removeFeature(_this);
+    _removeListeners();
+
+    _legendItem.classList.add('hide');
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} default is {}
+   */
+  _this.render = function (json = {}) {
+    _this.count = json.features?.length || 0;
+    _this.lightbox = Lightbox({
+      id: _this.id
+    }).render();
+
+    _this.mapLayer.addData(json);
+    _app.MapPane.addContent(_this);
+    _addListeners();
+
+    _legendItem.classList.remove('hide');
   };
 
 

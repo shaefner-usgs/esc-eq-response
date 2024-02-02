@@ -3,7 +3,7 @@
 
 
 /**
- * Create the Nearby Cities Feature.
+ * Create the Nearby Cities Feature, a sub-Feature of the Mainshock.
  *
  * @param options {Object}
  *     {
@@ -12,12 +12,12 @@
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
+ *       content: {String}
  *       data: {Array}
  *       destroy: {Function}
  *       id: {String}
  *       name: {String}
- *       summary: {String}
+ *       render: {Function}
  *       url: {String}
  *     }
  */
@@ -29,8 +29,8 @@ var NearbyCities = function (options) {
 
       _compare,
       _fetch,
+      _getContent,
       _getData,
-      _getSummary,
       _getUrl;
 
 
@@ -39,10 +39,10 @@ var NearbyCities = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
 
+    _this.content = '';
     _this.data = [];
     _this.id = 'nearby-cities';
     _this.name = 'Nearby Cities';
-    _this.summary = '';
     _this.url = _getUrl();
 
     _fetch();
@@ -78,28 +78,11 @@ var NearbyCities = function (options) {
   };
 
   /**
-   * Get the data used to create the content.
-   *
-   * @param json {Array}
-   *
-   * @return data {Array}
-   */
-  _getData = function (json) {
-    var data = [];
-
-    if (Array.isArray(json)) {
-      data = json.sort(_compare);
-    }
-
-    return data;
-  };
-
-  /**
    * Get the HTML content for the SummaryPane.
    *
    * @return html {String}
    */
-  _getSummary = function () {
+  _getContent = function () {
     var html = '',
         lis = '';
 
@@ -117,12 +100,29 @@ var NearbyCities = function (options) {
   };
 
   /**
+   * Get the data used to create the content.
+   *
+   * @param json {Array}
+   *
+   * @return data {Array}
+   */
+  _getData = function (json) {
+    var data = [];
+
+    if (Array.isArray(json)) {
+      data = json.sort(_compare);
+    }
+
+    return data;
+  };
+
+  /**
    * Get the JSON feed's URL.
    *
    * @return url {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         product = mainshock.data.eq.products?.['nearby-cities'] || [],
         contents = product[0]?.contents || {},
         url = '';
@@ -139,17 +139,7 @@ var NearbyCities = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is []
-   */
-  _this.addData = function (json = []) {
-    _this.data = _getData(json);
-    _this.summary = _getSummary();
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _initialize = null;
@@ -158,11 +148,25 @@ var NearbyCities = function (options) {
 
     _compare = null;
     _fetch = null;
+    _getContent = null;
     _getData = null;
-    _getSummary = null;
     _getUrl = null;
 
     _this = null;
+  };
+
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is []
+   */
+  _this.render = function (json = []) {
+    if (_this.data.length === 0) { // initial render
+      _this.data = _getData(json);
+      _this.content = _getContent();
+    }
+
+    _app.SummaryPane.addContent(_this);
   };
 
 

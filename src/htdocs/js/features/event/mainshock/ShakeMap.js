@@ -3,6 +3,7 @@
 
 
 var AppUtil = require('util/AppUtil'),
+    Lightbox = require('util/Lightbox'),
     Luxon = require('luxon'),
     RadioBar = require('util/controls/RadioBar');
 
@@ -17,14 +18,11 @@ var AppUtil = require('util/AppUtil'),
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
- *       addListeners: {Function}
  *       data: {Object}
  *       destroy: {Function}
  *       id: {String}
- *       lightbox: {String}
+ *       lightbox: {Mixed <Object|null>}
  *       name: {String}
- *       removeListeners: {Function}
  *       render: {Function}
  *       url: {String}
  *     }
@@ -39,13 +37,13 @@ var ShakeMap = function (options) {
       _radioBar,
       _selected,
 
-      _addBubble,
       _compare,
       _destroy,
       _fetch,
+      _getBubble,
+      _getContent,
       _getData,
       _getImages,
-      _getLightbox,
       _getMotions,
       _getRadioBar,
       _getStatus,
@@ -58,43 +56,24 @@ var ShakeMap = function (options) {
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _mainshock = _app.Features.getFeature('mainshock');
+    _mainshock = _app.Features.getMainshock();
     _product = _mainshock.data.eq.products?.shakemap?.[0] || {};
 
     _this.data = {};
     _this.id = 'shakemap';
-    _this.lightbox = '';
+    _this.lightbox = null;
     _this.name = 'ShakeMap';
     _this.url = _getUrl();
 
     if (_this.url) {
       _fetch();
-    } else if (!AppUtil.isEmpty(_product)) { // has ShakeMap, but no feed data
-      _this.data = _getData();
-      _this.lightbox = _getLightbox();
-
-      _app.Features.addContent(_this); // add manually
+    } else if (!AppUtil.isEmpty(_product)) {
+      _this.render(); // no feed data => render immediately
     }
   };
 
   /**
-   * Add the intensity bubble to the Lightbox's title.
-   */
-  _addBubble = function () {
-    var bubble = L.Util.template(
-          '<a href="{url}" class="mmi{mmiValue} impact-bubble" target="new" ' +
-            'title="Maximum estimated intensity">' +
-            '<strong class="roman">{mmiValue}</strong>' +
-          '</a>',
-          _this.data
-        ),
-        h3 = document.getElementById(_this.id).querySelector('h3');
-
-    h3.innerHTML = _this.name + bubble;
-  };
-
-  /**
-   * Comparison function to sort the Array of images by their id values (ASC).
+   * Comparison function to sort images by their id value (ASC).
    *
    * @params a, b {Objects}
    *
@@ -115,12 +94,8 @@ var ShakeMap = function (options) {
    * Destroy this Feature's sub-Classes.
    */
   _destroy = function () {
-    if (_this.lightbox) {
-      _app.Features.getLightbox(_this.id).destroy();
-    }
-    if (_radioBar) {
-      _radioBar.destroy();
-    }
+    _this.lightbox?.destroy();
+    _radioBar?.destroy();
   };
 
   /**
@@ -134,15 +109,83 @@ var ShakeMap = function (options) {
   };
 
   /**
+   * Get the HTML content for the external link bubble.
+   *
+   * @return {String}
+   */
+  _getBubble = function () {
+    return L.Util.template(
+      '<a href="{url}" class="mmi{mmiValue} impact-bubble" target="new" ' +
+        'title="Maximum estimated intensity">' +
+        '<strong class="roman">{mmiValue}</strong>' +
+      '</a>',
+      _this.data
+    );
+  };
+
+  /**
+   * Get the HTML content for the Lightbox.
+   *
+   * @return {String}
+   */
+  _getContent = function () {
+    var images = _getImages(),
+        imgs = '';
+
+    images.forEach(image => {
+      imgs += `<img src="${image.url}" alt="ShakeMap ${image.name}" ` +
+        `class="mmi{mmiValue} ${image.id} option">`;
+    });
+
+    return L.Util.template(
+      '<div class="wrapper">' +
+        '<div class="images">' +
+          _getRadioBar(images) +
+          imgs +
+        '</div>' +
+        '<div class="details">' +
+          '<dl class="props alt">' +
+            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
+            '<dd>{mmi}</dd>' +
+            '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
+            '<dd>{pga}</dd>' +
+            '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
+            '<dd>{pgv}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA ' +
+              '<em>(0.3s)</em></abbr></dt>' +
+            '<dd>{sa03}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA ' +
+              '<em>(1.0s)</em></abbr></dt>' +
+            '<dd>{sa10}</dd>' +
+            '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA ' +
+              '<em>(3.0s)</em></abbr></dt>' +
+            '<dd>{sa30}</dd>' +
+            '<dt class="stations">Seismic Stations</dt>' +
+            '<dd class="stations">{seismic}</dd>' +
+            '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
+            '<dd>{dyfi}</dd>' +
+          '</dl>' +
+        '</div>' +
+      '</div>' +
+      '<dl class="props">' +
+        '<dt>Status</dt>' +
+        '<dd class="status">{status}</dd>' +
+        _app.Features.getTimeStamp(_this.data) +
+      '</dl>',
+      _this.data
+    );
+  };
+
+  /**
    * Get the data used to create the content.
    *
-   * @param json {Object} default is {}
+   * @param json {Object}
    *
    * @return {Object}
    */
-  _getData = function (json = {}) {
-    var millis = Number(_product.updateTime) || 0,
-        datetime = Luxon.DateTime.fromMillis(millis),
+  _getData = function (json) {
+    var millisecs = Number(_product.updateTime) || 0,
+        datetime = Luxon.DateTime.fromMillis(millisecs),
         eq = _mainshock.data.eq,
         info = json.input?.event_information || {},
         motions = _getMotions(json);
@@ -150,7 +193,7 @@ var ShakeMap = function (options) {
     return Object.assign(motions, {
       dyfi: Number(info.intensity_observations) || '–',
       img: eq.shakemapImg,
-      isoTime: datetime.toUTC().toISO() || '',
+      isoTime: datetime.toUTC().toISO(),
       mmiValue: eq.mmi,
       seismic: Number(info.seismic_stations) || '–',
       status: _getStatus(),
@@ -209,66 +252,7 @@ var ShakeMap = function (options) {
   };
 
   /**
-   * Get the HTML content for the Lightbox.
-   *
-   * @return {String}
-   */
-  _getLightbox = function () {
-    var images = _getImages(),
-        imgs = '',
-        radioBar = _getRadioBar(images);
-
-    images.forEach(image => {
-      imgs += `<img src="${image.url}" alt="ShakeMap ${image.name}" ` +
-        `class="mmi{mmiValue} ${image.id} option">`;
-    });
-
-    return L.Util.template(
-      '<div class="wrapper">' +
-        '<div class="images">' +
-          radioBar +
-          imgs +
-        '</div>' +
-        '<div class="details">' +
-          '<dl class="props alt">' +
-            '<dt>Max <abbr title="Modified Mercalli Intensity">MMI</abbr></dt>' +
-            '<dd>{mmi}</dd>' +
-            '<dt>Max <abbr title="Peak Ground Acceleration">PGA</abbr></dt>' +
-            '<dd>{pga}</dd>' +
-            '<dt>Max <abbr title="Peak Ground Velocity">PGV</abbr></dt>' +
-            '<dd>{pgv}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 0.3s">SA ' +
-              '<em>(0.3s)</em></abbr></dt>' +
-            '<dd>{sa03}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 1.0s">SA ' +
-              '<em>(1.0s)</em></abbr></dt>' +
-            '<dd>{sa10}</dd>' +
-            '<dt>Max <abbr title="Spectral acceleration at 3.0s">SA ' +
-              '<em>(3.0s)</em></abbr></dt>' +
-            '<dd>{sa30}</dd>' +
-            '<dt class="stations">Seismic Stations</dt>' +
-            '<dd class="stations">{seismic}</dd>' +
-            '<dt><abbr title="Did You Feel It?">DYFI?</abbr> Stations</dt>' +
-            '<dd>{dyfi}</dd>' +
-          '</dl>' +
-        '</div>' +
-      '</div>' +
-      '<dl class="props">' +
-        '<dt>Status</dt>' +
-        '<dd class="status">{status}</dd>' +
-        '<dt>Updated</dt>' +
-        '<dd>' +
-          '<time datetime="{isoTime}" class="user">{userTime} ' +
-            '(UTC{utcOffset})</time>' +
-          '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
-        '</dd>' +
-      '</dl>',
-      _this.data
-    );
-  };
-
-  /**
-   * Get the ground motion data formatted for display.
+   * Get the ground motion data, formatted for display.
    *
    * @param json {Object}
    *
@@ -298,7 +282,7 @@ var ShakeMap = function (options) {
   };
 
   /**
-   * Create and get the HTML for the RadioBar.
+   * Get the HTML content for the RadioBar.
    *
    * @param images {Array}
    *
@@ -310,11 +294,10 @@ var ShakeMap = function (options) {
     if (images.length > 1) {
       _radioBar = RadioBar({
         id: 'shakemap-images',
-        items: images,
-        selected: _selected
+        items: images
       });
 
-      html = _radioBar.getHtml();
+      html = _radioBar.getContent();
     }
 
     return html;
@@ -398,29 +381,10 @@ var ShakeMap = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
-   */
-  _this.addData = function (json = {}) {
-    _this.data = _getData(json);
-    _this.lightbox = _getLightbox();
-  };
-
-  /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    // Display the selected image
-    if (_radioBar) {
-      _radioBar.addListeners(document.getElementById('shakemap-images'));
-    }
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
+    _radioBar?.removeListeners();
     _destroy();
 
     _initialize = null;
@@ -431,13 +395,13 @@ var ShakeMap = function (options) {
     _radioBar = null;
     _selected = null;
 
-    _addBubble = null;
     _compare = null;
     _destroy = null;
     _fetch = null;
+    _getBubble = null;
+    _getContent = null;
     _getData = null;
     _getImages = null;
-    _getLightbox = null;
     _getMotions = null;
     _getRadioBar = null;
     _getStatus = null;
@@ -449,23 +413,27 @@ var ShakeMap = function (options) {
   };
 
   /**
-   * Remove event listeners.
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is {}
    */
-  _this.removeListeners = function () {
-    if (_radioBar) {
-      _radioBar.removeListeners();
+  _this.render = function (json = {}) {
+    if (AppUtil.isEmpty(_this.data)) { // initial render
+      _this.data = _getData(json);
+    } else {
+      _radioBar?.removeListeners();
+      _this.lightbox?.destroy();
     }
-  };
 
-  /**
-   * Add the bubble and set the selected RadioBar option.
-   */
-  _this.render = function () {
-    _addBubble();
+    _this.lightbox = Lightbox({
+      content: _getContent(),
+      id: _this.id,
+      targets: document.querySelectorAll('.shakemap.feature'),
+      title: _this.name + _getBubble()
+    }).render();
 
-    if (_radioBar) {
-      _radioBar.setOption(document.getElementById(_selected));
-    }
+    _radioBar?.addListeners(document.getElementById('shakemap-images'));
+    _radioBar?.setOption(document.getElementById(_selected));
   };
 
 

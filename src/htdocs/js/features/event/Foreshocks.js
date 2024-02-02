@@ -1,3 +1,4 @@
+/* global L */
 'use strict';
 
 
@@ -6,36 +7,38 @@ var AppUtil = require('util/AppUtil'),
     Summary = require('features/util/earthquakes/Summary');
 
 
+var _DEFAULTS = {
+  isRefreshing: false
+};
+
+
 /**
  * Create the Foreshocks Feature.
  *
  * @param options {Object}
  *     {
  *       app: {Object} Application
- *       magThreshold: {Integer} optional
- *       showLayer: {Boolean}
- *       sortField: {String} optional
- *       sortOrder: {String} optional
- *       zoomToLayer: {Boolean}
+ *       isRefreshing: {Boolean} optional
  *     }
  *
  * @return _this {Object}
  *     {
- *       addData: {Function}
- *       addListeners: {Function}
- *       bins: {Object}
+ *       add: {Function}
+ *       content: {String}
  *       count: {Integer}
- *       data: {Array}
+ *       data: {Object}
  *       description: {String}
  *       destroy: {Function}
  *       id: {String}
- *       mapLayer: {L.FeatureGroup}
+ *       mapLayer: {L.GeoJSON}
  *       name: {String}
  *       params: {Object}
  *       placeholder: {String}
- *       removeListeners: {Function}
+ *       remove: {Function}
+ *       render: {Function}
  *       showLayer: {Boolean}
- *       summary: {String}
+ *       summary: {Object}
+ *       type: {String}
  *       url: {String}
  *       zoomToLayer: {Boolean}
  *     }
@@ -46,60 +49,128 @@ var Foreshocks = function (options) {
 
       _app,
       _earthquakes,
-      _summary,
-      _summaryOpts,
 
+      _addData,
+      _addListeners,
       _destroy,
+      _fetch,
+      _getDescription,
       _getPlaceholder,
-      _getUrl;
+      _getUrl,
+      _removeListeners;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
+    var catalog = AppUtil.getParam('catalog');
+
+    options = Object.assign({}, _DEFAULTS, options);
+
     _app = options.app;
 
-    _this.id = 'foreshocks';
-    _this.name = 'Foreshocks';
     _this.params = {
       days: Number(document.getElementById('fs-days').value),
-      distance: Number(document.getElementById('fs-dist').value),
-      magnitude: Number(document.getElementById('fs-mag').value)
+      distance: Number(document.getElementById('fs-distance').value),
+      magnitude: Number(document.getElementById('fs-magnitude').value)
     };
-    _this.showLayer = options.showLayer;
-    _this.summary = '';
+    _this.content = '';
+    _this.count = 0;
+    _this.data = {};
+    _this.description = _getDescription(catalog);
+    _this.id = 'foreshocks';
+    _this.mapLayer = L.geoJSON();
+    _this.name = 'Foreshocks';
+    _this.placeholder = _getPlaceholder();
+    _this.showLayer = true;
+    _this.summary = {};
+    _this.type = _this.id;
     _this.url = _getUrl();
-    _this.zoomToLayer = options.zoomToLayer;
+    _this.zoomToLayer = true;
 
-    if (AppUtil.getParam('catalog') === 'dd') {
+    if (catalog === 'dd') {
       _this.id = 'dd-foreshocks';
     }
 
-    _earthquakes = Earthquakes({ // fetch feed data
+    if (options.isRefreshing) {
+      _fetch();
+    }
+  };
+
+  /**
+   * Add the JSON data and set properties that depend on it.
+   *
+   * @param json {Object}
+   */
+  _addData = function (json) {
+    _earthquakes.addData(json);
+
+    _this.count = _earthquakes.data.eqs.length;
+    _this.data = _earthquakes.data;
+    _this.mapLayer = _earthquakes.mapLayer;
+    _this.summary = Summary({
       app: _app,
       feature: _this
     });
-    _summaryOpts = Object.assign({}, options, {
-      earthquakes: _earthquakes,
-      featureId: _this.id
-    });
+    _this.content = _this.summary.getContent();
+  };
 
-    _this.description = _earthquakes.getDescription();
-    _this.mapLayer = _earthquakes.mapLayer;
-    _this.placeholder = _getPlaceholder();
-
-    _app.SettingsBar.setStatus(_this, 'disabled');
+  /**
+   * Add event listeners.
+   */
+  _addListeners = function () {
+    _earthquakes.addListeners();
+    _this.summary.addListeners();
   };
 
   /**
    * Destroy this Feature's sub-Classes.
    */
   _destroy = function () {
-    _earthquakes.destroy();
+    _earthquakes?.destroy();
 
-    if (_summary) {
-      _summary.destroy();
+    if (!AppUtil.isEmpty(_this.summary)) {
+      _this.summary.destroy();
     }
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
+    _earthquakes = Earthquakes({
+      app: _app,
+      feature: _this
+    });
+  };
+
+  /**
+   * Get the Feature's description.
+   *
+   * @param catalog {String}
+   *
+   * @return {String}
+   */
+  _getDescription = function (catalog) {
+    var data, kind;
+
+    if (catalog === 'dd') {
+      kind = 'double-difference';
+    }
+
+    data = {
+      days: _this.params.days,
+      distance: _this.params.distance,
+      kind: kind || '',
+      mag: _this.params.magnitude
+    };
+
+    return L.Util.template(
+      '<strong>M {mag}+</strong> {kind} earthquakes within ' +
+      '<strong>{distance} km</strong> of the mainshock’s epicenter in the ' +
+      'prior <strong>{days} days</strong> before the mainshock.',
+      data
+    );
   };
 
   /**
@@ -120,7 +191,7 @@ var Foreshocks = function (options) {
    * @return {String}
    */
   _getUrl = function () {
-    var mainshock = _app.Features.getFeature('mainshock'),
+    var mainshock = _app.Features.getMainshock(),
         coords = mainshock.data.eq.coords,
         datetime = mainshock.data.eq.datetime,
         endtime = datetime.minus({ seconds: 1 }).toUTC().toISO().slice(0, -5),
@@ -137,36 +208,35 @@ var Foreshocks = function (options) {
     });
   };
 
+  /**
+   * Remove event listeners.
+   */
+  _removeListeners = function () {
+    _earthquakes?.removeListeners();
+
+    if (!AppUtil.isEmpty(_this.summary)) {
+      _this.summary.removeListeners();
+    }
+  };
+
   // ----------------------------------------------------------
   // Public methods
   // ----------------------------------------------------------
 
   /**
-   * Add the JSON feed data.
-   *
-   * @param json {Object} default is {}
+   * Add the Feature.
    */
-  _this.addData = function (json = {}) {
-    _earthquakes.addData(json);
+  _this.add = function () {
+    _app.MapPane.addFeature(_this);
+    _app.SummaryPane.addFeature(_this);
 
-    _summary = Summary(_summaryOpts);
-
-    _this.bins = _summary.bins;
-    _this.count = AppUtil.addCommas(_earthquakes.data.eqs.length);
-    _this.data = _earthquakes.data;
-    _this.summary = _summary.getContent();
+    if (!_earthquakes) { // only fetch once
+      _fetch();
+    }
   };
 
   /**
-   * Add event listeners.
-   */
-  _this.addListeners = function () {
-    _earthquakes.addListeners();
-    _summary.addListeners();
-  };
-
-  /**
-   * Destroy this Class to aid in garbage collection.
+   * Destroy this Class.
    */
   _this.destroy = function () {
     _destroy();
@@ -175,25 +245,45 @@ var Foreshocks = function (options) {
 
     _app = null;
     _earthquakes = null;
-    _summary = null;
-    _summaryOpts = null;
 
+    _addData = null;
+    _addListeners = null;
     _destroy = null;
+    _fetch = null;
+    _getDescription = null;
     _getPlaceholder = null;
     _getUrl = null;
+    _removeListeners = null;
 
     _this = null;
   };
 
   /**
-   * Remove event listeners.
+   * Remove the Feature.
    */
-  _this.removeListeners = function () {
-    _earthquakes.removeListeners();
+  _this.remove = function () {
+    _removeListeners();
+    _app.MapPane.removeFeature(_this);
+    _app.SummaryPane.removeFeature(_this);
+    _app.SettingsBar.setStatus(_this, 'disabled');
+  };
 
-    if (_summary) {
-      _summary.removeListeners();
+  /**
+   * Render the Feature.
+   *
+   * @param json {Object} optional; default is {}
+   */
+  _this.render = function (json = {}) {
+    if (AppUtil.isEmpty(_this.data)) { // initial render
+      _addData(json);
+    } else {
+      _this.content = _this.summary.getContent();
     }
+
+    _app.MapPane.addContent(_this);
+    _app.SummaryPane.addContent(_this);
+    _app.SettingsBar.setStatus(_this, 'enabled');
+    _addListeners();
   };
 
 
