@@ -5,9 +5,16 @@
 var AppUtil = require('util/AppUtil');
 
 
+var _TYPES = [ // plot types, in rendering order
+  'magtime',
+  'cumulative',
+  'hypocenters'
+];
+
+
 /**
- * Create, add, refresh, render, resize, update, and remove a Feature's
- * interactive Plotly plots.
+ * Create, add, configure, refresh, render, resize, update, and remove a
+ * Feature's interactive Plotly plots.
  *
  * @param options {Object}
  *     {
@@ -19,11 +26,10 @@ var AppUtil = require('util/AppUtil');
  *     {
  *       addContent: {Function}
  *       addFeature: {Function}
- *       names: {Object}
  *       params: {Object}
+ *       plotDivs: {Object}
  *       removeFeature: {Function}
  *       render: {Function}
- *       rendered: {Boolean}
  *       reset: {Function}
  *       resize: {Function}
  *       update: {Function}
@@ -34,42 +40,25 @@ var PlotsPane = function (options) {
       _initialize,
 
       _app,
-      _configured,
       _el,
-      _ids,
 
+      _addContainer,
+      _addFilter,
       _addPlots,
-      _configPlots,
-      _getParams,
-      _isActive,
+      _getFeatures,
       _refresh,
       _swapButton,
-      _toggleFilter,
-      _togglePlot,
-      _updateFilter,
-      _updateParams,
-      _updateTimeStamp;
+      _togglePlots;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _configured = {};
     _el = options.el;
-    _ids = [
-      'magtime',
-      'cumulative',
-      'hypocenters'
-    ];
 
-    _this.names = {
-      cumulative: 'Cumulative Earthquakes',
-      hypocenters: '3D Hypocenters',
-      magtime: 'Magnitude vs. Time'
-    };
     _this.params = {};
-    _this.rendered = false;
+    _this.plotDivs = {};
 
     // Make plots responsive
     window.onresize = function () {
@@ -78,222 +67,167 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Add the given Feature's plots.
+   * Add the given Feature/plot type's container (and header).
+   *
+   * @param feature {Object}
+   * @param type {String <cumulative|hypocenters|magtime>}
+   * @param params {Object}
+   *
+   * @return container {Element}
+   */
+  _addContainer = function (feature, type, params) {
+    var container = document.createElement('div'),
+        h3 = `<h3 class="${type}">${params.layout.name}</h3>`,
+        parent = _el.querySelector(`.${feature.id} .bubble`);
+
+    parent.appendChild(container);
+    container.classList.add(type);
+    container.insertAdjacentHTML('beforebegin', h3);
+
+    return container;
+  };
+
+  /**
+   * Add the given Feature's hypocenters plot filter if there's at least 2 eqs
+   * and there is a range in depth values.
+   *
+   * @param feature {Object}
+   */
+  _addFilter = function (feature) {
+    var el, html, value,
+        depths = _this.params[feature.id].hypocenters.data[0].z,
+        hasRange = !depths.every((val, i, arr) =>
+          Math.ceil(Math.round(10 * val) / 10) ===
+          Math.ceil(Math.round(10 * arr[0]) / 10)
+        ),
+        id = feature.type + '-depth';
+
+    if (feature.count >= 2 && hasRange) {
+      el = _el.querySelector(`.${feature.id} div.hypocenters`);
+      value = parseInt(sessionStorage.getItem(id));
+      html = feature.plots.getSlider(value);
+
+      el.insertAdjacentHTML('afterend', html);
+
+      feature.plots.filter.call(document.getElementById(id)); // filter data
+    }
+  };
+
+  /**
+   * Add the given Feature's plots (i.e. add the framework and store their data).
    *
    * @param feature {Object}
    */
   _addPlots = function (feature) {
-    var bubble = _el.querySelector(`.${feature.id} .bubble`),
+    var el = _el.querySelector(`.${feature.id} .bubble`),
+        timestamp = _app.Features.getTimeStamp(feature.data),
+        html = `<dl class="props timestamp">${timestamp}</dl>`,
         params = {},
-        timestamp = `<dl class="props timestamp">${feature.timestamp}</dl>`;
+        plotDivs = {};
 
-    _ids.forEach(id => {
-      params[id] = feature.plots.getParams(id); // add headers, containers
-
-      _togglePlot(id, feature);
+    _TYPES.forEach(type => {
+      params[type] = feature.plots.getParams(type);
+      plotDivs[type] = _addContainer(feature, type, params[type]);
     });
 
-    _updateParams(feature); // necessary when eq limit reached on initial request
+    _this.params[feature.id] = params;
+    _this.plotDivs[feature.id] = plotDivs;
 
-    _this.params[feature.id] = params; // add Plotly data
-    _this.rendered = false;
-    _configured[feature.id] = false;
-
-    bubble.insertAdjacentHTML('beforeend', timestamp);
+    el.insertAdjacentHTML('beforeend', html);
   };
 
   /**
-   * Configure the plots: add listeners and swap the 'resetLastSave' button on
-   * the hypocenters plot.
+   * Get the current catalog's Features that have plots (but skip the Mainshock
+   * which does not have its own standalone plot).
    *
-   * @param featureId {String}
+   * @return {Object}
    */
-  _configPlots = function (featureId) {
-    var feature = _app.Features.getFeature(featureId);
-
-    if (feature.plots && !_configured[featureId]) {
-      feature.plots.addListeners();
-      _swapButton(featureId);
-
-      _configured[featureId] = true;
-    }
-  };
-
-  /**
-   * Get the Plotly parameters for either the given Feature, or all the selected
-   * catalog's Features.
-   *
-   * @param feature {Object} optional; default is null
-   *
-   * @return params {Object}
-   */
-  _getParams = function (feature = null) {
+  _getFeatures = function () {
     var catalog = AppUtil.getParam('catalog') || 'comcat',
-        params = {};
+        features = _app.Features.getFeatures(catalog),
+        array = Object.entries(features),
+        filtered = array.filter(([id, feature]) => {
+          if (
+            !id.includes('mainshock') &&
+            feature.plots && !AppUtil.isEmpty(feature.plots)
+          ) return true;
+        });
 
-    if (feature) {
-      params[feature.id] = _this.params[feature.id];
-    } else {
-      Object.keys(_this.params).forEach(featureId => {
-        if (
-          (catalog === 'comcat' && !featureId.includes('dd-')) ||
-          (catalog === 'dd' && featureId.includes('dd-'))
-        ) {
-          params[featureId] = _this.params[featureId];
-        }
-      });
-    }
-
-    return params;
+    return Object.fromEntries(filtered);
   };
 
   /**
-   * Check if the PlotsPane is currently active.
-   *
-   * @return {Boolean}
-   */
-  _isActive = function () {
-    if (location.hash === '#plots') {
-      return true;
-    }
-
-    return false;
-  };
-
-  /**
-   * Refresh the given Feature's plots.
+   * Refresh the given Feature's existing plots.
    *
    * @param feature {Object}
    */
   _refresh = function (feature) {
-    var mainshock = _app.Features.getFeature('mainshock');
+    var description = _el.querySelector(`.${feature.id} .description`),
+        filter = _el.querySelector(`.${feature.id} .filter`),
+        text = feature.placeholder?.match(/<p[^>]+>(.*)<\/p>/)[1],
+        timestamp = _el.querySelector(`.${feature.id} .timestamp`);
 
-    _ids.forEach(id => {
-      var params = _this.params[feature.id][id];
+    filter?.remove(); // previous depth filter
+
+    description.innerHTML = text;
+    timestamp.innerHTML = _app.Features.getTimeStamp(feature.data);
+
+    _TYPES.forEach(type => {
+      var params = _this.params[feature.id][type];
 
       Object.assign(params, {
-        data: [feature.plots.getTrace(id)],
+        data: feature.plots.getParams(type).data,
         rendered: false
       });
-
-      if (id !== 'cumulative') {
-        params.data.push(mainshock.plots.getTrace(id));
-      }
-
-      _togglePlot(id, feature);
     });
-
-    _updateFilter(feature);
-    _updateParams(feature);
-    _updateTimeStamp(feature);
-
-    feature.plots.addListeners(_this.params[feature.id]);
   };
 
   /**
    * Change the 'Reset camera' button to 'Autoscale' for consistency between
    * plots.
    *
-   * @param featureId {String}
+   * @param id {String}
+   *     Feature id
    */
-  _swapButton = function (featureId) {
-    var plot = _el.querySelector(`.${featureId} div.hypocenters`),
+  _swapButton = function (id) {
+    var plot = _el.querySelector(`.${id} div.hypocenters`),
         button = plot.querySelector('[data-attr="resetLastSave"]'),
         path = button.querySelector('path');
 
-    button.setAttribute('data-title', 'Autoscale');
-    path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
-      '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
-      'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
-      '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
-      '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
-      '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
-      '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
-  };
-
-  /**
-   * Toggle the visibility to hide the hypocenters' filter when there's less
-   * than 2 eqs.
-   *
-   * @param feature {Object}
-   */
-  _toggleFilter = function (feature) {
-    var count = AppUtil.getInteger(feature.count),
-        el = _el.querySelector(`.${feature.id} .filter`);
-
-    if (count < 2) {
-      el.classList.add('hide');
-    } else {
-      el.classList.remove('hide');
+    if (button.getAttribute('data-title') !== 'Autoscale') {
+      button.setAttribute('data-title', 'Autoscale');
+      path.setAttribute('d', 'm250 850l-187 0-63 0 0-62 0-188 63 0 0 188 187 0 ' +
+        '0 62z m688 0l-188 0 0-62 188 0 0-188 62 0 0 188 0 62-62 0z ' +
+        'm-875-938l0 188-63 0 0-188 0-62 63 0 187 0 0 62-187 0z m875 ' +
+        '188l0-188-188 0 0-62 188 0 62 0 0 62 0 188-62 0z m-125 188l-1 ' +
+        '0-93-94-156 156 156 156 92-93 2 0 0 250-250 0 0-2 93-92-156-156-156 ' +
+        '156 94 92 0 2-250 0 0-250 0 0 93 93 157-156-157-156-93 94 0 0 0-250 ' +
+        '250 0 0 0-94 93 156 157 156-157-93-93 0 0 250 0 0 250z');
     }
   };
 
   /**
-   * Toggle the visibility to hide an 'empty' plot (i.e. no eqs).
+   * Toggle the visibility so that 'empty' plots (i.e. no eqs) are hidden.
    *
-   * @param id {String <cumulative|hypocenters|magtime>}
    * @param feature {Object}
    */
-  _togglePlot = function (id, feature) {
-    var count = AppUtil.getInteger(feature.count),
-        els = _el.querySelectorAll(`.${feature.id} .${id}`); // plot + header
+  _togglePlots = function (feature) {
+    var count = feature.count;
 
-    if (count === 0 || (id === 'cumulative' && count === 1)) {
-      els.forEach(el => el.classList.add('hide'));
-    } else {
-      els.forEach(el => el.classList.remove('hide'));
-    }
+    _TYPES.forEach(type => {
+      var els = _el.querySelectorAll(`.${feature.id} .${type}`); // plot + header
+
+      if (
+        count === 0 ||
+        (type === 'cumulative' && count === 1)
+      ) {
+        els.forEach(el => el.classList.add('hide'));
+      } else {
+        els.forEach(el => el.classList.remove('hide'));
+      }
+    });
 
     _this.resize(); // ensure plots render full-width
-  };
-
-  /**
-   * Update (replace) the given Feature's depth filter. Also filter the new data
-   * based on its current setting.
-   *
-   * @param feature {Object}
-   */
-  _updateFilter = function (feature) {
-    var slider, value,
-        el = _el.querySelector(`.${feature.id} .filter`),
-        input = el.querySelector('input'); // existing (previous) input
-
-    if (input.value !== input.min) {
-      value = Number(input.value); // user-set Slider value
-    }
-    slider = feature.plots.getSlider(value || null);
-
-    el.insertAdjacentHTML('beforebegin', slider);
-    el.remove();
-
-    input = document.getElementById(feature.id + '-depth'); // new input
-
-    feature.plots.filter.call(input);
-  };
-
-  /**
-   * Update the given Feature's parameters in its description.
-   *
-   * @param feature {Object}
-   */
-  _updateParams = function (feature) {
-    var description = feature.placeholder?.match(/<p[^>]+>(.*)<\/p>/)[1],
-        el = _el.querySelector(`.${feature.id} .description`);
-
-    if (el) {
-      el.innerHTML = description; // replace description
-    }
-  };
-
-  /**
-   * Update the given Feature's timestamp.
-   *
-   * @param feature {Object}
-   */
-  _updateTimeStamp = function (feature) {
-    var timestamp = _el.querySelector(`.${feature.id} .timestamp`);
-
-    timestamp.innerHTML = feature.timestamp;
   };
 
   // ----------------------------------------------------------
@@ -301,51 +235,43 @@ var PlotsPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the given Feature's plots and render them if the PlotsPane is active
-   * (visible). If the Feature is being refreshed, update the existing plots.
+   * Add or refresh the given Feature's plots and render them. If refreshing,
+   * update the existing plots.
    *
    * @param feature {Object}
    */
   _this.addContent = function (feature) {
-    var prevPlots = Object.prototype.hasOwnProperty.call(_this.params, feature.id);
+    if (AppUtil.isEmpty(feature.plots)) return;
 
-    if (feature.plots && feature.id !== 'mainshock') { // no stand-alone MS plot
-      if (feature.isRefreshing && prevPlots) {
-        _refresh(feature);
-      } else {
-        _addPlots(feature);
-      }
-
-      _toggleFilter(feature);
-
-      if (_isActive()) {
-        _this.render(feature);
-      }
+    if (feature.isRefreshing) {
+      _refresh(feature);
+    } else {
+      _addPlots(feature);
     }
+
+    _addFilter(feature);
+    _togglePlots(feature);
+
+    _this.render(feature);
   };
 
   /**
-   * Add the given Feature's placeholder to the DOM. Plots are added when the
+   * Add the given Feature's placeholder. Plots are added separately when the
    * fetched data is ready.
    *
    * @param feature {Object}
    */
   _this.addFeature = function (feature) {
-    var el, html;
+    var el = _el.querySelector('.container'),
+        html = L.Util.template(
+          '<div class="{id} feature">' +
+            '<h2>{name}</h2>' +
+            '{placeholder}' +
+          '</div>',
+          feature
+        );
 
-    // Skip the Mainshock (it's included in other Features' plots)
-    if (feature.plots && feature.id !== 'mainshock') {
-      el = _el.querySelector('.container');
-      html = L.Util.template(
-        '<div class="{id} feature">' +
-          '<h2>{name}</h2>' +
-          '{placeholder}' +
-        '</div>',
-        feature
-      );
-
-      el.insertAdjacentHTML('beforeend', html);
-    }
+    el.insertAdjacentHTML('beforeend', html);
   };
 
   /**
@@ -366,21 +292,28 @@ var PlotsPane = function (options) {
   };
 
   /**
-   * Create and render either the given Feature's plots, or all plots.
+   * Render either the given Feature's plots, or all plots.
    *
-   * Note: subsequent calls re-render existing plots.
+   * Note: subsequent calls re-render existing plots if their 'rendered' flag is
+   *       set to false.
    *
    * @param feature {Object} optional; default is null
    */
   _this.render = function (feature = null) {
-    Object.keys(_getParams(feature)).forEach(featureId => { // Features
-      var params = _this.params[featureId];
+    var features = {};
 
-      Object.keys(params).forEach(id => { // plot types
-        var plotly = params[id];
+    if (feature) {
+      features[feature.id] = feature;
+    } else {
+      features = _getFeatures();
+    }
+
+    Object.keys(features).forEach(id => {
+      _TYPES.forEach(type => {
+        var plotly = _this.params[id][type];
 
         if (!plotly.rendered) {
-          Plotly.react(plotly.graphDiv, {
+          Plotly.react(_this.plotDivs[id][type], {
             config: plotly.config,
             data: plotly.data,
             layout: plotly.layout
@@ -390,10 +323,8 @@ var PlotsPane = function (options) {
         }
       });
 
-      _configPlots(featureId);
+      _swapButton(id);
     });
-
-    _this.rendered = true;
   };
 
   /**
@@ -402,39 +333,41 @@ var PlotsPane = function (options) {
   _this.reset = function () {
     _el.querySelector('.container').innerHTML = '';
 
-    _configured = {};
-
     _this.params = {};
-    _this.rendered = false;
+    _this.plotDivs = {};
   };
 
   /**
-   * Resize the plots: add responsive / fluid sizing.
+   * Resize plots: add responsive/fluid sizing.
    */
   _this.resize = function () {
     var plots = _el.querySelectorAll('.js-plotly-plot');
 
-    if (_isActive()) {
-      plots.forEach(plot => {
-        if (!plot.classList.contains('hide')) {
-          Plotly.Plots.resize(plot);
-        }
-      });
-    }
+    plots.forEach(plot => {
+      if (!plot.classList.contains('hide')) {
+        Plotly.Plots.resize(plot);
+      }
+    });
   };
 
   /**
-   * Update the 2d plots, rendering them in the currently selected timezone. 3d
-   * plots don't need to be re-rendered b/c there's no time axis.
+   * Update plots to reflect the selected timezone.
    */
   _this.update = function () {
-    Object.keys(_getParams()).forEach(featureId => { // Features
-      var feature = _app.Features.getFeature(featureId),
-          params = _this.params[featureId];
+    Object.keys(_getFeatures()).forEach(id => {
+      var feature = _app.Features.getFeature(id);
 
-      Object.keys(params).forEach(id => { // plot types
-        if (id !== 'hypocenters') {
-          params[id] = feature.plots.getParams(id);
+      _TYPES.forEach(type => {
+        var params = _this.params[id][type];
+
+        if (type !== 'hypocenters') { // no time axis to update
+          var plotly = feature.plots.getParams(type);
+
+          Object.assign(params, {
+            data: plotly.data,
+            layout: plotly.layout,
+            rendered: false
+          });
         }
       });
     });

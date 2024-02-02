@@ -59,7 +59,7 @@ var NavBar = function (options) {
       });
     });
 
-    // Set scroll position
+    // Set the scroll position
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         if (tab.hash.substr(1) === _app.Pane.getSelected()) {
@@ -118,9 +118,9 @@ var NavBar = function (options) {
   /**
    * Hide all Panes or SideBars and unselect all of their nav buttons.
    *
-   * @param items {String <panes|sidebars>}
+   * @param items {String <panes|sidebars>} default is 'panes'
    */
-  _this.hideAll = function (items) {
+  _this.hideAll = function (items = 'panes') {
     var els = document.querySelectorAll('section.pane');
 
     if (items === 'sidebars') {
@@ -134,7 +134,7 @@ var NavBar = function (options) {
       if (el.classList.contains('pane')) {
         name = id.replace('-pane', '');
         button = _el.querySelector(`[href="#${name}"]`);
-      } else { // sidebars
+      } else { // SideBars
         name = id.replace('-bar', '');
         button = _el.querySelector('.icon-' + name);
       }

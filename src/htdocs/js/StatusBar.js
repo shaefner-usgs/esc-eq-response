@@ -15,7 +15,6 @@
  *       addError: {Function}
  *       addItem: {Function}
  *       removeItem: {Function}
- *       removeItems: {Function}
  *       reset: {Function}
  *     }
  */
@@ -29,6 +28,8 @@ var StatusBar = function (options) {
       _addListeners,
       _getMessage,
       _hide,
+      _openSettings,
+      _reloadFeature,
       _removeNode,
       _show;
 
@@ -44,61 +45,31 @@ var StatusBar = function (options) {
    * Add event listeners.
    *
    * @param div {Element}
-   * @param id {String}
-   *     Feature id
-   * @param mode {String} optional; default is ''
-   *     display mode
+   * @param error {Object}
    */
-  _addListeners = function (div, id, mode = '') {
+  _addListeners = function (div, error) {
     var close = div.querySelector('.close'),
         reload = div.querySelector('.reload'),
         settings = div.querySelector('ul a');
 
-    // Remove StatusBar item
     if (close) {
       close.addEventListener('click', e => {
         e.preventDefault();
-        _this.removeItem(id, false);
+        _this.removeItem(error.id, false);
       });
     }
 
-    // Reload Feature (or the app)
     if (reload) {
-      reload.addEventListener('click', e => {
-        var feature = _app.Features.getFeature(id);
-
-        e.preventDefault();
-
-        if (reload.classList.contains('app')) {
-          location.reload(); // reload app
-        } else {
-          _this.removeItem(id, false);
-
-          if (feature.isRefreshing) {
-            _app.Features.refreshFeature(id);
-          } else {
-            _app.Features.reloadFeature(id, mode);
-          }
-        }
-      });
+      reload.addEventListener('click', e => _reloadFeature(e, error));
     }
 
-    // Open Settings
     if (settings) {
-      settings.addEventListener('click', e => {
-        var aftershocks = document.querySelector('#settings-bar .aftershocks');
-
-        e.preventDefault();
-        _app.NavBar.switchSideBar('settings');
-        aftershocks.scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
+      settings.addEventListener('click', _openSettings);
     }
   };
 
   /**
-   * Get the loading message, including the animated ellipsis.
+   * Get the loading message, including the ellipsis loader.
    *
    * @param item {Object}
    * @param opts {Object}
@@ -127,6 +98,38 @@ var StatusBar = function (options) {
    */
   _hide = function () {
     _el.classList.add('hide');
+  };
+
+  /**
+   * Event handler that opens the SettingsBar.
+   *
+   * @param e {Event}
+   */
+  _openSettings = function (e) {
+    var aftershocks = document.querySelector('#settings-bar .aftershocks');
+
+    e.preventDefault();
+    _app.NavBar.switchSideBar('settings');
+    aftershocks.scrollIntoView({
+      behavior: 'smooth'
+    });
+  };
+
+  /**
+   * Event handler that reloads a Feature (or the app if necessary).
+   *
+   * @param e {Event}
+   * @param error {Object}
+   */
+  _reloadFeature = function (e, error) {
+    e.preventDefault();
+
+    if (e.target.classList.contains('app')) {
+      location.reload(); // reload app
+    } else {
+      _this.removeItem(error.id, false);
+      _app.Features.reloadFeature(error.id, error.mode);
+    }
   };
 
   /**
@@ -165,7 +168,8 @@ var StatusBar = function (options) {
    *
    * @param error {Object}
    *     {
-   *       id: {String} Feature id
+   *       id: {String}
+   *           Feature id
    *       message: {String}
    *       mode: {String} optional (req'd for reload button)
    *           display mode
@@ -194,10 +198,10 @@ var StatusBar = function (options) {
     div.innerHTML = content;
     div.classList.add(error.id, 'error');
 
-    // Remove any leftover items with this id, then add it
+    // Remove any 'leftover' items with this id, then add it
     _this.removeItem(error.id);
     _el.appendChild(div);
-    _addListeners(div, error.id, error.mode);
+    _addListeners(div, error);
     _show();
   };
 
@@ -228,7 +232,7 @@ var StatusBar = function (options) {
     div.innerHTML = '<h4>' + message + '</h4>';
     div.classList.add(item.id);
 
-    // Remove any leftover items with this id, then add it
+    // Remove any 'leftover' items with this id, then add it
     _this.removeItem(item.id);
     _el.appendChild(div);
     _show();
@@ -239,7 +243,7 @@ var StatusBar = function (options) {
    *
    * @param id {String}
    *     Feature id
-   * @param delay {Boolean} default is true
+   * @param delay {Boolean} optional; default is true
    *     Delays removal so CSS transition can finish first
    */
   _this.removeItem = function (id, delay = true) {
@@ -247,7 +251,7 @@ var StatusBar = function (options) {
 
     items.forEach(item => {
       if (id.includes('mainshock')) {
-        // Don't remove item before other (dependent) Features are added
+        // Don't remove item before other (dependent) Features get added
         setTimeout(_removeNode, 250, item);
       } else if (_el.children.length === 1) {
         _hide();
@@ -261,17 +265,6 @@ var StatusBar = function (options) {
         _removeNode(item);
       }
     });
-  };
-
-  /**
-   * Remove all items and hide the StatusBar.
-   */
-  _this.removeItems = function () {
-    while (_el.firstChild) {
-      _el.removeChild(_el.lastChild); // faster to remove lastChild
-    }
-
-    _hide();
   };
 
   /**

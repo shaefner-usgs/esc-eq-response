@@ -38,7 +38,8 @@ _DEFAULTS = {
 
 /**
  * Search the earthquake catalog and display the results on the map. Also set
- * the URL parameters to match the search parameters.
+ * the URL parameters (and the controls on initial load) to match the current
+ * settings.
  *
  * @param options {Object}
  *     {
@@ -49,8 +50,7 @@ _DEFAULTS = {
  * @return _this {Object}
  *     {
  *       getParams: {Function}
- *       postInit: {Function}
- *       renderMap: {Function}
+ *       render: {Function}
  *       setButton: {Function}
  *     }
  */
@@ -63,15 +63,15 @@ var SearchBar = function (options) {
       _el,
       _endtime,
       _map,
-      _mapRendered,
       _minmagnitude,
       _now,
       _nowButton,
-      _region,
       _regionLayer,
+      _rendered,
       _searchButton,
       _starttime,
 
+      _addBounds,
       _addButton,
       _addControl,
       _addListeners,
@@ -87,6 +87,7 @@ var SearchBar = function (options) {
       _onStartOpen,
       _onTimeChange,
       _searchCatalog,
+      _setControls,
       _setNow,
       _setOption,
       _setParams,
@@ -102,14 +103,13 @@ var SearchBar = function (options) {
     _app = options.app;
     _el = options.el;
     _endtime = document.getElementById('endtime');
-    _mapRendered = false;
     _minmagnitude = document.getElementById('minmagnitude');
     _now = _NOW;
-    _region = document.getElementById('region');
     _regionLayer = L.rectangle([ // default - contiguous U.S.
       [49.5, -66],
       [24.5, -125]
     ]);
+    _rendered = false;
     _searchButton = document.getElementById('search');
     _starttime = document.getElementById('starttime');
 
@@ -117,6 +117,34 @@ var SearchBar = function (options) {
     _initControls();
     _initMap();
     _addListeners();
+  };
+
+  /**
+   * Add the region's map bounds to the search parameters, if applicable.
+   *
+   * @param params {Object}
+   */
+  _addBounds = function (params) {
+    var bounds;
+
+    if (params.region === 'ca-nv') {
+      Object.assign(params, _CANV);
+    } else if (params.region === 'custom-region') {
+      _setRegion(); // ensure custom region control is not active
+
+      _map.eachLayer(layer => {
+        if (layer.getBounds) { // only the region layer has bounds
+          bounds = layer.getBounds();
+        }
+      });
+
+      Object.assign(params, {
+        maxlatitude: Number(AppUtil.round(bounds.getNorth(), 2)),
+        maxlongitude: Number(AppUtil.round(bounds.getEast(), 2)),
+        minlatitude: Number(AppUtil.round(bounds.getSouth(), 2)),
+        minlongitude: Number(AppUtil.round(bounds.getWest(), 2))
+      });
+    }
   };
 
   /**
@@ -137,7 +165,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Add a control to the map for creating a custom region rectangle.
+   * Add a map control that creates a custom region rectangle.
    */
   _addControl = function () {
     var control = L.control.rectangle({
@@ -187,7 +215,7 @@ var SearchBar = function (options) {
       region.addEventListener('click', _setOption)
     );
 
-    // Set the end time to 'now'
+    // Set the end time input to 'now'
     _nowButton.addEventListener('click', e => {
       e.preventDefault();
       _setNow();
@@ -199,8 +227,8 @@ var SearchBar = function (options) {
 
   /**
    * Temporarily disable the janky transition caused by Flatpickr resetting the
-   * current day to local time followed by immediately reverting it back to UTC
-   * time.
+   * current day to local time (and then immediately overriding to set it back
+   * to UTC time).
    *
    * @param el {Element}
    */
@@ -213,7 +241,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Get the relevant URL parameter key-value pairs from the current URL.
+   * Get the current search parameters from the URL.
    *
    * @return params {Object}
    */
@@ -276,47 +304,26 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Create the UI controls and set them to match the URL parameter values (or
-   * the default value if a parameter is not set).
+   * Create the custom UI controls.
    */
   _initControls = function () {
     var settings = Object.assign({}, _DEFAULTS, _getParams()),
         period = document.getElementById(settings.period),
         region = document.getElementById(settings.region);
 
+    _setControls(period, region, settings);
+
     RadioBar({
       el: document.getElementById('period')
     }).setOption(period);
 
     RadioBar({
-      el: _region
+      el: document.getElementById('region')
     }).setOption(region);
-
-    // Set magnitude
-    _minmagnitude.value = settings.minmagnitude;
 
     Slider({
       el: _minmagnitude
     }).setValue();
-
-    // Set custom dates
-    if (period.id === 'custom-period') {
-      if (settings.endtime === 'now') {
-        _setNow();
-      } else {
-        _calendars.endtime.setDate(settings.endtime);
-      }
-
-      _calendars.starttime.setDate(settings.starttime);
-    }
-
-    // Set custom region polygon
-    if (region.id === 'custom-region') {
-      _regionLayer = L.rectangle([
-        [settings.maxlatitude, settings.maxlongitude],
-        [settings.minlatitude, settings.minlongitude]
-      ]);
-    }
   };
 
   /**
@@ -349,7 +356,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler for changing a calendar's date or time.
+   * Event handler that changes a calendar's date or time.
    *
    * @param selDates {Array}
    * @param dateStr {String}
@@ -360,14 +367,14 @@ var SearchBar = function (options) {
     _setUtcDay(this);
     _setValidity(this.input);
 
-    // Unset 'Now' when a date is picked by user, but not when reverting in _onDateClose()
+    // Unset 'Now' when user picks a date, but not when reverting in _onDateClose()
     if (this.input.id === 'endtime' && datePicked) {
       _nowButton.classList.remove('selected');
     }
   };
 
   /**
-   * Event handler for closing a calendar.
+   * Event handler that closes a calendar.
    */
   _onDateClose = function () {
     _setValidity(this.input);
@@ -381,7 +388,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler for opening the 'endtime' calendar.
+   * Event handler that opens the 'endtime' calendar.
    */
   _onEndOpen = function () {
     var minDate = _calendars.starttime.selectedDates[0];
@@ -424,11 +431,10 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler for opening the 'starttime' calendar.
+   * Event handler that opens the 'starttime' calendar.
    */
   _onStartOpen = function () {
-    var endDate = _calendars.endtime.selectedDates[0],
-        maxDate = endDate; // default
+    var maxDate = _calendars.endtime.selectedDates[0]; // default
 
     _now = Luxon.DateTime.now(); // cache new value
 
@@ -441,7 +447,7 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Event handler for changing a calendar's time.
+   * Event handler that changes a calendar's time.
    *
    * @param e {Event}
    */
@@ -474,27 +480,51 @@ var SearchBar = function (options) {
    * Event handler that searches the earthquake catalog and displays the results.
    */
   _searchCatalog = function () {
-    var search = _app.Features.getFeature('catalog-search');
-
     location.href = '#map';
 
-    if (_app.Features.isFeature(search)) {
-      _app.Features.refreshFeature('catalog-search');
-    } else {
-      _app.Features.reloadFeature('catalog-search', 'base');
-    }
-
+    _app.Features.reloadFeature('catalog-search', 'base');
     _searchButton.setAttribute('disabled', 'disabled');
     _setParams();
 
     if (!document.body.classList.contains('mainshock')) {
       _app.MapPane.initBounds();
-      _app.MapPane.setView();
+      _app.MapPane.fitBounds();
     }
   };
 
   /**
-   * Set the end time to 'Now' on the 'endtime' calendar and its <input> field.
+   * Set the controls/options to match the URL parameter values (or the default
+   * value if a parameter is not set).
+   *
+   * @param period {Object}
+   * @param region {Object}
+   * @param settings {Object}
+   */
+  _setControls = function (period, region, settings) {
+    _minmagnitude.value = settings.minmagnitude;
+
+    // Custom dates
+    if (period.id === 'custom-period') {
+      if (settings.endtime === 'now') {
+        _setNow();
+      } else {
+        _calendars.endtime.setDate(settings.endtime);
+      }
+
+      _calendars.starttime.setDate(settings.starttime);
+    }
+
+    // Custom region polygon
+    if (region.id === 'custom-region') {
+      _regionLayer = L.rectangle([
+        [settings.maxlatitude, settings.maxlongitude],
+        [settings.minlatitude, settings.minlongitude]
+      ]);
+    }
+  };
+
+  /**
+   * Set the time to 'Now' on the 'endtime' calendar and its <input> field.
    */
   _setNow = function () {
     var calendar = _calendars.endtime;
@@ -514,14 +544,14 @@ var SearchBar = function (options) {
    */
   _setOption = function () {
     if (this.id === 'custom-region') {
-      _this.renderMap();
+      _this.render();
     } else if (this.id === 'worldwide' || this.id === 'ca-nv') {
       _setRegion();
     }
   };
 
   /**
-   * Set the URL parameters to match the UI controls.
+   * Set the URL parameter values to match the controls.
    *
    * Don't set a parameter if its control is set to its default value; delete
    * unneeded parameters.
@@ -538,6 +568,8 @@ var SearchBar = function (options) {
         AppUtil.setParam(name, value);
       }
     });
+
+    AppUtil.deleteParam('now');
 
     if (params.period !== 'custom-period') {
       AppUtil.deleteParam('endtime');
@@ -559,10 +591,10 @@ var SearchBar = function (options) {
   };
 
   /**
-   * Set the given calendar's highlighted day (today) to the current UTC day.
+   * Set the given calendar's default day (i.e. today) to the current UTC day.
    *
    * @param calendar {Object}
-   * @param jumpToDate {Boolean} default is true
+   * @param jumpToDate {Boolean} optional; default is true
    *     used as an override when user changes calendar's month or year
    */
   _setUtcDay = function (calendar, jumpToDate = true) {
@@ -596,9 +628,6 @@ var SearchBar = function (options) {
    * Flag a date field when no date is set or the date is invalid.
    *
    * @param input {Element}
-   *
-   * @return {Boolean}
-   *     whether or not the <input> is marked as valid
    */
   _setValidity = function (input) {
     var div = input.closest('.flatpickr-wrapper'),
@@ -606,12 +635,8 @@ var SearchBar = function (options) {
 
     if (isValid) {
       div.classList.remove('invalid');
-
-      return true;
     } else {
       div.classList.add('invalid');
-
-      return false;
     }
   };
 
@@ -620,18 +645,15 @@ var SearchBar = function (options) {
    * region's (or default) bounds.
    */
   _setView = function () {
-    var map = _el.querySelector('.custom-region'),
-        sidebar = _app.SideBar.getSelected();
+    var map = _el.querySelector('.custom-region');
 
-    if (map.classList.contains('hide')) return; // map not visible
-
-    if (sidebar === 'search' && !_mapRendered) {
+    if (!map.classList.contains('hide') && !_rendered) {
       _map.fitBounds(_regionLayer.getBounds(), {
         animate: false,
         padding: [32, 0]
       });
 
-      _mapRendered = true;
+      _rendered = true;
     }
   };
 
@@ -640,21 +662,21 @@ var SearchBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Get the search parameters from the UI controls and _DEFAULTS.
+   * Get the new search parameters from the UI controls and _DEFAULTS.
    *
    * @return {Object}
    */
   _this.getParams = function () {
-    var bounds,
-        minus = {},
+    var minus = {},
         now = Luxon.DateTime.now(),
         params = {
           minmagnitude: Number(_minmagnitude.value),
+          now: now,
           period: _el.querySelector('#period .selected').id,
           region: _el.querySelector('#region .selected').id
         };
 
-    // Begin, end times
+    // Add begin, end times
     if (params.period.match(/day|week|month/)) {
       minus[params.period + 's'] = 1;
 
@@ -669,40 +691,15 @@ var SearchBar = function (options) {
       });
     }
 
-    // Bounds
-    if (params.region === 'ca-nv') {
-      Object.assign(params, _CANV);
-    } else if (params.region === 'custom-region') {
-      _setRegion(); // ensure custom region control is not active
-
-      _map.eachLayer(layer => {
-        if (layer.getBounds) { // only the region layer has bounds
-          bounds = layer.getBounds();
-        }
-      });
-
-      Object.assign(params, {
-        maxlatitude: Number(AppUtil.round(bounds.getNorth(), 2)),
-        maxlongitude: Number(AppUtil.round(bounds.getEast(), 2)),
-        minlatitude: Number(AppUtil.round(bounds.getSouth(), 2)),
-        minlongitude: Number(AppUtil.round(bounds.getWest(), 2))
-      });
-    }
+    _addBounds(params); // search region
 
     return Object.assign({}, _DEFAULTS, params);
   };
 
   /**
-   * Initialization that depends on the app's other Classes being ready first.
+   * Render the map.
    */
-  _this.postInit = function () {
-    _setOption.call(_region.querySelector('.selected'));
-  };
-
-  /**
-   * Render the region map so it displays correctly.
-   */
-  _this.renderMap = function () {
+  _this.render = function () {
     _map.invalidateSize();
     _setView();
   };
@@ -713,20 +710,22 @@ var SearchBar = function (options) {
    * are invalid.
    */
   _this.setButton = function () {
-    var customPeriod = document.getElementById('custom-period')
-          .classList.contains('selected'),
+    var customPeriod = document.getElementById('custom-period'),
         inputs = [_endtime, _starttime],
         search = _app.Features.getFeature('catalog-search'),
         params = {
           controls: _this.getParams(),
           search: search.params
         },
-        skip = [];
+        skip = ['now']; // not applicable
 
     // Skip preset intervals' times, which will be different but aren't relevant
     if (params.controls.period.match(/day|week|month/)) {
-      skip = ['endtime', 'starttime'];
+      skip.push('endtime', 'starttime');
     }
+
+    _searchButton.removeAttribute('disabled');
+    _searchButton.removeAttribute('title');
 
     if (_app.Features.isFeature(search)) {
       if (AppUtil.shallowEqual(params.controls, params.search, skip)) {
@@ -735,10 +734,7 @@ var SearchBar = function (options) {
         _searchButton.textContent = 'Search';
       }
 
-      _searchButton.removeAttribute('disabled');
-      _searchButton.removeAttribute('title');
-
-      if (customPeriod) {
+      if (customPeriod.classList.contains('selected')) {
         inputs.forEach(input => {
           var div = input.closest('div'),
               invalid = div.classList.contains('invalid') || input.value === '';

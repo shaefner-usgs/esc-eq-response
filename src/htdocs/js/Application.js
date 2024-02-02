@@ -19,11 +19,11 @@ var Features = require('Features'),
 
 
 /**
- * Earthquake Response Application.
+ * Earthquake Response Application
  *
  * Instantiate the app's "primary" Classes and bind them together via the 'app'
- * property that is passed to all of the Classes. This makes all of their public
- * properties and methods accessible to each other.
+ * property that is passed to all Classes. This makes their public properties
+ * and methods accessible to each other.
  *
  * Also handle resetting the app to its default state.
  *
@@ -58,6 +58,7 @@ var Features = require('Features'),
  *       StatusBar: {Object}
  *       SummaryPane: {Object}
  *       TitleBar: {Object}
+ *       dateFormat: {String}
  *       headerHeight: {Number}
  *       reset: {Function}
  *       sideBarWidth: {Number}
@@ -68,7 +69,7 @@ var Application = function (options) {
       _initialize,
 
       _els,
-      _rendered,
+      _initialReset,
 
       _initClasses,
       _resetQueryString;
@@ -78,7 +79,7 @@ var Application = function (options) {
 
   _initialize = function (options = {}) {
     _els = options;
-    _rendered = false;
+    _initialReset = true;
 
     _this.dateFormat = 'LLL d, yyyy TT';
     _this.headerHeight = document.querySelector('header').offsetHeight;
@@ -105,7 +106,7 @@ var Application = function (options) {
           StatusBar: StatusBar,
           SummaryPane: SummaryPane,
           TitleBar: TitleBar,
-          Features: Features // Features must be last so that the UI is ready
+          Features: Features // must be last so that the UI is ready
         },
         postInits = [];
 
@@ -127,7 +128,7 @@ var Application = function (options) {
   };
 
   /**
-   * Reset the queryString, keeping only the non-Mainshock specific parameters.
+   * Reset the queryString, keeping only non-Mainshock specific parameters.
    */
   _resetQueryString = function () {
     var queryString,
@@ -160,27 +161,28 @@ var Application = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Reset the app to its default state (i.e. no Mainshock selected).
+   * Reset the app (i.e. no Mainshock selected).
    */
   _this.reset = function () {
     document.body.classList.remove('loading', 'mainshock');
+    sessionStorage.clear();
 
-    _this.Features.reset(); // Features must be first
-    _this.MapPane.reset();
-    _this.Pane.reset();
-    _this.PlotsPane.reset();
-    _this.SelectBar.reset();
-    _this.SettingsBar.reset();
-    _this.SideBar.reset();
-    _this.StatusBar.reset();
-    _this.SummaryPane.reset();
-    _this.TitleBar.reset();
+    if (!_initialReset) {
+      _this.Features.reset(); // must be first
+      _this.MapPane.reset();
+      _this.Pane.reset();
+      _this.PlotsPane.reset();
+      _this.SelectBar.reset();
+      _this.SettingsBar.reset();
+      _this.SideBar.reset();
+      _this.StatusBar.reset();
+      _this.SummaryPane.reset();
+      _this.TitleBar.reset();
 
-    if (_rendered) { // preserve initial (incoming) URL parameters
       _resetQueryString();
     }
 
-    _rendered = true;
+    _initialReset = false;
   };
 
 

@@ -22,9 +22,8 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Create the "main" Leaflet map instance, add the initial (static) layers to
- * the map, and add/remove Features (dynamic layers). Set/update the map extent
- * based on the current state.
+ * Create the "main" Leaflet map instance and add the initial (base) map layers.
+ * Add/remove Feature layers and set the map extent based on the current state.
  *
  * @param options {Object}
  *     {
@@ -36,6 +35,7 @@ var AppUtil = require('util/AppUtil');
  *     {
  *       addContent: {Function}
  *       addFeature: {Function}
+ *       fitBounds: {Function}
  *       initBounds: {Function}
  *       layerControl: {Object}
  *       map: {Object}
@@ -56,6 +56,7 @@ var MapPane = function (options) {
       _el,
       _initialExtent,
       _layers,
+      _placeholders,
       _rendered,
 
       _addControls,
@@ -65,8 +66,6 @@ var MapPane = function (options) {
       _getClassName,
       _getLayers,
       _initMap,
-      _removeLayer,
-      _restorePopup,
       _setBounds,
       _setFlag,
       _trackExtent;
@@ -79,6 +78,7 @@ var MapPane = function (options) {
     _el = options.el;
     _initialExtent = true;
     _layers = _getLayers();
+    _placeholders = {};
     _rendered = false;
 
     _initMap();
@@ -101,9 +101,6 @@ var MapPane = function (options) {
 
   /**
    * Add event listeners.
-   *
-   * Note: overlay listeners are triggered when a layer is added/removed,
-   * including programmatically.
    */
   _addListeners = function () {
     // Track the selected base layer
@@ -114,19 +111,6 @@ var MapPane = function (options) {
 
       document.body.classList.remove(...names);
       document.body.classList.add(selected);
-    });
-
-    // Track a Feature's showLayer property when the layer is toggled on/off
-    _this.map.on('overlayadd overlayremove', e => {
-      var feature = _app.Features.getFeature(e.layer.id),
-          showLayer = false; // default
-
-      if (e.type === 'overlayadd') {
-        showLayer = true;
-      }
-      if (Object.prototype.hasOwnProperty.call(feature, 'showLayer')) {
-        feature.showLayer = showLayer;
-      }
     });
   };
 
@@ -155,15 +139,15 @@ var MapPane = function (options) {
    * @return {L.Bounds}
    */
   _getBounds = function (mainshock) {
-    var latLng = mainshock.mapLayer.getLayers()[0].getLatLng(),
+    var marker = mainshock.mapLayer.getLayers()[0],
         maxDistance = Math.max(
-          Number(document.getElementById('as-dist').value),
-          Number(document.getElementById('fs-dist').value),
-          Number(document.getElementById('hs-dist').value)
+          Number(document.getElementById('as-distance').value),
+          Number(document.getElementById('fs-distance').value),
+          Number(document.getElementById('hs-distance').value)
         ),
         distance = maxDistance * 2 * 1000; // radius (km) -> diameter (meters)
 
-    return latLng.toBounds(distance);
+    return marker.getLatLng().toBounds(distance);
   };
 
   /**
@@ -181,11 +165,6 @@ var MapPane = function (options) {
    * Get the initial (static) map layers.
    *
    * @return layers {Object}
-   *     {
-   *       baseLayers: {Object},
-   *       defaults: {Array},
-   *       overlays: {Object}
-   *     }
    */
   _getLayers = function () {
     var layers,
@@ -235,41 +214,13 @@ var MapPane = function (options) {
   };
 
   /**
-   * Remove the given Feature from the map. Also cache its showLayer prop.
-   *
-   * @param feature {Object}
-   */
-  _removeLayer = function (feature) {
-    var showLayer = feature.showLayer;
-
-    _this.map.removeLayer(feature.mapLayer); // sets showLayer prop to false
-
-    feature.showLayer = showLayer;
-  };
-
-  /**
-   * Re-open an existing popup when its map layer is refreshed.
-   *
-   * @param feature {Object}
-   */
-  _restorePopup = function (feature) {
-    var mapLayer = feature.prevFeature.mapLayer;
-
-    mapLayer.eachLayer(layer => {
-      if (layer.isPopupOpen()) {
-        _this.openPopup(layer.feature.id, feature.id);
-      }
-    });
-  };
-
-  /**
    * Extend _bounds to contain the given Feature. If it's the Mainshock,
    * initialize _bounds centered on it.
    *
    * @param feature {Object}
    */
   _setBounds = function (feature) {
-    if (feature.id === 'mainshock') {
+    if (feature.id.includes('mainshock')) {
       _this.initBounds('event');
     } else {
       _bounds.extend(feature.mapLayer.getBounds());
@@ -284,15 +235,9 @@ var MapPane = function (options) {
   };
 
   /**
-   * Add event listeners that set a flag when the map extent is changed. Used to
-   * determine if the user has interacted with the map yet.
+   * Add event listeners that set a flag when the map extent is changed.
    *
-   * Notes:
-   *  1. It is not possible to distinguish btwn user and programmatic events in
-   *     Leaflet, so the flag (_initialExtent) is manipulated elsewhere to
-   *     mitigate.
-   *  2. This method might get called multiple times due to Features being added
-   *     asynchronously.
+   * Used to determine if the user has interacted with the map yet.
    */
   _trackExtent = function () {
     _this.map.off('movestart zoomstart', _setFlag); // avoid duplicate listeners
@@ -304,71 +249,94 @@ var MapPane = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Set the map's bounds (and set the view once all Features are ready). If the
-   * Feature is being refreshed, remove the 'old' layer and restore its popup.
-   *
-   * Note: the Feature's content is added to the existing (empty) map layer by
-   * L.GeoJSON.async.
-   */
-  _this.addContent = function (feature) {
-    var status = _app.Features.getStatus();
-
-    if (feature.id === 'mainshock') {
-      _this.setView(_getBounds(feature));
-    }
-    if (feature.zoomToLayer && (
-      feature.mode === 'event' ||
-      feature.mode === 'comcat' ||
-      feature.mode === 'dd'
-    )) {
-      _setBounds(feature);
-    }
-
-    if (status === 'ready' && _initialExtent) { // Mainshock Features are ready
-      _this.setView();
-
-      // Set up tracking after fitBounds() animation ends
-      _this.map.once('moveend zoomend', () => {
-        _initialExtent = true;
-
-        _trackExtent();
-      });
-    }
-
-    if (feature.isRefreshing) {
-      _restorePopup(feature);
-      _removeLayer(feature.prevFeature);
-    }
-  };
-
-  /**
-   * Add the given Feature to the map and/or layer control.
+   * Add the given Feature to the map (if applicable) and layer control and
+   * remove its temporary placeholder.
    *
    * @param feature {Object}
    */
-  _this.addFeature = function (feature) {
+  _this.addContent = function (feature) {
+    var key = feature.type || feature.id,
+        layer = sessionStorage.getItem(key + '-layer'),
+        placeholder = _placeholders[feature.id],
+        popup = sessionStorage.getItem(key + '-popup'),
+        showLayer = feature.showLayer; // default
+
     if (feature.mapLayer) {
-      feature.mapLayer.id = feature.id; // need access to id from Leaflet layer
+      _this.layerControl.removeLayer(placeholder);
+      _this.layerControl.addOverlay(feature);
 
-      _createPane(feature.id);
-      _this.layerControl.addOverlay(feature.mapLayer, feature.name);
-
-      if (feature.showLayer) {
+      if (layer) {
+        showLayer = (layer === 'true'); // override w/ value from Storage
+      }
+      if (popup) {
+        _this.openPopup(feature, popup); // re-open a pre-existing popup
+      }
+      if (showLayer) {
         _this.map.addLayer(feature.mapLayer);
+      }
+
+      if (!feature.isSwapping) { // not swapping catalogs
+        _this.setView(feature);
       }
     }
   };
 
   /**
+   * Add the given Feature's placeholder to the layer control and store it. Also
+   * create the layer's custom Leaflet map pane that controls stacking order.
+   *
+   * @param feature {Object}
+   */
+  _this.addFeature = function (feature) {
+    if (feature.mapLayer) {
+      _placeholders[feature.id] = feature.mapLayer;
+
+      _createPane(feature.id);
+      _this.layerControl.addOverlay(feature);
+    }
+  };
+
+  /**
+   * Set the map view to contain the given bounds.
+   *
+   * @param bounds {L.Bounds} optional; default is _bounds
+   */
+  _this.fitBounds = function (bounds = _bounds) {
+    var animate = false,
+        initialExtent = _initialExtent, // cache value
+        status = _app.Features.getStatus(),
+        x = 0;
+
+    if (AppUtil.getParam('sidebar')) {
+      x = _app.sideBarWidth;
+    }
+
+    if (status === 'ready') {
+      animate = true;
+
+      if (_app.Pane.getSelected() === 'map') {
+        _rendered = true;
+      }
+    }
+
+    if (bounds.isValid()) {
+      _this.map.fitBounds(_this.map.wrapLatLngBounds(bounds), {
+        animate: animate,
+        paddingBottomRight: L.point(x, 0), // accommodate sidebar
+        paddingTopLeft: L.point(0, _app.headerHeight) // accommodate header
+      });
+    }
+
+    _initialExtent = initialExtent; // set back to cached value
+  };
+
+  /**
    * Initialize the map's bounds for the given display mode:
    *
-   *   1. 'base': shows the current Catalog Search
+   *   1. 'base': centered on the current Catalog Search
    *   2. 'event': centered on the selected Mainshock
    *
-   * Note: the temporary bounds used while a new Mainshock is still loading its
-   * Features is set separately in _setBounds().
-   *
-   * @param mode {String <base|event>} default is 'base'
+   * @param mode {String <base|event>} optional; default is 'base'
    */
   _this.initBounds = function (mode = 'base') {
     var mainshock;
@@ -379,8 +347,8 @@ var MapPane = function (options) {
     );
 
     if (mode === 'event') {
-      mainshock = _app.Features.getFeature('mainshock');
-      _bounds = mainshock.data.eq.latLng.toBounds(5000); // init val: 2.5km radius
+      mainshock = _app.Features.getMainshock();
+      _bounds = mainshock.data.eq.latLng.toBounds(5000); // 2.5km radius
     } else if (AppUtil.getParam('region')) {
       _bounds = L.latLngBounds( // custom Catalog Search region
         [
@@ -396,30 +364,29 @@ var MapPane = function (options) {
   };
 
   /**
-   * Open the map popup matching the given eqid and featureId when the user
-   * selects an eq from the Plots/SummaryPanes.
+   * Open the given Feature's popup if the layer contains a marker matching the
+   * given eqid.
    *
-   * @param eqid {String}
-   * @param featureId {String}
+   * @param feature {Object}
+   * @param eqid {String} optional; default is ''
+   *     Required if feature.popup is not set to the Popup's eqid value
    */
-  _this.openPopup = function (eqid, featureId) {
+  _this.openPopup = function (feature, eqid = '') {
     var marker,
-        layer = _app.Features.getFeature(featureId).mapLayer;
+        mapLayer = feature.mapLayer;
 
-    if (!_rendered) {
-      _this.render();
-    }
+    eqid = eqid || feature.popup;
 
     // Find the marker
-    layer.eachLayer(eq => {
+    mapLayer.eachLayer(eq => {
       if (eq.feature.id === eqid) {
         marker = eq;
       }
     });
 
     if (marker) {
-      if (!_this.map.hasLayer(layer)) {
-        _this.map.addLayer(layer); // ensure Feature layer is "on"
+      if (!_this.map.hasLayer(mapLayer)) {
+        _this.map.addLayer(mapLayer); // ensure Feature layer is "on"
       }
 
       marker.openPopup();
@@ -429,31 +396,40 @@ var MapPane = function (options) {
   /**
    * Remove the given Feature from the map and layer control.
    *
+   * Also remove the placeholder layer if it exists (i.e. on a failed fetch
+   * request).
+   *
    * @param feature {Object}
    */
   _this.removeFeature = function (feature) {
+    var placeholder = _placeholders[feature.id];
+
     if (feature.mapLayer) {
       _this.layerControl.removeLayer(feature.mapLayer);
-      _removeLayer(feature);
+      _this.map.removeLayer(feature.mapLayer);
+    }
+
+    if (placeholder) {
+      _this.layerControl.removeLayer(placeholder);
     }
   };
 
   /**
-   * Render the map correctly when the MapPane is selected.
+   * Render the map.
    */
   _this.render = function () {
     _this.map.invalidateSize(); // updates map if its container size has changed
 
-    // Update popup (useful when swapping catalogs w/ Mainshock's popup open)
+    // Update popup (useful when refreshing a layer with a popup open)
     if (_this.map._popup) {
       _this.map._popup.update();
     }
 
-    // Set initial view (map must be visible)
+    // Set initial view
     if (!_rendered) {
       _rendered = true;
 
-      _this.setView();
+      _this.fitBounds();
     }
   };
 
@@ -464,45 +440,40 @@ var MapPane = function (options) {
     _el.querySelector('.container').innerHTML = '';
 
     _initialExtent = true;
+    _placeholders = {};
     _rendered = false;
 
     _this.initBounds();
-    _this.setView();
+    _this.fitBounds();
     _this.layerControl.reset();
   };
 
   /**
-   * Set the map extent to contain the given bounds.
+   * Set the map's bounds and view as Features load.
    *
-   * @param bounds {L.Bounds} default is _bounds
+   * @param feature {Object} optional; default is {}
    */
-  _this.setView = function (bounds = _bounds) {
-    var animate = false,
-        initialExtent = _initialExtent, // cache
-        status = _app.Features.getStatus(),
-        x = 0;
+  _this.setView = function (feature = {}) {
+    var status = _app.Features.getStatus();
 
-    if (status === 'ready') {
-      animate = true;
-
-      if (_app.Pane.getSelected() === 'map') {
-        _rendered = true;
-      }
+    if (feature.id?.includes('mainshock')) {
+      _this.fitBounds(_getBounds(feature));
     }
 
-    if (AppUtil.getParam('sidebar')) {
-      x = _app.sideBarWidth;
+    if (feature.zoomToLayer && feature.mode !== 'base') {
+      _setBounds(feature);
     }
 
-    if (bounds.isValid()) {
-      _this.map.fitBounds(_this.map.wrapLatLngBounds(bounds), {
-        animate: animate,
-        paddingBottomRight: L.point(x, 0), // accommodate sidebar
-        paddingTopLeft: L.point(0, _app.headerHeight) // accommodate header
+    if (status === 'ready' && _initialExtent) { // Mainshock Features are ready
+      _this.fitBounds();
+
+      // Set up tracking after fitBounds() animation ends
+      _this.map.once('moveend zoomend', () => {
+        _initialExtent = true;
+
+        _trackExtent();
       });
     }
-
-    _initialExtent = initialExtent; // set back to cached value
   };
 
   /**

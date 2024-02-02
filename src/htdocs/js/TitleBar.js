@@ -2,7 +2,7 @@
 
 
 /**
- * Set the TitleBar's content.
+ * Set the TitleBar's content (and the document's title).
  *
  * @param options {Object}
  *     {
@@ -33,7 +33,7 @@ var TitleBar = function (options) {
   _initialize = function (options = {}) {
     _app = options.app;
     _el = options.el;
-    _defaults = { // cache initial text from static HTML
+    _defaults = { // cache initial text from HTML
       subTitle: _el.querySelector('p').innerText, // instructions
       title: _el.querySelector('h1').innerText // app name
     };
@@ -53,12 +53,17 @@ var TitleBar = function (options) {
   /**
    * Set the subtitle.
    *
-   * @param subTitle {String} optional
+   * @param feature {Object}
    */
-  _setSubTitle = function (subTitle = '') {
-    var p = _el.querySelector('p');
+  _setSubTitle = function (feature) {
+    var p = _el.querySelector('p'),
+        subTitle = _defaults.subTitle;
 
-    p.innerHTML = subTitle || _defaults.subTitle;
+    if (feature.id?.includes('mainshock')) {
+      subTitle = feature.data.eq.timeDisplay;
+    }
+
+    p.innerHTML = subTitle;
   };
 
   // ----------------------------------------------------------
@@ -81,29 +86,29 @@ var TitleBar = function (options) {
   };
 
   /**
-   * Set the title (both the TitleBar and document <title>).
+   * Set the title (both the header and the document's <title>).
    *
    * @param feature {Object}
-   *     Mainshock or CatalogSearch Feature
+   *     Mainshock or CatalogSearch
    */
   _this.setTitle = function (feature) {
-    var subTitle,
+    var url,
         h1 = _el.querySelector('h1'),
         title = feature.title;
 
-    if (feature.id === 'mainshock') {
-      subTitle = feature.data.eq.timeDisplay;
-      title = // link to Event Page
-        `<a href="${feature.data.eq.url}" class="external" target="new" title="USGS Event Page">` +
+    if (feature.id?.includes('mainshock')) { // add a link to the Event Page
+      url = feature.data.eq.url;
+      title =
+        `<a href="${url}" class="external" target="new" title="USGS Event Page">` +
           `${title}<i class="icon-link"></i>` +
         '</a>';
     }
 
     h1.innerHTML = title;
-    document.title = feature.title + ' | ' + _defaults.title; // include app's name;
+    document.title = feature.title + ' | ' + _defaults.title; // include app name
 
     _repaint(h1);
-    _setSubTitle(subTitle);
+    _setSubTitle(feature);
   };
 
 

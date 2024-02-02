@@ -5,9 +5,8 @@ var AppUtil = require('util/AppUtil');
 
 
 /**
- * Toggle the SideBar on/off (and render it properly), set the 'sidebar' URL
- * parameter, and remember each SideBar's scroll position. Also toggle the map
- * links in the SideBar.
+ * Toggle/render the app's SideBars and remember their scroll positions. Also
+ * toggle the map links in the SideBar.
  *
  * @param options {Object}
  *     {
@@ -32,6 +31,7 @@ var SideBar = function (options) {
       _throttler,
 
       _addListeners,
+      _render,
       _saveScrollPosition,
       _setScrollPosition;
 
@@ -62,7 +62,37 @@ var SideBar = function (options) {
   };
 
   /**
-   * Save the current scroll position in sessionStorage.
+   * Render the given SideBar so it displays correctly. Also update the Pane's
+   * layout when the SideBar is toggled.
+   *
+   * @param sidebar {String}
+   * @param state {String <on|off>}
+   * @param toggled {Boolean}
+   */
+  _render = function (sidebar, state, toggled) {
+    var pane = _app.Pane.getSelected();
+
+    if (state === 'on') {
+      if (sidebar === 'search') {
+        _app.SearchBar.render();
+      } else if (sidebar === 'settings') {
+        _app.SettingsBar.render();
+      }
+    }
+
+    if (toggled) {
+      _app.MapPane.shiftMap();
+
+      if (pane === 'plots') {
+        _app.PlotsPane.resize();
+      } else if (pane === 'summary') {
+        _app.SummaryPane.render();
+      }
+    }
+  };
+
+  /**
+   * Event handler that saves the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
     var name = _this.getSelected(),
@@ -72,7 +102,7 @@ var SideBar = function (options) {
 
     // Throttle scroll event
     _throttler = setTimeout(() =>
-      sessionStorage.setItem(name, position), 250
+      sessionStorage.setItem(name, position), 100
     );
   };
 
@@ -80,6 +110,7 @@ var SideBar = function (options) {
    * Set the scroll position to its previously saved value.
    *
    * @param name {String}
+   *     SideBar name
    */
   _setScrollPosition = function (name) {
     var position = Number(sessionStorage.getItem(name));
@@ -127,16 +158,12 @@ var SideBar = function (options) {
   };
 
   /**
-   * Toggle the SideBar on/off and set the 'sidebar' URL parameter. Also shift
-   * the map's center point, resize the plots, and update the layout of the
-   * Mainshock's products.
+   * Toggle the SideBar on/off and set the 'sidebar' URL parameter.
    *
    * @param state {String <on|off>}
    */
   _this.toggle = function (state) {
-    var mainshock = _app.Features.getFeature('mainshock'),
-        pane = _app.Pane.getSelected(),
-        selected = document.querySelector('#nav-sub .selected'),
+    var selected = document.querySelector('#nav-sub .selected'),
         name = selected.className.match(/icon-(\w+)/)[1],
         el = document.getElementById(name + '-bar'),
         toggled = true; // default; whether or not SideBar visibility changed
@@ -150,29 +177,15 @@ var SideBar = function (options) {
       } else {
         document.body.classList.add('sidebar');
       }
-
-      if (name === 'search') {
-        _app.SearchBar.renderMap();
-      } else if (name === 'settings') {
-        _app.SettingsBar.setFocusedField();
-      }
     } else { // close SideBar
-      AppUtil.setParam('sidebar', ''); // suppresses default SideBar on load
+      AppUtil.setParam('sidebar', ''); // suppresses default SideBar onload
       document.body.classList.remove('sidebar');
       _app.NavBar.hideAll('sidebars');
 
       el.classList.remove('hide'); // keep visible for animation
     }
 
-    if (toggled) {
-      _app.MapPane.shiftMap();
-
-      if (pane === 'plots') {
-        _app.PlotsPane.resize();
-      } else if (pane === 'summary' && mainshock.render) {
-        mainshock.render();
-      }
-    }
+    _render(name, state, toggled);
   };
 
   /**

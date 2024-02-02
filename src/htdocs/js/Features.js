@@ -1,10 +1,10 @@
+/* global L */
 'use strict';
 
 
 var Aftershocks = require('features/event/Aftershocks'),
     AppUtil = require('util/AppUtil'),
     CatalogSearch = require('features/base/CatalogSearch'),
-    DdMainshock = require('features/event/DdMainshock'),
     Dyfi = require('features/event/mainshock/Dyfi'),
     FieldNotes = require('features/event/FieldNotes'),
     FocalMechanism = require('features/event/mainshock/FocalMechanism'),
@@ -12,44 +12,36 @@ var Aftershocks = require('features/event/Aftershocks'),
     Foreshocks = require('features/event/Foreshocks'),
     Historical = require('features/event/Historical'),
     HistoricalEvents = require('features/event/historical/HistoricalEvents'),
-    Lightbox = require('util/Lightbox'),
     Mainshock = require('features/event//Mainshock'),
     MomentTensor = require('features/event/mainshock/MomentTensor'),
     NearbyCities = require('features/event/mainshock/NearbyCities'),
     Pager = require('features/event/mainshock/Pager'),
     PagerCities = require('features/event/mainshock/PagerCities'),
     PagerExposures = require('features/event/mainshock/PagerExposures'),
-    Rtf = require('util/Rtf'),
     ShakeAlert = require('features/event/mainshock/ShakeAlert'),
     ShakeMap = require('features/event/mainshock/ShakeMap'),
     ShakeMapStations = require('features/event/ShakeMapStations'),
     SignificantEqs = require('features/base/SignificantEqs');
 
 
-var _MODULES,
-    _SETTINGS;
-
-/**
- * Feature modules, organized by display mode.
- */
-_MODULES = {
-  base: [ // Features added when the app is loaded
+var _MODULES = {
+  base: [ // Features added when app is loaded
     CatalogSearch,
     SignificantEqs
   ],
   comcat: [ // 'event' Features added when ComCat catalog is selected
+    Mainshock, // must be first
     Aftershocks,
     Foreshocks,
     Historical
   ],
   dd: [ // 'event' Features added when Double-difference catalog is selected
-    DdMainshock,
+    Mainshock, // must be first
     Aftershocks,
     Foreshocks,
     Historical
   ],
   event: [ // Features added when a new Mainshock (event) is selected
-    Mainshock, // must be first
     Dyfi,
     FieldNotes,
     FocalMechanism,
@@ -67,17 +59,9 @@ _MODULES = {
   rtf: [] // Features added when the Event Summary RTF is created
 };
 
-/**
- * Default settings for new Features.
- */
-_SETTINGS = {
-  showLayer: true,
-  zoomToLayer: true
-};
-
 
 /**
- * Create, add, get, remove, and refresh Features.
+ * Create, add, store, reload, get, remove, and delete Features.
  *
  * @param options {Object}
  *     {
@@ -86,24 +70,19 @@ _SETTINGS = {
  *
  * @return _this {Object}
  *     {
- *       addContent: {Function}
- *       addFeature: {Function}
  *       checkDependencies: {Function}
  *       clearQueue: {Function}
  *       createFeatures: {Function}
+ *       deleteFeature: {Function}
  *       getFeature: {Function}
  *       getFeatures: {Function}
- *       getHeaders: {Function}
- *       getLightbox: {Function}
+ *       getMainshock: {Function}
  *       getStatus: {Function}
+ *       getTimeStamp: {Function}
  *       isFeature: {Function}
- *       postInit: {Function)
- *       refreshFeature: {Function}
  *       reloadFeature: {Function}
- *       removeFeature: {Function}
  *       reset: {Function}
- *       restoreFeature: {Function}
- *       showLightbox: {Function}
+ *       storeFeature: {Function}
  *     }
  */
 var Features = function (options) {
@@ -112,101 +91,32 @@ var Features = function (options) {
 
       _app,
       _features,
-      _lightboxes,
       _modules,
       _queue,
 
-      _addCount,
-      _addFeature,
-      _addLightbox,
       _createFeature,
-      _createRtf,
-      _flagCount,
       _getMode,
       _getOptions,
       _initFeatures,
       _isReady,
-      _removeCount,
-      _removeFeatures;
+      _removeFeatures,
+      _render;
 
 
   _this = {};
 
   _initialize = function (options = {}) {
     _app = options.app;
-    _lightboxes = {};
     _modules = {};
     _queue = [];
 
     _initFeatures();
+    _this.createFeatures('base');
   };
 
   /**
-   * Add the given Feature's count next to its name.
-   *
-   * Note: also replaces (or removes) the loader.
-   *
-   * @param feature {Object}
-   */
-  _addCount = function (feature) {
-    var count = '',
-        els = _this.getHeaders(feature.id);
-
-    if (Object.prototype.hasOwnProperty.call(feature, 'count')) {
-      count = `<span class="count">${feature.count}</span>`;
-    }
-
-    els.forEach(el => el.innerHTML = feature.name + count);
-
-    // Layer control's count is handled by its Leaflet plugin
-    _app.MapPane.layerControl.addCount(count, feature.id);
-
-    _flagCount(feature.id, els);
-  };
-
-  /**
-   * Add the given Feature to the Map/Plots/SummaryPanes. This is typically a
-   * placeholder where content is subsequently added when it is ready.
-   *
-   * @param feature {Object}
-   */
-  _addFeature = function (feature) {
-    try {
-      if (!feature.isRefreshing) {
-        _app.PlotsPane.addFeature(feature);
-        _app.SummaryPane.addFeature(feature);
-      }
-
-      _app.MapPane.addFeature(feature); // must be last (so loaders are ready)
-    } catch (error) {
-      _app.StatusBar.addError({
-        id: feature.id,
-        message: `<h4>Error Adding ${feature.name}</h4><ul><li>${error}</li></ul>`
-      });
-      _this.removeFeature(feature);
-
-      console.error(error);
-    }
-  };
-
-  /**
-    * Add the given Feature's Lightbox to the DOM.
-    *
-    * @param feature {Object}
-    */
-  _addLightbox = function (feature) {
-    var id = feature.id;
-
-    _lightboxes[id] = Lightbox({
-      content: feature.lightbox,
-      id: id,
-      title: feature.title || feature.name
-    });
-  };
-
-  /**
-   * Create a new Feature (when its dependencies are ready) using the given
-   * module and then add it. Also store it in _features and store its module.
+   * Create a new Feature using the given module and mode. Also add it (if
+   * applicable) and store its module.
    *
    * @param mode {String <base|comcat|dd|event|rtf>}
    * @param module {Object}
@@ -222,118 +132,75 @@ var Features = function (options) {
    *       Auto-set props:
    *
    *         isRefreshing: {Boolean} refresh status
-   *         mode: {String <base|comcat|dd|event|rtf>} display mode
-   *         prevFeature: {Object} existing Feature before a refresh
-   *         status: {String} loading status
-   *         updated: {String} fetch time (milliseconds)
+   *         isSwapping: {Boolean} earthquake catalog swap
+   *         mode: {String <base|comcat|dd|event|loading|rtf>} display mode
+   *         status: {String} <error|initialized|loading|ready> loading status
+   *         updated: {Number} fetch/creation time (milliseconds)
    *
    *       Common props:
    *
-   *         addData: {Function} receives fetched JSON data
-   *         addListeners: {Function} event listeners added with Feature
-   *         content: {String} HTML content added to SideBar (in Element#feature-id)
-   *         count: {Integer} Feature's count value added next to its name
-   *         deferFetch: {Boolean} fetch data on demand when map layer turned 'on'
-   *           Note: only Features with a map layer; showLayer prop must be false
+   *         add: {Function} add the Feature (a placeholder for fetched content)
+   *         content: {String} HTML content added to SummaryPane
+   *         count: {Integer} Feature's count value
+   *         data: {Array|Object} Feature's fetched/compiled data
+   *         deferFetch: {Boolean} fetch data on demand when map layer turned on
    *         dependencies: {Array} Features (besides Mainshock) that must be ready
-   *         json: {String} JSON feed data (Mainshock only)
-   *         lightbox: {String} HTML content of Feature's Lightbox
-   *         mapLayer: {L.Layer} Leaflet layer added to MapPane
-   *         params: {Object} Feature's parameters that are exposed in SettingsBar
+   *         json: {Object} JSON feed data (Mainshock only)
+   *         lightbox: {Object} Lightbox instance
+   *         mapLayer: {L.GeoJSON} Leaflet layer added to MapPane
+   *         params: {Object} Feature's user-customizable parameters
    *         placeholder: {String} initial HTML content added to Plots/SummaryPanes
-   *           Note: fetched content is appended to Element.content in placeholder
    *         plots: {Object} Plotly parameters for Plots added to PlotsPane
-   *         removeListeners: {Function} event listeners removed with Feature
-   *         showLayer: {Boolean} whether or not map layer is "on" by default
-   *         summary: {String} HTML content added to SummaryPane
-   *         title: {String} document and page title (Mainshock and Catalog Search)
-   *         update: {Function} manual post-fetch updates
+   *         remove: {Function} remove the Feature
+   *         render: {Function} render the Feature
+   *         showLayer: {Boolean} sets map layer's initial display status
+   *         summary: {Object} Summary instance (Aftershocks, Foreshocks, Historical)
+   *         title: {String} document/page title (Mainshock, Catalog Search)
+   *         type: {String} 'generic' id (same regardless of catalog setting)
    *         url: {String} URL of data feed
-   *         zoomToLayer: {Boolean} whether or not initial map zoom fits layer
+   *         zoomToLayer: {Boolean} zoom initial map extent to fit layer
    *     }
    * @param options {Object} optional; default is {}
    */
-  _createFeature = function (mode, module, options = {}) {
-    var feature,
-        status = 'initialized'; // default
+  _createFeature = function (module, mode, options = {}) {
+    var feature;
 
-    if (_isReady(mode)) { // create Feature when dependencies are ready
-      options = Object.assign({}, _SETTINGS, options, {
-        app: _app
-      });
+    try {
+      if (_isReady(mode)) { // create Feature when dependencies are ready
+        feature = module(Object.assign(options, {
+          app: _app
+        }));
 
-      // Avoid "infinite" nesting of previous Features
-      if (options.prevFeature?.prevFeature) {
-        delete options.prevFeature.prevFeature;
-      }
+        Object.assign(feature, {
+          isRefreshing: options.isRefreshing || false,
+          isSwapping: false,
+          mode: mode,
+          status: 'initialized',
+          updated: 0
+        });
 
-      feature = module(options);
+        _features.loading[feature.id] = feature;
+        _modules[feature.id] = module;
 
-      if (!feature.url) {
-        status = 'ready';
-      } else if (feature.status) {
-        status = feature.status; // preserve assigned status
-      }
-
-      Object.assign(feature, {
-        isRefreshing: options.isRefreshing || false,
-        mode: mode,
-        prevFeature: options.prevFeature || {},
-        status: status
-      });
-
-      _features[mode][feature.id] = feature;
-      _modules[feature.id] = module;
-
-      if (mode === 'rtf') {
-        _createRtf(); // creates RTF doc when no RTF Features exist
-      }
-
-      _addFeature(feature);
-    } else { // dependencies not ready
-      _queue.push(setTimeout(() => {
-        _createFeature(mode, module, options);
-      }, 50));
-    }
-  };
-
-  /**
-   * Create the RTF Event Summary document if all RTF Features are ready.
-   */
-  _createRtf = function () {
-    var status = _this.getStatus('rtf');
-
-    if (status === 'ready') {
-      Rtf({
-        app: _app
-      });
-    }
-  };
-
-  /**
-   * Add a flag so the count animation is played only once.
-   *
-   * @param id {String}
-   *     Feature id
-   * @param headers {NodeList}
-   */
-  _flagCount = function (id, headers) {
-    var subheaders = document.querySelectorAll(`#summary-pane .${id} h3`),
-        els = Array.from(headers).concat(Array.from(subheaders));
-
-    setTimeout(() => {
-      els.forEach(el => {
-        var count = el.querySelector('.count');
-
-        if (count) {
-          count.classList.add('played');
+        if (feature.add && !feature.isRefreshing) {
+          feature.add();
         }
-      });
-    }, 500);
+
+        if (feature.deferFetch || !feature.url) {
+          _this.storeFeature(feature); // Feature ready; no data to load
+        }
+      } else { // dependencies not ready
+        _queue.push(setTimeout(() => {
+          _createFeature(module, mode, options);
+        }, 100));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   /**
-   * Get the display mode for the Feature with the given id.
+   * Get the display mode for the given Feature.
    *
    * @param id {String}
    *     Feature id
@@ -344,45 +211,34 @@ var Features = function (options) {
     var match = ''; // default
 
     Object.keys(_features).forEach(mode => {
-      Object.keys(_features[mode]).forEach(featureId => {
-        if (id === featureId) {
-          match = mode;
-        }
-      });
+      if (mode !== 'loading') { // skip Features that aren't ready
+        Object.keys(_features[mode]).forEach(featureId => {
+          if (id === featureId) {
+            match = mode;
+          }
+        });
+      }
     });
 
     return match;
   };
 
   /**
-   * Get the given Feature's currently visible earthquakes list options.
+   * Get the reload options for the given Feature.
    *
-   * @param feature {Object}
+   * @param id {String}
+   *     Feature id
    *
    * @return options {Object}
    */
-  _getOptions = function (feature) {
-    var th,
-        magThreshold = sessionStorage.getItem(feature.id + '-mag'),
+  _getOptions = function (id) {
+    var feature = _this.getFeature(id),
         options = {
-          isRefreshing: true,
-          prevFeature: feature,
-          showLayer: feature.showLayer
-        },
-        table = document.querySelector(`#summary-pane .${feature.id} .sortable`);
+          deferFetch: false // always reload immediately
+        };
 
-    if (magThreshold) {
-      options.magThreshold = Number(magThreshold);
-    }
-    if (table) {
-      th = table.querySelector('.sort-down, .sort-up');
-
-      Object.assign(options, {
-        sortField: Array.from(th.classList).find(className =>
-          !className.includes('sort-')
-        ),
-        sortOrder: th.classList.contains('sort-down') ? 'asc' : 'desc'
-      });
+    if (_this.isFeature(feature)) { // refreshing existing Feature
+      options.isRefreshing = true;
     }
 
     return options;
@@ -395,20 +251,22 @@ var Features = function (options) {
     var base;
 
     if (typeof _features === 'object') {
-      base = _features.base; // leave 'base' Features intact
+      base = _features.base;
     }
 
     _features = {
-      base: base || {},
+      base: base || {}, // leave existing 'base' Features intact
       comcat: {},
       dd: {},
       event: {},
+      loading: {}, // temporary storage for Features that aren't ready
       rtf: {}
     };
   };
 
   /**
    * Determine if a Feature with the given display mode is ready to be fetched.
+   *
    * All 'event', 'comcat', and 'dd' mode Features are dependent on the
    * Mainshock being fetched first.
    *
@@ -417,17 +275,17 @@ var Features = function (options) {
    * @return {Boolean}
    */
   _isReady = function (mode) {
-    var mainshock = _this.getFeature('mainshock');
+    var loading = document.body.classList.contains('loading'),
+        mainshock = _this.getMainshock();
 
     if (
       mode === 'base' || // no dependencies
-      mode === 'comcat' && mainshock.status === 'ready' ||
-      mode === 'dd' && mainshock.status === 'ready' ||
-      mode === 'event' && (
-        !_this.isFeature(mainshock) || // first create the Mainshock...
-        mainshock.status === 'ready' // then create the other 'event' Features
-      ) ||
-      mode === 'rtf' // other Features will always be ready
+      mode === 'rtf' || // dependencies will be ready
+      mode === 'event' && mainshock.status === 'ready' ||
+      (mode === 'comcat' || mode === 'dd') && (
+        (!_this.isFeature(mainshock) && !loading) || // create Mainshock 1st...
+        mainshock.status === 'ready' // then create other Features
+      )
     ) {
       return true;
     }
@@ -436,45 +294,42 @@ var Features = function (options) {
   };
 
   /**
-   * Remove the given Feature's count value (or its loader if it was still
-   * loading) in the SettingsBar, if applicable.
-   *
-   * @param feature {Object}
+   * Remove all Features, except 'base' Features.
    */
-  _removeCount = function (feature) {
-    var count, loader,
-        el = document.getElementById('settings-bar'),
-        header = el.querySelector(`div.${feature.id} h3`);
+  _removeFeatures = function () {
+    try {
+      Object.keys(_features).forEach(mode => {
+        if (mode !== 'base') {
+          Object.keys(_features[mode]).forEach(id => {
+            var feature = _features[mode][id];
 
-    if (header) { // Feature has user-configurable settings
-      count = header.querySelector('.count');
-      loader = header.querySelector('.breather');
+            if (feature.remove) {
+              feature.remove();
+            }
 
-      if (count) {
-        header.removeChild(count);
-      }
-      if (loader) {
-        header.removeChild(loader);
-      }
+            feature.destroy();
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error);
     }
   };
 
   /**
-   * Remove all Features, except 'base' Features. Also remove their associated
-   * storage items.
+   * Additional rendering that is necessary once all Features are ready.
    */
-  _removeFeatures = function () {
-    Object.keys(_features).forEach(mode => {
-      if (mode !== 'base') {
-        Object.keys(_features[mode]).forEach(id => {
-          _this.removeFeature(_this.getFeature(id));
+  _render = function () {
+    var mainshock,
+        status = _this.getStatus();
 
-          // Remove potentially saved values of Feature's Sliders
-          sessionStorage.removeItem(id + '-depth');
-          sessionStorage.removeItem(id + '-mag');
-        });
-      }
-    });
+    if (status === 'ready') {
+      mainshock = _this.getMainshock();
+
+      mainshock.enableDownload();
+      _app.MapPane.setView();
+      _app.SummaryPane.render();
+    }
   };
 
   // ----------------------------------------------------------
@@ -482,62 +337,7 @@ var Features = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Add the given Feature's content (i.e. the fetched data). Also render and
-   * add its event listeners and Lightbox, if applicable.
-   *
-   * Optionally create the RTF document depending on the Feature's mode.
-   *
-   * @param feature {Object}
-   */
-  _this.addContent = function (feature) {
-    var el;
-
-    _app.MapPane.addContent(feature);
-    _app.PlotsPane.addContent(feature);
-    _app.SummaryPane.addContent(feature);
-    _app.SettingsBar.setStatus(feature, 'enabled');
-    _app.SettingsBar.updateTimeStamp(feature);
-    _addCount(feature);
-
-    if (feature.content) { // SideBar content
-      el = document.getElementById(feature.id);
-      el.innerHTML = feature.content;
-
-      if (feature.id === 'mainshock') {
-        el.classList.remove('hide');
-      }
-    }
-    if (feature.lightbox) {
-      _addLightbox(feature);
-    }
-    if (feature.render) {
-      feature.render();
-    }
-    if (feature.addListeners) {
-      feature.addListeners();
-    }
-
-    if (feature.mode === 'rtf') {
-      _createRtf();
-    }
-  };
-
-  /**
-   * Add the given Feature back to the Map/Plots/SummaryPanes (when swapping
-   * between catalogs).
-   *
-   * Note: the Feature's placeholder and its content are added at once, as its
-   * data has already been fetched.
-   *
-   * @param feature {Object}
-   */
-  _this.addFeature = function (feature) {
-    _addFeature(feature);
-    _this.addContent(feature);
-  };
-
-  /**
-   * Check if the dependencies (if any) for the given Feature are ready.
+   * Check if the dependencies for the given Feature are ready (if applicable).
    *
    * @param feature {Object}
    *
@@ -560,7 +360,7 @@ var Features = function (options) {
   };
 
   /**
-   * Clear the queue of Features waiting to be fetched.
+   * Clear the queue of dependent Features waiting to be fetched.
    */
   _this.clearQueue = function () {
     _queue.forEach(timer => clearTimeout(timer));
@@ -576,26 +376,34 @@ var Features = function (options) {
   _this.createFeatures = function (mode = 'event') {
     var catalog = AppUtil.getParam('catalog') || 'comcat';
 
-    if (mode === 'rtf') {
-      _features.rtf = {}; // reset so _this.getStatus() is accurate
-
-      if (_MODULES[mode].length === 0) {
-        _createRtf(); // creates RTF doc when no RTF Features are defined
-      }
+    if (mode === 'event') {
+      _this.createFeatures(catalog); // catalog-specific 'event' Features
     }
 
     _MODULES[mode].forEach(module => {
-      _createFeature(mode, module);
+      _createFeature(module, mode);
     });
+  };
 
-    // Add the catalog-specific Features
-    if (mode === 'event') {
-      _this.createFeatures(catalog);
+  /**
+   * Delete the given stored Feature.
+   *
+   * @param id {String}
+   *     Feature id
+   */
+  _this.deleteFeature = function (id) {
+    var mode = _getMode(id);
+
+    if (mode) { // Feature stored
+      delete _features[mode][id];
     }
   };
 
   /**
    * Get the Feature matching the given id.
+   *
+   * Note: Features are stored when their feed data has finished loading.
+   * Features with no feed data (or with deferFetch set) are stored immediately.
    *
    * @param id {String}
    *     Feature id
@@ -606,7 +414,7 @@ var Features = function (options) {
     var feature = {}, // default
         mode = _getMode(id);
 
-    if (mode) { // Feature exists
+    if (mode) { // Feature exists and is ready
       feature = _features[mode][id];
     }
 
@@ -618,97 +426,59 @@ var Features = function (options) {
    *
    * @param mode {String <base|comcat|dd|event|rtf>} default is 'event'
    *
-   * @return {Object}
-   *     Features keyed by id
+   * @return features {Object}
    */
   _this.getFeatures = function (mode = 'event') {
-    return _features[mode] || {};
+    var catalog = AppUtil.getParam('catalog') || 'comcat',
+        features = Object.assign({}, _features[mode]) || {};
+
+    // Include catalog-specific 'event' Features
+    if (mode === 'event') {
+      Object.keys(_this.getFeatures(catalog)).forEach(id => {
+        features[id] = _this.getFeature(id);
+      });
+    }
+
+    return features;
   };
 
   /**
-   * Get all of the given Feature's header Elements for adding loaders/count
-   * values next to the Feature's name.
+   * Get the ComCat or Double-difference Mainshock, depending on which catalog
+   * is currently selected.
    *
-   * Note: the layer control's loaders/count values are handled separately (by
-   * L.Control.Layers.Sorted.js).
-   *
-   * @param id {String}
-   *     Feature id
-   *
-   * @return els {Array}
+   * @return mainshock {Object}
    */
-  _this.getHeaders = function (id) {
-    var els = [],
-        selectors = [
-          `#plots-pane div.${id} h2`,
-          `#settings-bar div.${id} h3`,
-          `#summary-pane div.${id} h2`
-        ];
+  _this.getMainshock = function () {
+    var catalog = AppUtil.getParam('catalog'),
+        mainshock = _this.getFeature('mainshock'); // default
 
-    selectors.forEach(selector => {
-      var el = document.querySelector(selector);
+    if (catalog === 'dd') {
+      mainshock = _this.getFeature('dd-mainshock');
+    }
 
-      if (el) {
-        els.push(el);
-      }
-    });
-
-    return els;
+    return mainshock;
   };
 
   /**
-   * Get the given Feature's Lightbox instance.
-   *
-   * @param id {Object}
-   *     Feature id
-   *
-   * @return {Object}
-   */
-  _this.getLightbox = function (id) {
-    return _lightboxes[id] || {};
-  };
-
-  /**
-   * Get the collective loading status (ready or not) of all Features for the
-   * given display mode.
+   * Get the collective loading status of all Features for the given display
+   * mode.
    *
    * @param mode {String <base|comcat|dd|event|rtf>} default is 'event'
    *
-   * @return status {String <error|initialized|loading|ready>} default is ''
+   * @return status {String}
    */
   _this.getStatus = function (mode = 'event') {
-    var numFeatures, numModules,
-        catalog = AppUtil.getParam('catalog') || 'comcat',
-        count = Object.keys(_features[mode]).length,
-        status = ''; // default
+    var catalog = AppUtil.getParam('catalog') || 'comcat',
+        numFeatures = Object.keys(_features[mode]).length,
+        numModules = _MODULES[mode].length,
+        status = 'loading'; // default
 
-    if (count === 1 && (mode === 'event' || mode === 'dd')) {
-      status = 'loading'; // only the Mainshock is ready
-    } else if (count !== 0) {
+    if (numFeatures === numModules) {
       status = 'ready';
 
-      Object.keys(_features[mode]).forEach(id => {
-        var feature = _this.getFeature(id);
-
-        if (feature.status !== 'ready') {
-          status = feature.status;
-        }
-      });
-
-      // Account for status of Mainshock's ComCat or double-difference Features
+      // Account for status of catalog-specific 'event' Features
       if (mode === 'event' && status === 'ready') {
         status = _this.getStatus(catalog);
-      }
-    }
-
-    // Check that all RTF Features have been instantiated
-    if (mode === 'rtf') {
-      numFeatures = Object.keys(_features.rtf).length;
-      numModules = _MODULES.rtf.length;
-      status = 'ready';
-
-      if (numFeatures !== numModules) {
-        status = 'loading';
       }
     }
 
@@ -716,108 +486,61 @@ var Features = function (options) {
   };
 
   /**
-   * Check if the given feature exists (i.e. it's not an empty Object).
+   * Get the HTML content for a Feature's timestamp (user and UTC time).
    *
-   * @param feature {Object}
+   * @param data {Object}
+   *
+   * @return {String}
+   */
+  _this.getTimeStamp = function (data) {
+    return L.Util.template(
+      '<dt>Updated</dt>' +
+      '<dd>' +
+        '<time datetime="{isoTime}" class="user">' +
+          '{userTime} (UTC{utcOffset})' +
+        '</time>' +
+        '<time datetime="{isoTime}" class="utc">{utcTime} (UTC)</time>' +
+      '</dd>',
+      data
+    );
+  };
+
+  /**
+   * Check if the given feature exists/contains the required properties.
+   *
+   * @param feature {Object} default is {}
    *
    * @return {Boolean}
    */
-  _this.isFeature = function (feature) {
-    if (AppUtil.isEmpty(feature)) {
-      return false;
-    }
+  _this.isFeature = function (feature = {}) {
+    var required = ['destroy', 'id', 'name'];
 
-    return true;
+    return required.every(prop => feature[prop]);
   };
 
   /**
-   * Initialization that depends on the app's other Classes being ready first.
-   */
-  _this.postInit = function () {
-    _this.createFeatures('base');
-  };
-
-  /**
-   * Refresh (update) the given Feature.
+   * Reload the given Feature.
    *
    * @param id {Object}
    *     Feature id
+   * @param mode {String} optional; default is ''
+   *     Feature mode - REQUIRED when reloading after a failed request
    */
-  _this.refreshFeature = function (id) {
-    var feature = _this.getFeature(id),
-        mode = _getMode(id),
-        options = _getOptions(feature);
+  _this.reloadFeature = function (id, mode = '') {
+    var mainshock = _this.getMainshock();
 
-    if (_this.isFeature(feature)) {
-      feature.isRefreshing = true;
-
-      if (mode !== 'base') {
-        _this.getFeature('mainshock').disableDownload();
-      }
-
-      if (feature.mapLayer) { // layer control item is replaced by loader
-        _app.MapPane.layerControl.removeLayer(feature.mapLayer);
-      }
-
-      _createFeature(mode, _modules[id], options);
+    if (_this.isFeature(mainshock) && mode !== 'base') {
+      mainshock.disableDownload();
     }
-  };
 
-  /**
-   * Re-create the given Feature after a failed request.
-   *
-   * @param id {String}
-   *     Feature id
-   * @param mode {String}
-   *     display mode
-   */
-  _this.reloadFeature = function (id, mode) {
     if (id === 'mainshock') {
-      _this.createFeatures(mode);
+      _this.createFeatures();
+    } else if (id === 'dd-mainshock') {
+      _this.createFeatures('dd');
     } else {
-      _createFeature(mode, _modules[id], {
-        deferFetch: false // always reload immediately
-      });
-    }
-  };
+      mode = mode || _getMode(id);
 
-  /**
-   * Remove the given Feature and optionally destroy it. Also remove the count
-   * value from the SettingsBar (if applicable).
-   *
-   * Note: when swapping between catalogs, the count value is updated, so it
-   * shouldn't be removed.
-   *
-   * @param feature {Object}
-   * @param destroy {Boolean} default is true
-   *     set to false when swapping catalogs
-   */
-  _this.removeFeature = function (feature, destroy = true) {
-    var id = feature.id;
-
-    if (_this.isFeature(feature)) {
-      _app.MapPane.removeFeature(feature);
-      _app.PlotsPane.removeFeature(feature);
-      _app.SummaryPane.removeFeature(feature);
-      _app.SettingsBar.setStatus(feature, 'disabled');
-
-      // SelectBar
-      if (id === 'mainshock') {
-        document.getElementById(id).innerHTML = ''; // Mainshock details
-      } else if (id === 'significant-eqs') {
-        document.getElementById(id).innerHTML = ''; // removes loader
-      }
-
-      if (destroy) {
-        if (feature.removeListeners) {
-          feature.removeListeners();
-        }
-
-        _removeCount(feature);
-        feature.destroy();
-
-        delete _features[feature.mode][id];
-      }
+      _createFeature(_modules[id], mode, _getOptions(id));
     }
   };
 
@@ -828,47 +551,28 @@ var Features = function (options) {
     _this.clearQueue();
     _removeFeatures();
     _initFeatures();
-
-    _lightboxes = {};
   };
 
   /**
-   * Restore the given Feature to its previous state, after a failed refresh.
+   * Store the given Feature and delete it from the list of loading Features.
+   * Also create the RTF doc or render, depending on the mode.
    *
    * @param feature {Object}
    */
-  _this.restoreFeature = function (feature) {
-    var id = feature.id,
-        mode = _getMode(id),
-        prevFeature = feature.prevFeature;
+  _this.storeFeature = function (feature) {
+    var mainshock;
 
-    _addCount(prevFeature);
-    _app.MapPane.layerControl.removeLayer(feature.mapLayer);
-    _app.MapPane.layerControl.addOverlay(prevFeature.mapLayer, feature.name);
+    feature.status = 'ready';
+    _features[feature.mode][feature.id] = feature;
 
-    _features[mode][id] = prevFeature;
-    _features[mode][id].prevFeature = {};
-  };
+    delete _features.loading[feature.id];
 
-  /**
-   * Event handler that shows a Feature's Lightbox.
-   *
-   * @param e {Event}
-   */
-  _this.showLightbox = function (e) {
-    var el = e.target.closest('.feature'),
-        id = Array.from(el.classList).find(className =>
-          !className.match('content|feature')
-        );
+    if (feature.mode === 'rtf') {
+      mainshock = _this.getMainshock();
 
-    e.preventDefault();
-
-    if (id === 'pager-exposures' || id === 'pager-loss') {
-      id = 'pager'; // show PAGER's Lightbox
-    }
-
-    if (_lightboxes[id]) {
-      _lightboxes[id].show();
+      mainshock.createRtf();
+    } else {
+      _render();
     }
   };
 

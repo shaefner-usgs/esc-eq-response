@@ -2,7 +2,7 @@
 
 
 /**
- * Render/handle the app's Panes and remember each Pane's scroll position.
+ * Render the app's Panes and remember their scroll positions.
  *
  * @param options {Object}
  *     {
@@ -27,7 +27,6 @@ var Pane = function (options) {
       _throttler,
 
       _addListeners,
-      _renderPlots,
       _saveScrollPosition;
 
 
@@ -57,31 +56,6 @@ var Pane = function (options) {
   };
 
   /**
-   * Wrapper method that renders the plots (and displays the rendering status).
-   */
-  _renderPlots = function () {
-    if (
-      document.body.classList.contains('mainshock') &&
-      !_app.PlotsPane.rendered
-    ) {
-      _app.StatusBar.addItem({
-        id: 'rendering',
-        name: 'Plots'
-      }, {
-        prepend: 'Rendering'
-      });
-
-      // Add a slight delay; otherwise rendering message does not display
-      setTimeout(() => {
-        _app.PlotsPane.render();
-        _app.StatusBar.removeItem('rendering');
-      }, 50);
-    }
-
-    _app.PlotsPane.resize(); // in case size of content area has changed
-  };
-
-  /**
    * Event handler that saves the current scroll position in sessionStorage.
    */
   _saveScrollPosition = function () {
@@ -92,7 +66,7 @@ var Pane = function (options) {
 
     // Throttle scroll event
     _throttler = setTimeout(() =>
-      sessionStorage.setItem(name, position), 250
+      sessionStorage.setItem(name, position), 100
     );
   };
 
@@ -121,21 +95,19 @@ var Pane = function (options) {
   /**
    * Render the given Pane so it displays correctly when it's unhidden.
    *
-   * @param name {String}
-   *     Pane name
+   * @param pane {String}
    */
-  _this.render = function (name) {
-    var mainshock = _app.Features.getFeature('mainshock');
+  _this.render = function (pane) {
+    _this.setScrollPosition(pane);
+    _app.SideBar.toggleLinks(pane);
 
-    _this.setScrollPosition(name);
-    _app.SideBar.toggleLinks(name);
-
-    if (name === 'map') {
+    if (pane === 'map') {
       _app.MapPane.render();
-    } else if (name === 'plots') {
-      _renderPlots();
-    } else if (name ==='summary' && mainshock.render) {
-      mainshock.render();
+    } else if (pane === 'plots') {
+      _app.PlotsPane.render();
+      _app.PlotsPane.resize(); // in case size of content area has changed
+    } else if (pane ==='summary') {
+      _app.SummaryPane.render();
     }
   };
 

@@ -7,16 +7,16 @@ var AppUtil = require('util/AppUtil'),
 
 
 var _DEFAULTS = {
-  'as-dist': null,
-  'as-mag': 0,
+  'as-distance': null,
+  'as-magnitude': 0,
   'as-refresh': 'm15',
   catalog: 'comcat',
   'cs-refresh': 'm15',
   'fs-days': 30,
-  'fs-dist': null,
-  'fs-mag': 1,
-  'hs-dist': null,
-  'hs-mag': null,
+  'fs-distance': null,
+  'fs-magnitude': 1,
+  'hs-distance': null,
+  'hs-magnitude': null,
   'hs-years': 10,
   timezone: 'utc'
 };
@@ -24,8 +24,9 @@ var _DEFAULTS = {
 
 /**
  * Refresh Features and swap between catalogs and timezones when the settings
- * are changed. Also set the URL parameters to match the current settings and
- * set default values based on the selected Mainshock.
+ * are changed. Also set the URL parameters (and the controls on initial load)
+ * to match the current settings and set default values based on the selected
+ * Mainshock.
  *
  * @param options {Object}
  *     {
@@ -35,10 +36,9 @@ var _DEFAULTS = {
  *
  * @return _this {Object}
  *     {
- *       postInit: {Function}
+ *       render: {Function}
  *       reset: {Function}
  *       resetCatalog: {Function}
- *       setFocusedField: {Function}
  *       setInterval: {Function}
  *       setStatus: {Function}
  *       setValues: {Function}
@@ -52,7 +52,7 @@ var SettingsBar = function (options) {
       _app,
       _catalogBar,
       _el,
-      _focusedField,
+      _field,
       _inputs,
       _intervals,
       _throttlers,
@@ -71,14 +71,17 @@ var SettingsBar = function (options) {
       _getTitle,
       _hasChanged,
       _initControls,
+      _removeCounts,
+      _removeFeatures,
       _setCatalog,
       _setField,
       _setParam,
       _setRefresh,
       _setTimeout,
       _setTimeZone,
+      _swapFeatures,
       _swapTimer,
-      _update;
+      _updateFeature;
 
 
   _this = {};
@@ -91,7 +94,7 @@ var SettingsBar = function (options) {
     _throttlers = {};
     _timeouts = {};
     _timezone = document.getElementById('timezone');
-    _title = _inputs[0].title; // first input (all title attrs identical)
+    _title = _inputs[0].title; // first input (all title attrs are identical)
 
     _initControls();
     _addListeners();
@@ -99,7 +102,7 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Add the given catalog's Features.
+   * Add the given catalog's Features (when swapping catalogs).
    *
    * @param catalog {String <comcat|dd>}
    */
@@ -109,10 +112,14 @@ var SettingsBar = function (options) {
     Object.keys(features).forEach(id => {
       var feature = features[id];
 
-      _app.Features.addFeature(feature);
+      feature.isSwapping = true;
+
+      feature.add();
+      feature.render();
+      feature.mapLayer.addCount(); // count values are added by L.GeoJSON.Async
 
       if (_hasChanged(feature)) {
-        _app.Features.refreshFeature(id);
+        _app.Features.reloadFeature(id);
       }
     });
   };
@@ -126,15 +133,15 @@ var SettingsBar = function (options) {
           'input[type=checkbox] + label',
           '#aftershocks',
           '#catalog-search'
-        ],
-        refresh = _el.querySelectorAll(selectors.join()),
+        ].join(','),
+        targets = _el.querySelectorAll(selectors), // auto-refresh settings
         timezones = _el.querySelectorAll('#timezone li');
 
     // Set the catalog, refresh and timezone options
     catalogs.forEach(catalog =>
       catalog.addEventListener('click', _setCatalog)
     );
-    refresh.forEach(target =>
+    targets.forEach(target =>
       target.addEventListener('click', _setRefresh)
     );
     timezones.forEach(timezone =>
@@ -144,7 +151,7 @@ var SettingsBar = function (options) {
     // Track changes to input fields
     _inputs.forEach(input => {
       input.addEventListener('focus', _setField);
-      input.addEventListener('input', _update);
+      input.addEventListener('input', _updateFeature);
     });
 
     // Safari clears form fields w/ autocomplete="off" when navigating "back" to app
@@ -185,20 +192,20 @@ var SettingsBar = function (options) {
    * @return {Object}
    */
   _getDefaults = function () {
-    var mag = _app.Features.getFeature('mainshock').data.eq.mag,
+    var mag = _app.Features.getMainshock().data.eq.mag,
         ruptureArea = Math.pow(10, mag - 4),
         ruptureLength = Math.pow(ruptureArea, 0.7);
 
     return Object.assign({}, _DEFAULTS, {
-      'as-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'fs-dist': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
-      'hs-dist': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
-      'hs-mag': Math.round(Math.max(4, mag - 2)),
+      'as-distance': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'fs-distance': Math.max(5, 10 * Math.round(0.1 * ruptureLength)),
+      'hs-distance': Math.max(20, 15 * Math.round(0.1 * ruptureLength)),
+      'hs-magnitude': Math.round(Math.max(4, mag - 2)),
     });
   };
 
   /**
-   * Get the Feature id from the given refresh parameter's name.
+   * Get the Feature id from the given URL parameter.
    *
    * @param name {String}
    *     URL parameter name
@@ -213,15 +220,14 @@ var SettingsBar = function (options) {
         id = ids[name] || '';
 
     if (id === 'aftershocks' && AppUtil.getParam('catalog') === 'dd') {
-      id = 'dd-aftershocks';
+      id = 'dd-' + id;
     }
 
     return id;
   };
 
   /**
-   * Get the refresh interval (in milliseconds) from the URL parameter value
-   * with the given name.
+   * Get the refresh interval (in milliseconds) from the given URL parameter.
    *
    * @param name {String}
    *     URL parameter name
@@ -231,11 +237,13 @@ var SettingsBar = function (options) {
   _getInterval = function (name) {
     var value = AppUtil.getParam(name) || '';
 
-    return parseInt(value.replace(/\D/g, ''), 10) * 60 * 1000; // strip 'm'
+    value = value.replace(/\D/g, ''); // strip 'm'
+
+    return (parseInt(value, 10) || 1) * 60 * 1000;
   };
 
   /**
-   * Get the relevant URL parameter key-value pairs from the current URL.
+   * Get the relevant URL parameters from the current URL.
    *
    * @return params {Object}
    */
@@ -262,7 +270,7 @@ var SettingsBar = function (options) {
    *     hint to user explaining why Feature's settings are disabled
    */
   _getTitle = function (feature) {
-    var title = _title || ''; // default
+    var title = _title; // default
 
     if (document.body.classList.contains('mainshock')) {
       title = `Disabled because ${feature.name} is loading`;
@@ -282,19 +290,13 @@ var SettingsBar = function (options) {
   _hasChanged = function (feature) {
     var inputs,
         changed = false, // default
-        lookup = {
-          dist: 'distance',
-          mag: 'magnitude'
-        },
-        settings = _el.querySelector('.' + feature.id);
+        settings = _el.querySelector('.' + feature.type);
 
     if (settings) {
       inputs = settings.querySelectorAll('input[type=number]');
 
       inputs.forEach(input => {
         var key = input.id.replace(/[a|f|h]s-/, '');
-
-        key = lookup[key] || key;
 
         if (Number(input.value) !== feature.params[key]) {
           changed = true;
@@ -306,8 +308,8 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Create the UI controls and set them to match the URL parameter values (or
-   * the default value if a parameter is not set).
+   * Create the custom UI controls and set them to match the URL parameter
+   * values (or the default value if a parameter is not set).
    */
   _initControls = function () {
     var params = _getParams(),
@@ -340,46 +342,56 @@ var SettingsBar = function (options) {
     Switch({
       el: document.getElementById('cs-refresh')
     }).setValue(Boolean(params['cs-refresh']));
+
+    document.body.classList.add(settings.timezone);
+  };
+
+  /**
+   * Remove the Features' count values/loaders, if applicable.
+   */
+  _removeCounts = function () {
+    var features = _el.querySelectorAll('div.disabled');
+
+    features.forEach(feature => {
+      var count = feature.querySelector('.count'),
+          header = feature.querySelector('h3');
+
+      if (count) {
+        header.removeChild(count);
+      }
+    });
+  };
+
+  /**
+   * Remove the given catalog's Features.
+   *
+   * @param catalog {String <comcat|dd>}
+   */
+  _removeFeatures = function (catalog) {
+    var features = _app.Features.getFeatures(catalog);
+
+    Object.keys(features).forEach(
+      id => features[id].remove()
+    );
   };
 
   /**
    * Event handler that sets the earthquake catalog option.
    */
   _setCatalog = function () {
-    var catalogs, mainshock, pane, prevCatalog, prevFeatures, status,
+    var pane,
         catalog = this.id;
 
     _setParam('catalog', catalog);
 
     if (document.body.classList.contains('mainshock')) {
-      catalogs = _catalogBar.getIds(),
-      mainshock = _app.Features.getFeature('mainshock'),
-      pane = _app.Pane.getSelected(),
-      prevCatalog = catalogs.find(item => item !== catalog),
-      prevFeatures = _app.Features.getFeatures(prevCatalog),
-      status = _app.Features.getStatus(catalog);
+      pane = _app.Pane.getSelected();
 
-      mainshock.update(catalog);
-      mainshock.disableDownload();
+      _swapFeatures(catalog);
       _swapTimer();
-
-      // Remove previous catalog's Features
-      Object.keys(prevFeatures).forEach(id => {
-        _app.Features.removeFeature(prevFeatures[id], false);
-      });
-
-      // Create (and add) or re-add selected catalog's Features
-      if (status === 'ready') {
-        _addFeatures(catalog);
-      } else {
-        _app.Features.createFeatures(catalog);
-      }
 
       if (pane !== 'map') {
         _app.Pane.setScrollPosition(pane);
-      }
-      if (pane !== 'plots') {
-        _app.PlotsPane.rendered = false; // flag to (re-)render plots
       }
     }
   };
@@ -395,7 +407,7 @@ var SettingsBar = function (options) {
   _setField = function (e) {
     var input = e.target;
 
-    _focusedField = input.id;
+    _field = input.id;
 
     input.select();
   };
@@ -416,19 +428,19 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Event handler that sets the auto-refresh option.
+   * Event handler that sets/unsets the auto-refresh option.
    *
    * @param e {Event}
    */
   _setRefresh = function (e) {
     var div = e.target.closest('.refresh'),
         input = div.querySelector('input'),
-        featureId = _getFeatureId(input.id),
+        id = _getFeatureId(input.id),
         name = input.id,
         selected = div.querySelector('.selected'),
         tagName = e.target.tagName.toLowerCase(),
-        value = Array.from(selected.classList).find(className =>
-          className !== 'selected' // e.g. 'm15'
+        value = Array.from(selected.classList).find(
+          item => item !== 'selected'
         );
 
     if (input.checked) {
@@ -437,9 +449,9 @@ var SettingsBar = function (options) {
       if (tagName === 'li') { // interval changed
         _setTimeout(name);
       } else if (tagName !== 'ul') { // switch turned on
-        _app.Features.refreshFeature(featureId);
+        _app.Features.reloadFeature(id);
         _this.setInterval(name);
-      } else { // RadioBar border clicked
+      } else { // RadioBar's border clicked
         return;
       }
     } else { // switch turned off
@@ -450,36 +462,34 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set a one-off (non-recurring) refresh timer for the Feature matching the
-   * given name. Then start an interval timer when it finishes.
+   * Set a one-off auto-refresh timer (i.e. the initial delay) for the Feature
+   * matching the given name. Then start a recurring timer when it expires.
    *
    * @param name {String}
    *     URL parameter name
    */
   _setTimeout = function (name) {
-    var elapsed,
+    var delay, elapsed, interval,
         id = _getFeatureId(name),
-        interval = _getInterval(name),
-        delay = interval, // default
         feature = _app.Features.getFeature(id);
 
-    // Set delay based on elapsed time in the current auto-refresh cycle
-    if (_app.Features.isFeature(feature)) {
-      delay = 0;
-      elapsed = Date.now() - feature.updated;
-
-      if (elapsed < interval) {
-        delay = interval - elapsed;
-      }
-    }
-
-    clearInterval(_intervals[name]); // cancel existing interval timer first
+    clearInterval(_intervals[name]); // cancel existing interval timer
     clearTimeout(_timeouts[name]); // ensure a single timer is set
 
-    _timeouts[name] = setTimeout(function() {
-      _app.Features.refreshFeature(id);
-      _this.setInterval(name);
-    }, delay);
+    if (_app.Features.isFeature(feature)) {
+      elapsed = Date.now() - feature.updated;
+      interval = _getInterval(name);
+      delay = interval - elapsed;
+
+      if (elapsed > interval) {
+        delay = 0; // refresh immediately
+      }
+
+      _timeouts[name] = setTimeout(() => {
+        _app.Features.reloadFeature(id);
+        _this.setInterval(name);
+      }, delay);
+    }
   };
 
   /**
@@ -492,14 +502,35 @@ var SettingsBar = function (options) {
 
     tzs.forEach(tz => document.body.classList.remove(tz));
 
-    document.body.classList.add(timezone);
+    document.body.classList.add(timezone); // CSS trigger that toggles timezone
     _setParam('timezone', timezone);
 
     if (document.body.classList.contains('mainshock')) {
       tables = document.querySelectorAll('#summary-pane table.list.sortable');
 
       _app.PlotsPane.update();
-      _app.SummaryPane.swapSortIndicator(tables);
+      _app.SummaryPane.swapSort(tables);
+    }
+  };
+
+  /**
+   * Swap Features to keep them in sync with the selected catalog.
+   *
+   * @param catalog {String <comcat|dd>}
+   */
+  _swapFeatures = function (catalog) {
+    var catalogs = _catalogBar.getIds(),
+        mainshock = _app.Features.getMainshock(),
+        prevCatalog = catalogs.find(item => item !== catalog),
+        status = _app.Features.getStatus(catalog);
+
+    _removeFeatures(prevCatalog);
+
+    if (status === 'ready') {
+      _addFeatures(catalog);
+      mainshock.enableDownload();
+    } else {
+      _app.Features.createFeatures(catalog);
     }
   };
 
@@ -516,35 +547,42 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Event handler that refreshes a Feature and updates its URL parameter.
+   * Event handler that updates a Feature and its URL parameter.
    *
    * @param e {Event}
    */
-  _update = function (e) {
-    var classList, feature, id;
+  _updateFeature = function (e) {
+    var feature, name,
+        div = this.closest('div'),
+        id = Array.from(div.classList).find(item => item !== 'enabled'), // default
+        mode = 'comcat'; // default
 
     if (e.data && !Number.isInteger(Number(e.data))) return;
 
-    classList = Array.from(this.closest('div').classList);
-    id = classList.find(className => !className.includes('dd-'));
-
     if (AppUtil.getParam('catalog') === 'dd') {
-      id = classList.find(className => className.includes('dd-'));
+      id = 'dd-' + id;
+      mode = 'dd';
     }
-
-    feature = _app.Features.getFeature(id);
 
     AppUtil.setParam(this.id, this.value);
 
     if (this.value !== '') {
+      feature = _app.Features.getFeature(id);
+
+      if (_app.Features.isFeature(feature)) {
+        name = feature.name;
+      } else {
+        name = div.querySelector('h3').textContent;
+      }
+
       // Throttle stacked requests if user changes settings rapidly
       clearTimeout(_throttlers[id]); // ensure one timer per Feature
-      _throttlers[id] = setTimeout(_app.Features.refreshFeature, 500, id);
+      _throttlers[id] = setTimeout(_app.Features.reloadFeature, 500, id, mode);
 
       // Show loading status immediately (don't wait for throttlers)
       _app.StatusBar.addItem({
         id: id,
-        name: feature.name
+        name: name
       });
     }
   };
@@ -554,36 +592,29 @@ var SettingsBar = function (options) {
   // ----------------------------------------------------------
 
   /**
-   * Initialization that depends on the app's other Classes being ready first.
+   * Render the currently selected field.
    */
-  _this.postInit = function () {
-    var tz = _timezone.querySelector('.selected').id;
-
-    document.body.classList.add(tz);
-
-    if (AppUtil.getParam('cs-refresh')) {
-      _this.setInterval('cs-refresh'); // Catalog Search auto refresh
+  _this.render = function () {
+    if (_field) {
+      document.getElementById(_field).focus();
     }
   };
 
   /**
-   * Reset to default state.
-   *
-   * Note: Feature counts are removed separately via Features.js.
+   * Reset to default state (except for catalog, timezone and refresh settings).
    */
   _this.reset = function () {
     var timestamp = _el.querySelector('#aftershocks + .timestamp');
 
     timestamp.innerHTML = '';
+    _field = null;
 
     _inputs.forEach(input => {
+      input.title = _title; // set to initial, cached value
       input.value = '';
-
-      if (_title) { // set back to initial value if title attr changed
-        input.title = _title;
-      }
     });
-    _focusedField = null;
+
+    _removeCounts();
 
     clearInterval(_intervals['as-refresh']);
     clearTimeout(_timeouts['as-refresh']);
@@ -600,15 +631,6 @@ var SettingsBar = function (options) {
   };
 
   /**
-   * Set the focus to the last field selected by the user.
-   */
-  _this.setFocusedField = function () {
-    if (_focusedField) {
-      document.getElementById(_focusedField).focus();
-    }
-  };
-
-  /**
    * Set an auto-refresh interval timer for the Feature matching the given name.
    *
    * @param name {String}
@@ -620,18 +642,18 @@ var SettingsBar = function (options) {
 
     clearInterval(_intervals[name]); // ensure a single timer per Feature is set
 
-    _intervals[name] = setInterval(_app.Features.refreshFeature, interval, id);
+    _intervals[name] = setInterval(_app.Features.reloadFeature, interval, id);
   };
 
   /**
    * Set the status of the given Feature's settings.
    *
    * @param feature {Object}
-   * @param status {String} default is ''
+   * @param status {String <enabled|disabled>} optional; default is ''
    */
   _this.setStatus = function (feature, status = '') {
     var inputs,
-        settings = _el.querySelector('.' + feature.id);
+        settings = _el.querySelector('.' + feature.type);
 
     if (settings) {
       inputs = settings.querySelectorAll('input[type=number]');
@@ -656,30 +678,28 @@ var SettingsBar = function (options) {
    * parameter values (if present) override the defaults.
    */
   _this.setValues = function () {
-    var params = Object.assign({}, _getDefaults(), _getParams());
+    var settings = Object.assign({}, _getDefaults(), _getParams());
 
-    Object.keys(params).forEach(name => {
+    Object.keys(settings).forEach(name => {
       var input = document.getElementById(name);
 
       if (input) {
-        input.value = params[name];
+        input.value = settings[name];
       }
     });
   };
 
   /**
-   * Update the given Feature's timestamp.
+   * Update the given Feature's refresh timestamp.
    *
    * @param feature {Object}
    */
   _this.updateTimeStamp = function (feature) {
-    var el, id;
+    var id = feature.type || feature.id, // catalog agnostic
+        el = _el.querySelector(`#${id} + .timestamp`);
 
-    if (feature.id.includes('aftershocks') || feature.id === 'catalog-search') {
-      id = feature.id.replace(/^dd-/, ''); // catalog agnostic
-      el = _el.querySelector(`#${id} + .timestamp`);
-
-      el.innerHTML = feature.timestamp;
+    if (el) {
+      el.innerHTML = _app.Features.getTimeStamp(feature.data);
     }
   };
 
