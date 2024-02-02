@@ -796,14 +796,14 @@ class Rtf {
         $this->_format->h4
       );
       $section5->writeText(
-        $dyfi->responses . ' responses',
-        $this->_font->body,
-        $this->_format->body
-      );
-      $section5->writeText(
         'Max MMI: ' . $dyfi->maxmmi,
         $this->_font->body,
         $this->_format->p
+      );
+      $section5->writeText(
+        $dyfi->responses . ' responses',
+        $this->_font->body,
+        $this->_format->body
       );
 
       if ($dyfi->map) {
@@ -862,41 +862,35 @@ class Rtf {
     );
 
     $section6->writeText(
-      strip_tags($aftershocks->description),
+      preg_replace('/\s+/', ' ', strip_tags($aftershocks->description)),
       $this->_font->body,
       $this->_format->p
     );
 
-    if ($count === 0) {
-      $section6->writeText(
-        'None',
-        $this->_font->h3,
-        $this->_format->h3
-      );
-    } else {
+    if ($count > 0) {
       $listCount = count($aftershocks->earthquakes);
-      $magThreshold = $aftershocks->magThreshold;
+      $threshold = $aftershocks->threshold;
 
       $this->_createTableBinnedData($section6, 'aftershocks', 'first');
       $this->_createTableBinnedData($section6, 'aftershocks', 'past');
 
       $section6->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $threshold+ Earthquakes ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
       $this->_createTableEqlist($section6, 'aftershocks');
 
       if (!empty(get_object_vars($plots))) {
-        foreach ($plots as $type => $dataUrl) {
+        foreach ($plots as $type => $props) {
           $section6->writeText(
-            $this->_data->plotNames->$type,
+            $props->name,
             $this->_font->h4,
             $this->_format->h4
           );
           $section6->writeText('<br>');
           $section6->addImage(
-            $this->_getImage($dataUrl),
+            $this->_getImage($props->dataUrl),
             $this->_format->image,
             18
           );
@@ -975,19 +969,19 @@ class Rtf {
     );
 
     $section7->writeText(
-      strip_tags($foreshocks->description),
+      preg_replace('/\s+/', ' ', strip_tags($foreshocks->description)),
       $this->_font->body,
       $this->_format->p
     );
 
     if ($count > 0) {
       $listCount = count($foreshocks->earthquakes);
-      $magThreshold = $foreshocks->magThreshold;
+      $threshold = $foreshocks->threshold;
 
       $this->_createTableBinnedData($section7, 'foreshocks', 'prior');
 
       $section7->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $threshold+ Earthquakes ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
@@ -1017,34 +1011,34 @@ class Rtf {
     );
 
     $section8->writeText(
-      strip_tags($historical->description),
+      preg_replace('/\s+/', ' ', strip_tags($historical->description)),
       $this->_font->body,
       $this->_format->p
     );
 
     if ($count > 0) {
       $listCount = count($historical->earthquakes);
-      $magThreshold = $historical->magThreshold;
+      $threshold = $historical->threshold;
 
       $this->_createTableBinnedData($section8, 'historical', 'prior');
 
       $section8->writeText(
-        "M $magThreshold+ Earthquakes ($listCount)",
+        "M $threshold+ Earthquakes ($listCount)",
         $this->_font->h4,
         $this->_format->h4
       );
       $this->_createTableEqlist($section8, 'historical');
 
       if (!empty(get_object_vars($plots))) {
-        foreach ($plots as $type => $dataUrl) {
+        foreach ($plots as $type => $props) {
           $section8->writeText(
-            $this->_data->plotNames->$type,
+            $props->name,
             $this->_font->h4,
             $this->_format->h4
           );
           $section8->writeText('<br>');
           $section8->addImage(
-            $this->_getImage($dataUrl),
+            $this->_getImage($props->dataUrl),
             $this->_format->image,
             18
           );
