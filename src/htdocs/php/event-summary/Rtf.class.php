@@ -580,7 +580,7 @@ class Rtf {
       }
 
       $section3->writeText(
-        'Population Exposure',
+        'Estimated Population Exposure',
         $this->_font->h4,
         $this->_format->h4
       );
