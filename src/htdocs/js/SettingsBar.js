@@ -420,7 +420,13 @@ var SettingsBar = function (options) {
    * @param value {String}
    */
   _setParam = function (name, value) {
-    if (value === _DEFAULTS[name]) {
+    var defaults = _DEFAULTS;
+
+    if (document.body.classList.contains('mainshock')) {
+      defaults = _getDefaults();
+    }
+
+    if (value === defaults[name]) {
       AppUtil.deleteParam(name, value);
     } else {
       AppUtil.setParam(name, value);
@@ -564,7 +570,7 @@ var SettingsBar = function (options) {
       mode = 'dd';
     }
 
-    AppUtil.setParam(this.id, this.value);
+    _setParam(this.id, Number(this.value));
 
     if (this.value !== '') {
       feature = _app.Features.getFeature(id);
