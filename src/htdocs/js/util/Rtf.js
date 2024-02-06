@@ -269,7 +269,7 @@ var Rtf = function (options) {
         app: location.href,
         eventPage: eq.url
       },
-      zone: AppUtil.getParam('timezone') || 'utc'
+      zone: AppUtil.getParam('timezone') || 'user'
     };
   };
 

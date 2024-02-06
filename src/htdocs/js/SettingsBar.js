@@ -18,7 +18,7 @@ var _DEFAULTS = {
   'hs-distance': null,
   'hs-magnitude': null,
   'hs-years': 10,
-  timezone: 'utc'
+  timezone: 'user'
 };
 
 
