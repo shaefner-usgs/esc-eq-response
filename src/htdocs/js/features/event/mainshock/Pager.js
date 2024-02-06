@@ -150,21 +150,21 @@ var Pager = function (options) {
    * @return {Object}
    */
   _getData = function (json) {
-    var contents = _product.contents || {},
+    var cities = _app.Features.getFeature('pager-cities'),
+        contents = _product.contents || {},
+        exposures = _app.Features.getFeature('pager-exposures'),
         millisecs = Number(_product.updateTime) || 0,
         datetime = Luxon.DateTime.fromMillis(millisecs),
-        eq = _mainshock.data.eq,
-        pagerCities = _app.Features.getFeature('pager-cities'),
-        pagerExposures = _app.Features.getFeature('pager-exposures');
+        eq = _mainshock.data.eq;
 
     return {
       alert: eq.alert,
-      cities: pagerCities.data,
+      cities: cities.data || [],
       cost: contents['alertecon.png']?.url || '',
       costBlurb: json.impact1 || '',
       effects: json.secondary_comment || '',
       exposure: contents['exposure.png']?.url || '',
-      exposures: pagerExposures.data,
+      exposures: exposures.data || {},
       fatal: contents['alertfatal.png']?.url || '',
       fatalBlurb: json.impact2 || '',
       isoTime: datetime.toUTC().toISO(),

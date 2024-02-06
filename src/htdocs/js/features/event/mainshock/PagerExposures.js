@@ -125,7 +125,7 @@ var PagerExposures = function (options) {
    */
   _getRows = function () {
     var data,
-        cities = _app.Features.getFeature('pager-cities').data,
+        cities = _app.Features.getFeature('pager-cities').data || [],
         html = '',
         mmis = _this.data.mmi,
         population = _this.data.population,
