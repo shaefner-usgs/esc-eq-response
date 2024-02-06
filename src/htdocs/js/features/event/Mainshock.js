@@ -306,6 +306,7 @@ var Mainshock = function (options) {
 
     return {
       eq: _getEq(json),
+      isoTime: datetime.toUTC().toISO(),
       userDate: datetime.toLocaleString(Luxon.DateTime.DATE_MED),
       userTime: datetime.toLocaleString(Luxon.DateTime.TIME_24_WITH_SECONDS),
       utcDate: datetime.toUTC().toLocaleString(Luxon.DateTime.DATE_MED),
@@ -626,12 +627,12 @@ var Mainshock = function (options) {
   };
 
   /**
-   * Get the HTML template for the updated time.
+   * Get the HTML content for the updated time.
    *
    * @return {String}
    */
   _getUpdated = function () {
-    return '' +
+    return L.Util.template(
       '<li class="user updated">' +
         '<strong>Updated</strong>' +
         '<span>' +
@@ -647,7 +648,9 @@ var Mainshock = function (options) {
           '<em>{utcTime}</em>' +
         '</span>' +
         '<small>UTC</small>' +
-      '</li>';
+      '</li>',
+      _this.data
+    );
   };
 
   /**
