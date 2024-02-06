@@ -23,18 +23,20 @@ class Rtf {
           $_fields,
           $_font,
           $_format,
-          $_now,
-          $_rtf;
+          $_rtf,
+          $_updated;
 
   public $file;
 
   public function __construct ($data) {
+    $updated = $data->mainshock->updated;
+
     $this->_data = $data;
     $this->_fields = $this->_getFields();
     $this->_font = new stdClass;
     $this->_format = new stdClass;
-    $this->_now = date('Y-m-d g:ia \(T\)');
     $this->_rtf = new PHPRtfLite(); // create RTF document instance
+    $this->_updated = date('Y-m-d g:ia \(T\)', strtotime($updated));
 
     if ($this->_data) {
       $this->_cleanData();
@@ -297,7 +299,7 @@ class Rtf {
       $this->_format->h1
     );
     $section1->writeText(
-      '<b>Version 1</b>, ' . $this->_now,
+      '<b>Version 1</b>, ' . $this->_updated,
       $this->_font->body,
       $this->_format->center
     );

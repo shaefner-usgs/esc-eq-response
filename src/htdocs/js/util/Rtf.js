@@ -257,7 +257,8 @@ var Rtf = function (options) {
           user: eq.userTimeDisplay,
           utc: eq.utcTimeDisplay,
         },
-        title: eq.title
+        title: eq.title,
+        updated: mainshock.data.isoTime
       },
       nearbyCities: nearbyCities.data,
       notice: notice[0]?.contents?.['']?.bytes || '',
