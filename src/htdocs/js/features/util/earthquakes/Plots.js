@@ -688,7 +688,7 @@ var Plots = function (options) {
     _slider?.removeListeners();
 
     _plots.forEach(plot => {
-      if (!plot.classList.contains('hypocenters')) { // 2d plots only
+      if (plot.removeListener && !plot.classList.contains('hypocenters')) {
         plot.removeListener('plotly_click', _openPopup);
       }
     });
