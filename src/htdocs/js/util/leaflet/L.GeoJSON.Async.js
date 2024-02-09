@@ -9,7 +9,7 @@ var AppUtil = require('util/AppUtil');
 
 var _DEFAULTS = {
   host: '',
-  pointToLayer: null // only fetch and return JSON data by default
+  pointToLayer: function() {} // only fetch and return JSON data by default
 };
 
 
