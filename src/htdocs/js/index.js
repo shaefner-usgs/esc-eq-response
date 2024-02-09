@@ -5,16 +5,16 @@ var Application = require('Application');
 
 
 Application({
-  LegendBar: document.getElementById('legend-bar'),
-  MapPane: document.getElementById('map-pane'),
-  NavBar: document.getElementById('navbar'),
-  Pane: document.getElementById('pane'),
-  PlotsPane: document.getElementById('plots-pane'),
-  SearchBar: document.getElementById('search-bar'),
-  SelectBar: document.getElementById('select-bar'),
-  SettingsBar: document.getElementById('settings-bar'),
-  SideBar: document.getElementById('sidebar'),
-  StatusBar: document.getElementById('status-bar'),
-  SummaryPane: document.getElementById('summary-pane'),
-  TitleBar: document.getElementById('title-bar')
+  legendBar: document.getElementById('legend-bar'),
+  mapPane: document.getElementById('map-pane'),
+  navBar: document.getElementById('navbar'),
+  pane: document.getElementById('pane'),
+  plotsPane: document.getElementById('plots-pane'),
+  searchBar: document.getElementById('search-bar'),
+  selectBar: document.getElementById('select-bar'),
+  settingsBar: document.getElementById('settings-bar'),
+  sideBar: document.getElementById('sidebar'),
+  statusBar: document.getElementById('status-bar'),
+  summaryPane: document.getElementById('summary-pane'),
+  titleBar: document.getElementById('title-bar')
 });

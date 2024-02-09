@@ -29,18 +29,18 @@ var Features = require('Features'),
  *
  * @param options {Object}
  *     {
- *       LegendBar: {Element}
- *       MapPane: {Element}
- *       NavBar: {Element}
- *       Pane: {Element}
- *       PlotsPane: {Element}
- *       SearchBar: {Element}
- *       SelectBar: {Element}
- *       SettingsBar: {Element}
- *       SideBar: {Element}
- *       StatusBar: {Element}
- *       SummaryPane: {Element}
- *       TitleBar: {Element}
+ *       legendBar: {Element}
+ *       mapPane: {Element}
+ *       navBar: {Element}
+ *       pane: {Element}
+ *       plotsPane: {Element}
+ *       searchBar: {Element}
+ *       selectBar: {Element}
+ *       settingsBar: {Element}
+ *       sideBar: {Element}
+ *       statusBar: {Element}
+ *       summaryPane: {Element}
+ *       titleBar: {Element}
  *     }
  *
  * @return _this {Object}
@@ -111,9 +111,11 @@ var Application = function (options) {
         postInits = [];
 
     Object.keys(appClasses).forEach(name => {
+      var key = name.charAt(0).toLowerCase() + name.slice(1);
+
       _this[name] = appClasses[name]({
         app: _this,
-        el: _els[name] || null
+        el: _els[key] || null
       });
 
       if (typeof _this[name].postInit === 'function') {
