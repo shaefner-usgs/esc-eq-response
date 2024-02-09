@@ -175,4 +175,8 @@
   .leaflet-tooltip-right:before {
     border-right-color: var(--bg-color);
   }
+
+  .leaflet-top .leaflet-control {
+    margin-top: 7.75rem;
+  }
 }
