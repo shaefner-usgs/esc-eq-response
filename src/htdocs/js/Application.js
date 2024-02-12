@@ -42,27 +42,6 @@ var Features = require('Features'),
  *       summaryPane: {Element}
  *       titleBar: {Element}
  *     }
- *
- * @return _this {Object}
- *     {
- *       Features: {Object}
- *       LegendBar: {Object}
- *       MapPane: {Object}
- *       NavBar: {Object}
- *       Pane: {Object}
- *       PlotsPane: {Object}
- *       SearchBar: {Object}
- *       SelectBar: {Object}
- *       SettingsBar: {Object}
- *       SideBar: {Object}
- *       StatusBar: {Object}
- *       SummaryPane: {Object}
- *       TitleBar: {Object}
- *       dateFormat: {String}
- *       headerHeight: {Number}
- *       reset: {Function}
- *       sideBarWidth: {Number}
- *     }
  */
 var Application = function (options) {
   var _this,
