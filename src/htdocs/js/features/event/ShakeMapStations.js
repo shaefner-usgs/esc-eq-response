@@ -55,6 +55,7 @@ var ShakeMapStations = function (options) {
       _app,
       _markerOptions,
 
+      _fetch,
       _filter,
       _getAmplitudes,
       _getComponent,
@@ -89,6 +90,13 @@ var ShakeMapStations = function (options) {
     _this.url = _getUrl();
     _this.zoomToLayer = false;
 
+    _fetch();
+  };
+
+  /**
+   * Fetch the feed data.
+   */
+  _fetch = function () {
     if (_this.url) {
       _this.mapLayer = L.geoJSON.async(_this.url, {
         app: _app,
@@ -408,6 +416,7 @@ var ShakeMapStations = function (options) {
     _app = null;
     _markerOptions = null;
 
+    _fetch = null;
     _filter = null;
     _getAmplitudes = null;
     _getComponent = null;
