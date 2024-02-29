@@ -8,18 +8,18 @@ var AppUtil = require('util/AppUtil'),
 
 
 var _COLORS,
-    _DEFAULTS;
+    _MARKERS;
 
 _COLORS = {
   foreshocks: '#99a',
   historical: '#dde',
   mainshock: '#00f',
+  older: '#ffffe6',
   pasthour: '#f00',
   pastday: '#f90',
-  pastweek: '#ff0',
-  older: '#ffffe6'
+  pastweek: '#ff0'
 };
-_DEFAULTS = {
+_MARKERS = {
   color: '#000', // stroke
   fillOpacity: 0.85,
   opacity: 0.6, // stroke
@@ -57,7 +57,6 @@ var Earthquakes = function (options) {
       _catalog,
       _feature,
       _mainshock,
-      _markerOptions,
 
       _addBubbles,
       _addListeners,
@@ -79,17 +78,9 @@ var Earthquakes = function (options) {
   _initialize = function (options = {}) {
     var host = '';
 
-    options = Object.assign({}, _DEFAULTS, options);
-
     _app = options.app;
     _catalog = AppUtil.getParam('catalog') || 'comcat';
     _feature = options.feature;
-    _markerOptions = {
-      color: options.color,
-      fillOpacity: options.fillOpacity,
-      opacity: options.opacity,
-      weight: options.weight
-    };
 
     if (_feature.type === 'mainshock' || _feature.id === 'catalog-search') {
       _catalog = 'comcat'; // always ComCat, despite catalog param
@@ -450,7 +441,7 @@ var Earthquakes = function (options) {
   };
 
   /**
-   * Create Leaflet Markers.
+   * Create the Leaflet Markers.
    *
    * @param feature {Object}
    * @param latlng {L.LatLng}
@@ -459,7 +450,7 @@ var Earthquakes = function (options) {
    */
   _pointToLayer = function (feature, latlng) {
     var eq = _this.data.eqs.find(item => item.id === feature.id), // eqid
-        opts = Object.assign({}, _markerOptions, {
+        opts = Object.assign({}, _MARKERS, {
           fillColor: eq.fillColor,
           pane: _feature.id, // controls stacking order
           radius: eq.radius
@@ -531,8 +522,8 @@ var Earthquakes = function (options) {
    */
   _this.addListeners = function () {
     _this.mapLayer.on({
-      popupopen: _onPopupOpen,
-      popupclose: _onPopupClose
+      popupclose: _onPopupClose,
+      popupopen: _onPopupOpen
     });
   };
 
@@ -546,7 +537,6 @@ var Earthquakes = function (options) {
     _catalog = null;
     _feature = null;
     _mainshock = null;
-    _markerOptions = null;
 
     _addBubbles = null;
     _addListeners = null;
@@ -610,8 +600,8 @@ var Earthquakes = function (options) {
    */
   _this.removeListeners = function () {
     _this.mapLayer.off({
-      popupopen: _onPopupOpen,
-      popupclose: _onPopupClose
+      popupclose: _onPopupClose,
+      popupopen: _onPopupOpen
     });
   };
 
