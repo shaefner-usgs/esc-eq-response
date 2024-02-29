@@ -167,50 +167,6 @@ AppUtil.getParam = function (name) {
 };
 
 /**
- * Get the circle marker radius for the given eq magnitude, rounded to the
- * nearest tenth.
- *
- * @param mag {Number}
- *
- * @return {Number}
- */
-AppUtil.getRadius = function (mag) {
-  var radius = 2 * Math.pow(10, (0.15 * Number(mag)));
-
-  return Math.round(radius * 10) / 10;
-};
-
-/**
- * Get the shaking values (intensity/level) for an array of MMI Integer values.
- *
- * @param mmis {Array}
- *
- * @return values {Array}
- */
-AppUtil.getShakingValues = function (mmis) {
-  var shaking = [
-        {intensity: 'N/A',  level: '–'},
-        {intensity: 'I',    level: 'Not felt'},
-        {intensity: 'II',   level: 'Weak'},
-        {intensity: 'III',  level: 'Weak'},
-        {intensity: 'IV',   level: 'Light'},
-        {intensity: 'V',    level: 'Moderate'},
-        {intensity: 'VI',   level: 'Strong'},
-        {intensity: 'VII',  level: 'Very strong'},
-        {intensity: 'VIII', level: 'Severe'},
-        {intensity: 'IX',   level: 'Violent'},
-        {intensity: 'X+',   level: 'Extreme'}
-      ],
-      values = [];
-
-  mmis.forEach(val =>
-    values.push(shaking[Number(val) || 0])
-  );
-
-  return values;
-};
-
-/**
  * Get the timezone on the user's device.
  *
  * Taken from: https://stackoverflow.com/questions/2897478/get-client-timezone-

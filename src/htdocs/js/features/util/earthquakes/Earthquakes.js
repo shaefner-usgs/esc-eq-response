@@ -352,7 +352,7 @@ var Earthquakes = function (options) {
         magInt: Math.floor(mag),
         magType: magType,
         mmi: mmi || '', // ShakeMap
-        radius: AppUtil.getRadius(mag),
+        radius: Earthquakes.getRadius(mag),
         status: status,
         statusIcon: statusIcon || '',
         title: title,
@@ -609,6 +609,21 @@ var Earthquakes = function (options) {
   _initialize(options);
   options = null;
   return _this;
+};
+
+
+/**
+ * Static method to get the circle marker radius for the given eq magnitude,
+ * rounded to the nearest tenth.
+ *
+ * @param mag {Number}
+ *
+ * @return {Number}
+ */
+Earthquakes.getRadius = function (mag) {
+  var radius = 2 * Math.pow(10, (0.15 * Number(mag)));
+
+  return Math.round(radius * 10) / 10;
 };
 
 /**
