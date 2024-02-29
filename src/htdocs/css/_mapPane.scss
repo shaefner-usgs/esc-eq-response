@@ -78,6 +78,10 @@
       z-index: 417;
     }
 
+    .leaflet-top .leaflet-control {
+      margin-top: 7.75rem;
+    }
+
     // Scroll wide tables in Leaflet popups elegantly
     .scroll-wrapper {
       overflow: auto;
