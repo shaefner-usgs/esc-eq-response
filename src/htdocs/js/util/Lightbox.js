@@ -17,7 +17,7 @@ var _DEFAULTS = {
  *     {
  *       content: {String} optional
  *       id: {String}
- *       targets: {NodeList}
+ *       targets: {NodeList} optional
  *       title: {String} optional
  *     }
  *
@@ -57,8 +57,8 @@ var Lightbox = function (options) {
     options = Object.assign({}, _DEFAULTS, options);
 
     _content = options.content;
-    _el = document.createElement('div');
     _id = options.id;
+    _el = document.getElementById(_id) || document.createElement('div');
     _targets = options.targets;
     _title = options.title;
   };
@@ -151,7 +151,7 @@ var Lightbox = function (options) {
     _container?.removeEventListener('click', _disableClick);
     _el.removeEventListener('click', _this.hide);
 
-    _targets?.forEach(target => {
+    _targets.forEach(target => {
       target.removeEventListener('click', _this.hide);
     });
 
@@ -251,9 +251,13 @@ var Lightbox = function (options) {
 
   /**
    * Show the Lightbox.
+   *
+   * @return _this {Object}
    */
   _this.show = function () {
     _el.classList.remove('hide');
+
+    return _this; // enable chaining
   };
 
 
