@@ -94,8 +94,8 @@ var Lightbox = function (options) {
   /**
    * Get the HTML content for the Lightbox.
    *
-   * Note: placeholders are used for the title/content if not provided
-   * during instantiation.
+   * Note: placeholders are used for the title/content if not provided during
+   * instantiation.
    *
    * @return {String}
    */
@@ -124,7 +124,7 @@ var Lightbox = function (options) {
    */
   _onKeyDown = function (e) {
     if (e.key === 'Escape') {
-      e.stopPropagation(); // don't also close Leaflet Popup
+      e.stopPropagation(); // don't also close Leaflet Popup (if applicable)
 
       _this.hide();
     }
@@ -136,7 +136,7 @@ var Lightbox = function (options) {
   _remove = function () {
     _removeListeners();
 
-    if (document.getElementById(_el.id)) {
+    if (document.getElementById(_id)) {
       _el.parentNode.removeChild(_el);
     }
   };
@@ -224,7 +224,7 @@ var Lightbox = function (options) {
   };
 
   /**
-   * Set the content.
+   * Set the Lightbox's content.
    *
    * @param content {String}
    *
@@ -243,7 +243,7 @@ var Lightbox = function (options) {
   };
 
   /**
-   * Set the title.
+   * Set the Lightbox's title.
    *
    * @param title {String}
    *
@@ -264,9 +264,18 @@ var Lightbox = function (options) {
   /**
    * Show the Lightbox.
    *
+   * @param reset {Boolean} optional; default is false
+   *     Reset scroll position to top
+   *
    * @return _this {Object}
    */
-  _this.show = function () {
+  _this.show = function (reset = false) {
+    var container = _el.querySelector('.container');
+
+    if (reset) {
+      container.scrollTop = 0;
+    }
+
     _el.classList.remove('hide');
 
     return _this; // enable chaining
