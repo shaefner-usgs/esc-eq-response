@@ -48,7 +48,8 @@ var Lightbox = function (options) {
       _getContent,
       _onKeyDown,
       _remove,
-      _removeListeners;
+      _removeListeners,
+      _show;
 
 
   _this = {};
@@ -75,10 +76,7 @@ var Lightbox = function (options) {
     _el.addEventListener('click', _this.hide); // silhouette (background)
 
     _targets.forEach(target => {
-      target.addEventListener('click', e => {
-        e.preventDefault();
-        _this.show();
-      });
+      target.addEventListener('click', _show);
     });
 
     document.addEventListener('keydown', _onKeyDown, true);
@@ -152,10 +150,20 @@ var Lightbox = function (options) {
     _el.removeEventListener('click', _this.hide);
 
     _targets.forEach(target => {
-      target.removeEventListener('click', _this.hide);
+      target.removeEventListener('click', _show);
     });
 
     document.removeEventListener('keydown', _onKeyDown, true);
+  };
+
+  /**
+   * Event handler that shows the Lightbox.
+   *
+   * @param e {Event}
+   */
+  _show = function (e) {
+    e.preventDefault();
+    _this.show();
   };
 
   // ----------------------------------------------------------
@@ -184,6 +192,7 @@ var Lightbox = function (options) {
     _onKeyDown = null;
     _remove = null;
     _removeListeners = null;
+    _show = null;
 
     _this = null;
   };
@@ -201,11 +210,14 @@ var Lightbox = function (options) {
    * @return _this {Object}
    */
   _this.render = function () {
+    if (!document.getElementById(_id)) {
+      document.body.appendChild(_el);
+    }
+
     _el.classList.add('lightbox', 'hide');
     _el.id = _id;
     _el.innerHTML = _getContent();
 
-    document.body.appendChild(_el);
     _addListeners();
 
     return _this; // enable chaining
