@@ -54,4 +54,5 @@ Alias {$CONFIG['MOUNT_PATH']} $HTDOCS_DIR
   ExpiresActive on
   ExpiresDefault "access plus 30 minutes"
 </Location>
-OUT);
+OUT
+);
