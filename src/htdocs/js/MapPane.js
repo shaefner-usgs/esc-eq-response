@@ -6,16 +6,17 @@
 require('leaflet-mouse-position');
 require('util/leaflet/L.Control.Layers.Sorted');
 require('util/leaflet/L.Control.Zoom');
-require('util/leaflet/L.DarkLayer');
+// require('util/leaflet/L.DarkLayer');
 require('util/leaflet/L.FaultsLayer');
 require('util/leaflet/L.GeoJSON.Async');
-require('util/leaflet/L.GreyscaleLayer');
+// require('util/leaflet/L.GreyscaleLayer');
 require('util/leaflet/L.Map');
 require('util/leaflet/L.Map.BoxZoom');
 require('util/leaflet/L.Marker.Canvas');
 require('util/leaflet/L.Popup');
 require('util/leaflet/L.SatelliteLayer');
-require('util/leaflet/L.TerrainLayer');
+// require('util/leaflet/L.TerrainLayer');
+require('util/leaflet/L.TerrainLayer-alt');
 require('util/leaflet/L.Tooltip');
 
 var AppUtil = require('util/AppUtil');
@@ -136,7 +137,7 @@ var MapPane = function (options) {
    *
    * @param mainshock {Object}
    *
-   * @return {L.Bounds}
+   * @return {L.LatLngBounds}
    */
   _getBounds = function (mainshock) {
     var marker = mainshock.mapLayer.getLayers()[0],
@@ -169,18 +170,18 @@ var MapPane = function (options) {
   _getLayers = function () {
     var layers,
         faults = L.faultsLayer(),
-        greyscale = L.greyscaleLayer();
+        terrain =  L.terrainLayer();
 
     layers = {
       baseLayers: {
-        'Light': greyscale,
-        'Dark': L.darkLayer(),
+        // 'Light': L.greyscaleLayer(),
+        // 'Dark': L.darkLayer(),
         'Satellite': L.satelliteLayer(),
-        'Terrain': L.terrainLayer()
+        'Terrain': terrain
       },
       defaults: [
         faults,
-        greyscale
+        terrain
       ],
       overlays: {
         'Faults': faults
@@ -299,7 +300,7 @@ var MapPane = function (options) {
   /**
    * Set the map view to contain the given bounds.
    *
-   * @param bounds {L.Bounds} optional; default is _bounds
+   * @param bounds {L.LatLngBounds} optional; default is _bounds
    */
   _this.fitBounds = function (bounds = _bounds) {
     var animate = false,

@@ -336,7 +336,7 @@ var SearchBar = function (options) {
       attributionControl: false,
       editable: true,
       layers: [
-        L.greyscaleLayer(),
+        L.terrainLayer(),
         _regionLayer
       ],
       minZoom: 1,
